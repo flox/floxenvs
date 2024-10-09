@@ -1,0 +1,121 @@
+#
+# This is a Flox environment manifest.
+# Visit flox.dev/docs/concepts/manifest/
+# or see flox-edit(1), manifest.toml(5) for more information.
+#
+version = 1
+
+#
+# This environment sets up everything necessary to run the Fooocus
+# text-to-image web interface.
+#
+# It was designed to be activated from within either:
+#   - a directory containing a clone of the Fooocus repo,
+#   - an empty directory, or
+#   - a directory you don't mind ruining.
+#
+# On a CUDA system, the FLOX_FEATURES_ENV_ENABLE_CUDA feature flag
+# must be set to 1 *prior* to activation.
+#
+
+
+[install]
+
+# Let's get Python
+python3 = { pkg-path = "python3" }
+
+# Since these packages are accelerated in the Flox Catalog, let's
+# get them from there instead of from PyPI.
+pytorch = { pkg-path = "python311Packages.pytorch-bin", systems=["aarch64-darwin", "x86_64-darwin"], pkg-group="darwin" }
+torchsde = { pkg-path = "python311Packages.torchsde", systems=["aarch64-darwin", "x86_64-darwin"], pkg-group="darwin" }
+torchvision = { pkg-path = "python311Packages.torchvision-bin", systems=["aarch64-linux", "x86_64-linux"], pkg-group="linux" }
+
+# Use Gum for user interactions
+gum = { pkg-path = "gum" }
+
+
+[vars]
+
+# Since we are managing our venv with Flox, there is no need to
+# be told about it in our prompt
+VIRTUAL_ENV_DISABLE_PROMPT="1"
+
+# The location of Fooocus
+FOOOCUS_REPO_GIT="git@github.com:lllyasviel/Fooocus.git"
+FOOOCUS_REPO_HTTPS="https://github.com/lllyasviel/Fooocus.git"
+
+
+# This portion of the manifest runs in a bash(1) shell, before the
+# 'profile' sections below.
+[hook]
+on-activate = '''
+
+  # 
+  # First, we check to see if we are in a working copy of Fooocus from git.
+  #
+  # If we aren't, and cwd is empty, offer to clone it.
+  #
+  # Failing all, provide some education.
+  # 
+
+  git_url=$(git config --get remote.origin.url)
+
+  if [ "$git_url" != "$FOOOCUS_REPO_GIT" ] && [ "$git_url" != "$FOOOCUS_REPO_HTTPS" ]; then
+    echo "You do not seem to be in a directory containing a checked out Fooocus."
+    echo "This is required for Python environment initialization."
+    echo
+    if [ -z "$(ls -A $directory)" ]; then
+      if gum confirm "Would you like to clone it here?" --default=true --affirmative "Yes" --negative "No"; then
+        gum spin --spinner dot --title "Cloning $FOOOCUS_REPO_HTTPS to cwd" --  git clone $FOOOCUS_REPO_HTTPS .
+        echo "📇 $FOOOCUS_REPO_HTTPS repo cloned to cwd"
+      fi
+    else
+      echo "Tip: try activating this from an empty directory ✨"
+    fi
+  fi
+
+  if [ -f "./requirements_versions.txt" ]; then
+    #export PYTHON_DIR="$FLOX_ENV_CACHE/python"
+    export PYTHON_DIR=".venv/"
+    if [ ! -d "$PYTHON_DIR" ]; then
+      gum spin --spinner dot --title "Creating python virtual environment in $PYTHON_DIR" -- python -m venv "$PYTHON_DIR"
+      echo "🌏 Virtual environment created in $PYTHON_DIR"
+    fi
+
+    (
+      source "$PYTHON_DIR/bin/activate"
+      gum spin --spinner dot --title "Updating packages in $PYTHON_DIR" -- pip install -r "./requirements_versions.txt" --quiet
+      echo "📦 Packages updated in $PYTHON_DIR"
+    )
+  else
+    echo; echo "❌ Python not prepared for Fooocus"
+  fi
+'''
+
+[services.foocus]
+command = "$PYTHON_DIR/bin/python3 ./launch.py"
+
+[profile]
+bash = '''
+  if [ -d "$PYTHON_DIR" ]; then
+    source "$PYTHON_DIR/bin/activate"
+  fi
+'''
+fish = '''
+  if [ -d "$PYTHON_DIR" ];
+    source "$PYTHON_DIR/bin/activate.fish"
+  end
+'''
+tcsh = '''
+  source "$PYTHON_DIR/bin/activate.csh"
+'''
+zsh = '''
+  if [ -d "$PYTHON_DIR" ]; then
+    source "$PYTHON_DIR/bin/activate"
+  fi
+'''
+
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
+

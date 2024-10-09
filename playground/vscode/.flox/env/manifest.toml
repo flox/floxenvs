@@ -1,0 +1,22 @@
+#
+# This is a Flox environment manifest.
+# Visit flox.dev/docs/concepts/manifest/
+# or see flox-edit(1), manifest.toml(5) for more information.
+#
+# Flox manifest version managed by Flox CLI
+version = 1
+
+# Install VS Code and set it up as a service so we get logging
+install.vscode.pkg-path = "vscode"
+services.vscode.command = "code --verbose"
+services.vscode.is-daemon = false
+
+# Print a banner
+install.figlet.pkg-path = "toilet"
+profile.common = "toilet -f smmono9 --metal vscode"
+
+# Set some general options
+options.cuda-detection = false
+options.systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
+
+

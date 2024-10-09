@@ -1,0 +1,156 @@
+{
+  "lockfile-version": 0,
+  "manifest": {
+    "install": {
+      "curl": {
+        "pkg-path": "curl"
+      },
+      "dosbox-x": {
+        "pkg-path": "dosbox-x"
+      },
+      "unzip": {
+        "pkg-path": "unzip"
+      }
+    },
+    "options": {
+      "systems": [
+        "aarch64-darwin"
+      ]
+    },
+    "profile": {
+      "common": "  GAME_DIR=\"$HOME/.cache/dune-for-dos\"\n  GAME_URL=\"https://d2.myabandonware.com/t/aca2daa6-fadc-406b-bcb4-bc649c43ce00/Dune_DOS_EN_RIP-Version.zip\"\n\n  if [[ ! -d $GAME_DIR ]]; then\n    echo; echo -n \"🏜️  Downloading game to $GAME_DIR...\"\n\n    mkdir -p $GAME_DIR\n    curl -Lso $GAME_DIR/game.zip $GAME_URL\n    unzip -qq $GAME_DIR/game.zip -d $GAME_DIR\n    echo \"done.\"\n  fi\n\n  dosbox-x -c \"mount g $GAME_DIR\"\n  exit\n"
+    },
+    "registry": {
+      "defaults": {
+        "subtrees": null
+      },
+      "inputs": {
+        "nixpkgs": {
+          "from": {
+            "owner": "NixOS",
+            "ref": "release-23.11",
+            "repo": "nixpkgs",
+            "type": "github"
+          },
+          "subtrees": [
+            "legacyPackages"
+          ]
+        }
+      },
+      "priority": [
+        "nixpkgs"
+      ]
+    }
+  },
+  "packages": {
+    "aarch64-darwin": {
+      "curl": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "curl"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A command line tool for transferring files with URL syntax",
+          "license": "curl",
+          "pname": "curl",
+          "unfree": false,
+          "version": "8.6.0"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712670302,
+            "narHash": "sha256-iV3ChPOnUTEx2Bb+hsUoTEMUT1u4uOnwdssvfNI95Zw=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "466b061d6faf82721ed437865d081a57908ebebf",
+            "type": "github"
+          },
+          "fingerprint": "c0a5815c4843588f176933d9214312afd0aef3203db6f2416ca44176cef2a5ec",
+          "url": "github:NixOS/nixpkgs/466b061d6faf82721ed437865d081a57908ebebf"
+        },
+        "priority": 5
+      },
+      "dosbox-x": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "dosbox-x"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A cross-platform DOS emulator based on the DOSBox project",
+          "license": "GPL-2.0-or-later",
+          "pname": "dosbox-x",
+          "unfree": false,
+          "version": "2024.03.01"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712670302,
+            "narHash": "sha256-iV3ChPOnUTEx2Bb+hsUoTEMUT1u4uOnwdssvfNI95Zw=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "466b061d6faf82721ed437865d081a57908ebebf",
+            "type": "github"
+          },
+          "fingerprint": "c0a5815c4843588f176933d9214312afd0aef3203db6f2416ca44176cef2a5ec",
+          "url": "github:NixOS/nixpkgs/466b061d6faf82721ed437865d081a57908ebebf"
+        },
+        "priority": 5
+      },
+      "unzip": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "unzip"
+        ],
+        "info": {
+          "broken": false,
+          "description": "An extraction utility for archives compressed in .zip format",
+          "license": "Info-ZIP",
+          "pname": "unzip",
+          "unfree": false,
+          "version": "6.0"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712670302,
+            "narHash": "sha256-iV3ChPOnUTEx2Bb+hsUoTEMUT1u4uOnwdssvfNI95Zw=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "466b061d6faf82721ed437865d081a57908ebebf",
+            "type": "github"
+          },
+          "fingerprint": "c0a5815c4843588f176933d9214312afd0aef3203db6f2416ca44176cef2a5ec",
+          "url": "github:NixOS/nixpkgs/466b061d6faf82721ed437865d081a57908ebebf"
+        },
+        "priority": 5
+      }
+    }
+  },
+  "registry": {
+    "defaults": {
+      "subtrees": null
+    },
+    "inputs": {
+      "nixpkgs": {
+        "from": {
+          "lastModified": 1712670302,
+          "narHash": "sha256-iV3ChPOnUTEx2Bb+hsUoTEMUT1u4uOnwdssvfNI95Zw=",
+          "owner": "NixOS",
+          "repo": "nixpkgs",
+          "rev": "466b061d6faf82721ed437865d081a57908ebebf",
+          "type": "github"
+        },
+        "subtrees": [
+          "legacyPackages"
+        ]
+      }
+    },
+    "priority": [
+      "nixpkgs"
+    ]
+  }
+}

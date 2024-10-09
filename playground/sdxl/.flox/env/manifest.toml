@@ -1,0 +1,57 @@
+[install]
+python312.pkg-path = "python312"
+pip.pkg-path       = "python310Packages.pip"
+gcc.pkg-path       = "gcc-unwrapped"
+
+[install.libGL]
+pkg-path = "libGL"
+systems  = ["x86_64-linux"]
+
+[install.glib]
+pkg-path = "glib"
+systems  = ["x86_64-linux"]
+
+[hook]
+script = """
+
+	# We need a directory for our venv and models
+	mkdir -p $HOME/.cache/sdxl-env/
+	sdxlDir=$(realpath $HOME/.cache/sdxl-env/)
+
+	# Create a Python virtual environment in ~/.cache
+        if [ ! -d "$sdxlDir/venv" ]; then
+                echo; echo -n "🌏 Preparing new venv in $sdxlDir/venv.."
+                python -m venv $sdxlDir/venv
+        	. $sdxlDir/venv/bin/activate
+        else
+        	echo; echo -n "⚡️ Activating existing venv in $sdxlDir/venv..."
+        	. $sdxlDir/venv/bin/activate
+	fi
+
+	# Preinstall SDXL requirements
+        [[ $(uname -m) == 'arm64' ]] && pip3 -qq install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+       	pip3 -qq install diffusers compel accelerate numba imgcat safetensors invisible-watermark pillow
+
+
+	# If there is a requirements file, process it
+	[ -f requirements.txt ] && pip3 -qq install -r requirements.txt
+	[ -f requirements_versions.txt ] && pip3 -qq install -r requirements_versions.txt
+
+	echo "done."
+
+	# Create our own models directory so we can clean it up later
+	mkdir -p $sdxlDir/models
+
+	# Set aliases and educate the user
+
+	alias gen="python -c \\"[(importlib := __import__('importlib')), (warnings := importlib.import_module('warnings')), warnings.filterwarnings('ignore'), (sys := importlib.import_module('sys')), (torch := importlib.import_module('torch')), (__ol_mod_wdqhequwqx := __import__('imgcat', globals(), locals(), ['imgcat'], 0)), (imgcat := __ol_mod_wdqhequwqx.imgcat), (__ol_mod_mzyrofanne := __import__('diffusers', globals(), locals(), ['AutoPipelineForText2Image'], 0)), (AutoPipelineForText2Image := __ol_mod_mzyrofanne.AutoPipelineForText2Image), (__ol_mod_jmipndipfc := __import__('diffusers', globals(), locals(), ['logging'], 0)), (logging := __ol_mod_jmipndipfc.logging), logging.set_verbosity(50), logging.disable_progress_bar(), [(pipe := AutoPipelineForText2Image.from_pretrained('stabilityai/sd-turbo', cache_dir='$sdxlDir/models', torch_dtype=torch.float16, variant='fp16')), pipe.to('cuda')] if torch.cuda.is_available() else [(pipe := AutoPipelineForText2Image.from_pretrained('stabilityai/sd-turbo', cache_dir='$sdxlDir/models')), pipe.to('mps')] if torch.backends.mps.is_available() else (pipe := AutoPipelineForText2Image.from_pretrained('stabilityai/sd-turbo', cache_dir='$sdxlDir/models')), (prompt := (sys.argv[1] if len(sys.argv) > 1 else 'a fox in a henhouse')), pipe.set_progress_bar_config(disable=True), (image := pipe(prompt=prompt, num_inference_steps=1, guidance_scale=0.0).images[0]), image.save('img.png'), imgcat(image)]\\""
+
+	alias purgecache="deactivate; rm -rf $sdxlDir"
+
+	echo; echo "Run 'gen <string>' for an image."
+	echo "Run 'purgecache' to purge the venv and model cache."
+
+"""
+
+[options]
+systems = ["aarch64-darwin", "x86_64-linux"]

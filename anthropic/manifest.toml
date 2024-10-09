@@ -1,0 +1,88 @@
+#
+# This is a Flox environment manifest.
+# Visit flox.dev/docs/concepts/manifest/
+# or see flox-edit(1), manifest.toml(5) for more information.
+#
+version = 1
+
+[install]
+anthropic.pkg-path = "python312Packages.anthropic"
+click.pkg-path = "python312Packages.click"
+gum.pkg-path = "gum"
+
+[vars]
+claude_script="[(importlib := __import__('importlib')), (click := importlib.import_module('click')), (os := importlib.import_module('os')), (anthropic := importlib.import_module('anthropic')), (__ol_mod_znnivfqyig := __import__('pathlib', globals(), locals(), ['Path'], 0)), (Path := __ol_mod_znnivfqyig.Path), (claude := click.command()(click.option('--model', '-m', default='claude-3-5-sonnet-20240620', help='The Claude model to use (sonnet3.5, opus3, sonnet3, haiku3, or full model name)', metavar='<string>')(click.option('--temperature', '-t', default=0.0, help='The temperature (0.0 to 1.0) for response generation', metavar='<float>')(click.option('--max-tokens', '-x', default=1000, help='The maximum number of tokens in the response', metavar='<integer>')(click.option('--infile', '-i', help='File to read input from', metavar='<file>')(click.option('--outfile', '-o', help='File to write the response to', metavar='<file>')(click.argument('prompt')(lambda model, temperature, max_tokens, infile, outfile, prompt: [(__ol_retv_ewemytjeia := None), (model_fullname := 'claude-3-5-sonnet-20240620') if model == 'sonnet3.5' else (model_fullname := 'claude-3-opus-20240229') if model == 'opus3' else (model_fullname := 'claude-3-sonnet-20240229') if model == 'sonnet3' else (model_fullname := 'claude-3-haiku-20240307') if model == 'haiku3' else (model_fullname := model), [(size := os.path.getsize(infile)), [print('Error: input file size exceeds 16kb limit.'), exit(1)] if size > 16383 else ..., (file_path := Path(infile)), (inputfilecontent := file_path.read_text()), (fullprompt := (inputfilecontent + ' ' + prompt).strip())] if infile else (fullprompt := prompt.strip()), (client := anthropic.Anthropic()), (message := client.messages.create(model=model, max_tokens=max_tokens, temperature=temperature, messages=[{'role': 'user', 'content': fullprompt}])), (content := message.content[0].text), [(write_file := open(outfile, 'w')), write_file.write(content), write_file.close(), print('Output saved to', outfile)] if outfile else print(content), [], __ol_retv_ewemytjeia][-1])))))))), claude(auto_envvar_prefix='CLAUDE') if __name__ == '__main__' else ..., (main := click.group()(lambda: [(__ol_retv_ckoahrmehp := None), ..., __ol_retv_ckoahrmehp][-1]))]"
+
+[hook]
+on-activate = '''
+    # Bootstrap ANTHROPIC_API_KEY setup
+    bootstrap_anthropic_config() {
+        local config_file="$HOME/.config/flox/anthropic.session"
+        local config_dir="$(dirname "$config_file")"
+
+        # Check if exists ANTHROPIC_API_KEY as an env variable
+        if [ -n "$ANTHROPIC_API_KEY" ]; then
+            echo "Anthropic API key is already set as an environment variable."
+            return 0
+        fi
+
+        # Check if exists ~/.config/flox/anthropic and if exists valid API key
+        if [ -f "$config_file" ]; then
+            source "$config_file"
+            if [ -n "$ANTHROPIC_API_KEY" ]; then
+                echo "Anthropic API key loaded from config file."
+                export ANTHROPIC_API_KEY
+                return 0
+            fi
+        fi
+
+
+        # If we've reached this point, it's time to prompt you for your API key
+        mkdir -p "$config_dir"
+
+        echo "Please enter your Anthropic API key:"
+        ANTHROPIC_API_KEY=$(gum input --password)
+
+	# If the user has said "no" to persisting the key previously, let's stop here
+	if [ "$ANTHROPIC_KEY_PERSISTENCE" == "false" ]; then
+           echo "Not storing key based on setting in $config_file"
+           return 0
+        fi
+
+        echo "# Anthropic API configuration" > "$config_file"
+        echo "# You can enable/disable key persistence by setting ANTHROPIC_KEY_PERSISTENCE to true/false" >> "$config_file"
+
+        # Here we ask you if you want to persist your API key
+
+        if gum confirm "Do you want to persist your Anthropic API key?" --affirmative="Yes" --negative="No"; then
+            # If user sez Yes save API key
+            echo "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY" >> "$config_file"
+            echo "ANTHROPIC_KEY_PERSISTENCE=true" >> "$config_file"
+            echo "API key saved to config file and persistence enabled: $config_file"
+        else
+            # If user sez No do not save API key
+            echo "ANTHROPIC_KEY_PERSISTENCE=false" >> "$config_file"
+            echo "API key not saved to file. It will only be available for this session."
+        fi
+
+        export ANTHROPIC_API_KEY
+        echo "Anthropic API key set for this session."
+        echo "Configuration file location: $config_file"
+    }
+
+    # Call the bootstrapping wizard
+    bootstrap_anthropic_config
+'''
+
+[profile]
+bash = '''
+    alias claude="python3 -c \"$claude_script\""
+'''
+
+zsh = '''
+    alias claude="python3 -c \"$claude_script\""
+'''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
+

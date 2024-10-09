@@ -1,0 +1,158 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "version": 1,
+    "install": {
+      "ollama": {
+        "pkg-path": "ollama"
+      }
+    },
+    "vars": {
+      "NEXT_PUBLIC_OLLAMA_URL": "http://localhost:11434"
+    },
+    "hook": {},
+    "profile": {
+      "common": "  if ollama list >/dev/null 2>&1; then\n    echo \"🤖 Ollama service running\"\n  else\n    echo \"⛔️ Ollama service not available\"\n  fi\n"
+    },
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux",
+        "x86_64-darwin"
+      ],
+      "allow": {
+        "licenses": []
+      },
+      "semver": {}
+    },
+    "services": {
+      "ollama-serve": {
+        "command": "ollama serve",
+        "vars": null
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "ollama",
+      "broken": false,
+      "derivation": "/nix/store/q3fizi2dyxr5n9jx3ri279g3gff1k039-ollama-0.2.1.drv",
+      "description": "Get up and running with large language models locally",
+      "install_id": "ollama",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ad0b5eed1b6031efaed382844806550c3dcb4206",
+      "name": "ollama-0.2.1",
+      "pname": "ollama",
+      "rev": "ad0b5eed1b6031efaed382844806550c3dcb4206",
+      "rev_count": 654036,
+      "rev_date": "2024-07-16T14:01:16Z",
+      "scrape_date": "2024-07-19T05:30:25Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.2.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/652ph0hsah1qjw626rr0fp42fkr2d33x-ollama-0.2.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "ollama",
+      "broken": false,
+      "derivation": "/nix/store/ll65s6whw9nldwh07afr6z6rxrj9i7fq-ollama-0.2.1.drv",
+      "description": "Get up and running with large language models locally",
+      "install_id": "ollama",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ad0b5eed1b6031efaed382844806550c3dcb4206",
+      "name": "ollama-0.2.1",
+      "pname": "ollama",
+      "rev": "ad0b5eed1b6031efaed382844806550c3dcb4206",
+      "rev_count": 654036,
+      "rev_date": "2024-07-16T14:01:16Z",
+      "scrape_date": "2024-07-19T05:30:25Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.2.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ngcdfays1yrhy53g7y4xin32767ngf6i-ollama-0.2.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "ollama",
+      "broken": false,
+      "derivation": "/nix/store/z3v68qpkj3i899r7ahf7i8p7i4rxpwm1-ollama-0.2.1.drv",
+      "description": "Get up and running with large language models locally",
+      "install_id": "ollama",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ad0b5eed1b6031efaed382844806550c3dcb4206",
+      "name": "ollama-0.2.1",
+      "pname": "ollama",
+      "rev": "ad0b5eed1b6031efaed382844806550c3dcb4206",
+      "rev_count": 654036,
+      "rev_date": "2024-07-16T14:01:16Z",
+      "scrape_date": "2024-07-19T05:30:25Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.2.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/znvrbh3875h73dl36szn0v2i7b59vz0a-ollama-0.2.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "ollama",
+      "broken": false,
+      "derivation": "/nix/store/r0kpk24gzl4i2kjfhs7qg4n3d29acrb6-ollama-0.2.1.drv",
+      "description": "Get up and running with large language models locally",
+      "install_id": "ollama",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ad0b5eed1b6031efaed382844806550c3dcb4206",
+      "name": "ollama-0.2.1",
+      "pname": "ollama",
+      "rev": "ad0b5eed1b6031efaed382844806550c3dcb4206",
+      "rev_count": 654036,
+      "rev_date": "2024-07-16T14:01:16Z",
+      "scrape_date": "2024-07-19T05:30:25Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.2.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/2ih40ris6bi3vaz3bkqvkffmdv178dbi-ollama-0.2.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ]
+}

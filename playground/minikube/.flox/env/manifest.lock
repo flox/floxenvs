@@ -1,0 +1,765 @@
+{
+  "lockfile-version": 0,
+  "manifest": {
+    "hook": {
+      "on-activate": "    if [ \"$(minikube status --format='{{.Host}}')\" = \"Running\" ]; then\n        echo \"✅ minikube is already running\"\n        echo \"Stop it with 'minikube stop' or by exiting this shell.\"\n        return\n    fi\n\n    autostart=\"$HOME/.config/minikube-env/autostart\"\n    choice=\n    if [ ! -f \"$autostart\" ]; then\n        echo \"This Flox environment can automatically create and start minikube.\"; echo\n        choice=$($FLOX_ENV/bin/gum choose \"Always - start now & on future activations\" \"Yes - start now only\" \"No - do not start\")\n        if [ \"${choice:0:1}\" = \"A\" ]; then\n            mkdir -p \"$HOME\"/.config/minikube-env\n            echo \"1\" > \"$autostart\"\n            echo\n            echo \"OK - minikube will start automatically on next activation. To disable this, run:\"\n            echo \"  rm $autostart\"\n        fi\n    fi\n\n    if [ -f \"$autostart\" ] || [ \"${choice:0:1}\" = \"A\" ] || [ \"${choice:0:1}\" = \"Y\" ] ; then\n\n       \t$FLOX_ENV/bin/gum spin --spinner dot --show-output --title \"Starting minikube...\" -- $FLOX_ENV/bin/minikube start --driver=qemu2 --qemu-firmware-path=$FLOX_ENV/share/qemu/edk2-aarch64-code.fd --network=builtin 2>&1\n\n\tif [ \"$(minikube status --format='{{.Host}}')\" = \"Running\" ]; then\n            echo; echo \"✅ minikube started\"\n            echo \"Stop it with 'minikube stop' or by exiting this shell.\"\n            return\n        fi\n    fi\n\n    echo \"🚨 minikube did not start successfully\"\n"
+    },
+    "install": {
+      "gum": {
+        "pkg-path": "gum"
+      },
+      "kubectl": {
+        "pkg-path": "kubectl"
+      },
+      "kubectl-images": {
+        "pkg-path": "kubectl-images"
+      },
+      "kubectl-ktop": {
+        "pkg-path": "kubectl-ktop"
+      },
+      "kubectl-tree": {
+        "pkg-path": "kubectl-tree"
+      },
+      "minikube": {
+        "pkg-path": "minikube"
+      }
+    },
+    "options": {
+      "systems": [
+        "x86_64-linux",
+        "aarch64-linux",
+        "x86_64-darwin",
+        "aarch64-darwin"
+      ]
+    },
+    "profile": {
+      "common": "    ##\n    ## YOWCH! this is not shell-portable, will have to write versions for bash/fish/tcsh\n    ##\n    trap '$FLOX_ENV/bin/gum confirm \"Stop minikube cluster?\" && $FLOX_ENV/bin/gum spin --spinner dot --title \"Stopping minikube ....\" -- $FLOX_ENV/bin/minikube stop ; echo; echo \"✅ minikube stopped\"' EXIT\n"
+    },
+    "registry": {
+      "defaults": {
+        "subtrees": null
+      },
+      "inputs": {
+        "nixpkgs": {
+          "from": {
+            "owner": "NixOS",
+            "ref": "release-23.11",
+            "repo": "nixpkgs",
+            "type": "github"
+          },
+          "subtrees": [
+            "legacyPackages"
+          ]
+        }
+      },
+      "priority": [
+        "nixpkgs"
+      ]
+    }
+  },
+  "packages": {
+    "aarch64-darwin": {
+      "gum": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "gum"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Tasty Bubble Gum for your shell",
+          "license": "MIT",
+          "pname": "gum",
+          "unfree": false,
+          "version": "0.13.0"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      },
+      "kubectl": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "kubectl"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Kubernetes CLI",
+          "license": "Apache-2.0",
+          "pname": "kubectl",
+          "unfree": false,
+          "version": "1.28.9"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      },
+      "kubectl-images": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "kubectl-images"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Show container images used in the cluster.",
+          "license": "MIT",
+          "pname": "kubectl-images",
+          "unfree": false,
+          "version": "0.6.3"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      },
+      "kubectl-ktop": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "kubectl-ktop"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A top-like tool for your Kubernetes clusters",
+          "license": "Apache-2.0",
+          "pname": "kubectl-ktop",
+          "unfree": false,
+          "version": "0.3.5"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      },
+      "kubectl-tree": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "kubectl-tree"
+        ],
+        "info": {
+          "broken": false,
+          "description": "kubectl plugin to browse Kubernetes object hierarchies as a tree",
+          "license": "Apache-2.0",
+          "pname": "kubectl-tree",
+          "unfree": false,
+          "version": "0.4.3"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      },
+      "minikube": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "minikube"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A tool that makes it easy to run Kubernetes locally",
+          "license": "Apache-2.0",
+          "pname": "minikube",
+          "unfree": false,
+          "version": "1.31.2"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      }
+    },
+    "aarch64-linux": {
+      "gum": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-linux",
+          "gum"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Tasty Bubble Gum for your shell",
+          "license": "MIT",
+          "pname": "gum",
+          "unfree": false,
+          "version": "0.13.0"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      },
+      "kubectl": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-linux",
+          "kubectl"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Kubernetes CLI",
+          "license": "Apache-2.0",
+          "pname": "kubectl",
+          "unfree": false,
+          "version": "1.28.9"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      },
+      "kubectl-images": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-linux",
+          "kubectl-images"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Show container images used in the cluster.",
+          "license": "MIT",
+          "pname": "kubectl-images",
+          "unfree": false,
+          "version": "0.6.3"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      },
+      "kubectl-ktop": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-linux",
+          "kubectl-ktop"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A top-like tool for your Kubernetes clusters",
+          "license": "Apache-2.0",
+          "pname": "kubectl-ktop",
+          "unfree": false,
+          "version": "0.3.5"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      },
+      "kubectl-tree": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-linux",
+          "kubectl-tree"
+        ],
+        "info": {
+          "broken": false,
+          "description": "kubectl plugin to browse Kubernetes object hierarchies as a tree",
+          "license": "Apache-2.0",
+          "pname": "kubectl-tree",
+          "unfree": false,
+          "version": "0.4.3"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      },
+      "minikube": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-linux",
+          "minikube"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A tool that makes it easy to run Kubernetes locally",
+          "license": "Apache-2.0",
+          "pname": "minikube",
+          "unfree": false,
+          "version": "1.31.2"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      }
+    },
+    "x86_64-darwin": {
+      "gum": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-darwin",
+          "gum"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Tasty Bubble Gum for your shell",
+          "license": "MIT",
+          "pname": "gum",
+          "unfree": false,
+          "version": "0.13.0"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      },
+      "kubectl": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-darwin",
+          "kubectl"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Kubernetes CLI",
+          "license": "Apache-2.0",
+          "pname": "kubectl",
+          "unfree": false,
+          "version": "1.28.9"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      },
+      "kubectl-images": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-darwin",
+          "kubectl-images"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Show container images used in the cluster.",
+          "license": "MIT",
+          "pname": "kubectl-images",
+          "unfree": false,
+          "version": "0.6.3"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      },
+      "kubectl-ktop": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-darwin",
+          "kubectl-ktop"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A top-like tool for your Kubernetes clusters",
+          "license": "Apache-2.0",
+          "pname": "kubectl-ktop",
+          "unfree": false,
+          "version": "0.3.5"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      },
+      "kubectl-tree": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-darwin",
+          "kubectl-tree"
+        ],
+        "info": {
+          "broken": false,
+          "description": "kubectl plugin to browse Kubernetes object hierarchies as a tree",
+          "license": "Apache-2.0",
+          "pname": "kubectl-tree",
+          "unfree": false,
+          "version": "0.4.3"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      },
+      "minikube": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-darwin",
+          "minikube"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A tool that makes it easy to run Kubernetes locally",
+          "license": "Apache-2.0",
+          "pname": "minikube",
+          "unfree": false,
+          "version": "1.31.2"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      }
+    },
+    "x86_64-linux": {
+      "gum": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-linux",
+          "gum"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Tasty Bubble Gum for your shell",
+          "license": "MIT",
+          "pname": "gum",
+          "unfree": false,
+          "version": "0.13.0"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      },
+      "kubectl": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-linux",
+          "kubectl"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Kubernetes CLI",
+          "license": "Apache-2.0",
+          "pname": "kubectl",
+          "unfree": false,
+          "version": "1.28.9"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      },
+      "kubectl-images": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-linux",
+          "kubectl-images"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Show container images used in the cluster.",
+          "license": "MIT",
+          "pname": "kubectl-images",
+          "unfree": false,
+          "version": "0.6.3"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      },
+      "kubectl-ktop": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-linux",
+          "kubectl-ktop"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A top-like tool for your Kubernetes clusters",
+          "license": "Apache-2.0",
+          "pname": "kubectl-ktop",
+          "unfree": false,
+          "version": "0.3.5"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      },
+      "kubectl-tree": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-linux",
+          "kubectl-tree"
+        ],
+        "info": {
+          "broken": false,
+          "description": "kubectl plugin to browse Kubernetes object hierarchies as a tree",
+          "license": "Apache-2.0",
+          "pname": "kubectl-tree",
+          "unfree": false,
+          "version": "0.4.3"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      },
+      "minikube": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-linux",
+          "minikube"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A tool that makes it easy to run Kubernetes locally",
+          "license": "Apache-2.0",
+          "pname": "minikube",
+          "unfree": false,
+          "version": "1.31.2"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1716702362,
+            "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+            "type": "github"
+          },
+          "fingerprint": "36ae6b8ef32912f213ef81267f76c5d5d77272af6eb3b013c0748d7c10b7da2d",
+          "url": "github:NixOS/nixpkgs/8ed72179617b1b4dbd15134371daf4e9c4c039ee"
+        },
+        "priority": 5
+      }
+    }
+  },
+  "registry": {
+    "defaults": {
+      "subtrees": null
+    },
+    "inputs": {
+      "nixpkgs": {
+        "from": {
+          "lastModified": 1716702362,
+          "narHash": "sha256-1iExBg0gqYHqSEwALu4LYPOKlJMbUUbsfhsGZf2mi0M=",
+          "owner": "NixOS",
+          "repo": "nixpkgs",
+          "rev": "8ed72179617b1b4dbd15134371daf4e9c4c039ee",
+          "type": "github"
+        },
+        "subtrees": [
+          "legacyPackages"
+        ]
+      }
+    },
+    "priority": [
+      "nixpkgs"
+    ]
+  }
+}

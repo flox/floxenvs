@@ -1,0 +1,34 @@
+version = 1
+
+[install]
+op.pkg-path = "_1password"
+
+[hook]
+on-activate = '''
+
+    # Start OP injection code
+    if ! op vault list >/dev/null 2>&1; then
+        CACHE="$HOME/.cache/op-session"
+        OP_TOKEN=$( [[ -f "$CACHE" ]] && cat "$CACHE" || op signin --raw 2>&1 )
+        if op whoami --session "${OP_TOKEN}" >/dev/null 2>&1; then
+            mkdir -p dirname "$CACHE" 2>/dev/null && echo "${OP_TOKEN}" > "$CACHE"
+            chmod 600 "$CACHE"
+        else
+            echo "op auth failed!" && return 1
+        fi
+    fi
+    export op_token=$( [[ "$OP_TOKEN" ]] && echo "--session $OP_TOKEN" )
+    # End OP injection code
+
+    export ANTHROPIC_API_KEY=$(op $op_token item get "Anthropic" --field "credential")
+    export TAILSCALE_TOKEN=$(op $op_token item get "Tailscale" --field "token")
+'''
+
+[profile]
+common = '''
+    alias op="op $op_token"
+'''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
+

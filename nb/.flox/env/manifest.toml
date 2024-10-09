@@ -1,0 +1,64 @@
+version = 1
+#
+# This is a flox environment manifest.
+# Visit
+# or see flox-edit(1) for more information
+#
+
+[install]
+jupyter.pkg-path = "jupyter-all"
+pandas.pkg-path = "python312Packages.pandas"
+matplotlib.pkg-path = "python312Packages.matplotlib"
+numpy.pkg-path = "python312Packages.numpy"
+pyarrow.pkg-path = "python312Packages.pyarrow"
+sympy.pkg-path = "python312Packages.sympy"
+pydot.pkg-path = "python312Packages.pydot"
+plotly.pkg-path = "python312Packages.plotly"
+toilet.pkg-path = "toilet"
+
+[vars]
+PYTHON_ENV='./nb-venv/'
+JUPYTER_SERVER_TOKEN = "floxfan123456"
+
+[hook]
+on-activate = '''
+  if [[ -d $PYTHON_ENV ]]; then
+    echo; echo -n "⚡️ Activating existing venv in $PYTHON_ENV..."
+    . $PYTHON_ENV/bin/activate
+    echo "done."
+  fi
+
+  # If we see a requirements.txt file, install its contents
+  # into a virtual environment
+
+  if [[ -f requirements.txt ]]; then
+    echo -n "🐍 Processing requirements.txt..."
+    [ ! -d $PYTHON_ENV ] && python -m venv $PYTHON_ENV
+    . $PYTHON_ENV/bin/activate
+    pip3 -qq install -r requirements.txt
+    echo "done."
+  fi
+'''
+
+[services.jupyter-server]
+command = "jupyter-notebook --no-browser --IdentityProvider.token=${JUPYTER_SERVER_TOKEN} --ip=0.0.0.0"
+
+[profile]
+common = '''
+  toilet -f smmono9 --metal "jupyter"
+
+  echo
+  if [[ "$FLOX_ACTIVATE_START_SERVICES" == "true" ]]; then
+    sleep 1
+    jupyter-notebook list
+  else
+    echo "To start notebook server, run activate with '--start-services'."
+  fi
+  echo
+'''
+
+[options]
+systems = ["x86_64-linux", "aarch64-darwin", "aarch64-linux", "x86_64-darwin"]
+
+
+

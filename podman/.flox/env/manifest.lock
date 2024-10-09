@@ -1,0 +1,714 @@
+{
+  "lockfile-version": 0,
+  "manifest": {
+    "hook": {
+      "script": "    echo\n\n    # Confirm policy.json exits\n    if [ ! -f ~/.config/containers/policy.json ]; then\n        if gum confirm \"Create podman policy file?\" --default=true --affirmative \"Yes\" --negative \"No\"; then\n            printf '%s\n' '{\"default\": [{\"type\": \"insecureAcceptAnything\"}]}' > ~/.config/containers/policy.json\n            echo \"✅ Podman policy created at ~/.config/containers/policy.json\"\n        fi\n    fi\n\n    # Ensure podman can run\n    if [ \"$(uname -s)\" = 'Linux' ] || [ \"$(podman machine ssh -- uname -s)\" = \"Linux\" ]; then\n        echo \"🍟 Podman is available.\"\n        # return 0\n    fi\n\n    # We need a virtual machine\n    autostart=\"$HOME/.config/podman-env/autostart\"\n    choice=\n    if [ ! -f \"$autostart\" ]; then\n        echo \"Would you like to create and start the Podman virtual machine?\"\n        choice=$(gum choose \"Always - start now & on future activations\" \"Yes - start now only\" \"No - do not start\")\n        if [ \"${choice:0:1}\" = \"A\" ]; then\n            mkdir -p \"$HOME\"/.config/podman-env\n            echo \"1\" > \"$autostart\"\n            echo\n            echo \"Machine will start automatically on next activation. To disable this, run:\"\n            echo \"  rm $autostart\"\n        fi\n    fi\n\n    if [ -f \"$autostart\" ] || [ \"${choice:0:1}\" = \"A\" ] || [ \"${choice:0:1}\" = \"Y\" ] ; then\n        gum spin --spinner dot --title \"Initializing machine...\" -- podman machine init || true\n        gum spin --spinner dot --title \"Starting machine...\" -- podman machine start\n        if [ \"$(podman machine ssh -- uname -s)\" = \"Linux\" ]; then\n            trap 'gum confirm \"Stop virtual machine?\" && gum spin --spinner dot --title \"Stopping machine ....\" -- podman machine stop ; echo \"✅ Podman virtual machine stopped\"' EXIT\n            echo \"✅ Podman virtual machine started - stop it with 'podman machine stop' or exit this shell.\"\n            return 0\n        fi\n    fi\n\n    echo \"🚨 Podman is not available.\"\n"
+    },
+    "install": {
+      "gum": {
+        "pkg-path": "gum"
+      },
+      "podman": {
+        "pkg-path": "podman"
+      },
+      "podman-compose": {
+        "pkg-path": "podman-compose"
+      },
+      "podman-tui": {
+        "pkg-path": "podman-tui"
+      },
+      "qemu": {
+        "pkg-path": [
+          "qemu"
+        ],
+        "systems": [
+          "x86_64-darwin",
+          "aarch64-darwin"
+        ]
+      },
+      "undocker": {
+        "pkg-path": "undocker"
+      }
+    },
+    "options": {
+      "systems": [
+        "x86_64-linux",
+        "aarch64-linux",
+        "x86_64-darwin",
+        "aarch64-darwin"
+      ]
+    },
+    "registry": {
+      "defaults": {
+        "subtrees": null
+      },
+      "inputs": {
+        "nixpkgs": {
+          "from": {
+            "owner": "NixOS",
+            "ref": "release-23.11",
+            "repo": "nixpkgs",
+            "type": "github"
+          },
+          "subtrees": [
+            "legacyPackages"
+          ]
+        }
+      },
+      "priority": [
+        "nixpkgs"
+      ]
+    }
+  },
+  "packages": {
+    "aarch64-darwin": {
+      "gum": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "gum"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Tasty Bubble Gum for your shell",
+          "license": "MIT",
+          "pname": "gum",
+          "unfree": false,
+          "version": "0.13.0"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      },
+      "podman": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "podman"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A program for managing pods, containers and container images",
+          "license": "Apache-2.0",
+          "pname": "podman",
+          "unfree": false,
+          "version": "4.7.2"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      },
+      "podman-compose": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "podman-compose"
+        ],
+        "info": {
+          "broken": false,
+          "description": "An implementation of docker-compose with podman backend",
+          "license": "GPL-2.0-only",
+          "pname": "podman-compose",
+          "unfree": false,
+          "version": "1.0.6"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      },
+      "podman-tui": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "podman-tui"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Podman Terminal UI",
+          "license": "Apache-2.0",
+          "pname": "podman-tui",
+          "unfree": false,
+          "version": "0.12.0"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      },
+      "qemu": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "qemu"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A generic and open source machine emulator and virtualizer",
+          "license": "GPL-2.0-or-later",
+          "pname": "qemu",
+          "unfree": false,
+          "version": "8.1.5"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      },
+      "undocker": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "undocker"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A CLI tool to convert a Docker image to a flattened rootfs tarball",
+          "license": "Apache-2.0",
+          "pname": "undocker",
+          "unfree": false,
+          "version": "1.0.4"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      }
+    },
+    "aarch64-linux": {
+      "gum": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-linux",
+          "gum"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Tasty Bubble Gum for your shell",
+          "license": "MIT",
+          "pname": "gum",
+          "unfree": false,
+          "version": "0.13.0"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      },
+      "podman": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-linux",
+          "podman"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A program for managing pods, containers and container images",
+          "license": "Apache-2.0",
+          "pname": "podman",
+          "unfree": false,
+          "version": "4.7.2"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      },
+      "podman-compose": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-linux",
+          "podman-compose"
+        ],
+        "info": {
+          "broken": false,
+          "description": "An implementation of docker-compose with podman backend",
+          "license": "GPL-2.0-only",
+          "pname": "podman-compose",
+          "unfree": false,
+          "version": "1.0.6"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      },
+      "podman-tui": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-linux",
+          "podman-tui"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Podman Terminal UI",
+          "license": "Apache-2.0",
+          "pname": "podman-tui",
+          "unfree": false,
+          "version": "0.12.0"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      },
+      "qemu": null,
+      "undocker": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-linux",
+          "undocker"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A CLI tool to convert a Docker image to a flattened rootfs tarball",
+          "license": "Apache-2.0",
+          "pname": "undocker",
+          "unfree": false,
+          "version": "1.0.4"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      }
+    },
+    "x86_64-darwin": {
+      "gum": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-darwin",
+          "gum"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Tasty Bubble Gum for your shell",
+          "license": "MIT",
+          "pname": "gum",
+          "unfree": false,
+          "version": "0.13.0"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      },
+      "podman": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-darwin",
+          "podman"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A program for managing pods, containers and container images",
+          "license": "Apache-2.0",
+          "pname": "podman",
+          "unfree": false,
+          "version": "4.7.2"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      },
+      "podman-compose": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-darwin",
+          "podman-compose"
+        ],
+        "info": {
+          "broken": false,
+          "description": "An implementation of docker-compose with podman backend",
+          "license": "GPL-2.0-only",
+          "pname": "podman-compose",
+          "unfree": false,
+          "version": "1.0.6"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      },
+      "podman-tui": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-darwin",
+          "podman-tui"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Podman Terminal UI",
+          "license": "Apache-2.0",
+          "pname": "podman-tui",
+          "unfree": false,
+          "version": "0.12.0"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      },
+      "qemu": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-darwin",
+          "qemu"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A generic and open source machine emulator and virtualizer",
+          "license": "GPL-2.0-or-later",
+          "pname": "qemu",
+          "unfree": false,
+          "version": "8.1.5"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      },
+      "undocker": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-darwin",
+          "undocker"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A CLI tool to convert a Docker image to a flattened rootfs tarball",
+          "license": "Apache-2.0",
+          "pname": "undocker",
+          "unfree": false,
+          "version": "1.0.4"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      }
+    },
+    "x86_64-linux": {
+      "gum": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-linux",
+          "gum"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Tasty Bubble Gum for your shell",
+          "license": "MIT",
+          "pname": "gum",
+          "unfree": false,
+          "version": "0.13.0"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      },
+      "podman": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-linux",
+          "podman"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A program for managing pods, containers and container images",
+          "license": "Apache-2.0",
+          "pname": "podman",
+          "unfree": false,
+          "version": "4.7.2"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      },
+      "podman-compose": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-linux",
+          "podman-compose"
+        ],
+        "info": {
+          "broken": false,
+          "description": "An implementation of docker-compose with podman backend",
+          "license": "GPL-2.0-only",
+          "pname": "podman-compose",
+          "unfree": false,
+          "version": "1.0.6"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      },
+      "podman-tui": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-linux",
+          "podman-tui"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Podman Terminal UI",
+          "license": "Apache-2.0",
+          "pname": "podman-tui",
+          "unfree": false,
+          "version": "0.12.0"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      },
+      "qemu": null,
+      "undocker": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-linux",
+          "undocker"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A CLI tool to convert a Docker image to a flattened rootfs tarball",
+          "license": "Apache-2.0",
+          "pname": "undocker",
+          "unfree": false,
+          "version": "1.0.4"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712069209,
+            "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+            "type": "github"
+          },
+          "fingerprint": "3941a6cdea31e68661f05d90f6f6cdefb05ab88d096197cc8d6a1e73e9a329af",
+          "url": "github:NixOS/nixpkgs/cf8af60ce6b44bb88e4d0608f11b82db4769a2b6"
+        },
+        "priority": 5
+      }
+    }
+  },
+  "registry": {
+    "defaults": {
+      "subtrees": null
+    },
+    "inputs": {
+      "nixpkgs": {
+        "from": {
+          "lastModified": 1712069209,
+          "narHash": "sha256-GLIuAjkJgdMe3shzk23V3pYnwrHfu61eJ+bUeZdT0d4=",
+          "owner": "NixOS",
+          "repo": "nixpkgs",
+          "rev": "cf8af60ce6b44bb88e4d0608f11b82db4769a2b6",
+          "type": "github"
+        },
+        "subtrees": [
+          "legacyPackages"
+        ]
+      }
+    },
+    "priority": [
+      "nixpkgs"
+    ]
+  }
+}

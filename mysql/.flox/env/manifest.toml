@@ -1,0 +1,271 @@
+version = 1
+
+[install]
+gum.pkg-path = "gum"
+which.pkg-path = "which"
+coreutils.pkg-path = "coreutils"
+
+## MySQL:
+mysql.pkg-path = "mysql84"
+#mysql.pkg-path = "mysql80"
+#mysql.pkg-path = "mysql57"
+## MariaDB:
+#mysql.pkg-path = "mariadb_110"
+#mysql.pkg-path = "mariadb_1011"
+#mysql.pkg-path = "mariadb_109"
+#mysql.pkg-path = "mariadb_108"
+#mysql.pkg-path = "mariadb_107"
+
+[vars]
+MYSQL_DATABASE = "mydb"
+MYSQL_USER = ""
+MYSQL_PWD= "mypass"
+MYSQL_HOST = "127.0.0.1"
+
+
+[hook]
+on-activate = '''
+
+export MYSQL_HOME="$FLOX_ENV_CACHE/mysql"
+export MYSQL_CONFIG_FILE="$MYSQL_HOME/my.cnf"
+export MYSQL_DATADIR="$MYSQL_HOME/data"
+export MYSQL_TMPDIR="$MYSQL_HOME/tmp"
+export MYSQL_SHAREDIR="$MYSQL_HOME/share"
+export MYSQL_BASEDIR=$(realpath -s "$(dirname $(realpath $(which mysqld)))/..")
+export MYSQL_TCP_PORT="${MYSQL_TCP_PORT:-13306}"
+export MYSQL_UNIX_PORT="$MYSQL_HOME/mysql.sock"
+export MYSQL_UNIX_PORT_TMP="$MYSQL_HOME/tmp.sock"
+export MYSQLX_UNIX_PORT="$MYSQL_HOME/mysqlx.sock"
+export MYSQLD_PID="$MYSQL_HOME/mysqld.pid"
+export MYSQL_ERROR_LOG="$MYSQL_HOME/error.log"
+export MYSQL_SLOW_LOG="$MYSQL_HOME/slow.log"
+
+if [[ "$MYSQL_USER" == "" ]]; then
+  export MYSQL_USER="$USER"
+fi
+
+export IS_MARIADB=0
+if command -v mysql_install_db 2>&1 >/dev/null; then
+  export IS_MARIADB=1
+fi
+
+if [ ! -d "$MYSQL_DATADIR" ]; then
+  mkdir -p "$MYSQL_DATADIR"
+  mkdir -p "$MYSQL_TMPDIR"
+  chmod -R 755 $MYSQL_DATADIR
+
+
+  tee -a $MYSQL_CONFIG_FILE > /dev/null << EOF
+[client]
+port            = $MYSQL_TCP_PORT
+socket          = $MYSQL_UNIX_PORT
+
+[mysqld]
+user            = $USER
+pid-file        = $MYSQLD_PID
+socket          = $MYSQL_UNIX_PORT
+port            = $MYSQL_TCP_PORT
+basedir         = $MYSQL_BASEDIR
+datadir         = $MYSQL_DATADIR
+tmpdir          = $MYSQL_TMPDIR
+#lc-messages-dir = $MYSQL_SHAREDIR
+skip-external-locking
+
+# Memory settings for InnoDB (adjust as needed)
+innodb_buffer_pool_size = 256M
+innodb_log_file_size    = 64M
+innodb_file_per_table   = 1
+innodb_flush_method     = O_DIRECT
+
+# Error and slow query logs
+#log_error       = $MYSQL_ERROR_LOG
+slow_query_log  = 1
+slow_query_log_file = $MYSQL_SLOW_LOG
+
+# Query cache
+#query_cache_limit       = 1M
+#query_cache_size        = 16M
+
+# Networking
+bind-address    = $MYSQL_HOST
+max_connections = 100
+max_connect_errors = 1000
+
+# Security settings
+symbolic-links=0
+
+# InnoDB Settings
+innodb_file_per_table = 1
+innodb_data_home_dir  = $MYSQL_DATADIR
+innodb_data_file_path = ibdata1:10M:autoextend
+innodb_log_group_home_dir = $MYSQL_DATADIR
+innodb_buffer_pool_size = 128M
+innodb_log_file_size = 64M
+innodb_log_buffer_size = 8M
+innodb_flush_log_at_trx_commit = 1
+
+[mysqldump]
+quick
+quote-names
+max_allowed_packet = 16M
+
+[mysql]
+# Interactive command-line settings
+no-auto-rehash
+
+[isamchk]
+key_buffer_size = 16M
+
+[mysqlhotcopy]
+interactive-timeout
+EOF
+
+  if [ $IS_MARIADB -eq 1 ]; then
+    init_db () {
+      mysql_install_db \
+        --defaults-file=$MYSQL_CONFIG_FILE \
+        --auth-root-authentication-method=normal
+    }
+  else
+    init_db () {
+      mysqld \
+        --defaults-file=$MYSQL_CONFIG_FILE \
+        --default-time-zone=SYSTEM \
+        --initialize-insecure
+    }
+  fi
+  export -f init_db
+
+  # Initialize the MySQL data directory
+  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+    init_db
+  else
+    gum spin --spinner dot --title "Initializing database..." -- bash -c init_db
+  fi
+
+  echo "✅ MySQL initialized in $MYSQL_DATADIR."
+fi
+
+# XXX: --defaults-file needs to be first argument for some reason
+export MYSQLD_ARGS="\
+ --defaults-file=$MYSQL_CONFIG_FILE \
+ --mysql-native-password=ON \
+"
+export MYSQLD_ARGS_TMP="$MYSQLD_ARGS \
+ --socket=$MYSQL_UNIX_PORT_TMP \
+ --skip-networking \
+ --default-time-zone=SYSTEM \
+"
+export MYSQL_ARGS_TMP="\
+ --defaults-file=$MYSQL_CONFIG_FILE \
+ --socket=$MYSQL_UNIX_PORT_TMP \
+"
+
+#
+# Start mysql and create the database and user
+#
+
+# Temporary set the password to empty
+export MYSQL_PWD_TMP="$MYSQL_PWD"
+export MYSQL_PWD=""
+export MYSQL_HOST_TMP="$MYSQL_HOST"
+unset MYSQL_HOST
+
+# Start mysql
+echo -n "✅ Starting Temporary MySQL in the background ..."
+nohup mysqld $MYSQLD_ARGS_TMP > /dev/null 2>&1 &
+
+MAX_ATTEMPTS=10
+while [ $MAX_ATTEMPTS -gt 0 ]; do
+  set +e
+  MYSQL_STATUS=$(mysqladmin $(echo $MYSQL_ARGS_TMP) ping -u root 2>&1)
+  set -e
+  if [ "$MYSQL_STATUS" == "mysqld is alive" ]; then
+    break
+  fi
+  echo -n ".."
+  sleep 1
+  MAX_ATTEMPTS=$((MAX_ATTEMPTS - 1))
+done
+
+if [ $MAX_ATTEMPTS -eq 0 ]; then
+  echo ""
+  echo "❌ Error: MySQL is not up."
+  exit 1
+fi
+echo ""
+echo "✅ Temporary MySQL is up."
+
+
+MYSQL_DATABASE_EXISTS="$(
+  mysql $MYSQL_ARGS_TMP -u root -sB information_schema \
+  -e "SELECT COUNT(*) FROM schemata WHERE schema_name = \"$MYSQL_DATABASE\""
+)"
+
+# helper functions
+create_db() {
+  mysql $MYSQL_ARGS_TMP -u root -N -e "CREATE DATABASE \`$MYSQL_DATABASE\`;"
+}
+create_user() {
+  mysql $MYSQL_ARGS_TMP -u root -N -e "CREATE USER IF NOT EXISTS '$MYSQL_USER'@'localhost' IDENTIFIED WITH caching_sha2_password BY '$MYSQL_PWD_TMP'; GRANT ALL PRIVILEGES ON *.* TO '$MYSQL_USER'@'localhost' WITH GRANT OPTION;"
+}
+export -f create_db
+export -f create_user
+
+# Create the database if it doesn't exist
+if [[ "$MYSQL_DATABASE_EXISTS" == "0" ]]; then
+  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+    create_db
+  else
+    gum spin --spinner dot --title "Creating '$MYSQL_DATABASE' database..." -- bash -c create_db
+  fi
+  echo "  -> ✅ Created '$MYSQL_DATABASE' database."
+else
+  echo "  -> ✅ Database '$MYSQL_DATABASE' already exists. Doing nothing."
+fi
+
+# Create the user with the password and grant all privileges for the database
+if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+  create_user
+else
+  gum spin --spinner dot --title "Creating '$MYSQL_USER' user..." -- bash -c create_user
+fi
+echo "  -> ✅ '$MYSQL_USER' user created if not existed before."
+
+# Stop MySQL
+mysqladmin $(echo $MYSQL_ARGS_TMP) shutdown -u root
+echo "  -> ✅ Temporary MySQL is being shut down."
+
+# Reset the password
+export MYSQL_HOST="$MYSQL_HOST_TMP"
+export MYSQL_PWD="$MYSQL_PWD_TMP"
+'''
+
+[profile]
+common = '''
+
+echo ""
+echo "     ╔══════════════════════════════════════════════╗"
+echo "     ║                                              ║"
+echo "     ║  Start MySQL in the background:              ║"
+echo "     ║  👉 flox services start                      ║"
+echo "     ║  👉 flox activate --start-services           ║"
+echo "     ║                                              ║"
+echo "     ║  Connect to MySQL:                           ║"
+echo "     ║  👉 mysql                                    ║"
+echo "     ║                                              ║"
+echo "     ╚══════════════════════════════════════════════╝"
+echo ""
+'''
+
+[services]
+mysql.command = "mysqld $MYSQLD_ARGS"
+
+
+[options]
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]

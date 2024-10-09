@@ -1,0 +1,785 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "version": 1,
+    "install": {
+      "accelerate": {
+        "pkg-path": "python311Packages.accelerate",
+        "version": "python3.11-accelerate-0.32.0"
+      },
+      "diffusers": {
+        "pkg-path": "python311Packages.diffusers",
+        "version": "python3.11-diffusers-0.29.2"
+      },
+      "figlet": {
+        "pkg-path": "toilet"
+      },
+      "gum": {
+        "pkg-path": "gum"
+      },
+      "jupyter": {
+        "pkg-path": "python311Packages.jupyter"
+      },
+      "pytorch-bin": {
+        "pkg-path": "python311Packages.pytorch-bin",
+        "version": "python3.11-torch-2.3.1"
+      },
+      "sentencepiece": {
+        "pkg-path": "python311Packages.sentencepiece",
+        "version": "python3.11-sentencepiece-0.2.0"
+      },
+      "transformers": {
+        "pkg-path": "python311Packages.transformers",
+        "version": "python3.11-transformers-4.44.0"
+      }
+    },
+    "vars": {
+      "JUPYTER_SERVER_TOKEN": "floxfan123456",
+      "VIRTUAL_ENV_DISABLE_PROMPT": "1",
+      "generate_image": "[(importlib := __import__('importlib')), (warnings := importlib.import_module('warnings')), warnings.filterwarnings('ignore'), (sys := importlib.import_module('sys')), (torch := importlib.import_module('torch')), (__ol_mod_cbtwjvbiot := __import__('imgcat', globals(), locals(), ['imgcat'], 0)), (imgcat := __ol_mod_cbtwjvbiot.imgcat), (__ol_mod_ambwamhbvl := __import__('diffusers', globals(), locals(), ['StableDiffusionPipeline'], 0)), (StableDiffusionPipeline := __ol_mod_ambwamhbvl.StableDiffusionPipeline), (__ol_mod_xshmfbhacj := __import__('diffusers', globals(), locals(), ['logging'], 0)), (logging := __ol_mod_xshmfbhacj.logging), logging.set_verbosity(50), logging.disable_progress_bar(), (pipe := StableDiffusionPipeline.from_pretrained('IDKiro/sdxs-512-0.9', torch_dtype=torch.float32)), pipe.to('cuda') if torch.cuda.is_available() else pipe.to('mps') if torch.backends.mps.is_available() else ..., (prompt := (sys.argv[1] if len(sys.argv) > 1 else 'a fox in a henhouse')), pipe.set_progress_bar_config(disable=True), (image := pipe(prompt=prompt, num_inference_steps=1, guidance_scale=0).images[0]), image.save(f'{prompt}.png'), imgcat(image)]",
+      "test_acceleration": "[(importlib := __import__('importlib')), (warnings := importlib.import_module('warnings')), warnings.filterwarnings('ignore'), (torch := importlib.import_module('torch')), print('CUDA is available 🔥') if torch.cuda.is_available() else print('Metal is available 🍏') if torch.backends.mps.is_available() else print('I only see a CPU 😞')]"
+    },
+    "hook": {
+      "on-activate": "\n  # If there is a requirements.txt file in the current directory,\n  # let's make our venv in the same place. Otherwise, in the cache.\n  if [[ -f requirements.txt ]]; then\n    export VENV_DIR='./.venv/'\n    req_text=1\n  else\n    export VENV_DIR=\"$FLOX_ENV_CACHE/python\"\n    req_text=0\n  fi\n\n\n  # Make the venv if it does not already exist\n  if [ ! -d \"$VENV_DIR\" ]; then\n    gum spin --spinner dot --title \"Creating python venv in $VENV_DIR\" -- python3 -m venv \"$VENV_DIR\"\n    if [ \"$req_text\" == \"1\" ]; then\n      echo \"✅ Virtual environment created in $VENV_DIR\"\n    fi\n  fi\n\n  # Install or update packages in the venv\n  (\n    source \"$VENV_DIR/bin/activate\"\n    gum spin --spinner dot --title \"Managing packages in $VENV_DIR\" -- pip3 install --quiet imgcat\n    if [[ -f requirements.txt ]]; then\n      gum spin --spinner dot --title \"Managing packages in $VENV_DIR\" -- pip3 install --quiet -r requirements.txt\n    fi\n  )\n\n  toilet -f smmono9 --metal \"flaim\"\n  echo \"\"\n  $FLOX_ENV/bin/python3 -c \"$test_acceleration\"\n  echo \"Run 'testaccel' to retest acceleration.\"\n  echo \"Run 'genimg <string>' for an image.\"\n"
+    },
+    "profile": {
+      "bash": "  if [ -d \"$VENV_DIR\" ]; then\n    source \"$VENV_DIR/bin/activate\"\n  fi\n\n  alias genimg=\"python3 -c \\\"$generate_image\\\"\"\n  alias testaccel=\"python3 -c \\\"$test_acceleration\\\"\"\n\n  if [ \"$FLOX_ACTIVATE_START_SERVICES\" == \"true\" ]; then\n    echo\n    jupyter-notebook list\n    echo\n  fi\n",
+      "zsh": "  if [ -d \"$VENV_DIR\" ]; then\n    source \"$VENV_DIR/bin/activate\"\n  fi\n\n  alias genimg=\"python3 -c \\\"$generate_image\\\"\"\n  alias testaccel=\"python3 -c \\\"$test_acceleration\\\"\"\n\n  if [[ \"$FLOX_ACTIVATE_START_SERVICES\" == \"true\" ]]; then\n    echo\n    jupyter-notebook list\n    echo\n  fi\n"
+    },
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ],
+      "allow": {
+        "licenses": []
+      },
+      "semver": {}
+    },
+    "services": {
+      "jupyter-server": {
+        "command": "jupyter-server --IdentityProvider.token=${JUPYTER_SERVER_TOKEN} --ip=0.0.0.0",
+        "vars": null,
+        "is-daemon": null,
+        "shutdown": null
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "python311Packages.accelerate",
+      "broken": false,
+      "derivation": "/nix/store/95xv837a10rlhwdrr3krba44q1lc10hy-python3.11-accelerate-0.32.0.drv",
+      "description": "Simple way to train and use PyTorch models with multi-GPU, TPU, mixed-precision",
+      "install_id": "accelerate",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "python3.11-accelerate-0.32.0",
+      "pname": "accelerate",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-accelerate-0.32.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/glwbww5llw0kh6w4cgcnfi2azb7cz0lp-python3.11-accelerate-0.32.0-dist",
+        "out": "/nix/store/2vgxa2av6gn0b6xd6h0jjwaqxay7iwbq-python3.11-accelerate-0.32.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.accelerate",
+      "broken": false,
+      "derivation": "/nix/store/kpj8li343xm7dm378fmhzmddh5zy757z-python3.11-accelerate-0.32.0.drv",
+      "description": "Simple way to train and use PyTorch models with multi-GPU, TPU, mixed-precision",
+      "install_id": "accelerate",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "python3.11-accelerate-0.32.0",
+      "pname": "accelerate",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-accelerate-0.32.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/kwq7x32b9g80jsig5x23ngl1wwpdy5j4-python3.11-accelerate-0.32.0-dist",
+        "out": "/nix/store/8jbd4gzz828qkqp07543ijqsbvm2zr9p-python3.11-accelerate-0.32.0"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.accelerate",
+      "broken": false,
+      "derivation": "/nix/store/c3zg07mi9yq5l6hsvnwzv87n25bk24s6-python3.11-accelerate-0.32.0.drv",
+      "description": "Simple way to train and use PyTorch models with multi-GPU, TPU, mixed-precision",
+      "install_id": "accelerate",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "python3.11-accelerate-0.32.0",
+      "pname": "accelerate",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-accelerate-0.32.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/ch5i095bm1ddlbzy0i8y25qqpwcxgq6c-python3.11-accelerate-0.32.0-dist",
+        "out": "/nix/store/0qpb05if6nr3f1npn82kazpiaxymvg96-python3.11-accelerate-0.32.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.diffusers",
+      "broken": false,
+      "derivation": "/nix/store/r7wzdkyq8xsh3qjn67fcymd4q74khiha-python3.11-diffusers-0.29.2.drv",
+      "description": "State-of-the-art diffusion models for image and audio generation in PyTorch",
+      "install_id": "diffusers",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "python3.11-diffusers-0.29.2",
+      "pname": "diffusers",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-diffusers-0.29.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/zb2mndh4bsg1nkz8f5qkd4qx62ik2yzp-python3.11-diffusers-0.29.2-dist",
+        "out": "/nix/store/px9xwyca426z7bcs9zm8mjr9973mw0k0-python3.11-diffusers-0.29.2"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.diffusers",
+      "broken": false,
+      "derivation": "/nix/store/3y71j54csj6ijbkkzlx414cn8ihmjc35-python3.11-diffusers-0.29.2.drv",
+      "description": "State-of-the-art diffusion models for image and audio generation in PyTorch",
+      "install_id": "diffusers",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "python3.11-diffusers-0.29.2",
+      "pname": "diffusers",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-diffusers-0.29.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/54gs77m39f9p8czyh9z45y63l0y2n8dp-python3.11-diffusers-0.29.2-dist",
+        "out": "/nix/store/8w9j10kf25qzjry0yc3jvp6wzqcf3x8k-python3.11-diffusers-0.29.2"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.diffusers",
+      "broken": false,
+      "derivation": "/nix/store/cvkix89z1y41fsbis0fspi0k928356jl-python3.11-diffusers-0.29.2.drv",
+      "description": "State-of-the-art diffusion models for image and audio generation in PyTorch",
+      "install_id": "diffusers",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "python3.11-diffusers-0.29.2",
+      "pname": "diffusers",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-diffusers-0.29.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/xvhlz9jpf455imghnpgpn37ianlb2vxs-python3.11-diffusers-0.29.2-dist",
+        "out": "/nix/store/pml93p5fwl1qcql05a7zqi4dm38zwmgv-python3.11-diffusers-0.29.2"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "toilet",
+      "broken": false,
+      "derivation": "/nix/store/w40pzvybrzqmkgv26v33hs9fivq82kpk-toilet-0.3.drv",
+      "description": "Display large colourful characters in text mode",
+      "install_id": "figlet",
+      "license": "WTFPL",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "toilet-0.3",
+      "pname": "toilet",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/4fly6l0xhhw31kjs8yzvy362skij5vbv-toilet-0.3"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "toilet",
+      "broken": false,
+      "derivation": "/nix/store/prlb2snr37g64wb2j2c0majxbnsd8gn3-toilet-0.3.drv",
+      "description": "Display large colourful characters in text mode",
+      "install_id": "figlet",
+      "license": "WTFPL",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "toilet-0.3",
+      "pname": "toilet",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/bkqdqfp34i44q8kfkwwi65fm5p05gg4m-toilet-0.3"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "toilet",
+      "broken": false,
+      "derivation": "/nix/store/72m90s0ccbb3rhw5788zhlw5lp45fiaa-toilet-0.3.drv",
+      "description": "Display large colourful characters in text mode",
+      "install_id": "figlet",
+      "license": "WTFPL",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "toilet-0.3",
+      "pname": "toilet",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/7gckyaq9dwgf8fpizv2nmbfghxr32g00-toilet-0.3"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/sarvhaq958mwadmd26i1wn7nlr57ipi5-gum-0.14.3.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "gum-0.14.3",
+      "pname": "gum",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/nz6k85xrxacczcfnq0kigcsigxbfpwhk-gum-0.14.3"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/nidddmjh6qkn34y0fvxs7zzy43dbb0h3-gum-0.14.3.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "gum-0.14.3",
+      "pname": "gum",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/81bzbzmm6ryr8319wr9vikrvxqlzhcdk-gum-0.14.3"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/c989ar42jj8z7hsdj1xnbqwm5sagzqq7-gum-0.14.3.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "gum-0.14.3",
+      "pname": "gum",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/8d15pvy5v2r31izz0jgfjl3s4a5n66ag-gum-0.14.3"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.jupyter",
+      "broken": false,
+      "derivation": "/nix/store/84xmz05fijgl1g4kzm1bqqwjwyyfv40n-python3.11-jupyter-1.0.0.drv",
+      "description": "Installs all the Jupyter components in one go",
+      "install_id": "jupyter",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "python3.11-jupyter-1.0.0",
+      "pname": "jupyter",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-jupyter-1.0.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/1lfal6z0z7dkxc3iw00smbjw17kskxff-python3.11-jupyter-1.0.0-dist",
+        "out": "/nix/store/6233bliackcjhivdnxwplvcm2c8hinr6-python3.11-jupyter-1.0.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.jupyter",
+      "broken": false,
+      "derivation": "/nix/store/kkmmna7rya4f87bkby89bcnpary4sriy-python3.11-jupyter-1.0.0.drv",
+      "description": "Installs all the Jupyter components in one go",
+      "install_id": "jupyter",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "python3.11-jupyter-1.0.0",
+      "pname": "jupyter",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-jupyter-1.0.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/lndhmk6jsq2krjpdibkpn40lrxrs07i6-python3.11-jupyter-1.0.0-dist",
+        "out": "/nix/store/f6x4ngljsk1l89sc67nx2bimdbc3z4gd-python3.11-jupyter-1.0.0"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.jupyter",
+      "broken": false,
+      "derivation": "/nix/store/f9if0q6z6p488n936gjmn40mfnkmwfyi-python3.11-jupyter-1.0.0.drv",
+      "description": "Installs all the Jupyter components in one go",
+      "install_id": "jupyter",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "python3.11-jupyter-1.0.0",
+      "pname": "jupyter",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-jupyter-1.0.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/3vbfp6w053pw36mj59ww3afk8j15ybda-python3.11-jupyter-1.0.0-dist",
+        "out": "/nix/store/8g4dlxjwd1njs3bydfd7k6bckyqgzzvr-python3.11-jupyter-1.0.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.pytorch-bin",
+      "broken": false,
+      "derivation": "/nix/store/53r25fqv228jrrri7simdjwl7fyhnm79-python3.11-torch-2.3.1.drv",
+      "description": "PyTorch: Tensors and Dynamic neural networks in Python with strong GPU acceleration",
+      "install_id": "pytorch-bin",
+      "license": "[ BSD-3-Clause, Intel Simplified Software License, Unfree redistributable ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "python3.11-torch-2.3.1",
+      "pname": "pytorch-bin",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "python3.11-torch-2.3.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/fp48bj0sfp5577i3w3fb7a4gjasv7d8s-python3.11-torch-2.3.1-dist",
+        "out": "/nix/store/z32ycm1xc0qdb9igi972fc1kx0hivn4s-python3.11-torch-2.3.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.pytorch-bin",
+      "broken": false,
+      "derivation": "/nix/store/qk896870yyp0gyg6vkiwaf2dzp0110bw-python3.11-torch-2.3.1.drv",
+      "description": "PyTorch: Tensors and Dynamic neural networks in Python with strong GPU acceleration",
+      "install_id": "pytorch-bin",
+      "license": "[ BSD-3-Clause, Intel Simplified Software License, Unfree redistributable ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "python3.11-torch-2.3.1",
+      "pname": "pytorch-bin",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "python3.11-torch-2.3.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/5f8igp99li3adcgdy1jsxh7ddjbfhgp7-python3.11-torch-2.3.1-dist",
+        "out": "/nix/store/fh7l7lhgfjv5x9z7knikqf9bkap3c7fl-python3.11-torch-2.3.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.pytorch-bin",
+      "broken": false,
+      "derivation": "/nix/store/yls6mnfiqmjslf4ga9al0236352d8hv8-python3.11-torch-2.3.1.drv",
+      "description": "PyTorch: Tensors and Dynamic neural networks in Python with strong GPU acceleration",
+      "install_id": "pytorch-bin",
+      "license": "[ BSD-3-Clause, Intel Simplified Software License, Unfree redistributable ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "python3.11-torch-2.3.1",
+      "pname": "pytorch-bin",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "python3.11-torch-2.3.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/d1qk73p68washdkkr7h74jrgbkc873i7-python3.11-torch-2.3.1-dist",
+        "out": "/nix/store/sk8pqkjgvba0hcfwnnqklmjpvcm2x5s4-python3.11-torch-2.3.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.sentencepiece",
+      "broken": false,
+      "derivation": "/nix/store/z55i5743zm6049vppxbmq27spagvjn35-python3.11-sentencepiece-0.2.0.drv",
+      "description": "Unsupervised text tokenizer for Neural Network-based text generation",
+      "install_id": "sentencepiece",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "python3.11-sentencepiece-0.2.0",
+      "pname": "sentencepiece",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-sentencepiece-0.2.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/8l5v8vsyp7kr0kgha6j2kjc3iwys8dfx-python3.11-sentencepiece-0.2.0-dist",
+        "out": "/nix/store/n307adxapkz67wrwrj568b1n1zfbqg54-python3.11-sentencepiece-0.2.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.sentencepiece",
+      "broken": false,
+      "derivation": "/nix/store/xzh17hcljf22ip9cvaw9bg1k8jdi5458-python3.11-sentencepiece-0.2.0.drv",
+      "description": "Unsupervised text tokenizer for Neural Network-based text generation",
+      "install_id": "sentencepiece",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "python3.11-sentencepiece-0.2.0",
+      "pname": "sentencepiece",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-sentencepiece-0.2.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/vjh8xqr5cf251qxx7hfnqyaaqaw3p4gd-python3.11-sentencepiece-0.2.0-dist",
+        "out": "/nix/store/ixx3awhs45annhrg2f8xjx9dlq7fn9nv-python3.11-sentencepiece-0.2.0"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.sentencepiece",
+      "broken": false,
+      "derivation": "/nix/store/3vxkz5x7gw8pfb34lrscc75ihgjznvw4-python3.11-sentencepiece-0.2.0.drv",
+      "description": "Unsupervised text tokenizer for Neural Network-based text generation",
+      "install_id": "sentencepiece",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "python3.11-sentencepiece-0.2.0",
+      "pname": "sentencepiece",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-sentencepiece-0.2.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/9f54bjrg6kydxrs8ppkgbx293h8w464r-python3.11-sentencepiece-0.2.0-dist",
+        "out": "/nix/store/v1jix722dmwg64xlrrlvsxpi8ngxh0dq-python3.11-sentencepiece-0.2.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.transformers",
+      "broken": false,
+      "derivation": "/nix/store/ginmzd22y3yqpy7crly96sixbqpafrbi-python3.11-transformers-4.44.0.drv",
+      "description": "Natural Language Processing for TensorFlow 2.0 and PyTorch",
+      "install_id": "transformers",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "python3.11-transformers-4.44.0",
+      "pname": "transformers",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-transformers-4.44.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/mly0h0hzibfrwjs8k2ybimb8d49xyyhi-python3.11-transformers-4.44.0-dist",
+        "out": "/nix/store/fvid9w3wmw5czgfjs7b5jz7cr2lkbfmc-python3.11-transformers-4.44.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.transformers",
+      "broken": false,
+      "derivation": "/nix/store/4llj4rchyv5zrj18ypbxx6wrsq9akajw-python3.11-transformers-4.44.0.drv",
+      "description": "Natural Language Processing for TensorFlow 2.0 and PyTorch",
+      "install_id": "transformers",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "python3.11-transformers-4.44.0",
+      "pname": "transformers",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-transformers-4.44.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/k4iqxkm6dnk2mbqy1gcc8zchyamls201-python3.11-transformers-4.44.0-dist",
+        "out": "/nix/store/l0rh666j5v602l046rf0pkbr1ab8xiii-python3.11-transformers-4.44.0"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.transformers",
+      "broken": false,
+      "derivation": "/nix/store/75fmra8ds6v3a98nsq3wd3dg2n45rgyy-python3.11-transformers-4.44.0.drv",
+      "description": "Natural Language Processing for TensorFlow 2.0 and PyTorch",
+      "install_id": "transformers",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "name": "python3.11-transformers-4.44.0",
+      "pname": "transformers",
+      "rev": "5e0ca22929f3342b19569b21b2f3462f053e497b",
+      "rev_count": 664135,
+      "rev_date": "2024-08-09T03:53:12Z",
+      "scrape_date": "2024-08-11T02:08:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-transformers-4.44.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/hk2lsi3568zlph3jcbb00kp865a4ssjr-python3.11-transformers-4.44.0-dist",
+        "out": "/nix/store/b787dsyrhmwbrzkwrb1zcnmhk3ns922k-python3.11-transformers-4.44.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ]
+}

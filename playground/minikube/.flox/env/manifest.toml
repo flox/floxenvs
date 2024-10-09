@@ -1,0 +1,65 @@
+#
+# This is a Flox environment manifest.
+# Visit flox.dev/docs/concepts/manifest/
+# or see flox-edit(1), manifest.toml(1) for more information.
+#
+
+# List packages you wish to install in your environment inside
+# the `[install]` section.
+[install]
+minikube.pkg-path = "minikube"
+kubectl.pkg-path = "kubectl"
+kubectl-tree.pkg-path = "kubectl-tree"
+kubectl-ktop.pkg-path = "kubectl-ktop"
+kubectl-images.pkg-path = "kubectl-images"
+gum.pkg-path            = "gum"
+
+
+[hook]
+on-activate = """
+    if [ "$(minikube status --format='{{.Host}}')" = "Running" ]; then
+        echo "✅ minikube is already running"
+        echo "Stop it with 'minikube stop' or by exiting this shell."
+        return
+    fi
+
+    autostart="$HOME/.config/minikube-env/autostart"
+    choice=
+    if [ ! -f "$autostart" ]; then
+        echo "This Flox environment can automatically create and start minikube."; echo
+        choice=$($FLOX_ENV/bin/gum choose "Always - start now & on future activations" "Yes - start now only" "No - do not start")
+        if [ "${choice:0:1}" = "A" ]; then
+            mkdir -p "$HOME"/.config/minikube-env
+            echo "1" > "$autostart"
+            echo
+            echo "OK - minikube will start automatically on next activation. To disable this, run:"
+            echo "  rm $autostart"
+        fi
+    fi
+
+    if [ -f "$autostart" ] || [ "${choice:0:1}" = "A" ] || [ "${choice:0:1}" = "Y" ] ; then
+
+       	$FLOX_ENV/bin/gum spin --spinner dot --show-output --title "Starting minikube..." -- $FLOX_ENV/bin/minikube start \
+			--driver=qemu2 --qemu-firmware-path=$FLOX_ENV/share/qemu/edk2-aarch64-code.fd --network=builtin 2>&1
+
+	if [ "$(minikube status --format='{{.Host}}')" = "Running" ]; then
+            echo; echo "✅ minikube started"
+            echo "Stop it with 'minikube stop' or by exiting this shell."
+            return
+        fi
+    fi
+
+    echo "🚨 minikube did not start successfully"
+"""
+
+[profile]
+common = """
+    ##
+    ## YOWCH! this is not shell-portable, will have to write versions for bash/fish/tcsh
+    ##
+    trap '$FLOX_ENV/bin/gum confirm "Stop minikube cluster?" && $FLOX_ENV/bin/gum spin --spinner dot --title "Stopping minikube ...." -- $FLOX_ENV/bin/minikube stop ; echo; echo "✅ minikube stopped"' EXIT
+"""
+
+
+[options]
+systems = ["x86_64-linux", "aarch64-linux", "x86_64-darwin", "aarch64-darwin"]

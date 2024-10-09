@@ -1,0 +1,169 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "version": 1,
+    "install": {
+      "direnv": {
+        "pkg-path": "direnv",
+        "pkg-group": null,
+        "priority": null,
+        "version": null,
+        "systems": null
+      },
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": null,
+        "priority": null,
+        "version": null,
+        "systems": null
+      }
+    },
+    "vars": {
+      "DIRENV_LOG_FORMAT": "",
+      "FLOX_DIRENV_EXT_HASH": "0awwzi4k3v1wvfaiyd6vlcc68ixq0fw03apbdm6vf1x8wrv2wpdp",
+      "FLOX_DIRENV_EXT_URL": "https://raw.githubusercontent.com/flox/flox-direnv/v1.1.0/direnv.rc"
+    },
+    "hook": {
+      "on-activate": "  #\n  # Make sure the flox-direnv extension is installed\n  #\n\n  temp_location=$(mktemp)\n  target_location=\"$HOME/.config/direnv/lib/flox-direnv.sh\"\n\n  # If it's installed and matches the hash, return from the hook and continue shell init\n  if [ -f \"$target_location\" ] && [ \"$(nix-hash --type sha256 --base32 $target_location)\" == \"$FLOX_DIRENV_EXT_HASH\" ]; then\n    echo \"🤖 This shell now has direnv enabled.\"\n    return\n  fi\n\n  # Grab the extension script into a temp file and check the hash\n  gum spin --spinner dot --title \"Downloading extension\" -- curl -so \"$temp_location\" \"$FLOX_DIRENV_EXT_URL\"\n  hash=$(nix-hash --type sha256 --base32 \"$temp_location\")\n\n  # If what we downloaded matches the hash, put it into place\n  if [ \"$hash\" == \"$FLOX_DIRENV_EXT_HASH\" ]; then\n    mkdir -p $(dirname \"$target_location\")\n    cat $temp_location > $target_location\n    echo \"✅ Extension installed in ~/.config/direnv/lib/\"\n  else\n    echo \"🚨 Could not validate downloaded extension\"\n    return\n  fi\n  echo \"🤖 direnv enabled\"\n"
+    },
+    "profile": {
+      "common": null,
+      "bash": "  eval \"$(direnv hook bash)\"\n",
+      "zsh": "  eval \"$(direnv hook zsh)\"\n\n  # TODO: Figure out how to get this working across all the shells\n  floxit() {\n\n    #\n    # If we are in a directory with a .flox, let's make a matching\n    # .envrc that activates it and add to the direnv allowlist.\n    #\n    # (Asking on each step, of course!)\n    #\n\n    if [ -d \".flox\" ]; then  # TODO: better way to validate?\n      FILE=\".envrc\"\n      LINE='use flox'\n  \n      echo\n      if [ -f $FILE ] && grep -qxF \"$LINE\" \"$FILE\"; then\n        echo \"This directory is already configured for direnv ✨\"\n      else\n        echo \"This directory has a Flox environment, lucky you! 🌟\"\n        echo\n\n        # Ask whether to add the line, in case this was run accidentally\n        if gum confirm \"Add Flox activation to .envrc?\" --default=true --affirmative \"Yep!\" --negative \"Not now\"; then\n          if [ -f $FILE ]; then\n            echo \"$LINE\" >> \"$FILE\"\n          else\n            echo \"$LINE\" > \"$FILE\"\n          fi\n          echo \"✅ Added Flox activation to .envrc\"\n\n          # Ask whether to add to allowlist, we want this explicit\n          if gum confirm \"Add this directory to direnv's allowlist?\" --default=true --affirmative \"Yes\" --negative \"Not now\"; then\n            $FLOX_ENV/bin/direnv allow .\n            echo \"✅ Added this directory to the direnv allowlist\"\n          fi\n        fi\n     fi\n    else\n      echo \"This directory does not contain a Flox environment.\"\n    fi\n    echo\n  }\n",
+      "fish": "direnv hook fish | source",
+      "tcsh": "eval `direnv hook tcsh`"
+    },
+    "options": {
+      "systems": [
+        "x86_64-linux",
+        "aarch64-darwin"
+      ],
+      "allow": {
+        "unfree": null,
+        "broken": null,
+        "licenses": []
+      },
+      "semver": {
+        "allow-pre-releases": null
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "direnv",
+      "broken": false,
+      "derivation": "/nix/store/0k7knzscb3g84nnsvp8g6nl3l5q989as-direnv-2.34.0.drv",
+      "description": "Shell extension that manages your environment",
+      "install_id": "direnv",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=00d80d13810dbfea8ab4ed1009b09100cca86ba8",
+      "name": "direnv-2.34.0",
+      "pname": "direnv",
+      "rev": "00d80d13810dbfea8ab4ed1009b09100cca86ba8",
+      "rev_count": 646099,
+      "rev_date": "2024-07-01T15:47:52Z",
+      "scrape_date": "2024-07-03T00:14:18Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.34.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/q161ialkxk9anr9z7adbi9qwc43s7819-direnv-2.34.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "direnv",
+      "broken": false,
+      "derivation": "/nix/store/39hl9fhip29wmdf4hsn0b15s9mm6fvfx-direnv-2.34.0.drv",
+      "description": "Shell extension that manages your environment",
+      "install_id": "direnv",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=00d80d13810dbfea8ab4ed1009b09100cca86ba8",
+      "name": "direnv-2.34.0",
+      "pname": "direnv",
+      "rev": "00d80d13810dbfea8ab4ed1009b09100cca86ba8",
+      "rev_count": 646099,
+      "rev_date": "2024-07-01T15:47:52Z",
+      "scrape_date": "2024-07-03T00:14:18Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.34.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/q71rzcnj4kpv6pp7alasws5si5dp216c-direnv-2.34.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/j3iqzlix25py9141hlnnvj397244gsrw-gum-0.14.1.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=00d80d13810dbfea8ab4ed1009b09100cca86ba8",
+      "name": "gum-0.14.1",
+      "pname": "gum",
+      "rev": "00d80d13810dbfea8ab4ed1009b09100cca86ba8",
+      "rev_count": 646099,
+      "rev_date": "2024-07-01T15:47:52Z",
+      "scrape_date": "2024-07-03T00:14:18Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kdlpj359v1bzjya79j8iwapg0swzm8mh-gum-0.14.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/r3nxwiiq30rljqj31x16kbxdplvsyv4j-gum-0.14.1.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=00d80d13810dbfea8ab4ed1009b09100cca86ba8",
+      "name": "gum-0.14.1",
+      "pname": "gum",
+      "rev": "00d80d13810dbfea8ab4ed1009b09100cca86ba8",
+      "rev_count": 646099,
+      "rev_date": "2024-07-01T15:47:52Z",
+      "scrape_date": "2024-07-03T00:14:18Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/wrwq2wp1b37aab7g84mwfjrck5qmbdwq-gum-0.14.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ]
+}

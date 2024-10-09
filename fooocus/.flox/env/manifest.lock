@@ -1,0 +1,490 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "version": 1,
+    "install": {
+      "gum": {
+        "pkg-path": "gum"
+      },
+      "python3": {
+        "pkg-path": "python3"
+      },
+      "pytorch": {
+        "pkg-path": "python311Packages.pytorch-bin",
+        "pkg-group": "darwin",
+        "systems": [
+          "aarch64-darwin",
+          "x86_64-darwin"
+        ]
+      },
+      "torchsde": {
+        "pkg-path": "python311Packages.torchsde",
+        "pkg-group": "darwin",
+        "systems": [
+          "aarch64-darwin",
+          "x86_64-darwin"
+        ]
+      },
+      "torchvision": {
+        "pkg-path": "python311Packages.torchvision-bin",
+        "pkg-group": "linux",
+        "systems": [
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      }
+    },
+    "vars": {
+      "FOOOCUS_REPO_GIT": "git@github.com:lllyasviel/Fooocus.git",
+      "FOOOCUS_REPO_HTTPS": "https://github.com/lllyasviel/Fooocus.git",
+      "VIRTUAL_ENV_DISABLE_PROMPT": "1"
+    },
+    "hook": {
+      "on-activate": "\n  # \n  # First, we check to see if we are in a working copy of Fooocus from git.\n  #\n  # If we aren't, and cwd is empty, offer to clone it.\n  #\n  # Failing all, provide some education.\n  # \n\n  git_url=$(git config --get remote.origin.url)\n\n  if [ \"$git_url\" != \"$FOOOCUS_REPO_GIT\" ] && [ \"$git_url\" != \"$FOOOCUS_REPO_HTTPS\" ]; then\n    echo \"You do not seem to be in a directory containing a checked out Fooocus.\"\n    echo \"This is required for Python environment initialization.\"\n    echo\n    if [ -z \"$(ls -A $directory)\" ]; then\n      if gum confirm \"Would you like to clone it here?\" --default=true --affirmative \"Yes\" --negative \"No\"; then\n        gum spin --spinner dot --title \"Cloning $FOOOCUS_REPO_HTTPS to cwd\" --  git clone $FOOOCUS_REPO_HTTPS .\n        echo \"📇 $FOOOCUS_REPO_HTTPS repo cloned to cwd\"\n      fi\n    else\n      echo \"Tip: try activating this from an empty directory ✨\"\n    fi\n  fi\n\n  if [ -f \"./requirements_versions.txt\" ]; then\n    #export PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n    export PYTHON_DIR=\".venv/\"\n    if [ ! -d \"$PYTHON_DIR\" ]; then\n      gum spin --spinner dot --title \"Creating python virtual environment in $PYTHON_DIR\" -- python -m venv \"$PYTHON_DIR\"\n      echo \"🌏 Virtual environment created in $PYTHON_DIR\"\n    fi\n\n    (\n      source \"$PYTHON_DIR/bin/activate\"\n      gum spin --spinner dot --title \"Updating packages in $PYTHON_DIR\" -- pip install -r \"./requirements_versions.txt\" --quiet\n      echo \"📦 Packages updated in $PYTHON_DIR\"\n    )\n  else\n    echo; echo \"❌ Python not prepared for Fooocus\"\n  fi\n"
+    },
+    "profile": {
+      "bash": "  if [ -d \"$PYTHON_DIR\" ]; then\n    source \"$PYTHON_DIR/bin/activate\"\n  fi\n",
+      "zsh": "  if [ -d \"$PYTHON_DIR\" ]; then\n    source \"$PYTHON_DIR/bin/activate\"\n  fi\n",
+      "fish": "  if [ -d \"$PYTHON_DIR\" ];\n    source \"$PYTHON_DIR/bin/activate.fish\"\n  end\n",
+      "tcsh": "  source \"$PYTHON_DIR/bin/activate.csh\"\n"
+    },
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-darwin",
+        "x86_64-linux"
+      ],
+      "allow": {
+        "licenses": []
+      },
+      "semver": {}
+    },
+    "services": {
+      "foocus": {
+        "command": "$PYTHON_DIR/bin/python3 ./launch.py",
+        "vars": null
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "python311Packages.pytorch-bin",
+      "broken": false,
+      "derivation": "/nix/store/sxl02zbn8rrr55328ylw7iq6vnw6md2y-python3.11-torch-2.2.2.drv",
+      "description": "PyTorch: Tensors and Dynamic neural networks in Python with strong GPU acceleration",
+      "install_id": "pytorch",
+      "license": "[ BSD-3-Clause, Intel Simplified Software License, Unfree redistributable ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=25865a40d14b3f9cf19f19b924e2ab4069b09588",
+      "name": "python3.11-torch-2.2.2",
+      "pname": "pytorch-bin",
+      "rev": "25865a40d14b3f9cf19f19b924e2ab4069b09588",
+      "rev_count": 621993,
+      "rev_date": "2024-05-05T10:51:47Z",
+      "scrape_date": "2024-06-13T21:31:30Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "python3.11-torch-2.2.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/kfjvzpm47702msj2k4b0psmw80dav3sm-python3.11-torch-2.2.2-dist",
+        "out": "/nix/store/fjpgjzm9s68y85csvyvdaxn1m4ppz50i-python3.11-torch-2.2.2"
+      },
+      "system": "aarch64-darwin",
+      "group": "darwin",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.pytorch-bin",
+      "broken": false,
+      "derivation": "/nix/store/mxmasv0340wihcrd30h4b5xwhr1vii28-python3.11-torch-2.2.2.drv",
+      "description": "PyTorch: Tensors and Dynamic neural networks in Python with strong GPU acceleration",
+      "install_id": "pytorch",
+      "license": "[ BSD-3-Clause, Intel Simplified Software License, Unfree redistributable ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=25865a40d14b3f9cf19f19b924e2ab4069b09588",
+      "name": "python3.11-torch-2.2.2",
+      "pname": "pytorch-bin",
+      "rev": "25865a40d14b3f9cf19f19b924e2ab4069b09588",
+      "rev_count": 621993,
+      "rev_date": "2024-05-05T10:51:47Z",
+      "scrape_date": "2024-06-13T21:31:30Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "python3.11-torch-2.2.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/cv3hpmxxl6nac1wqj3vczja2s6z0sdsh-python3.11-torch-2.2.2-dist",
+        "out": "/nix/store/33w1s44203bffh1wqprk9xhqr0pxfv88-python3.11-torch-2.2.2"
+      },
+      "system": "x86_64-darwin",
+      "group": "darwin",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.torchsde",
+      "broken": false,
+      "derivation": "/nix/store/wx3v68lxj8v51j448s8vjn1ykag5vy33-python3.11-torchsde-0.2.6.drv",
+      "description": "Differentiable SDE solvers with GPU support and efficient sensitivity analysis",
+      "install_id": "torchsde",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=25865a40d14b3f9cf19f19b924e2ab4069b09588",
+      "name": "python3.11-torchsde-0.2.6",
+      "pname": "torchsde",
+      "rev": "25865a40d14b3f9cf19f19b924e2ab4069b09588",
+      "rev_count": 621993,
+      "rev_date": "2024-05-05T10:51:47Z",
+      "scrape_date": "2024-06-13T21:31:30Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-torchsde-0.2.6",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/jpipl479njq8050j5r1pkadv5ga9lr3b-python3.11-torchsde-0.2.6-dist",
+        "out": "/nix/store/pyws6vvm5fmdilwj1389k14nshzzxs6z-python3.11-torchsde-0.2.6"
+      },
+      "system": "aarch64-darwin",
+      "group": "darwin",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.torchsde",
+      "broken": false,
+      "derivation": "/nix/store/j29ib32kr365i89ypw8ah8rvaf8x29sl-python3.11-torchsde-0.2.6.drv",
+      "description": "Differentiable SDE solvers with GPU support and efficient sensitivity analysis",
+      "install_id": "torchsde",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=25865a40d14b3f9cf19f19b924e2ab4069b09588",
+      "name": "python3.11-torchsde-0.2.6",
+      "pname": "torchsde",
+      "rev": "25865a40d14b3f9cf19f19b924e2ab4069b09588",
+      "rev_count": 621993,
+      "rev_date": "2024-05-05T10:51:47Z",
+      "scrape_date": "2024-06-13T21:31:30Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-torchsde-0.2.6",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/ixk31npzrxj5vjkgk4dfrjjkasairwxy-python3.11-torchsde-0.2.6-dist",
+        "out": "/nix/store/mdmiwk6zmhc4nsc18z0vqalr632raapb-python3.11-torchsde-0.2.6"
+      },
+      "system": "x86_64-darwin",
+      "group": "darwin",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.torchvision-bin",
+      "broken": false,
+      "derivation": "/nix/store/vgwg13xa3bw2p7p849yhjn1n6j42papv-python3.11-torchvision-0.18.1.drv",
+      "description": "PyTorch vision library",
+      "install_id": "torchvision",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a58bc8ad779655e790115244571758e8de055e3d",
+      "name": "python3.11-torchvision-0.18.1",
+      "pname": "torchvision-bin",
+      "rev": "a58bc8ad779655e790115244571758e8de055e3d",
+      "rev_count": 665011,
+      "rev_date": "2024-08-11T07:55:43Z",
+      "scrape_date": "2024-08-14T02:08:40Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-torchvision-0.18.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/4cgd11az1cspxpjz2fkkrpzpdbhx84gc-python3.11-torchvision-0.18.1-dist",
+        "out": "/nix/store/3y48arzm7235pdgf27nfsdviwbksy4xc-python3.11-torchvision-0.18.1"
+      },
+      "system": "aarch64-linux",
+      "group": "linux",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311Packages.torchvision-bin",
+      "broken": false,
+      "derivation": "/nix/store/amx4rhmky0x4p0g5pwvi9fv5djwzazsy-python3.11-torchvision-0.18.1.drv",
+      "description": "PyTorch vision library",
+      "install_id": "torchvision",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a58bc8ad779655e790115244571758e8de055e3d",
+      "name": "python3.11-torchvision-0.18.1",
+      "pname": "torchvision-bin",
+      "rev": "a58bc8ad779655e790115244571758e8de055e3d",
+      "rev_count": 665011,
+      "rev_date": "2024-08-11T07:55:43Z",
+      "scrape_date": "2024-08-14T02:08:40Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-torchvision-0.18.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/mfzgfdfslm4qzv1l198wzbkhjsqvq5hz-python3.11-torchvision-0.18.1-dist",
+        "out": "/nix/store/hjj4m1n4s2in5r24qss9m3cchb65gs2b-python3.11-torchvision-0.18.1"
+      },
+      "system": "x86_64-linux",
+      "group": "linux",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/sarvhaq958mwadmd26i1wn7nlr57ipi5-gum-0.14.3.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a58bc8ad779655e790115244571758e8de055e3d",
+      "name": "gum-0.14.3",
+      "pname": "gum",
+      "rev": "a58bc8ad779655e790115244571758e8de055e3d",
+      "rev_count": 665011,
+      "rev_date": "2024-08-11T07:55:43Z",
+      "scrape_date": "2024-08-14T02:08:40Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/nz6k85xrxacczcfnq0kigcsigxbfpwhk-gum-0.14.3"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/nidddmjh6qkn34y0fvxs7zzy43dbb0h3-gum-0.14.3.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a58bc8ad779655e790115244571758e8de055e3d",
+      "name": "gum-0.14.3",
+      "pname": "gum",
+      "rev": "a58bc8ad779655e790115244571758e8de055e3d",
+      "rev_count": 665011,
+      "rev_date": "2024-08-11T07:55:43Z",
+      "scrape_date": "2024-08-14T02:08:40Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/81bzbzmm6ryr8319wr9vikrvxqlzhcdk-gum-0.14.3"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/90ic1xh74zrqv8gdcr2yw4kbvi86qyaq-gum-0.14.3.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a58bc8ad779655e790115244571758e8de055e3d",
+      "name": "gum-0.14.3",
+      "pname": "gum",
+      "rev": "a58bc8ad779655e790115244571758e8de055e3d",
+      "rev_count": 665011,
+      "rev_date": "2024-08-11T07:55:43Z",
+      "scrape_date": "2024-08-14T02:08:40Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ddzn78h6b8dp3b4sv65w75b4c4dcxsbi-gum-0.14.3"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/c989ar42jj8z7hsdj1xnbqwm5sagzqq7-gum-0.14.3.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a58bc8ad779655e790115244571758e8de055e3d",
+      "name": "gum-0.14.3",
+      "pname": "gum",
+      "rev": "a58bc8ad779655e790115244571758e8de055e3d",
+      "rev_count": 665011,
+      "rev_date": "2024-08-11T07:55:43Z",
+      "scrape_date": "2024-08-14T02:08:40Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/8d15pvy5v2r31izz0jgfjl3s4a5n66ag-gum-0.14.3"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python3",
+      "broken": false,
+      "derivation": "/nix/store/mhc5h81w16fnibsw9qdy75dxq8aavw3a-python3-3.12.4.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python3",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a58bc8ad779655e790115244571758e8de055e3d",
+      "name": "python3-3.12.4",
+      "pname": "python3",
+      "rev": "a58bc8ad779655e790115244571758e8de055e3d",
+      "rev_count": 665011,
+      "rev_date": "2024-08-11T07:55:43Z",
+      "scrape_date": "2024-08-14T02:08:40Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.12.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/1sgajx2r3bkriyxzwsahhva63p08pmac-python3-3.12.4"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python3",
+      "broken": false,
+      "derivation": "/nix/store/psrcdr7glp1rxwd1586q75nhljpdbzby-python3-3.12.4.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python3",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a58bc8ad779655e790115244571758e8de055e3d",
+      "name": "python3-3.12.4",
+      "pname": "python3",
+      "rev": "a58bc8ad779655e790115244571758e8de055e3d",
+      "rev_count": 665011,
+      "rev_date": "2024-08-11T07:55:43Z",
+      "scrape_date": "2024-08-14T02:08:40Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.12.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/rshmxwibmxqvf94w3ld05yqnsijrmk4m-python3-3.12.4-debug",
+        "out": "/nix/store/jms4z7lzzwnv6gv3y0795365haicmh8m-python3-3.12.4"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python3",
+      "broken": false,
+      "derivation": "/nix/store/bs2ygcjxw88nq9wakc1rzbxjjqiirknx-python3-3.12.4.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python3",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a58bc8ad779655e790115244571758e8de055e3d",
+      "name": "python3-3.12.4",
+      "pname": "python3",
+      "rev": "a58bc8ad779655e790115244571758e8de055e3d",
+      "rev_count": 665011,
+      "rev_date": "2024-08-11T07:55:43Z",
+      "scrape_date": "2024-08-14T02:08:40Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.12.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/dh1i1387ibdzw0ala5rkl3s3ylf8i8pa-python3-3.12.4"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python3",
+      "broken": false,
+      "derivation": "/nix/store/zakf7g0dmhlx4qbvv8h157d9d0k2r591-python3-3.12.4.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python3",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a58bc8ad779655e790115244571758e8de055e3d",
+      "name": "python3-3.12.4",
+      "pname": "python3",
+      "rev": "a58bc8ad779655e790115244571758e8de055e3d",
+      "rev_count": 665011,
+      "rev_date": "2024-08-11T07:55:43Z",
+      "scrape_date": "2024-08-14T02:08:40Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.12.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/myg0p2vf2cj2jsb663qswnygvgn54kbc-python3-3.12.4-debug",
+        "out": "/nix/store/l014xp1qxdl6gim3zc0jv3mpxhbp346s-python3-3.12.4"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+version = 1
+
+# Install XQuartz
+install.xquartz.pkg-path = "xquartz"
+services.xquartz.command = "xquartz"
+vars.DISPLAY=":0"
+profile.common = "alias ssh='ssh -XY'"
+
+# Install quartz-wm
+services.quartz-wm.command = "sleep 5;quartz-wm"
+install.quartz-wm.pkg-path = "quartz-wm"
+
+# Install xterm
+install.xterm.pkg-path = "xterm"
+
+options.systems = ["aarch64-darwin", "x86_64-darwin"]
+

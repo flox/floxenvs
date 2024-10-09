@@ -1,0 +1,54 @@
+#
+# This is a flox environment manifest.
+# Visit flox.dev/docs/concepts/manifest/
+# or see flox-edit(1), manifest.toml(1) for more information.
+#
+
+[install]
+openai.pkg-path  = "openai"
+llm.pkg-path     = "llm"
+gum.pkg-path     = "gum"
+chatgpt-cli.pkg-path = "chatgpt-cli"
+mods.pkg-path = "mods"
+
+[profile]
+common = """
+
+  # First, check if $OPENAI_API_KEY is set
+  if [[ "${OPENAI_API_KEY}" ]]; then
+    echo "🤖 OpenAI configured with key from existing environment"
+    return 0
+  fi
+
+  # Then, check to see if the dotfile exists
+  if [[ -f ~/.config/openai.key ]]; then
+    export OPENAI_API_KEY=$(cat ~/.config/openai.key)
+    echo "🤖 OpenAI configured with key from ~/.config/openai.key"
+    return 0
+  fi
+
+  # We got nothing! Let's ask.
+  echo "OpenAI key not detected."
+  
+  if gum confirm "Would you like to provide one now?" --default=true --affirmative "Yes" --negative "No"; then
+    OPENAI_API_KEY=$(gum input --placeholder "OpenAI API key")
+    export OPENAI_API_KEY
+    if gum confirm "Write this into ~/.config/openai.key for next time?" --default=true --affirmative "Yes" --negative "No"; then
+      mkdir -p ~/.config/
+      echo "$OPENAI_API_KEY" > ~/.config/openai.key
+      chmod 600 ~/.config/openai.key
+    fi
+    echo "🤖 OpenAI configured with provided key"
+    return 0
+  fi
+
+  echo "An OpenAI key is required. You can provide one by setting OPENAI_API_KEY."
+  echo; echo "🚨 OpenAI client is available (no key)"
+
+"""
+
+[options]
+systems = ["aarch64-darwin", "x86_64-linux"]
+
+
+

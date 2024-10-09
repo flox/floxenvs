@@ -1,0 +1,85 @@
+name: "Update flox environments manifests"
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 0 * * 1"
+
+jobs:
+
+  envs:
+    name: "Find environments"
+    runs-on: "ubuntu-latest"
+
+    outputs:
+      envs: "${{ steps.envs.outputs.envs }}"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v4"
+
+      - name: "Find environment"
+        id: "envs"
+        run: |
+          set -x
+          envs="["
+          while IFS= read path; do
+            env_path=$(realpath -s $(dirname $path)/../..)
+            if [ -f "$env_path/test.sh" ]; then
+              name=$(basename $env_path)
+              num_of_services=$(yq -oy '.services | length' $path)
+              start_services="true"
+              if [ "$num_of_services" -eq 0 ]; then
+                start_services="false"
+              fi
+
+              comma=""
+              if [ "$envs" != "[" ]; then comma=","; fi
+              envs="$envs$comma{\"example\":\"$name\"}"
+            fi
+          done <<< "$(find ./ -name manifest.toml)"
+          envs="$envs]"
+
+          echo "-- ENVS --------------------"
+          echo "$envs " | jq
+          echo "----------------------------"
+
+          echo "envs=$envs" >> "$GITHUB_OUTPUT"
+
+  upgrade:
+    name: "Upgrade '${{ matrix.example }}' manifest"
+    runs-on: "ubuntu-latest"
+
+    needs:
+      - "envs"
+
+    strategy:
+      matrix:
+        include: ${{ fromJSON(needs.envs.outputs.envs) }}
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v4"
+
+      - name: "Install flox"
+        uses: "flox/install-flox-action@main"
+
+      - name: "Run upgrade"
+        run: |
+          pushd ./${{ matrix.example }}
+          flox -vvv upgrade
+          popd
+
+      - name: "Create Pull Request"
+        uses: "peter-evans/create-pull-request@v7"
+        with:
+          token: "${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}"
+          add-paths: "${{ matrix.example }}/.flox"
+          commit-message: "chore: Update manifest of `${{ matrix.example }}` environment"
+          commiter: "FloxBot <bot@flox.dev>"
+          author: "FloxBot <bot@flox.dev>"
+          branch: "chore-update-${{ matrix.example }}-environment"
+          delete-branch: true
+          title: "chore: Update manifest of `${{ matrix.example }}` flox environment"
+          body: "This PR was automatically created by [Update workflow](https://github.com/flox/floxenvs/actions/workflows/update.yml)."
+          labels: "team-developer-support"

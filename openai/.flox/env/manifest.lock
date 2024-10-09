@@ -1,0 +1,219 @@
+{
+  "lockfile-version": 0,
+  "manifest": {
+    "hook": {},
+    "install": {
+      "gum": {
+        "pkg-path": "gum"
+      },
+      "jupyter": {
+        "pkg-path": "jupyter"
+      },
+      "llm": {
+        "pkg-path": "llm"
+      },
+      "openai": {
+        "pkg-path": "openai"
+      },
+      "vscode": {
+        "pkg-path": "vscode"
+      }
+    },
+    "options": {
+      "systems": [
+        "aarch64-darwin"
+      ]
+    },
+    "profile": {
+      "common": "\n  # First, check if $OPENAI_API_KEY is set\n  if [[ \"${OPENAI_API_KEY}\" ]]; then\n    echo \"🤖 OpenAI configured with key from existing environment\"\n    return 0\n  fi\n\n  # Then, check to see if the dotfile exists\n  if [[ -f ~/.config/openai.key ]]; then\n    export OPENAI_API_KEY=$(cat ~/.config/openai.key)\n    echo \"🤖 OpenAI configured with key from ~/.config/openai.key\"\n    return 0\n  fi\n\n  # We got nothing! Let's ask.\n  echo \"OpenAI key not detected.\"\n  \n  if gum confirm \"Would you like to provide one now?\" --default=true --affirmative \"Yes\" --negative \"No\"; then\n    OPENAI_API_KEY=$(gum input --placeholder \"OpenAI API key\")\n    if gum confirm \"Write this into ~/.config/openai.key for next time?\" --default=true --affirmative \"Yes\" --negative \"No\"; then\n      echo \"$OPENAI_API_KEY\" > ~/.config/openai.key\n      chmod 600 ~/.config/openai.key\n    fi\n    echo \"🤖 OpenAI configured with provided key\"\n    return 0\n  fi\n\n  echo \"An OpenAI key is required. You can provide one by setting OPENAI_API_KEY.\"\n  echo; echo \"🚨 OpenAI client is available (no key)\"\n\n"
+    },
+    "registry": {
+      "defaults": {
+        "subtrees": null
+      },
+      "inputs": {
+        "nixpkgs": {
+          "from": {
+            "owner": "NixOS",
+            "ref": "release-23.11",
+            "repo": "nixpkgs",
+            "type": "github"
+          },
+          "subtrees": [
+            "legacyPackages"
+          ]
+        }
+      },
+      "priority": [
+        "nixpkgs"
+      ]
+    }
+  },
+  "packages": {
+    "aarch64-darwin": {
+      "gum": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "gum"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Tasty Bubble Gum for your shell",
+          "license": "MIT",
+          "pname": "gum",
+          "unfree": false,
+          "version": "0.13.0"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712670302,
+            "narHash": "sha256-iV3ChPOnUTEx2Bb+hsUoTEMUT1u4uOnwdssvfNI95Zw=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "466b061d6faf82721ed437865d081a57908ebebf",
+            "type": "github"
+          },
+          "fingerprint": "c0a5815c4843588f176933d9214312afd0aef3203db6f2416ca44176cef2a5ec",
+          "url": "github:NixOS/nixpkgs/466b061d6faf82721ed437865d081a57908ebebf"
+        },
+        "priority": 5
+      },
+      "jupyter": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "jupyter"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A high-level dynamically-typed programming language",
+          "license": "Python-2.0",
+          "pname": "python3",
+          "unfree": false,
+          "version": "3.11.8-env"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712670302,
+            "narHash": "sha256-iV3ChPOnUTEx2Bb+hsUoTEMUT1u4uOnwdssvfNI95Zw=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "466b061d6faf82721ed437865d081a57908ebebf",
+            "type": "github"
+          },
+          "fingerprint": "c0a5815c4843588f176933d9214312afd0aef3203db6f2416ca44176cef2a5ec",
+          "url": "github:NixOS/nixpkgs/466b061d6faf82721ed437865d081a57908ebebf"
+        },
+        "priority": 5
+      },
+      "llm": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "llm"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Access large language models from the command-line",
+          "license": "Apache-2.0",
+          "pname": "llm",
+          "unfree": false,
+          "version": "0.13.1"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712670302,
+            "narHash": "sha256-iV3ChPOnUTEx2Bb+hsUoTEMUT1u4uOnwdssvfNI95Zw=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "466b061d6faf82721ed437865d081a57908ebebf",
+            "type": "github"
+          },
+          "fingerprint": "c0a5815c4843588f176933d9214312afd0aef3203db6f2416ca44176cef2a5ec",
+          "url": "github:NixOS/nixpkgs/466b061d6faf82721ed437865d081a57908ebebf"
+        },
+        "priority": 5
+      },
+      "openai": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "openai"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Python client library for the OpenAI API",
+          "license": "MIT",
+          "pname": "openai",
+          "unfree": false,
+          "version": "1.16.2"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712670302,
+            "narHash": "sha256-iV3ChPOnUTEx2Bb+hsUoTEMUT1u4uOnwdssvfNI95Zw=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "466b061d6faf82721ed437865d081a57908ebebf",
+            "type": "github"
+          },
+          "fingerprint": "c0a5815c4843588f176933d9214312afd0aef3203db6f2416ca44176cef2a5ec",
+          "url": "github:NixOS/nixpkgs/466b061d6faf82721ed437865d081a57908ebebf"
+        },
+        "priority": 5
+      },
+      "vscode": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "vscode"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Open source source code editor developed by Microsoft for Windows,\nLinux and macOS\n",
+          "license": null,
+          "pname": "vscode",
+          "unfree": true,
+          "version": "1.88.0"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1712670302,
+            "narHash": "sha256-iV3ChPOnUTEx2Bb+hsUoTEMUT1u4uOnwdssvfNI95Zw=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "466b061d6faf82721ed437865d081a57908ebebf",
+            "type": "github"
+          },
+          "fingerprint": "c0a5815c4843588f176933d9214312afd0aef3203db6f2416ca44176cef2a5ec",
+          "url": "github:NixOS/nixpkgs/466b061d6faf82721ed437865d081a57908ebebf"
+        },
+        "priority": 5
+      }
+    }
+  },
+  "registry": {
+    "defaults": {
+      "subtrees": null
+    },
+    "inputs": {
+      "nixpkgs": {
+        "from": {
+          "lastModified": 1712670302,
+          "narHash": "sha256-iV3ChPOnUTEx2Bb+hsUoTEMUT1u4uOnwdssvfNI95Zw=",
+          "owner": "NixOS",
+          "repo": "nixpkgs",
+          "rev": "466b061d6faf82721ed437865d081a57908ebebf",
+          "type": "github"
+        },
+        "subtrees": [
+          "legacyPackages"
+        ]
+      }
+    },
+    "priority": [
+      "nixpkgs"
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+#
+# This is a flox environment manifest.
+# Visit flox.dev/docs/concepts/manifest/
+# or see flox-edit(1), manifest.toml(1) for more information.
+#
+
+[install]
+unzip.pkg-path    = "unzip"
+curl.pkg-path     = "curl"
+dosbox-x.pkg-path = "dosbox-x"
+
+[profile]
+common = """
+  GAME_DIR="$HOME/.cache/dune-for-dos"
+  GAME_URL="https://d2.myabandonware.com/t/aca2daa6-fadc-406b-bcb4-bc649c43ce00/Dune_DOS_EN_RIP-Version.zip"
+
+  if [[ ! -d $GAME_DIR ]]; then
+    echo; echo -n "🏜️  Downloading game to $GAME_DIR..."
+
+    mkdir -p $GAME_DIR
+    curl -Lso $GAME_DIR/game.zip $GAME_URL
+    unzip -qq $GAME_DIR/game.zip -d $GAME_DIR
+    echo "done."
+  fi
+
+  dosbox-x -c "mount g $GAME_DIR"
+  exit
+"""
+
+[options]
+systems = ["aarch64-darwin"]

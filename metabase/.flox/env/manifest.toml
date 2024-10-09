@@ -1,0 +1,25 @@
+#
+# This is a Flox environment manifest.
+# Visit flox.dev/docs/concepts/manifest/
+# or see flox-edit(1), manifest.toml(5) for more information.
+#
+version = 1
+
+[install]
+metabase.pkg-path = "metabase"
+
+[vars]
+# deactivate metabase tracking here if desired (I keep it on!)
+MB_ANON_TRACKING_ENABLED="true"
+MB_CHECK_FOR_UPDATES="true"
+
+[services.metabase]
+command = "metabase"
+
+[profile]
+common = '''
+  echo "Metabase URL: http://localhost:3000"
+'''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]

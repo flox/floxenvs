@@ -1,0 +1,110 @@
+#
+# This is a flox environment manifest.
+# Visit flox.dev/docs/concepts/manifest/
+# or see flox-edit(1) for more information
+#
+version = 1
+
+[install]
+direnv.pkg-path = "direnv"
+gum.pkg-path = "gum"
+
+[vars]
+# It would be better if there were a way to have *less* output
+# instead of *no* output, but this is still unresolved in direnv
+DIRENV_LOG_FORMAT=""
+
+# The location of the flox-direnv extension to be installed
+FLOX_DIRENV_EXT_URL="https://raw.githubusercontent.com/flox/flox-direnv/v1.1.0/direnv.rc"
+FLOX_DIRENV_EXT_HASH="0awwzi4k3v1wvfaiyd6vlcc68ixq0fw03apbdm6vf1x8wrv2wpdp"
+
+[hook]
+on-activate = '''
+  #
+  # Make sure the flox-direnv extension is installed
+  #
+
+  temp_location=$(mktemp)
+  target_location="$HOME/.config/direnv/lib/flox-direnv.sh"
+
+  # If it's installed and matches the hash, return from the hook and continue shell init
+  if [ -f "$target_location" ] && [ "$(nix-hash --type sha256 --base32 $target_location)" == "$FLOX_DIRENV_EXT_HASH" ]; then
+    echo "🤖 This shell now has direnv enabled."
+    return
+  fi
+
+  # Grab the extension script into a temp file and check the hash
+  gum spin --spinner dot --title "Downloading extension" -- curl -so "$temp_location" "$FLOX_DIRENV_EXT_URL"
+  hash=$(nix-hash --type sha256 --base32 "$temp_location")
+
+  # If what we downloaded matches the hash, put it into place
+  if [ "$hash" == "$FLOX_DIRENV_EXT_HASH" ]; then
+    mkdir -p $(dirname "$target_location")
+    cat $temp_location > $target_location
+    echo "✅ Extension installed in ~/.config/direnv/lib/"
+  else
+    echo "🚨 Could not validate downloaded extension"
+    return
+  fi
+  echo "🤖 direnv enabled"
+'''
+
+[profile]
+fish = "direnv hook fish | source"
+tcsh = "eval `direnv hook tcsh`"
+
+bash = """
+  eval "$(direnv hook bash)"
+"""
+
+zsh = """
+  eval "$(direnv hook zsh)"
+
+  # TODO: Figure out how to get this working across all the shells
+  floxit() {
+
+    #
+    # If we are in a directory with a .flox, let's make a matching
+    # .envrc that activates it and add to the direnv allowlist.
+    #
+    # (Asking on each step, of course!)
+    #
+
+    if [ -d ".flox" ]; then  # TODO: better way to validate?
+      FILE=".envrc"
+      LINE='use flox'
+  
+      echo
+      if [ -f $FILE ] && grep -qxF "$LINE" "$FILE"; then
+        echo "This directory is already configured for direnv ✨"
+      else
+        echo "This directory has a Flox environment, lucky you! 🌟"
+        echo
+
+        # Ask whether to add the line, in case this was run accidentally
+        if gum confirm "Add Flox activation to .envrc?" --default=true --affirmative "Yep!" --negative "Not now"; then
+          if [ -f $FILE ]; then
+            echo "$LINE" >> "$FILE"
+          else
+            echo "$LINE" > "$FILE"
+          fi
+          echo "✅ Added Flox activation to .envrc"
+
+          # Ask whether to add to allowlist, we want this explicit
+          if gum confirm "Add this directory to direnv's allowlist?" --default=true --affirmative "Yes" --negative "Not now"; then
+            $FLOX_ENV/bin/direnv allow .
+            echo "✅ Added this directory to the direnv allowlist"
+          fi
+        fi
+     fi
+    else
+      echo "This directory does not contain a Flox environment."
+    fi
+    echo
+  }
+"""
+
+[options]
+systems = ["x86_64-linux", "aarch64-darwin"]
+
+

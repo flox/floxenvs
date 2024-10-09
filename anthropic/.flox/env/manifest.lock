@@ -1,0 +1,397 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "version": 1,
+    "install": {
+      "anthropic": {
+        "pkg-path": "python312Packages.anthropic"
+      },
+      "click": {
+        "pkg-path": "python312Packages.click"
+      },
+      "gum": {
+        "pkg-path": "gum"
+      }
+    },
+    "vars": {
+      "claude_script": "[(importlib := __import__('importlib')), (click := importlib.import_module('click')), (os := importlib.import_module('os')), (anthropic := importlib.import_module('anthropic')), (__ol_mod_kfhxdqofiu := __import__('pathlib', globals(), locals(), ['Path'], 0)), (Path := __ol_mod_kfhxdqofiu.Path), (claude := click.command()(click.option('--model', '-m', default='claude-3-5-sonnet-20240620', help='The Claude model to use (sonnet3.5, opus3, sonnet3, haiku3, or full model name)', metavar='<string>')(click.option('--temperature', '-t', default=0.0, help='The temperature (0.0 to 1.0) for response generation', metavar='<float>')(click.option('--max-tokens', '-x', default=1000, help='The maximum number of tokens in the response', metavar='<integer>')(click.option('--infile', '-i', help='File to read input from', metavar='<file>')(click.option('--outfile', '-o', help='File to write the response to', metavar='<file>')(click.argument('prompt')(lambda model, temperature, max_tokens, infile, outfile, prompt: [(__ol_retv_ddeknbkqsh := None), (model_fullname := 'claude-3-5-sonnet-20240620') if model == 'sonnet3.5' else (model_fullname := 'claude-3-opus-20240229') if model == 'opus3' else (model_fullname := 'claude-3-sonnet-20240229') if model == 'sonnet3' else (model_fullname := 'claude-3-haiku-20240307') if model == 'haiku3' else (model_fullname := model), [(size := os.path.getsize(infile)), [print('Error: input file size exceeds 16kb limit.'), exit(1)] if size > 16383 else ..., (file_path := Path(infile)), (inputfilecontent := file_path.read_text()), (fullprompt := (inputfilecontent + ' ' + prompt).strip())] if infile else (fullprompt := prompt.strip()), (client := anthropic.Anthropic()), (message := client.messages.create(model=model_fullname, max_tokens=max_tokens, temperature=temperature, messages=[{'role': 'user', 'content': fullprompt}])), (content := message.content[0].text), [(write_file := open(outfile, 'w')), write_file.write(content), write_file.close(), print('Output saved to', outfile)] if outfile else print(content), [], __ol_retv_ddeknbkqsh][-1])))))))), claude(auto_envvar_prefix='CLAUDE') if __name__ == '__main__' else ...]"
+    },
+    "hook": {
+      "on-activate": "    # Bootstrap ANTHROPIC_API_KEY setup\n    bootstrap_anthropic_config() {\n        local config_file=\"$HOME/.config/flox/anthropic.session\"\n        local config_dir=\"$(dirname \"$config_file\")\"\n\n        # Check if exists ANTHROPIC_API_KEY as an env variable\n        if [ -n \"$ANTHROPIC_API_KEY\" ]; then\n            echo \"Anthropic API key is already set as an environment variable.\"\n            return 0\n        fi\n\n        # Check if exists ~/.config/flox/anthropic and if exists valid API key\n        if [ -f \"$config_file\" ]; then\n            source \"$config_file\"\n            if [ -n \"$ANTHROPIC_API_KEY\" ]; then\n                echo \"Anthropic API key loaded from config file.\"\n                export ANTHROPIC_API_KEY\n                return 0\n            fi\n        fi\n\n\n        # If we've reached this point, it's time to prompt you for your API key\n        mkdir -p \"$config_dir\"\n\n        echo \"Please enter your Anthropic API key:\"\n        ANTHROPIC_API_KEY=$(gum input --password)\n\n\t# If the user has said \"no\" to persisting the key previously, let's stop here\n\tif [ \"$ANTHROPIC_KEY_PERSISTENCE\" == \"false\" ]; then\n           echo \"Not storing key based on setting in $config_file\"\n           return 0\n        fi\n\n        echo \"# Anthropic API configuration\" > \"$config_file\"\n        echo \"# You can enable/disable key persistence by setting ANTHROPIC_KEY_PERSISTENCE to true/false\" >> \"$config_file\"\n\n        # Here we ask you if you want to persist your API key\n\n        if gum confirm \"Do you want to persist your Anthropic API key?\" --affirmative=\"Yes\" --negative=\"No\"; then\n            # If user sez Yes save API key\n            echo \"ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY\" >> \"$config_file\"\n            echo \"ANTHROPIC_KEY_PERSISTENCE=true\" >> \"$config_file\"\n            echo \"API key saved to config file and persistence enabled: $config_file\"\n        else\n            # If user sez No do not save API key\n            echo \"ANTHROPIC_KEY_PERSISTENCE=false\" >> \"$config_file\"\n            echo \"API key not saved to file. It will only be available for this session.\"\n        fi\n\n        export ANTHROPIC_API_KEY\n        echo \"Anthropic API key set for this session.\"\n        echo \"Configuration file location: $config_file\"\n    }\n\n    # Call the bootstrapping wizard\n    bootstrap_anthropic_config\n"
+    },
+    "profile": {
+      "bash": "    alias claude=\"python3 -c \\\"$claude_script\\\"\"\n",
+      "zsh": "    alias claude=\"python3 -c \\\"$claude_script\\\"\"\n"
+    },
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-darwin",
+        "x86_64-linux"
+      ],
+      "allow": {
+        "licenses": []
+      },
+      "semver": {}
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "python312Packages.anthropic",
+      "broken": false,
+      "derivation": "/nix/store/6n6x89jknzv55qiggq39z2070b2byym4-python3.12-anthropic-0.28.1.drv",
+      "description": "Anthropic's safety-first language model APIs",
+      "install_id": "anthropic",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "name": "python3.12-anthropic-0.28.1",
+      "pname": "anthropic",
+      "rev": "693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "rev_count": 652902,
+      "rev_date": "2024-07-14T11:43:13Z",
+      "scrape_date": "2024-07-16T03:03:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.12-anthropic-0.28.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/24as89zcx84js82kgmfnchnwdvapc4kb-python3.12-anthropic-0.28.1-dist",
+        "out": "/nix/store/yn4a93qxvvavpkzi0ymd64g639y859jd-python3.12-anthropic-0.28.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python312Packages.anthropic",
+      "broken": false,
+      "derivation": "/nix/store/qpm2mg892xmajmmsz0j6fa71rsgi5cqp-python3.12-anthropic-0.28.1.drv",
+      "description": "Anthropic's safety-first language model APIs",
+      "install_id": "anthropic",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "name": "python3.12-anthropic-0.28.1",
+      "pname": "anthropic",
+      "rev": "693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "rev_count": 652902,
+      "rev_date": "2024-07-14T11:43:13Z",
+      "scrape_date": "2024-07-16T03:03:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.12-anthropic-0.28.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/8n0gzdbbxab47q0348i2zy1cahf5gbag-python3.12-anthropic-0.28.1-dist",
+        "out": "/nix/store/qqpllncy3agdh8b5lgsl0d391dylzqic-python3.12-anthropic-0.28.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python312Packages.anthropic",
+      "broken": false,
+      "derivation": "/nix/store/67537820w4cdvcgad9gn4v4bmhkb6hmm-python3.12-anthropic-0.28.1.drv",
+      "description": "Anthropic's safety-first language model APIs",
+      "install_id": "anthropic",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "name": "python3.12-anthropic-0.28.1",
+      "pname": "anthropic",
+      "rev": "693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "rev_count": 652902,
+      "rev_date": "2024-07-14T11:43:13Z",
+      "scrape_date": "2024-07-16T03:03:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.12-anthropic-0.28.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/57wc89fl0f9bapxq12l18iqflqwy866h-python3.12-anthropic-0.28.1-dist",
+        "out": "/nix/store/bybnad800ykh47jwfc4q3ljfgnim07cq-python3.12-anthropic-0.28.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python312Packages.anthropic",
+      "broken": false,
+      "derivation": "/nix/store/bkni33xviif6pwrbl0gypa0xvq8hnnhq-python3.12-anthropic-0.28.1.drv",
+      "description": "Anthropic's safety-first language model APIs",
+      "install_id": "anthropic",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "name": "python3.12-anthropic-0.28.1",
+      "pname": "anthropic",
+      "rev": "693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "rev_count": 652902,
+      "rev_date": "2024-07-14T11:43:13Z",
+      "scrape_date": "2024-07-16T03:03:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.12-anthropic-0.28.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/q27panzq7rcni0kp8zs51k1lpk34ih6n-python3.12-anthropic-0.28.1-dist",
+        "out": "/nix/store/f0z6cn3gikja6by98qvnv8z57id4pvmq-python3.12-anthropic-0.28.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python312Packages.click",
+      "broken": false,
+      "derivation": "/nix/store/nxfk8nb4nriw9r6qg80gy4l9vqfz957b-python3.12-click-8.1.7.drv",
+      "description": "Create beautiful command line interfaces in Python",
+      "install_id": "click",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "name": "python3.12-click-8.1.7",
+      "pname": "click",
+      "rev": "693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "rev_count": 652902,
+      "rev_date": "2024-07-14T11:43:13Z",
+      "scrape_date": "2024-07-16T03:03:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.12-click-8.1.7",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/adjvc1kv0ldq3nx88s6c7a23z9g86zmi-python3.12-click-8.1.7-dist",
+        "out": "/nix/store/frzdh6avkfwz290zdzq208fzzm9r6b1s-python3.12-click-8.1.7"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python312Packages.click",
+      "broken": false,
+      "derivation": "/nix/store/yanh95p3v831792il8dlgvjd58hs56sh-python3.12-click-8.1.7.drv",
+      "description": "Create beautiful command line interfaces in Python",
+      "install_id": "click",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "name": "python3.12-click-8.1.7",
+      "pname": "click",
+      "rev": "693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "rev_count": 652902,
+      "rev_date": "2024-07-14T11:43:13Z",
+      "scrape_date": "2024-07-16T03:03:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.12-click-8.1.7",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/v6xrc8yg8jp6f2qxm7066v897gx7dwpw-python3.12-click-8.1.7-dist",
+        "out": "/nix/store/58psp7vbpvx9dyd9zl7vx4pzgk1g7y45-python3.12-click-8.1.7"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python312Packages.click",
+      "broken": false,
+      "derivation": "/nix/store/symfwm01l64i1hxp65cnqbi5di2nqk22-python3.12-click-8.1.7.drv",
+      "description": "Create beautiful command line interfaces in Python",
+      "install_id": "click",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "name": "python3.12-click-8.1.7",
+      "pname": "click",
+      "rev": "693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "rev_count": 652902,
+      "rev_date": "2024-07-14T11:43:13Z",
+      "scrape_date": "2024-07-16T03:03:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.12-click-8.1.7",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/vrf5vj79xnjih8l0090ww0qxd2v2liqw-python3.12-click-8.1.7-dist",
+        "out": "/nix/store/i23rgnflskws9wqnzgzzrmryrw6s1m60-python3.12-click-8.1.7"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python312Packages.click",
+      "broken": false,
+      "derivation": "/nix/store/b7c06dzmaqvb0zwaa60lxw031nz9ci20-python3.12-click-8.1.7.drv",
+      "description": "Create beautiful command line interfaces in Python",
+      "install_id": "click",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "name": "python3.12-click-8.1.7",
+      "pname": "click",
+      "rev": "693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "rev_count": 652902,
+      "rev_date": "2024-07-14T11:43:13Z",
+      "scrape_date": "2024-07-16T03:03:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.12-click-8.1.7",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/glpfcpa70jr8a0xzsjjbbz32wpcf997a-python3.12-click-8.1.7-dist",
+        "out": "/nix/store/km5k1j2wffwn6wbyxnibd0w0yl2rcabw-python3.12-click-8.1.7"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/9j6a33883ya6b3c89i28nv7s2m53b65s-gum-0.14.1.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "name": "gum-0.14.1",
+      "pname": "gum",
+      "rev": "693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "rev_count": 652902,
+      "rev_date": "2024-07-14T11:43:13Z",
+      "scrape_date": "2024-07-16T03:03:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/hi946camicx98bv9y9nz6jx2fyxcc9kk-gum-0.14.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/vz1ssxa54qj3gxfyx2rkys370m0xdpqh-gum-0.14.1.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "name": "gum-0.14.1",
+      "pname": "gum",
+      "rev": "693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "rev_count": 652902,
+      "rev_date": "2024-07-14T11:43:13Z",
+      "scrape_date": "2024-07-16T03:03:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/3z1lqas4yni9hzvx2kpbmd108fs7qr0r-gum-0.14.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/s339azrz2q6vynb5g4x08z9wnsgfs14a-gum-0.14.1.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "name": "gum-0.14.1",
+      "pname": "gum",
+      "rev": "693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "rev_count": 652902,
+      "rev_date": "2024-07-14T11:43:13Z",
+      "scrape_date": "2024-07-16T03:03:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/hxfw2r39malghnmrm20d23qvf3p1lwdg-gum-0.14.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/cbgkdgp6kz31szqsn2hi1y0nnp0lizwr-gum-0.14.1.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "name": "gum-0.14.1",
+      "pname": "gum",
+      "rev": "693bc46d169f5af9c992095736e82c3488bf7dbb",
+      "rev_count": 652902,
+      "rev_date": "2024-07-14T11:43:13Z",
+      "scrape_date": "2024-07-16T03:03:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/js1fcw5brznb0lcw55l5b3ad4rwfj4mf-gum-0.14.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ]
+}

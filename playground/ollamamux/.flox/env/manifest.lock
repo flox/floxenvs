@@ -1,0 +1,416 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "version": 1,
+    "install": {
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": null,
+        "priority": null,
+        "version": null,
+        "systems": null
+      },
+      "ollama": {
+        "pkg-path": "ollama",
+        "pkg-group": null,
+        "priority": null,
+        "version": null,
+        "systems": null
+      },
+      "tmux": {
+        "pkg-path": "tmux",
+        "pkg-group": null,
+        "priority": null,
+        "version": null,
+        "systems": null
+      }
+    },
+    "vars": {
+      "OLLAMA_TMUX_SESSION": "ollama"
+    },
+    "hook": {
+      "on-activate": null
+    },
+    "profile": {
+      "common": null,
+      "bash": "  autostart=\"$HOME/.config/ollama-env/autostart\"\n  choice=\n  if [ ! -f \"$autostart\" ]; then\n      echo \"Would you like to start the Ollama service in tmux?\"\n      choice=$(gum choose \"Always - start now & on future activations\" \"Yes - start now only\" \"No - do not start\")\n      if [ \"${choice:0:1}\" = \"A\" ]; then\n          mkdir -p \"$HOME\"/.config/ollama-env\n          echo \"1\" > \"$autostart\"\n          echo\n          echo \"Machine will start automatically on next activation. To disable this, run:\"\n          echo \"  rm $autostart\"\n      fi\n  fi\n\n  if [ -f \"$autostart\" ] || [ \"${choice:0:1}\" = \"A\" ] || [ \"${choice:0:1}\" = \"Y\" ] ; then\n    instructionsFile=$(mktemp)\n    echo > $instructionsFile\n    echo \"The ollama service is running in the top pane.\" >> $instructionsFile\n    echo >> $instructionsFile\n    echo \"Use 'ollama pull' to download a model, e.g. 'ollama pull llama3'\" >> $instructionsFile\n    echo \"Use 'ollama run' to run a model, e.g. 'ollama run llama3'\" >> $instructionsFile\n    echo \"Use 'teardown' to kill the session\" >> $instructionsFile\n\n    # In case we're already running\n    $FLOX_ENV/bin/tmux kill-session -t $OLLAMA_TMUX_SESSION\n\n    # Create a new tmux session\n    $FLOX_ENV/bin/tmux new-session -d -s $OLLAMA_TMUX_SESSION\n\n    # Create a pane at the top\n    $FLOX_ENV/bin/tmux split-window -v -t $OLLAMA_TMUX_SESSION\n    $FLOX_ENV/bin/tmux resize-pane -t $OLLAMA_TMUX_SESSION:0.0 -y 7\n\n    # Run the ollama servce in the top pane\n    $FLOX_ENV/bin/tmux send-keys -t $OLLAMA_TMUX_SESSION:0.0 \"ollama serve\" Enter\n\n    # Create an alias in the bottom pane\n    # (and clear the screen so the user doesn't have to see it)\n    $FLOX_ENV/bin/tmux send-keys -t $OLLAMA_TMUX_SESSION:0.1 \"alias teardown='tmux kill-session -t \" $OLLAMA_TMUX_SESSION \"'\" Enter\n\n    # Provide some instructions for the user\n    $FLOX_ENV/bin/tmux send-keys -t $OLLAMA_TMUX_SESSION:0.1 \"alias instructions='command cat \" $instructionsFile \"'\" Enter\n    $FLOX_ENV/bin/tmux send-keys -t $OLLAMA_TMUX_SESSION:0.1 \"instructions\" ^L Enter\n\n    # Attach to our session!\n    $FLOX_ENV/bin/tmux attach-session -t $OLLAMA_TMUX_SESSION\n\n    # Cause the Flox environment to exit once tmux is done\n    exit # im dead\n  fi\n",
+      "zsh": "  autostart=\"$HOME/.config/ollama-env/autostart\"\n  choice=\n  if [ ! -f \"$autostart\" ]; then\n      echo \"Would you like to start the Ollama service in tmux?\"\n      choice=$(gum choose \"Always - start now & on future activations\" \"Yes - start now only\" \"No - do not start\")\n      if [ \"${choice:0:1}\" = \"A\" ]; then\n          mkdir -p \"$HOME\"/.config/ollama-env\n          echo \"1\" > \"$autostart\"\n          echo\n          echo \"Machine will start automatically on next activation. To disable this, run:\"\n          echo \"  rm $autostart\"\n      fi\n  fi\n\n  if [ -f \"$autostart\" ] || [ \"${choice:0:1}\" = \"A\" ] || [ \"${choice:0:1}\" = \"Y\" ] ; then\n    instructionsFile=$(mktemp)\n    echo > $instructionsFile\n    echo \"The ollama service is running in the top pane.\" >> $instructionsFile\n    echo >> $instructionsFile\n    echo \"Use 'ollama pull' to download a model, e.g. 'ollama pull llama3'\" >> $instructionsFile\n    echo \"Use 'ollama run' to run a model, e.g. 'ollama run llama3'\" >> $instructionsFile\n    echo \"Use 'teardown' to kill the session\" >> $instructionsFile\n\n    # In case we're already running\n    $FLOX_ENV/bin/tmux kill-session -t $OLLAMA_TMUX_SESSION\n\n    # Create a new tmux session\n    $FLOX_ENV/bin/tmux new-session -d -s $OLLAMA_TMUX_SESSION\n\n    # Create a pane at the top\n    $FLOX_ENV/bin/tmux split-window -v -t $OLLAMA_TMUX_SESSION\n    $FLOX_ENV/bin/tmux resize-pane -t $OLLAMA_TMUX_SESSION:0.0 -y 7\n\n    # Run the ollama servce in the top pane\n    $FLOX_ENV/bin/tmux send-keys -t $OLLAMA_TMUX_SESSION:0.0 \"ollama serve\" Enter\n\n    # Create an alias in the bottom pane\n    # (and clear the screen so the user doesn't have to see it)\n    $FLOX_ENV/bin/tmux send-keys -t $OLLAMA_TMUX_SESSION:0.1 \"alias teardown='tmux kill-session -t \" $OLLAMA_TMUX_SESSION \"'\" Enter\n\n    # Provide some instructions for the user\n    $FLOX_ENV/bin/tmux send-keys -t $OLLAMA_TMUX_SESSION:0.1 \"alias instructions='command cat \" $instructionsFile \"'\" Enter\n    $FLOX_ENV/bin/tmux send-keys -t $OLLAMA_TMUX_SESSION:0.1 \"instructions\" ^L Enter\n\n    # Attach to our session!\n    $FLOX_ENV/bin/tmux attach-session -t $OLLAMA_TMUX_SESSION\n\n    # Cause the Flox environment to exit once tmux is done\n    exit # im dead\n  fi\n",
+      "fish": null,
+      "tcsh": null
+    },
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-darwin",
+        "x86_64-linux"
+      ],
+      "allow": {
+        "unfree": null,
+        "broken": null,
+        "licenses": []
+      },
+      "semver": {
+        "allow-pre-releases": null
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/43fpvgbgqd8imi47gwq3srvq03x22way-gum-0.14.1.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "name": "gum-0.14.1",
+      "pname": "gum",
+      "rev": "57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "rev_count": 633517,
+      "rev_date": "2024-05-31T23:09:26Z",
+      "scrape_date": "2024-06-04T09:46:16Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/h5z17zm21lz3qkccqh4mnkb9xsx27ds5-gum-0.14.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/d6wz8nghqkq32a2624w1pbf3zpwc7ay6-gum-0.14.1.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "name": "gum-0.14.1",
+      "pname": "gum",
+      "rev": "57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "rev_count": 633517,
+      "rev_date": "2024-05-31T23:09:26Z",
+      "scrape_date": "2024-06-04T09:46:16Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/0f0na0sdmp64p5ynd4j1lpgx57a1jwd9-gum-0.14.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/hwpf1d61s76c215zsa0byv8v74fbfqrv-gum-0.14.1.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "name": "gum-0.14.1",
+      "pname": "gum",
+      "rev": "57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "rev_count": 633517,
+      "rev_date": "2024-05-31T23:09:26Z",
+      "scrape_date": "2024-06-04T09:46:16Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/08rsns46wcxyqdwbaalprzcsd355vw7n-gum-0.14.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/08mz1c0m1bh40h4rk7akzgq43zch5kca-gum-0.14.1.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "name": "gum-0.14.1",
+      "pname": "gum",
+      "rev": "57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "rev_count": 633517,
+      "rev_date": "2024-05-31T23:09:26Z",
+      "scrape_date": "2024-06-04T09:46:16Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/vh7sq5jganhj305981d6w07l1x6iclq6-gum-0.14.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "ollama",
+      "broken": false,
+      "derivation": "/nix/store/2s3ppwvi2fp1y08cvw88vxhk4czd6myn-ollama-0.1.39.drv",
+      "description": "Get up and running with large language models locally",
+      "install_id": "ollama",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "name": "ollama-0.1.39",
+      "pname": "ollama",
+      "rev": "57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "rev_count": 633517,
+      "rev_date": "2024-05-31T23:09:26Z",
+      "scrape_date": "2024-06-04T09:46:16Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.1.39",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/zc7khcr0mdl71rn2hx277g7iax8rsxqa-ollama-0.1.39"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "ollama",
+      "broken": false,
+      "derivation": "/nix/store/hx86zh9lsa9l5lsv2hmb37m1v9lbr113-ollama-0.1.39.drv",
+      "description": "Get up and running with large language models locally",
+      "install_id": "ollama",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "name": "ollama-0.1.39",
+      "pname": "ollama",
+      "rev": "57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "rev_count": 633517,
+      "rev_date": "2024-05-31T23:09:26Z",
+      "scrape_date": "2024-06-04T09:46:16Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.1.39",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/b90m6q5ida1dd9a5dihgkzghv9wphxkh-ollama-0.1.39"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "ollama",
+      "broken": false,
+      "derivation": "/nix/store/hj1wm6ah4ps0wsq12axxh6dn7qw2sggy-ollama-0.1.39.drv",
+      "description": "Get up and running with large language models locally",
+      "install_id": "ollama",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "name": "ollama-0.1.39",
+      "pname": "ollama",
+      "rev": "57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "rev_count": 633517,
+      "rev_date": "2024-05-31T23:09:26Z",
+      "scrape_date": "2024-06-04T09:46:16Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.1.39",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/2s9sqyl9nvl08hq03hiy52kxrxvdzxmn-ollama-0.1.39"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "ollama",
+      "broken": false,
+      "derivation": "/nix/store/91yk2jhvyh9ml8pgh7h3jzj6zgj6rfi5-ollama-0.1.39.drv",
+      "description": "Get up and running with large language models locally",
+      "install_id": "ollama",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "name": "ollama-0.1.39",
+      "pname": "ollama",
+      "rev": "57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "rev_count": 633517,
+      "rev_date": "2024-05-31T23:09:26Z",
+      "scrape_date": "2024-06-04T09:46:16Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.1.39",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/1jk62s23zjrp7xsabq6p7g4cai8610h6-ollama-0.1.39"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "tmux",
+      "broken": false,
+      "derivation": "/nix/store/hd851gilk6x0dgkk48ddpmk1cy4xl5rr-tmux-3.4.drv",
+      "description": "Terminal multiplexer",
+      "install_id": "tmux",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "name": "tmux-3.4",
+      "pname": "tmux",
+      "rev": "57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "rev_count": 633517,
+      "rev_date": "2024-05-31T23:09:26Z",
+      "scrape_date": "2024-06-04T09:46:16Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.4",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "man": "/nix/store/xpafbd5q828wajgv0m6rgmz1f3m5v62p-tmux-3.4-man",
+        "out": "/nix/store/qm7b2r63shfadhfi6ng806xrwraxvdhh-tmux-3.4"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "tmux",
+      "broken": false,
+      "derivation": "/nix/store/9sw36a9f0i6c41gcai85k2hbriqpdn41-tmux-3.4.drv",
+      "description": "Terminal multiplexer",
+      "install_id": "tmux",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "name": "tmux-3.4",
+      "pname": "tmux",
+      "rev": "57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "rev_count": 633517,
+      "rev_date": "2024-05-31T23:09:26Z",
+      "scrape_date": "2024-06-04T09:46:16Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.4",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "man": "/nix/store/x4klz4bqxkm2a24lff9vir6sjm5k0xyr-tmux-3.4-man",
+        "out": "/nix/store/y4gy0j73z5786c6iiwf76yv8abik0lwr-tmux-3.4"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "tmux",
+      "broken": false,
+      "derivation": "/nix/store/c4y69pcvyhcwl10l53z85gy4d4qgv367-tmux-3.4.drv",
+      "description": "Terminal multiplexer",
+      "install_id": "tmux",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "name": "tmux-3.4",
+      "pname": "tmux",
+      "rev": "57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "rev_count": 633517,
+      "rev_date": "2024-05-31T23:09:26Z",
+      "scrape_date": "2024-06-04T09:46:16Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.4",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "man": "/nix/store/7rr83m5j2avlvqmh7z11filzp0axw637-tmux-3.4-man",
+        "out": "/nix/store/3l8g2zrr66mpv02x6mdia0v282p450by-tmux-3.4"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "tmux",
+      "broken": false,
+      "derivation": "/nix/store/sx8gm46pgl9vby44i024h7hck7f53d4g-tmux-3.4.drv",
+      "description": "Terminal multiplexer",
+      "install_id": "tmux",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "name": "tmux-3.4",
+      "pname": "tmux",
+      "rev": "57610d2f8f0937f39dbd72251e9614b1561942d8",
+      "rev_count": 633517,
+      "rev_date": "2024-05-31T23:09:26Z",
+      "scrape_date": "2024-06-04T09:46:16Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.4",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "man": "/nix/store/0vb8ywcwpgiavqrl80n44w64wn3jjam6-tmux-3.4-man",
+        "out": "/nix/store/dxy57vc4sbk1zb8r57firz1sad7cz1vn-tmux-3.4"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ]
+}

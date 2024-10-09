@@ -1,0 +1,463 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "version": 1,
+    "install": {
+      "graphviz": {
+        "pkg-path": "python311Packages.graphviz",
+        "pkg-group": null,
+        "priority": null,
+        "version": null,
+        "systems": null,
+        "optional": false
+      },
+      "instructor": {
+        "pkg-path": "python311Packages.instructor",
+        "pkg-group": null,
+        "priority": null,
+        "version": null,
+        "systems": null,
+        "optional": false
+      },
+      "jupyter": {
+        "pkg-path": "python311Packages.jupyter",
+        "pkg-group": null,
+        "priority": null,
+        "version": null,
+        "systems": null,
+        "optional": false
+      },
+      "ollama": {
+        "pkg-path": "ollama",
+        "pkg-group": null,
+        "priority": null,
+        "version": null,
+        "systems": null,
+        "optional": false
+      },
+      "openai": {
+        "pkg-path": "python311Packages.openai",
+        "pkg-group": null,
+        "priority": null,
+        "version": null,
+        "systems": null,
+        "optional": false
+      },
+      "wikipedia": {
+        "pkg-path": "python311Packages.wikipedia",
+        "pkg-group": null,
+        "priority": null,
+        "version": null,
+        "systems": null,
+        "optional": false
+      }
+    },
+    "vars": {},
+    "hook": {
+      "on-activate": null
+    },
+    "profile": {
+      "common": "  # First, check if $OPENAI_API_KEY is set\n  if [[ \"${OPENAI_API_KEY}\" ]]; then\n    echo \"🤖 OpenAI configured with key from existing environment\"\n    return 0\n  fi\n\n  # Then, check to see if the dotfile exists\n  if [[ -f ~/.config/openai.key ]]; then\n    export OPENAI_API_KEY=$(cat ~/.config/openai.key)\n    echo \"🤖 OpenAI configured with key from ~/.config/openai.key\"\n    return 0\n  fi\n\n  # We got nothing! Let's ask.\n  echo \"OpenAI key not detected.\"\n  \n  if gum confirm \"Would you like to provide one now?\" --default=true --affirmative \"Yes\" --negative \"No\"; then\n    OPENAI_API_KEY=$(gum input --placeholder \"OpenAI API key\")\n    export OPENAI_API_KEY\n    if gum confirm \"Write this into ~/.config/openai.key for next time?\" --default=true --affirmative \"Yes\" --negative \"No\"; then\n      mkdir -p ~/.config/\n      echo \"$OPENAI_API_KEY\" > ~/.config/openai.key\n      chmod 600 ~/.config/openai.key\n    fi\n    echo \"🤖 OpenAI configured with provided key\"\n    return 0\n  fi\n\n  echo \"An OpenAI key is required. You can provide one by setting OPENAI_API_KEY.\"\n  echo; echo \"🚨 OpenAI client is available (no key)\"\n",
+      "bash": null,
+      "zsh": null
+    },
+    "options": {
+      "systems": [
+        "x86_64-linux",
+        "aarch64-darwin"
+      ],
+      "allow": {
+        "unfree": null,
+        "broken": null,
+        "licenses": []
+      },
+      "semver": {
+        "allow-pre-releases": null
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "ollama",
+      "broken": false,
+      "derivation": "/nix/store/qf67xipadvg0rgaz7khzzbfn4dshs9f5-ollama-0.1.38.drv",
+      "description": "Get up and running with large language models locally",
+      "install_id": "ollama",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "name": "ollama-0.1.38",
+      "pname": "ollama",
+      "rev": "3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "rev_count": 629267,
+      "rev_date": "2024-05-21T12:07:05Z",
+      "scrape_date": "2024-05-22T20:43:04Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.1.38",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/bpj3lfb4979r8x6ysj0h1lya6kwkrhaw-ollama-0.1.38"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5,
+      "optional": false
+    },
+    {
+      "attr_path": "python311Packages.graphviz",
+      "broken": false,
+      "derivation": "/nix/store/03x19zrw533ihxrj42r17g2dlljkvvz4-python3.11-graphviz-0.20.3.drv",
+      "description": "Simple Python interface for Graphviz",
+      "install_id": "graphviz",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "name": "python3.11-graphviz-0.20.3",
+      "pname": "graphviz",
+      "rev": "3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "rev_count": 629267,
+      "rev_date": "2024-05-21T12:07:05Z",
+      "scrape_date": "2024-05-22T20:43:04Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-graphviz-0.20.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/cdjd0m5dci565srr5maxqxykl0ig8xpd-python3.11-graphviz-0.20.3-dist",
+        "out": "/nix/store/a5jk46yiab7gj7n98vs9pl5mzx1ry5pr-python3.11-graphviz-0.20.3"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5,
+      "optional": false
+    },
+    {
+      "attr_path": "python311Packages.instructor",
+      "broken": false,
+      "derivation": "/nix/store/iwr3k9x0lxhp6fac2hid7wiaaa6r89gn-python3.11-instructor-1.2.3.drv",
+      "description": "Structured outputs for llm",
+      "install_id": "instructor",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "name": "python3.11-instructor-1.2.3",
+      "pname": "instructor",
+      "rev": "3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "rev_count": 629267,
+      "rev_date": "2024-05-21T12:07:05Z",
+      "scrape_date": "2024-05-22T20:43:04Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-instructor-1.2.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/v2g8kjh6r9zn0852iwifq5smclrpi6dz-python3.11-instructor-1.2.3-dist",
+        "out": "/nix/store/mmrj0hmp09ac6ppkkgfyksdx945f3vp5-python3.11-instructor-1.2.3"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5,
+      "optional": false
+    },
+    {
+      "attr_path": "python311Packages.jupyter",
+      "broken": false,
+      "derivation": "/nix/store/mlpy67m9fsz3q5bdnbh39v30nx93g6x3-python3.11-jupyter-1.0.0.drv",
+      "description": "Installs all the Jupyter components in one go",
+      "install_id": "jupyter",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "name": "python3.11-jupyter-1.0.0",
+      "pname": "jupyter",
+      "rev": "3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "rev_count": 629267,
+      "rev_date": "2024-05-21T12:07:05Z",
+      "scrape_date": "2024-05-22T20:43:04Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-jupyter-1.0.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/dpxbv2zb4lh59mylkfbbvx2gr3ih7dz6-python3.11-jupyter-1.0.0-dist",
+        "out": "/nix/store/a4r7c4a1akh2ffgm735zrbmnncv4dqkd-python3.11-jupyter-1.0.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5,
+      "optional": false
+    },
+    {
+      "attr_path": "python311Packages.openai",
+      "broken": false,
+      "derivation": "/nix/store/kacrfzd1xsnqnjda6ygy3kqqnz245nxp-python3.11-openai-1.28.0.drv",
+      "description": "Python client library for the OpenAI API",
+      "install_id": "openai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "name": "openai-1.28.0",
+      "pname": "openai",
+      "rev": "3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "rev_count": 629267,
+      "rev_date": "2024-05-21T12:07:05Z",
+      "scrape_date": "2024-05-22T20:43:04Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.28.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/czr7hzylfa03k4lbbsx52i6bby0j1mcx-python3.11-openai-1.28.0-dist",
+        "out": "/nix/store/kmk3q3v1gndxv09nfyhc74ilpz896q3k-python3.11-openai-1.28.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5,
+      "optional": false
+    },
+    {
+      "attr_path": "python311Packages.wikipedia",
+      "broken": false,
+      "derivation": "/nix/store/1lalwlpz0bp43jqg2w7j93f1x8lrar57-python3.11-wikipedia-1.4.0.drv",
+      "description": "A Pythonic wrapper for the Wikipedia API",
+      "install_id": "wikipedia",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "name": "python3.11-wikipedia-1.4.0",
+      "pname": "wikipedia",
+      "rev": "3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "rev_count": 629267,
+      "rev_date": "2024-05-21T12:07:05Z",
+      "scrape_date": "2024-05-22T20:43:04Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-wikipedia-1.4.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/c2ss305bcb0i59fzs6g64ynqrwai3c4x-python3.11-wikipedia-1.4.0-dist",
+        "out": "/nix/store/vkzfyz0hnwi3y4jqz0zhrk6sar7kx0kr-python3.11-wikipedia-1.4.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5,
+      "optional": false
+    },
+    {
+      "attr_path": "ollama",
+      "broken": false,
+      "derivation": "/nix/store/rgj3fbkmxsvls6g52jkcr65nxzj5kz8k-ollama-0.1.38.drv",
+      "description": "Get up and running with large language models locally",
+      "install_id": "ollama",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "name": "ollama-0.1.38",
+      "pname": "ollama",
+      "rev": "3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "rev_count": 629267,
+      "rev_date": "2024-05-21T12:07:05Z",
+      "scrape_date": "2024-05-22T20:43:04Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.1.38",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cfwqqcdslq109c3f5m0cjiygp0ag6rx2-ollama-0.1.38"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5,
+      "optional": false
+    },
+    {
+      "attr_path": "python311Packages.graphviz",
+      "broken": false,
+      "derivation": "/nix/store/kbr9pmcqdxh6a7plibnbsh0sxf8vblwa-python3.11-graphviz-0.20.3.drv",
+      "description": "Simple Python interface for Graphviz",
+      "install_id": "graphviz",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "name": "python3.11-graphviz-0.20.3",
+      "pname": "graphviz",
+      "rev": "3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "rev_count": 629267,
+      "rev_date": "2024-05-21T12:07:05Z",
+      "scrape_date": "2024-05-22T20:43:04Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-graphviz-0.20.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/k1rn4xz64jsbpisxpyla9n8wh2ikirc2-python3.11-graphviz-0.20.3-dist",
+        "out": "/nix/store/6vzlw7a6sw05ngqx58yi9pxss2sp8ira-python3.11-graphviz-0.20.3"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5,
+      "optional": false
+    },
+    {
+      "attr_path": "python311Packages.instructor",
+      "broken": false,
+      "derivation": "/nix/store/s3hri0xkb7fnqacjxrp2qikvl05hhkww-python3.11-instructor-1.2.3.drv",
+      "description": "Structured outputs for llm",
+      "install_id": "instructor",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "name": "python3.11-instructor-1.2.3",
+      "pname": "instructor",
+      "rev": "3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "rev_count": 629267,
+      "rev_date": "2024-05-21T12:07:05Z",
+      "scrape_date": "2024-05-22T20:43:04Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-instructor-1.2.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/ccwnsw3xg7xjxs68bhp54hxqd04nizxs-python3.11-instructor-1.2.3-dist",
+        "out": "/nix/store/fr3kjjrsry35awavc42kkqnb80q2n585-python3.11-instructor-1.2.3"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5,
+      "optional": false
+    },
+    {
+      "attr_path": "python311Packages.jupyter",
+      "broken": false,
+      "derivation": "/nix/store/wwmnn4qwmgw0hv9pc36n11y9v7jrxbqn-python3.11-jupyter-1.0.0.drv",
+      "description": "Installs all the Jupyter components in one go",
+      "install_id": "jupyter",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "name": "python3.11-jupyter-1.0.0",
+      "pname": "jupyter",
+      "rev": "3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "rev_count": 629267,
+      "rev_date": "2024-05-21T12:07:05Z",
+      "scrape_date": "2024-05-22T20:43:04Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-jupyter-1.0.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/zfsd41xn8w24jqy0l5x58fiwk07678ba-python3.11-jupyter-1.0.0-dist",
+        "out": "/nix/store/9zjg6ngm4zkd7k2wwgah78xlchrg0mjh-python3.11-jupyter-1.0.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5,
+      "optional": false
+    },
+    {
+      "attr_path": "python311Packages.openai",
+      "broken": false,
+      "derivation": "/nix/store/kgqr245xc1y0ml9vs44n13n76g4sg0pg-python3.11-openai-1.28.0.drv",
+      "description": "Python client library for the OpenAI API",
+      "install_id": "openai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "name": "openai-1.28.0",
+      "pname": "openai",
+      "rev": "3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "rev_count": 629267,
+      "rev_date": "2024-05-21T12:07:05Z",
+      "scrape_date": "2024-05-22T20:43:04Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.28.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/2j43d0z7vx9ipzr55hszm57bv7hyms8s-python3.11-openai-1.28.0-dist",
+        "out": "/nix/store/9jdm9vh9z5611s7zg0ijn4sljbwlxsjn-python3.11-openai-1.28.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5,
+      "optional": false
+    },
+    {
+      "attr_path": "python311Packages.wikipedia",
+      "broken": false,
+      "derivation": "/nix/store/00qf6ypafic7v9v41y4nxrl6yy4ghxsi-python3.11-wikipedia-1.4.0.drv",
+      "description": "A Pythonic wrapper for the Wikipedia API",
+      "install_id": "wikipedia",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "name": "python3.11-wikipedia-1.4.0",
+      "pname": "wikipedia",
+      "rev": "3eaeaeb6b1e08a016380c279f8846e0bd8808916",
+      "rev_count": 629267,
+      "rev_date": "2024-05-21T12:07:05Z",
+      "scrape_date": "2024-05-22T20:43:04Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3.11-wikipedia-1.4.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/llvb4aavifgq5nfzacsj9170c3b2kclf-python3.11-wikipedia-1.4.0-dist",
+        "out": "/nix/store/jxi20d3bnipyslhwkfkdsz5zw2i3q5fx-python3.11-wikipedia-1.4.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5,
+      "optional": false
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+version = 1
+
+
+[install]
+coreutils.pkg-path = "coreutils"
+which.pkg-path = "which"
+semver-tool.pkg-path = "semver-tool"
+
+# Cassandra
+cassandra.pkg-path = "cassandra_4"
+#cassandra.pkg-path = "cassandra_3_0"
+#cassandra.pkg-path = "cassandra_2_2"
+#cassandra.pkg-path = "cassandra_2_1"
+#cassandra.pkg-path = "cassandra_3_11"
+
+
+[vars]
+CASSANDRA_HOST="127.0.0.1"
+CASSANDRA_PORT="19042"
+CASSANDRA_SEED_ADDRS = "127.0.0.1"  # comma separated
+CASSANDRA_CLUSTER_NAME = "My Cluster"
+CASSANDRA_ALLOW_CLIENTS = "true"
+JVM_OPTS= ""
+
+
+[hook]
+on-activate = '''
+
+export CASSANDRA_CACHE="$FLOX_ENV_CACHE/cassandra"
+export CASSANDRA_CONFIG_FILE="$CASSANDRA_CACHE/cassandra.yaml"
+
+if [[ ! -d "$CASSANDRA_CACHE" ]]; then
+    mkdir -p "$CASSANDRA_CACHE"
+fi
+
+CASSANDRA_PATH="$(realpath $(which cassandra))"
+CASSANDRA_VERSION="${CASSANDRA_PATH:54:-14}"
+# Only for cassandra >=4.0.0
+if [[ "$(semver compare "$CASSANDRA_VERSION" "4.0.0")" != "-1" ]]; then
+  JVM_OPTS="$JVM_OPTS -Xlog:gc=warning,heap*=warning,age*=warning,safepoint=warning,promotion*=warning"
+fi
+
+if [[ ! -f "$CASSANDRA_CONFIG_FILE" ]]; then
+
+  tee -a $CASSANDRA_CONFIG_FILE > /dev/null << EOF
+listen_address: "$CASSANDRA_HOST"
+native_transport_port: "$CASSANDRA_PORT"
+start_native_transport: "$CASSANDRA_ALLOW_CLIENTS"
+cluster_name: "$CASSANDRA_CLUSTER_NAME"
+data_file_directories:
+  - "$CASSANDRA_CACHE/data"
+commitlog_directory: "$CASSANDRA_CACHE/commitlog"
+saved_caches_directory: "$CASSANDRA_CACHE/saved_caches"
+hints_directory: "$CASSANDRA_CACHE/hints"
+seed_provider:
+  - class_name: "org.apache.cassandra.locator.SimpleSeedProvider"
+    parameters:
+      - seeds: "$CASSANDRA_SEED_ADDRS"
+commitlog_sync: "batch"
+commitlog_sync_batch_window_in_ms: 2
+partitioner: "org.apache.cassandra.dht.Murmur3Partitioner"
+endpoint_snitch: "SimpleSnitch"
+EOF
+
+fi
+'''
+
+
+[profile]
+common = '''
+echo ""
+echo "     ╔═══════════════════════════════════════════════╗"
+echo "     ║                                               ║"
+echo "     ║  Start Cassandra in the background:           ║"
+echo "     ║  👉 flox services start                       ║"
+echo "     ║  👉 flox activate --start-services            ║"
+echo "     ║                                               ║"
+echo "     ║  Try to connect to Cassandra:                 ║"
+echo "     ║  👉 cqlsh \$CASSANDRA_HOST \$CASSANDRA_PORT \   ║"
+echo "     ║        -e \"SELECT ...;\"                       ║"
+echo "     ║                                               ║"
+echo "     ╚═══════════════════════════════════════════════╝"
+echo ""
+'''
+
+[services]
+cassandra.command = "cassandra -Dcassandra.config=file://$CASSANDRA_CONFIG_FILE -f"
+
+
+[options]
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]

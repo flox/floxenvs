@@ -1,0 +1,28 @@
+#
+# This is a Flox environment manifest.
+# Visit flox.dev/docs/concepts/manifest/
+# or see flox-edit(1), manifest.toml(5) for more information.
+#
+version = 1
+
+[install]
+ollama.pkg-path = "ollama"
+
+[vars]
+NEXT_PUBLIC_OLLAMA_URL="http://localhost:11434"
+
+[services.ollama-serve]
+command="ollama serve"
+
+[profile]
+common = '''
+  if ollama list >/dev/null 2>&1; then
+    echo "🤖 Ollama service running"
+  else
+    echo "⛔️ Ollama service not available"
+  fi
+'''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux", "x86_64-darwin"]
+

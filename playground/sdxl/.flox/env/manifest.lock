@@ -1,0 +1,315 @@
+{
+  "lockfile-version": 0,
+  "manifest": {
+    "hook": {
+      "script": "\n\t# We need a directory for our venv and models\n\tmkdir -p $HOME/.cache/sdxl-env/\n\tsdxlDir=$(realpath $HOME/.cache/sdxl-env/)\n\n\t# Create a Python virtual environment in ~/.cache\n        if [ ! -d \"$sdxlDir/venv\" ]; then\n                echo; echo -n \"🌏 Preparing new venv in $sdxlDir/venv..\"\n                python -m venv $sdxlDir/venv\n        \t. $sdxlDir/venv/bin/activate\n        else\n        \techo; echo -n \"⚡️ Activating existing venv in $sdxlDir/venv...\"\n        \t. $sdxlDir/venv/bin/activate\n\tfi\n\n\t# Preinstall SDXL requirements\n        [[ $(uname -m) == 'arm64' ]] && pip3 -qq install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu\n       \tpip3 -qq install diffusers compel accelerate numba imgcat safetensors invisible-watermark pillow\n\n\n\t# If there is a requirements file, process it\n\t[ -f requirements.txt ] && pip3 -qq install -r requirements.txt\n\t[ -f requirements_versions.txt ] && pip3 -qq install -r requirements_versions.txt\n\n\techo \"done.\"\n\n\t# Create our own models directory so we can clean it up later\n\tmkdir -p $sdxlDir/models\n\n\t# Set aliases and educate the user\n\n\talias gen=\"python -c \\\"[(importlib := __import__('importlib')), (warnings := importlib.import_module('warnings')), warnings.filterwarnings('ignore'), (sys := importlib.import_module('sys')), (torch := importlib.import_module('torch')), (__ol_mod_wdqhequwqx := __import__('imgcat', globals(), locals(), ['imgcat'], 0)), (imgcat := __ol_mod_wdqhequwqx.imgcat), (__ol_mod_mzyrofanne := __import__('diffusers', globals(), locals(), ['AutoPipelineForText2Image'], 0)), (AutoPipelineForText2Image := __ol_mod_mzyrofanne.AutoPipelineForText2Image), (__ol_mod_jmipndipfc := __import__('diffusers', globals(), locals(), ['logging'], 0)), (logging := __ol_mod_jmipndipfc.logging), logging.set_verbosity(50), logging.disable_progress_bar(), [(pipe := AutoPipelineForText2Image.from_pretrained('stabilityai/sd-turbo', cache_dir='$sdxlDir/models', torch_dtype=torch.float16, variant='fp16')), pipe.to('cuda')] if torch.cuda.is_available() else [(pipe := AutoPipelineForText2Image.from_pretrained('stabilityai/sd-turbo', cache_dir='$sdxlDir/models')), pipe.to('mps')] if torch.backends.mps.is_available() else (pipe := AutoPipelineForText2Image.from_pretrained('stabilityai/sd-turbo', cache_dir='$sdxlDir/models')), (prompt := (sys.argv[1] if len(sys.argv) > 1 else 'a fox in a henhouse')), pipe.set_progress_bar_config(disable=True), (image := pipe(prompt=prompt, num_inference_steps=1, guidance_scale=0.0).images[0]), image.save('img.png'), imgcat(image)]\\\"\"\n\n\talias purgecache=\"deactivate; rm -rf $sdxlDir\"\n\n\techo; echo \"Run 'gen <string>' for an image.\"\n\techo \"Run 'purgecache' to purge the venv and model cache.\"\n\n"
+    },
+    "install": {
+      "gcc": {
+        "pkg-path": "gcc-unwrapped"
+      },
+      "glib": {
+        "pkg-path": "glib",
+        "systems": [
+          "x86_64-linux"
+        ]
+      },
+      "libGL": {
+        "pkg-path": "libGL",
+        "systems": [
+          "x86_64-linux"
+        ]
+      },
+      "pip": {
+        "pkg-path": "python310Packages.pip"
+      },
+      "python312": {
+        "pkg-path": "python312"
+      }
+    },
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "x86_64-linux"
+      ]
+    },
+    "registry": {
+      "defaults": {
+        "subtrees": null
+      },
+      "inputs": {
+        "nixpkgs": {
+          "from": {
+            "owner": "NixOS",
+            "ref": "release-23.11",
+            "repo": "nixpkgs",
+            "type": "github"
+          },
+          "subtrees": [
+            "legacyPackages"
+          ]
+        }
+      },
+      "priority": [
+        "nixpkgs"
+      ]
+    }
+  },
+  "packages": {
+    "aarch64-darwin": {
+      "gcc": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "gcc-unwrapped"
+        ],
+        "info": {
+          "broken": false,
+          "description": "GNU Compiler Collection, version 12.3.0",
+          "license": "GPL-3.0-or-later",
+          "pname": "gcc",
+          "unfree": false,
+          "version": "12.3.0"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1707863453,
+            "narHash": "sha256-vfc/bwjCQgLARXKBVVJ//iuTu2cXlnJQA+xVBw7BpQE=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "d675ed1a08d96a8828b8f8fd2323e5ec024fd79b",
+            "type": "github"
+          },
+          "fingerprint": "ded957dede996490458ec6e815140e8497dde4329bbbd9ab3e5debe56f299c0e",
+          "url": "github:NixOS/nixpkgs/d675ed1a08d96a8828b8f8fd2323e5ec024fd79b"
+        },
+        "priority": 5
+      },
+      "glib": null,
+      "libGL": null,
+      "pip": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "python310Packages",
+          "pip"
+        ],
+        "info": {
+          "broken": false,
+          "description": "The PyPA recommended tool for installing Python packages",
+          "license": null,
+          "pname": "pip",
+          "unfree": false,
+          "version": "23.2.1"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1707863453,
+            "narHash": "sha256-vfc/bwjCQgLARXKBVVJ//iuTu2cXlnJQA+xVBw7BpQE=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "d675ed1a08d96a8828b8f8fd2323e5ec024fd79b",
+            "type": "github"
+          },
+          "fingerprint": "ded957dede996490458ec6e815140e8497dde4329bbbd9ab3e5debe56f299c0e",
+          "url": "github:NixOS/nixpkgs/d675ed1a08d96a8828b8f8fd2323e5ec024fd79b"
+        },
+        "priority": 5
+      },
+      "python312": {
+        "attr-path": [
+          "legacyPackages",
+          "aarch64-darwin",
+          "python312"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A high-level dynamically-typed programming language",
+          "license": "Python-2.0",
+          "pname": "python3",
+          "unfree": false,
+          "version": "3.12.1"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1707863453,
+            "narHash": "sha256-vfc/bwjCQgLARXKBVVJ//iuTu2cXlnJQA+xVBw7BpQE=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "d675ed1a08d96a8828b8f8fd2323e5ec024fd79b",
+            "type": "github"
+          },
+          "fingerprint": "ded957dede996490458ec6e815140e8497dde4329bbbd9ab3e5debe56f299c0e",
+          "url": "github:NixOS/nixpkgs/d675ed1a08d96a8828b8f8fd2323e5ec024fd79b"
+        },
+        "priority": 5
+      }
+    },
+    "x86_64-linux": {
+      "gcc": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-linux",
+          "gcc-unwrapped"
+        ],
+        "info": {
+          "broken": false,
+          "description": "GNU Compiler Collection, version 12.3.0",
+          "license": "GPL-3.0-or-later",
+          "pname": "gcc",
+          "unfree": false,
+          "version": "12.3.0"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1707863453,
+            "narHash": "sha256-vfc/bwjCQgLARXKBVVJ//iuTu2cXlnJQA+xVBw7BpQE=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "d675ed1a08d96a8828b8f8fd2323e5ec024fd79b",
+            "type": "github"
+          },
+          "fingerprint": "ded957dede996490458ec6e815140e8497dde4329bbbd9ab3e5debe56f299c0e",
+          "url": "github:NixOS/nixpkgs/d675ed1a08d96a8828b8f8fd2323e5ec024fd79b"
+        },
+        "priority": 5
+      },
+      "glib": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-linux",
+          "glib"
+        ],
+        "info": {
+          "broken": false,
+          "description": "C library of programming buildings blocks",
+          "license": "LGPL-2.1-or-later",
+          "pname": "glib",
+          "unfree": false,
+          "version": "2.78.3"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1707863453,
+            "narHash": "sha256-vfc/bwjCQgLARXKBVVJ//iuTu2cXlnJQA+xVBw7BpQE=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "d675ed1a08d96a8828b8f8fd2323e5ec024fd79b",
+            "type": "github"
+          },
+          "fingerprint": "ded957dede996490458ec6e815140e8497dde4329bbbd9ab3e5debe56f299c0e",
+          "url": "github:NixOS/nixpkgs/d675ed1a08d96a8828b8f8fd2323e5ec024fd79b"
+        },
+        "priority": 5
+      },
+      "libGL": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-linux",
+          "libGL"
+        ],
+        "info": {
+          "broken": false,
+          "description": "Stub bindings using libglvnd",
+          "license": null,
+          "pname": "libGL",
+          "unfree": false,
+          "version": "1.7.0"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1707863453,
+            "narHash": "sha256-vfc/bwjCQgLARXKBVVJ//iuTu2cXlnJQA+xVBw7BpQE=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "d675ed1a08d96a8828b8f8fd2323e5ec024fd79b",
+            "type": "github"
+          },
+          "fingerprint": "ded957dede996490458ec6e815140e8497dde4329bbbd9ab3e5debe56f299c0e",
+          "url": "github:NixOS/nixpkgs/d675ed1a08d96a8828b8f8fd2323e5ec024fd79b"
+        },
+        "priority": 5
+      },
+      "pip": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-linux",
+          "python310Packages",
+          "pip"
+        ],
+        "info": {
+          "broken": false,
+          "description": "The PyPA recommended tool for installing Python packages",
+          "license": null,
+          "pname": "pip",
+          "unfree": false,
+          "version": "23.2.1"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1707863453,
+            "narHash": "sha256-vfc/bwjCQgLARXKBVVJ//iuTu2cXlnJQA+xVBw7BpQE=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "d675ed1a08d96a8828b8f8fd2323e5ec024fd79b",
+            "type": "github"
+          },
+          "fingerprint": "ded957dede996490458ec6e815140e8497dde4329bbbd9ab3e5debe56f299c0e",
+          "url": "github:NixOS/nixpkgs/d675ed1a08d96a8828b8f8fd2323e5ec024fd79b"
+        },
+        "priority": 5
+      },
+      "python312": {
+        "attr-path": [
+          "legacyPackages",
+          "x86_64-linux",
+          "python312"
+        ],
+        "info": {
+          "broken": false,
+          "description": "A high-level dynamically-typed programming language",
+          "license": "Python-2.0",
+          "pname": "python3",
+          "unfree": false,
+          "version": "3.12.1"
+        },
+        "input": {
+          "attrs": {
+            "lastModified": 1707863453,
+            "narHash": "sha256-vfc/bwjCQgLARXKBVVJ//iuTu2cXlnJQA+xVBw7BpQE=",
+            "owner": "NixOS",
+            "repo": "nixpkgs",
+            "rev": "d675ed1a08d96a8828b8f8fd2323e5ec024fd79b",
+            "type": "github"
+          },
+          "fingerprint": "ded957dede996490458ec6e815140e8497dde4329bbbd9ab3e5debe56f299c0e",
+          "url": "github:NixOS/nixpkgs/d675ed1a08d96a8828b8f8fd2323e5ec024fd79b"
+        },
+        "priority": 5
+      }
+    }
+  },
+  "registry": {
+    "defaults": {
+      "subtrees": null
+    },
+    "inputs": {
+      "nixpkgs": {
+        "from": {
+          "lastModified": 1707863453,
+          "narHash": "sha256-vfc/bwjCQgLARXKBVVJ//iuTu2cXlnJQA+xVBw7BpQE=",
+          "owner": "NixOS",
+          "repo": "nixpkgs",
+          "rev": "d675ed1a08d96a8828b8f8fd2323e5ec024fd79b",
+          "type": "github"
+        },
+        "subtrees": [
+          "legacyPackages"
+        ]
+      }
+    },
+    "priority": [
+      "nixpkgs"
+    ]
+  }
+}

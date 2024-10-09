@@ -1,0 +1,107 @@
+version = 1
+
+
+[install]
+coreutils.pkg-path = "coreutils"
+which.pkg-path = "which"
+jq.pkg-path = "jq"
+curl.pkg-path = "curl"
+
+# Elasticsearch / Opensearch
+elasticsearch.pkg-path = "elasticsearch7"
+#elasticsearch.pkg-path = "elasticsearch6"
+#elasticsearch.pkg-path = "opensearch"
+
+[vars]
+ES_ADDR = "127.0.0.1"
+ES_PORT = "19200"
+ES_TRANSPORT_PORT = "19300"
+ES_CLUSTER_NAME = "elasticsearch"
+ES_JAVA_OPTS = ""
+
+
+[hook]
+on-activate = '''
+
+export ES_HOME="$FLOX_ENV_CACHE/elasticsearch"
+export ES_PATH_CONF="$ES_HOME/config"
+export ES_CONFIG_FILE="$ES_PATH_CONF/elasticsearch.yml"
+export ES_CONFIG_LOG_FILE="$ES_PATH_CONF/log4j2.properties"
+export ES_CONFIG_JVM_FILE="$ES_PATH_CONF/jvm.options"
+export ES_BIN="$(realpath $(which elasticsearch))"
+export ES_PKG="${ES_BIN::-17}"
+
+if [[ ! -d "$ES_HOME" ]]; then
+  mkdir -m 0700 -p "$ES_HOME"
+fi
+
+rm -f "$ES_HOME/lib"     && ln -sf "$ES_PKG/lib"         "$ES_HOME/lib"
+rm -f "$ES_HOME/modules" && ln -sf "$ES_PKG/modules"     "$ES_HOME/modules"
+
+# Elasticsearch configuration
+mkdir -m 0700 -p "$ES_HOME/config"
+rm -f "$ES_CONFIG_FILE"
+tee -a "$ES_CONFIG_FILE" > /dev/null << EOF
+network.host: "$ES_ADDR"
+http.port: $ES_PORT
+cluster.name: "$ES_CLUSTER_NAME"
+discovery.type: "single-node"
+transport.port: $ES_TRANSPORT_PORT
+EOF
+
+# Logging configuration
+rm -f "$ES_HOME/logging.yml" "$ES_CONFIG_LOG_FILE"
+tee -a "$ES_CONFIG_LOG_FILE" > /dev/null << EOF
+logger.action.name = org.elasticsearch.action
+logger.action.level = info
+appender.console.type = Console
+appender.console.name = console
+appender.console.layout.type = PatternLayout
+appender.console.layout.pattern = [%d{ISO8601}][%-5p][%-25c{1.}] %marker%m%n
+rootLogger.level = info
+rootLogger.appenderRef.console.ref = console
+ingest.geoip.downloader.enabled = false
+EOF
+
+# JVM configuration
+rm -f "$ES_CONFIG_JVM_FILE"
+cp "$ES_PKG/config/jvm.options" "$ES_CONFIG_JVM_FILE"
+
+# Scripts
+mkdir -p "$ES_HOME/scripts"
+
+# Plugins
+mkdir -p "$ES_HOME/plugins"
+
+# Create log dir
+mkdir -m 0700 -p "$ES_HOME/logs"
+'''
+
+[profile]
+common = '''
+echo ""
+echo "     ╔═════════════════════════════════════════════╗"
+echo "     ║                                             ║"
+echo "     ║  Start Elasticsearch in the background:     ║"
+echo "     ║  👉 flox services start                     ║"
+echo "     ║  👉 flox activate --start-services          ║"
+echo "     ║                                             ║"
+echo "     ║  Point your Elasticsearch client to:        ║"
+echo "     ║  👉 http://\$ES_ADDR:\$ES_PORT                ║"
+echo "     ║                                             ║"
+echo "     ╚═════════════════════════════════════════════╝"
+echo ""
+'''
+
+
+[services]
+elasticsearch.command = "elasticsearch"
+
+
+[options]
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]
