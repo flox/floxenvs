@@ -6,11 +6,20 @@
       "bat": {
         "pkg-path": "bat"
       },
+      "cowsay": {
+        "pkg-path": "cowsay"
+      },
       "curl": {
         "pkg-path": "curl"
       },
+      "ddgr": {
+        "pkg-path": "ddgr"
+      },
       "exa": {
         "pkg-path": "exa"
+      },
+      "figlet": {
+        "pkg-path": "figlet"
       },
       "fzf": {
         "pkg-path": "fzf",
@@ -32,8 +41,17 @@
       "jq": {
         "pkg-path": "jq"
       },
+      "lolcat": {
+        "pkg-path": "lolcat"
+      },
       "lynx": {
         "pkg-path": "lynx"
+      },
+      "navi": {
+        "pkg-path": "navi"
+      },
+      "neofetch": {
+        "pkg-path": "neofetch"
       },
       "ripgrep": {
         "pkg-path": "ripgrep"
@@ -47,10 +65,10 @@
       "HISTSIZE": "5000"
     },
     "hook": {
-      "on-activate": "\n  # Marry gh cli with fzf...\n  [[ \"$(gh f -V 2>&1)\" =~ \"unknown command\" ]] && gh extension install gennaro-tedesco/gh-f\n\n"
+      "on-activate": "\n  # Marry gh cli with fzf...\n  [[ \"$(gh f -V 2>&1)\" =~ \"unknown command\" ]] && gh extension install gennaro-tedesco/gh-f\n\n  navi repo add denisidoro/cheats\n"
     },
     "profile": {
-      "common": "  [[ -z $GITHUB_TOKEN ]] || echo \"Set GITHUB_TOKEN before activating to auth gh tooling.\"\n\n  alias cat=bat\n  alias ls=exa\n  alias ll=exa -al\n",
+      "common": "  [[ -z $GITHUB_TOKEN ]] && echo \"Set GITHUB_TOKEN before activating to auth gh tooling.\"\n\n  alias cat=bat\n  alias lz=exa\n  alias lx=exa -al\n",
       "bash": "  # Setup fzf shortcuts and tab completion\n  eval \"$(fzf --bash)\"\n",
       "zsh": "  # Setup fzf shortcuts and tab completion\n  eval \"$(fzf --zsh)\"\n"
     },
@@ -429,6 +447,134 @@
       "priority": 5
     },
     {
+      "attr_path": "cowsay",
+      "broken": false,
+      "derivation": "/nix/store/9gjp3lwv6qzlmpsl3aa6jm0zcmi9frzv-cowsay-3.7.0.drv",
+      "description": "A program which generates ASCII pictures of a cow with a message",
+      "install_id": "cowsay",
+      "license": "GPL-3.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "cowsay-3.7.0",
+      "pname": "cowsay",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.7.0",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "man": "/nix/store/qzrvicph7q7mk5a6fnlz70z7jlg5drv1-cowsay-3.7.0-man",
+        "out": "/nix/store/45392chv022xc558ahmqdh78sc03y299-cowsay-3.7.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "cowsay",
+      "broken": false,
+      "derivation": "/nix/store/n5qv5w4957b1rj9bz8gz1syn6mn095s8-cowsay-3.7.0.drv",
+      "description": "A program which generates ASCII pictures of a cow with a message",
+      "install_id": "cowsay",
+      "license": "GPL-3.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "cowsay-3.7.0",
+      "pname": "cowsay",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.7.0",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "man": "/nix/store/k0yirhl6y6qr2iffhd1q6pjwjlkhnm3y-cowsay-3.7.0-man",
+        "out": "/nix/store/8a1d8fcns3d4lyh5nk04c4p5gc48bq75-cowsay-3.7.0"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "cowsay",
+      "broken": false,
+      "derivation": "/nix/store/d4nm5ck5hn80p96r99h5nalpgffy5vdf-cowsay-3.7.0.drv",
+      "description": "A program which generates ASCII pictures of a cow with a message",
+      "install_id": "cowsay",
+      "license": "GPL-3.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "cowsay-3.7.0",
+      "pname": "cowsay",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.7.0",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "man": "/nix/store/m3yyzv52hnv9a5wg8czwz11nyx07dw7d-cowsay-3.7.0-man",
+        "out": "/nix/store/w9siamicn4cpyrxahgrj9sj4fdnqj77j-cowsay-3.7.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "cowsay",
+      "broken": false,
+      "derivation": "/nix/store/crf7caazqcb4ird0jipf02yzqpnsxxsc-cowsay-3.7.0.drv",
+      "description": "A program which generates ASCII pictures of a cow with a message",
+      "install_id": "cowsay",
+      "license": "GPL-3.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "cowsay-3.7.0",
+      "pname": "cowsay",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.7.0",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "man": "/nix/store/lb2c0bz3z8sj9fi5mppln9hddmcj12f7-cowsay-3.7.0-man",
+        "out": "/nix/store/k3xhwh54bf9z6xxsdz32lhq4h7c5fimj-cowsay-3.7.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
       "attr_path": "curl",
       "broken": false,
       "derivation": "/nix/store/rlzg5gibl7mhky67pshv2xvzbc3gp3mk-curl-8.2.1.drv",
@@ -571,6 +717,126 @@
       "priority": 5
     },
     {
+      "attr_path": "ddgr",
+      "broken": false,
+      "derivation": "/nix/store/qkrpr8fr6kfsb1idivdz2vhcnjdfk57v-ddgr-2.1.drv",
+      "description": "Search DuckDuckGo from the terminal",
+      "install_id": "ddgr",
+      "license": "GPL-3.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "ddgr-2.1",
+      "pname": "ddgr",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/prv8hj1idp1i45i55wp08s4ivpl617z9-ddgr-2.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "ddgr",
+      "broken": false,
+      "derivation": "/nix/store/grzska8q7izrlxvxi4c8avmqx88bk36c-ddgr-2.1.drv",
+      "description": "Search DuckDuckGo from the terminal",
+      "install_id": "ddgr",
+      "license": "GPL-3.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "ddgr-2.1",
+      "pname": "ddgr",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/g73gyahdgcsn1q6b1z8lmf2mdzvpbsis-ddgr-2.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "ddgr",
+      "broken": false,
+      "derivation": "/nix/store/dv1q3qnwmvgfyp8wg38g48mrm91yk2ni-ddgr-2.1.drv",
+      "description": "Search DuckDuckGo from the terminal",
+      "install_id": "ddgr",
+      "license": "GPL-3.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "ddgr-2.1",
+      "pname": "ddgr",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/7d8pkn1hfp58jkxj4yllpa7a9bcxwcrv-ddgr-2.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "ddgr",
+      "broken": false,
+      "derivation": "/nix/store/98l568j6n4cdvhjs2jgpk4g9rk320j4a-ddgr-2.1.drv",
+      "description": "Search DuckDuckGo from the terminal",
+      "install_id": "ddgr",
+      "license": "GPL-3.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "ddgr-2.1",
+      "pname": "ddgr",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/7bczw79z7jb6b9siginqng1zgfm9y4bk-ddgr-2.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
       "attr_path": "exa",
       "broken": false,
       "derivation": "/nix/store/kl61866l4995mw6c85dir0fijc4vxzyb-exa-unstable-2023-03-01.drv",
@@ -693,6 +959,126 @@
       "outputs": {
         "man": "/nix/store/7arx9z5xf60g7iyhxj80j9g21gs1xgsk-exa-unstable-2023-03-01-man",
         "out": "/nix/store/lh4c4lvn5bpndiml3ajhjarcpy9wpf3g-exa-unstable-2023-03-01"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "figlet",
+      "broken": false,
+      "derivation": "/nix/store/iqjyw1y1wwybkiz6ar2vp92pdp4cqlpg-figlet-2.2.5.drv",
+      "description": "Program for making large letters out of ordinary text",
+      "install_id": "figlet",
+      "license": "AFL-2.1",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "figlet-2.2.5",
+      "pname": "figlet",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.2.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/y32iqirfpg4g8s5hpavdg8zxhladyakx-figlet-2.2.5"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "figlet",
+      "broken": false,
+      "derivation": "/nix/store/5rv1yl26ynr9cv27ywm9mc7k3mh4vfcf-figlet-2.2.5.drv",
+      "description": "Program for making large letters out of ordinary text",
+      "install_id": "figlet",
+      "license": "AFL-2.1",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "figlet-2.2.5",
+      "pname": "figlet",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.2.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/427fyqwkl1s4jqsrf6l3qx9yzwxcdfdx-figlet-2.2.5"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "figlet",
+      "broken": false,
+      "derivation": "/nix/store/99jrywwv6mrwvrlc31s4mcbq24f81x0g-figlet-2.2.5.drv",
+      "description": "Program for making large letters out of ordinary text",
+      "install_id": "figlet",
+      "license": "AFL-2.1",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "figlet-2.2.5",
+      "pname": "figlet",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.2.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/gqx9l9nj3v4h85bp9d9js1azb95p7vd0-figlet-2.2.5"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "figlet",
+      "broken": false,
+      "derivation": "/nix/store/f299fmszmm39jl788fmqvkmwgz5ir2xc-figlet-2.2.5.drv",
+      "description": "Program for making large letters out of ordinary text",
+      "install_id": "figlet",
+      "license": "AFL-2.1",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "figlet-2.2.5",
+      "pname": "figlet",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.2.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/x25rwhp7n6vnhs5scwm97mn0gfz5wldn-figlet-2.2.5"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -1209,6 +1595,126 @@
       "priority": 5
     },
     {
+      "attr_path": "lolcat",
+      "broken": false,
+      "derivation": "/nix/store/by2h0zvssidd5qyasvc1s5ids9v1ll4p-lolcat-100.0.1.drv",
+      "description": "A rainbow version of cat",
+      "install_id": "lolcat",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "lolcat-100.0.1",
+      "pname": "lolcat",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "100.0.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/6xw4i6fsalxcl0p56mrn0lmk9ryi0dmd-lolcat-100.0.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "lolcat",
+      "broken": false,
+      "derivation": "/nix/store/7pscdm9p9xsv0ilqnarhk1pq9i6wpqsf-lolcat-100.0.1.drv",
+      "description": "A rainbow version of cat",
+      "install_id": "lolcat",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "lolcat-100.0.1",
+      "pname": "lolcat",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "100.0.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/2j755q619yzzyijmsjg4l2yi97gqlqil-lolcat-100.0.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "lolcat",
+      "broken": false,
+      "derivation": "/nix/store/vp8lw0bcvxs82bjmq0jm66s3bd6dk6q7-lolcat-100.0.1.drv",
+      "description": "A rainbow version of cat",
+      "install_id": "lolcat",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "lolcat-100.0.1",
+      "pname": "lolcat",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "100.0.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/mfhj9irq2yccfmcpm7i67l7mjlajfijb-lolcat-100.0.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "lolcat",
+      "broken": false,
+      "derivation": "/nix/store/ahx7637rrd6px20050nv2k1rdy5i1igp-lolcat-100.0.1.drv",
+      "description": "A rainbow version of cat",
+      "install_id": "lolcat",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "lolcat-100.0.1",
+      "pname": "lolcat",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "100.0.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ws88ar34ahgrpyhbxjp0mw3wff92h0am-lolcat-100.0.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
       "attr_path": "lynx",
       "broken": false,
       "derivation": "/nix/store/w60q395hr4w49gdaj07xm56m28ipg54i-lynx-2.8.9rel.1.drv",
@@ -1323,6 +1829,254 @@
       ],
       "outputs": {
         "out": "/nix/store/lb8smsx901n8pdcxqbjj2rkdzaajjd4j-lynx-2.8.9rel.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "navi",
+      "broken": false,
+      "derivation": "/nix/store/3ijp80c1k6h5fqh2yklnyq7b2k2f7119-navi-2.22.1.drv",
+      "description": "An interactive cheatsheet tool for the command-line and application launchers",
+      "install_id": "navi",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "navi-2.22.1",
+      "pname": "navi",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.22.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ycvcwz9l7bhpfvmdz0fsv8s8s7m7c23q-navi-2.22.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "navi",
+      "broken": false,
+      "derivation": "/nix/store/4db9yjz6qsnkr332rim3jjqx5g134xw3-navi-2.22.1.drv",
+      "description": "An interactive cheatsheet tool for the command-line and application launchers",
+      "install_id": "navi",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "navi-2.22.1",
+      "pname": "navi",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.22.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/0f9cpni8cbxsk7wa7kx3cflyp092fyx4-navi-2.22.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "navi",
+      "broken": false,
+      "derivation": "/nix/store/249mcw9xrcxnbjggmbif8rq8q7rp8ir8-navi-2.22.1.drv",
+      "description": "An interactive cheatsheet tool for the command-line and application launchers",
+      "install_id": "navi",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "navi-2.22.1",
+      "pname": "navi",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.22.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/qwsy5qi5kgc3s2qsc5m7vf7v78d5saj5-navi-2.22.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "navi",
+      "broken": false,
+      "derivation": "/nix/store/zfkv8jjbqpxlahl949b31knrljjwpvvg-navi-2.22.1.drv",
+      "description": "An interactive cheatsheet tool for the command-line and application launchers",
+      "install_id": "navi",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "navi-2.22.1",
+      "pname": "navi",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.22.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kw4di3kmd50pnrlxl20hl8i0hfx8syxl-navi-2.22.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "neofetch",
+      "broken": false,
+      "derivation": "/nix/store/fmjilk0zpm1yvq5p1prsyrnz8f5k3amh-neofetch-unstable-2021-12-10.drv",
+      "description": "A fast, highly customizable system info script",
+      "install_id": "neofetch",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "neofetch-unstable-2021-12-10",
+      "pname": "neofetch",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "unstable-2021-12-10",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "man": "/nix/store/ax9wmbi44wdlnb6lr6hhls8mqdwckwvl-neofetch-unstable-2021-12-10-man",
+        "out": "/nix/store/6ckj56g46i5vhqiravrr8z5ad4lfmgi8-neofetch-unstable-2021-12-10"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "neofetch",
+      "broken": false,
+      "derivation": "/nix/store/dkph2ql381g23rvb3v6ym9vp7cb7dc75-neofetch-unstable-2021-12-10.drv",
+      "description": "A fast, highly customizable system info script",
+      "install_id": "neofetch",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "neofetch-unstable-2021-12-10",
+      "pname": "neofetch",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "unstable-2021-12-10",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "man": "/nix/store/axfcq456qblbhlyvcvi46i7hvsy0lzwd-neofetch-unstable-2021-12-10-man",
+        "out": "/nix/store/gl123rcn94x53w6aaalbya0vra22bqcf-neofetch-unstable-2021-12-10"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "neofetch",
+      "broken": false,
+      "derivation": "/nix/store/21yy4jqs23jiaw6mfgwg8kvb5xjz9124-neofetch-unstable-2021-12-10.drv",
+      "description": "A fast, highly customizable system info script",
+      "install_id": "neofetch",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "neofetch-unstable-2021-12-10",
+      "pname": "neofetch",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "unstable-2021-12-10",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "man": "/nix/store/z5y3yi4l3b8s6xgn743zx9i42k5ibf0l-neofetch-unstable-2021-12-10-man",
+        "out": "/nix/store/6sfihydivv2qg84v51w3nls0f0ks6mja-neofetch-unstable-2021-12-10"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "neofetch",
+      "broken": false,
+      "derivation": "/nix/store/8g7wv9k24c9iffhqwyr9ggfplb26767g-neofetch-unstable-2021-12-10.drv",
+      "description": "A fast, highly customizable system info script",
+      "install_id": "neofetch",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=e56990880811a451abd32515698c712788be5720",
+      "name": "neofetch-unstable-2021-12-10",
+      "pname": "neofetch",
+      "rev": "e56990880811a451abd32515698c712788be5720",
+      "rev_count": 521611,
+      "rev_date": "2023-09-02T14:03:41Z",
+      "scrape_date": "2024-08-16T00:19:10Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "unstable-2021-12-10",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "man": "/nix/store/qwlr8ll0ndw3ihd4jm4hm1mf3v4aicam-neofetch-unstable-2021-12-10-man",
+        "out": "/nix/store/y51ifllqjfwilis5dg026jnjrm6jyns0-neofetch-unstable-2021-12-10"
       },
       "system": "x86_64-linux",
       "group": "toplevel",

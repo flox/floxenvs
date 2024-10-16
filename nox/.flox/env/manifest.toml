@@ -7,6 +7,9 @@ version = 1
 
 # Web browsing
 lynx.pkg-path = "lynx"
+
+# Duck Duck Go search
+ddgr.pkg-path = "ddgr"
 curl.pkg-path = "curl"
 
 # THE best editor
@@ -28,7 +31,16 @@ fzf-obc.pkg-group = "fzf"
 # Git and github access
 git.pkg-path = "git"
 gh.pkg-path = "gh"
+
+# Other nice updgrade
 ripgrep.pkg-path = "ripgrep"
+
+# cheat sheet
+navi.pkg-path = "navi"
+lolcat.pkg-path = "lolcat"
+cowsay.pkg-path = "cowsay"
+figlet.pkg-path = "figlet"
+neofetch.pkg-path = "neofetch"
 
 [vars]
 # Since history is sooo fast with fzf, increase the limits!
@@ -41,15 +53,16 @@ on-activate = '''
   # Marry gh cli with fzf...
   [[ "$(gh f -V 2>&1)" =~ "unknown command" ]] && gh extension install gennaro-tedesco/gh-f
 
+  navi repo add denisidoro/cheats
 '''
 
 [profile]
 common = '''
-  [[ -z $GITHUB_TOKEN ]] || echo "Set GITHUB_TOKEN before activating to auth gh tooling."
+  [[ -z $GITHUB_TOKEN ]] && echo "Set GITHUB_TOKEN before activating to auth gh tooling."
 
   alias cat=bat
-  alias ls=exa
-  alias ll=exa -al
+  alias lz=exa
+  alias lx=exa -al
 '''
 
 bash = '''
