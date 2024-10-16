@@ -1,0 +1,29 @@
+version = 1
+
+[install]
+go.pkg-path = "go"
+go.version = ">=1.23"
+
+# Taskfile support.
+go-task.pkg-path = "go-task"
+
+# Common editor dependencies.
+gomodifytags.pkg-path = "gomodifytags"
+gopls.pkg-path = "gopls"
+gore.pkg-path = "gore"
+gotests.pkg-path = "gotests"
+gotools.pkg-path = "gotools"
+
+[hook]
+on-activate = '''
+# Point GOENV to Flox environment cache
+export GOENV="${FLOX_ENV_CACHE}/go"
+'''
+
+[options]
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]
