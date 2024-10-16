@@ -14,5 +14,11 @@ gore.pkg-path = "gore"
 gotests.pkg-path = "gotests"
 gotools.pkg-path = "gotools"
 
+[hook]
+on-activate = '''
+  # Point GOENV to Flox environment cache
+  export GOENV="$FLOX_ENV_CACHE/goenv"
+'''
+
 [options]
 systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
