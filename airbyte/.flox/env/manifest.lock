@@ -1,0 +1,181 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "version": 1,
+    "install": {
+      "abctl": {
+        "pkg-path": "abctl",
+        "pkg-group": "abctl",
+        "systems": [
+          "x86_64-linux"
+        ]
+      },
+      "gum": {
+        "pkg-path": "gum"
+      }
+    },
+    "hook": {
+      "on-activate": "echo \"This script sets up your Airbyte credentials.\"\n\nemail=$(gum input --placeholder \"Enter your email address\")\n\norganization=$(gum input --placeholder \"Enter your organization name\")\n\ncredentials_output=$(abctl local credentials)\n\npassword=$(echo \"$credentials_output\" | grep \"Password:\" | awk '{print $2}')\n\nabctl local credentials --email \"$email\"\n\nabctl local credentials --password \"$password\"\n\n# Provide feedback to the user\necho \"Your email and password have been set for your Airbyte instance.\"\necho \"Email: $email\"\necho \"Password: $password\"\n\n\n"
+    },
+    "profile": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-darwin",
+        "x86_64-linux"
+      ],
+      "allow": {
+        "licenses": []
+      },
+      "semver": {}
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "abctl",
+      "broken": false,
+      "derivation": "/nix/store/9faavn7939msja3s7l5pg3c990xakv4y-abctl-0.13.1.drv",
+      "description": "Airbyte's CLI for managing local Airbyte installations",
+      "install_id": "abctl",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a3c0b3b21515f74fd2665903d4ce6bc4dc81c77c",
+      "name": "abctl-0.13.1",
+      "pname": "abctl",
+      "rev": "a3c0b3b21515f74fd2665903d4ce6bc4dc81c77c",
+      "rev_count": 692963,
+      "rev_date": "2024-10-14T06:48:30Z",
+      "scrape_date": "2024-10-16T03:55:11Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.13.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/wbqgl7kgy4xn5hknj8hvs51mw1nmw1i4-abctl-0.13.1"
+      },
+      "system": "x86_64-linux",
+      "group": "abctl",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/ippvngi4fvlm7wcjv66q35882kk0d782-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a3c0b3b21515f74fd2665903d4ce6bc4dc81c77c",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "a3c0b3b21515f74fd2665903d4ce6bc4dc81c77c",
+      "rev_count": 692963,
+      "rev_date": "2024-10-14T06:48:30Z",
+      "scrape_date": "2024-10-16T03:55:11Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/s4yb9a7cvj5vd5yw0nvssf51lmpa5id0-gum-0.14.5"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/yjf86f3qgpirr5lc9wsds4nlqyf8riw0-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a3c0b3b21515f74fd2665903d4ce6bc4dc81c77c",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "a3c0b3b21515f74fd2665903d4ce6bc4dc81c77c",
+      "rev_count": 692963,
+      "rev_date": "2024-10-14T06:48:30Z",
+      "scrape_date": "2024-10-16T03:55:11Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/bw0ii1jjvxd8albrmvi0lin6h1ssz4yi-gum-0.14.5"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/db7hhax9rfpj0gl677sqcm1s5gfjkmrc-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a3c0b3b21515f74fd2665903d4ce6bc4dc81c77c",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "a3c0b3b21515f74fd2665903d4ce6bc4dc81c77c",
+      "rev_count": 692963,
+      "rev_date": "2024-10-14T06:48:30Z",
+      "scrape_date": "2024-10-16T03:55:11Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/zidlqhd8qq8wljvm38j1j4izx8ww7aps-gum-0.14.5"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/vsq73s5cq771rh6nz9hsjhiy74xsyh1r-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a3c0b3b21515f74fd2665903d4ce6bc4dc81c77c",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "a3c0b3b21515f74fd2665903d4ce6bc4dc81c77c",
+      "rev_count": 692963,
+      "rev_date": "2024-10-14T06:48:30Z",
+      "scrape_date": "2024-10-16T03:55:11Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kma26ygxqp39pm6fl32yjach0czasc3j-gum-0.14.5"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ]
+}
