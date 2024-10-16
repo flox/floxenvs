@@ -41,7 +41,6 @@ jobs:
             update_all=true
           fi
           while IFS= read manifest_path; do
-          ❯ echo "${manifest_path#$PWD}"
             env_path=$(realpath -s $(dirname $manifest_path)/../..)
             rel_env_path=$(env_path#$PWD)
             if [ -f "$env_path/test.sh" ]; then
