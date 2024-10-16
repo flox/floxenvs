@@ -42,7 +42,7 @@ jobs:
           fi
           while IFS= read manifest_path; do
             env_path=$(realpath -s $(dirname $manifest_path)/../..)
-            rel_env_path=$(env_path#$PWD)
+            rel_env_path="${env_path#$PWD}"
             if [ -f "$env_path/test.sh" ]; then
               name=$(basename $env_path)
 
