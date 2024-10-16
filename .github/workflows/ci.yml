@@ -84,6 +84,8 @@ jobs:
           echo "envs_test=$envs_test" >> "$GITHUB_OUTPUT"
           echo "envs_push=$envs_push" >> "$GITHUB_OUTPUT"
 
+      - uses: mxschmitt/action-tmate@v3
+
   test:
     name: "Test '${{ matrix.example }}' example on '${{ matrix.system }}'"
     runs-on: "ubuntu-latest"
