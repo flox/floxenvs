@@ -1,0 +1,57 @@
+version = 1
+
+[install]
+# ruby version options
+#ruby.version = "3.3.4"
+#ruby.version = "3.1.6"
+#ruby.version = "2.7.8"
+
+ruby.pkg-path = "ruby"
+gcc-unwrapped.pkg-path = "gcc-unwrapped"
+
+# For nokogiri and other native extensions
+libxml2.pkg-path = "libxml2"
+libxslt.pkg-path = "libxslt"
+gnumake.pkg-path = "gnumake"
+binutils.pkg-path = "binutils"
+pkg-config.pkg-path = "pkg-config"
+# glibc only needed on linux builds
+glibc.pkg-path = "glibc"
+glibc.systems = [ "x86_64-linux" , "aarch64-linux"]
+openssl.pkg-path = "openssl"
+libyaml.pkg-path = "libyaml"
+imagemagick.pkg-path = "imagemagick"
+postgresql.pkg-path = "postgresql"
+libmysqlclient.pkg-path = "libmysqlclient"
+
+# Helpful for setup
+gum.pkg-path = "gum"
+which.pkg-path = "which"
+
+[vars]
+
+[hook]
+ on-activate = '''
+  unset CPATH
+  bundle config build.pg --with-pg-config=ignore
+  bundle config set --local path './vendor'
+ '''
+
+[profile]
+common = '''
+echo ''
+echo '     ╔═══════════════════════════════════════════════╗'
+echo '     ║                                               ║'
+echo '     ║  Run `bundle` to finish the setup of          ║'
+echo '     ║  of your project                              ║'
+echo '     ║  bundler is configured to install into        ║'
+echo '     ║       ./vendor                                ║'
+echo '     ║                                               ║'
+echo '     ║  You can also select a differnet ruby version ║'
+echo '     ║    using `flox edit`                          ║'
+echo '     ╚═══════════════════════════════════════════════╝'
+echo ''
+'''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
