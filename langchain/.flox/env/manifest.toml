@@ -1,0 +1,23 @@
+version = 1
+
+[install]
+langgraph.pkg-path = "python312Packages.langgraph"
+langchain-ollama.pkg-path = "python312Packages.langchain-ollama"
+langchain-community.pkg-path = "python312Packages.langchain-community"
+ollama.pkg-path = "ollama"
+
+[profile]
+common = '''
+  if ollama list >/dev/null 2>&1; then
+    echo "🤖 Ollama service running"
+  else
+    echo "⛔️ Ollama service not available"
+  fi
+'''
+
+[services]
+ollama.command = "ollama serve"
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
+
