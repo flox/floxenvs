@@ -1,0 +1,160 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "version": 1,
+    "install": {
+      "nginx": {
+        "pkg-path": "nginx"
+      }
+    },
+    "hook": {
+      "on-activate": "export NGINX_DIR=\"$FLOX_ENV_CACHE/nginx\"\nexport NGINX_CONFIG=\"$NGINX_DIR/nginx.conf\"\nexport NGINX_ROOT=\"$NGINX_DIR/www\"\n\nif [ ! -e \"$NGINX_CONFIG\" ]; then\n  mkdir -p \"$NGINX_DIR\"\n  cat <<EOF > \"$NGINX_CONFIG\"\nlock_file $NGINX_DIR/nginx.lock;\npid $NGINX_DIR/nginx.pid;\nevents {\n}\nhttp {\n  server {\n    listen 8080;\n    root $NGINX_ROOT;\n  \n    location / {\n    }\n\n    access_log $NGINX_DIR/access.log;\n  }\n}\nEOF\n\nfi\n\nif [ ! -e \"$NGINX_ROOT/index.html\" ]; then\n  mkdir -p \"$NGINX_ROOT\"\n  cat <<EOF > \"$NGINX_ROOT/index.html\"\n<!doctype html>\n<html>\n  <head>\n    <title>Hello World!</title>\n    <meta charset=\"utf-8\" />\n  </head>\n  <body>\n    <h1>\n      Hello World!\n    </h1>\n  </body>\n</html>\n\nEOF\nfi\n "
+    },
+    "profile": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-darwin",
+        "x86_64-linux"
+      ],
+      "allow": {
+        "licenses": []
+      },
+      "semver": {}
+    },
+    "services": {
+      "nginx": {
+        "command": "nginx -c \"$NGINX_CONFIG\" -e stderr",
+        "vars": null,
+        "is-daemon": true,
+        "shutdown": {
+          "command": "echo hi > /tmp/f; nginx -c \"$NGINX_CONFIG\" -s quit -e /Users/matthew/log"
+        },
+        "systems": null
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "nginx",
+      "broken": false,
+      "derivation": "/nix/store/fmcxnpii0pm525xpnbj6vg6mv1lp4200-nginx-1.26.2.drv",
+      "description": "Reverse proxy and lightweight webserver",
+      "install_id": "nginx",
+      "license": "[ BSD-2-Clause, BSD-2-Clause, BSD-2-Clause, BSD-2-Clause ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a3c0b3b21515f74fd2665903d4ce6bc4dc81c77c",
+      "name": "nginx-1.26.2",
+      "pname": "nginx",
+      "rev": "a3c0b3b21515f74fd2665903d4ce6bc4dc81c77c",
+      "rev_count": 692963,
+      "rev_date": "2024-10-14T06:48:30Z",
+      "scrape_date": "2024-10-16T03:55:11Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.26.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/5vkdjy3h1g3pk3fjrxqnyizbn32jfgzp-nginx-1.26.2-doc",
+        "out": "/nix/store/k9frc2f3fm38hdlp7l31qh8i5k6bgyzs-nginx-1.26.2"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nginx",
+      "broken": false,
+      "derivation": "/nix/store/0my9cjk6mh2j149nv3asvz8ng7ch0ych-nginx-1.26.2.drv",
+      "description": "Reverse proxy and lightweight webserver",
+      "install_id": "nginx",
+      "license": "[ BSD-2-Clause, BSD-2-Clause, BSD-2-Clause, BSD-2-Clause ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a3c0b3b21515f74fd2665903d4ce6bc4dc81c77c",
+      "name": "nginx-1.26.2",
+      "pname": "nginx",
+      "rev": "a3c0b3b21515f74fd2665903d4ce6bc4dc81c77c",
+      "rev_count": 692963,
+      "rev_date": "2024-10-14T06:48:30Z",
+      "scrape_date": "2024-10-16T03:55:11Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.26.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/i3km1iw3wiklc71zsjqrlmbmazc8w4qj-nginx-1.26.2-doc",
+        "out": "/nix/store/dvgb54l52kya0wpmb256h35zasan436k-nginx-1.26.2"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nginx",
+      "broken": false,
+      "derivation": "/nix/store/y9vivi98kkl6z9r79hib1yy7srpjzvka-nginx-1.26.2.drv",
+      "description": "Reverse proxy and lightweight webserver",
+      "install_id": "nginx",
+      "license": "[ BSD-2-Clause, BSD-2-Clause, BSD-2-Clause, BSD-2-Clause ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a3c0b3b21515f74fd2665903d4ce6bc4dc81c77c",
+      "name": "nginx-1.26.2",
+      "pname": "nginx",
+      "rev": "a3c0b3b21515f74fd2665903d4ce6bc4dc81c77c",
+      "rev_count": 692963,
+      "rev_date": "2024-10-14T06:48:30Z",
+      "scrape_date": "2024-10-16T03:55:11Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.26.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/rbrkmql8ws5a2cc3pfjqak0kykxaf9zm-nginx-1.26.2-doc",
+        "out": "/nix/store/w95cz4b6hbshxbk7ykvfqzw9lpp776fd-nginx-1.26.2"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nginx",
+      "broken": false,
+      "derivation": "/nix/store/ba6l07q1by884jsi1pmcjbva4h25q1vx-nginx-1.26.2.drv",
+      "description": "Reverse proxy and lightweight webserver",
+      "install_id": "nginx",
+      "license": "[ BSD-2-Clause, BSD-2-Clause, BSD-2-Clause, BSD-2-Clause ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a3c0b3b21515f74fd2665903d4ce6bc4dc81c77c",
+      "name": "nginx-1.26.2",
+      "pname": "nginx",
+      "rev": "a3c0b3b21515f74fd2665903d4ce6bc4dc81c77c",
+      "rev_count": 692963,
+      "rev_date": "2024-10-14T06:48:30Z",
+      "scrape_date": "2024-10-16T03:55:11Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.26.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/11ksaavr27994iqqcq4vlmbci8jcgjk0-nginx-1.26.2-doc",
+        "out": "/nix/store/rdc8w0yiw5n4k9w8l0d31738614cj2a6-nginx-1.26.2"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ]
+}

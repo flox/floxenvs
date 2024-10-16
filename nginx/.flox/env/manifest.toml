@@ -1,0 +1,66 @@
+version = 1
+
+
+[install]
+nginx.pkg-path = "nginx"
+
+[hook]
+on-activate = '''
+export NGINX_DIR="$FLOX_ENV_CACHE/nginx"
+export NGINX_CONFIG="$NGINX_DIR/nginx.conf"
+export NGINX_ROOT="$NGINX_DIR/www"
+
+if [ ! -e "$NGINX_CONFIG" ]; then
+  mkdir -p "$NGINX_DIR"
+  cat <<EOF > "$NGINX_CONFIG"
+lock_file $NGINX_DIR/nginx.lock;
+pid $NGINX_DIR/nginx.pid;
+events {
+}
+http {
+  server {
+    listen 8080;
+    root $NGINX_ROOT;
+
+    location / {
+    }
+
+    access_log $NGINX_DIR/access.log;
+  }
+}
+EOF
+
+fi
+
+if [ ! -e "$NGINX_ROOT/index.html" ]; then
+  mkdir -p "$NGINX_ROOT"
+  cat <<EOF > "$NGINX_ROOT/index.html"
+<!doctype html>
+<html>
+  <head>
+    <title>Hello World!</title>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <h1>
+      Hello World!
+    </h1>
+  </body>
+</html>
+
+EOF
+fi
+ '''
+
+[services.nginx]
+command = "nginx -c \"$NGINX_CONFIG\" -e stderr"
+is-daemon = true
+shutdown.command = "echo hi > /tmp/f; nginx -c \"$NGINX_CONFIG\" -s quit -e /Users/matthew/log"
+
+[options]
+systems = [
+    "aarch64-darwin",
+    "aarch64-linux",
+    "x86_64-darwin",
+    "x86_64-linux"
+]
