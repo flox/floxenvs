@@ -1,0 +1,68 @@
+#
+# No-X environment
+#
+version = 1
+
+[install]
+
+# Web browsing
+lynx.pkg-path = "lynx"
+curl.pkg-path = "curl"
+
+# THE best editor
+vim.pkg-path = "vim-full"
+
+# Pretteier outputs!
+jq.pkg-path = "jq"
+jless.pkg-path = "jless"
+bat.pkg-path = "bat"
+exa.pkg-path = "exa"
+
+# Fuzzy incremental search.
+# Use a package group to allow this to resolve to the latest
+fzf.pkg-path = "fzf"
+fzf.pkg-group = "fzf"
+fzf-obc.pkg-path = "fzf-obc"
+fzf-obc.pkg-group = "fzf"
+
+# Git and github access
+git.pkg-path = "git"
+gh.pkg-path = "gh"
+ripgrep.pkg-path = "ripgrep"
+
+[vars]
+# Since history is sooo fast with fzf, increase the limits!
+HISTSIZE = "5000"
+HISTFILESIZE = "8000"
+
+[hook]
+on-activate = '''
+
+  # Marry gh cli with fzf...
+  [[ "$(gh f -V 2>&1)" =~ "unknown command" ]] && gh extension install gennaro-tedesco/gh-f
+
+'''
+
+[profile]
+common = '''
+  [[ -z $GITHUB_TOKEN ]] || echo "Set GITHUB_TOKEN before activating to auth gh tooling."
+
+  alias cat=bat
+  alias ls=exa
+  alias ll=exa -al
+'''
+
+bash = '''
+  # Setup fzf shortcuts and tab completion
+  eval "$(fzf --bash)"
+'''
+
+zsh = '''
+  # Setup fzf shortcuts and tab completion
+  eval "$(fzf --zsh)"
+'''
+
+[services]
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
