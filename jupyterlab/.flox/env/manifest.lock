@@ -53,7 +53,7 @@
       "JUPYTER_SERVER_TOKEN": "floxfan123456"
     },
     "hook": {
-      "on-activate": " \n  export PYTHON_ENV=\"${PYTHON_ENV:-$FLOX_ENV_CACHE/python}\" \n\n  if [[ -d $PYTHON_ENV ]]; then\n    echo; echo -n \"⚡️ Activating existing venv in $PYTHON_ENV...\"\n    . $PYTHON_ENV/bin/activate\n    echo \"done.\"\n  fi\n\n  # If we see a requirements.txt file, install its contents\n  # into a virtual environment\n\n  if [[ -f requirements.txt ]]; then\n    [ ! -d $PYTHON_ENV ] && python -m venv $PYTHON_ENV\n    . $PYTHON_ENV/bin/activate\n    gum spin --spinner dot --title \"Updating packages in $PYTHON_DIR\" -- pip install -r \"./requirements.txt\" --quiet\n  fi\n"
+      "on-activate": " \n  export PYTHON_ENV=\"${PYTHON_ENV:-$FLOX_ENV_CACHE/python}\" \n\n  if [[ -d $PYTHON_ENV ]]; then\n    echo; echo -n \"⚡️ Activating existing venv in $PYTHON_ENV...\"\n    . $PYTHON_ENV/bin/activate\n    echo \"done.\"\n  fi\n\n  [ ! -d $PYTHON_ENV ] && python -m venv $PYTHON_ENV\n  . $PYTHON_ENV/bin/activate\n\n  # If we see a requirements.txt file, install its contents\n  # into the virtual environment\n\n  if [[ -f requirements.txt ]]; then\n    gum spin --spinner dot --title \"Updating packages in $PYTHON_DIR\" -- pip install -r \"./requirements.txt\" --quiet\n  fi\n"
     },
     "profile": {
       "common": "  toilet -f smmono9 --metal \"jupyterlab\"\n\n  echo\n  if [[ \"$FLOX_ACTIVATE_START_SERVICES\" == \"true\" ]]; then\n    sleep 1\n    jupyter-lab list\n  else\n    echo \"To start Jupyter Lab, run activate with '--start-services'.\"\n  fi\n  echo\n",

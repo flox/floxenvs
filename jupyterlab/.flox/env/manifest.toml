@@ -46,12 +46,13 @@ on-activate = '''
     echo "done."
   fi
 
+  [ ! -d $PYTHON_ENV ] && python -m venv $PYTHON_ENV
+  . $PYTHON_ENV/bin/activate
+
   # If we see a requirements.txt file, install its contents
-  # into a virtual environment
+  # into the virtual environment
 
   if [[ -f requirements.txt ]]; then
-    [ ! -d $PYTHON_ENV ] && python -m venv $PYTHON_ENV
-    . $PYTHON_ENV/bin/activate
     gum spin --spinner dot --title "Updating packages in $PYTHON_DIR" -- pip install -r "./requirements.txt" --quiet
   fi
 '''
