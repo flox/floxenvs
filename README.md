@@ -5,6 +5,8 @@
 |      | Updated | Tested | FloxHub | Description |
 | :--- | :-----: | :----: | :-----: | :---------- |
 | |
+| **Languages:** |
+| `python-poetry`  | ✅ | ✅ | ✅ | |
 | **Databases:** |
 | `postgres`  | ✅ | ✅ | ✅ | |
 | `redis`     | ✅ | ✅ | ✅ | |
