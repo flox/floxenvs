@@ -15,18 +15,18 @@
 | `mysql` | ✅ | ✅ | ✅ | |
 | |
 | **Applications:** |
-| `nb`          | ✅ | ✅ | ✅ | IPython notebook |
-| `fuzzytools`  | ✅ | ✅ | ✅ | An opinionated shell environment |
-| `1password`   |  |  |  | |
-| `anthropic`   |  |  |  | |
-| `direnv`      |  |  |  | |
-| `flaim`       |  |  |  | |
-| `fooocus`     |  |  |  | |
-| `metabase`    |  |  |  | |
-| `ollama`      |  |  |  | |
-| `openai`      |  |  |  | |
-| `podman`      |  |  |  | |
-| `verba`       |  |  |  | |
+| `nb`              | ✅ | ✅ | ✅ | IPython notebook |
+| `a-perfect-shell` | ✅ | ✅ | ✅ | An opinionated shell environment |
+| `1password`       |  |  |  | |
+| `anthropic`       |  |  |  | |
+| `direnv`          |  |  |  | |
+| `flaim`           |  |  |  | |
+| `fooocus`         |  |  |  | |
+| `metabase`        |  |  |  | |
+| `ollama`          |  |  |  | |
+| `openai`          |  |  |  | |
+| `podman`          |  |  |  | |
+| `verba`           |  |  |  | |
 
 
 See more examples in `./playground/` folder.
