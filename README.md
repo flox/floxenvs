@@ -14,6 +14,7 @@
 | |
 | **Applications:** |
 | `nb`          | ✅ | ✅ | ✅ | IPython notebook |
+| `fuzzytools`  | ✅ | ✅ | ✅ | An opinionated shell environment |
 | `1password`   |  |  |  | |
 | `anthropic`   |  |  |  | |
 | `direnv`      |  |  |  | |
