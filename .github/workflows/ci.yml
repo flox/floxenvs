@@ -25,6 +25,7 @@ jobs:
         uses: "actions/checkout@v4"
         with:
           fetch-depth: 5
+          ref: ${{ github.head_ref }}
 
       - name: "Find environment"
         id: "envs"
@@ -33,29 +34,28 @@ jobs:
           envs_push="["
 
           update_all=
-          git diff
-          git diff --name-only HEAD~1 HEAD --
           if git diff --name-only HEAD~1 HEAD -- | grep -E "flake.nix|flake.lock|.github" ; then
             echo detected major change
             update_all=true
           fi
-          while IFS= read path; do
-            rel_env_path=$(realpath $(dirname $path)/../..)
-            env_path=$(realpath -s $(dirname $path)/../..)
+
+          while IFS= read manifest_path; do
+            env_path=$(realpath -s $(dirname $manifest_path)/../..)
+            rel_env_path="${env_path#$PWD/}"
             if [ -f "$env_path/test.sh" ]; then
               name=$(basename $env_path)
 
-              if [ "$update_all" != "true" ] && ( git diff --name-only HEAD~1 HEAD | grep -v "$rel_env_path" ; ) ; then
+              if [ "$update_all" != "true" ] && ( git diff --name-only HEAD~1 HEAD | grep -qv "$rel_env_path/" ; ) ; then
                 continue
               fi
 
-              num_of_services=$(yq -oy '.services | length' $path)
+              num_of_services=$(yq -oy '.services | length' $manifest_path)
               start_services="true"
               if [ "$num_of_services" -eq 0 ]; then
                 start_services="false"
               fi
 
-              readarray systems < <(yq e -o=j -I=0 '.options.systems[]' $path)
+              readarray systems < <(yq e -o=j -I=0 '.options.systems[]' $manifest_path)
               comma_test=""
               if [ "$envs_test" != "[" ]; then comma_test=","; fi
               for system in "${systems[@]}"; do
@@ -68,7 +68,7 @@ jobs:
               if [ "$envs_push" != "[" ]; then comma_push=","; fi
               envs_push="$envs_push$comma_push{\"example\":\"$name\"}"
             fi
-          done <<< "$(find ./ -name manifest.toml)"
+          done <<< "$(find $PWD -name manifest.toml)"
           envs_test="$envs_test]"
           envs_push="$envs_push]"
 
