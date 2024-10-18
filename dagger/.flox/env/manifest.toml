@@ -1,0 +1,45 @@
+version = 1
+
+[install]
+coreutils.pkg-path = "coreutils"
+dagger.flake = "github:dagger/nix#dagger"
+
+[vars]
+# Get token from -> https://dagger.cloud/traces/setup
+# DAGGER_CLOUD_TOKEN = "your-token-here"
+
+
+[hook]
+on-activate = '''
+
+# TODO: check that docker is running using `docker info`
+
+export DAGGER_VERSION=$(dagger version | cut -d 'v' -f 2 | cut -d ' ' -f 1)
+export DAGGER_ENGINE_IMAGE="registry.dagger.io/engine:v$DAGGER_VERSION"
+export DAGGER_ENGINE_NAME="flox-dagger-engine-$DAGGER_VERSION"
+export _EXPERIMENTAL_DAGGER_RUNNER_HOST="docker-container://$DAGGER_ENGINE_NAME"
+'''
+
+[profile]
+common = '''
+# TODO: tell how to use dagger
+'''
+
+[services]
+dagger-engine.command = '''
+# For more see: https://docs.dagger.io/configuration/custom-runner
+docker run \
+  --rm \
+  --privileged \
+  -v dagger-engine:/var/lib/dagger \
+  --name $DAGGER_ENGINE_NAME \
+    $DAGGER_ENGINE_IMAGE
+'''
+
+[options]
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]
