@@ -17,7 +17,7 @@
 | **Applications:** |
 | `nb`              | ✅ | ✅ | ✅ | IPython notebook |
 | `a-perfect-shell` | ✅ | ✅ | ✅ | An opinionated shell environment |
-| `1password`       |  |  |  | |
+| `1password` | ✅ | ✅ | | 1Password + a simple shell helper |
 | `anthropic`       |  |  |  | |
 | `direnv`          |  |  |  | |
 | `flaim`           |  |  |  | |

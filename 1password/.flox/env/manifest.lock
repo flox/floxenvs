@@ -7,9 +7,8 @@
         "pkg-path": "_1password"
       }
     },
-    "vars": {},
     "hook": {
-      "on-activate": "\n    # Start OP injection code\n    if ! op vault list >/dev/null 2>&1; then\n        CACHE=\"$HOME/.cache/op-session\"\n        OP_TOKEN=$( [[ -f \"$CACHE\" ]] && cat \"$CACHE\" || op signin --raw 2>&1 )\n        if op whoami --session \"${OP_TOKEN}\" >/dev/null 2>&1; then\n            mkdir -p dirname \"$CACHE\" 2>/dev/null && echo \"${OP_TOKEN}\" > \"$CACHE\"\n            chmod 600 \"$CACHE\"\n        else\n            echo \"op auth failed!\" && return 1\n        fi\n    fi\n    export op_token=$( [[ \"$OP_TOKEN\" ]] && echo \"--session $OP_TOKEN\" )\n    # End OP injection code\n\n    export ANTHROPIC_API_KEY=$(op $op_token item get \"Anthropic\" --field \"credential\")\n    export TAILSCALE_TOKEN=$(op $op_token item get \"Tailscale\" --field \"token\")\n"
+      "on-activate": "\n    # Start OP injection code\n    if ! op vault list >/dev/null 2>&1; then\n        CACHE=\"$HOME/.cache/op-session\"\n        OP_TOKEN=$( [[ -f \"$CACHE\" ]] && cat \"$CACHE\" || op signin --raw 2>&1 )\n        if op whoami --session \"${OP_TOKEN}\" >/dev/null 2>&1; then\n            mkdir -p $(dirname \"$CACHE\") 2>/dev/null && echo \"${OP_TOKEN}\" > \"$CACHE\"\n            chmod 600 \"$CACHE\"\n        else\n            echo \"op auth failed!\" && return 1\n        fi\n    fi\n    export op_token=$( [[ \"$OP_TOKEN\" ]] && echo \"--session $OP_TOKEN\" )\n    # End OP injection code\n\n    export ANTHROPIC_API_KEY=$(op $op_token item get \"Anthropic\" --field \"credential\")\n    export TAILSCALE_TOKEN=$(op $op_token item get \"Tailscale\" --field \"token\")\n"
     },
     "profile": {
       "common": "    alias op=\"op $op_token\"\n"
