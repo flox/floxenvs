@@ -18,10 +18,11 @@
 | `dagger`          | ✅ | ✅ | ✅ | Dagger - write your pipelines in Go/Python/Typescript |
 | `nb`              | ✅ | ✅ | ✅ | IPython notebook |
 | `a-perfect-shell` | ✅ | ✅ | ✅ | An opinionated shell environment |
-| `1password`       |  |  |  | |
+| `1password` | ✅ | ✅ | | 1Password + a simple shell helper |
 | `anthropic`       |  |  |  | |
 | `direnv`          |  |  |  | |
 | `flaim`           |  |  |  | |
+| `flaim` | ✅ | ✅ | | A stack of Python modules for Stable Diffusion |
 | `fooocus`         |  |  |  | |
 | `metabase`        |  |  |  | |
 | `ollama`          |  |  |  | |
