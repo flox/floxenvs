@@ -7,10 +7,13 @@
         "pkg-path": "qmk"
       }
     },
+    "vars": {},
     "hook": {
-      "on-activate": "echo \"\"\necho \"     ╔═════════════════════════════════════╗\"\necho \"     ║                                     ║\"\necho \"     ║  Compile and flash your firmware:   ║\"\necho \"     ║  👉 qmk compile                     ║\"\necho \"     ║  👉 qmk flash                       ║\"\necho \"     ║                                     ║\"\necho \"     ╚═════════════════════════════════════╝\"\necho \"\"\n"
+      "on-activate": ""
     },
-    "profile": {},
+    "profile": {
+      "common": "echo \"\"\necho \"     ╔═════════════════════════════════════╗\"\necho \"     ║                                     ║\"\necho \"     ║  Compile and flash your firmware:   ║\"\necho \"     ║  👉 qmk compile                     ║\"\necho \"     ║  👉 qmk flash                       ║\"\necho \"     ║                                     ║\"\necho \"     ╚═════════════════════════════════════╝\"\necho \"\"\n"
+    },
     "options": {
       "systems": [
         "aarch64-darwin",
@@ -22,7 +25,9 @@
         "licenses": []
       },
       "semver": {}
-    }
+    },
+    "services": {},
+    "build": {}
   },
   "packages": [
     {
