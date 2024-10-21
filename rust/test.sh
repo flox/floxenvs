@@ -26,3 +26,5 @@ echo ">>> Linting code"
 cargo run
 echo ">>> Building and running code"
 
+cargo test
+echo ">>> Testing code"
