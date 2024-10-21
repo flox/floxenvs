@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-token = ''
+import os
+token = os.environ.get('HF_TOKEN')
 
 # sssshhhhhhhhh if we wanna see you talk we'll run the notebook
 import warnings
@@ -64,7 +65,7 @@ try:
 
     # load up the prompt a bit with some opinions
     loaded_prompt = (
-        "concept art"
+        "concept art "
         + prompt
         + ", high quality, (magical), (nature), (futuristic), digital artwork, graphic art"
     )
