@@ -32,6 +32,9 @@ libiconv.systems = ["aarch64-darwin", "x86_64-darwin"]
 
 # Extra tools
 cargo-nextest.pkg-path = "cargo-nextest"
+cargo-watch.pkg-path = "cargo-watch"
+cargo-semver-checks.pkg-path = "cargo-semver-checks"
+# For more use search: flox search cargo- --all
 
 [vars]
 
@@ -40,4 +43,9 @@ cargo-nextest.pkg-path = "cargo-nextest"
 [profile]
 
 [options]
-systems = ["aarch64-darwin", "x86_64-darwin", "aarch64-linux", "x86_64-linux"]
+systems = [
+  "aarch64-darwin",
+  "x86_64-darwin",
+  "aarch64-linux",
+  "x86_64-linux",
+]

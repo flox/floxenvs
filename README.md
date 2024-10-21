@@ -7,6 +7,7 @@
 | |
 | **Languages:** |
 | `python-poetry`  | ✅ | ✅ | ✅ | |
+| `rust`  | ✅ | ✅ | ✅ | Rust environment |
 | **Databases:** |
 | `postgres`  | ✅ | ✅ | ✅ | |
 | `redis`     | ✅ | ✅ | ✅ | |
@@ -21,8 +22,7 @@
 | `qmk` | ✅ | ✅ | ✅ | Open-source keyboard firmware for Atmel AVR and Arm USB families |
 | `anthropic`       |  |  |  | |
 | `direnv`          |  |  |  | |
-| `flaim`           |  |  |  | |
-| `flaim` | ✅ | ✅ | | A stack of Python modules for Stable Diffusion |
+| `flaim` | ✅ | ✅ | ✅ | A stack of Python modules for Stable Diffusion |
 | `fooocus`         |  |  |  | |
 | `metabase`        |  |  |  | |
 | `ollama`          |  |  |  | |
