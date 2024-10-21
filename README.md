@@ -21,6 +21,7 @@
 | `anthropic`       |  |  |  | |
 | `direnv`          |  |  |  | |
 | `flaim`           |  |  |  | |
+| `flaim` | ✅ | ✅ | | A stack of Python modules for Stable Diffusion |
 | `fooocus`         |  |  |  | |
 | `metabase`        |  |  |  | |
 | `ollama`          |  |  |  | |
