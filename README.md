@@ -17,7 +17,8 @@
 | **Applications:** |
 | `nb`              | ✅ | ✅ | ✅ | IPython notebook |
 | `a-perfect-shell` | ✅ | ✅ | ✅ | An opinionated shell environment |
-| `1password` | ✅ | ✅ | | 1Password + a simple shell helper |
+| `1password` | ✅ | ✅ | ✅ | 1Password + a simple shell helper |
+| `qmk` | ✅ | ✅ | ✅ | Open-source keyboard firmware for Atmel AVR and Arm USB families |
 | `anthropic`       |  |  |  | |
 | `direnv`          |  |  |  | |
 | `flaim`           |  |  |  | |
