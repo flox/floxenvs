@@ -11,7 +11,7 @@ on-activate = '''
         CACHE="$HOME/.cache/op-session"
         OP_TOKEN=$( [[ -f "$CACHE" ]] && cat "$CACHE" || op signin --raw 2>&1 )
         if op whoami --session "${OP_TOKEN}" >/dev/null 2>&1; then
-            mkdir -p dirname "$CACHE" 2>/dev/null && echo "${OP_TOKEN}" > "$CACHE"
+            mkdir -p $(dirname "$CACHE") 2>/dev/null && echo "${OP_TOKEN}" > "$CACHE"
             chmod 600 "$CACHE"
         else
             echo "op auth failed!" && return 1

@@ -60,7 +60,7 @@ try:
 
     # load up the prompt a bit with some opinions
     loaded_prompt = (
-        "concept art"
+        "concept art "
         + prompt
         + ", high quality, (magical), (nature), (futuristic), digital artwork"
     )

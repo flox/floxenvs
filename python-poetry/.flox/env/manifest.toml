@@ -1,0 +1,102 @@
+version = 1
+
+[install]
+gum.pkg-path = "gum"
+coreutils.pkg-path = "coreutils"
+python.pkg-path = "python3"
+python.version = "3.11.*"  # <-- Change this to the version of Python you want
+poetry.pkg-path = "poetry"
+
+[vars]
+
+[hook]
+on-activate = '''
+
+export POETRY_VIRTUALENVS_PATH="$FLOX_ENV_CACHE/python-poetry/venvs"
+export FLOX_HOME=$(realpath -s "$FLOX_ENV_CACHE/../..")
+
+if [ ! -f "$FLOX_HOME/pyproject.toml" ]; then
+  echo "❌ No pyproject.toml found in $FLOX_HOME. Cannot activate environment."
+  exit 1
+fi
+
+export FLOX_PYENV_PATH=$(poetry env info --path)
+
+create_python_env() {
+  poetry env use python
+}
+export -f create_python_env
+
+activate_python_env() {
+  source "$FLOX_PYENV_PATH/bin/activate"
+}
+export -f activate_python_env
+
+install_python_dependencies() {
+  poetry install
+}
+export -f install_python_dependencies
+
+
+if [ -z "$FLOX_PYENV_PATH" ]; then
+  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+    create_python_env
+  else
+    gum spin --spinner dot --title "Creating python environment" -- bash -c create_python_env
+  fi
+  echo "✅ Python environment created"
+else
+  echo "✅ Python environment already exists"
+fi
+
+
+if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+  activate_python_env
+else
+  gum spin --spinner dot --title "Activating python environment" -- bash -c activate_python_env
+fi
+echo "✅ Python environment activated"
+
+
+if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+  install_python_dependencies
+else
+  gum spin --spinner dot --title "Installing python dependencies" -- bash -c install_python_dependencies
+fi
+echo "✅ Python project dependencies installed"
+
+'''
+
+
+[profile]
+common = '''
+echo ""
+echo "     ╔═════════════════════════════════════╗"
+echo "     ║                                     ║"
+echo "     ║  Your python environment is ready!  ║"
+echo "     ║                                     ║"
+echo "     ╚═════════════════════════════════════╝"
+echo ""
+'''
+bash = '''
+  source "$(poetry env info --path)/bin/activate"
+'''
+fish = '''
+  source "$(poetry env info --path)/bin/activate.fish"
+'''
+tcsh = '''
+  source "$(poetry env info --path)/bin/activate.csh"
+'''
+zsh = '''
+  source "$(poetry env info --path)/bin/activate"
+'''
+
+[services]
+
+[options]
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]

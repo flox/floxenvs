@@ -1,0 +1,37 @@
+version = 1
+
+[install]
+# That's literally it, that's all you need
+qmk.pkg-path = "qmk"
+
+[vars]
+
+[hook]
+on-activate = '''
+'''
+
+[profile]
+common = '''
+echo ""
+echo "     ╔═════════════════════════════════════╗"
+echo "     ║                                     ║"
+echo "     ║  Compile and flash your firmware:   ║"
+echo "     ║  👉 qmk setup                       ║"
+echo "     ║  👉 qmk compile                     ║"
+echo "     ║  👉 qmk flash                       ║"
+echo "     ║                                     ║"
+echo "     ║  Read: https://docs.qmk.fm/newbs    ║"
+echo "     ║                                     ║"
+echo "     ╚═════════════════════════════════════╝"
+echo ""
+'''
+
+[services]
+
+[options]
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]

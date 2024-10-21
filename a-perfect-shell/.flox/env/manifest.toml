@@ -1,0 +1,26 @@
+version = 1
+
+[install]
+zoxide.pkg-path = "zoxide"
+fzf.pkg-path = "fzf"
+
+[profile]
+bash = '''
+eval "$(fzf --bash)"
+eval "$(zoxide init bash)"
+'''
+
+fish = '''
+fzf --fish | source
+zoxide init fish | source
+'''
+
+zsh = '''
+source <(fzf --zsh)
+eval "$(zoxide init zsh)"
+'''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
+cuda-detection = false
+
