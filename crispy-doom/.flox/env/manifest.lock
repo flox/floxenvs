@@ -1,0 +1,530 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "version": 1,
+    "install": {
+      "crispy-doom": {
+        "pkg-path": "crispy-doom"
+      },
+      "curl": {
+        "pkg-path": "curl"
+      },
+      "gum": {
+        "pkg-path": "gum"
+      },
+      "unzip": {
+        "pkg-path": "unzip"
+      }
+    },
+    "vars": {
+      "doom_iwad": "DOOM1.WAD",
+      "doom_url": "http://www.doomworld.com/3ddownloads/ports/shareware_doom_iwad.zip"
+    },
+    "hook": {
+      "on-activate": "if [[ ! -f \"$FLOX_ENV_CACHE/$doom_iwad\" ]]; then\n  filename=${doom_url##*/}\n  gum spin --spinner dot --title \"Grabbing $filename into cache...\" -- curl -Lso \"$FLOX_ENV_CACHE/game.zip\" \"$doom_url\"\n  gum spin --spinner dot --title \"Unzipping $filename...\" -- unzip -qq \"$FLOX_ENV_CACHE/game.zip\" -d \"$FLOX_ENV_CACHE\"\nfi\n"
+    },
+    "profile": {
+      "common": "alias runcrispy=\"crispy-doom -iwad $FLOX_ENV_CACHE/$doom_iwad\"\n"
+    },
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-darwin",
+        "x86_64-linux"
+      ],
+      "allow": {
+        "licenses": []
+      },
+      "semver": {}
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "crispy-doom",
+      "broken": false,
+      "derivation": "/nix/store/77kbqxzgn9nncmc1j20sjg83f8fyx2gs-crispy-doom-7.0.drv",
+      "description": "Limit-removing enhanced-resolution Doom source port based on Chocolate Doom",
+      "install_id": "crispy-doom",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "crispy-doom-7.0",
+      "pname": "crispy-doom",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "7.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/sld454m36cbimv6ysks8ycp9px8rdvl2-crispy-doom-7.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "crispy-doom",
+      "broken": false,
+      "derivation": "/nix/store/l5gyvd9kn484jzqh2f5k56m0fkqv99qn-crispy-doom-7.0.drv",
+      "description": "Limit-removing enhanced-resolution Doom source port based on Chocolate Doom",
+      "install_id": "crispy-doom",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "crispy-doom-7.0",
+      "pname": "crispy-doom",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "7.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/sglqbfxygwwfy3ialpx1kzwd436rr5nv-crispy-doom-7.0"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "crispy-doom",
+      "broken": false,
+      "derivation": "/nix/store/f9zhj1pg6l4044q5dvsvps30bvjxm97n-crispy-doom-7.0.drv",
+      "description": "Limit-removing enhanced-resolution Doom source port based on Chocolate Doom",
+      "install_id": "crispy-doom",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "crispy-doom-7.0",
+      "pname": "crispy-doom",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "7.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/0rdff1grgjjyfmhhcw6snrm3p5f3pa08-crispy-doom-7.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "crispy-doom",
+      "broken": false,
+      "derivation": "/nix/store/0a99ly7cpslfpc8nn0xfs4sdd2d5kg4r-crispy-doom-7.0.drv",
+      "description": "Limit-removing enhanced-resolution Doom source port based on Chocolate Doom",
+      "install_id": "crispy-doom",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "crispy-doom-7.0",
+      "pname": "crispy-doom",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "7.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/chg14mr47b7j9n9axvzdmi070jd5076j-crispy-doom-7.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/psq3izh55ls3fq1jl6bn91kfr10xcvpd-curl-8.9.1.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "curl-8.9.1",
+      "pname": "curl",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.9.1",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/jwyikhivayg1cnhq8dy396gafw2p7nzc-curl-8.9.1-bin",
+        "dev": "/nix/store/vcj58ndz7fxjpsl40g646nwnrg3g5h4w-curl-8.9.1-dev",
+        "devdoc": "/nix/store/hkpdd9na2pj9cq52xx285hzvhvp81hag-curl-8.9.1-devdoc",
+        "man": "/nix/store/260af9ihhfmf43yx7xyhnpg3qbif95pn-curl-8.9.1-man",
+        "out": "/nix/store/8a3dyq9kd9scbsqagfcasv3rkq749c60-curl-8.9.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/3r063c4jy3wraibc1rvy1kf2vkb5bnc9-curl-8.9.1.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "curl-8.9.1",
+      "pname": "curl",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.9.1",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/20v3m4bkkkhq8pgjwccnpc1cy2r16g3s-curl-8.9.1-bin",
+        "debug": "/nix/store/brl478nbjmjlhrc6fgwy0570c5rvr57w-curl-8.9.1-debug",
+        "dev": "/nix/store/4rpmwdvmsrlxrfsrdr0qk3jf00sn48sh-curl-8.9.1-dev",
+        "devdoc": "/nix/store/xb866d2r4y5h1y8hk966srfpiq37pxra-curl-8.9.1-devdoc",
+        "man": "/nix/store/k6sxbdr652d0kxy1c39v5mgfsb5ayw9s-curl-8.9.1-man",
+        "out": "/nix/store/h2x0xrfq3iqfn6anb3hld7h3k0dgsj3x-curl-8.9.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/88qw9hfyzgzracw1sk5v6fn9hh9hcxdq-curl-8.9.1.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "curl-8.9.1",
+      "pname": "curl",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.9.1",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/mpx4ws0xbllyqljfs2fi3ghdawg9jkza-curl-8.9.1-bin",
+        "dev": "/nix/store/h0y0vlbw3nclay3h5g6cslbavpnzgwxp-curl-8.9.1-dev",
+        "devdoc": "/nix/store/halagx6ybkdyavmxpj11qq7j9d0hljfd-curl-8.9.1-devdoc",
+        "man": "/nix/store/h014hmwi97j892zjxcchm2gzkgw7bj56-curl-8.9.1-man",
+        "out": "/nix/store/iafphqafhksq4wil0amk9nxrd757zfdp-curl-8.9.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/qmylqimn8q31mlbja3fmyyi05b1627ca-curl-8.9.1.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "curl-8.9.1",
+      "pname": "curl",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.9.1",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/mm852m65blp3r7jq3iqyp8nnc64jw1l4-curl-8.9.1-bin",
+        "debug": "/nix/store/kwap1vwmmlfwr0s45cb0lgz77knjqgmq-curl-8.9.1-debug",
+        "dev": "/nix/store/m8kn1aq1ralckmqfdhl147ql9lpad2ky-curl-8.9.1-dev",
+        "devdoc": "/nix/store/r1937djiayiws99hwh74jlsnxyip0r1g-curl-8.9.1-devdoc",
+        "man": "/nix/store/fzazy0ib1w9mrsrd8fqv2p02z4r1689v-curl-8.9.1-man",
+        "out": "/nix/store/czkqnm2prg7lrhxpi7s04yv19xxkkfb5-curl-8.9.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/ippvngi4fvlm7wcjv66q35882kk0d782-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/s4yb9a7cvj5vd5yw0nvssf51lmpa5id0-gum-0.14.5"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/yjf86f3qgpirr5lc9wsds4nlqyf8riw0-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/bw0ii1jjvxd8albrmvi0lin6h1ssz4yi-gum-0.14.5"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/db7hhax9rfpj0gl677sqcm1s5gfjkmrc-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/zidlqhd8qq8wljvm38j1j4izx8ww7aps-gum-0.14.5"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/vsq73s5cq771rh6nz9hsjhiy74xsyh1r-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kma26ygxqp39pm6fl32yjach0czasc3j-gum-0.14.5"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "unzip",
+      "broken": false,
+      "derivation": "/nix/store/y5a386ip6sc1r7ncjz9646hhvrvm8w2q-unzip-6.0.drv",
+      "description": "Extraction utility for archives compressed in .zip format",
+      "install_id": "unzip",
+      "license": "Info-ZIP",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "unzip-6.0",
+      "pname": "unzip",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "6.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/jsm13ixdy0j2j9kzb6n3zmx0hf1xwn3v-unzip-6.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "unzip",
+      "broken": false,
+      "derivation": "/nix/store/6imkx7rph9was0h2c6ckpjdqjz0wk0d2-unzip-6.0.drv",
+      "description": "Extraction utility for archives compressed in .zip format",
+      "install_id": "unzip",
+      "license": "Info-ZIP",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "unzip-6.0",
+      "pname": "unzip",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "6.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/d9hwv369a70jahg4dsa1rq93lkl24501-unzip-6.0"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "unzip",
+      "broken": false,
+      "derivation": "/nix/store/638z1vnrd1d07wx3m53i6xq78ilfc4x2-unzip-6.0.drv",
+      "description": "Extraction utility for archives compressed in .zip format",
+      "install_id": "unzip",
+      "license": "Info-ZIP",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "unzip-6.0",
+      "pname": "unzip",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "6.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/nr0gm8jl14vy2gmn5pdkb1a4wj14j6c3-unzip-6.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "unzip",
+      "broken": false,
+      "derivation": "/nix/store/60221dynwsrpksv8i8iinsr7y0f2a1gk-unzip-6.0.drv",
+      "description": "Extraction utility for archives compressed in .zip format",
+      "install_id": "unzip",
+      "license": "Info-ZIP",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "unzip-6.0",
+      "pname": "unzip",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "6.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/nlq7k10125cphwab8hilly8c3x3j5vcq-unzip-6.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ]
+}

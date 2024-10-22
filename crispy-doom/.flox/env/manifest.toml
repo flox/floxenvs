@@ -1,0 +1,40 @@
+#
+# This is a Flox environment manifest.
+# Visit flox.dev/docs/concepts/manifest/
+# or see flox-edit(1), manifest.toml(5) for more information.
+#
+# Flox manifest version managed by Flox CLI
+version = 1
+
+[install]
+crispy-doom.pkg-path = "crispy-doom"
+gum.pkg-path = "gum"
+unzip.pkg-path = "unzip"
+curl.pkg-path = "curl"
+
+[vars]
+# Freedoom
+#doom_url = "https://github.com/freedoom/freedoom/releases/download/v0.13.0/freedoom-0.13.0.zip"
+#doom_iwad = "freedoom-0.13.0/freedoom1.wad"
+
+# Original Doom shareware
+doom_url = "http://www.doomworld.com/3ddownloads/ports/shareware_doom_iwad.zip"
+doom_iwad = "DOOM1.WAD"
+
+[hook]
+on-activate = '''
+if [[ ! -f "$FLOX_ENV_CACHE/$doom_iwad" ]]; then
+  filename=${doom_url##*/}
+  gum spin --spinner dot --title "Grabbing $filename into cache..." -- curl -Lso "$FLOX_ENV_CACHE/game.zip" "$doom_url"
+  gum spin --spinner dot --title "Unzipping $filename..." -- unzip -qq "$FLOX_ENV_CACHE/game.zip" -d "$FLOX_ENV_CACHE"
+fi
+'''
+
+[profile]
+common = '''
+alias runcrispy="crispy-doom -iwad $FLOX_ENV_CACHE/$doom_iwad"
+'''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
+
