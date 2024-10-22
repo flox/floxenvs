@@ -16,6 +16,7 @@
 | `mysql` | ✅ | ✅ | ✅ | |
 | |
 | **Applications:** |
+| `nginx`           | ✅ | ✅ | ✅ | A HTTP web server and much more... |
 | `nb`              | ✅ | ✅ | ✅ | IPython notebook |
 | `a-perfect-shell` | ✅ | ✅ | ✅ | An opinionated shell environment |
 | `1password` | ✅ | ✅ | ✅ | 1Password + a simple shell helper |

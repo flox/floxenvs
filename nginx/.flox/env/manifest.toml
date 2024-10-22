@@ -1,0 +1,81 @@
+version = 1
+
+[install]
+nginx.pkg-path = "nginx"
+curl.pkg-path = "curl"
+gnugrep.pkg-path = "gnugrep"
+
+[vars]
+NGINX_WWW_DIR = ""
+NGINX_PORT = "18181"
+NGINX_WORKER_CONNECTIONS = "1024"
+NGINX_WORKER_PROCESSES = "1"
+
+[hook]
+on-activate = '''
+
+export NGINX_DIR="$FLOX_ENV_CACHE/nginx"
+export NGINX_CONFIG="$NGINX_DIR/nginx.conf"
+export NGINX_ERROR_LOG="$NGINX_DIR/error.log"
+export NGINX_ACCESS_LOG="$NGINX_DIR/access.log"
+
+if [ -z "$NGINX_WWW_DIR" ]; then
+  export NGINX_WWW_DIR="$FLOX_ENV_CACHE/www"
+fi
+
+mkdir -p "$NGINX_DIR"
+
+cat <<EOF > "$NGINX_CONFIG"
+worker_processes $NGINX_WORKER_PROCESSES;
+
+lock_file $NGINX_DIR/nginx.lock;
+pid $NGINX_DIR/nginx.pid;
+error_log $NGINX_ERROR_LOG;
+
+events {
+  worker_connections $NGINX_WORKER_CONNECTIONS;
+}
+
+http {
+  access_log $NGINX_ACCESS_LOG;
+
+  server {
+    listen $NGINX_PORT;
+    root $NGINX_WWW_DIR;
+
+    location / {
+    }
+
+  }
+}
+EOF
+
+if [ ! -d "$NGINX_WWW_DIR" ]; then
+  mkdir -p "$NGINX_WWW_DIR"
+  cat <<EOF > "$NGINX_WWW_DIR/index.html"
+<!doctype html>
+<html>
+  <head>
+    <title>Hello Flox!</title>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <h1>
+      Hello from <a href="https://flox.dev">Flox</a> environment!
+    </h1>
+  </body>
+</html>
+EOF
+fi
+'''
+
+[services]
+nginx.command = "nginx -c $NGINX_CONFIG -e $NGINX_ERROR_LOG -g 'daemon off;'"
+
+[options]
+systems = [
+    "aarch64-darwin",
+    "aarch64-linux",
+    "x86_64-darwin",
+    "x86_64-linux",
+]

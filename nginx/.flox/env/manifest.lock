@@ -1,0 +1,429 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "version": 1,
+    "install": {
+      "curl": {
+        "pkg-path": "curl"
+      },
+      "gnugrep": {
+        "pkg-path": "gnugrep"
+      },
+      "nginx": {
+        "pkg-path": "nginx"
+      }
+    },
+    "vars": {
+      "NGINX_PORT": "18181",
+      "NGINX_WORKER_CONNECTIONS": "1024",
+      "NGINX_WORKER_PROCESSES": "1",
+      "NGINX_WWW_DIR": ""
+    },
+    "hook": {
+      "on-activate": "\nexport NGINX_DIR=\"$FLOX_ENV_CACHE/nginx\"\nexport NGINX_CONFIG=\"$NGINX_DIR/nginx.conf\"\nexport NGINX_ERROR_LOG=\"$NGINX_DIR/error.log\"\nexport NGINX_ACCESS_LOG=\"$NGINX_DIR/access.log\"\n\nif [ -z \"$NGINX_WWW_DIR\" ]; then\n  export NGINX_WWW_DIR=\"$FLOX_ENV_CACHE/www\"\nfi\n\nmkdir -p \"$NGINX_DIR\"\n\ncat <<EOF > \"$NGINX_CONFIG\"\nworker_processes $NGINX_WORKER_PROCESSES;\n\nlock_file $NGINX_DIR/nginx.lock;\npid $NGINX_DIR/nginx.pid;\nerror_log $NGINX_ERROR_LOG;\n\nevents {\n  worker_connections $NGINX_WORKER_CONNECTIONS;\n}\n\nhttp {\n  access_log $NGINX_ACCESS_LOG;\n\n  server {\n    listen $NGINX_PORT;\n    root $NGINX_WWW_DIR;\n\n    location / {\n    }\n\n  }\n}\nEOF\n\nif [ ! -d \"$NGINX_WWW_DIR\" ]; then\n  mkdir -p \"$NGINX_WWW_DIR\"\n  cat <<EOF > \"$NGINX_WWW_DIR/index.html\"\n<!doctype html>\n<html>\n  <head>\n    <title>Hello Flox!</title>\n    <meta charset=\"utf-8\" />\n  </head>\n  <body>\n    <h1>\n      Hello from <a href=\"https://flox.dev\">Flox</a> environment!\n    </h1>\n  </body>\n</html>\nEOF\nfi\n"
+    },
+    "profile": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-darwin",
+        "x86_64-linux"
+      ],
+      "allow": {
+        "licenses": []
+      },
+      "semver": {}
+    },
+    "services": {
+      "nginx": {
+        "command": "nginx -c $NGINX_CONFIG -e $NGINX_ERROR_LOG -g 'daemon off;'",
+        "vars": null,
+        "is-daemon": null,
+        "shutdown": null,
+        "systems": null
+      }
+    },
+    "build": {}
+  },
+  "packages": [
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/psq3izh55ls3fq1jl6bn91kfr10xcvpd-curl-8.9.1.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "curl-8.9.1",
+      "pname": "curl",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.9.1",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/jwyikhivayg1cnhq8dy396gafw2p7nzc-curl-8.9.1-bin",
+        "dev": "/nix/store/vcj58ndz7fxjpsl40g646nwnrg3g5h4w-curl-8.9.1-dev",
+        "devdoc": "/nix/store/hkpdd9na2pj9cq52xx285hzvhvp81hag-curl-8.9.1-devdoc",
+        "man": "/nix/store/260af9ihhfmf43yx7xyhnpg3qbif95pn-curl-8.9.1-man",
+        "out": "/nix/store/8a3dyq9kd9scbsqagfcasv3rkq749c60-curl-8.9.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/3r063c4jy3wraibc1rvy1kf2vkb5bnc9-curl-8.9.1.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "curl-8.9.1",
+      "pname": "curl",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.9.1",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/20v3m4bkkkhq8pgjwccnpc1cy2r16g3s-curl-8.9.1-bin",
+        "debug": "/nix/store/brl478nbjmjlhrc6fgwy0570c5rvr57w-curl-8.9.1-debug",
+        "dev": "/nix/store/4rpmwdvmsrlxrfsrdr0qk3jf00sn48sh-curl-8.9.1-dev",
+        "devdoc": "/nix/store/xb866d2r4y5h1y8hk966srfpiq37pxra-curl-8.9.1-devdoc",
+        "man": "/nix/store/k6sxbdr652d0kxy1c39v5mgfsb5ayw9s-curl-8.9.1-man",
+        "out": "/nix/store/h2x0xrfq3iqfn6anb3hld7h3k0dgsj3x-curl-8.9.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/88qw9hfyzgzracw1sk5v6fn9hh9hcxdq-curl-8.9.1.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "curl-8.9.1",
+      "pname": "curl",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.9.1",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/mpx4ws0xbllyqljfs2fi3ghdawg9jkza-curl-8.9.1-bin",
+        "dev": "/nix/store/h0y0vlbw3nclay3h5g6cslbavpnzgwxp-curl-8.9.1-dev",
+        "devdoc": "/nix/store/halagx6ybkdyavmxpj11qq7j9d0hljfd-curl-8.9.1-devdoc",
+        "man": "/nix/store/h014hmwi97j892zjxcchm2gzkgw7bj56-curl-8.9.1-man",
+        "out": "/nix/store/iafphqafhksq4wil0amk9nxrd757zfdp-curl-8.9.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/qmylqimn8q31mlbja3fmyyi05b1627ca-curl-8.9.1.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "curl-8.9.1",
+      "pname": "curl",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.9.1",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/mm852m65blp3r7jq3iqyp8nnc64jw1l4-curl-8.9.1-bin",
+        "debug": "/nix/store/kwap1vwmmlfwr0s45cb0lgz77knjqgmq-curl-8.9.1-debug",
+        "dev": "/nix/store/m8kn1aq1ralckmqfdhl147ql9lpad2ky-curl-8.9.1-dev",
+        "devdoc": "/nix/store/r1937djiayiws99hwh74jlsnxyip0r1g-curl-8.9.1-devdoc",
+        "man": "/nix/store/fzazy0ib1w9mrsrd8fqv2p02z4r1689v-curl-8.9.1-man",
+        "out": "/nix/store/czkqnm2prg7lrhxpi7s04yv19xxkkfb5-curl-8.9.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gnugrep",
+      "broken": false,
+      "derivation": "/nix/store/9llddkby0qqkrgidazh6690970pzcf6x-gnugrep-3.11.drv",
+      "description": "GNU implementation of the Unix grep command",
+      "install_id": "gnugrep",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "gnugrep-3.11",
+      "pname": "gnugrep",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.11",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/mhw68paz9fhcmbl9k3xchmrb4w2fhnza-gnugrep-3.11-info",
+        "out": "/nix/store/dxqp89x3g9z721ic4ddis07hwxqafn86-gnugrep-3.11"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gnugrep",
+      "broken": false,
+      "derivation": "/nix/store/6a8fva30mn64kqq5kzvy1nm2lywmxsbv-gnugrep-3.11.drv",
+      "description": "GNU implementation of the Unix grep command",
+      "install_id": "gnugrep",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "gnugrep-3.11",
+      "pname": "gnugrep",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.11",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/6vkbzpdlw438lvzhn0pi4hky3rkynvd0-gnugrep-3.11-info",
+        "out": "/nix/store/hz0n7bgpmnkvd83kz7ahgd899yiwrvsa-gnugrep-3.11"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gnugrep",
+      "broken": false,
+      "derivation": "/nix/store/caxv6f1gn538r2wa6mm98sjm30i5pgmx-gnugrep-3.11.drv",
+      "description": "GNU implementation of the Unix grep command",
+      "install_id": "gnugrep",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "gnugrep-3.11",
+      "pname": "gnugrep",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.11",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/p499kg12jqhnsfkyj1y67nnbl0s6w76m-gnugrep-3.11-info",
+        "out": "/nix/store/knhqbfrkmkpd079yq6axms7ibsqh1nkz-gnugrep-3.11"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gnugrep",
+      "broken": false,
+      "derivation": "/nix/store/mqlc2yqi2q77ysim185ap10rjnr0ly8q-gnugrep-3.11.drv",
+      "description": "GNU implementation of the Unix grep command",
+      "install_id": "gnugrep",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "gnugrep-3.11",
+      "pname": "gnugrep",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.11",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/19q1k2wab4bgcn0d5srfv6d6r3d5d0yh-gnugrep-3.11-info",
+        "out": "/nix/store/lvnwdmnjm7nvaq0a3vhvvn46iy4ql7gr-gnugrep-3.11"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nginx",
+      "broken": false,
+      "derivation": "/nix/store/fmcxnpii0pm525xpnbj6vg6mv1lp4200-nginx-1.26.2.drv",
+      "description": "Reverse proxy and lightweight webserver",
+      "install_id": "nginx",
+      "license": "[ BSD-2-Clause, BSD-2-Clause, BSD-2-Clause, BSD-2-Clause ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "nginx-1.26.2",
+      "pname": "nginx",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.26.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/5vkdjy3h1g3pk3fjrxqnyizbn32jfgzp-nginx-1.26.2-doc",
+        "out": "/nix/store/k9frc2f3fm38hdlp7l31qh8i5k6bgyzs-nginx-1.26.2"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nginx",
+      "broken": false,
+      "derivation": "/nix/store/0my9cjk6mh2j149nv3asvz8ng7ch0ych-nginx-1.26.2.drv",
+      "description": "Reverse proxy and lightweight webserver",
+      "install_id": "nginx",
+      "license": "[ BSD-2-Clause, BSD-2-Clause, BSD-2-Clause, BSD-2-Clause ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "nginx-1.26.2",
+      "pname": "nginx",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.26.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/i3km1iw3wiklc71zsjqrlmbmazc8w4qj-nginx-1.26.2-doc",
+        "out": "/nix/store/dvgb54l52kya0wpmb256h35zasan436k-nginx-1.26.2"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nginx",
+      "broken": false,
+      "derivation": "/nix/store/y9vivi98kkl6z9r79hib1yy7srpjzvka-nginx-1.26.2.drv",
+      "description": "Reverse proxy and lightweight webserver",
+      "install_id": "nginx",
+      "license": "[ BSD-2-Clause, BSD-2-Clause, BSD-2-Clause, BSD-2-Clause ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "nginx-1.26.2",
+      "pname": "nginx",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.26.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/rbrkmql8ws5a2cc3pfjqak0kykxaf9zm-nginx-1.26.2-doc",
+        "out": "/nix/store/w95cz4b6hbshxbk7ykvfqzw9lpp776fd-nginx-1.26.2"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nginx",
+      "broken": false,
+      "derivation": "/nix/store/ba6l07q1by884jsi1pmcjbva4h25q1vx-nginx-1.26.2.drv",
+      "description": "Reverse proxy and lightweight webserver",
+      "install_id": "nginx",
+      "license": "[ BSD-2-Clause, BSD-2-Clause, BSD-2-Clause, BSD-2-Clause ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "name": "nginx-1.26.2",
+      "pname": "nginx",
+      "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
+      "rev_count": 694395,
+      "rev_date": "2024-10-18T13:02:40Z",
+      "scrape_date": "2024-10-20T03:56:48Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.26.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/11ksaavr27994iqqcq4vlmbci8jcgjk0-nginx-1.26.2-doc",
+        "out": "/nix/store/rdc8w0yiw5n4k9w8l0d31738614cj2a6-nginx-1.26.2"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ]
+}
