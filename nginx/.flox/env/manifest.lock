@@ -7,8 +7,14 @@
         "pkg-path": "nginx"
       }
     },
+    "vars": {
+      "NGINX_PORT": "8080",
+      "NGINX_WORKER_CONNECTIONS": "1024",
+      "NGINX_WORKER_PROCESSES": "1",
+      "NGINX_WWW_DIR": ""
+    },
     "hook": {
-      "on-activate": "export NGINX_DIR=\"$FLOX_ENV_CACHE/nginx\"\nexport NGINX_CONFIG=\"$NGINX_DIR/nginx.conf\"\nexport NGINX_ROOT=\"$NGINX_DIR/www\"\n\nif [ ! -e \"$NGINX_CONFIG\" ]; then\n  mkdir -p \"$NGINX_DIR\"\n  cat <<EOF > \"$NGINX_CONFIG\"\nlock_file $NGINX_DIR/nginx.lock;\npid $NGINX_DIR/nginx.pid;\nevents {\n}\nhttp {\n  server {\n    listen 8080;\n    root $NGINX_ROOT;\n  \n    location / {\n    }\n\n    access_log $NGINX_DIR/access.log;\n  }\n}\nEOF\n\nfi\n\nif [ ! -e \"$NGINX_ROOT/index.html\" ]; then\n  mkdir -p \"$NGINX_ROOT\"\n  cat <<EOF > \"$NGINX_ROOT/index.html\"\n<!doctype html>\n<html>\n  <head>\n    <title>Hello World!</title>\n    <meta charset=\"utf-8\" />\n  </head>\n  <body>\n    <h1>\n      Hello World!\n    </h1>\n  </body>\n</html>\n\nEOF\nfi\n "
+      "on-activate": "\nexport NGINX_DIR=\"$FLOX_ENV_CACHE/nginx\"\nexport NGINX_CONFIG=\"$NGINX_DIR/nginx.conf\"\nexport NGINX_ERROR_LOG=\"$NGINX_DIR/error.log\"\nexport NGINX_ACCESS_LOG=\"$NGINX_DIR/access.log\"\n\nif [ -z \"$NGINX_WWW_DIR\" ]; then\n  export NGINX_WWW_DIR=\"$FLOX_ENV_CACHE/www\"\nfi\n\nmkdir -p \"$NGINX_DIR\"\n\ncat <<EOF > \"$NGINX_CONFIG\"\nworker_processes $NGINX_WORKER_PROCESSES;\n\nlock_file $NGINX_DIR/nginx.lock;\npid $NGINX_DIR/nginx.pid;\nerror_log $NGINX_ERROR_LOG;\n\nevents {\n  worker_connections $NGINX_WORKER_CONNECTIONS;\n}\n\nhttp {\n  access_log $NGINX_ACCESS_LOG;\n\n  server {\n    listen $NGINX_PORT;\n    root $NGINX_WWW_DIR;\n\n    location / {\n    }\n\n  }\n}\nEOF\n\nif [ ! -d \"$NGINX_WWW_DIR\" ]; then\n  mkdir -p \"$NGINX_WWW_DIR\"\n  cat <<EOF > \"$NGINX_WWW_DIR/index.html\"\n<!doctype html>\n<html>\n  <head>\n    <title>Hello Flox!</title>\n    <meta charset=\"utf-8\" />\n  </head>\n  <body>\n    <h1>\n      Hello from <a href=\"https://flox.dev\">Flox</a> environment!\n    </h1>\n  </body>\n</html>\nEOF\nfi\n"
     },
     "profile": {},
     "options": {
@@ -25,15 +31,14 @@
     },
     "services": {
       "nginx": {
-        "command": "nginx -c \"$NGINX_CONFIG\" -e stderr",
+        "command": "nginx -c $NGINX_CONFIG -e $NGINX_ERROR_LOG -g 'daemon off;'",
         "vars": null,
-        "is-daemon": true,
-        "shutdown": {
-          "command": "echo hi > /tmp/f; nginx -c \"$NGINX_CONFIG\" -s quit -e /Users/matthew/log"
-        },
+        "is-daemon": null,
+        "shutdown": null,
         "systems": null
       }
-    }
+    },
+    "build": {}
   },
   "packages": [
     {
