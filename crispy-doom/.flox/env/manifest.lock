@@ -24,7 +24,7 @@
       "on-activate": "if [[ ! -f \"$FLOX_ENV_CACHE/$doom_iwad\" ]]; then\n  filename=${doom_url##*/}\n  gum spin --spinner dot --title \"Grabbing $filename into cache...\" -- curl -Lso \"$FLOX_ENV_CACHE/game.zip\" \"$doom_url\"\n  gum spin --spinner dot --title \"Unzipping $filename...\" -- unzip -qq \"$FLOX_ENV_CACHE/game.zip\" -d \"$FLOX_ENV_CACHE\"\nfi\n"
     },
     "profile": {
-      "common": "alias runcrispy=\"crispy-doom -iwad $FLOX_ENV_CACHE/$doom_iwad\"\n"
+      "common": "alias runcrispy=\"crispy-doom -iwad $FLOX_ENV_CACHE/$doom_iwad\"\n\necho \"\"\necho \"     ╔════════════════════════════════════════════╗\"\necho \"     ║                                            ║\"\necho \"     ║    Edit the environment to switch game     ║\"\necho \"     ║    libraries inside the [vars] section:    ║\"\necho \"     ║    👉 flox edit                            ║\"\necho \"     ║                                            ║\"\necho \"     ║    Start a nice game of Doom:              ║\"\necho \"     ║    👉 runcrispy                            ║\"\necho \"     ║                                            ║\"\necho \"     ╚════════════════════════════════════════════╝\"\necho \"\"\n\n"
     },
     "options": {
       "systems": [
