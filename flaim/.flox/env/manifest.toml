@@ -24,13 +24,11 @@ transformers.version = "python3.11-transformers-4.45.2"
 sentencepiece.pkg-path = "python311Packages.sentencepiece"
 sentencepiece.version = "python3.11-sentencepiece-0.2.0"
 
-imgcat.pkg-path = "python311Packages.imgcat"
-imgcat.version = "python3.11-imgcat-0.5.0"
-
 gum.pkg-path = "gum"
 figlet.pkg-path = "toilet"
 
-jupyter.pkg-path = "python311Packages.jupyter"
+jupyterlab.pkg-path = "python311Packages.jupyterlab"
+ipywidgets.pkg-path = "python311Packages.ipywidgets"
 
 [vars]
 # Since we are managing our venv with Flox, there is no need to
@@ -40,7 +38,7 @@ VIRTUAL_ENV_DISABLE_PROMPT="1"
 # These are example scripts that can be used later on to
 # generate a sample image and test acceleration
 
-generate_image="[(importlib := __import__('importlib')), (warnings := importlib.import_module('warnings')), warnings.filterwarnings('ignore'), (sys := importlib.import_module('sys')), (torch := importlib.import_module('torch')), (__ol_mod_cbtwjvbiot := __import__('imgcat', globals(), locals(), ['imgcat'], 0)), (imgcat := __ol_mod_cbtwjvbiot.imgcat), (__ol_mod_ambwamhbvl := __import__('diffusers', globals(), locals(), ['StableDiffusionPipeline'], 0)), (StableDiffusionPipeline := __ol_mod_ambwamhbvl.StableDiffusionPipeline), (__ol_mod_xshmfbhacj := __import__('diffusers', globals(), locals(), ['logging'], 0)), (logging := __ol_mod_xshmfbhacj.logging), logging.set_verbosity(50), logging.disable_progress_bar(), (pipe := StableDiffusionPipeline.from_pretrained('IDKiro/sdxs-512-0.9', torch_dtype=torch.float32)), pipe.to('cuda') if torch.cuda.is_available() else pipe.to('mps') if torch.backends.mps.is_available() else ..., (prompt := (sys.argv[1] if len(sys.argv) > 1 else 'a fox in a henhouse')), pipe.set_progress_bar_config(disable=True), (image := pipe(prompt=prompt, num_inference_steps=1, guidance_scale=0).images[0]), image.save(f'{prompt}.png'), imgcat(image)]"
+generate_image="[(importlib := __import__('importlib')), (warnings := importlib.import_module('warnings')), warnings.filterwarnings('ignore'), (sys := importlib.import_module('sys')), (torch := importlib.import_module('torch')), (sixel := importlib.import_module('sixel')), (__ol_mod_tqgdpsmggw := __import__('io', globals(), locals(), ['BytesIO'], 0)), (BytesIO := __ol_mod_tqgdpsmggw.BytesIO), (__ol_mod_rdfadkcuju := __import__('diffusers', globals(), locals(), ['StableDiffusionPipeline'], 0)), (StableDiffusionPipeline := __ol_mod_rdfadkcuju.StableDiffusionPipeline), (__ol_mod_rrergazjfx := __import__('diffusers', globals(), locals(), ['logging'], 0)), (logging := __ol_mod_rrergazjfx.logging), (draw := (lambda image: [(__ol_retv_yarsjpxwtm := None), (buffer := BytesIO()), (writer := sixel.SixelWriter()), image.save(buffer, format='png'), writer.draw(buffer), __ol_retv_yarsjpxwtm][-1])), logging.set_verbosity(50), logging.disable_progress_bar(), (pipe := StableDiffusionPipeline.from_pretrained('IDKiro/sdxs-512-0.9', torch_dtype=torch.float32)), pipe.to('cuda') if torch.cuda.is_available() else pipe.to('mps') if torch.backends.mps.is_available() else ..., (prompt := (sys.argv[1] if len(sys.argv) > 1 else 'a fox in a henhouse')), pipe.set_progress_bar_config(disable=True), (image := pipe(prompt=prompt, num_inference_steps=1, guidance_scale=0).images[0]), image.save(f'{prompt}.png'), draw(image)]"
 
 test_acceleration="[(importlib := __import__('importlib')), (warnings := importlib.import_module('warnings')), warnings.filterwarnings('ignore'), (torch := importlib.import_module('torch')), print('CUDA is available 🔥') if torch.cuda.is_available() else print('Metal is available 🍏') if torch.backends.mps.is_available() else print('I only see a CPU 😞')]"
 
@@ -50,7 +48,7 @@ test_acceleration="[(importlib := __import__('importlib')), (warnings := importl
 JUPYTER_SERVER_TOKEN    = "floxfan123456"
 
 [services.jupyter-server]
-command                 = "jupyter-server --IdentityProvider.token=${JUPYTER_SERVER_TOKEN} --ip=0.0.0.0"
+command                 = "jupyter-lab --IdentityProvider.token=${JUPYTER_SERVER_TOKEN} --ip=0.0.0.0"
 
 [hook]
 on-activate = '''
@@ -77,7 +75,7 @@ on-activate = '''
   # Install or update packages in the venv
   (
     source "$VENV_DIR/bin/activate"
-    gum spin --spinner dot --title "Managing packages in $VENV_DIR" -- pip3 install --quiet imgcat
+    gum spin --spinner dot --title "Managing packages in $VENV_DIR" -- pip3 install --quiet sixel
     if [[ -f requirements.txt ]]; then
       gum spin --spinner dot --title "Managing packages in $VENV_DIR" -- pip3 install --quiet -r requirements.txt
     fi
@@ -101,7 +99,7 @@ bash = '''
 
   if [ "$FLOX_ACTIVATE_START_SERVICES" == "true" ]; then
     echo
-    jupyter-notebook list
+    jupyter-lab list
     echo
   fi
 '''
@@ -116,7 +114,8 @@ zsh = '''
 
   if [[ "$FLOX_ACTIVATE_START_SERVICES" == "true" ]]; then
     echo
-    jupyter-notebook list
+    sleep 1
+    jupyter-lab list
     echo
   fi
 '''
