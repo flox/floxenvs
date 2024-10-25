@@ -211,6 +211,7 @@ jobs:
       - name: "Slack Notification"
         uses: "rtCamp/action-slack-notify@v2"
         env:
+          SLACK_CHANNEL:    "team-content"
           SLACK_TITLE:      "Something broke CI for floxenvs"
           SLACK_FOOTER:     "Thank you for caring"
           SLACK_WEBHOOK:    "${{ secrets.MANAGED_SLACK_WEBHOOK }}"
