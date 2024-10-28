@@ -22,9 +22,10 @@
 | `a-perfect-shell` | ✅ | ✅ | ✅ | An opinionated shell environment |
 | `1password` | ✅ | ✅ | ✅ | 1Password + a simple shell helper |
 | `qmk` | ✅ | ✅ | ✅ | Open-source keyboard firmware for Atmel AVR and Arm USB families |
+| `flaim` | ✅ | ✅ | ✅ | A stack of Python modules for Stable Diffusion |
+| `crispy-doom` | ✅ | ✅ | ✅ | The Crispy Doom game engine w/a hook that downloads a Doom game library |
 | `anthropic`       |  |  |  | |
 | `direnv`          |  |  |  | |
-| `flaim` | ✅ | ✅ | ✅ | A stack of Python modules for Stable Diffusion |
 | `fooocus`         |  |  |  | |
 | `metabase`        |  |  |  | |
 | `ollama`          |  |  |  | |
