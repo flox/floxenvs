@@ -15,17 +15,18 @@
 | `cassandra` | ✅ | ✅ | ✅ | |
 | `elasticsearch` | ✅ | ✅ | ✅ | |
 | `mysql` | ✅ | ✅ | ✅ | |
-| |
+| **Shell:** |
+| `dotenv` | ✅ | ✅ | ✅ | Load .env environment variables |
+| `a-perfect-shell` | ✅ | ✅ | ✅ | An opinionated shell environment |
+| `direnv`          |  |  |  | |
 | **Applications:** |
+| `1password` | ✅ | ✅ | ✅ | 1Password + a simple shell helper |
 | `nginx`           | ✅ | ✅ | ✅ | A HTTP web server and much more... |
 | `nb`              | ✅ | ✅ | ✅ | IPython notebook |
-| `a-perfect-shell` | ✅ | ✅ | ✅ | An opinionated shell environment |
-| `1password` | ✅ | ✅ | ✅ | 1Password + a simple shell helper |
 | `qmk` | ✅ | ✅ | ✅ | Open-source keyboard firmware for Atmel AVR and Arm USB families |
 | `flaim` | ✅ | ✅ | ✅ | A stack of Python modules for Stable Diffusion |
 | `crispy-doom` | ✅ | ✅ | ✅ | The Crispy Doom game engine w/a hook that downloads a Doom game library |
 | `anthropic`       |  |  |  | |
-| `direnv`          |  |  |  | |
 | `fooocus`         |  |  |  | |
 | `metabase`        |  |  |  | |
 | `ollama`          |  |  |  | |
