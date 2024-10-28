@@ -15,7 +15,8 @@
 | `cassandra` | ✅ | ✅ | ✅ | |
 | `elasticsearch` | ✅ | ✅ | ✅ | |
 | `mysql` | ✅ | ✅ | ✅ | |
-| |
+| **Shell:** |
+| `mkcert` | ✅ | ✅ | ✅ | A tool to make locally trusted development certificates |
 | **Applications:** |
 | `nginx`           | ✅ | ✅ | ✅ | A HTTP web server and much more... |
 | `nb`              | ✅ | ✅ | ✅ | IPython notebook |
