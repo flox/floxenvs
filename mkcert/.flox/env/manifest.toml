@@ -1,0 +1,86 @@
+version = 1
+
+
+[install]
+mkcert.pkg-path = "mkcert"
+nssTools.pkg-path = "nssTools"
+gum.pkg-path = "gum"
+
+
+[vars]
+# A space-separated list of domains
+MKCERT_DOMAINS="example.com localhost 127.0.0.1 ::1"
+
+# A comma-separated list of trust stores to install the local
+# root CA into. Options are: "system", "java" and "nss" (includes
+# Firefox). Autodetected by default.
+TRUST_STORES=" "
+
+
+[hook]
+on-activate = '''
+
+export CAROOT="$FLOX_ENV_CACHE/mkcert"
+export NODE_EXTRA_CA_CERTS="$CAROOT}/rootCA.pem";
+
+if [ ! -d "$CAROOT" ]; then
+  mkdir -p "$CAROOT"
+fi
+
+
+
+if [ ! -f "$NODE_EXTRA_CA_CERTS" ]; then
+  mkcert_install() {
+    mkcert -install 
+  }
+  export -f mkcert_install
+
+  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+    mkcert_install
+  else
+    gum spin --spinner dot --title "Creating a new local CA" -- bash -c mkcert_install
+  fi
+  echo "✅ Local CA certificate created ($NODE_EXTRA_CA_CERTS)."
+fi
+
+if [[ ! -f "$CAROOT/domains" || "$(cat "$CAROOT/domains")" != "$MKCERT_DOMAINS" ]]; then
+  echo "$MKCERT_DOMAINS" > $CAROOT/domains
+  
+  mkcert_domains() {
+    pushd "$CAROOT"
+    mkcert \
+      -cert-file=domains.pem \
+      -key-file=domains-key.pem \
+      -p12-file=domains.p12 \
+        $(echo $MKCERT_DOMAINS)
+    popd
+  }
+  export -f mkcert_domains
+
+  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+    mkcert_domains
+  else
+    gum spin --spinner dot --title "Generating domains certificate" -- bash -c mkcert_domains
+  fi
+  echo "✅ Local certificate created for '$MKCERT_DOMAINS' domains:"
+  if [ -f "$CAROOT/domains.pem" ]; then
+    echo "    -> $CAROOT/domains.pem"
+  fi
+  if [ -f "$CAROOT/domains-key.pem" ]; then
+    echo "    -> $CAROOT/domains-key.pem"
+  fi
+  if [ -f "$CAROOT/domains.p12" ]; then
+    echo "    -> $CAROOT/domains.p12"
+  fi
+fi
+'''
+
+[profile]
+
+[options]
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]

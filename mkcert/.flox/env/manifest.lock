@@ -1,0 +1,395 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "version": 1,
+    "install": {
+      "gum": {
+        "pkg-path": "gum"
+      },
+      "mkcert": {
+        "pkg-path": "mkcert"
+      },
+      "nssTools": {
+        "pkg-path": "nssTools"
+      }
+    },
+    "vars": {
+      "MKCERT_DOMAINS": "example.com localhost 127.0.0.1 ::1",
+      "TRUST_STORES": " "
+    },
+    "hook": {
+      "on-activate": "\nexport CAROOT=\"$FLOX_ENV_CACHE/mkcert\"\nexport NODE_EXTRA_CA_CERTS=\"$CAROOT}/rootCA.pem\";\n\nif [ ! -d \"$CAROOT\" ]; then\n  mkdir -p \"$CAROOT\"\nfi\n\n\n\nif [ ! -f \"$NODE_EXTRA_CA_CERTS\" ]; then\n  mkcert_install() {\n    mkcert -install \n  }\n  export -f mkcert_install\n\n  if [[ \"$FLOX_ENVS_TESTING\" == \"1\" ]]; then\n    mkcert_install\n  else\n    gum spin --spinner dot --title \"Creating a new local CA\" -- bash -c mkcert_install\n  fi\n  echo \"✅ Local CA certificate created ($NODE_EXTRA_CA_CERTS).\"\nfi\n\nif [[ ! -f \"$CAROOT/domains\" || \"$(cat \"$CAROOT/domains\")\" != \"$MKCERT_DOMAINS\" ]]; then\n  echo \"$MKCERT_DOMAINS\" > $CAROOT/domains\n  \n  mkcert_domains() {\n    pushd \"$CAROOT\"\n    mkcert \\\n      -cert-file=domains.pem \\\n      -key-file=domains-key.pem \\\n      -p12-file=domains.p12 \\\n        $(echo $MKCERT_DOMAINS)\n    popd\n  }\n  export -f mkcert_domains\n\n  if [[ \"$FLOX_ENVS_TESTING\" == \"1\" ]]; then\n    mkcert_domains\n  else\n    gum spin --spinner dot --title \"Generating domains certificate\" -- bash -c mkcert_domains\n  fi\n  echo \"✅ Local certificate created for '$MKCERT_DOMAINS' domains:\"\n  if [ -f \"$CAROOT/domains.pem\" ]; then\n    echo \"    -> $CAROOT/domains.pem\"\n  fi\n  if [ -f \"$CAROOT/domains-key.pem\" ]; then\n    echo \"    -> $CAROOT/domains-key.pem\"\n  fi\n  if [ -f \"$CAROOT/domains.p12\" ]; then\n    echo \"    -> $CAROOT/domains.p12\"\n  fi\nfi\n"
+    },
+    "profile": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-darwin",
+        "x86_64-linux"
+      ],
+      "allow": {
+        "licenses": []
+      },
+      "semver": {}
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/d6kkfkqypl6igsgs5x1gmjyg47pm0izw-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/s4yb9a7cvj5vd5yw0nvssf51lmpa5id0-gum-0.14.5"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/6ksswsqaa8n58vgyk3b3zxjky1w2l3a2-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/bw0ii1jjvxd8albrmvi0lin6h1ssz4yi-gum-0.14.5"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/4fhj185pacdd14ysvix8r7yb8qn6ypkr-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/zidlqhd8qq8wljvm38j1j4izx8ww7aps-gum-0.14.5"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/czi4h4p0rvcm366d7pwz4jg4da2197sn-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kma26ygxqp39pm6fl32yjach0czasc3j-gum-0.14.5"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mkcert",
+      "broken": false,
+      "derivation": "/nix/store/x6pmbhz8lsmy6qp1g9d6nkwk49x1kwl9-mkcert-1.4.4.drv",
+      "description": "Simple tool for making locally-trusted development certificates",
+      "install_id": "mkcert",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "mkcert-1.4.4",
+      "pname": "mkcert",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.4.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ds5l9h8p8h4285a643ymwg12awry0psw-mkcert-1.4.4"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mkcert",
+      "broken": false,
+      "derivation": "/nix/store/j8p71k5dcv7k3g2763zw3fggwj7nx4r2-mkcert-1.4.4.drv",
+      "description": "Simple tool for making locally-trusted development certificates",
+      "install_id": "mkcert",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "mkcert-1.4.4",
+      "pname": "mkcert",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.4.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/87jk7dibvqcb11h26wnxk3hsw4g23zf3-mkcert-1.4.4"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mkcert",
+      "broken": false,
+      "derivation": "/nix/store/glriisk908dyd0rwzxgxll262a6sd60n-mkcert-1.4.4.drv",
+      "description": "Simple tool for making locally-trusted development certificates",
+      "install_id": "mkcert",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "mkcert-1.4.4",
+      "pname": "mkcert",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.4.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/z1q365bskwfj4xn1wir11nd1887iynfd-mkcert-1.4.4"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mkcert",
+      "broken": false,
+      "derivation": "/nix/store/r72fky9bska8qx6aqj7wb5r6ar0dqd7r-mkcert-1.4.4.drv",
+      "description": "Simple tool for making locally-trusted development certificates",
+      "install_id": "mkcert",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "mkcert-1.4.4",
+      "pname": "mkcert",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.4.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/f5qn6ihss8qplbjlhxm267ywdxia9f50-mkcert-1.4.4"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nssTools",
+      "broken": false,
+      "derivation": "/nix/store/0i0nav15061lix20xykdx0jgp2730qv6-nss-3.101.2.drv",
+      "description": "Set of libraries for development of security-enabled client and server applications",
+      "install_id": "nssTools",
+      "license": "MPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "nss-3.101.2",
+      "pname": "nssTools",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "nss-3.101.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/29vkrcm73w4zm793a793c59dlz356xns-nss-3.101.2-dev",
+        "out": "/nix/store/ic8f9r2q0m6lywcrjm24w1dl3q95zp9l-nss-3.101.2",
+        "tools": "/nix/store/02ad73kzav0rkjfg4zqndb1x7gybh876-nss-3.101.2-tools"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nssTools",
+      "broken": false,
+      "derivation": "/nix/store/fy2q8i0gzbkb8q5x1bnsdc2hc2fdyv6f-nss-3.101.2.drv",
+      "description": "Set of libraries for development of security-enabled client and server applications",
+      "install_id": "nssTools",
+      "license": "MPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "nss-3.101.2",
+      "pname": "nssTools",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "nss-3.101.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/3vc0ra9b1rmkkaxj3m9l7sj3nflkxhjg-nss-3.101.2-dev",
+        "out": "/nix/store/icac0vf0xiz8w60vnadrhw9h53hl1l2m-nss-3.101.2",
+        "tools": "/nix/store/vdbllgdmkmjqna9kajw6v44smb41zf7s-nss-3.101.2-tools"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nssTools",
+      "broken": false,
+      "derivation": "/nix/store/77qwprrr5aagpnri1lwbqby8nkfrvzcl-nss-3.101.2.drv",
+      "description": "Set of libraries for development of security-enabled client and server applications",
+      "install_id": "nssTools",
+      "license": "MPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "nss-3.101.2",
+      "pname": "nssTools",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "nss-3.101.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/vmc5frz8p9n7bljj6abxl1j9g1qkll2k-nss-3.101.2-dev",
+        "out": "/nix/store/gnh0xyn22mg7g744vm4pgxdvdg1gdp0q-nss-3.101.2",
+        "tools": "/nix/store/q3yxxfhfvdrnsg1mc1g5z0ga244kb1cd-nss-3.101.2-tools"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nssTools",
+      "broken": false,
+      "derivation": "/nix/store/81767dr9franm11k5phsaffp0cijp7c5-nss-3.101.2.drv",
+      "description": "Set of libraries for development of security-enabled client and server applications",
+      "install_id": "nssTools",
+      "license": "MPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "nss-3.101.2",
+      "pname": "nssTools",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "nss-3.101.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/fj0534a50gf99z9jdqj10ksqsp3q14kj-nss-3.101.2-dev",
+        "out": "/nix/store/z56hz0hz23hc6s2mgr8aqqjzn3h2jv7s-nss-3.101.2",
+        "tools": "/nix/store/ingafm0fn98xbvjmccq45irbfr6wrlm0-nss-3.101.2-tools"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ]
+}
