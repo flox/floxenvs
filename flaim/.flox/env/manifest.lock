@@ -17,12 +17,11 @@
       "gum": {
         "pkg-path": "gum"
       },
-      "imgcat": {
-        "pkg-path": "python311Packages.imgcat",
-        "version": "python3.11-imgcat-0.5.0"
+      "ipywidgets": {
+        "pkg-path": "python311Packages.ipywidgets"
       },
-      "jupyter": {
-        "pkg-path": "python311Packages.jupyter"
+      "jupyterlab": {
+        "pkg-path": "python311Packages.jupyterlab"
       },
       "pytorch-bin": {
         "pkg-path": "python311Packages.pytorch-bin",
@@ -40,15 +39,15 @@
     "vars": {
       "JUPYTER_SERVER_TOKEN": "floxfan123456",
       "VIRTUAL_ENV_DISABLE_PROMPT": "1",
-      "generate_image": "[(importlib := __import__('importlib')), (warnings := importlib.import_module('warnings')), warnings.filterwarnings('ignore'), (sys := importlib.import_module('sys')), (torch := importlib.import_module('torch')), (__ol_mod_cbtwjvbiot := __import__('imgcat', globals(), locals(), ['imgcat'], 0)), (imgcat := __ol_mod_cbtwjvbiot.imgcat), (__ol_mod_ambwamhbvl := __import__('diffusers', globals(), locals(), ['StableDiffusionPipeline'], 0)), (StableDiffusionPipeline := __ol_mod_ambwamhbvl.StableDiffusionPipeline), (__ol_mod_xshmfbhacj := __import__('diffusers', globals(), locals(), ['logging'], 0)), (logging := __ol_mod_xshmfbhacj.logging), logging.set_verbosity(50), logging.disable_progress_bar(), (pipe := StableDiffusionPipeline.from_pretrained('IDKiro/sdxs-512-0.9', torch_dtype=torch.float32)), pipe.to('cuda') if torch.cuda.is_available() else pipe.to('mps') if torch.backends.mps.is_available() else ..., (prompt := (sys.argv[1] if len(sys.argv) > 1 else 'a fox in a henhouse')), pipe.set_progress_bar_config(disable=True), (image := pipe(prompt=prompt, num_inference_steps=1, guidance_scale=0).images[0]), image.save(f'{prompt}.png'), imgcat(image)]",
+      "generate_image": "[(importlib := __import__('importlib')), (warnings := importlib.import_module('warnings')), warnings.filterwarnings('ignore'), (sys := importlib.import_module('sys')), (torch := importlib.import_module('torch')), (sixel := importlib.import_module('sixel')), (__ol_mod_tqgdpsmggw := __import__('io', globals(), locals(), ['BytesIO'], 0)), (BytesIO := __ol_mod_tqgdpsmggw.BytesIO), (__ol_mod_rdfadkcuju := __import__('diffusers', globals(), locals(), ['StableDiffusionPipeline'], 0)), (StableDiffusionPipeline := __ol_mod_rdfadkcuju.StableDiffusionPipeline), (__ol_mod_rrergazjfx := __import__('diffusers', globals(), locals(), ['logging'], 0)), (logging := __ol_mod_rrergazjfx.logging), (draw := (lambda image: [(__ol_retv_yarsjpxwtm := None), (buffer := BytesIO()), (writer := sixel.SixelWriter()), image.save(buffer, format='png'), writer.draw(buffer), __ol_retv_yarsjpxwtm][-1])), logging.set_verbosity(50), logging.disable_progress_bar(), (pipe := StableDiffusionPipeline.from_pretrained('IDKiro/sdxs-512-0.9', torch_dtype=torch.float32)), pipe.to('cuda') if torch.cuda.is_available() else pipe.to('mps') if torch.backends.mps.is_available() else ..., (prompt := (sys.argv[1] if len(sys.argv) > 1 else 'a fox in a henhouse')), pipe.set_progress_bar_config(disable=True), (image := pipe(prompt=prompt, num_inference_steps=1, guidance_scale=0).images[0]), image.save(f'{prompt}.png'), draw(image)]",
       "test_acceleration": "[(importlib := __import__('importlib')), (warnings := importlib.import_module('warnings')), warnings.filterwarnings('ignore'), (torch := importlib.import_module('torch')), print('CUDA is available 🔥') if torch.cuda.is_available() else print('Metal is available 🍏') if torch.backends.mps.is_available() else print('I only see a CPU 😞')]"
     },
     "hook": {
-      "on-activate": "\n  # If there is a requirements.txt file in the current directory,\n  # let's make our venv in the same place. Otherwise, in the cache.\n  if [[ -f requirements.txt ]]; then\n    export VENV_DIR='./.venv/'\n    req_text=1\n  else\n    export VENV_DIR=\"$FLOX_ENV_CACHE/python\"\n    req_text=0\n  fi\n\n\n  # Make the venv if it does not already exist\n  if [ ! -d \"$VENV_DIR\" ]; then\n    gum spin --spinner dot --title \"Creating python venv in $VENV_DIR\" -- python3 -m venv \"$VENV_DIR\"\n    if [ \"$req_text\" == \"1\" ]; then\n      echo \"✅ Virtual environment created in $VENV_DIR\"\n    fi\n  fi\n\n  # Install or update packages in the venv\n  (\n    source \"$VENV_DIR/bin/activate\"\n    gum spin --spinner dot --title \"Managing packages in $VENV_DIR\" -- pip3 install --quiet imgcat\n    if [[ -f requirements.txt ]]; then\n      gum spin --spinner dot --title \"Managing packages in $VENV_DIR\" -- pip3 install --quiet -r requirements.txt\n    fi\n  )\n\n  toilet -f smmono9 --metal \"flaim\"\n  echo \"\"\n  $FLOX_ENV/bin/python3 -c \"$test_acceleration\"\n  echo \"Run 'testaccel' to retest acceleration.\"\n  echo \"Run 'genimg <string>' for an image.\"\n"
+      "on-activate": "\n  # If there is a requirements.txt file in the current directory,\n  # let's make our venv in the same place. Otherwise, in the cache.\n  if [[ -f requirements.txt ]]; then\n    export VENV_DIR='./.venv/'\n    req_text=1\n  else\n    export VENV_DIR=\"$FLOX_ENV_CACHE/python\"\n    req_text=0\n  fi\n\n\n  # Make the venv if it does not already exist\n  if [ ! -d \"$VENV_DIR\" ]; then\n    gum spin --spinner dot --title \"Creating python venv in $VENV_DIR\" -- python3 -m venv \"$VENV_DIR\"\n    if [ \"$req_text\" == \"1\" ]; then\n      echo \"✅ Virtual environment created in $VENV_DIR\"\n    fi\n  fi\n\n  # Install or update packages in the venv\n  (\n    source \"$VENV_DIR/bin/activate\"\n    gum spin --spinner dot --title \"Managing packages in $VENV_DIR\" -- pip3 install --quiet sixel\n    if [[ -f requirements.txt ]]; then\n      gum spin --spinner dot --title \"Managing packages in $VENV_DIR\" -- pip3 install --quiet -r requirements.txt\n    fi\n  )\n\n  toilet -f smmono9 --metal \"flaim\"\n  echo \"\"\n  $FLOX_ENV/bin/python3 -c \"$test_acceleration\"\n  echo \"Run 'testaccel' to retest acceleration.\"\n  echo \"Run 'genimg <string>' for an image.\"\n"
     },
     "profile": {
-      "bash": "  if [ -d \"$VENV_DIR\" ]; then\n    source \"$VENV_DIR/bin/activate\"\n  fi\n\n  alias genimg=\"python3 -c \\\"$generate_image\\\"\"\n  alias testaccel=\"python3 -c \\\"$test_acceleration\\\"\"\n\n  if [ \"$FLOX_ACTIVATE_START_SERVICES\" == \"true\" ]; then\n    echo\n    jupyter-notebook list\n    echo\n  fi\n",
-      "zsh": "  if [ -d \"$VENV_DIR\" ]; then\n    source \"$VENV_DIR/bin/activate\"\n  fi\n\n  alias genimg=\"python3 -c \\\"$generate_image\\\"\"\n  alias testaccel=\"python3 -c \\\"$test_acceleration\\\"\"\n\n  if [[ \"$FLOX_ACTIVATE_START_SERVICES\" == \"true\" ]]; then\n    echo\n    jupyter-notebook list\n    echo\n  fi\n"
+      "bash": "  if [ -d \"$VENV_DIR\" ]; then\n    source \"$VENV_DIR/bin/activate\"\n  fi\n\n  alias genimg=\"python3 -c \\\"$generate_image\\\"\"\n  alias testaccel=\"python3 -c \\\"$test_acceleration\\\"\"\n\n  if [ \"$FLOX_ACTIVATE_START_SERVICES\" == \"true\" ]; then\n    echo\n    jupyter-lab list\n    echo\n  fi\n",
+      "zsh": "  if [ -d \"$VENV_DIR\" ]; then\n    source \"$VENV_DIR/bin/activate\"\n  fi\n\n  alias genimg=\"python3 -c \\\"$generate_image\\\"\"\n  alias testaccel=\"python3 -c \\\"$test_acceleration\\\"\"\n\n  if [[ \"$FLOX_ACTIVATE_START_SERVICES\" == \"true\" ]]; then\n    echo\n    sleep 1\n    jupyter-lab list\n    echo\n  fi\n"
     },
     "options": {
       "systems": [
@@ -63,7 +62,7 @@
     },
     "services": {
       "jupyter-server": {
-        "command": "jupyter-server --IdentityProvider.token=${JUPYTER_SERVER_TOKEN} --ip=0.0.0.0",
+        "command": "jupyter-lab --IdentityProvider.token=${JUPYTER_SERVER_TOKEN} --ip=0.0.0.0",
         "vars": null,
         "is-daemon": null,
         "shutdown": null,
@@ -427,15 +426,15 @@
       "priority": 5
     },
     {
-      "attr_path": "python311Packages.imgcat",
+      "attr_path": "python311Packages.ipywidgets",
       "broken": false,
-      "derivation": "/nix/store/d3gxbpjzajkbfvppmg9qc7j6r4q0g574-python3.11-imgcat-0.5.0.drv",
-      "description": "Imgcat in Python",
-      "install_id": "imgcat",
-      "license": "MIT",
+      "derivation": "/nix/store/bjll4ib611ivkcimxfflg7zc7a6ng7qy-python3.11-ipywidgets-8.1.5.drv",
+      "description": "IPython HTML widgets for Jupyter",
+      "install_id": "ipywidgets",
+      "license": "BSD-3-Clause",
       "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
-      "name": "python3.11-imgcat-0.5.0",
-      "pname": "imgcat",
+      "name": "python3.11-ipywidgets-8.1.5",
+      "pname": "ipywidgets",
       "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
       "rev_count": 694395,
       "rev_date": "2024-10-18T13:02:40Z",
@@ -444,28 +443,28 @@
         "unstable"
       ],
       "unfree": false,
-      "version": "python3.11-imgcat-0.5.0",
+      "version": "python3.11-ipywidgets-8.1.5",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/3840qppxh5i0awslw2sglkaxhvids6cy-python3.11-imgcat-0.5.0-dist",
-        "out": "/nix/store/ja4xg810v88f0h72k3ycskl31d3k55db-python3.11-imgcat-0.5.0"
+        "dist": "/nix/store/wkbsx19shwp072bbqq1zqm3nvwvmn4gm-python3.11-ipywidgets-8.1.5-dist",
+        "out": "/nix/store/fcir97z7xks89dz4cjf5wa9z1ng993wb-python3.11-ipywidgets-8.1.5"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "python311Packages.imgcat",
+      "attr_path": "python311Packages.ipywidgets",
       "broken": false,
-      "derivation": "/nix/store/mvd9py2fy29dv8vmd69cck716lk318hk-python3.11-imgcat-0.5.0.drv",
-      "description": "Imgcat in Python",
-      "install_id": "imgcat",
-      "license": "MIT",
+      "derivation": "/nix/store/fkwdw759ixbbaqrrxzkmzqx03nanc8vb-python3.11-ipywidgets-8.1.5.drv",
+      "description": "IPython HTML widgets for Jupyter",
+      "install_id": "ipywidgets",
+      "license": "BSD-3-Clause",
       "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
-      "name": "python3.11-imgcat-0.5.0",
-      "pname": "imgcat",
+      "name": "python3.11-ipywidgets-8.1.5",
+      "pname": "ipywidgets",
       "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
       "rev_count": 694395,
       "rev_date": "2024-10-18T13:02:40Z",
@@ -474,28 +473,28 @@
         "unstable"
       ],
       "unfree": false,
-      "version": "python3.11-imgcat-0.5.0",
+      "version": "python3.11-ipywidgets-8.1.5",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/h9afzsbqm11dz8v1pq343dajii72wvyi-python3.11-imgcat-0.5.0-dist",
-        "out": "/nix/store/w37nrhc0lxrayhndmkipyihcs84r14xh-python3.11-imgcat-0.5.0"
+        "dist": "/nix/store/71k6b1ycnmvzbix9q1i7afafdpb0rzj5-python3.11-ipywidgets-8.1.5-dist",
+        "out": "/nix/store/0q4lwaza3chckfabmdj61952kf2fbkx3-python3.11-ipywidgets-8.1.5"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "python311Packages.imgcat",
+      "attr_path": "python311Packages.ipywidgets",
       "broken": false,
-      "derivation": "/nix/store/sv1ig9zfj9lqgirwvmf3qqzlb1mnx0dk-python3.11-imgcat-0.5.0.drv",
-      "description": "Imgcat in Python",
-      "install_id": "imgcat",
-      "license": "MIT",
+      "derivation": "/nix/store/wm56nq64312ywxvvs46l9kpaxcxikmj6-python3.11-ipywidgets-8.1.5.drv",
+      "description": "IPython HTML widgets for Jupyter",
+      "install_id": "ipywidgets",
+      "license": "BSD-3-Clause",
       "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
-      "name": "python3.11-imgcat-0.5.0",
-      "pname": "imgcat",
+      "name": "python3.11-ipywidgets-8.1.5",
+      "pname": "ipywidgets",
       "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
       "rev_count": 694395,
       "rev_date": "2024-10-18T13:02:40Z",
@@ -504,28 +503,28 @@
         "unstable"
       ],
       "unfree": false,
-      "version": "python3.11-imgcat-0.5.0",
+      "version": "python3.11-ipywidgets-8.1.5",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/5yr0n1xv03j2hv0i7wlyld31i3g1i1hi-python3.11-imgcat-0.5.0-dist",
-        "out": "/nix/store/5zwbam3dgqs883f47c98l2dd383rdw9a-python3.11-imgcat-0.5.0"
+        "dist": "/nix/store/qwb9xmvx37928z1kxm50lbkgh5nwbdbz-python3.11-ipywidgets-8.1.5-dist",
+        "out": "/nix/store/mdvgp8q3wj883hzijl596r5xcniwqy96-python3.11-ipywidgets-8.1.5"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "python311Packages.jupyter",
+      "attr_path": "python311Packages.jupyterlab",
       "broken": false,
-      "derivation": "/nix/store/29q6a6r67ii2kkx7sfzv0aq35ykh2rbr-python3.11-jupyter-1.1.1.drv",
-      "description": "Installs all the Jupyter components in one go",
-      "install_id": "jupyter",
+      "derivation": "/nix/store/xxwks70p5vqmy8vjzcrlw20csfn7g1c3-python3.11-jupyterlab-4.2.5.drv",
+      "description": "Jupyter lab environment notebook server extension",
+      "install_id": "jupyterlab",
       "license": "BSD-3-Clause",
       "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
-      "name": "python3.11-jupyter-1.1.1",
-      "pname": "jupyter",
+      "name": "python3.11-jupyterlab-4.2.5",
+      "pname": "jupyterlab",
       "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
       "rev_count": 694395,
       "rev_date": "2024-10-18T13:02:40Z",
@@ -534,28 +533,28 @@
         "unstable"
       ],
       "unfree": false,
-      "version": "python3.11-jupyter-1.1.1",
+      "version": "python3.11-jupyterlab-4.2.5",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/6r7v4fw7al1p60qnjq6w2033h9qw6ysj-python3.11-jupyter-1.1.1-dist",
-        "out": "/nix/store/niqmrgrkwkywhbl8454qccbl5fqp63n5-python3.11-jupyter-1.1.1"
+        "dist": "/nix/store/yqcqdxyak1kzj8s5plv03sfl725z56w0-python3.11-jupyterlab-4.2.5-dist",
+        "out": "/nix/store/h66kb4f8wnhaqr8hmff5fzdngaw978p1-python3.11-jupyterlab-4.2.5"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "python311Packages.jupyter",
+      "attr_path": "python311Packages.jupyterlab",
       "broken": false,
-      "derivation": "/nix/store/8yilvfrnzg4ajbawr6s1sxryl0yvi60v-python3.11-jupyter-1.1.1.drv",
-      "description": "Installs all the Jupyter components in one go",
-      "install_id": "jupyter",
+      "derivation": "/nix/store/b1djf7q3zps5xi558zsqq2611r7zjyjg-python3.11-jupyterlab-4.2.5.drv",
+      "description": "Jupyter lab environment notebook server extension",
+      "install_id": "jupyterlab",
       "license": "BSD-3-Clause",
       "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
-      "name": "python3.11-jupyter-1.1.1",
-      "pname": "jupyter",
+      "name": "python3.11-jupyterlab-4.2.5",
+      "pname": "jupyterlab",
       "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
       "rev_count": 694395,
       "rev_date": "2024-10-18T13:02:40Z",
@@ -564,28 +563,28 @@
         "unstable"
       ],
       "unfree": false,
-      "version": "python3.11-jupyter-1.1.1",
+      "version": "python3.11-jupyterlab-4.2.5",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/5ibn2nkb8qlqhm4ry5qlrmmd3has1lsb-python3.11-jupyter-1.1.1-dist",
-        "out": "/nix/store/3ibc8iz49f9gmf1lqavg02iwbh71c381-python3.11-jupyter-1.1.1"
+        "dist": "/nix/store/s97wynd8yaylb6g8any3vhycsfdn97cm-python3.11-jupyterlab-4.2.5-dist",
+        "out": "/nix/store/rvwwi5ibnk681dyni3y9z4pvsa1sz34p-python3.11-jupyterlab-4.2.5"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "python311Packages.jupyter",
+      "attr_path": "python311Packages.jupyterlab",
       "broken": false,
-      "derivation": "/nix/store/j5irq94nvl900abandwh2p20c5dk9lpv-python3.11-jupyter-1.1.1.drv",
-      "description": "Installs all the Jupyter components in one go",
-      "install_id": "jupyter",
+      "derivation": "/nix/store/5pjqz594ivyw3chs4ypbrcizy41cymip-python3.11-jupyterlab-4.2.5.drv",
+      "description": "Jupyter lab environment notebook server extension",
+      "install_id": "jupyterlab",
       "license": "BSD-3-Clause",
       "locked_url": "https://github.com/flox/nixpkgs?rev=4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
-      "name": "python3.11-jupyter-1.1.1",
-      "pname": "jupyter",
+      "name": "python3.11-jupyterlab-4.2.5",
+      "pname": "jupyterlab",
       "rev": "4c2fcb090b1f3e5b47eaa7bd33913b574a11e0a0",
       "rev_count": 694395,
       "rev_date": "2024-10-18T13:02:40Z",
@@ -594,13 +593,13 @@
         "unstable"
       ],
       "unfree": false,
-      "version": "python3.11-jupyter-1.1.1",
+      "version": "python3.11-jupyterlab-4.2.5",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/8yx72a6dzv5h77v3c0rpqzin9r6n8wck-python3.11-jupyter-1.1.1-dist",
-        "out": "/nix/store/scsirs1qhba9dnan3kf4y0dmqz2s8x2j-python3.11-jupyter-1.1.1"
+        "dist": "/nix/store/p66kw5fwqlsfz54rix2fxhg75ij2sm16-python3.11-jupyterlab-4.2.5-dist",
+        "out": "/nix/store/czp8zd1zpa5kfcg3ixn786db3l0zcrm7-python3.11-jupyterlab-4.2.5"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
