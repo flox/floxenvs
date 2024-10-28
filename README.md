@@ -17,6 +17,7 @@
 | `mysql` | ✅ | ✅ | ✅ | |
 | **Shell:** |
 | `dotenv` | ✅ | ✅ | ✅ | Load .env environment variables |
+| `mkcert` | ✅ | ✅ | ✅ | A tool to make locally trusted development certificates |
 | `a-perfect-shell` | ✅ | ✅ | ✅ | An opinionated shell environment |
 | `direnv`          |  |  |  | |
 | **Applications:** |
