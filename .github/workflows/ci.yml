@@ -44,7 +44,7 @@ jobs:
             rel_env_path="${env_path#$PWD/}"
             echo "env_path=$env_path"
             echo "rel_env_path=$rel_env_path"
-            if [ -f "$env_path/test.sh" ] && [ $update_all" == "true" ] || [ ( git diff --name-only HEAD~1 HEAD | grep -q "$rel_env_path/" ; ) ]; then
+            if [ -f "$env_path/test.sh" ] && [ "$update_all" == "true" ] || [ ( git diff --name-only HEAD~1 HEAD | grep -q "$rel_env_path/" ; ) ]; then
               name=$(basename $env_path)
 
               num_of_services=$(yq -oy '.services | length' $manifest_path)
