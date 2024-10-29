@@ -35,19 +35,17 @@ jobs:
 
           update_all=
           if git diff --name-only HEAD~1 HEAD -- | grep -E "flake.nix|flake.lock|.github" ; then
-            echo detected major change
+            echo "detected major change"
             update_all=true
           fi
 
           while IFS= read manifest_path; do
             env_path=$(realpath -s $(dirname $manifest_path)/../..)
             rel_env_path="${env_path#$PWD/}"
-            if [ -f "$env_path/test.sh" ]; then
+            echo "env_path=$env_path"
+            echo "rel_env_path=$rel_env_path"
+            if [[ -f "$env_path/test.sh" && ( $update_all" == "true" || ( git diff --name-only HEAD~1 HEAD | grep -q "$rel_env_path/" ; ) ) ]]; then
               name=$(basename $env_path)
-
-              if [ "$update_all" != "true" ] && ( git diff --name-only HEAD~1 HEAD | grep -qv "$rel_env_path/" ; ) ; then
-                continue
-              fi
 
               num_of_services=$(yq -oy '.services | length' $manifest_path)
               start_services="true"
