@@ -9,11 +9,24 @@
       "curl": {
         "pkg-path": "curl"
       },
+      "gcc-unwrapped": {
+        "pkg-path": "gcc-unwrapped"
+      },
+      "glibc": {
+        "pkg-path": "glibc",
+        "systems": [
+          "x86_64-linux",
+          "aarch64-linux"
+        ]
+      },
       "gum": {
         "pkg-path": "gum"
       },
       "ollama": {
         "pkg-path": "ollama"
+      },
+      "pkg-config": {
+        "pkg-path": "pkg-config"
       },
       "python": {
         "pkg-path": "python311"
@@ -361,6 +374,210 @@
       "priority": 5
     },
     {
+      "attr_path": "gcc-unwrapped",
+      "broken": false,
+      "derivation": "/nix/store/xsvw3q5li4xbamw9ac7012gbk65x3xdq-gcc-13.3.0.drv",
+      "description": "GNU Compiler Collection, version 13.3.0",
+      "install_id": "gcc-unwrapped",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "gcc-13.3.0",
+      "pname": "gcc-unwrapped",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "gcc-13.3.0",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "info": "/nix/store/k8i74v73lnqz7vkhfm1myxh2vyvfaka7-gcc-13.3.0-info",
+        "lib": "/nix/store/6kr46lx29dw3nd8xl28mv5h151s040j7-gcc-13.3.0-lib",
+        "man": "/nix/store/3a0d0l2yfrrhalwzg2023c9kb607chyv-gcc-13.3.0-man",
+        "out": "/nix/store/wx46lrii10gji7i6rk9gmyd62y9n9wyz-gcc-13.3.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gcc-unwrapped",
+      "broken": false,
+      "derivation": "/nix/store/vf68k49prkdma795nj46misa00zxx62b-gcc-13.3.0.drv",
+      "description": "GNU Compiler Collection, version 13.3.0",
+      "install_id": "gcc-unwrapped",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "gcc-13.3.0",
+      "pname": "gcc-unwrapped",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "gcc-13.3.0",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "checksum": "/nix/store/w48ijv2wa89vbn967hsi8f9f75xfx1by-gcc-13.3.0-checksum",
+        "info": "/nix/store/3hfxiisdnl5f5q3hda96s243fh6vfk8s-gcc-13.3.0-info",
+        "lib": "/nix/store/9ki1b72wzh9b5g9pl9sdqg691clrriq7-gcc-13.3.0-lib",
+        "libgcc": "/nix/store/dajy07dbzdag6vbmcdbhqhnn2hiaiwhd-gcc-13.3.0-libgcc",
+        "man": "/nix/store/0mhy62y8caj7wlhmm9392y1ncl0xr8h0-gcc-13.3.0-man",
+        "out": "/nix/store/3y6ami71csargy3hbrdc15lbkdi3icyy-gcc-13.3.0"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gcc-unwrapped",
+      "broken": false,
+      "derivation": "/nix/store/74y9p0kqg4rjysvsr0jgz16hpkrhf8pz-gcc-13.3.0.drv",
+      "description": "GNU Compiler Collection, version 13.3.0",
+      "install_id": "gcc-unwrapped",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "gcc-13.3.0",
+      "pname": "gcc-unwrapped",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "gcc-13.3.0",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "checksum": "/nix/store/xd941k2flwqwx9zxzi6iikd23496hnbh-gcc-13.3.0-checksum",
+        "info": "/nix/store/i0wzk70ykq0cw4d0dp6l2zm8mc4g5a1x-gcc-13.3.0-info",
+        "lib": "/nix/store/y3kdn61k93rq2jx1lj2x72lnsk0l92qh-gcc-13.3.0-lib",
+        "libgcc": "/nix/store/lw294qfdnf29lhxqwzy9byrmx975rvn9-gcc-13.3.0-libgcc",
+        "man": "/nix/store/m2f7pnmmwnv71p5q36v5vmrwvsrnpyfp-gcc-13.3.0-man",
+        "out": "/nix/store/0vsyw5bhwmisszyfd1a0sdnwvnf4qa5a-gcc-13.3.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gcc-unwrapped",
+      "broken": false,
+      "derivation": "/nix/store/421szqx5xcaix72p87664xigyjf9yl7d-gcc-13.3.0.drv",
+      "description": "GNU Compiler Collection, version 13.3.0",
+      "install_id": "gcc-unwrapped",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "gcc-13.3.0",
+      "pname": "gcc-unwrapped",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "gcc-13.3.0",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "info": "/nix/store/cv6w2shaysyi3im061r379kcmgzjr9xi-gcc-13.3.0-info",
+        "lib": "/nix/store/mph9fikx3fx6va81jras97mxnnw7ijw6-gcc-13.3.0-lib",
+        "man": "/nix/store/nig6h6iq8gk351x8wb15hcs5aksfyy7n-gcc-13.3.0-man",
+        "out": "/nix/store/qk0y65nvivkzb7ipn7hlwaay5fh3478a-gcc-13.3.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "glibc",
+      "broken": false,
+      "derivation": "/nix/store/fpc40k6jgl3ig2mbq6qxy2m5hdfzja9m-glibc-2.40-36.drv",
+      "description": "GNU C Library",
+      "install_id": "glibc",
+      "license": "LGPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "glibc-2.40-36",
+      "pname": "glibc",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.40-36",
+      "outputs_to_install": [
+        "bin"
+      ],
+      "outputs": {
+        "bin": "/nix/store/vpsla1ivhavzd4fmi95yzmgb4g9rd072-glibc-2.40-36-bin",
+        "debug": "/nix/store/z2sw3rmg6n5ypnmmyi8k0nzim3axjifn-glibc-2.40-36-debug",
+        "dev": "/nix/store/n15bxkd7id2gvlwpihm4kp675aqkrwmj-glibc-2.40-36-dev",
+        "getent": "/nix/store/vh67ndapi0ppz56qdap9yv03x2i296aj-glibc-2.40-36-getent",
+        "out": "/nix/store/sl141d1g77wvhr050ah87lcyz2czdxa3-glibc-2.40-36",
+        "static": "/nix/store/lk3bic74lmbhx31d4q7cicvfwb6s2pqn-glibc-2.40-36-static"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "glibc",
+      "broken": false,
+      "derivation": "/nix/store/3nhfrp16d344z80kfw8n0i9canw4x1j6-glibc-2.40-36.drv",
+      "description": "GNU C Library",
+      "install_id": "glibc",
+      "license": "LGPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "glibc-2.40-36",
+      "pname": "glibc",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.40-36",
+      "outputs_to_install": [
+        "bin"
+      ],
+      "outputs": {
+        "bin": "/nix/store/2idfdm25lr2dgdh1p9mz7r6cl7gc3fdz-glibc-2.40-36-bin",
+        "debug": "/nix/store/5vh6bzpxa7fx54m31i1ci1ccz412pynz-glibc-2.40-36-debug",
+        "dev": "/nix/store/a79372lvalazma0jzpkajm4q6s8m84ks-glibc-2.40-36-dev",
+        "getent": "/nix/store/8ha5gmibmlzyvi2dy7rlgd4fj7s21ndc-glibc-2.40-36-getent",
+        "out": "/nix/store/qii6jadf3xrhg4y0f5m09k11lh5ymwnv-glibc-2.40-36",
+        "static": "/nix/store/xs4awsjrh5sgci7jnvsifqz8gr4s4gqn-glibc-2.40-36-static"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
       "attr_path": "gum",
       "broken": false,
       "derivation": "/nix/store/d6kkfkqypl6igsgs5x1gmjyg47pm0izw-gum-0.14.5.drv",
@@ -587,6 +804,134 @@
       ],
       "outputs": {
         "out": "/nix/store/f35r6q1dr4j2vjr203kgkrgx03zygi33-ollama-0.3.12"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "pkg-config",
+      "broken": false,
+      "derivation": "/nix/store/fvq4dbxi3isq4pb987vg4hwmy19cpgi3-pkg-config-wrapper-0.29.2.drv",
+      "description": "Tool that allows packages to find out information about other packages (wrapper script)",
+      "install_id": "pkg-config",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "pkg-config-wrapper-0.29.2",
+      "pname": "pkg-config",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "wrapper-0.29.2",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "doc": "/nix/store/nw4nlx2v34v8iy6mkq0b0i4ip0qy1v97-pkg-config-wrapper-0.29.2-doc",
+        "man": "/nix/store/rynrbfp1j1cc012hq46sss03r2vgh13k-pkg-config-wrapper-0.29.2-man",
+        "out": "/nix/store/x1779s197x1g32pfbm2xaqp4v7158z7l-pkg-config-wrapper-0.29.2"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "pkg-config",
+      "broken": false,
+      "derivation": "/nix/store/my7g95dcw96l17na4isxmc0k5sydkmbj-pkg-config-wrapper-0.29.2.drv",
+      "description": "Tool that allows packages to find out information about other packages (wrapper script)",
+      "install_id": "pkg-config",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "pkg-config-wrapper-0.29.2",
+      "pname": "pkg-config",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "wrapper-0.29.2",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "doc": "/nix/store/vqlzlfdzqi1phgx3dgqdzk00748b26n0-pkg-config-wrapper-0.29.2-doc",
+        "man": "/nix/store/hnl03h5w8rpaxgw9495f6ixl324y4lpx-pkg-config-wrapper-0.29.2-man",
+        "out": "/nix/store/m4snqj8ijxs3cjrc8vxmpd7z141a52s6-pkg-config-wrapper-0.29.2"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "pkg-config",
+      "broken": false,
+      "derivation": "/nix/store/daaa520fvqr4s1rbk9hd28aq9jch2w4c-pkg-config-wrapper-0.29.2.drv",
+      "description": "Tool that allows packages to find out information about other packages (wrapper script)",
+      "install_id": "pkg-config",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "pkg-config-wrapper-0.29.2",
+      "pname": "pkg-config",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "wrapper-0.29.2",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "doc": "/nix/store/78pnh0l35ckpdxw13gamc8bs9b55cxin-pkg-config-wrapper-0.29.2-doc",
+        "man": "/nix/store/5jkknl6287w5kkniyrkmj5i2sqcdr4jp-pkg-config-wrapper-0.29.2-man",
+        "out": "/nix/store/mi7q9m86m3rkqmc0niyvfv25ji9fxxha-pkg-config-wrapper-0.29.2"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "pkg-config",
+      "broken": false,
+      "derivation": "/nix/store/4mzympybd01l9lqhfmw4acnilijgj59a-pkg-config-wrapper-0.29.2.drv",
+      "description": "Tool that allows packages to find out information about other packages (wrapper script)",
+      "install_id": "pkg-config",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "pkg-config-wrapper-0.29.2",
+      "pname": "pkg-config",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "wrapper-0.29.2",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "doc": "/nix/store/lrsnjnqpvfyj7s15d4k41pl83dc3y6fi-pkg-config-wrapper-0.29.2-doc",
+        "man": "/nix/store/rcpfih5fin18ij985rmsxxw4535nwmax-pkg-config-wrapper-0.29.2-man",
+        "out": "/nix/store/fz33c0w5zjragrniihagc367gyq6x165-pkg-config-wrapper-0.29.2"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
