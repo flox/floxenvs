@@ -43,6 +43,7 @@
           export TESTDIR="$(mktemp -d --suffix floxenvs-${name}-example)"
           cp -R ${path}/* $TESTDIR
           cp -R ${path}/.flox* $TESTDIR
+          cp -R ${path}/.env* $TESTDIR
           chown -R $(whoami) $TESTDIR/.flox*
           chmod -R +w $TESTDIR/.flox*
 
