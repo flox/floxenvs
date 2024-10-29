@@ -6,6 +6,7 @@
 | :--- | :-----: | :----: | :-----: | :---------- |
 | |
 | **Languages:** |
+| `go`  | ✅ | ✅ | ✅ | |
 | `python-poetry`  | ✅ | ✅ | ✅ | Python environment using poerty |
 | `ruby`  | ✅ | ✅ | ✅ | Ruby environment |
 | `rust`  | ✅ | ✅ | ✅ | Rust environment |
