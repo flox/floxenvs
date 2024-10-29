@@ -13,15 +13,13 @@
         "pkg-path": "gum"
       },
       "ollama": {
-        "pkg-path": "ollama",
-        "version": "0.3.5"
+        "pkg-path": "ollama"
       },
-      "python310": {
-        "pkg-path": "python310"
+      "python": {
+        "pkg-path": "python311"
       },
       "weaviate": {
-        "pkg-path": "weaviate",
-        "version": "1.25.9"
+        "pkg-path": "weaviate"
       }
     },
     "vars": {
@@ -31,12 +29,13 @@
       "OLLAMA_URL": "http://localhost:11434",
       "PERSISTENCE_DATA_PATH": "./verba-data",
       "QUERY_DEFAULTS_LIMIT": "10",
-      "VERBA_INSTALL_PACKAGE": "goldenverba==1.0.4",
+      "VERBA_INSTALL_PACKAGE": "goldenverba@git+https://github.com/weaviate/Verba",
       "VIRTUAL_ENV_DISABLE_PROMPT": "1",
+      "WEAVIATE_API_KEY_VERBA": "",
       "WEAVIATE_URL_VERBA": "http://localhost:8080"
     },
     "hook": {
-      "on-activate": "  # If we export this here, it can be used later in 'profiles.common'\n  export PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\n  if [ ! -d \"$PYTHON_DIR\" ]; then\n    gum spin -s globe --title \"Creating venv in $PYTHON_DIR...\" -- python -m venv \"$PYTHON_DIR\"\n  fi\n\n  (\n    source \"$PYTHON_DIR/bin/activate\"\n    gum spin -s monkey --title \"Installing/updating Verba...\" -- pip install \"$VERBA_INSTALL_PACKAGE\"\n  )\n"
+      "on-activate": "\n# If we export this here, it can be used later in 'profiles.common'\nexport PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nif [ ! -d \"$PYTHON_DIR\" ]; then\n  gum spin -s globe --title \"Creating venv in $PYTHON_DIR...\" -- python -m venv \"$PYTHON_DIR\"\nfi\n\n(\n  source \"$PYTHON_DIR/bin/activate\"\n  gum spin -s monkey --title \"Installing/updating Verba...\" -- pip install \"$VERBA_INSTALL_PACKAGE\"\n)\n\n"
     },
     "profile": {
       "common": "  # Activate the Python venv\n  source \"$PYTHON_DIR/bin/activate\"\n"
@@ -45,7 +44,8 @@
       "systems": [
         "aarch64-darwin",
         "aarch64-linux",
-        "x86_64-linux"
+        "x86_64-linux",
+        "x86_64-darwin"
       ],
       "allow": {
         "licenses": []
@@ -68,7 +68,7 @@
         "systems": null
       },
       "verba": {
-        "command": "if [[ \"$WEAVIATE_URL_VERBA\" != \"\" ]]; then\n  until curl -s \"$WEAVIATE_URL_VERBA\"; do\n    echo \"waiting for weaviate ...\"\n    sleep 0.1\n  done\nfi\n\n$PYTHON_DIR/bin/verba start --host 0.0.0.0\n",
+        "command": "if [[ \"$WEAVIATE_URL_VERBA\" != \"\" ]]; then\n  until curl -s \"$WEAVIATE_URL_VERBA\"; do\n    echo \"waiting for weaviate ...\"\n    sleep 0.1\n  done\nfi\n$PYTHON_DIR/bin/verba start --port 8000 --host 0.0.0.0\n",
         "vars": null,
         "is-daemon": null,
         "shutdown": null,
@@ -81,24 +81,26 @@
         "shutdown": null,
         "systems": null
       }
-    },
-    "build": {}
+    }
   },
   "packages": [
     {
       "attr_path": "bash",
       "broken": false,
-      "derivation": "/nix/store/samcvjli1l02v5q3wkh68v6icvn2nzqn-bash-5.2p32.drv",
+      "derivation": "/nix/store/kvcrv4yd69z4dcicm5sl7a1v7mkcan28-bash-5.2p32.drv",
       "description": "GNU Bourne-Again Shell, the de facto standard shell on Linux",
       "install_id": "bash",
       "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c374d94f1536013ca8e92341b540eba4c22f9c62",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
       "name": "bash-5.2p32",
       "pname": "bash",
-      "rev": "c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "rev_count": 669741,
-      "rev_date": "2024-08-21T07:22:56Z",
-      "scrape_date": "2024-08-23T05:11:04Z",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
       "unfree": false,
       "version": "5.2p32",
       "outputs_to_install": [
@@ -106,11 +108,11 @@
         "man"
       ],
       "outputs": {
-        "dev": "/nix/store/gz9bsxa8hlk7gjgyl7yy3bbn444b7wdj-bash-5.2p32-dev",
-        "doc": "/nix/store/j73xsfyv5pndsvfwk2h1mwgisv62h9rz-bash-5.2p32-doc",
-        "info": "/nix/store/62ximradwflgggsiw8rz9zcrkb2r6g6n-bash-5.2p32-info",
-        "man": "/nix/store/w9cd4fgk7ps1wr7rnj38jikhps25vwi2-bash-5.2p32-man",
-        "out": "/nix/store/b34ianga4diikh0kymkpqwmvba0mmzf7-bash-5.2p32"
+        "dev": "/nix/store/8839i4a82s1gi03y6y119i824akjdw8q-bash-5.2p32-dev",
+        "doc": "/nix/store/nbd42in15j01cafp06lxjagmlm6ns9ch-bash-5.2p32-doc",
+        "info": "/nix/store/axzhk16m9yc4cjg3spk7k16xxvf1rjvk-bash-5.2p32-info",
+        "man": "/nix/store/9pjrvj2spk0czxwwpl7sz7g9mii2jz41-bash-5.2p32-man",
+        "out": "/nix/store/0w0hhy7rmn5xisasdr4v4p958x114sj1-bash-5.2p32"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -119,17 +121,20 @@
     {
       "attr_path": "bash",
       "broken": false,
-      "derivation": "/nix/store/v277hdrvmqgy8gl2mbpd79sx8f94dd82-bash-5.2p32.drv",
+      "derivation": "/nix/store/b1fkd0yvnrhjfylyyh1z0vsg46m4dnwy-bash-5.2p32.drv",
       "description": "GNU Bourne-Again Shell, the de facto standard shell on Linux",
       "install_id": "bash",
       "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c374d94f1536013ca8e92341b540eba4c22f9c62",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
       "name": "bash-5.2p32",
       "pname": "bash",
-      "rev": "c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "rev_count": 669741,
-      "rev_date": "2024-08-21T07:22:56Z",
-      "scrape_date": "2024-08-23T05:11:04Z",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
       "unfree": false,
       "version": "5.2p32",
       "outputs_to_install": [
@@ -137,12 +142,12 @@
         "man"
       ],
       "outputs": {
-        "debug": "/nix/store/rc834ghw7bqizg2w3k0fhdbh9ylgmnv5-bash-5.2p32-debug",
-        "dev": "/nix/store/wkf859q107gkib0pq9hv7jjlbg48031c-bash-5.2p32-dev",
-        "doc": "/nix/store/752vimy8vav8sqq2xjgxh2853vnb9h3l-bash-5.2p32-doc",
-        "info": "/nix/store/70jzxpp6ssnyfddnr07yn2a2gfsl0b82-bash-5.2p32-info",
-        "man": "/nix/store/7in9hv6iw4qzmdk5gxk8l9135zz504sk-bash-5.2p32-man",
-        "out": "/nix/store/q2xy9y7zsqx2a1harmj0c021chdyfxbw-bash-5.2p32"
+        "debug": "/nix/store/vlhxk6lnmn3cs888nvip6prfnaxcvx3v-bash-5.2p32-debug",
+        "dev": "/nix/store/6hawbckg7xdjq1ikjb0xzmrrkfv5372b-bash-5.2p32-dev",
+        "doc": "/nix/store/flw4h6radqyj77gyl1jz42vx0lxx35by-bash-5.2p32-doc",
+        "info": "/nix/store/iikmi8x4n0z1fr7mz59afh3y3vk1019k-bash-5.2p32-info",
+        "man": "/nix/store/rn94wx712zy76dpk6qmdicx4g42x848p-bash-5.2p32-man",
+        "out": "/nix/store/k2wspf0nq81hxjwxsnb8r9cg08qngdk2-bash-5.2p32"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -151,17 +156,20 @@
     {
       "attr_path": "bash",
       "broken": false,
-      "derivation": "/nix/store/2miv8n4k7nram4qnbjfjcg400dzkzcdg-bash-5.2p32.drv",
+      "derivation": "/nix/store/nkj6x4ajnxz1w80mhi7sspjpkvgp3bpk-bash-5.2p32.drv",
       "description": "GNU Bourne-Again Shell, the de facto standard shell on Linux",
       "install_id": "bash",
       "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c374d94f1536013ca8e92341b540eba4c22f9c62",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
       "name": "bash-5.2p32",
       "pname": "bash",
-      "rev": "c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "rev_count": 669741,
-      "rev_date": "2024-08-21T07:22:56Z",
-      "scrape_date": "2024-08-23T05:11:04Z",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
       "unfree": false,
       "version": "5.2p32",
       "outputs_to_install": [
@@ -169,12 +177,150 @@
         "man"
       ],
       "outputs": {
-        "debug": "/nix/store/p18acjw0r4sq1yrj0vlxv7x5mgx2amn9-bash-5.2p32-debug",
-        "dev": "/nix/store/pz8mq2lgw0lg2n9dwjiiryi7bmcmz0k2-bash-5.2p32-dev",
-        "doc": "/nix/store/1klrlhcxd6clwhqkpbfxbq1dk50ayjlz-bash-5.2p32-doc",
-        "info": "/nix/store/a8f97v60r829vp724nlkqfnk036rif7b-bash-5.2p32-info",
-        "man": "/nix/store/v76rk8m1d1wm4rrygfsgfkkxfz9hahkp-bash-5.2p32-man",
-        "out": "/nix/store/4bj2kxdm1462fzcc2i2s4dn33g2angcc-bash-5.2p32"
+        "debug": "/nix/store/kxpifz480zsgjiwnm85rcxz7y44grp0a-bash-5.2p32-debug",
+        "dev": "/nix/store/vdrbdfmknwi7ab89wqdk7am1qjjkidl7-bash-5.2p32-dev",
+        "doc": "/nix/store/k4ahxnl4j78yk0m8zawnh80b7xfz17hq-bash-5.2p32-doc",
+        "info": "/nix/store/kr02rv1zaqc5srs8zsc279jirfd5q3cx-bash-5.2p32-info",
+        "man": "/nix/store/07fbcsqwmjh5p9cf2asfqhispyxf5y6q-bash-5.2p32-man",
+        "out": "/nix/store/717iy55ncqs0wmhdkwc5fg2vci5wbmq8-bash-5.2p32"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "bash",
+      "broken": false,
+      "derivation": "/nix/store/pikkzpl8hwbr6xkvm11l7jmi6q7jkzwx-bash-5.2p32.drv",
+      "description": "GNU Bourne-Again Shell, the de facto standard shell on Linux",
+      "install_id": "bash",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "bash-5.2p32",
+      "pname": "bash",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "5.2p32",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "dev": "/nix/store/34zrv25dm92aki051021dy3pdnarkfsq-bash-5.2p32-dev",
+        "doc": "/nix/store/3bbbwqc8a1cdsxmqj8qj9s44ygfv1njl-bash-5.2p32-doc",
+        "info": "/nix/store/qxvcjk83harmrdl9rd979gw6abcngfm7-bash-5.2p32-info",
+        "man": "/nix/store/slmnkld3ymlk3md7j6jl6jjz8c87fs8r-bash-5.2p32-man",
+        "out": "/nix/store/m32rsgpxqpnc674ayk60iarj68s5q9lp-bash-5.2p32"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/w4r9gl4znc24ippzsaidxa2nakj47ddj-curl-8.9.1.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "curl-8.9.1",
+      "pname": "curl",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.9.1",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/jwyikhivayg1cnhq8dy396gafw2p7nzc-curl-8.9.1-bin",
+        "dev": "/nix/store/vcj58ndz7fxjpsl40g646nwnrg3g5h4w-curl-8.9.1-dev",
+        "devdoc": "/nix/store/hkpdd9na2pj9cq52xx285hzvhvp81hag-curl-8.9.1-devdoc",
+        "man": "/nix/store/260af9ihhfmf43yx7xyhnpg3qbif95pn-curl-8.9.1-man",
+        "out": "/nix/store/8a3dyq9kd9scbsqagfcasv3rkq749c60-curl-8.9.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/2qi5mprrbbc38prrckwhvx0jdclsj9s9-curl-8.9.1.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "curl-8.9.1",
+      "pname": "curl",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.9.1",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/20v3m4bkkkhq8pgjwccnpc1cy2r16g3s-curl-8.9.1-bin",
+        "debug": "/nix/store/brl478nbjmjlhrc6fgwy0570c5rvr57w-curl-8.9.1-debug",
+        "dev": "/nix/store/4rpmwdvmsrlxrfsrdr0qk3jf00sn48sh-curl-8.9.1-dev",
+        "devdoc": "/nix/store/xb866d2r4y5h1y8hk966srfpiq37pxra-curl-8.9.1-devdoc",
+        "man": "/nix/store/k6sxbdr652d0kxy1c39v5mgfsb5ayw9s-curl-8.9.1-man",
+        "out": "/nix/store/h2x0xrfq3iqfn6anb3hld7h3k0dgsj3x-curl-8.9.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/9gkavlzg7dckdz8b22m7a53ijdf08nvl-curl-8.9.1.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "curl-8.9.1",
+      "pname": "curl",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.9.1",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/mm852m65blp3r7jq3iqyp8nnc64jw1l4-curl-8.9.1-bin",
+        "debug": "/nix/store/kwap1vwmmlfwr0s45cb0lgz77knjqgmq-curl-8.9.1-debug",
+        "dev": "/nix/store/m8kn1aq1ralckmqfdhl147ql9lpad2ky-curl-8.9.1-dev",
+        "devdoc": "/nix/store/r1937djiayiws99hwh74jlsnxyip0r1g-curl-8.9.1-devdoc",
+        "man": "/nix/store/fzazy0ib1w9mrsrd8fqv2p02z4r1689v-curl-8.9.1-man",
+        "out": "/nix/store/czkqnm2prg7lrhxpi7s04yv19xxkkfb5-curl-8.9.1"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -183,119 +329,61 @@
     {
       "attr_path": "curl",
       "broken": false,
-      "derivation": "/nix/store/7x8c1hykfyyh0zqwndq733b61a8s816j-curl-8.9.0.drv",
+      "derivation": "/nix/store/qd5ilvd0mw5q7gkqgf83z88agz6jyfl7-curl-8.9.1.drv",
       "description": "Command line tool for transferring files with URL syntax",
       "install_id": "curl",
       "license": "curl",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "name": "curl-8.9.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "curl-8.9.1",
       "pname": "curl",
-      "rev": "c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "rev_count": 669741,
-      "rev_date": "2024-08-21T07:22:56Z",
-      "scrape_date": "2024-08-23T05:11:04Z",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
       "unfree": false,
-      "version": "8.9.0",
+      "version": "8.9.1",
       "outputs_to_install": [
         "bin",
         "man"
       ],
       "outputs": {
-        "bin": "/nix/store/c8zjxnirrs9w62rh5mnzd54rx9w31zai-curl-8.9.0-bin",
-        "dev": "/nix/store/96h80z8vhdh6m71n74dxqc27vf7l542d-curl-8.9.0-dev",
-        "devdoc": "/nix/store/wlpdpn2y8p4xi37dmbgvsvfb9midqj90-curl-8.9.0-devdoc",
-        "man": "/nix/store/s7mcf5vjgqzfvpscw8s182v8vf6c2q95-curl-8.9.0-man",
-        "out": "/nix/store/q4j78718q8lsqavm0jjh2qzfd4jq94vd-curl-8.9.0"
+        "bin": "/nix/store/mpx4ws0xbllyqljfs2fi3ghdawg9jkza-curl-8.9.1-bin",
+        "dev": "/nix/store/h0y0vlbw3nclay3h5g6cslbavpnzgwxp-curl-8.9.1-dev",
+        "devdoc": "/nix/store/halagx6ybkdyavmxpj11qq7j9d0hljfd-curl-8.9.1-devdoc",
+        "man": "/nix/store/h014hmwi97j892zjxcchm2gzkgw7bj56-curl-8.9.1-man",
+        "out": "/nix/store/iafphqafhksq4wil0amk9nxrd757zfdp-curl-8.9.1"
       },
-      "system": "aarch64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "curl",
-      "broken": false,
-      "derivation": "/nix/store/kzqvhqg6bzgdppxv2cmnkp4vabxx1hiz-curl-8.9.0.drv",
-      "description": "Command line tool for transferring files with URL syntax",
-      "install_id": "curl",
-      "license": "curl",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "name": "curl-8.9.0",
-      "pname": "curl",
-      "rev": "c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "rev_count": 669741,
-      "rev_date": "2024-08-21T07:22:56Z",
-      "scrape_date": "2024-08-23T05:11:04Z",
-      "unfree": false,
-      "version": "8.9.0",
-      "outputs_to_install": [
-        "bin",
-        "man"
-      ],
-      "outputs": {
-        "bin": "/nix/store/kl8rbmykp9qxr9kf0kxbm17zkca3v370-curl-8.9.0-bin",
-        "debug": "/nix/store/d860jgqwk43jhg7x1b2aq4c30xx23wli-curl-8.9.0-debug",
-        "dev": "/nix/store/pliq1d472pvylaf4gln7nflscghgndhs-curl-8.9.0-dev",
-        "devdoc": "/nix/store/gaq5wfqpv8civ3v0g58l6h65wbji14vr-curl-8.9.0-devdoc",
-        "man": "/nix/store/348y0w2ffkwf28fyj316798bk979bajr-curl-8.9.0-man",
-        "out": "/nix/store/f389sfk00in6l1hvq6jhbnysy0p4l0mg-curl-8.9.0"
-      },
-      "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "curl",
-      "broken": false,
-      "derivation": "/nix/store/hcgvklb47frrn2lszxbga772zmrsw282-curl-8.9.0.drv",
-      "description": "Command line tool for transferring files with URL syntax",
-      "install_id": "curl",
-      "license": "curl",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "name": "curl-8.9.0",
-      "pname": "curl",
-      "rev": "c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "rev_count": 669741,
-      "rev_date": "2024-08-21T07:22:56Z",
-      "scrape_date": "2024-08-23T05:11:04Z",
-      "unfree": false,
-      "version": "8.9.0",
-      "outputs_to_install": [
-        "bin",
-        "man"
-      ],
-      "outputs": {
-        "bin": "/nix/store/fv44n5lc7kgz8ivpqzyd857whggdfy17-curl-8.9.0-bin",
-        "debug": "/nix/store/8py8g44fwn1ssp3i576rr6wmnw48wnaw-curl-8.9.0-debug",
-        "dev": "/nix/store/wsv4nk804b2gwglgzvgwp8h4xqjk23xh-curl-8.9.0-dev",
-        "devdoc": "/nix/store/prd1afjz6nr2dmzdhxkrndy74whccf0q-curl-8.9.0-devdoc",
-        "man": "/nix/store/8md42r901syamn55rsi16bb7kxf7g384-curl-8.9.0-man",
-        "out": "/nix/store/n6sn7yf3kkc0hh463w74gi6lj51p3cdc-curl-8.9.0"
-      },
-      "system": "x86_64-linux",
+      "system": "x86_64-darwin",
       "group": "toplevel",
       "priority": 5
     },
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/r31lkf3q1qcmam9zmljm5a1cy3hmxycy-gum-0.14.3.drv",
+      "derivation": "/nix/store/d6kkfkqypl6igsgs5x1gmjyg47pm0izw-gum-0.14.5.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "name": "gum-0.14.3",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "gum-0.14.5",
       "pname": "gum",
-      "rev": "c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "rev_count": 669741,
-      "rev_date": "2024-08-21T07:22:56Z",
-      "scrape_date": "2024-08-23T05:11:04Z",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
       "unfree": false,
-      "version": "0.14.3",
+      "version": "0.14.5",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/rkf4cn71s3pd82b6rfn2q0nb8vl4h4qv-gum-0.14.3"
+        "out": "/nix/store/s4yb9a7cvj5vd5yw0nvssf51lmpa5id0-gum-0.14.5"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -304,24 +392,27 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/zzg6lwbs7cg89102324yfy01qiqbvxfq-gum-0.14.3.drv",
+      "derivation": "/nix/store/6ksswsqaa8n58vgyk3b3zxjky1w2l3a2-gum-0.14.5.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "name": "gum-0.14.3",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "gum-0.14.5",
       "pname": "gum",
-      "rev": "c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "rev_count": 669741,
-      "rev_date": "2024-08-21T07:22:56Z",
-      "scrape_date": "2024-08-23T05:11:04Z",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
       "unfree": false,
-      "version": "0.14.3",
+      "version": "0.14.5",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/5mx01pjljxp7xynjgjvygbxs4czq0k61-gum-0.14.3"
+        "out": "/nix/store/bw0ii1jjvxd8albrmvi0lin6h1ssz4yi-gum-0.14.5"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -330,50 +421,85 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/r6z929bbgcgxmn42ydana6xhgvl8qq50-gum-0.14.3.drv",
+      "derivation": "/nix/store/czi4h4p0rvcm366d7pwz4jg4da2197sn-gum-0.14.5.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "name": "gum-0.14.3",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "gum-0.14.5",
       "pname": "gum",
-      "rev": "c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "rev_count": 669741,
-      "rev_date": "2024-08-21T07:22:56Z",
-      "scrape_date": "2024-08-23T05:11:04Z",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
       "unfree": false,
-      "version": "0.14.3",
+      "version": "0.14.5",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/6abhjsvq4z61y1v16l2y9fbcd6kdwc6w-gum-0.14.3"
+        "out": "/nix/store/kma26ygxqp39pm6fl32yjach0czasc3j-gum-0.14.5"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "ollama",
+      "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/aldcj085lgmncj4pfdggvj7d7k05r8j4-ollama-0.3.5.drv",
-      "description": "Get up and running with large language models locally",
-      "install_id": "ollama",
+      "derivation": "/nix/store/4fhj185pacdd14ysvix8r7yb8qn6ypkr-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "name": "ollama-0.3.5",
-      "pname": "ollama",
-      "rev": "c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "rev_count": 669741,
-      "rev_date": "2024-08-21T07:22:56Z",
-      "scrape_date": "2024-08-23T05:11:04Z",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
       "unfree": false,
-      "version": "0.3.5",
+      "version": "0.14.5",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/9v27wavfppd684ppv1mnigasxxiza756-ollama-0.3.5"
+        "out": "/nix/store/zidlqhd8qq8wljvm38j1j4izx8ww7aps-gum-0.14.5"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "ollama",
+      "broken": false,
+      "derivation": "/nix/store/5p1k08dagbg5xsmjxvi4xx4mdllsy3n4-ollama-0.3.12.drv",
+      "description": "Get up and running with large language models locally",
+      "install_id": "ollama",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "ollama-0.3.12",
+      "pname": "ollama",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.3.12",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/7i5zadmvk0fxdfrm1bvdvpscdhy2psa1-ollama-0.3.12"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -382,24 +508,27 @@
     {
       "attr_path": "ollama",
       "broken": false,
-      "derivation": "/nix/store/f1j9j0g9bqz00404sj7xmsqmw1n1fcy2-ollama-0.3.5.drv",
+      "derivation": "/nix/store/jwg30vljziikn47hi8w5c2366lq3b6iv-ollama-0.3.12.drv",
       "description": "Get up and running with large language models locally",
       "install_id": "ollama",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "name": "ollama-0.3.5",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "ollama-0.3.12",
       "pname": "ollama",
-      "rev": "c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "rev_count": 669741,
-      "rev_date": "2024-08-21T07:22:56Z",
-      "scrape_date": "2024-08-23T05:11:04Z",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
       "unfree": false,
-      "version": "0.3.5",
+      "version": "0.3.12",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/3ww2nbsf61ag7pw71dnqbqvk637c9qdf-ollama-0.3.5"
+        "out": "/nix/store/lwxg7cdl346xjmih26hbr0vci0anpz16-ollama-0.3.12"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -408,130 +537,203 @@
     {
       "attr_path": "ollama",
       "broken": false,
-      "derivation": "/nix/store/0c2i7di39n8an35nxasaaiya6f6byfik-ollama-0.3.5.drv",
+      "derivation": "/nix/store/kqpbhvm40h8q26qlimsskxk8gxcjv0br-ollama-0.3.12.drv",
       "description": "Get up and running with large language models locally",
       "install_id": "ollama",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "name": "ollama-0.3.5",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "ollama-0.3.12",
       "pname": "ollama",
-      "rev": "c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "rev_count": 669741,
-      "rev_date": "2024-08-21T07:22:56Z",
-      "scrape_date": "2024-08-23T05:11:04Z",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
       "unfree": false,
-      "version": "0.3.5",
+      "version": "0.3.12",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/sm5yn3dmv5wm940xszfhy2w0i7hfbv77-ollama-0.3.5"
+        "out": "/nix/store/9ls7738xdnjcmjpi6ijpk21wm4awjq6i-ollama-0.3.12"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "python310",
+      "attr_path": "ollama",
       "broken": false,
-      "derivation": "/nix/store/lrb1ksx0jasj1fzmfqx41lsprqz6942n-python3-3.10.14.drv",
-      "description": "High-level dynamically-typed programming language",
-      "install_id": "python310",
-      "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "name": "python3-3.10.14",
-      "pname": "python310",
-      "rev": "c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "rev_count": 669741,
-      "rev_date": "2024-08-21T07:22:56Z",
-      "scrape_date": "2024-08-23T05:11:04Z",
+      "derivation": "/nix/store/r49r6a78gawsqfby01r8hk1z551sbad0-ollama-0.3.12.drv",
+      "description": "Get up and running with large language models locally",
+      "install_id": "ollama",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "ollama-0.3.12",
+      "pname": "ollama",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
       "unfree": false,
-      "version": "python3-3.10.14",
+      "version": "0.3.12",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/1l73sya48bffkjv10rf7fcn3nvnz1zvl-python3-3.10.14"
+        "out": "/nix/store/f35r6q1dr4j2vjr203kgkrgx03zygi33-ollama-0.3.12"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311",
+      "broken": false,
+      "derivation": "/nix/store/vxczacs70w7kxr4gyp3rpx7c83rqpw8g-python3-3.11.10.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "python3-3.11.10",
+      "pname": "python311",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3-3.11.10",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/nixf1pwf0irygcdk81xh4lz7zfa2k06y-python3-3.11.10"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "python310",
+      "attr_path": "python311",
       "broken": false,
-      "derivation": "/nix/store/9hghr4d4k1w7ipvsv8ydl71ilsqqgdpd-python3-3.10.14.drv",
+      "derivation": "/nix/store/6ba2vxwzchsj8zjmb1ys0760s3vxm747-python3-3.11.10.drv",
       "description": "High-level dynamically-typed programming language",
-      "install_id": "python310",
+      "install_id": "python",
       "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "name": "python3-3.10.14",
-      "pname": "python310",
-      "rev": "c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "rev_count": 669741,
-      "rev_date": "2024-08-21T07:22:56Z",
-      "scrape_date": "2024-08-23T05:11:04Z",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "python3-3.11.10",
+      "pname": "python311",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
       "unfree": false,
-      "version": "python3-3.10.14",
+      "version": "python3-3.11.10",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "debug": "/nix/store/zccb88kbi1scvs2rqkza6b81j3vw1sia-python3-3.10.14-debug",
-        "out": "/nix/store/fa9jr4mkdnmn0m5f41yzwx8qba7mmzsz-python3-3.10.14"
+        "debug": "/nix/store/b5jmgp4kirkb1ndm13l5icval34hl75d-python3-3.11.10-debug",
+        "out": "/nix/store/k5457x40win21kxxqdff2771hrpbiwfh-python3-3.11.10"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "python310",
+      "attr_path": "python311",
       "broken": false,
-      "derivation": "/nix/store/3aqw6396x44wr6dsprxfm4ck6j2q101r-python3-3.10.14.drv",
+      "derivation": "/nix/store/ybq8dz3fsw31kw2wsmwyc2wmzn81vg08-python3-3.11.10.drv",
       "description": "High-level dynamically-typed programming language",
-      "install_id": "python310",
+      "install_id": "python",
       "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "name": "python3-3.10.14",
-      "pname": "python310",
-      "rev": "c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "rev_count": 669741,
-      "rev_date": "2024-08-21T07:22:56Z",
-      "scrape_date": "2024-08-23T05:11:04Z",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "python3-3.11.10",
+      "pname": "python311",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
       "unfree": false,
-      "version": "python3-3.10.14",
+      "version": "python3-3.11.10",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "debug": "/nix/store/k5p6bi63nzhydp2srm86kzsky8arwyfm-python3-3.10.14-debug",
-        "out": "/nix/store/25j36x4pjsn1sr3597gppa7sdn2c2v0n-python3-3.10.14"
+        "debug": "/nix/store/b1qysg4jpcl4vhqpa32hfvgny2zf1p88-python3-3.11.10-debug",
+        "out": "/nix/store/0bygl9k94j0xkxq7cmxnpqdqf8va5k7j-python3-3.11.10"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "weaviate",
+      "attr_path": "python311",
       "broken": false,
-      "derivation": "/nix/store/x81zkwdq6akd4qkgavl2c2kfj5a85g5x-weaviate-1.25.9.drv",
-      "description": "ML-first vector search engine",
-      "install_id": "weaviate",
-      "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "name": "weaviate-1.25.9",
-      "pname": "weaviate",
-      "rev": "c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "rev_count": 669741,
-      "rev_date": "2024-08-21T07:22:56Z",
-      "scrape_date": "2024-08-23T05:11:04Z",
+      "derivation": "/nix/store/lf4rg4wc8z9v2iw17c1avdqwv266vykc-python3-3.11.10.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "python3-3.11.10",
+      "pname": "python311",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
       "unfree": false,
-      "version": "1.25.9",
+      "version": "python3-3.11.10",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/s3p1dlraid0svng67j7npwnsqipw3kay-weaviate-1.25.9"
+        "out": "/nix/store/fpxwlwmhwha4krcipji4f4cbq30v75jl-python3-3.11.10"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "weaviate",
+      "broken": false,
+      "derivation": "/nix/store/2dvsxh0zmjpg956m1b6z89kcmmdb19cm-weaviate-1.26.6.drv",
+      "description": "ML-first vector search engine",
+      "install_id": "weaviate",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "weaviate-1.26.6",
+      "pname": "weaviate",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.26.6",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/w51p01ajy4nksmy2vb0mn6xp0zc24kyf-weaviate-1.26.6"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -540,24 +742,27 @@
     {
       "attr_path": "weaviate",
       "broken": false,
-      "derivation": "/nix/store/qy89q18dsrs7z7az9rfswn0v3ramlz4l-weaviate-1.25.9.drv",
+      "derivation": "/nix/store/sy6ghzz4vvl20r1anig1vpklv5x211jk-weaviate-1.26.6.drv",
       "description": "ML-first vector search engine",
       "install_id": "weaviate",
       "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "name": "weaviate-1.25.9",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "weaviate-1.26.6",
       "pname": "weaviate",
-      "rev": "c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "rev_count": 669741,
-      "rev_date": "2024-08-21T07:22:56Z",
-      "scrape_date": "2024-08-23T05:11:04Z",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
       "unfree": false,
-      "version": "1.25.9",
+      "version": "1.26.6",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/chkxkhl8s4gvjb8dip8zpx3v8swwc3d3-weaviate-1.25.9"
+        "out": "/nix/store/lb0dh8v8dp19zn6wqmc32nnsfq47b124-weaviate-1.26.6"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -566,26 +771,58 @@
     {
       "attr_path": "weaviate",
       "broken": false,
-      "derivation": "/nix/store/28an6l5fkg1ljx7v7xp2vby9wzv5p1k5-weaviate-1.25.9.drv",
+      "derivation": "/nix/store/r4xsxrv0kvyh7f9hlgvxzyvf99qf4ijs-weaviate-1.26.6.drv",
       "description": "ML-first vector search engine",
       "install_id": "weaviate",
       "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "name": "weaviate-1.25.9",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "weaviate-1.26.6",
       "pname": "weaviate",
-      "rev": "c374d94f1536013ca8e92341b540eba4c22f9c62",
-      "rev_count": 669741,
-      "rev_date": "2024-08-21T07:22:56Z",
-      "scrape_date": "2024-08-23T05:11:04Z",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
       "unfree": false,
-      "version": "1.25.9",
+      "version": "1.26.6",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/zgmk7fa5x324dx2bl9h5m2bfad5wd9hl-weaviate-1.25.9"
+        "out": "/nix/store/qdlxm7wsbxy41jmdh07x4z9g8p5abisd-weaviate-1.26.6"
       },
       "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "weaviate",
+      "broken": false,
+      "derivation": "/nix/store/02hwwwm0392bajb5bd4h23bff2p0xmbr-weaviate-1.26.6.drv",
+      "description": "ML-first vector search engine",
+      "install_id": "weaviate",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "weaviate-1.26.6",
+      "pname": "weaviate",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.26.6",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/k3f5ky096vxbmmdsvkfwnkgzwxxpgi34-weaviate-1.26.6"
+      },
+      "system": "x86_64-darwin",
       "group": "toplevel",
       "priority": 5
     }
