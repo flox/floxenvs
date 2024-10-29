@@ -41,9 +41,9 @@
 
           # copy self/nb into temp dir
           export TESTDIR="$(mktemp -d --suffix floxenvs-${name}-example)"
-          cp -R ${path}/* $TESTDIR
-          cp -R ${path}/.flox* $TESTDIR
-          cp -R ${path}/.env* $TESTDIR
+          cp -fR ${path}/* $TESTDIR
+          cp -fR ${path}/.flox* $TESTDIR
+          cp -fR ${path}/.env* $TESTDIR
           chown -R $(whoami) $TESTDIR/.flox*
           chmod -R +w $TESTDIR/.flox*
 
