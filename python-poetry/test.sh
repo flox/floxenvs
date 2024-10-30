@@ -19,3 +19,4 @@ echo ">>> pyjokes python package installed"
 
 pyjokes
 echo ">>> pyjokes binary works"
+
