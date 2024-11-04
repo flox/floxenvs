@@ -1,0 +1,408 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "version": 1,
+    "install": {
+      "gum": {
+        "pkg-path": "gum"
+      },
+      "poetry": {
+        "pkg-path": "poetry"
+      },
+      "python": {
+        "pkg-path": "python3",
+        "version": "3.12.5"
+      }
+    },
+    "hook": {
+      "on-activate": "\nexport FLOX_PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\nexport FLOX_PYTHON_CONFIG=\"$FLOX_ENV_CACHE/python/env.config\"\nexport FLOX_PYTHON_RESET=\"${FLOX_PYTHON_RESET:-0}\"\n\nfunction indent() {\n  echo -e '{{ Foreground \"#cccccc\" \" │ \"}}' | \\\n    gum format -t template --theme=auto\n}\n\nwith_spinner() {\n  if [[ \"$FLOX_ENVS_TESTING\" == \"1\" ]]; then\n    bash -c \"$1\"\n  else\n    echo\n    gum spin \\\n      --show-error \\\n      --spinner line \\\n      --spinner.foreground=\"#cccccc\" \\\n      --title \" >>> $2 ...\" \\\n      --title.foreground=\"#cccccc\" \\\n        -- bash -c \"$1\"\n    echo -en \"\\033[2A\\033[K\"\n  fi\n}\n\n\nfunction configure() {\n\n  indent && echo\n  indent && echo -e '{{ Bold (Foreground \"212\" \"Configure Python environment\") }}\\n' \\\n    | gum format -t template\n  indent && echo\n\n\n  export FLOX_PYTHON_VERSIONS=$(\n    flox show python3 \\\n      | rg '^    python3@' \\\n      | cut -d' ' -f5 \\\n      | rg -v '^python3@3.8' \\\n      | sed -e 's|^python3@||'\n  )\n\n  export FLOX_PYTHON_VERSION=$(\n    gum filter \\\n      --limit 1 \\\n      --height 8 \\\n      --prompt=\" │   > \" \\\n      --prompt.foreground=\"#cccccc\" \\\n      --indicator.foreground=\"#ffffff\" \\\n      --selected-indicator.foreground=\"#ffffff\" \\\n      --cursor-text.foreground=\"#ffffff\" \\\n      --text.foreground=\"#cccccc\"  \\\n      --placeholder=\"Select PYTHON version...\" \\\n      --indicator=\" │   •\" \\\n      --header.foreground=\"#cccccc\" \\\n      --header \" │  • [1/3] PYTHON VERSION:\" \\\n        $FLOX_PYTHON_VERSIONS\n  )\n  indent && echo -e '{{ Foreground \"#ffffff\" \"✅ [1/3] PYTHON VERSION: \" }}' \\\n    | gum format -t template\n  echo $FLOX_PYTHON_VERSION\n\n\n  export FLOX_PYTHON_PACKAGE_MANAGER=$(\n    gum choose \\\n      --header=\" │  • [2/3] Package manager:\" \\\n      --header.foreground=\"#cccccc\" \\\n      --cursor=\" │   > \" \\\n      --cursor.foreground=\"#ffffff\" \\\n      --selected.foreground=\"#ffffff\" \\\n        \"pip\" \"poetry\" \"uv\"\n  )\n  indent && echo -e '{{ Foreground \"#ffffff\" \"✅ [2/3] PACKAGE MANAGER: \" }}' \\\n    | gum format -t template\n  echo $FLOX_PYTHON_PACKAGE_MANAGER\n\n\n  export FLOX_PYTHON_AUTO_INSTALL=$(\n    gum choose \\\n      --header=\" │  • [3/3] Auto install python packages:\" \\\n      --header.foreground=\"#cccccc\" \\\n      --cursor=\" │   > \" \\\n      --cursor.foreground=\"#ffffff\" \\\n      --selected.foreground=\"#ffffff\" \\\n        \"Yes\" \"No\"\n  )\n  indent && echo -e '{{ Foreground \"#ffffff\" \"✅ [3/3] AUTO INSTALL PACKAGES: \" }}' \\\n    | gum format -t template\n  echo $FLOX_PYTHON_AUTO_INSTALL\n\n  # Persist config\n  mkdir -p \"$(dirname \"$FLOX_PYTHON_CONFIG\")\"\n  rm -f \"$FLOX_PYTHON_CONFIG\"\n  echo \"FLOX_PYTHON_VERSION=\\\"$FLOX_PYTHON_VERSION\\\"\" >> \"$FLOX_PYTHON_CONFIG\"\n  echo \"FLOX_PYTHON_PACKAGE_MANAGER=\\\"$FLOX_PYTHON_PACKAGE_MANAGER\\\"\" >> \"$FLOX_PYTHON_CONFIG\"\n  echo \"FLOX_PYTHON_AUTO_INSTALL=\\\"$FLOX_PYTHON_AUTO_INSTALL\\\"\" >> \"$FLOX_PYTHON_CONFIG\"\n\n}\n\ninstall_python() {\n  flox install --id python python3@$FLOX_PYTHON_VERSION\n}\nexport -f install_python\n\ninstall_package_manager() {\n  case \"$FLOX_PYTHON_PACKAGE_MANAGER\" in\n    \"uv\")\n      flox install $FLOX_PYTHON_PACKAGE_MANAGER\n      ;;\n    \"poetry\")\n      flox install $FLOX_PYTHON_PACKAGE_MANAGER\n      ;;\n  esac\n}\nexport -f install_package_manager\n\nensure_venv() {\n  case \"$FLOX_PYTHON_PACKAGE_MANAGER\" in\n    \"uv\")\n      uv venv -p \"$FLOX_PYTHON_INTERPRETER\" \"$FLOX_PYTHON_VENV_PATH\"\n      ;;\n    \"pip\")\n      \"$FLOX_PYTHON_INTERPRETER\" -m venv --upgrade-deps \"$FLOX_PYTHON_VENV_PATH\"\n      \"$FLOX_PYTHON_VENV_PATH/bin/python\" -m ensurepip --upgrade\n      ;;\n    \"poetry\")\n      \"$FLOX_PYTHON_INTERPRETER\" -m venv --upgrade-deps \"$FLOX_PYTHON_VENV_PATH\"\n      ;;\n  esac\n  source \"$FLOX_PYTHON_VENV_PATH/bin/activate\"\n}\nexport -f ensure_venv\n\ninstall_packages() {\n  case \"$FLOX_PYTHON_PACKAGE_MANAGER\" in\n    \"uv\")\n      uv sync\n      ;;\n    \"pip\")\n      \"$FLOX_PYTHON_VENV_PATH/bin/pip\" install .\n      ;;\n    \"poetry\")\n      poetry install\n      ;;\n  esac\n}\nexport -f install_packages\n\n\nactivate() {\n\n  # Make sure any tools are not attempting to use the Python interpreter from any\n  # existing virtual environment.\n  unset VIRTUAL_ENV\n\n  indent && echo\n  indent && echo -e '{{ Bold (Foreground \"212\" \"Activate Python environment\") }}\\n' \\\n    | gum format -t template\n  indent && echo\n\n  #\n  # 1. ensure correct python version\n  #\n  if ! flox list | grep \"^python: python3\" &> /dev/null; then\n    with_spinner install_python \"Installing Python $FLOX_PYTHON_VERSION\"\n    indent && echo\n  fi\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ [1/4] Python $FLOX_PYTHON_VERSION installed.\\\" }}\\n\" \\\n    | gum format -t template\n\n  #\n  # 2. ensure correct package manager\n  #\n  if ! flox list | grep \"^$FLOX_PYTHON_PACKAGE_MANAGER: $FLOX_PYTHON_PACKAGE_MANAGER\" &> /dev/null; then\n    indent && echo\n    with_spinner install_package_manager \"Installing $FLOX_PYTHON_PACKAGE_MANAGER\"\n  fi\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ [2/4] $FLOX_PYTHON_PACKAGE_MANAGER installed.\\\" }}\\n\" \\\n    | gum format -t template\n\n  #\n  # 3. ensure virtual env exists (and activate it)\n  #\n  indent && echo\n  export FLOX_PYTHON_VENV_PATH=\"$FLOX_PYTHON_DIR/venv\"\n  export FLOX_PYTHON_VENV_INTERPRETER=\"$(cat \"$FLOX_PYTHON_DIR/venv.interpreter\" 2> /dev/null || echo false )\"\n  export FLOX_PYTHON_INTERPRETER=\"$(realpath $(which python3))\"\n  if [ \"$FLOX_PYTHON_VENV_INTERPRETER\" != \"$FLOX_PYTHON_INTERPRETER\" ]; then\n    with_spinner ensure_venv \"Creating virtual environment\"\n    indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ [3/4] Virtual environment was created.\\\" }}\\n\" \\\n      | gum format -t template\n  else\n    indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ [3/4] Virtual environment already exists.\\\" }}\\n\" \\\n      | gum format -t template\n  fi\n\n\n  # 4. (optional) install python packages\n  if [ \"$FLOX_PYTHON_AUTO_INSTALL\" == \"Yes\" ]; then\n    indent && echo\n    with_spinner install_packages \"Installing Python packages\"\n    indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ [4/4] Python packages installed.\\\" }}\\n\" \\\n      | gum format -t template\n  else\n    indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ [4/4] No need to install Python packages.\\\" }}\\n\" \\\n      | gum format -t template\n  fi\n\n  indent && echo\n}\n\n\n\nif [ ! -f \"$FLOX_PYTHON_CONFIG\" ] || [ \"$FLOX_PYTHON_RESET\" == \"1\" ]; then\n  configure\nelse\n  set -o allexport\n  source \"$FLOX_PYTHON_CONFIG\"\n  set +o allexport\nfi\n\nactivate\n\n"
+    },
+    "profile": {
+      "common": "#echo \"\"\n#echo \"     ╔═════════════════════════════════════╗\"\n#echo \"     ║                                     ║\"\n#echo \"     ║  Your python environment is ready!  ║\"\n#echo \"     ║                                     ║\"\n#echo \"     ╚═════════════════════════════════════╝\"\n#echo \"\"\n#",
+      "bash": "  source \"$FLOX_PYTHON_VENV_PATH/bin/activate\"\n",
+      "zsh": "  source \"$FLOX_PYTHON_VENV_PATH/bin/activate\"\n",
+      "fish": "  source \"$FLOX_PYTHON_VENV_PATH/bin/activate.fish\"\n",
+      "tcsh": "  source \"$FLOX_PYTHON_VENV_PATH/bin/activate.csh\"\n"
+    },
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-darwin",
+        "x86_64-linux"
+      ],
+      "allow": {
+        "licenses": []
+      },
+      "semver": {}
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/rf7qipzf7sani2690rkiprm4d0ikrypi-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "rev_count": 690827,
+      "rev_date": "2024-10-09T16:51:18Z",
+      "scrape_date": "2024-10-11T03:53:01Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/n1gqffrwdzr3vpsmwmwx3hmw814c1k6g-gum-0.14.5"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/igrp0rimwsnvj7l72iv0sagbbyn3kzqy-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "rev_count": 690827,
+      "rev_date": "2024-10-09T16:51:18Z",
+      "scrape_date": "2024-10-11T03:53:01Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ggp10jr3l6higs0gqibp6ypjlf7yakpc-gum-0.14.5"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/a93pnfn8q8r8kpgbkjn94x8mqa2vxc5g-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "rev_count": 690827,
+      "rev_date": "2024-10-09T16:51:18Z",
+      "scrape_date": "2024-10-11T03:53:01Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/jq8shghha81s1wg67fcjrfnf4hbliimn-gum-0.14.5"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/sxn2f2zrjhzi1b47qbp7llmww0gqz76v-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "rev_count": 690827,
+      "rev_date": "2024-10-09T16:51:18Z",
+      "scrape_date": "2024-10-11T03:53:01Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/f199acwir08z47f3d5kf1fhmhajmd1ig-gum-0.14.5"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "poetry",
+      "broken": false,
+      "derivation": "/nix/store/v8hfgyp97bbl8p9jhfk1zs4wkw74dc7c-python3.12-poetry-1.8.3.drv",
+      "description": "Python dependency management and packaging made easy",
+      "install_id": "poetry",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "name": "poetry-1.8.3",
+      "pname": "poetry",
+      "rev": "5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "rev_count": 690827,
+      "rev_date": "2024-10-09T16:51:18Z",
+      "scrape_date": "2024-10-11T03:53:01Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.8.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/s44zb723g0jxnhxl6llgaz9g9byj5wy5-python3.12-poetry-1.8.3-dist",
+        "out": "/nix/store/ckpa79sy4rj1pbplmp74sjx59nw8r4xp-python3.12-poetry-1.8.3"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "poetry",
+      "broken": false,
+      "derivation": "/nix/store/60b9h24sfna5hypl0giri0y8h9sf6gbv-python3.12-poetry-1.8.3.drv",
+      "description": "Python dependency management and packaging made easy",
+      "install_id": "poetry",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "name": "poetry-1.8.3",
+      "pname": "poetry",
+      "rev": "5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "rev_count": 690827,
+      "rev_date": "2024-10-09T16:51:18Z",
+      "scrape_date": "2024-10-11T03:53:01Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.8.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/m7c6ck6h18jxis7l1r4fiw8m0ml16rpq-python3.12-poetry-1.8.3-dist",
+        "out": "/nix/store/s1liys3nn0sh28k4izwqs1jiirrvnw79-python3.12-poetry-1.8.3"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "poetry",
+      "broken": false,
+      "derivation": "/nix/store/sg7f02w789icaal3df93i77ic0h9spjy-python3.12-poetry-1.8.3.drv",
+      "description": "Python dependency management and packaging made easy",
+      "install_id": "poetry",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "name": "poetry-1.8.3",
+      "pname": "poetry",
+      "rev": "5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "rev_count": 690827,
+      "rev_date": "2024-10-09T16:51:18Z",
+      "scrape_date": "2024-10-11T03:53:01Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.8.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/f53fclsrksrbfnk5ss1s5ydqxr52xbs0-python3.12-poetry-1.8.3-dist",
+        "out": "/nix/store/0xffpydiisn36savnslpzsqzrd8hnb08-python3.12-poetry-1.8.3"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "poetry",
+      "broken": false,
+      "derivation": "/nix/store/wd3lgs5r7gf9dcv1r4ycwdcpdwlg74wv-python3.12-poetry-1.8.3.drv",
+      "description": "Python dependency management and packaging made easy",
+      "install_id": "poetry",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "name": "poetry-1.8.3",
+      "pname": "poetry",
+      "rev": "5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "rev_count": 690827,
+      "rev_date": "2024-10-09T16:51:18Z",
+      "scrape_date": "2024-10-11T03:53:01Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.8.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/0yz46s47qaq6rph8sv17i7lx2d4vjrrf-python3.12-poetry-1.8.3-dist",
+        "out": "/nix/store/nccb1zw832cnd23k1jmv6l3r62njjs6l-python3.12-poetry-1.8.3"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python3",
+      "broken": false,
+      "derivation": "/nix/store/dzz3d11s5dqrnzfyhmq4fhf1q9ly3jlp-python3-3.12.5.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "name": "python3-3.12.5",
+      "pname": "python3",
+      "rev": "5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "rev_count": 690827,
+      "rev_date": "2024-10-09T16:51:18Z",
+      "scrape_date": "2024-10-11T03:53:01Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.12.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/9pj4rzx5pbynkkxq1srzwjhywmcfxws3-python3-3.12.5"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python3",
+      "broken": false,
+      "derivation": "/nix/store/1gcbmlprvgy00zgar9czh867sr0kfw8n-python3-3.12.5.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "name": "python3-3.12.5",
+      "pname": "python3",
+      "rev": "5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "rev_count": 690827,
+      "rev_date": "2024-10-09T16:51:18Z",
+      "scrape_date": "2024-10-11T03:53:01Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.12.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/xc4hygp28y7g1rvjf0vi7fj0d83a75pj-python3-3.12.5-debug",
+        "out": "/nix/store/6iq3nhgdyp8a5wzwf097zf2mn4zyqxr6-python3-3.12.5"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python3",
+      "broken": false,
+      "derivation": "/nix/store/dazm7qi0dvmjlf1kbjzq81ipbwqlmiij-python3-3.12.5.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "name": "python3-3.12.5",
+      "pname": "python3",
+      "rev": "5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "rev_count": 690827,
+      "rev_date": "2024-10-09T16:51:18Z",
+      "scrape_date": "2024-10-11T03:53:01Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.12.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ks8acr22s4iggnmvxydm5czl30racy32-python3-3.12.5"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python3",
+      "broken": false,
+      "derivation": "/nix/store/5k1b6g2qgy2a7kiis6snyidzryz6bljl-python3-3.12.5.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "name": "python3-3.12.5",
+      "pname": "python3",
+      "rev": "5633bcff0c6162b9e4b5f1264264611e950c8ec7",
+      "rev_count": 690827,
+      "rev_date": "2024-10-09T16:51:18Z",
+      "scrape_date": "2024-10-11T03:53:01Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.12.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/0a39pi2s6kxqc3kjjz2y9yzibd62zhhb-python3-3.12.5-debug",
+        "out": "/nix/store/h3i0acpmr8mrjx07519xxmidv8mpax4y-python3-3.12.5"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ]
+}

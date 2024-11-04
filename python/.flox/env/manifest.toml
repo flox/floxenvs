@@ -1,0 +1,281 @@
+version = 1
+
+[install]
+gum.pkg-path = "gum"
+python.pkg-path = "python3"
+python.version = "3.12.5"
+poetry.pkg-path = "poetry"
+
+#coreutils.pkg-path = "coreutils"
+
+#python.pkg-path = "python3"
+#python.version = "3.11.*"  # <-- Change this to the version of Python you want
+#poetry.pkg-path = "poetry"
+
+[vars]
+
+[hook]
+# Clear all output
+#echo -e "\033[K"
+#for i in $(seq 1 3); do
+#  echo -e "\033[2A\033[K"
+#done
+on-activate = '''
+
+export FLOX_PYTHON_DIR="$FLOX_ENV_CACHE/python"
+export FLOX_PYTHON_CONFIG="$FLOX_ENV_CACHE/python/env.config"
+export FLOX_PYTHON_RESET="${FLOX_PYTHON_RESET:-0}"
+
+function indent() {
+  echo -e '{{ Foreground "#cccccc" " │ "}}' | \
+    gum format -t template --theme=auto
+}
+
+with_spinner() {
+  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+    bash -c "$1"
+  else
+    echo
+    gum spin \
+      --show-error \
+      --spinner line \
+      --spinner.foreground="#cccccc" \
+      --title " >>> $2 ..." \
+      --title.foreground="#cccccc" \
+        -- bash -c "$1"
+    echo -en "\033[2A\033[K"
+  fi
+}
+
+
+function configure() {
+
+  indent && echo
+  indent && echo -e '{{ Bold (Foreground "212" "Configure Python environment") }}\n' \
+    | gum format -t template
+  indent && echo
+
+
+  export FLOX_PYTHON_VERSIONS=$(
+    flox show python3 \
+      | rg '^    python3@' \
+      | cut -d' ' -f5 \
+      | rg -v '^python3@3.8' \
+      | sed -e 's|^python3@||'
+  )
+
+  export FLOX_PYTHON_VERSION=$(
+    gum filter \
+      --limit 1 \
+      --height 8 \
+      --prompt=" │   > " \
+      --prompt.foreground="#cccccc" \
+      --indicator.foreground="#ffffff" \
+      --selected-indicator.foreground="#ffffff" \
+      --cursor-text.foreground="#ffffff" \
+      --text.foreground="#cccccc"  \
+      --placeholder="Select PYTHON version..." \
+      --indicator=" │   •" \
+      --header.foreground="#cccccc" \
+      --header " │  • [1/3] PYTHON VERSION:" \
+        $FLOX_PYTHON_VERSIONS
+  )
+  indent && echo -e '{{ Foreground "#ffffff" "✅ [1/3] PYTHON VERSION: " }}' \
+    | gum format -t template
+  echo $FLOX_PYTHON_VERSION
+
+
+  export FLOX_PYTHON_PACKAGE_MANAGER=$(
+    gum choose \
+      --header=" │  • [2/3] Package manager:" \
+      --header.foreground="#cccccc" \
+      --cursor=" │   > " \
+      --cursor.foreground="#ffffff" \
+      --selected.foreground="#ffffff" \
+        "pip" "poetry" "uv"
+  )
+  indent && echo -e '{{ Foreground "#ffffff" "✅ [2/3] PACKAGE MANAGER: " }}' \
+    | gum format -t template
+  echo $FLOX_PYTHON_PACKAGE_MANAGER
+
+
+  export FLOX_PYTHON_AUTO_INSTALL=$(
+    gum choose \
+      --header=" │  • [3/3] Auto install python packages:" \
+      --header.foreground="#cccccc" \
+      --cursor=" │   > " \
+      --cursor.foreground="#ffffff" \
+      --selected.foreground="#ffffff" \
+        "Yes" "No"
+  )
+  indent && echo -e '{{ Foreground "#ffffff" "✅ [3/3] AUTO INSTALL PACKAGES: " }}' \
+    | gum format -t template
+  echo $FLOX_PYTHON_AUTO_INSTALL
+
+  # Persist config
+  mkdir -p "$(dirname "$FLOX_PYTHON_CONFIG")"
+  rm -f "$FLOX_PYTHON_CONFIG"
+  echo "FLOX_PYTHON_VERSION=\"$FLOX_PYTHON_VERSION\"" >> "$FLOX_PYTHON_CONFIG"
+  echo "FLOX_PYTHON_PACKAGE_MANAGER=\"$FLOX_PYTHON_PACKAGE_MANAGER\"" >> "$FLOX_PYTHON_CONFIG"
+  echo "FLOX_PYTHON_AUTO_INSTALL=\"$FLOX_PYTHON_AUTO_INSTALL\"" >> "$FLOX_PYTHON_CONFIG"
+
+}
+
+install_python() {
+  flox install --id python python3@$FLOX_PYTHON_VERSION
+}
+export -f install_python
+
+install_package_manager() {
+  case "$FLOX_PYTHON_PACKAGE_MANAGER" in
+    "uv")
+      flox install $FLOX_PYTHON_PACKAGE_MANAGER
+      ;;
+    "poetry")
+      flox install $FLOX_PYTHON_PACKAGE_MANAGER
+      ;;
+  esac
+}
+export -f install_package_manager
+
+ensure_venv() {
+  case "$FLOX_PYTHON_PACKAGE_MANAGER" in
+    "uv")
+      uv venv -p "$FLOX_PYTHON_INTERPRETER" "$FLOX_PYTHON_VENV_PATH"
+      ;;
+    "pip")
+      "$FLOX_PYTHON_INTERPRETER" -m venv --upgrade-deps "$FLOX_PYTHON_VENV_PATH"
+      "$FLOX_PYTHON_VENV_PATH/bin/python" -m ensurepip --upgrade
+      ;;
+    "poetry")
+      "$FLOX_PYTHON_INTERPRETER" -m venv --upgrade-deps "$FLOX_PYTHON_VENV_PATH"
+      ;;
+  esac
+  source "$FLOX_PYTHON_VENV_PATH/bin/activate"
+}
+export -f ensure_venv
+
+install_packages() {
+  case "$FLOX_PYTHON_PACKAGE_MANAGER" in
+    "uv")
+      uv sync
+      ;;
+    "pip")
+      "$FLOX_PYTHON_VENV_PATH/bin/pip" install .
+      ;;
+    "poetry")
+      poetry install
+      ;;
+  esac
+}
+export -f install_packages
+
+
+activate() {
+
+  # Make sure any tools are not attempting to use the Python interpreter from any
+  # existing virtual environment.
+  unset VIRTUAL_ENV
+
+  indent && echo
+  indent && echo -e '{{ Bold (Foreground "212" "Activate Python environment") }}\n' \
+    | gum format -t template
+  indent && echo
+
+  #
+  # 1. ensure correct python version
+  #
+  if ! flox list | grep "^python: python3" &> /dev/null; then
+    with_spinner install_python "Installing Python $FLOX_PYTHON_VERSION"
+    indent && echo
+  fi
+  indent && echo -e "{{ Foreground \"#ffffff\" \"✅ [1/4] Python $FLOX_PYTHON_VERSION installed.\" }}\n" \
+    | gum format -t template
+
+  #
+  # 2. ensure correct package manager
+  #
+  if ! flox list | grep "^$FLOX_PYTHON_PACKAGE_MANAGER: $FLOX_PYTHON_PACKAGE_MANAGER" &> /dev/null; then
+    indent && echo
+    with_spinner install_package_manager "Installing $FLOX_PYTHON_PACKAGE_MANAGER"
+  fi
+  indent && echo -e "{{ Foreground \"#ffffff\" \"✅ [2/4] $FLOX_PYTHON_PACKAGE_MANAGER installed.\" }}\n" \
+    | gum format -t template
+
+  #
+  # 3. ensure virtual env exists (and activate it)
+  #
+  indent && echo
+  export FLOX_PYTHON_VENV_PATH="$FLOX_PYTHON_DIR/venv"
+  export FLOX_PYTHON_VENV_INTERPRETER="$(cat "$FLOX_PYTHON_DIR/venv.interpreter" 2> /dev/null || echo false )"
+  export FLOX_PYTHON_INTERPRETER="$(realpath $(which python3))"
+  if [ "$FLOX_PYTHON_VENV_INTERPRETER" != "$FLOX_PYTHON_INTERPRETER" ]; then
+    with_spinner ensure_venv "Creating virtual environment"
+    indent && echo -e "{{ Foreground \"#ffffff\" \"✅ [3/4] Virtual environment was created.\" }}\n" \
+      | gum format -t template
+  else
+    indent && echo -e "{{ Foreground \"#ffffff\" \"✅ [3/4] Virtual environment already exists.\" }}\n" \
+      | gum format -t template
+  fi
+
+
+  # 4. (optional) install python packages
+  if [ "$FLOX_PYTHON_AUTO_INSTALL" == "Yes" ]; then
+    indent && echo
+    with_spinner install_packages "Installing Python packages"
+    indent && echo -e "{{ Foreground \"#ffffff\" \"✅ [4/4] Python packages installed.\" }}\n" \
+      | gum format -t template
+  else
+    indent && echo -e "{{ Foreground \"#ffffff\" \"✅ [4/4] No need to install Python packages.\" }}\n" \
+      | gum format -t template
+  fi
+
+  indent && echo
+}
+
+
+
+if [ ! -f "$FLOX_PYTHON_CONFIG" ] || [ "$FLOX_PYTHON_RESET" == "1" ]; then
+  configure
+else
+  set -o allexport
+  source "$FLOX_PYTHON_CONFIG"
+  set +o allexport
+fi
+
+activate
+
+'''
+
+
+[profile]
+common = '''
+#echo ""
+#echo "     ╔═════════════════════════════════════╗"
+#echo "     ║                                     ║"
+#echo "     ║  Your python environment is ready!  ║"
+#echo "     ║                                     ║"
+#echo "     ╚═════════════════════════════════════╝"
+#echo ""
+#'''
+bash = '''
+  source "$FLOX_PYTHON_VENV_PATH/bin/activate"
+'''
+fish = '''
+  source "$FLOX_PYTHON_VENV_PATH/bin/activate.fish"
+'''
+tcsh = '''
+  source "$FLOX_PYTHON_VENV_PATH/bin/activate.csh"
+'''
+zsh = '''
+  source "$FLOX_PYTHON_VENV_PATH/bin/activate"
+'''
+
+
+[options]
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]

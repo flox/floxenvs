@@ -1,13 +1,15 @@
 # Example Flox Environments
 
+> WORKS
+
 ## Environments
 
 |      | Updated | Tested | FloxHub | Description |
 | :--- | :-----: | :----: | :-----: | :---------- |
 | |
 | **Languages:** |
-| `go`  | ✅ | ✅ | ✅ | |
-| `python-poetry`  | ✅ | ✅ | ✅ | Python environment using poerty |
+| `go`  | ✅ | ✅ | ✅ | Go environment |
+| `python`  | ✅ | ✅ | ✅ | Python environment |
 | `ruby`  | ✅ | ✅ | ✅ | Ruby environment |
 | `rust`  | ✅ | ✅ | ✅ | Rust environment |
 | **Databases:** |
