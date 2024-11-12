@@ -54,6 +54,7 @@ jobs:
       - "envs"
 
     strategy:
+      fail-fast: false
       max-parallel: 4
       matrix:
         include: ${{ fromJSON(needs.envs.outputs.envs) }}
