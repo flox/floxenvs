@@ -6,9 +6,15 @@
       "bun": {
         "pkg-path": "bun"
       },
+      "coreutils": {
+        "pkg-path": "coreutils"
+      },
       "gum": {
         "pkg-path": "gum"
       }
+    },
+    "vars": {
+      "NODE_ENV": "development"
     },
     "hook": {
       "on-activate": "\nexport FLOX_JAVASCRIPT_BUN_CACHE_DIR=\"$FLOX_ENV_CACHE/javascript-bun\"\nmkdir -p \"$FLOX_JAVASCRIPT_BUN_CACHE_DIR\"\n\nexport FLOX_JAVASCRIPT_BUN_PACKAGES_HASH_FILE=\"$FLOX_JAVASCRIPT_BUN_CACHE_DIR/packages-hash\"\n\nfunction with_spinner() {\n  if [[ \"$FLOX_ENVS_TESTING\" == \"1\" ]]; then\n    bash -c \"$1\"\n  else\n    gum spin \\\n      --show-error \\\n      --spinner line \\\n      --spinner.foreground=\"#cccccc\" \\\n      --title \">>> $2 ...\" \\\n      --title.foreground=\"#cccccc\" \\\n        -- bash -c \"$1\"\n  fi\n}\n\nfunction install_packages() { \n  bun install --frozen-lockfile\n}\nexport -f install_packages\n\n\nif [ -f \"package.json\" ] && [ -f \"bun.lockb\" ]; then\n  export FLOX_JAVASCRIPT_BUN_PACKAGES_HASH=\"false\"\n  if [ -f \"$FLOX_JAVASCRIPT_BUN_PACKAGES_HASH_FILE\" ] ; then\n    export FLOX_JAVASCRIPT_BUN_PACKAGES_HASH=$(cat package.json bun.lockb | sha256sum | cut -d\" \" -f 1)\n  fi\n  if [ \"$FLOX_JAVASCRIPT_BUN_PACKAGES_HASH\" != \"$(cat $FLOX_JAVASCRIPT_BUN_PACKAGES_HASH_FILE 2>/dev/null)\" ]; then\n    with_spinner install_packages \"Installing Javascript packages (with Bun)\"\n    echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Javascript packages installed (with Bun).\\\" }}\\n\" \\\n      | gum format -t template\n    echo \"$FLOX_JAVASCRIPT_BUN_PACKAGES_HASH\" > \"$FLOX_JAVASCRIPT_BUN_PACKAGES_HASH_FILE\"\n  fi\nfi\n"
@@ -109,6 +115,98 @@
       ],
       "outputs": {
         "out": "/nix/store/1xgl28bhcsvmw14vfyxlrb5qhmlzjifi-bun-1.1.29"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "coreutils",
+      "broken": false,
+      "derivation": "/nix/store/vfg938b84ynz7csm2skx674fx2xh7b5q-coreutils-9.5.drv",
+      "description": "GNU Core Utilities",
+      "install_id": "coreutils",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
+      "name": "coreutils-9.5",
+      "pname": "coreutils",
+      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
+      "rev_count": 695081,
+      "rev_date": "2024-10-20T08:35:21Z",
+      "scrape_date": "2024-10-23T03:58:08Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/8rnzj25fishm1d6z4y8b5lb86s45bkm1-coreutils-9.5-info",
+        "out": "/nix/store/b7j95xd7yccclshfln10k843q2qf20yg-coreutils-9.5"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "coreutils",
+      "broken": false,
+      "derivation": "/nix/store/wdai1c4vx0yr6avk96fjpsh27nq2h0fw-coreutils-9.5.drv",
+      "description": "GNU Core Utilities",
+      "install_id": "coreutils",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
+      "name": "coreutils-9.5",
+      "pname": "coreutils",
+      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
+      "rev_count": 695081,
+      "rev_date": "2024-10-20T08:35:21Z",
+      "scrape_date": "2024-10-23T03:58:08Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/05xfc02h42y6xs1giwgnvmkwp8x136hl-coreutils-9.5-debug",
+        "info": "/nix/store/gv411q70m9qx6754zvzpaw7vfnk37wrn-coreutils-9.5-info",
+        "out": "/nix/store/cqnb5spmpzvc32h16568s028frzvz8hs-coreutils-9.5"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "coreutils",
+      "broken": false,
+      "derivation": "/nix/store/9vqf51lf53y47mjxg58b66j3vzhpqgjg-coreutils-9.5.drv",
+      "description": "GNU Core Utilities",
+      "install_id": "coreutils",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
+      "name": "coreutils-9.5",
+      "pname": "coreutils",
+      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
+      "rev_count": 695081,
+      "rev_date": "2024-10-20T08:35:21Z",
+      "scrape_date": "2024-10-23T03:58:08Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/faxmahlbgdg3mz3mbgnmnn6sf5hsvcb8-coreutils-9.5-debug",
+        "info": "/nix/store/kb44yznfd4w4asrr6rsc3x4zm99nz426-coreutils-9.5-info",
+        "out": "/nix/store/ph44jcx3ddmlwh394mh1wb7f1qigxqb1-coreutils-9.5"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
