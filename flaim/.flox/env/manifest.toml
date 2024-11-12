@@ -1,11 +1,5 @@
-
-#
-# This is a flox environment manifest.
-# Visit flox.dev/docs/concepts/manifest/
-# or see flox-edit(1), manifest.toml(1) for more information.
-#
-
 version = 1
+
 
 [install]
 
@@ -24,104 +18,91 @@ transformers.version = "python3.11-transformers-4.45.2"
 sentencepiece.pkg-path = "python311Packages.sentencepiece"
 sentencepiece.version = "python3.11-sentencepiece-0.2.0"
 
-imgcat.pkg-path = "python311Packages.imgcat"
-imgcat.version = "python3.11-imgcat-0.5.0"
-
 gum.pkg-path = "gum"
 figlet.pkg-path = "toilet"
 
-jupyter.pkg-path = "python311Packages.jupyter"
+jupyterlab.pkg-path = "python311Packages.jupyterlab"
+ipywidgets.pkg-path = "python311Packages.ipywidgets"
+
 
 [vars]
-# Since we are managing our venv with Flox, there is no need to
-# be told about it in our prompt
-VIRTUAL_ENV_DISABLE_PROMPT="1"
-
-# These are example scripts that can be used later on to
-# generate a sample image and test acceleration
-
-generate_image="[(importlib := __import__('importlib')), (warnings := importlib.import_module('warnings')), warnings.filterwarnings('ignore'), (sys := importlib.import_module('sys')), (torch := importlib.import_module('torch')), (__ol_mod_cbtwjvbiot := __import__('imgcat', globals(), locals(), ['imgcat'], 0)), (imgcat := __ol_mod_cbtwjvbiot.imgcat), (__ol_mod_ambwamhbvl := __import__('diffusers', globals(), locals(), ['StableDiffusionPipeline'], 0)), (StableDiffusionPipeline := __ol_mod_ambwamhbvl.StableDiffusionPipeline), (__ol_mod_xshmfbhacj := __import__('diffusers', globals(), locals(), ['logging'], 0)), (logging := __ol_mod_xshmfbhacj.logging), logging.set_verbosity(50), logging.disable_progress_bar(), (pipe := StableDiffusionPipeline.from_pretrained('IDKiro/sdxs-512-0.9', torch_dtype=torch.float32)), pipe.to('cuda') if torch.cuda.is_available() else pipe.to('mps') if torch.backends.mps.is_available() else ..., (prompt := (sys.argv[1] if len(sys.argv) > 1 else 'a fox in a henhouse')), pipe.set_progress_bar_config(disable=True), (image := pipe(prompt=prompt, num_inference_steps=1, guidance_scale=0).images[0]), image.save(f'{prompt}.png'), imgcat(image)]"
-
-test_acceleration="[(importlib := __import__('importlib')), (warnings := importlib.import_module('warnings')), warnings.filterwarnings('ignore'), (torch := importlib.import_module('torch')), print('CUDA is available 🔥') if torch.cuda.is_available() else print('Metal is available 🍏') if torch.backends.mps.is_available() else print('I only see a CPU 😞')]"
-
 # This token will be used in the query string for our Jupyter
 # server. When you clone this environment for your own uses,
 # recommend using a proper Identity Provider.
 JUPYTER_SERVER_TOKEN    = "floxfan123456"
 
-[services.jupyter-server]
-command                 = "jupyter-server --IdentityProvider.token=${JUPYTER_SERVER_TOKEN} --ip=0.0.0.0"
+VIRTUAL_ENV_DISABLE_PROMPT="1"
+
+# These are example scripts that can be used later on to
+# generate a sample image and test acceleration
+
+generate_image="[(importlib := __import__('importlib')), (warnings := importlib.import_module('warnings')), warnings.filterwarnings('ignore'), (sys := importlib.import_module('sys')), (torch := importlib.import_module('torch')), (sixel := importlib.import_module('sixel')), (__ol_mod_tqgdpsmggw := __import__('io', globals(), locals(), ['BytesIO'], 0)), (BytesIO := __ol_mod_tqgdpsmggw.BytesIO), (__ol_mod_rdfadkcuju := __import__('diffusers', globals(), locals(), ['StableDiffusionPipeline'], 0)), (StableDiffusionPipeline := __ol_mod_rdfadkcuju.StableDiffusionPipeline), (__ol_mod_rrergazjfx := __import__('diffusers', globals(), locals(), ['logging'], 0)), (logging := __ol_mod_rrergazjfx.logging), (draw := (lambda image: [(__ol_retv_yarsjpxwtm := None), (buffer := BytesIO()), (writer := sixel.SixelWriter()), image.save(buffer, format='png'), writer.draw(buffer), __ol_retv_yarsjpxwtm][-1])), logging.set_verbosity(50), logging.disable_progress_bar(), (pipe := StableDiffusionPipeline.from_pretrained('IDKiro/sdxs-512-0.9', torch_dtype=torch.float32)), pipe.to('cuda') if torch.cuda.is_available() else pipe.to('mps') if torch.backends.mps.is_available() else ..., (prompt := (sys.argv[1] if len(sys.argv) > 1 else 'a fox in a henhouse')), pipe.set_progress_bar_config(disable=True), (image := pipe(prompt=prompt, num_inference_steps=1, guidance_scale=0).images[0]), image.save(f'{prompt}.png'), draw(image)]"
+
+test_acceleration="[(importlib := __import__('importlib')), (warnings := importlib.import_module('warnings')), warnings.filterwarnings('ignore'), (torch := importlib.import_module('torch')), print('CUDA is available 🔥') if torch.cuda.is_available() else print('Metal is available 🍏') if torch.backends.mps.is_available() else print('I only see a CPU 😞')]"
+
 
 [hook]
 on-activate = '''
+# If there is a requirements.txt file in the current directory,
+# let's make our venv in the same place. Otherwise, in the cache.
+if [[ -f requirements.txt ]]; then
+  export VENV_DIR='./.venv/'
+  req_text=1
+else
+  export VENV_DIR="$FLOX_ENV_CACHE/python"
+  req_text=0
+fi
 
-  # If there is a requirements.txt file in the current directory,
-  # let's make our venv in the same place. Otherwise, in the cache.
+
+# Make the venv if it does not already exist
+if [ ! -d "$VENV_DIR" ]; then
+  gum spin --spinner dot --title "Creating python venv in $VENV_DIR" -- python3 -m venv "$VENV_DIR"
+  if [ "$req_text" == "1" ]; then
+    echo "✅ Virtual environment created in $VENV_DIR"
+  fi
+fi
+
+# Install or update packages in the venv
+(
+  source "$VENV_DIR/bin/activate"
+  gum spin --spinner dot --title "Managing packages in $VENV_DIR" -- pip3 install --quiet sixel
   if [[ -f requirements.txt ]]; then
-    export VENV_DIR='./.venv/'
-    req_text=1
-  else
-    export VENV_DIR="$FLOX_ENV_CACHE/python"
-    req_text=0
+    gum spin --spinner dot --title "Managing packages in $VENV_DIR" -- pip3 install --quiet -r requirements.txt
   fi
+)
 
-
-  # Make the venv if it does not already exist
-  if [ ! -d "$VENV_DIR" ]; then
-    gum spin --spinner dot --title "Creating python venv in $VENV_DIR" -- python3 -m venv "$VENV_DIR"
-    if [ "$req_text" == "1" ]; then
-      echo "✅ Virtual environment created in $VENV_DIR"
-    fi
-  fi
-
-  # Install or update packages in the venv
-  (
-    source "$VENV_DIR/bin/activate"
-    gum spin --spinner dot --title "Managing packages in $VENV_DIR" -- pip3 install --quiet imgcat
-    if [[ -f requirements.txt ]]; then
-      gum spin --spinner dot --title "Managing packages in $VENV_DIR" -- pip3 install --quiet -r requirements.txt
-    fi
-  )
-
-  toilet -f smmono9 --metal "flaim"
-  echo ""
-  $FLOX_ENV/bin/python3 -c "$test_acceleration"
-  echo "Run 'testaccel' to retest acceleration."
-  echo "Run 'genimg <string>' for an image."
+toilet -f smmono9 --metal "flaim"
+echo ""
+$FLOX_ENV/bin/python3 -c "$test_acceleration"
+echo "Run 'testaccel' to retest acceleration."
+echo "Run 'genimg <string>' for an image."
 '''
+
 
 [profile]
-bash = '''
-  if [ -d "$VENV_DIR" ]; then
-    source "$VENV_DIR/bin/activate"
-  fi
+common = '''
+if [ -d "$VENV_DIR" ]; then source "$VENV_DIR/bin/activate"; fi
 
-  alias genimg="python3 -c \"$generate_image\""
-  alias testaccel="python3 -c \"$test_acceleration\""
+alias genimg="python3 -c \"$generate_image\""
+alias testaccel="python3 -c \"$test_acceleration\""
 
-  if [ "$FLOX_ACTIVATE_START_SERVICES" == "true" ]; then
-    echo
-    jupyter-notebook list
-    echo
-  fi
+if [[ "$FLOX_ACTIVATE_START_SERVICES" == "true" ]]; then
+  echo
+  sleep 1
+  jupyter-lab list
+  echo
+fi
 '''
 
-zsh = '''
-  if [ -d "$VENV_DIR" ]; then
-    source "$VENV_DIR/bin/activate"
-  fi
 
-  alias genimg="python3 -c \"$generate_image\""
-  alias testaccel="python3 -c \"$test_acceleration\""
+[services.jupyter-server]
+command = "jupyter-lab --IdentityProvider.token=${JUPYTER_SERVER_TOKEN} --ip=0.0.0.0"
 
-  if [[ "$FLOX_ACTIVATE_START_SERVICES" == "true" ]]; then
-    echo
-    jupyter-notebook list
-    echo
-  fi
-'''
 
 [options]
-systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]
-
-
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-linux",
+#  "x86_64-darwin",
+]

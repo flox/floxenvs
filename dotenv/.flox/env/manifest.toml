@@ -1,0 +1,22 @@
+version = 1
+
+[vars]
+DOTENV_FILE = ".env"
+
+[hook]
+on-activate = '''
+if [ -f "$DOTENV_FILE" ]; then
+  set -o allexport
+  source "$DOTENV_FILE"
+  set +o allexport
+  echo "✅ Environment variables loaded from '$DOTENV_FILE' file"
+fi
+'''
+
+[options]
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]
