@@ -34,7 +34,7 @@ jobs:
           envs_push="["
 
           update_all=${{ github.event_name == 'schedule' && 'true' || '' }}
-          if git diff --name-only HEAD~1 HEAD -- | grep -E "flake.nix|flake.lock|.github" ; then
+          if git diff --name-only ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || 'HEAD~1' }} HEAD -- | grep -E "flake.nix|flake.lock|.github" ; then
             echo "detected major change"
             update_all=true
           fi
@@ -90,7 +90,7 @@ jobs:
 
     strategy:
       fail-fast: false
-      max-parallel: 6
+      max-parallel: 8
       matrix:
         include: ${{ fromJSON(needs.envs.outputs.envs_test ) }}
 
