@@ -27,11 +27,10 @@ jobs:
             env_path=$(realpath -s $(dirname $path)/../..)
             if [ -f "$env_path/test.sh" ]; then
               name=$(basename $env_path)
+              if [ "$name" == "flaim" ]; then continue; fi
               num_of_services=$(yq -oy '.services | length' $path)
               start_services="true"
-              if [ "$num_of_services" -eq 0 ]; then
-                start_services="false"
-              fi
+              if [ "$num_of_services" -eq 0 ]; then start_services="false"; fi
 
               comma=""
               if [ "$envs" != "[" ]; then comma=","; fi
@@ -58,9 +57,6 @@ jobs:
       max-parallel: 4
       matrix:
         include: ${{ fromJSON(needs.envs.outputs.envs) }}
-        # TODO: need to exclude flaim until it works on x86_64-linux
-        exclude:
-          - example: "flaim"
 
     steps:
       - name: "Checkout"
