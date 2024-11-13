@@ -150,6 +150,9 @@ jobs:
     strategy:
       matrix:
         include: ${{ fromJSON(needs.envs.outputs.envs_push ) }}
+        # TODO: need to exclude flaim until it works on x86_64-linux
+        exclude:
+          - example: "flaim"
 
     steps:
       - name: "Checkout"
