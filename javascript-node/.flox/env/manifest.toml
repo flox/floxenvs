@@ -2,15 +2,66 @@ version = 1
 
 [install]
 nodejs.pkg-path = "nodejs"
+nodejs.version = "20"
+
+# helper tools
+gum.pkg-path = "gum"
+coreutils.pkg-path = "coreutils"
+
 
 [vars]
 NODE_ENV="development"
 
+
 [hook]
 on-activate = '''
-  echo "Activating Node.js environment $(node -v)"
-  node -e "console.log('Node.js environment: ' + process.env.NODE_ENV)"
+
+export FLOX_JAVASCRIPT_NODE_CACHE_DIR="$FLOX_ENV_CACHE/javascript-node"
+mkdir -p "$FLOX_JAVASCRIPT_NODE_CACHE_DIR"
+
+export FLOX_JAVASCRIPT_NODE_PACKAGES_HASH_FILE="$FLOX_JAVASCRIPT_NODE_CACHE_DIR/packages-hash"
+
+
+function with_spinner() {
+  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+    bash -c "$1"
+  else
+    gum spin \
+      --show-error \
+      --spinner line \
+      --spinner.foreground="#cccccc" \
+      --title ">>> $2 ..." \
+      --title.foreground="#cccccc" \
+        -- bash -c "$1"
+  fi
+}
+
+function install_packages() { 
+  npm install
+}
+export -f install_packages
+
+
+
+if [ -f "package.json" ] && [ -f "package-lock.json" ]; then
+  export FLOX_JAVASCRIPT_NODE_PACKAGES_HASH="false"
+  if [ -f "$FLOX_JAVASCRIPT_NODE_PACKAGES_HASH_FILE" ] ; then
+    export FLOX_JAVASCRIPT_NODE_PACKAGES_HASH=$(cat package.json package-lock.json | sha256sum | cut -d" " -f 1)
+  fi
+  if [ "$FLOX_JAVASCRIPT_NODE_PACKAGES_HASH" != "$(cat $FLOX_JAVASCRIPT_NODE_PACKAGES_HASH_FILE 2>/dev/null)" ]; then
+    with_spinner install_packages "Installing Javascript packages (with NPM)"
+    echo -e "{{ Foreground \"#ffffff\" \"✅ Javascript packages installed (with NPM).\" }}\n" \
+      | gum format -t template
+    echo "$FLOX_JAVASCRIPT_NODE_PACKAGES_HASH" > "$FLOX_JAVASCRIPT_NODE_PACKAGES_HASH_FILE"
+  fi
+fi
 '''
 
+
 [options]
-systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]
