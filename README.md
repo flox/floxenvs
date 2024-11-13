@@ -11,6 +11,7 @@
 | `python-pip`  | ✅ | ✅ | ✅ | Python environment using pip |
 | `python-uv`  | ✅ | ✅ | ✅ | Python environment using uv |
 | `javascript-bun`  | ✅ | ✅ | ✅ | Javascript environment with Bun |
+| `javascript-deno`  | ✅ | ✅ | ✅ | Javascript environment with Deno |
 | `javascript-node`  | ✅ | ✅ | ✅ | Javascript environment with Node/NPM |
 | `ruby`  | ✅ | ✅ | ✅ | Ruby environment |
 | `rust`  | ✅ | ✅ | ✅ | Rust environment |
