@@ -1,0 +1,59 @@
+version = 1
+
+[install]
+deno.pkg-path = "deno"
+
+# helper tools
+gum.pkg-path = "gum"
+coreutils.pkg-path = "coreutils"
+
+
+[hook]
+on-activate = '''
+
+export FLOX_JAVASCRIPT_DENO_CACHE_DIR="$FLOX_ENV_CACHE/javascript-deno"
+mkdir -p "$FLOX_JAVASCRIPT_DENO_CACHE_DIR"
+
+export FLOX_JAVASCRIPT_DENO_PACKAGES_HASH_FILE="$FLOX_JAVASCRIPT_DENO_CACHE_DIR/packages-hash"
+
+function with_spinner() {
+  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+    bash -c "$1"
+  else
+    gum spin \
+      --show-error \
+      --spinner line \
+      --spinner.foreground="#cccccc" \
+      --title ">>> $2 ..." \
+      --title.foreground="#cccccc" \
+        -- bash -c "$1"
+  fi
+}
+
+function install_packages() { 
+  deno install
+}
+export -f install_packages
+
+
+if [ -f "deno.json" ] && [ -f "deno.lock" ]; then
+  export FLOX_JAVASCRIPT_DENO_PACKAGES_HASH="false"
+  if [ -f "$FLOX_JAVASCRIPT_DENO_PACKAGES_HASH_FILE" ] ; then
+    export FLOX_JAVASCRIPT_DENO_PACKAGES_HASH=$(cat deno.json deno.lock | sha256sum | cut -d" " -f 1)
+  fi
+  if [ "$FLOX_JAVASCRIPT_DENO_PACKAGES_HASH" != "$(cat $FLOX_JAVASCRIPT_DENO_PACKAGES_HASH_FILE 2>/dev/null)" ]; then
+    with_spinner install_packages "Installing Javascript packages (with Deno)"
+    echo -e "{{ Foreground \"#ffffff\" \"✅ Javascript packages installed (with Deno).\" }}\n" \
+      | gum format -t template
+    echo "$FLOX_JAVASCRIPT_DENO_PACKAGES_HASH" > "$FLOX_JAVASCRIPT_DENO_PACKAGES_HASH_FILE"
+  fi
+fi
+'''
+
+[options]
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]
