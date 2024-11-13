@@ -1,0 +1,16 @@
+version = 1
+
+[install]
+nodejs.pkg-path = "nodejs"
+
+[vars]
+NODE_ENV="development"
+
+[hook]
+on-activate = '''
+  echo "Activating Node.js environment $(node -v)"
+  node -e "console.log('Node.js environment: ' + process.env.NODE_ENV)"
+'''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
