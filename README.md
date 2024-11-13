@@ -8,6 +8,8 @@
 | **Languages:** |
 | `go`  | ✅ | ✅ | ✅ | |
 | `python-poetry`  | ✅ | ✅ | ✅ | Python environment using poerty |
+| `python-pip`  | ✅ | ✅ | ✅ | Python environment using pip |
+| `python-uv`  | ✅ | ✅ | ✅ | Python environment using uv |
 | `javascript-bun`  | ✅ | ✅ | ✅ | Javascript environment with Bun |
 | `ruby`  | ✅ | ✅ | ✅ | Ruby environment |
 | `rust`  | ✅ | ✅ | ✅ | Rust environment |

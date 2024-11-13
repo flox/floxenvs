@@ -1,0 +1,22 @@
+version = 1
+requires-python = ">=3.12"
+
+[[package]]
+name = "pyjokes"
+version = "0.8.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/30/cc/2d25e5397d7a6d362971f23b42c8b624c5298c0864a1000cd587f39e6748/pyjokes-0.8.3.tar.gz", hash = "sha256:5735d31e973d5b6934b46b89431505733c3110f9b66eac0ff0be86f7f3646423", size = 44617 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1d/dd/2495fe4d1ff804ec3094ad4c76cd0fcfb8902d630ce690118560a40df171/pyjokes-0.8.3-py3-none-any.whl", hash = "sha256:12836e61bc7a2c1ff302604a040f0f63ac36c5c947c20319fcb5d1ab37bac46e", size = 47563 },
+]
+
+[[package]]
+name = "python-uv"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "pyjokes" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "pyjokes", specifier = ">=0.8.3" }]
