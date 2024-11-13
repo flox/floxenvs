@@ -1,0 +1,115 @@
+version = 1
+
+[install]
+python.pkg-path = "python3"
+python.version = "3.12"  # <-- Change this to the version of Python you want
+
+# helper tools
+gum.pkg-path = "gum"
+coreutils.pkg-path = "coreutils"
+
+
+[vars]
+FLOX_PYTHON_PIP_REQUIREMENTS_FILE = "requirements.txt"
+
+
+[hook]
+on-activate = '''
+
+export FLOX_PYTHON_PIP_CACHE_DIR="$FLOX_ENV_CACHE/python-pip"
+mkdir -p "$FLOX_PYTHON_PIP_CACHE_DIR"
+
+export FLOX_PYTHON_PIP_VENV_PATH="$FLOX_PYTHON_PIP_CACHE_DIR/venv"
+export FLOX_PYTHON_PIP_VENV_INTERPRETER="$(cat "$FLOX_PYTHON_PIP_CACHE_DIR/venv.interpreter" 2> /dev/null || echo false )"
+export FLOX_PYTHON_PIP_INTERPRETER="$(realpath $(which python3))"
+
+# Make sure any tools are not attempting to use the Python interpreter from any
+# existing virtual environment.
+unset VIRTUAL_ENV
+
+
+function indent() {
+  echo -e '{{ Foreground "#cccccc" " │ "}}' | \
+    gum format -t template --theme=auto
+}
+
+function with_spinner() {
+  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+    bash -c "$1"
+  else
+    echo
+    gum spin \
+      --show-error \
+      --spinner line \
+      --spinner.foreground="#cccccc" \
+      --title " >>> $2 ..." \
+      --title.foreground="#cccccc" \
+        -- bash -c "$1"
+    echo -en "\033[2A\033[K"
+  fi
+}
+
+function ensure_venv() {
+  "$FLOX_PYTHON_PIP_INTERPRETER" -m venv --upgrade-deps "$FLOX_PYTHON_PIP_VENV_PATH"
+  source "$FLOX_PYTHON_PIP_VENV_PATH/bin/activate"
+}
+export -f ensure_venv
+
+function install_packages() {
+  source "$FLOX_PYTHON_PIP_VENV_PATH/bin/activate"
+  pip install -r "$FLOX_PYTHON_PIP_REQUIREMENTS_FILE"
+}
+export -f install_packages
+
+
+
+indent && echo
+indent && echo
+
+if [ "$FLOX_PYTHON_PIP_VENV_INTERPRETER" != "$FLOX_PYTHON_PIP_INTERPRETER" ]; then
+  with_spinner ensure_venv "Creating virtual environment"
+  indent && echo -e "{{ Foreground \"#ffffff\" \"✅ Virtual environment was created.\" }}\n" \
+    | gum format -t template
+else
+  indent && echo -e "{{ Foreground \"#ffffff\" \"✅ Virtual environment already exists.\" }}\n" \
+    | gum format -t template
+fi
+
+indent && echo
+
+if [ -f "$FLOX_PYTHON_PIP_REQUIREMENTS_FILE" ]; then
+  with_spinner install_packages "Installing Python packages"
+  indent && echo -e "{{ Foreground \"#ffffff\" \"✅ Python packages installed.\" }}\n" \
+    | gum format -t template
+else
+  indent && echo -e "{{ Foreground \"#ffffff\" \"✅ No need to install Python packages.\" }}\n" \
+    | gum format -t template
+fi
+
+indent && echo
+
+
+'''
+
+[profile]
+bash = '''
+source "$FLOX_PYTHON_PIP_VENV_PATH/bin/activate"
+'''
+fish = '''
+source "$FLOX_PYTHON_PIP_VENV_PATH/bin/activate.fish"
+'''
+tcsh = '''
+source "$FLOX_PYTHON_PIP_VENV_PATH/bin/activate.csh"
+'''
+zsh = '''
+source "$FLOX_PYTHON_PIP_VENV_PATH/bin/activate"
+'''
+
+
+[options]
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]
