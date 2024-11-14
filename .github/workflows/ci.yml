@@ -64,6 +64,7 @@ jobs:
               done
 
               comma_push=""
+              if [ "$name" == "flaim" ]; then continue; fi
               if [ "$envs_push" != "[" ]; then comma_push=","; fi
               envs_push="$envs_push$comma_push{\"example\":\"$name\"}"
             fi
@@ -150,9 +151,6 @@ jobs:
     strategy:
       matrix:
         include: ${{ fromJSON(needs.envs.outputs.envs_push ) }}
-        # TODO: need to exclude flaim until it works on x86_64-linux
-        exclude:
-          - example: "flaim"
 
     steps:
       - name: "Checkout"
