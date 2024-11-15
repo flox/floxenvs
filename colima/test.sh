@@ -30,6 +30,4 @@ command_exists colima
 command_exists docker
 command_exists gum
 
-flox services start
-
 docker_is_running
