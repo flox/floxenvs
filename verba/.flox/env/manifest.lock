@@ -4,7 +4,8 @@
     "version": 1,
     "install": {
       "bash": {
-        "pkg-path": "bash"
+        "pkg-path": "bash",
+        "priority": 0
       },
       "curl": {
         "pkg-path": "curl"
@@ -44,11 +45,11 @@
       "QUERY_DEFAULTS_LIMIT": "10",
       "VERBA_INSTALL_PACKAGE": "goldenverba@git+https://github.com/weaviate/Verba",
       "VIRTUAL_ENV_DISABLE_PROMPT": "1",
-      "WEAVIATE_API_KEY_VERBA": "",
-      "WEAVIATE_URL_VERBA": "http://localhost:8080"
+      "WEAVIATE_URL_VERBA": "localhost",
+      "WEAVIATE_URL_VERBA_full": "http://localhost:8080"
     },
     "hook": {
-      "on-activate": "\n# If we export this here, it can be used later in 'profiles.common'\nexport PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nif [ ! -d \"$PYTHON_DIR\" ]; then\n  gum spin -s globe --title \"Creating venv in $PYTHON_DIR...\" -- python -m venv \"$PYTHON_DIR\"\nfi\n\n(\n  source \"$PYTHON_DIR/bin/activate\"\n  gum spin -s monkey --title \"Installing/updating Verba...\" -- pip install \"$VERBA_INSTALL_PACKAGE\"\n)\n\n"
+      "on-activate": "# If we export this here, it can be used later in 'profiles.common'\nexport PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nif [ ! -d \"$PYTHON_DIR\" ]; then\n  gum spin -s globe --title \"Creating venv in $PYTHON_DIR...\" -- python -m venv \"$PYTHON_DIR\"\nfi\n\n(\n  source \"$PYTHON_DIR/bin/activate\"\n  gum spin -s monkey --title \"Installing/updating Verba...\" -- pip install \"$VERBA_INSTALL_PACKAGE\"\n)\n"
     },
     "profile": {
       "common": "  # Activate the Python venv\n  source \"$PYTHON_DIR/bin/activate\"\n"
@@ -81,7 +82,7 @@
         "systems": null
       },
       "verba": {
-        "command": "if [[ \"$WEAVIATE_URL_VERBA\" != \"\" ]]; then\n  until curl -s \"$WEAVIATE_URL_VERBA\"; do\n    echo \"waiting for weaviate ...\"\n    sleep 0.1\n  done\nfi\n$PYTHON_DIR/bin/verba start --port 8000 --host 0.0.0.0\n",
+        "command": "if [[ \"$WEAVIATE_URL_VERBA\" != \"\" ]]; then\n  until curl -s \"$WEAVIATE_URL_VERBA_full\"; do\n    echo \"waiting for weaviate ...\"\n    sleep 0.1\n  done\nfi\n\"$PYTHON_DIR/bin/verba\" start --port 8000 --host 0.0.0.0\n",
         "vars": null,
         "is-daemon": null,
         "shutdown": null,
@@ -129,7 +130,7 @@
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
-      "priority": 5
+      "priority": 0
     },
     {
       "attr_path": "bash",
@@ -164,7 +165,7 @@
       },
       "system": "aarch64-linux",
       "group": "toplevel",
-      "priority": 5
+      "priority": 0
     },
     {
       "attr_path": "bash",
@@ -199,7 +200,7 @@
       },
       "system": "x86_64-linux",
       "group": "toplevel",
-      "priority": 5
+      "priority": 0
     },
     {
       "attr_path": "bash",
@@ -233,7 +234,7 @@
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
-      "priority": 5
+      "priority": 0
     },
     {
       "attr_path": "curl",
