@@ -79,14 +79,25 @@ on-activate = '''
 # If we export this here, it can be used later in 'profiles.common'
 export PYTHON_DIR="$FLOX_ENV_CACHE/python"
 
-if [ ! -d "$PYTHON_DIR" ]; then
-  gum spin -s globe --title "Creating venv in $PYTHON_DIR..." -- python -m venv "$PYTHON_DIR"
-fi
+if tty -s; then
+  if [ ! -d "$PYTHON_DIR" ]; then
+    gum spin -s globe --title "Creating venv in $PYTHON_DIR..." -- python -m venv "$PYTHON_DIR"
+  fi
 
-(
-  source "$PYTHON_DIR/bin/activate"
-  gum spin -s monkey --title "Installing/updating Verba..." -- pip install "$VERBA_INSTALL_PACKAGE"
-)
+  (
+    source "$PYTHON_DIR/bin/activate"
+    gum spin -s monkey --title "Installing/updating Verba..." -- pip install "$VERBA_INSTALL_PACKAGE"
+  )
+else
+  if [ ! -d "$PYTHON_DIR" ]; then
+    python -m venv "$PYTHON_DIR"
+  fi
+
+  (
+    source "$PYTHON_DIR/bin/activate"
+    pip install "$VERBA_INSTALL_PACKAGE"
+  )
+fi
 '''
 
 
