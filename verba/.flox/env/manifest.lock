@@ -13,6 +13,9 @@
       "gcc-unwrapped": {
         "pkg-path": "gcc-unwrapped"
       },
+      "git": {
+        "pkg-path": "git"
+      },
       "glibc": {
         "pkg-path": "glibc",
         "systems": [
@@ -49,7 +52,7 @@
       "WEAVIATE_URL_VERBA_full": "http://localhost:8080"
     },
     "hook": {
-      "on-activate": "# If we export this here, it can be used later in 'profiles.common'\nexport PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nif [ ! -d \"$PYTHON_DIR\" ]; then\n  gum spin -s globe --title \"Creating venv in $PYTHON_DIR...\" -- python -m venv \"$PYTHON_DIR\"\nfi\n\n(\n  source \"$PYTHON_DIR/bin/activate\"\n  gum spin -s monkey --title \"Installing/updating Verba...\" -- pip install \"$VERBA_INSTALL_PACKAGE\"\n)\n"
+      "on-activate": "# If we export this here, it can be used later in 'profiles.common'\nexport PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nif tty -s; then\n  if [ ! -d \"$PYTHON_DIR\" ]; then\n    gum spin -s globe --title \"Creating venv in $PYTHON_DIR...\" -- python -m venv \"$PYTHON_DIR\"\n  fi\n\n  (\n    source \"$PYTHON_DIR/bin/activate\"\n    gum spin -s monkey --title \"Installing/updating Verba...\" -- pip install \"$VERBA_INSTALL_PACKAGE\"\n  )\nelse\n  if [ ! -d \"$PYTHON_DIR\" ]; then\n    python -m venv \"$PYTHON_DIR\"\n  fi\n\n  (\n    source \"$PYTHON_DIR/bin/activate\"\n    pip install \"$VERBA_INSTALL_PACKAGE\"\n  )\nfi\n"
     },
     "profile": {
       "common": "  # Activate the Python venv\n  source \"$PYTHON_DIR/bin/activate\"\n"
@@ -505,6 +508,128 @@
         "lib": "/nix/store/mph9fikx3fx6va81jras97mxnnw7ijw6-gcc-13.3.0-lib",
         "man": "/nix/store/nig6h6iq8gk351x8wb15hcs5aksfyy7n-gcc-13.3.0-man",
         "out": "/nix/store/qk0y65nvivkzb7ipn7hlwaay5fh3478a-gcc-13.3.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "git",
+      "broken": false,
+      "derivation": "/nix/store/krqq2gzqfnd2vldl2ima0crsmmng28qp-git-2.46.1.drv",
+      "description": "Distributed version control system",
+      "install_id": "git",
+      "license": "GPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "git-2.46.1",
+      "pname": "git",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.46.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/9i3j85b675c29xwmyg7bvaxs2jbqn4gx-git-2.46.1-doc",
+        "out": "/nix/store/fzsjyd9wxiymv5j38f1igk99660hi4vl-git-2.46.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "git",
+      "broken": false,
+      "derivation": "/nix/store/8r8ni86pppmcp3b7sg9gh5020vf78arf-git-2.46.1.drv",
+      "description": "Distributed version control system",
+      "install_id": "git",
+      "license": "GPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "git-2.46.1",
+      "pname": "git",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.46.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/qgm6gdx0ic216alm4kl7lyyd5k74gn1p-git-2.46.1-debug",
+        "doc": "/nix/store/ngyj5imnlagsj5avqgc3f65iz9pffqjm-git-2.46.1-doc",
+        "out": "/nix/store/qmdn10127g14bb1v5h5qpckcm6n9m8ms-git-2.46.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "git",
+      "broken": false,
+      "derivation": "/nix/store/v86dakq8ai7jvyjkls694k2jmx2nivmh-git-2.46.1.drv",
+      "description": "Distributed version control system",
+      "install_id": "git",
+      "license": "GPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "git-2.46.1",
+      "pname": "git",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.46.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/n5i11ch2x778v95wnbg56mlc9rc8xsjn-git-2.46.1-debug",
+        "doc": "/nix/store/9xdnzfl42isjgsn1mnxyjdmspakf8ayi-git-2.46.1-doc",
+        "out": "/nix/store/zmmhkn7ndfskwk2mfqn9nzmv9y699lms-git-2.46.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "git",
+      "broken": false,
+      "derivation": "/nix/store/ggxrx796vjn8214jw3nzcnvz5knrilzn-git-2.46.1.drv",
+      "description": "Distributed version control system",
+      "install_id": "git",
+      "license": "GPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=18536bf04cd71abd345f9579158841376fdd0c5a",
+      "name": "git-2.46.1",
+      "pname": "git",
+      "rev": "18536bf04cd71abd345f9579158841376fdd0c5a",
+      "rev_count": 696981,
+      "rev_date": "2024-10-25T18:19:15Z",
+      "scrape_date": "2024-10-28T04:00:37Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.46.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/vhiqrx6ka20krpi255vk99iac98zr3sb-git-2.46.1-doc",
+        "out": "/nix/store/n4s67bnpyvxqj51fhj57gxn7f8n1v6wk-git-2.46.1"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
