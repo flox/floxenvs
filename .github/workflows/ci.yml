@@ -24,7 +24,8 @@ jobs:
       - name: "Checkout"
         uses: "actions/checkout@v4"
         with:
-          fetch-depth: 5
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
 
       - name: "Find environment"
         id: "envs"
@@ -32,30 +33,28 @@ jobs:
           envs_test="["
           envs_push="["
 
-          update_all=
-          git diff
-          git diff --name-only HEAD~1 HEAD --
-          if git diff --name-only HEAD~1 HEAD -- | grep -E "flake.nix|flake.lock|.github" ; then
-            echo detected major change
+          update_all=${{ github.event_name == 'schedule' && 'true' || '' }}
+          BASE_SHA="${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || 'HEAD~1' }}"
+          if git diff --name-only $BASE_SHA HEAD -- | grep -E "flake.nix|flake.lock|.github" ; then
+            echo "detected major change"
             update_all=true
           fi
-          while IFS= read path; do
-            rel_env_path=$(realpath $(dirname $path)/../..)
-            env_path=$(realpath -s $(dirname $path)/../..)
-            if [ -f "$env_path/test.sh" ]; then
+
+          while IFS= read manifest_path; do
+            env_path=$(realpath -s $(dirname $manifest_path)/../..)
+            rel_env_path="${env_path#$PWD/}"
+            echo "env_path=$env_path"
+            echo "rel_env_path=$rel_env_path"
+            if [ -f "$env_path/test.sh" ] && [ "$update_all" == "true" ] || ( git diff --name-only $BASE_SHA HEAD | grep -q "$rel_env_path/" ; ); then
               name=$(basename $env_path)
 
-              if [ "$update_all" != "true" ] && ( git diff --name-only HEAD~1 HEAD | grep -v "$rel_env_path" ; ) ; then
-                continue
-              fi
-
-              num_of_services=$(yq -oy '.services | length' $path)
+              num_of_services=$(yq -oy '.services | length' $manifest_path)
               start_services="true"
               if [ "$num_of_services" -eq 0 ]; then
                 start_services="false"
               fi
 
-              readarray systems < <(yq e -o=j -I=0 '.options.systems[]' $path)
+              readarray systems < <(yq e -o=j -I=0 '.options.systems[]' $manifest_path)
               comma_test=""
               if [ "$envs_test" != "[" ]; then comma_test=","; fi
               for system in "${systems[@]}"; do
@@ -65,10 +64,11 @@ jobs:
               done
 
               comma_push=""
+              if [ "$name" == "flaim" ]; then continue; fi
               if [ "$envs_push" != "[" ]; then comma_push=","; fi
               envs_push="$envs_push$comma_push{\"example\":\"$name\"}"
             fi
-          done <<< "$(find ./ -name manifest.toml)"
+          done <<< "$(find $PWD -name manifest.toml)"
           envs_test="$envs_test]"
           envs_push="$envs_push]"
 
@@ -92,6 +92,7 @@ jobs:
 
     strategy:
       fail-fast: false
+      max-parallel: 8
       matrix:
         include: ${{ fromJSON(needs.envs.outputs.envs_test ) }}
 
@@ -211,6 +212,7 @@ jobs:
       - name: "Slack Notification"
         uses: "rtCamp/action-slack-notify@v2"
         env:
+          SLACK_CHANNEL:    "team-content"
           SLACK_TITLE:      "Something broke CI for floxenvs"
           SLACK_FOOTER:     "Thank you for caring"
           SLACK_WEBHOOK:    "${{ secrets.MANAGED_SLACK_WEBHOOK }}"

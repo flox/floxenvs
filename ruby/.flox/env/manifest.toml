@@ -1,0 +1,98 @@
+version = 1
+
+[install]
+ruby.pkg-path = "ruby"
+# ruby version options
+#ruby.version = "3.3.4"
+#ruby.version = "3.1.6"
+#ruby.version = "2.7.8"
+
+# Useful for building native extensions
+gcc-unwrapped.pkg-path = "gcc-unwrapped"
+libxml2.pkg-path = "libxml2"
+libxslt.pkg-path = "libxslt"
+gnumake.pkg-path = "gnumake"
+binutils.pkg-path = "binutils"
+pkg-config.pkg-path = "pkg-config"
+glibc.pkg-path = "glibc"  # glibc only needed on linux builds
+glibc.systems = [ "x86_64-linux" , "aarch64-linux"]
+openssl.pkg-path = "openssl"
+libyaml.pkg-path = "libyaml"
+imagemagick.pkg-path = "imagemagick"
+postgresql.pkg-path = "postgresql"
+libmysqlclient.pkg-path = "libmysqlclient"
+
+# Helpful for setup
+gum.pkg-path = "gum"
+which.pkg-path = "which"
+
+[vars]
+
+[hook]
+on-activate = '''
+unset CPATH
+
+export RUBY_DIR="$FLOX_ENV_CACHE/ruby"
+export RUBY_VENDOR_DIR="$RUBY_DIR/vendor"
+
+set_vendor_path() {
+  bundle config set --local path "$RUBY_VENDOR_DIR"
+}
+
+bundle_install() {
+  bundle install
+}
+
+export -f set_vendor_path
+export -f bundle_install
+
+if [ -f "Gemfile" ]; then
+
+  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+    set_vendor_path
+  else
+    gum spin \
+      --show-error \
+      --spinner dot \
+      --title "Configuring vendor path" \
+        -- bash -c set_vendor_path
+  fi
+  echo "✅ Vendor path set to:"
+  echo "   -> $RUBY_VENDOR_DIR"
+
+  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+    bundle_install
+  else
+    gum spin \
+      --show-error \
+      --spinner monkey \
+      --title "Installing Ruby gems" \
+        -- bash -c bundle_install
+  fi
+  echo "✅ Ruby gems installed"
+fi
+
+'''
+
+[profile]
+common = '''
+echo ''
+echo '     ╔═════════════════════════════════════════════════════╗'
+echo '     ║                                                     ║'
+echo '     ║  Run `bundle` to finish the setup of your project   ║'
+echo '     ║  bundler is configured to install into              ║'
+echo '     ║       .flox/cache/ruby/vendor                       ║'
+echo '     ║                                                     ║'
+echo '     ║  Select a differnet Ruby version using `flox edit`  ║'
+echo '     ║                                                     ║'
+echo '     ╚═════════════════════════════════════════════════════╝'
+echo ''
+'''
+
+[options]
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]
