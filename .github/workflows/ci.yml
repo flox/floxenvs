@@ -87,6 +87,8 @@ jobs:
     name: "Test '${{ matrix.example }}' example on '${{ matrix.system }}'"
     runs-on: "ubuntu-latest"
 
+    timeout-minutes: 30
+
     needs:
       - "envs"
 
