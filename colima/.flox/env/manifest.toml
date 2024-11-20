@@ -3,12 +3,23 @@ version = 1
 [install]
 colima.pkg-path = "colima"
 docker.pkg-path = "docker-client"
+kubectl.pkg-path = "kubectl"
 gum.pkg-path = "gum"
 
 [services]
 colima.command = "colima start"
 colima.is-daemon = true
 colima.shutdown.command = "colima stop"
+
+colima-k8s.command = '''
+until colima status; do
+  echo "colima-k8s >>> waiting for colima ..."
+  sleep 3
+done
+colima k start
+'''
+colima-k8s.is-daemon = true
+colima-k8s.shutdown.command = "colima k stop"
 
 [hook]
 on-activate = '''
