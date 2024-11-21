@@ -9,45 +9,47 @@ on:
   schedule:
     - cron: "0 0 * * *"
 
+env:
+  FLOX_DISABLE_METRICS: "true"
 
 jobs:
 
   envs:
     name: "Find environments"
     runs-on: "ubuntu-latest"
+    timeout-minutes: 30
 
     outputs:
-      envs_test: "${{ steps.envs.outputs.envs_test }}"
-      envs_push: "${{ steps.envs.outputs.envs_push }}"
+      envs_per_system: "${{ steps.envs.outputs.envs_per_system }}"
+      envs_only: "${{ steps.envs.outputs.envs_only }}"
 
     steps:
       - name: "Checkout"
         uses: "actions/checkout@v4"
         with:
-          fetch-depth: 5
+          fetch-depth: 0
           ref: ${{ github.head_ref }}
 
       - name: "Find environment"
         id: "envs"
         run: |
-          envs_test="["
-          envs_push="["
+          envs_per_system="["
+          envs_only="["
 
-          update_all=
-          if git diff --name-only HEAD~1 HEAD -- | grep -E "flake.nix|flake.lock|.github" ; then
-            echo detected major change
+          update_all=${{ github.event_name == 'schedule' && 'true' || '' }}
+          BASE_SHA="${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || 'HEAD~1' }}"
+          if git diff --name-only $BASE_SHA HEAD -- | grep -E "flake.nix|flake.lock|.github" ; then
+            echo "detected major change"
             update_all=true
           fi
 
           while IFS= read manifest_path; do
             env_path=$(realpath -s $(dirname $manifest_path)/../..)
             rel_env_path="${env_path#$PWD/}"
-            if [ -f "$env_path/test.sh" ]; then
+            echo "env_path=$env_path"
+            echo "rel_env_path=$rel_env_path"
+            if [ -f "$env_path/test.sh" ] && [ "$update_all" == "true" ] || ( git diff --name-only $BASE_SHA HEAD | grep -q "$rel_env_path/" ; ); then
               name=$(basename $env_path)
-
-              if [ "$update_all" != "true" ] && ( git diff --name-only HEAD~1 HEAD | grep -qv "$rel_env_path/" ; ) ; then
-                continue
-              fi
 
               num_of_services=$(yq -oy '.services | length' $manifest_path)
               start_services="true"
@@ -56,44 +58,47 @@ jobs:
               fi
 
               readarray systems < <(yq e -o=j -I=0 '.options.systems[]' $manifest_path)
-              comma_test=""
-              if [ "$envs_test" != "[" ]; then comma_test=","; fi
+              comma_per_system=""
+              if [ "$envs_per_system" != "[" ]; then comma_per_system=","; fi
               for system in "${systems[@]}"; do
                 system=$(echo $system | xargs)
-                envs_test="$envs_test$comma_test{\"example\":\"$name\",\"system\":\"$system\",\"start_services\":$start_services}"
-                comma_test=","
+                envs_per_system="$envs_per_system$comma_per_system{\"example\":\"$name\",\"system\":\"$system\",\"start_services\":$start_services}"
+                comma_per_system=","
               done
 
-              comma_push=""
-              if [ "$envs_push" != "[" ]; then comma_push=","; fi
-              envs_push="$envs_push$comma_push{\"example\":\"$name\"}"
+              comma_only=""
+              if [ "$name" == "flaim" ]; then continue; fi
+              if [ "$envs_only" != "[" ]; then comma_only=","; fi
+              envs_only="$envs_only$comma_only{\"example\":\"$name\"}"
             fi
           done <<< "$(find $PWD -name manifest.toml)"
-          envs_test="$envs_test]"
-          envs_push="$envs_push]"
+          envs_per_system="$envs_per_system]"
+          envs_only="$envs_only]"
 
-          echo "-- ENVS_TEST ---------------"
-          echo "$envs_test" | jq
+          echo "-- envs_per_system ---------"
+          echo "$envs_per_system" | jq
           echo "----------------------------"
 
-          echo "-- ENVS_PUSH ---------------"
-          echo "$envs_push" | jq
+          echo "-- envs_only ---------------"
+          echo "$envs_only" | jq
           echo "----------------------------"
 
-          echo "envs_test=$envs_test" >> "$GITHUB_OUTPUT"
-          echo "envs_push=$envs_push" >> "$GITHUB_OUTPUT"
+          echo "envs_per_system=$envs_per_system" >> "$GITHUB_OUTPUT"
+          echo "envs_only=$envs_only" >> "$GITHUB_OUTPUT"
 
   test:
     name: "Test '${{ matrix.example }}' example on '${{ matrix.system }}'"
     runs-on: "ubuntu-latest"
+    timeout-minutes: 30
 
     needs:
       - "envs"
 
     strategy:
       fail-fast: false
+      max-parallel: 8
       matrix:
-        include: ${{ fromJSON(needs.envs.outputs.envs_test ) }}
+        include: ${{ fromJSON(needs.envs.outputs.envs_per_system ) }}
 
     steps:
       - name: "Setup SSH"
@@ -132,9 +137,61 @@ jobs:
                 --option access-tokens "github.com=${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}" \
                 github:flox/floxenvs/${{ github.sha }}#apps.${{ matrix.system }}.test-${{ matrix.example }} -- ${{ matrix.start_services }}
 
+  containarize:
+    name: "Containarize '${{ matrix.example }}'"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+
+    if: (github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+
+    needs:
+      - "envs"
+      - "test"
+
+    env:
+      FLOX_BIN: "flox -vvv"
+
+
+    permissions:
+      contents:       "read"
+      packages:       "write"
+      attestations:   "write"
+      id-token:       "write"
+
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        include: ${{ fromJSON(needs.envs.outputs.envs_only ) }}
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v4"
+
+      - name: "Install flox"
+        uses: "flox/install-flox-action@main"
+
+      - name: "Login to Github Container Registry"
+        uses: "docker/login-action@v3"
+        with:
+          registry: "ghcr.io"
+          username: "${{ github.actor }}"
+          password: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: "Containarize"
+        run: |
+          flox containerize -d ./${{ matrix.example }}
+
+      - name: "Tag & Push"
+        run: |
+          docker tag ${{ matrix.example }}:latest ghcr.io/flox/floxenvs:${{ matrix.example }}-latest
+          docker push ghcr.io/flox/floxenvs:${{ matrix.example }}-latest
+
+
   push:
     name: "Sync '${{ matrix.example }}' manifest"
     runs-on: "ubuntu-latest"
+    timeout-minutes: 30
 
     if: (github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
 
@@ -149,7 +206,7 @@ jobs:
 
     strategy:
       matrix:
-        include: ${{ fromJSON(needs.envs.outputs.envs_push ) }}
+        include: ${{ fromJSON(needs.envs.outputs.envs_only ) }}
 
     steps:
       - name: "Checkout"
@@ -206,11 +263,13 @@ jobs:
     needs:
       - "test"
       - "push"
+      - "containarize"
 
     steps:
       - name: "Slack Notification"
         uses: "rtCamp/action-slack-notify@v2"
         env:
+          SLACK_CHANNEL:    "team-content"
           SLACK_TITLE:      "Something broke CI for floxenvs"
           SLACK_FOOTER:     "Thank you for caring"
           SLACK_WEBHOOK:    "${{ secrets.MANAGED_SLACK_WEBHOOK }}"

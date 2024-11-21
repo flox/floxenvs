@@ -5,9 +5,16 @@ warnings.filterwarnings("ignore")
 
 import sys
 import torch
-from imgcat import imgcat
+import sixel
+from io import BytesIO
 from diffusers import StableDiffusionPipeline
 from diffusers import logging
+
+def draw(image):
+    buffer = BytesIO()
+    writer = sixel.SixelWriter()
+    image.save(buffer, format='png')
+    writer.draw(buffer)
 
 logging.set_verbosity(50)
 logging.disable_progress_bar()
@@ -25,4 +32,6 @@ pipe.set_progress_bar_config(disable=True)
 
 image = pipe(prompt=prompt, num_inference_steps=1, guidance_scale=0).images[0]
 image.save(f"{prompt}.png")
-imgcat(image)
+
+draw(image)
+
