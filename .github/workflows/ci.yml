@@ -9,12 +9,15 @@ on:
   schedule:
     - cron: "0 0 * * *"
 
+env:
+  FLOX_DISABLE_METRICS: "true"
 
 jobs:
 
   envs:
     name: "Find environments"
     runs-on: "ubuntu-latest"
+    timeout-minutes: 30
 
     outputs:
       envs_per_system: "${{ steps.envs.outputs.envs_per_system }}"
@@ -86,7 +89,6 @@ jobs:
   test:
     name: "Test '${{ matrix.example }}' example on '${{ matrix.system }}'"
     runs-on: "ubuntu-latest"
-
     timeout-minutes: 30
 
     needs:
@@ -138,6 +140,7 @@ jobs:
   containarize:
     name: "Containarize '${{ matrix.example }}'"
     runs-on: "ubuntu-latest"
+    timeout-minutes: 30
 
     if: (github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
 
@@ -148,7 +151,6 @@ jobs:
     env:
       FLOX_BIN: "flox -vvv"
 
-    timeout-minutes: 30
 
     permissions:
       contents:       "read"
@@ -189,6 +191,7 @@ jobs:
   push:
     name: "Sync '${{ matrix.example }}' manifest"
     runs-on: "ubuntu-latest"
+    timeout-minutes: 30
 
     if: (github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
 
@@ -200,8 +203,6 @@ jobs:
       FLOX_BIN:           "flox -vvv"
       FLOX_REMOTE_OWNER:  "flox"
       FLOX_AUTH0_URL:     "https://auth.flox.dev"
-
-    timeout-minutes: 30
 
     strategy:
       matrix:
