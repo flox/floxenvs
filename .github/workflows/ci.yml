@@ -205,6 +205,8 @@ jobs:
       FLOX_AUTH0_URL:     "https://auth.flox.dev"
 
     strategy:
+      fail-fast: false
+      max-parallel: 8
       matrix:
         include: ${{ fromJSON(needs.envs.outputs.envs_only ) }}
 
