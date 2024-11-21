@@ -31,7 +31,7 @@ function indent() {
     gum format -t template --theme=auto
 }
 
-with_spinner() {
+function with_spinner() {
   if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
     bash -c "$1"
   else
@@ -121,12 +121,12 @@ function configure() {
 
 }
 
-install_python() {
+function install_python() {
   flox install --id python python3@$FLOX_PYTHON_VERSION
 }
 export -f install_python
 
-install_package_manager() {
+function install_package_manager() {
   case "$FLOX_PYTHON_PACKAGE_MANAGER" in
     "uv")
       flox install $FLOX_PYTHON_PACKAGE_MANAGER
@@ -138,7 +138,7 @@ install_package_manager() {
 }
 export -f install_package_manager
 
-ensure_venv() {
+function ensure_venv() {
   case "$FLOX_PYTHON_PACKAGE_MANAGER" in
     "uv")
       uv venv -p "$FLOX_PYTHON_INTERPRETER" "$FLOX_PYTHON_VENV_PATH"
@@ -171,7 +171,7 @@ install_packages() {
 export -f install_packages
 
 
-activate() {
+function activate() {
 
   # Make sure any tools are not attempting to use the Python interpreter from any
   # existing virtual environment.
@@ -259,16 +259,16 @@ common = '''
 #echo ""
 #'''
 bash = '''
-  source "$FLOX_PYTHON_VENV_PATH/bin/activate"
+source "$FLOX_PYTHON_VENV_PATH/bin/activate"
 '''
 fish = '''
-  source "$FLOX_PYTHON_VENV_PATH/bin/activate.fish"
+source "$FLOX_PYTHON_VENV_PATH/bin/activate.fish"
 '''
 tcsh = '''
-  source "$FLOX_PYTHON_VENV_PATH/bin/activate.csh"
+source "$FLOX_PYTHON_VENV_PATH/bin/activate.csh"
 '''
 zsh = '''
-  source "$FLOX_PYTHON_VENV_PATH/bin/activate"
+source "$FLOX_PYTHON_VENV_PATH/bin/activate"
 '''
 
 
