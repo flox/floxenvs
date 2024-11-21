@@ -1,50 +1,41 @@
-
-#
-# This is a Flox environment manifest.
-# Visit flox.dev/docs/concepts/manifest/
-# or see flox-edit(1), manifest.toml(5) for more information.
-#
 version = 1
-
-#
-# [install]
-# Let's install some packages into our environment!
-#
 
 [install]
 
-# Get Python 3.10
-python310.pkg-path = "python310"
+python.pkg-path = "python311"
 
 # Install Weaviate as a vector database
 weaviate.pkg-path = "weaviate"
-weaviate.version = "1.25.9"
+#weaviate.version = "1.25.9"
 
 # Install Ollama as a backend
 ollama.pkg-path = "ollama"
-ollama.version = "0.3.5"
+#ollama.version = "0.3.5"
 
 # Nice UI for our hook and profile scripts :)
 gum.pkg-path = "gum"
 
 # Deps for our service scripts
 bash.pkg-path = "bash"
+bash.priority = 0
 curl.pkg-path = "curl"
+git.pkg-path = "git"
 
+# System/C deps
+gcc-unwrapped.pkg-path = "gcc-unwrapped"
+pkg-config.pkg-path = "pkg-config"
+glibc.pkg-path = "glibc"  # glibc only needed on linux builds
+glibc.systems = [ "x86_64-linux" , "aarch64-linux"]
 
-#
-# [vars]
-# These vars will be available throughout the environment lifecycle
-#
 
 [vars]
 
 # The name of the Verba package to install
-VERBA_INSTALL_PACKAGE = "goldenverba==1.0.4"
-#VERBA_INSTALL_PACKAGE = "goldenverba[huggingface]"
+VERBA_INSTALL_PACKAGE = "goldenverba@git+https://github.com/weaviate/Verba"
 
 # This configures Weaviate, and configures Verba to use it
-WEAVIATE_URL_VERBA = "http://localhost:8080"
+WEAVIATE_URL_VERBA = "localhost"
+WEAVIATE_URL_VERBA_full = "http://localhost:8080" # needed for verba v2.1.0 Custom Deploy UI
 
 # Weaviate data path
 PERSISTENCE_DATA_PATH = "./verba-data"
@@ -63,7 +54,7 @@ OLLAMA_MODEL = "llama3"
 OLLAMA_EMBED_MODEL = "mxbai-embed-large"
 
 # OpenAI configuration
-# OPENAI_API_KEY = "makealottanonsensequicklylikehumansdo"
+# OPENAI_API_KEY = ""
 # OPENAI_BASE_URL = "http://100.0.0.0:8000"
 
 # For other Verba variables that can be set here, see:
@@ -78,20 +69,18 @@ OLLAMA_EMBED_MODEL = "mxbai-embed-large"
 VIRTUAL_ENV_DISABLE_PROMPT="1"
 
 
-#
-# [hook]
 # Since Verba is not (yet) in the Flox catalog, we need to
 # install it from pypi using a venv
 
 # We can add a hook that makes sure that Verba is installed
 # before we try to start it (or use it!)
 #
-
 [hook]
 on-activate = '''
-  # If we export this here, it can be used later in 'profiles.common'
-  export PYTHON_DIR="$FLOX_ENV_CACHE/python"
+# If we export this here, it can be used later in 'profiles.common'
+export PYTHON_DIR="$FLOX_ENV_CACHE/python"
 
+if tty -s; then
   if [ ! -d "$PYTHON_DIR" ]; then
     gum spin -s globe --title "Creating venv in $PYTHON_DIR..." -- python -m venv "$PYTHON_DIR"
   fi
@@ -100,38 +89,42 @@ on-activate = '''
     source "$PYTHON_DIR/bin/activate"
     gum spin -s monkey --title "Installing/updating Verba..." -- pip install "$VERBA_INSTALL_PACKAGE"
   )
+else
+  if [ ! -d "$PYTHON_DIR" ]; then
+    python -m venv "$PYTHON_DIR"
+  fi
+
+  (
+    source "$PYTHON_DIR/bin/activate"
+    pip install "$VERBA_INSTALL_PACKAGE"
+  )
+fi
 '''
 
 
-#
-# [services]
-# Services are defined here, and are started after hook.on-activate is finished
-#
+[profile]
+common = '''
+  # Activate the Python venv
+  source "$PYTHON_DIR/bin/activate"
+'''
 
-# Start Weaviate
-[services.weaviate]
-command = "weaviate --host 0.0.0.0 --port 8080 --scheme http"
 
-# Start Ollama
-[services.ollama]
-command = "ollama serve"
+[services]
+weaviate.command = "weaviate --host 0.0.0.0 --port 8080 --scheme http"
 
-# Start Verba
-[services.verba]
-command = """
+ollama.command = "ollama serve"
+
+verba.command = """
 if [[ "$WEAVIATE_URL_VERBA" != "" ]]; then
-  until curl -s "$WEAVIATE_URL_VERBA"; do
+  until curl -s "$WEAVIATE_URL_VERBA_full"; do
     echo "waiting for weaviate ..."
     sleep 0.1
   done
 fi
-
-$PYTHON_DIR/bin/verba start --host 0.0.0.0
+"$PYTHON_DIR/bin/verba" start --port 8000 --host 0.0.0.0
 """
 
-
-[services.models]
-command = """
+models.command = """
 # wait for ollama to be ready
 until ollama list; do
   sleep 0.1
@@ -141,20 +134,11 @@ ollama pull "$OLLAMA_MODEL"
 ollama pull "$OLLAMA_EMBED_MODEL"
 """
 
-#
-# [profile]
-# The profile scripts are executed in the user's shell, after
-# everything else has been done
-#
-
-[profile]
-
-common = '''
-  # Activate the Python venv
-  source "$PYTHON_DIR/bin/activate"
-'''
 
 [options]
-systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]
-
-
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-linux",
+  "x86_64-darwin",
+]

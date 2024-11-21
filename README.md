@@ -8,8 +8,13 @@
 | :--- | :-----: | :----: | :-----: | :---------- |
 | |
 | **Languages:** |
-| `go`  | ✅ | ✅ | ✅ | Go environment |
-| `python`  | ✅ | ✅ | ✅ | Python environment |
+| `go`  | ✅ | ✅ | ✅ | |
+| `python-poetry`  | ✅ | ✅ | ✅ | Python environment using poerty |
+| `python-pip`  | ✅ | ✅ | ✅ | Python environment using pip |
+| `python-uv`  | ✅ | ✅ | ✅ | Python environment using uv |
+| `javascript-bun`  | ✅ | ✅ | ✅ | Javascript environment with Bun |
+| `javascript-deno`  | ✅ | ✅ | ✅ | Javascript environment with Deno |
+| `javascript-node`  | ✅ | ✅ | ✅ | Javascript environment with Node/NPM |
 | `ruby`  | ✅ | ✅ | ✅ | Ruby environment |
 | `rust`  | ✅ | ✅ | ✅ | Rust environment |
 | **Databases:** |
@@ -27,7 +32,6 @@
 | `1password` | ✅ | ✅ | ✅ | 1Password + a simple shell helper |
 | `nginx`           | ✅ | ✅ | ✅ | A HTTP web server and much more... |
 | `nb`              | ✅ | ✅ | ✅ | IPython notebook |
-| `qmk` | ✅ | ✅ | ✅ | Open-source keyboard firmware for Atmel AVR and Arm USB families |
 | `flaim` | ✅ | ✅ | ✅ | A stack of Python modules for Stable Diffusion |
 | `crispy-doom` | ✅ | ✅ | ✅ | The Crispy Doom game engine w/a hook that downloads a Doom game library |
 | `anthropic`       |  |  |  | |
