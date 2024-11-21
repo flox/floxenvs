@@ -8,11 +8,11 @@ ollama.pkg-path = "ollama"
 
 [profile]
 common = '''
-  if ollama list >/dev/null 2>&1; then
-    echo "🤖 Ollama service running"
-  else
-    echo "⛔️ Ollama service not available"
-  fi
+if ollama list >/dev/null 2>&1; then
+  echo "🤖 Ollama service running"
+else
+  echo "⛔️ Ollama service not available"
+fi
 '''
 
 [services]

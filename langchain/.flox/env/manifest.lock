@@ -16,10 +16,9 @@
         "pkg-path": "ollama"
       }
     },
-    "vars": {},
     "hook": {},
     "profile": {
-      "common": "  if ollama list >/dev/null 2>&1; then\n    echo \"🤖 Ollama service running\"\n  else\n    echo \"⛔️ Ollama service not available\"\n  fi\n"
+      "common": "if ollama list >/dev/null 2>&1; then\n  echo \"🤖 Ollama service running\"\nelse\n  echo \"⛔️ Ollama service not available\"\nfi\n"
     },
     "options": {
       "systems": [
@@ -41,8 +40,7 @@
         "shutdown": null,
         "systems": null
       }
-    },
-    "build": {}
+    }
   },
   "packages": [
     {
