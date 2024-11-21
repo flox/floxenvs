@@ -30,7 +30,6 @@
 | `1password` | ✅ | ✅ | ✅ | 1Password + a simple shell helper |
 | `nginx`           | ✅ | ✅ | ✅ | A HTTP web server and much more... |
 | `nb`              | ✅ | ✅ | ✅ | IPython notebook |
-| `qmk` | ✅ | ✅ | ✅ | Open-source keyboard firmware for Atmel AVR and Arm USB families |
 | `flaim` | ✅ | ✅ | ✅ | A stack of Python modules for Stable Diffusion |
 | `crispy-doom` | ✅ | ✅ | ✅ | The Crispy Doom game engine w/a hook that downloads a Doom game library |
 | `anthropic`       |  |  |  | |
