@@ -1,0 +1,32 @@
+version = 1
+
+[install]
+abctl.pkg-path = "abctl"
+
+[vars]
+
+[hook]
+on-activate = '''
+'''
+
+[profile]
+common = '''
+echo ""
+echo "     ╔═════════════════════════════════════╗"
+echo "     ║                                     ║"
+echo "     ║  Compile and flash your firmware:   ║"
+echo "     ║  👉 abctl                           ║"
+echo "     ║                                     ║"
+echo "     ║  Read: https://www.airbyte.com      ║"
+echo "     ║                                     ║"
+echo "     ╚═════════════════════════════════════╝"
+echo ""
+'''
+
+[services]
+
+[options]
+systems = [
+  "aarch64-linux",
+  "x86_64-linux",
+]
