@@ -5,11 +5,15 @@ on:
   schedule:
     - cron: "30 0 * * 1"
 
+env:
+  FLOX_DISABLE_METRICS: "true"
+
 jobs:
 
   envs:
     name: "Find environments"
     runs-on: "ubuntu-latest"
+    timeout-minutes: 30
 
     outputs:
       envs: "${{ steps.envs.outputs.envs }}"
@@ -48,6 +52,7 @@ jobs:
   upgrade:
     name: "Upgrade '${{ matrix.example }}' manifest"
     runs-on: "ubuntu-latest"
+    timeout-minutes: 30
 
     needs:
       - "envs"
