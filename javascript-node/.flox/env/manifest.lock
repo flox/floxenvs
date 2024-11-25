@@ -1,1 +1,397 @@
-{"lockfile-version":1,"manifest":{"hook":{"on-activate":"\nexport FLOX_JAVASCRIPT_NODE_CACHE_DIR=\"$FLOX_ENV_CACHE/javascript-node\"\nmkdir -p \"$FLOX_JAVASCRIPT_NODE_CACHE_DIR\"\n\nexport FLOX_JAVASCRIPT_NODE_PACKAGES_HASH_FILE=\"$FLOX_JAVASCRIPT_NODE_CACHE_DIR/packages-hash\"\n\n\nfunction with_spinner() {\n  if [[ \"$FLOX_ENVS_TESTING\" == \"1\" ]]; then\n    bash -c \"$1\"\n  else\n    gum spin \\\n      --show-error \\\n      --spinner line \\\n      --spinner.foreground=\"#cccccc\" \\\n      --title \">>> $2 ...\" \\\n      --title.foreground=\"#cccccc\" \\\n        -- bash -c \"$1\"\n  fi\n}\n\nfunction install_packages() { \n  npm install\n}\nexport -f install_packages\n\n\n\nif [ -f \"package.json\" ] && [ -f \"package-lock.json\" ]; then\n  export FLOX_JAVASCRIPT_NODE_PACKAGES_HASH=\"false\"\n  if [ -f \"$FLOX_JAVASCRIPT_NODE_PACKAGES_HASH_FILE\" ] ; then\n    export FLOX_JAVASCRIPT_NODE_PACKAGES_HASH=$(cat package.json package-lock.json | sha256sum | cut -d\" \" -f 1)\n  fi\n  if [ \"$FLOX_JAVASCRIPT_NODE_PACKAGES_HASH\" != \"$(cat $FLOX_JAVASCRIPT_NODE_PACKAGES_HASH_FILE 2>/dev/null)\" ]; then\n    with_spinner install_packages \"Installing Javascript packages (with NPM)\"\n    echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Javascript packages installed (with NPM).\\\" }}\\n\" \\\n      | gum format -t template\n    echo \"$FLOX_JAVASCRIPT_NODE_PACKAGES_HASH\" > \"$FLOX_JAVASCRIPT_NODE_PACKAGES_HASH_FILE\"\n  fi\nfi\n"},"install":{"coreutils":{"pkg-path":"coreutils"},"gum":{"pkg-path":"gum"},"nodejs":{"pkg-path":"nodejs","version":"20"}},"options":{"allow":{"licenses":[]},"semver":{},"systems":["aarch64-darwin","aarch64-linux","x86_64-darwin","x86_64-linux"]},"profile":{},"vars":{"NODE_ENV":"development"},"version":1},"packages":[{"attr_path":"coreutils","broken":false,"derivation":"/nix/store/5naisiq61kp39x9mi4nnlh4h0agrv6ix-coreutils-9.5.drv","description":"GNU Core Utilities","group":"toplevel","install_id":"coreutils","license":"GPL-3.0-or-later","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"coreutils-9.5","outputs":{"info":"/nix/store/ydfklbdc7sdv9jl2jy0prq0wa4cv2zzf-coreutils-9.5-info","out":"/nix/store/5g6np23z9q7vwwp1s5pxkgn8f8wrmihh-coreutils-9.5"},"outputs_to_install":["out"],"pname":"coreutils","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"aarch64-darwin","unfree":false,"version":"9.5"},{"attr_path":"coreutils","broken":false,"derivation":"/nix/store/ir8y199idsk97agpjjkxk24nrrhlygiz-coreutils-9.5.drv","description":"GNU Core Utilities","group":"toplevel","install_id":"coreutils","license":"GPL-3.0-or-later","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"coreutils-9.5","outputs":{"debug":"/nix/store/q70vk5m0nlz0qpy7z6nfczi8ksyaszap-coreutils-9.5-debug","info":"/nix/store/cbk08ylbni3vx41g1hdd013146yvcf5c-coreutils-9.5-info","out":"/nix/store/g5manmr2a4jc9m06cf2lpnx1092wvvjh-coreutils-9.5"},"outputs_to_install":["out"],"pname":"coreutils","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"aarch64-linux","unfree":false,"version":"9.5"},{"attr_path":"coreutils","broken":false,"derivation":"/nix/store/5qkwxai9nx4hszq8m25ralrg5nrjfs6n-coreutils-9.5.drv","description":"GNU Core Utilities","group":"toplevel","install_id":"coreutils","license":"GPL-3.0-or-later","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"coreutils-9.5","outputs":{"info":"/nix/store/64g8lpl80mprjql96w0wsqc3n2q753l3-coreutils-9.5-info","out":"/nix/store/w95g6dz0b7byi4w2mgvmwpl692pilqf1-coreutils-9.5"},"outputs_to_install":["out"],"pname":"coreutils","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"x86_64-darwin","unfree":false,"version":"9.5"},{"attr_path":"coreutils","broken":false,"derivation":"/nix/store/gk6as4in5fphr7ds30l9cyn70icxr54a-coreutils-9.5.drv","description":"GNU Core Utilities","group":"toplevel","install_id":"coreutils","license":"GPL-3.0-or-later","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"coreutils-9.5","outputs":{"debug":"/nix/store/h42j46bwd0fqsg70axqpkn49fzfgsxkd-coreutils-9.5-debug","info":"/nix/store/kszl2ij9l8ql5ai95h357rkwg77g2f68-coreutils-9.5-info","out":"/nix/store/k48bha2fjqzarg52picsdfwlqx75aqbb-coreutils-9.5"},"outputs_to_install":["out"],"pname":"coreutils","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"x86_64-linux","unfree":false,"version":"9.5"},{"attr_path":"gum","broken":false,"derivation":"/nix/store/8psmrf1crmc3x1pdnd4pkk66gw5jh0z8-gum-0.14.5.drv","description":"Tasty Bubble Gum for your shell","group":"toplevel","install_id":"gum","license":"MIT","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"gum-0.14.5","outputs":{"out":"/nix/store/rzqm62ixipbzbhfagqlic5xxag9a2v82-gum-0.14.5"},"outputs_to_install":["out"],"pname":"gum","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"aarch64-darwin","unfree":false,"version":"0.14.5"},{"attr_path":"gum","broken":false,"derivation":"/nix/store/cmqqdgyzm0p03hfk7cwb0x4x2y9s42cd-gum-0.14.5.drv","description":"Tasty Bubble Gum for your shell","group":"toplevel","install_id":"gum","license":"MIT","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"gum-0.14.5","outputs":{"out":"/nix/store/3ick2j8z9jgkk3cyc1ik4zkbs3m4583n-gum-0.14.5"},"outputs_to_install":["out"],"pname":"gum","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"aarch64-linux","unfree":false,"version":"0.14.5"},{"attr_path":"gum","broken":false,"derivation":"/nix/store/vj45dkfx974zr2f1y3mnx30xqa06p9is-gum-0.14.5.drv","description":"Tasty Bubble Gum for your shell","group":"toplevel","install_id":"gum","license":"MIT","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"gum-0.14.5","outputs":{"out":"/nix/store/9rh8qxbxgb07v3a62mx9404ynk2yhxrj-gum-0.14.5"},"outputs_to_install":["out"],"pname":"gum","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"x86_64-darwin","unfree":false,"version":"0.14.5"},{"attr_path":"gum","broken":false,"derivation":"/nix/store/sxm0whwwcbs6f4ml5hw8zxfjlhlcc42k-gum-0.14.5.drv","description":"Tasty Bubble Gum for your shell","group":"toplevel","install_id":"gum","license":"MIT","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"gum-0.14.5","outputs":{"out":"/nix/store/1bnivwijzrnzx5h0hd5rywwy8rlhxmw5-gum-0.14.5"},"outputs_to_install":["out"],"pname":"gum","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"x86_64-linux","unfree":false,"version":"0.14.5"},{"attr_path":"nodejs","broken":false,"derivation":"/nix/store/v0v7dny82f4hmfp9s8zj31iykjrdblkn-nodejs-20.18.0.drv","description":"Event-driven I/O framework for the V8 JavaScript engine","group":"toplevel","install_id":"nodejs","license":"MIT","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"nodejs-20.18.0","outputs":{"libv8":"/nix/store/hfchgw1as9fm02wcyr3iqya05ylll5f3-nodejs-20.18.0-libv8","out":"/nix/store/9grahx8677nlgbx3yfiggibw335lkgfr-nodejs-20.18.0"},"outputs_to_install":["out"],"pname":"nodejs","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"aarch64-darwin","unfree":false,"version":"20.18.0"},{"attr_path":"nodejs","broken":false,"derivation":"/nix/store/d3mn4dx774ppvnajxls24jkgsscv4sq5-nodejs-20.18.0.drv","description":"Event-driven I/O framework for the V8 JavaScript engine","group":"toplevel","install_id":"nodejs","license":"MIT","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"nodejs-20.18.0","outputs":{"libv8":"/nix/store/yajvza262cb3bri9cryfrgpm3pvc066n-nodejs-20.18.0-libv8","out":"/nix/store/hsh74yzdb9yk834w9j5qz0w3sw84wcfv-nodejs-20.18.0"},"outputs_to_install":["out"],"pname":"nodejs","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"aarch64-linux","unfree":false,"version":"20.18.0"},{"attr_path":"nodejs","broken":false,"derivation":"/nix/store/lmn1hdq8i3gf5d3r64l13nhanlb2pnx5-nodejs-20.18.0.drv","description":"Event-driven I/O framework for the V8 JavaScript engine","group":"toplevel","install_id":"nodejs","license":"MIT","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"nodejs-20.18.0","outputs":{"libv8":"/nix/store/93xdzgjsm1dnnw33lnba4i7h7k5yph4k-nodejs-20.18.0-libv8","out":"/nix/store/v8p36abnvrn9i5h41zkgrayaj7sclv6z-nodejs-20.18.0"},"outputs_to_install":["out"],"pname":"nodejs","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"x86_64-darwin","unfree":false,"version":"20.18.0"},{"attr_path":"nodejs","broken":false,"derivation":"/nix/store/l136ajs6lg3mic58rnb7cdwhfhl3qcyr-nodejs-20.18.0.drv","description":"Event-driven I/O framework for the V8 JavaScript engine","group":"toplevel","install_id":"nodejs","license":"MIT","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"nodejs-20.18.0","outputs":{"libv8":"/nix/store/czcxwki3zqih2pf355zk0vxbmrij2bzx-nodejs-20.18.0-libv8","out":"/nix/store/z0ivg3dbal4sk5h0c7p1pfkxc7ff98ri-nodejs-20.18.0"},"outputs_to_install":["out"],"pname":"nodejs","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"x86_64-linux","unfree":false,"version":"20.18.0"}]}
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "version": 1,
+    "install": {
+      "coreutils": {
+        "pkg-path": "coreutils"
+      },
+      "gum": {
+        "pkg-path": "gum"
+      },
+      "nodejs": {
+        "pkg-path": "nodejs",
+        "version": "20"
+      }
+    },
+    "vars": {
+      "NODE_ENV": "development"
+    },
+    "hook": {
+      "on-activate": "\nexport FLOX_JAVASCRIPT_NODE_CACHE_DIR=\"$FLOX_ENV_CACHE/javascript-node\"\nmkdir -p \"$FLOX_JAVASCRIPT_NODE_CACHE_DIR\"\n\nexport FLOX_JAVASCRIPT_NODE_PACKAGES_HASH_FILE=\"$FLOX_JAVASCRIPT_NODE_CACHE_DIR/packages-hash\"\n\n\nfunction with_spinner() {\n  if [[ \"$FLOX_ENVS_TESTING\" == \"1\" ]]; then\n    bash -c \"$1\"\n  else\n    gum spin \\\n      --show-error \\\n      --spinner line \\\n      --spinner.foreground=\"#cccccc\" \\\n      --title \">>> $2 ...\" \\\n      --title.foreground=\"#cccccc\" \\\n        -- bash -c \"$1\"\n  fi\n}\n\nfunction install_packages() { \n  npm install\n}\nexport -f install_packages\n\n\n\nif [ -f \"package.json\" ] && [ -f \"package-lock.json\" ]; then\n  export FLOX_JAVASCRIPT_NODE_PACKAGES_HASH=\"false\"\n  if [ -f \"$FLOX_JAVASCRIPT_NODE_PACKAGES_HASH_FILE\" ] ; then\n    export FLOX_JAVASCRIPT_NODE_PACKAGES_HASH=$(cat package.json package-lock.json | sha256sum | cut -d\" \" -f 1)\n  fi\n  if [ \"$FLOX_JAVASCRIPT_NODE_PACKAGES_HASH\" != \"$(cat $FLOX_JAVASCRIPT_NODE_PACKAGES_HASH_FILE 2>/dev/null)\" ]; then\n    with_spinner install_packages \"Installing Javascript packages (with NPM)\"\n    echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Javascript packages installed (with NPM).\\\" }}\\n\" \\\n      | gum format -t template\n    echo \"$FLOX_JAVASCRIPT_NODE_PACKAGES_HASH\" > \"$FLOX_JAVASCRIPT_NODE_PACKAGES_HASH_FILE\"\n  fi\nfi\n"
+    },
+    "profile": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-darwin",
+        "x86_64-linux"
+      ],
+      "allow": {
+        "licenses": []
+      },
+      "semver": {}
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "coreutils",
+      "broken": false,
+      "derivation": "/nix/store/5naisiq61kp39x9mi4nnlh4h0agrv6ix-coreutils-9.5.drv",
+      "description": "GNU Core Utilities",
+      "install_id": "coreutils",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "name": "coreutils-9.5",
+      "pname": "coreutils",
+      "rev": "5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "rev_count": 708622,
+      "rev_date": "2024-11-15T13:07:34Z",
+      "scrape_date": "2024-11-17T03:59:12Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/ydfklbdc7sdv9jl2jy0prq0wa4cv2zzf-coreutils-9.5-info",
+        "out": "/nix/store/5g6np23z9q7vwwp1s5pxkgn8f8wrmihh-coreutils-9.5"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "coreutils",
+      "broken": false,
+      "derivation": "/nix/store/ir8y199idsk97agpjjkxk24nrrhlygiz-coreutils-9.5.drv",
+      "description": "GNU Core Utilities",
+      "install_id": "coreutils",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "name": "coreutils-9.5",
+      "pname": "coreutils",
+      "rev": "5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "rev_count": 708622,
+      "rev_date": "2024-11-15T13:07:34Z",
+      "scrape_date": "2024-11-17T03:59:12Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/q70vk5m0nlz0qpy7z6nfczi8ksyaszap-coreutils-9.5-debug",
+        "info": "/nix/store/cbk08ylbni3vx41g1hdd013146yvcf5c-coreutils-9.5-info",
+        "out": "/nix/store/g5manmr2a4jc9m06cf2lpnx1092wvvjh-coreutils-9.5"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "coreutils",
+      "broken": false,
+      "derivation": "/nix/store/5qkwxai9nx4hszq8m25ralrg5nrjfs6n-coreutils-9.5.drv",
+      "description": "GNU Core Utilities",
+      "install_id": "coreutils",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "name": "coreutils-9.5",
+      "pname": "coreutils",
+      "rev": "5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "rev_count": 708622,
+      "rev_date": "2024-11-15T13:07:34Z",
+      "scrape_date": "2024-11-17T03:59:12Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/64g8lpl80mprjql96w0wsqc3n2q753l3-coreutils-9.5-info",
+        "out": "/nix/store/w95g6dz0b7byi4w2mgvmwpl692pilqf1-coreutils-9.5"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "coreutils",
+      "broken": false,
+      "derivation": "/nix/store/gk6as4in5fphr7ds30l9cyn70icxr54a-coreutils-9.5.drv",
+      "description": "GNU Core Utilities",
+      "install_id": "coreutils",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "name": "coreutils-9.5",
+      "pname": "coreutils",
+      "rev": "5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "rev_count": 708622,
+      "rev_date": "2024-11-15T13:07:34Z",
+      "scrape_date": "2024-11-17T03:59:12Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/h42j46bwd0fqsg70axqpkn49fzfgsxkd-coreutils-9.5-debug",
+        "info": "/nix/store/kszl2ij9l8ql5ai95h357rkwg77g2f68-coreutils-9.5-info",
+        "out": "/nix/store/k48bha2fjqzarg52picsdfwlqx75aqbb-coreutils-9.5"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/8psmrf1crmc3x1pdnd4pkk66gw5jh0z8-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "rev_count": 708622,
+      "rev_date": "2024-11-15T13:07:34Z",
+      "scrape_date": "2024-11-17T03:59:12Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rzqm62ixipbzbhfagqlic5xxag9a2v82-gum-0.14.5"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/cmqqdgyzm0p03hfk7cwb0x4x2y9s42cd-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "rev_count": 708622,
+      "rev_date": "2024-11-15T13:07:34Z",
+      "scrape_date": "2024-11-17T03:59:12Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/3ick2j8z9jgkk3cyc1ik4zkbs3m4583n-gum-0.14.5"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/vj45dkfx974zr2f1y3mnx30xqa06p9is-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "rev_count": 708622,
+      "rev_date": "2024-11-15T13:07:34Z",
+      "scrape_date": "2024-11-17T03:59:12Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/9rh8qxbxgb07v3a62mx9404ynk2yhxrj-gum-0.14.5"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/sxm0whwwcbs6f4ml5hw8zxfjlhlcc42k-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "rev_count": 708622,
+      "rev_date": "2024-11-15T13:07:34Z",
+      "scrape_date": "2024-11-17T03:59:12Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/1bnivwijzrnzx5h0hd5rywwy8rlhxmw5-gum-0.14.5"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nodejs",
+      "broken": false,
+      "derivation": "/nix/store/v0v7dny82f4hmfp9s8zj31iykjrdblkn-nodejs-20.18.0.drv",
+      "description": "Event-driven I/O framework for the V8 JavaScript engine",
+      "install_id": "nodejs",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "name": "nodejs-20.18.0",
+      "pname": "nodejs",
+      "rev": "5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "rev_count": 708622,
+      "rev_date": "2024-11-15T13:07:34Z",
+      "scrape_date": "2024-11-17T03:59:12Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "20.18.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "libv8": "/nix/store/hfchgw1as9fm02wcyr3iqya05ylll5f3-nodejs-20.18.0-libv8",
+        "out": "/nix/store/9grahx8677nlgbx3yfiggibw335lkgfr-nodejs-20.18.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nodejs",
+      "broken": false,
+      "derivation": "/nix/store/d3mn4dx774ppvnajxls24jkgsscv4sq5-nodejs-20.18.0.drv",
+      "description": "Event-driven I/O framework for the V8 JavaScript engine",
+      "install_id": "nodejs",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "name": "nodejs-20.18.0",
+      "pname": "nodejs",
+      "rev": "5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "rev_count": 708622,
+      "rev_date": "2024-11-15T13:07:34Z",
+      "scrape_date": "2024-11-17T03:59:12Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "20.18.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "libv8": "/nix/store/yajvza262cb3bri9cryfrgpm3pvc066n-nodejs-20.18.0-libv8",
+        "out": "/nix/store/hsh74yzdb9yk834w9j5qz0w3sw84wcfv-nodejs-20.18.0"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nodejs",
+      "broken": false,
+      "derivation": "/nix/store/lmn1hdq8i3gf5d3r64l13nhanlb2pnx5-nodejs-20.18.0.drv",
+      "description": "Event-driven I/O framework for the V8 JavaScript engine",
+      "install_id": "nodejs",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "name": "nodejs-20.18.0",
+      "pname": "nodejs",
+      "rev": "5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "rev_count": 708622,
+      "rev_date": "2024-11-15T13:07:34Z",
+      "scrape_date": "2024-11-17T03:59:12Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "20.18.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "libv8": "/nix/store/93xdzgjsm1dnnw33lnba4i7h7k5yph4k-nodejs-20.18.0-libv8",
+        "out": "/nix/store/v8p36abnvrn9i5h41zkgrayaj7sclv6z-nodejs-20.18.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nodejs",
+      "broken": false,
+      "derivation": "/nix/store/l136ajs6lg3mic58rnb7cdwhfhl3qcyr-nodejs-20.18.0.drv",
+      "description": "Event-driven I/O framework for the V8 JavaScript engine",
+      "install_id": "nodejs",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "name": "nodejs-20.18.0",
+      "pname": "nodejs",
+      "rev": "5e4fbfb6b3de1aa2872b76d49fafc942626e2add",
+      "rev_count": 708622,
+      "rev_date": "2024-11-15T13:07:34Z",
+      "scrape_date": "2024-11-17T03:59:12Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "20.18.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "libv8": "/nix/store/czcxwki3zqih2pf355zk0vxbmrij2bzx-nodejs-20.18.0-libv8",
+        "out": "/nix/store/z0ivg3dbal4sk5h0c7p1pfkxc7ff98ri-nodejs-20.18.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ]
+}
