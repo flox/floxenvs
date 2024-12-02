@@ -32,6 +32,7 @@
 | `nb`              | ✅ | ✅ | ✅ | IPython notebook |
 | `flaim` | ✅ | ✅ | ✅ | A stack of Python modules for Stable Diffusion |
 | `crispy-doom` | ✅ | ✅ | ✅ | The Crispy Doom game engine w/a hook that downloads a Doom game library |
+| `colima` | ✅ | ✅ | ✅ | Turnkey Docker with Containers on Linux Machines |
 | `anthropic`       |  |  |  | |
 | `fooocus`         |  |  |  | |
 | `metabase`        |  |  |  | |
