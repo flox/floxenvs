@@ -1,0 +1,93 @@
+#
+# This is a Flox environment manifest.
+# Visit flox.dev/docs/concepts/manifest/
+# or see flox-edit(1), manifest.toml(5) for more information.
+#
+# Flox manifest version managed by Flox CLI
+version = 1
+
+
+[install]
+# Jupyter Lab
+jupyterlab.pkg-path = "python312Packages.jupyterlab"
+jupyterlab-lsp.pkg-path = "python312Packages.jupyterlab-lsp"
+jupyterlab-server.pkg-path = "python312Packages.jupyterlab-server"
+jupyterlab-widgets.pkg-path = "python312Packages.jupyterlab-widgets"
+jupyterlab-pygments.pkg-path = "python312Packages.jupyterlab-pygments"
+jupyterlab-execute-time.pkg-path = "python312Packages.jupyterlab-execute-time"
+
+# Data science stuffs
+pandas.pkg-path = "python312Packages.pandas"
+matplotlib.pkg-path = "python312Packages.matplotlib"
+numpy.pkg-path = "python312Packages.numpy"
+pyarrow.pkg-path = "python312Packages.pyarrow"
+sympy.pkg-path = "python312Packages.sympy"
+pydot.pkg-path = "python312Packages.pydot"
+plotly.pkg-path = "python312Packages.plotly"
+
+# To print a welcome banner
+figlet.pkg-path = "toilet"
+
+# For the spinnin'
+gum.pkg-path = "gum"
+
+[vars]
+#PYTHON_ENV='./nb-venv/'
+JUPYTER_SERVER_TOKEN = "floxfan123456"
+
+[hook]
+on-activate = '''
+ 
+  export PYTHON_ENV="${PYTHON_ENV:-$FLOX_ENV_CACHE/python}" 
+
+  if [[ -d $PYTHON_ENV ]]; then
+    echo; echo -n "⚡️ Activating existing venv in $PYTHON_ENV..."
+    . $PYTHON_ENV/bin/activate
+    echo "done."
+  fi
+
+  [ ! -d $PYTHON_ENV ] && python -m venv $PYTHON_ENV
+  . $PYTHON_ENV/bin/activate
+
+  # If we see a requirements.txt file, install its contents
+  # into the virtual environment
+
+  if [[ -f requirements.txt ]]; then
+    gum spin --spinner dot --title "Updating packages in $PYTHON_DIR" -- pip install -r "./requirements.txt" --quiet
+  fi
+'''
+
+[services.jupyter-lab]
+command = "jupyter-lab --no-browser --IdentityProvider.token=${JUPYTER_SERVER_TOKEN} --ip=0.0.0.0"
+
+[profile]
+common = '''
+  toilet -f smmono9 --metal "jupyterlab"
+
+  echo
+  if [[ "$FLOX_ACTIVATE_START_SERVICES" == "true" ]]; then
+    sleep 1
+    jupyter-lab list
+  else
+    echo "To start Jupyter Lab, run activate with '--start-services'."
+  fi
+  echo
+'''
+
+bash = '''
+  if [ -d "$VENV_DIR" ]; then
+    source "$VENV_DIR/bin/activate"
+  fi
+'''
+
+zsh = '''
+  if [ -d "$VENV_DIR" ]; then
+    source "$VENV_DIR/bin/activate"
+  fi
+'''
+
+[options]
+systems = ["x86_64-linux", "aarch64-darwin", "aarch64-linux", "x86_64-darwin"]
+
+
+
