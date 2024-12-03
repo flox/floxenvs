@@ -29,7 +29,7 @@ VIRTUAL_ENV_DISABLE_PROMPT="1"
 FLOX_FLAIM_ADDITIONAL_REQUIREMENTS_FILE = "requirements.txt"
 
 # The Github hash of our helper scripts
-FLOX_FLAIM_HELPER_HASH="dac8194788869c4c64319e7f7133fa8aef61ebb4"
+FLOX_FLAIM_HELPER_HASH="ae7ba346c1c43d51abc6dffd25d45f1671a188fa"
 
 [hook]
 on-activate = '''
@@ -110,16 +110,17 @@ export -f create_requirements_file
 function gather_helpers() {
   bindir="$FLOX_FLAIM_HELPER_DIR/$FLOX_FLAIM_HELPER_HASH"
   mkdir -p "$bindir"
-  curl -Ls -o "$bindir/testaccel" "https://github.com/flox/floxenvs/raw/$FLOX_FLAIM_HELPER_HASH/flaim/flapt/test.py"
-  curl -Ls -o "$bindir/genimg" "https://github.com/flox/floxenvs/raw/$FLOX_FLAIM_HELPER_HASH/flaim/image/image.py"
-  chmod +x "$bindir/genimg"
-  chmod +x "$bindir/testaccel"
+
+  for helper in testaccel genimg; do
+    curl -Ls -o "$bindir/$helper" "https://github.com/flox/floxenvs/raw/$FLOX_FLAIM_HELPER_HASH/flaim/helpers/$helper.py"
+    chmod +x "$bindir/$helper"
+  done
 }
 export -f gather_helpers
 
-indent && echo
-indent && echo
 
+indent && echo
+indent && echo
 
 if [ "$FLOX_FLAIM_VENV_INTERPRETER" != "$FLOX_FLAIM_INTERPRETER" ]; then
   with_spinner ensure_venv "Creating virtual environment"
@@ -172,7 +173,17 @@ export PATH="$FLOX_FLAIM_HELPER_DIR/$FLOX_FLAIM_HELPER_HASH:$PATH"
 
 indent && echo
 
+(
+  source "$FLOX_FLAIM_VENV_PATH/bin/activate"
+  indent && $FLOX_FLAIM_HELPER_DIR/$FLOX_FLAIM_HELPER_HASH/testaccel
+)
+
+indent && echo
+
 toilet -f smmono9 --metal "flaim"
+
+echo "Run 'testaccel' to retest acceleration."
+echo "Run 'genimg <string>' for an image."
 '''
 
 [services.jupyter-lab]
@@ -184,11 +195,6 @@ jupyter-lab --no-browser --IdentityProvider.token=${JUPYTER_SERVER_TOKEN} --ip=0
 [profile]
 bash = '''
 source "$FLOX_FLAIM_VENV_PATH/bin/activate"
-
-$FLOX_FLAIM_HELPER_DIR/$FLOX_FLAIM_HELPER_HASH/testaccel
-echo "Run 'testaccel' to retest acceleration."
-echo "Run 'genimg <string>' for an image."
-
 if [ "$FLOX_ACTIVATE_START_SERVICES" == "true" ]; then
   echo
   jupyter-lab list
@@ -198,30 +204,14 @@ fi
 
 fish = '''
 source "$FLOX_FLAIM_VENV_PATH/bin/activate.fish"
-
-$FLOX_FLAIM_HELPER_DIR/$FLOX_FLAIM_HELPER_HASH/testaccel
-
-echo "Run 'testaccel' to retest acceleration."
-echo "Run 'genimg <string>' for an image."
 '''
 
 tcsh = '''
 source "$FLOX_FLAIM_VENV_PATH/bin/activate.csh"
-
-$FLOX_FLAIM_HELPER_DIR/$FLOX_FLAIM_HELPER_HASH/testaccel
-
-echo "Run 'testaccel' to retest acceleration."
-echo "Run 'genimg <string>' for an image."
 '''
 
 zsh = '''
 source "$FLOX_FLAIM_VENV_PATH/bin/activate"
-
-$FLOX_FLAIM_HELPER_DIR/$FLOX_FLAIM_HELPER_HASH/testaccel
-
-echo "Run 'testaccel' to retest acceleration."
-echo "Run 'genimg <string>' for an image."
-
 if [[ "$FLOX_ACTIVATE_START_SERVICES" == "true" ]]; then
   echo
   jupyter-lab list
