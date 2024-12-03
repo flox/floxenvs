@@ -27,7 +27,8 @@ import torch
 
 # grab some image tools
 from PIL import Image
-from imgcat import imgcat
+from io import BytesIO
+import sixel
 import sys
 import gc
 
@@ -40,6 +41,13 @@ from rich.prompt import Prompt
 # here's that more shutup we talked about
 logging.set_verbosity(50)
 logging.disable_progress_bar()
+
+# draw images in the terminal
+def draw(image):
+    buffer = BytesIO()
+    writer = sixel.SixelWriter()
+    image.save(buffer, format='png')
+    writer.draw(buffer)
 
 # set our device and nope out if we don't have either CUDA or Metal
 if torch.cuda.is_available():
@@ -145,8 +153,8 @@ try:
             protocomp.paste(im, (x_offset, -212))
             x_offset += im.size[0]
 
-        # this requires an imgcat terminal to do anything, sadly
-        imgcat(protocomp)
+        # this requires a sixel terminal to do anything, sadly
+        draw(protocomp)
         print("\n")
 
         # ask the user to choose a proto
@@ -206,7 +214,7 @@ try:
     refinercomp.paste(image, (1000, -212))
 
     print("\n")
-    imgcat(refinercomp)
+    draw(refinercomp)
 
     # at this point I have found that we need to do some garbage collection;
     # the refiner needs a lot of memory
@@ -240,7 +248,7 @@ try:
     )  # from 2048/1024 to 2000/1200
 
     print("\n")
-    imgcat(cropped_image)
+    draw(cropped_image)
     print("\n")
 
     # export in two formats
@@ -250,7 +258,3 @@ try:
 except KeyboardInterrupt:
     print("\nOkay bye bye!\n")
     exit(1)
-
-
-
-
