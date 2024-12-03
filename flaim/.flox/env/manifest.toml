@@ -28,9 +28,6 @@ VIRTUAL_ENV_DISABLE_PROMPT="1"
 # packages to be installed in addition to the Flaim ones
 FLOX_FLAIM_ADDITIONAL_REQUIREMENTS_FILE = "requirements.txt"
 
-# The Github hash of our helper scripts
-FLOX_FLAIM_HELPER_HASH="ae7ba346c1c43d51abc6dffd25d45f1671a188fa"
-
 [hook]
 on-activate = '''
 
@@ -109,12 +106,11 @@ EOF
 export -f create_requirements_file
 
 function gather_helpers() {
-  bindir="$FLOX_FLAIM_HELPER_DIR/$FLOX_FLAIM_HELPER_HASH"
-  mkdir -p "$bindir"
+  mkdir -p "$FLOX_FLAIM_HELPER_DIR/"
 
   for helper in testaccel genimg; do
-    curl -Ls -o "$bindir/$helper" "https://github.com/flox/floxenvs/raw/$FLOX_FLAIM_HELPER_HASH/flaim/helpers/$helper.py"
-    chmod +x "$bindir/$helper"
+    curl -Ls -o "$FLOX_FLAIM_HELPER_DIR/$helper" "https://github.com/flox/floxenvs/raw/main/flaim/helpers/$helper.py"
+    chmod +x "$FLOX_FLAIM_HELPER_DIR/$helper"
   done
 }
 export -f gather_helpers
@@ -162,21 +158,16 @@ fi
 
 indent && echo
 
-if [ ! -d "$FLOX_FLAIM_HELPER_DIR/$FLOX_FLAIM_HELPER_HASH" ]; then
-  with_spinner gather_helpers "Gathering helper scripts"
-  indent && echo -e "{{ Foreground \"#ffffff\" \"✅ Helper scripts gathered.\" }}\n" \
-    | gum format -t template
-else
-  indent && echo -e "{{ Foreground \"#ffffff\" \"✅ Helper scripts already in place.\" }}\n" \
-    | gum format -t template
-fi
-export PATH="$FLOX_FLAIM_HELPER_DIR/$FLOX_FLAIM_HELPER_HASH:$PATH"
+with_spinner gather_helpers "Gathering helper scripts"
+indent && echo -e "{{ Foreground \"#ffffff\" \"✅ Helper scripts gathered.\" }}\n" \
+  | gum format -t template
+export PATH="$FLOX_FLAIM_HELPER_DIR:$PATH"
 
 indent && echo
 
 (
   source "$FLOX_FLAIM_VENV_PATH/bin/activate"
-  indent && $FLOX_FLAIM_HELPER_DIR/$FLOX_FLAIM_HELPER_HASH/testaccel
+  indent && $FLOX_FLAIM_HELPER_DIR/testaccel
 )
 
 indent && echo
