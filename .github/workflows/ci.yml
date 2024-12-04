@@ -67,7 +67,6 @@ jobs:
               done
 
               comma_only=""
-              if [ "$name" == "flaim" ]; then continue; fi
               if [ "$envs_only" != "[" ]; then comma_only=","; fi
               envs_only="$envs_only$comma_only{\"example\":\"$name\"}"
             fi
