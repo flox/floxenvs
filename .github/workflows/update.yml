@@ -31,7 +31,6 @@ jobs:
             env_path=$(realpath -s $(dirname $path)/../..)
             if [ -f "$env_path/test.sh" ]; then
               name=$(basename $env_path)
-              if [ "$name" == "flaim" ]; then continue; fi
               num_of_services=$(yq -oy '.services | length' $path)
               start_services="true"
               if [ "$num_of_services" -eq 0 ]; then start_services="false"; fi
