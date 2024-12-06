@@ -1,0 +1,75 @@
+version = 1
+
+[install]
+python3.pkg-path = "python3"
+gum.pkg-path = "gum"
+gource.pkg-path = "gource"
+
+[vars]
+INSTALL_PACKAGE="gitfaces"
+
+[hook]
+on-activate = '''
+
+# Make a spinner we can skip this in CI
+function with_spinner() {
+  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+    bash -c "$2"
+  else
+    gum spin \
+      --show-error \
+      --spinner line \
+      --title "$1" \
+        -- bash -c "$2"
+  fi
+}
+
+# Make a venv
+export PYTHON_DIR="$FLOX_ENV_CACHE/python"
+if [ ! -d "$PYTHON_DIR" ]; then
+  with_spinner "Creating venv in $PYTHON_DIR..." "python -m venv \"$PYTHON_DIR\""
+  echo "✅ Created venv"
+fi
+
+(
+  # Install gitfaces
+  source "$PYTHON_DIR/bin/activate"
+  with_spinner "Installing $INSTALL_PACKAGE..." "pip install $INSTALL_PACKAGE"
+  echo "✅ Installed $INSTALL_PACKAGE"
+
+  # We need to have a project to study, look for one in `cwd`!
+  if [ ! -d .git ]; then
+    echo "🚨 This is designed to be used inside a git repo!"
+    echo 
+    echo "Exit and reactivate this from within a directory containing .git."
+    return
+  fi
+
+  # Get our avatars
+  mkdir -p .git/avatars
+  with_spinner "Downloading avatars to .git/avatars" "gitfaces . .git/avatars"
+  echo "✅ Downloaded avatars"
+
+  # Run gource
+  gource --user-image-dir .git/avatars
+  exit 0
+)
+'''
+
+[profile]
+bash = '''
+source "$PYTHON_DIR/bin/activate"
+'''
+fish = '''
+source "$PYTHON_DIR/bin/activate.fish"
+'''
+tcsh = '''
+source "$PYTHON_DIR/bin/activate.csh"
+'''
+zsh = '''
+source "$PYTHON_DIR/bin/activate"
+'''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
+
