@@ -28,7 +28,6 @@ docker_is_running() {
 
 command_exists colima
 command_exists docker
-command_exists kubectl
 command_exists gum
 
 #docker_is_running
