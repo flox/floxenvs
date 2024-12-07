@@ -1,0 +1,31 @@
+version = 1
+
+[install]
+localstack.pkg-path = "localstack"
+kubectl.pkg-path = "kubectl"
+gum.pkg-path = "gum"
+
+[services]
+localstack.command = "localstack start -d"
+localstack.is-daemon = true
+localstack.shutdown.command = "localstack stop"
+
+[hook]
+on-activate = '''
+if [[ "$FLOX_ACTIVATE_START_SERVICES" == "true" ]]; then
+  gum style --border double --margin "1 2" --padding "1 4" \
+    'Localstack may take a few moments to start.' '' \
+    'Once it starts, see available services with:' \
+    '  localstack status services'
+else
+  gum style --border double --margin "1 2" --padding "1 4" \
+    'You may need to start localstack using:' \
+    '  flox services start'
+fi
+'''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
+
+
+
