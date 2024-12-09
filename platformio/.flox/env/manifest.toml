@@ -1,0 +1,27 @@
+version = 1
+
+[install]
+platformio-core.pkg-path = "platformio-core"
+cppcheck.pkg-path = "cppcheck"
+clang-tools.pkg-path = "clang-tools"
+gum.pkg-path = "gum"
+
+[vars]
+COMPILATIONDB_GENERATE = 'true'
+COMPILATIONDB_INCLUDE_TOOLCHAIN = 'true'
+
+[hook]
+on-activate = '''
+  if [[ ! -e platformio.ini ]]; then
+    gum log --time rfc822 --level error 'No platformio.ini file found'
+    exit 1
+  fi
+
+  if [[ 'true' == COMPILATIONDB_GENERATE ]]; then
+    gum log --time rfc822 --level info 'Generating compilation database'
+    pio run -t compiledb
+  fi
+'''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
