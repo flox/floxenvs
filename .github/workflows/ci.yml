@@ -67,7 +67,6 @@ jobs:
               done
 
               comma_only=""
-              if [ "$name" == "flaim" ]; then continue; fi
               if [ "$envs_only" != "[" ]; then comma_only=","; fi
               envs_only="$envs_only$comma_only{\"example\":\"$name\"}"
             fi
@@ -205,6 +204,8 @@ jobs:
       FLOX_AUTH0_URL:     "https://auth.flox.dev"
 
     strategy:
+      fail-fast: false
+      max-parallel: 8
       matrix:
         include: ${{ fromJSON(needs.envs.outputs.envs_only ) }}
 
