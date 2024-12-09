@@ -14,4 +14,3 @@ command_exists localstack
 command_exists kubectl
 command_exists gum
 
-localstack status services
