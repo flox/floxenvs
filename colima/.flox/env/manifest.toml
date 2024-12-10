@@ -1,0 +1,33 @@
+version = 1
+
+[install]
+colima.pkg-path = "colima"
+docker.pkg-path = "docker-client"
+gum.pkg-path = "gum"
+
+[services]
+colima.command = "colima start"
+colima.is-daemon = true
+colima.shutdown.command = "colima stop"
+
+[hook]
+on-activate = '''
+if [[ "$FLOX_ACTIVATE_START_SERVICES" == "true" ]]; then
+  gum style --border double --margin "1 2" --padding "1 4" \
+    'Colima may take a few moments to start.' '' \
+    'Once it starts, try it with:' \
+    '  docker run hello-world'
+else
+  if ! docker ps > /dev/null 2>&1; then
+    gum style --border double --margin "1 2" --padding "1 4" \
+      'Colima is not running.' '' \
+    'You may want to start it using:' \
+    '  flox services start'
+  fi
+fi
+'''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]
+
+
