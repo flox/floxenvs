@@ -32,6 +32,9 @@
 | `nb`              | ✅ | ✅ | ✅ | IPython notebook |
 | `flaim` | ✅ | ✅ | ✅ | A stack of Python modules for Stable Diffusion |
 | `crispy-doom` | ✅ | ✅ | ✅ | The Crispy Doom game engine w/a hook that downloads a Doom game library |
+| `colima` | ✅ | ✅ | ✅ | Turnkey Docker with Containers on Linux Machines |
+| `gource` | ✅ | ✅ | ✅ | Create a video of your Git history, with avatars |
+| `localstack` | ✅ | ✅ | ✅ | Run a local version of AWS services for testing and development |
 | `anthropic`       |  |  |  | |
 | `fooocus`         |  |  |  | |
 | `metabase`        |  |  |  | |
