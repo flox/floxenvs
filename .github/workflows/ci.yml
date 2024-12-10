@@ -116,19 +116,20 @@ jobs:
         run: |
           set -eo pipefail
           echo "${{ vars.MANAGED_REMOTE_BUILDERS }}" > machines
-          export REMOTE_SERVER=$(cat machines | shuf | grep ${{ matrix.system }} | cut -f1 -d' ' | cut -f3 -d'/' | head -1 | sed 's/nixbld@//' ; )
+          export REMOTE_SERVER_ENTRY=$(cat machines | shuf | grep ${{ matrix.system }} | head -1 ; )
+          export REMOTE_SERVER_ADDRESS=$(echo "$REMOTE_SERVER_ENTRY" | cut -f1 -d' ' | cut -f3 -d'/' | sed 's/nixbld@//' ; )
           export REMOTE_SERVER_USER_KNOWN_HOSTS_FILE=$(mktemp)
-          export REMOTE_PUBLIC_HOST_KEY=$(cat machines | grep ${{ matrix.system }} | tr -s ' ' | cut -f8 -d' ' | base64 -d ; )
-          printf "%s %s\n" "$REMOTE_SERVER" "$REMOTE_PUBLIC_HOST_KEY" > "$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE"
-          echo "REMOTE_SERVER: $REMOTE_SERVER"
+          export REMOTE_SERVER_PUBLIC_HOST_KEY=$(echo "$REMOTE_SERVER_ENTRY" | tr -s ' ' | cut -f8 -d' ' | base64 -d ; )
+          printf "%s %s\n" "$REMOTE_SERVER_ADDRESS" "$REMOTE_SERVER_PUBLIC_HOST_KEY" > "$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE"
+          echo "REMOTE_SERVER_ADDRESS: $REMOTE_SERVER_ADDRESS"
           echo "REMOTE_SERVER_USER_KNOWN_HOSTS_FILE: $REMOTE_SERVER_USER_KNOWN_HOSTS_FILE"
           cat $REMOTE_SERVER_USER_KNOWN_HOSTS_FILE
-          echo "REMOTE_SERVER=$REMOTE_SERVER" >> $GITHUB_ENV
+          echo "REMOTE_SERVER_ADDRESS=$REMOTE_SERVER_ADDRESS" >> $GITHUB_ENV
           echo "REMOTE_SERVER_USER_KNOWN_HOSTS_FILE=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE" >> $GITHUB_ENV
 
       - name: "Test environment"
         run: |
-          ssh github@$REMOTE_SERVER \
+          ssh github@$REMOTE_SERVER_ADDRESS \
             -oUserKnownHostsFile=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE \
             nix run \
                 --accept-flake-config \
