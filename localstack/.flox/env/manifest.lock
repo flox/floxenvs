@@ -3,6 +3,9 @@
   "manifest": {
     "version": 1,
     "install": {
+      "awscli2": {
+        "pkg-path": "awscli2"
+      },
       "gum": {
         "pkg-path": "gum"
       },
@@ -11,12 +14,23 @@
       },
       "localstack": {
         "pkg-path": "localstack"
+      },
+      "python3": {
+        "pkg-path": "python3"
       }
     },
-    "hook": {
-      "on-activate": "if [[ \"$FLOX_ACTIVATE_START_SERVICES\" == \"true\" ]]; then\n  gum style --border double --margin \"1 2\" --padding \"1 4\" \\\n    'Localstack may take a few moments to start.' '' \\\n    'Once it starts, see available services with:' \\\n    '  localstack status services'\nelse\n  gum style --border double --margin \"1 2\" --padding \"1 4\" \\\n    'You may need to start localstack using:' \\\n    '  flox services start'\nfi\n"
+    "vars": {
+      "AWSCLILOCAL_PACKAGE": "awscli-local"
     },
-    "profile": {},
+    "hook": {
+      "on-activate": "# Make a spinner we can skip this in CI\nfunction with_spinner() {\n  if [[ \"$FLOX_ENVS_TESTING\" == \"1\" ]]; then\n    bash -c \"$2\"\n  else\n    gum spin \\\n      --show-error \\\n      --spinner line \\\n      --title \"$1\" \\\n        -- bash -c \"$2\"\n  fi\n}\n\n# Make a venv\nexport PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\nif [ ! -d \"$PYTHON_DIR\" ]; then\n  with_spinner \"Creating venv in $PYTHON_DIR...\" \"python -m venv \\\"$PYTHON_DIR\\\"\"\n  echo \"✅ Created venv\"\nfi\n\n(\n  source \"$PYTHON_DIR/bin/activate\"\n  with_spinner \"Installing $AWSCLILOCAL_PACKAGE...\" \"pip install $AWSCLILOCAL_PACKAGE\"\n  echo \"✅ Installed $AWSCLILOCAL_PACKAGE\"\n)\n\nif [[ \"$FLOX_ACTIVATE_START_SERVICES\" == \"true\" ]]; then\n  gum style --border double --margin \"1 2\" --padding \"1 4\" \\\n    'Localstack may take a few moments to start.' '' \\\n    'Once it starts, see available services with:' \\\n    '  localstack status services'\nelse\n  gum style --border double --margin \"1 2\" --padding \"1 4\" \\\n    'You may need to start localstack using:' \\\n    '  flox services start'\nfi\n"
+    },
+    "profile": {
+      "bash": "source \"$PYTHON_DIR/bin/activate\"\n",
+      "zsh": "source \"$PYTHON_DIR/bin/activate\"\n",
+      "fish": "source \"$PYTHON_DIR/bin/activate.fish\"\n",
+      "tcsh": "source \"$PYTHON_DIR/bin/activate.csh\"\n"
+    },
     "options": {
       "systems": [
         "aarch64-darwin",
@@ -43,6 +57,130 @@
   },
   "packages": [
     {
+      "attr_path": "awscli2",
+      "broken": false,
+      "derivation": "/nix/store/sy02xzn107asinmvv1z8wzr1mhsprkix-awscli2-2.19.0.drv",
+      "description": "Unified tool to manage your AWS services",
+      "install_id": "awscli2",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=55d15ad12a74eb7d4646254e13638ad0c4128776",
+      "name": "awscli2-2.19.0",
+      "pname": "awscli2",
+      "rev": "55d15ad12a74eb7d4646254e13638ad0c4128776",
+      "rev_count": 716003,
+      "rev_date": "2024-12-03T07:54:31Z",
+      "scrape_date": "2024-12-04T03:55:34Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.19.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/254shki4ihfaqw0h1v5xj9vqcc0y5vkz-awscli2-2.19.0-dist",
+        "out": "/nix/store/ywgz36mwv7q52m3lnsj8d1h7x70nyylc-awscli2-2.19.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "awscli2",
+      "broken": false,
+      "derivation": "/nix/store/y09h0qc7kb9jfx4yd828jwjh4pbmkn2w-awscli2-2.19.0.drv",
+      "description": "Unified tool to manage your AWS services",
+      "install_id": "awscli2",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=55d15ad12a74eb7d4646254e13638ad0c4128776",
+      "name": "awscli2-2.19.0",
+      "pname": "awscli2",
+      "rev": "55d15ad12a74eb7d4646254e13638ad0c4128776",
+      "rev_count": 716003,
+      "rev_date": "2024-12-03T07:54:31Z",
+      "scrape_date": "2024-12-04T03:55:34Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.19.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/yqnb36a2b6bmlpsbxx28sb5857r6j9dz-awscli2-2.19.0-dist",
+        "out": "/nix/store/irx8wcn8hqar9nnq1h9b92cssl7plj1g-awscli2-2.19.0"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "awscli2",
+      "broken": false,
+      "derivation": "/nix/store/0qk0qllxywh51pg93qpr8zxq4ziyac3z-awscli2-2.19.0.drv",
+      "description": "Unified tool to manage your AWS services",
+      "install_id": "awscli2",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=55d15ad12a74eb7d4646254e13638ad0c4128776",
+      "name": "awscli2-2.19.0",
+      "pname": "awscli2",
+      "rev": "55d15ad12a74eb7d4646254e13638ad0c4128776",
+      "rev_count": 716003,
+      "rev_date": "2024-12-03T07:54:31Z",
+      "scrape_date": "2024-12-04T03:55:34Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.19.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/3zxc4fc3jqbd2m19p37ydpnj8w3s3mpm-awscli2-2.19.0-dist",
+        "out": "/nix/store/6jgmxb4gc0zbhhdd2h566vz4v08gz19g-awscli2-2.19.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "awscli2",
+      "broken": false,
+      "derivation": "/nix/store/4sh8xkcqra0h9wmvfrj2xncja14gfvqc-awscli2-2.19.0.drv",
+      "description": "Unified tool to manage your AWS services",
+      "install_id": "awscli2",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=55d15ad12a74eb7d4646254e13638ad0c4128776",
+      "name": "awscli2-2.19.0",
+      "pname": "awscli2",
+      "rev": "55d15ad12a74eb7d4646254e13638ad0c4128776",
+      "rev_count": 716003,
+      "rev_date": "2024-12-03T07:54:31Z",
+      "scrape_date": "2024-12-04T03:55:34Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.19.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/r5rkanfiin4i6cicbhl5jfswydq9kqgw-awscli2-2.19.0-dist",
+        "out": "/nix/store/g2w36iqqxj51nlfpid40dq102ag6kq8y-awscli2-2.19.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
       "attr_path": "gum",
       "broken": false,
       "derivation": "/nix/store/b8hmgi9iccbdpmckdh3rb70wm8a5m39w-gum-0.14.5.drv",
@@ -57,6 +195,7 @@
       "rev_date": "2024-12-03T07:54:31Z",
       "scrape_date": "2024-12-04T03:55:34Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -86,6 +225,7 @@
       "rev_date": "2024-12-03T07:54:31Z",
       "scrape_date": "2024-12-04T03:55:34Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -115,6 +255,7 @@
       "rev_date": "2024-12-03T07:54:31Z",
       "scrape_date": "2024-12-04T03:55:34Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -144,6 +285,7 @@
       "rev_date": "2024-12-03T07:54:31Z",
       "scrape_date": "2024-12-04T03:55:34Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -173,6 +315,7 @@
       "rev_date": "2024-12-03T07:54:31Z",
       "scrape_date": "2024-12-04T03:55:34Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -205,6 +348,7 @@
       "rev_date": "2024-12-03T07:54:31Z",
       "scrape_date": "2024-12-04T03:55:34Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -237,6 +381,7 @@
       "rev_date": "2024-12-03T07:54:31Z",
       "scrape_date": "2024-12-04T03:55:34Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -269,6 +414,7 @@
       "rev_date": "2024-12-03T07:54:31Z",
       "scrape_date": "2024-12-04T03:55:34Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -301,6 +447,7 @@
       "rev_date": "2024-12-03T07:54:31Z",
       "scrape_date": "2024-12-04T03:55:34Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -331,6 +478,7 @@
       "rev_date": "2024-12-03T07:54:31Z",
       "scrape_date": "2024-12-04T03:55:34Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -361,6 +509,7 @@
       "rev_date": "2024-12-03T07:54:31Z",
       "scrape_date": "2024-12-04T03:55:34Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -391,6 +540,7 @@
       "rev_date": "2024-12-03T07:54:31Z",
       "scrape_date": "2024-12-04T03:55:34Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -401,6 +551,128 @@
       "outputs": {
         "dist": "/nix/store/aqb4xh5mb62vzbz1mjbnxinq7g3v44ks-python3.12-localstack-3.7.2-dist",
         "out": "/nix/store/6dqwlhvzl0lr344n2jfbia3bmwnvzjfb-python3.12-localstack-3.7.2"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python3",
+      "broken": false,
+      "derivation": "/nix/store/f9hl5kjzr19apnwr86r91sg8l1vhp9df-python3-3.12.7.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python3",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=55d15ad12a74eb7d4646254e13638ad0c4128776",
+      "name": "python3-3.12.7",
+      "pname": "python3",
+      "rev": "55d15ad12a74eb7d4646254e13638ad0c4128776",
+      "rev_count": 716003,
+      "rev_date": "2024-12-03T07:54:31Z",
+      "scrape_date": "2024-12-04T03:55:34Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.12.7",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/7c494qcmh62av43zsxr3wvzh8hcpy1vl-python3-3.12.7"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python3",
+      "broken": false,
+      "derivation": "/nix/store/zmj2nziiz98ndjap1hbhnvc8bwd4rakd-python3-3.12.7.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python3",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=55d15ad12a74eb7d4646254e13638ad0c4128776",
+      "name": "python3-3.12.7",
+      "pname": "python3",
+      "rev": "55d15ad12a74eb7d4646254e13638ad0c4128776",
+      "rev_count": 716003,
+      "rev_date": "2024-12-03T07:54:31Z",
+      "scrape_date": "2024-12-04T03:55:34Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.12.7",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/s5biairx04d930rlh4szdbqsrai3w8gm-python3-3.12.7-debug",
+        "out": "/nix/store/c1fbv3y657fp2m514gjxqqgqfsvayp6v-python3-3.12.7"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python3",
+      "broken": false,
+      "derivation": "/nix/store/bvr6nhyqhbzy2w869f0xlsvj0y5qw55v-python3-3.12.7.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python3",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=55d15ad12a74eb7d4646254e13638ad0c4128776",
+      "name": "python3-3.12.7",
+      "pname": "python3",
+      "rev": "55d15ad12a74eb7d4646254e13638ad0c4128776",
+      "rev_count": 716003,
+      "rev_date": "2024-12-03T07:54:31Z",
+      "scrape_date": "2024-12-04T03:55:34Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.12.7",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/c0zcl6sav8305n3pb1crk2ysrlfk9ppk-python3-3.12.7"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python3",
+      "broken": false,
+      "derivation": "/nix/store/yjlx78f4khvqxa9d3j906qk8vdh6bd3r-python3-3.12.7.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python3",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=55d15ad12a74eb7d4646254e13638ad0c4128776",
+      "name": "python3-3.12.7",
+      "pname": "python3",
+      "rev": "55d15ad12a74eb7d4646254e13638ad0c4128776",
+      "rev_count": 716003,
+      "rev_date": "2024-12-03T07:54:31Z",
+      "scrape_date": "2024-12-04T03:55:34Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.12.7",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/66ln8wcdigr854aacj657zfjilwn4lrv-python3-3.12.7-debug",
+        "out": "/nix/store/zv1kaq7f1q20x62kbjv6pfjygw5jmwl6-python3-3.12.7"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
