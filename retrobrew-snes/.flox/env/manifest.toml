@@ -1,0 +1,50 @@
+version = 1
+
+# This environment contains selections from the
+# RetroBrewsFan collection of homebrew SNES games
+# 
+# https://github.com/retrobrews
+
+[install]
+mednafen.pkg-path = "mednafen"
+gum.pkg-path = "gum"
+
+[vars]
+GAME_COLLECTION="https://github.com/retrobrews/snes-games/archive/refs/heads/master.zip"
+
+[hook]
+on-activate = '''
+# Make a space for the games
+export GAMEDIR="${GAMEDIR:-$HOME/.cache/retrobrews/snes-games}"
+
+if [[ ! -d "$GAMEDIR" ]]; then
+  mkdir -p "$GAMEDIR"
+fi
+
+# Download the game collection
+filename=${GAME_COLLECTION##*/}
+if [ ! -f "$GAMEDIR/$filename" ]; then
+  pushd $GAMEDIR > /dev/null
+  gum spin --spinner dot --title "Grabbing homebrew SNES collection..." -- \
+    curl --output-dir "$GAMEDIR" -LsO "$GAME_COLLECTION"
+  gum spin --spinner dot --title "Unzipping..." -- \
+    unzip -jqq "$GAMEDIR/$filename" -d "$GAMEDIR"
+  popd > /dev/null
+fi
+
+# Choose the game to run
+RUNGAME=$(ls $GAMEDIR/*.s?c | gum choose)
+
+mednafen $RUNGAME
+exit 0
+'''
+
+[options]
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]
+cuda-detection = false
+

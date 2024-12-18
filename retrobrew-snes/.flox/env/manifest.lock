@@ -1,0 +1,272 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "version": 1,
+    "install": {
+      "gum": {
+        "pkg-path": "gum"
+      },
+      "mednafen": {
+        "pkg-path": "mednafen"
+      }
+    },
+    "vars": {
+      "GAME_COLLECTION": "https://github.com/retrobrews/snes-games/archive/refs/heads/master.zip"
+    },
+    "hook": {
+      "on-activate": "# Make a space for the games\nexport GAMEDIR=\"${GAMEDIR:-$HOME/.cache/retrobrews/snes-games}\"\n\nif [[ ! -d \"$GAMEDIR\" ]]; then\n  mkdir -p \"$GAMEDIR\"\nfi\n\n# Download the game collection\nfilename=${GAME_COLLECTION##*/}\nif [ ! -f \"$GAMEDIR/$filename\" ]; then\n  pushd $GAMEDIR > /dev/null\n  gum spin --spinner dot --title \"Grabbing homebrew SNES collection...\" -- \\\n    curl --output-dir \"$GAMEDIR\" -LsO \"$GAME_COLLECTION\"\n  gum spin --spinner dot --title \"Unzipping...\" -- \\\n    unzip -jqq \"$GAMEDIR/$filename\" -d \"$GAMEDIR\"\n  popd > /dev/null\nfi\n\n# Choose the game to run\nRUNGAME=$(ls $GAMEDIR/*.s?c | gum choose)\n\nmednafen $RUNGAME\nexit 0\n"
+    },
+    "profile": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-darwin",
+        "x86_64-linux"
+      ],
+      "allow": {
+        "licenses": []
+      },
+      "semver": {},
+      "cuda-detection": false
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/aca39ag4xf38ays966y23b3p9xagn7yr-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=3566ab7246670a43abd2ffa913cc62dad9cdf7d5",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "3566ab7246670a43abd2ffa913cc62dad9cdf7d5",
+      "rev_count": 721821,
+      "rev_date": "2024-12-13T19:53:07Z",
+      "scrape_date": "2024-12-16T03:51:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/2kh20kzsh8p9b045janwracxwh43zzcf-gum-0.14.5"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/hyb2nyh522k9zqqw7pqx6qv52ffhmn85-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=3566ab7246670a43abd2ffa913cc62dad9cdf7d5",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "3566ab7246670a43abd2ffa913cc62dad9cdf7d5",
+      "rev_count": 721821,
+      "rev_date": "2024-12-13T19:53:07Z",
+      "scrape_date": "2024-12-16T03:51:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/l82bhnw3lbrpjszs98wwgfnr5zkz3rz8-gum-0.14.5"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/gf7l3khqfnhlx0wi4ycdrx8wxzc56lgi-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=3566ab7246670a43abd2ffa913cc62dad9cdf7d5",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "3566ab7246670a43abd2ffa913cc62dad9cdf7d5",
+      "rev_count": 721821,
+      "rev_date": "2024-12-13T19:53:07Z",
+      "scrape_date": "2024-12-16T03:51:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/652lcsz1jind3y4dbg4vnfas6fvhblf9-gum-0.14.5"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/dxn3jm44jgpvwc6lvfgjlzaksqyzp7v7-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=3566ab7246670a43abd2ffa913cc62dad9cdf7d5",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "3566ab7246670a43abd2ffa913cc62dad9cdf7d5",
+      "rev_count": 721821,
+      "rev_date": "2024-12-13T19:53:07Z",
+      "scrape_date": "2024-12-16T03:51:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/0dl1rmdsxqn0x775zb433bf8cfar3cxv-gum-0.14.5"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mednafen",
+      "broken": false,
+      "derivation": "/nix/store/56ggvfad0lf2dz74zcp7mc6irnp1ldh5-mednafen-1.32.1.drv",
+      "description": "Portable, CLI-driven, SDL+OpenGL-based, multi-system emulator",
+      "install_id": "mednafen",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=3566ab7246670a43abd2ffa913cc62dad9cdf7d5",
+      "name": "mednafen-1.32.1",
+      "pname": "mednafen",
+      "rev": "3566ab7246670a43abd2ffa913cc62dad9cdf7d5",
+      "rev_count": 721821,
+      "rev_date": "2024-12-13T19:53:07Z",
+      "scrape_date": "2024-12-16T03:51:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.32.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/601wr0a6jyfw3d927arknp1zcasvj10p-mednafen-1.32.1-doc",
+        "out": "/nix/store/0j020iy2m43g4jbzb60ad1y2pp8zl7bp-mednafen-1.32.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mednafen",
+      "broken": false,
+      "derivation": "/nix/store/jillrx86cpip672qlajj3d187k2jlrym-mednafen-1.32.1.drv",
+      "description": "Portable, CLI-driven, SDL+OpenGL-based, multi-system emulator",
+      "install_id": "mednafen",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=3566ab7246670a43abd2ffa913cc62dad9cdf7d5",
+      "name": "mednafen-1.32.1",
+      "pname": "mednafen",
+      "rev": "3566ab7246670a43abd2ffa913cc62dad9cdf7d5",
+      "rev_count": 721821,
+      "rev_date": "2024-12-13T19:53:07Z",
+      "scrape_date": "2024-12-16T03:51:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.32.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/06fcpvrg770i0g96lah62l57pr3rwj7f-mednafen-1.32.1-doc",
+        "out": "/nix/store/a6zq3dhjkzz1ffk2mj8yyw0p72zywjy4-mednafen-1.32.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mednafen",
+      "broken": false,
+      "derivation": "/nix/store/pf42xprj5q0i9hv89h66dzkvnqyb2g6r-mednafen-1.32.1.drv",
+      "description": "Portable, CLI-driven, SDL+OpenGL-based, multi-system emulator",
+      "install_id": "mednafen",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=3566ab7246670a43abd2ffa913cc62dad9cdf7d5",
+      "name": "mednafen-1.32.1",
+      "pname": "mednafen",
+      "rev": "3566ab7246670a43abd2ffa913cc62dad9cdf7d5",
+      "rev_count": 721821,
+      "rev_date": "2024-12-13T19:53:07Z",
+      "scrape_date": "2024-12-16T03:51:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.32.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/8c04imaqwgjgc91hw6sngljxgh82nr34-mednafen-1.32.1-doc",
+        "out": "/nix/store/6kg8fi04kxs6wdb8l6zqfr3jxrw4c32f-mednafen-1.32.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mednafen",
+      "broken": false,
+      "derivation": "/nix/store/5lv6sykd1s7rxi22642j8ny7pv3j2w34-mednafen-1.32.1.drv",
+      "description": "Portable, CLI-driven, SDL+OpenGL-based, multi-system emulator",
+      "install_id": "mednafen",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=3566ab7246670a43abd2ffa913cc62dad9cdf7d5",
+      "name": "mednafen-1.32.1",
+      "pname": "mednafen",
+      "rev": "3566ab7246670a43abd2ffa913cc62dad9cdf7d5",
+      "rev_count": 721821,
+      "rev_date": "2024-12-13T19:53:07Z",
+      "scrape_date": "2024-12-16T03:51:20Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.32.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/s6zdbg9gqz91v1py2i6j2by8hiphcgpd-mednafen-1.32.1-doc",
+        "out": "/nix/store/2x6lvs9b7g4fzx3njn725ivc52g5a0za-mednafen-1.32.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ]
+}
