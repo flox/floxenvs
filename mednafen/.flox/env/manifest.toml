@@ -87,6 +87,11 @@ fi
 
 export GAMEDIR="snes-games"
 
+# exit in CI, be kind to github
+if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+  return
+fi
+
 if [[ ! -d "$GAMEDIR" ]] && gum confirm "Download homebrew SNES collection into cwd?"; then
   mkdir -p "$GAMEDIR"
   filename=${GAME_COLLECTION##*/}
