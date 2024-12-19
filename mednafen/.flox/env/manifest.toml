@@ -1,0 +1,117 @@
+version = 1
+
+# This environment contains selections from the
+# RetroBrewsFan collection of homebrew SNES games
+# 
+# https://github.com/retrobrews
+
+[install]
+mednafen.pkg-path = "mednafen"
+mednafen.pkg-group = "mednafen"
+broot.pkg-path = "broot"
+unzip.pkg-path = "unzip"
+gum.pkg-path = "gum"
+SDL2.pkg-path = "SDL2"
+SDL2.systems = [
+  "aarch64-linux",
+  "x86_64-linux",
+]
+
+[vars]
+GAME_COLLECTION="https://github.com/retrobrews/snes-games/archive/refs/heads/master.zip"
+
+[hook]
+on-activate = '''
+
+write_mednafen_cfg() {
+    local mednafen_cfg_file="$FLOX_ENV_CACHE/mednafen.cfg"
+
+    if [[ -f "$mednafen_cfg_file" ]]; then
+        return
+    fi
+
+    cat > "$mednafen_cfg_file" <<EOL
+; Mednafen Configuration File
+
+; Specify the sound driver (default: pulse)
+sound.driver sdl
+
+; Specify the video driver (default: default unless overridden)
+video.driver ${VIDEO_DRIVER:-default}
+EOL
+}
+
+write_broot_cfg() {
+    local broot_cfg_dir="${FLOX_ENV_CACHE}/broot"
+    local broot_cfg_file="${broot_cfg_dir}/conf.toml"
+
+    if [[ -f "$broot_cfg_file" ]]; then
+        return
+    fi
+
+    mkdir -p "$broot_cfg_dir"
+
+    cat > "$broot_cfg_file" <<EOL
+[[verbs]]
+invocation = "mednafen"
+execution = "mednafen {file}"
+shortcut = "m"
+apply_to = "file"
+
+[[verbs]]
+invocation = "edit"
+execution = "nvim {file}"
+shortcut = "e"
+apply_to = "file"
+
+[[verbs]]
+invocation = "open"
+execution = "xdg-open {file}"
+shortcut = "o"
+apply_to = "file"
+EOL
+
+}
+
+# export mednafen and broot config
+export MEDNAFEN_HOME="$FLOX_ENV_CACHE"
+export BROOT_CONFIG_DIR="${FLOX_ENV_CACHE}/broot"
+
+# write broot config file
+write_broot_cfg
+
+# write mednafen config file (if on Linux)
+if [[ "$(uname)" == "Linux" ]]; then
+    write_mednafen_cfg
+fi
+
+export GAMEDIR="snes-games"
+
+# exit in CI, be kind to github
+if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+  return
+fi
+
+if [[ ! -d "$GAMEDIR" ]] && gum confirm "Download homebrew SNES collection into cwd?"; then
+  mkdir -p "$GAMEDIR"
+  filename=${GAME_COLLECTION##*/}
+  gum spin --spinner dot --title "Grabbing homebrew SNES collection..." -- \
+    curl --output-dir "$GAMEDIR" -LsO "$GAME_COLLECTION"
+  gum spin --spinner dot --title "Unzipping..." -- \
+    unzip -jqq "$GAMEDIR/$filename" -d "$GAMEDIR"
+fi
+
+# run broot
+broot
+
+'''
+
+[options]
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]
+cuda-detection = false
+
