@@ -3,7 +3,7 @@
 
   inputs.flake-utils.url = "github:numtide/flake-utils";
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-  inputs.flox.url = "github:flox/flox/refs/tags/v1.3.2";
+  inputs.flox.url = "github:flox/flox/refs/tags/v1.3.5";
 
   outputs =
     {
@@ -43,6 +43,9 @@
           export TESTDIR="$(mktemp -d --suffix floxenvs-${name}-example)"
           cp -R ${path}/* $TESTDIR
           cp -R ${path}/.flox* $TESTDIR
+          if [ -f ${path}/.env ]; then
+            cp -R ${path}/.env $TESTDIR
+          fi
           chown -R $(whoami) $TESTDIR/.flox*
           chmod -R +w $TESTDIR/.flox*
 

@@ -5,11 +5,15 @@ on:
   schedule:
     - cron: "30 0 * * 1"
 
+env:
+  FLOX_DISABLE_METRICS: "true"
+
 jobs:
 
   envs:
     name: "Find environments"
     runs-on: "ubuntu-latest"
+    timeout-minutes: 30
 
     outputs:
       envs: "${{ steps.envs.outputs.envs }}"
@@ -29,9 +33,7 @@ jobs:
               name=$(basename $env_path)
               num_of_services=$(yq -oy '.services | length' $path)
               start_services="true"
-              if [ "$num_of_services" -eq 0 ]; then
-                start_services="false"
-              fi
+              if [ "$num_of_services" -eq 0 ]; then start_services="false"; fi
 
               comma=""
               if [ "$envs" != "[" ]; then comma=","; fi
@@ -49,11 +51,14 @@ jobs:
   upgrade:
     name: "Upgrade '${{ matrix.example }}' manifest"
     runs-on: "ubuntu-latest"
+    timeout-minutes: 30
 
     needs:
       - "envs"
 
     strategy:
+      fail-fast: false
+      max-parallel: 4
       matrix:
         include: ${{ fromJSON(needs.envs.outputs.envs) }}
 
