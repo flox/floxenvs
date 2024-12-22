@@ -5,6 +5,9 @@
     "install": {
       "ollama": {
         "pkg-path": "ollama"
+      },
+      "ollama-ui": {
+        "flake": "github:NixOS/nixpkgs/pull/366977/head#nextjs-ollama-llm-ui"
       }
     },
     "vars": {
@@ -24,12 +27,23 @@
       "allow": {
         "licenses": []
       },
-      "semver": {}
+      "semver": {},
+      "cuda-detection": false
     },
     "services": {
-      "ollama-serve": {
+      "ollama": {
         "command": "ollama serve",
-        "vars": null
+        "vars": null,
+        "is-daemon": null,
+        "shutdown": null,
+        "systems": null
+      },
+      "ollama-ui": {
+        "command": "# wait for ollama to be ready\nuntil ollama list; do sleep 1; done\n\nexport NEXT_CACHE_DIR=\"$FLOX_ENV_CACHE/next\"\nmkdir -p $NEXT_CACHE_DIR\nnextjs-ollama-llm-ui\n",
+        "vars": null,
+        "is-daemon": null,
+        "shutdown": null,
+        "systems": null
       }
     }
   },
@@ -152,6 +166,118 @@
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "install_id": "ollama-ui",
+      "locked-url": "github:NixOS/nixpkgs/792c4b5677e8ce0f3a2c15b778b5447c31012682",
+      "flake-description": "A collection of packages for the Nix package manager",
+      "locked-flake-attr-path": "legacyPackages.aarch64-darwin.nextjs-ollama-llm-ui",
+      "derivation": "/nix/store/4w2nxjpmlpzlx2ba6pvl41s4kyxw04vf-nextjs-ollama-llm-ui-1.1.0.drv",
+      "outputs": {
+        "out": "/nix/store/27h8saywh0c1sljw3c6q9d23l76arg8l-nextjs-ollama-llm-ui-1.1.0"
+      },
+      "output-names": [
+        "out"
+      ],
+      "outputs-to-install": [
+        "out"
+      ],
+      "package-system": "aarch64-darwin",
+      "system": "aarch64-darwin",
+      "name": "nextjs-ollama-llm-ui-1.1.0",
+      "pname": "nextjs-ollama-llm-ui",
+      "version": "1.1.0",
+      "description": "Simple chat web interface for Ollama LLMs",
+      "licenses": [
+        "MIT"
+      ],
+      "broken": false,
+      "unfree": false,
+      "priority": 5
+    },
+    {
+      "install_id": "ollama-ui",
+      "locked-url": "github:NixOS/nixpkgs/792c4b5677e8ce0f3a2c15b778b5447c31012682",
+      "flake-description": "A collection of packages for the Nix package manager",
+      "locked-flake-attr-path": "legacyPackages.aarch64-linux.nextjs-ollama-llm-ui",
+      "derivation": "/nix/store/n9n5almr38rjzc7sqkshjkmgjdjafa8y-nextjs-ollama-llm-ui-1.1.0.drv",
+      "outputs": {
+        "out": "/nix/store/hi1aksvhvyfsl1x7d3rq7323pa1hhcf0-nextjs-ollama-llm-ui-1.1.0"
+      },
+      "output-names": [
+        "out"
+      ],
+      "outputs-to-install": [
+        "out"
+      ],
+      "package-system": "aarch64-linux",
+      "system": "aarch64-linux",
+      "name": "nextjs-ollama-llm-ui-1.1.0",
+      "pname": "nextjs-ollama-llm-ui",
+      "version": "1.1.0",
+      "description": "Simple chat web interface for Ollama LLMs",
+      "licenses": [
+        "MIT"
+      ],
+      "broken": false,
+      "unfree": false,
+      "priority": 5
+    },
+    {
+      "install_id": "ollama-ui",
+      "locked-url": "github:NixOS/nixpkgs/792c4b5677e8ce0f3a2c15b778b5447c31012682",
+      "flake-description": "A collection of packages for the Nix package manager",
+      "locked-flake-attr-path": "legacyPackages.x86_64-linux.nextjs-ollama-llm-ui",
+      "derivation": "/nix/store/6mc7rvafjsplmw5dsiaj1b0whpzihifl-nextjs-ollama-llm-ui-1.1.0.drv",
+      "outputs": {
+        "out": "/nix/store/6m8ymxi3zj3h7phhv6ra8q38s6fihznf-nextjs-ollama-llm-ui-1.1.0"
+      },
+      "output-names": [
+        "out"
+      ],
+      "outputs-to-install": [
+        "out"
+      ],
+      "package-system": "x86_64-linux",
+      "system": "x86_64-linux",
+      "name": "nextjs-ollama-llm-ui-1.1.0",
+      "pname": "nextjs-ollama-llm-ui",
+      "version": "1.1.0",
+      "description": "Simple chat web interface for Ollama LLMs",
+      "licenses": [
+        "MIT"
+      ],
+      "broken": false,
+      "unfree": false,
+      "priority": 5
+    },
+    {
+      "install_id": "ollama-ui",
+      "locked-url": "github:NixOS/nixpkgs/792c4b5677e8ce0f3a2c15b778b5447c31012682",
+      "flake-description": "A collection of packages for the Nix package manager",
+      "locked-flake-attr-path": "legacyPackages.x86_64-darwin.nextjs-ollama-llm-ui",
+      "derivation": "/nix/store/ikf6phvkc4pkajlmi1ckn07fzqkb3ikn-nextjs-ollama-llm-ui-1.1.0.drv",
+      "outputs": {
+        "out": "/nix/store/bp5xz05mspi78av9s9zsl9qq6w4hl07p-nextjs-ollama-llm-ui-1.1.0"
+      },
+      "output-names": [
+        "out"
+      ],
+      "outputs-to-install": [
+        "out"
+      ],
+      "package-system": "x86_64-darwin",
+      "system": "x86_64-darwin",
+      "name": "nextjs-ollama-llm-ui-1.1.0",
+      "pname": "nextjs-ollama-llm-ui",
+      "version": "1.1.0",
+      "description": "Simple chat web interface for Ollama LLMs",
+      "licenses": [
+        "MIT"
+      ],
+      "broken": false,
+      "unfree": false,
       "priority": 5
     }
   ]
