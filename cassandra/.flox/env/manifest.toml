@@ -17,6 +17,7 @@ cassandra.pkg-path = "cassandra_4"
 [vars]
 CASSANDRA_HOST="127.0.0.1"
 CASSANDRA_PORT="19042"
+CASSANDRA_STORAGE_PORT="7070"
 CASSANDRA_SEED_ADDRS = "127.0.0.1"  # comma separated
 CASSANDRA_CLUSTER_NAME = "My Cluster"
 CASSANDRA_ALLOW_CLIENTS = "true"
@@ -45,6 +46,7 @@ if [[ ! -f "$CASSANDRA_CONFIG_FILE" ]]; then
   tee -a $CASSANDRA_CONFIG_FILE > /dev/null << EOF
 listen_address: "$CASSANDRA_HOST"
 native_transport_port: "$CASSANDRA_PORT"
+storage_port: "$CASSANDRA_STORAGE_PORT"
 start_native_transport: "$CASSANDRA_ALLOW_CLIENTS"
 cluster_name: "$CASSANDRA_CLUSTER_NAME"
 data_file_directories:
