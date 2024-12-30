@@ -180,6 +180,7 @@ jobs:
 
       - name: "Containarize"
         run: |
+          export NIX_CONFIG='extra-experimental-features = nix-command flakes'
           flox containerize -d ./${{ matrix.example }}
 
       - name: "Tag & Push"
