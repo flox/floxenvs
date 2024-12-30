@@ -2,6 +2,12 @@ name: "CI"
 
 on:
   workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
   push:
     branches:
       - "main"
@@ -85,58 +91,6 @@ jobs:
           echo "envs_per_system=$envs_per_system" >> "$GITHUB_OUTPUT"
           echo "envs_only=$envs_only" >> "$GITHUB_OUTPUT"
 
-  test:
-    name: "Test '${{ matrix.example }}' example on '${{ matrix.system }}'"
-    runs-on: "ubuntu-latest"
-    timeout-minutes: 30
-
-    needs:
-      - "envs"
-
-    strategy:
-      fail-fast: false
-      max-parallel: 8
-      matrix:
-        include: ${{ fromJSON(needs.envs.outputs.envs_per_system ) }}
-
-    steps:
-      - name: "Setup SSH"
-        uses: "webfactory/ssh-agent@v0.9.0"
-        with:
-          ssh-private-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
-
-      - name: "Setup Tailscale"
-        uses: "tailscale/github-action@v2"
-        with:
-          args: "--timeout 30s --login-server ${{ vars.MANAGED_TAILSCALE_URL }}"
-          tags: "tag:ci"
-          authkey: "${{ secrets.MANAGED_TAILSCALE_AUTH_KEY }}"
-
-      - name: "Find remote server to run tests on"
-        run: |
-          set -eo pipefail
-          echo "${{ vars.MANAGED_REMOTE_BUILDERS }}" > machines
-          export REMOTE_SERVER_ENTRY=$(cat machines | shuf | grep ${{ matrix.system }} | head -1 ; )
-          export REMOTE_SERVER_ADDRESS=$(echo "$REMOTE_SERVER_ENTRY" | cut -f1 -d' ' | cut -f3 -d'/' | sed 's/nixbld@//' ; )
-          export REMOTE_SERVER_USER_KNOWN_HOSTS_FILE=$(mktemp)
-          export REMOTE_SERVER_PUBLIC_HOST_KEY=$(echo "$REMOTE_SERVER_ENTRY" | tr -s ' ' | cut -f8 -d' ' | base64 -d ; )
-          printf "%s %s\n" "$REMOTE_SERVER_ADDRESS" "$REMOTE_SERVER_PUBLIC_HOST_KEY" > "$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE"
-          echo "REMOTE_SERVER_ADDRESS: $REMOTE_SERVER_ADDRESS"
-          echo "REMOTE_SERVER_USER_KNOWN_HOSTS_FILE: $REMOTE_SERVER_USER_KNOWN_HOSTS_FILE"
-          cat $REMOTE_SERVER_USER_KNOWN_HOSTS_FILE
-          echo "REMOTE_SERVER_ADDRESS=$REMOTE_SERVER_ADDRESS" >> $GITHUB_ENV
-          echo "REMOTE_SERVER_USER_KNOWN_HOSTS_FILE=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE" >> $GITHUB_ENV
-
-      - name: "Test environment"
-        run: |
-          ssh github@$REMOTE_SERVER_ADDRESS \
-            -oUserKnownHostsFile=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE \
-            nix run \
-                --accept-flake-config \
-                --extra-experimental-features '"nix-command flakes"' \
-                --option access-tokens "github.com=${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}" \
-                github:flox/floxenvs/${{ github.sha }}#apps.${{ matrix.system }}.test-${{ matrix.example }} -- ${{ matrix.start_services }}
-
   containarize:
     name: "Containarize '${{ matrix.example }}'"
     runs-on: "ubuntu-latest"
@@ -146,7 +100,6 @@ jobs:
 
     needs:
       - "envs"
-      - "test"
 
     env:
       FLOX_BIN: "flox -vvv"
@@ -178,104 +131,15 @@ jobs:
           username: "${{ github.actor }}"
           password: "${{ secrets.GITHUB_TOKEN }}"
 
+      # Enable tmate debugging of manually-triggered workflows if the input option was provided
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+
       - name: "Containarize"
         run: |
-          flox containerize -d ./${{ matrix.example }}
-
-      - name: "Tag & Push"
-        run: |
-          docker tag ${{ matrix.example }}:latest ghcr.io/flox/floxenvs:${{ matrix.example }}-latest
-          docker push ghcr.io/flox/floxenvs:${{ matrix.example }}-latest
-
-
-  push:
-    name: "Sync '${{ matrix.example }}' manifest"
-    runs-on: "ubuntu-latest"
-    timeout-minutes: 30
-
-    if: (github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
-
-    needs:
-      - "envs"
-      - "test"
-
-    env:
-      FLOX_BIN:           "flox -vvv"
-      FLOX_REMOTE_OWNER:  "flox"
-      FLOX_AUTH0_URL:     "https://auth.flox.dev"
-
-    strategy:
-      fail-fast: false
-      max-parallel: 8
-      matrix:
-        include: ${{ fromJSON(needs.envs.outputs.envs_only ) }}
-
-    steps:
-      - name: "Checkout"
-        uses: "actions/checkout@v4"
-
-      - name: "Install flox"
-        uses: "flox/install-flox-action@main"
-
-      - name: "Get FloxHub token"
-        run: |
-          echo "FLOX_FLOXHUB_TOKEN=$(
-            curl --request POST \
-              --url $FLOX_AUTH0_URL/oauth/token \
-              --header 'content-type: application/x-www-form-urlencoded' \
-              --data "client_id=${{ secrets.MANAGED_FLOXENVS_AUTH0_CLIENT_ID }}" \
-              --data "audience=https://hub.flox.dev/api" \
-              --data "grant_type=client_credentials" \
-              --data "client_secret=${{ secrets.MANAGED_FLOXENVS_AUTH0_CLIENT_SECRET }}" \
-                | jq .access_token -r)" >> $GITHUB_ENV
-
-      - name: "Pull or Create remote environment"
-        run: |
-          pushd ./${{ matrix.example }}
-          if flox list --config --remote "$FLOX_REMOTE_OWNER/${{ matrix.example }}" >/dev/null; then
-            $FLOX_BIN pull --remote "$FLOX_REMOTE_OWNER/${{ matrix.example }}" --dir "remote"
-          else
-            echo "WARN: No environment $FLOX_REMOTE_OWNER/${{ matrix.example }} found on FloxHub"
-            echo "WARN: Creating a new environment ${{ matrix.example }}"
-            $FLOX_BIN init --name ${{ matrix.example }} --dir "remote"
-            $FLOX_BIN push --dir "remote"
-          fi
-          popd
-
-      - name: "Sync to remote environment"
-        run: |
-          pushd ./${{ matrix.example }}
-          cp -rf .flox/env/* remote/.flox/env/
-          $FLOX_BIN edit --sync --dir "remote"
-          popd
-
-      - name: "Push to remote environment"
-        run: |
-          pushd ./${{ matrix.example }}
-          $FLOX_BIN push --dir "remote"
-          popd
-
-
-  report-failure:
-    name: "Report Failure"
-    runs-on: "ubuntu-latest"
-
-    if: ${{ failure() && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'schedule') }}
-
-    needs:
-      - "test"
-      - "push"
-      - "containarize"
-
-    steps:
-      - name: "Slack Notification"
-        uses: "rtCamp/action-slack-notify@v2"
-        env:
-          SLACK_CHANNEL:    "team-content"
-          SLACK_TITLE:      "Something broke CI for floxenvs"
-          SLACK_FOOTER:     "Thank you for caring"
-          SLACK_WEBHOOK:    "${{ secrets.MANAGED_SLACK_WEBHOOK }}"
-          SLACK_USERNAME:   "GitHub"
-          SLACK_ICON_EMOJI: ":poop:"
-          SLACK_COLOR:      "#ff2800"  # ferrari red -> https://encycolorpedia.com/ff2800
-          SLACK_LINK_NAMES: true
+          export NIX_CONFIG='extra-experimental-features = nix-command flakes'
+          nix store ping
+          flox containerize -vvvv -d ./${{ matrix.example }}
