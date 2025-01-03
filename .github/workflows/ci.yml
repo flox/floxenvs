@@ -106,7 +106,7 @@ jobs:
           ssh-private-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
 
       - name: "Setup Tailscale"
-        uses: "tailscale/github-action@v2"
+        uses: "tailscale/github-action@v3"
         with:
           args: "--timeout 30s --login-server ${{ vars.MANAGED_TAILSCALE_URL }}"
           tags: "tag:ci"
