@@ -9,7 +9,7 @@
 version = 1
 
 [install]
-ollama-ui.flake = "github:NixOS/nixpkgs/pull/366977/head#nextjs-ollama-llm-ui"
+ollama-ui.pkg-path = "nextjs-ollama-llm-ui"
 ollama.pkg-path = "ollama"
 
 [vars]
@@ -32,6 +32,7 @@ nextjs-ollama-llm-ui
 common = '''
   if ollama list >/dev/null 2>&1; then
     echo "🤖 Ollama service running"
+    echo "🌐 Web interface running on port 3000"
   else
     echo "⛔️ Ollama service not available"
   fi
