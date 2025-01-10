@@ -5,6 +5,9 @@
     "install": {
       "ollama": {
         "pkg-path": "ollama"
+      },
+      "ollama-ui": {
+        "pkg-path": "nextjs-ollama-llm-ui"
       }
     },
     "vars": {
@@ -12,7 +15,7 @@
     },
     "hook": {},
     "profile": {
-      "common": "  if ollama list >/dev/null 2>&1; then\n    echo \"🤖 Ollama service running\"\n  else\n    echo \"⛔️ Ollama service not available\"\n  fi\n"
+      "common": "  if ollama list >/dev/null 2>&1; then\n    echo \"🤖 Ollama service running\"\n    echo \"🌐 Web interface running on port 3000\"\n  else\n    echo \"⛔️ Ollama service not available\"\n  fi\n"
     },
     "options": {
       "systems": [
@@ -24,12 +27,23 @@
       "allow": {
         "licenses": []
       },
-      "semver": {}
+      "semver": {},
+      "cuda-detection": false
     },
     "services": {
-      "ollama-serve": {
+      "ollama": {
         "command": "ollama serve",
-        "vars": null
+        "vars": null,
+        "is-daemon": null,
+        "shutdown": null,
+        "systems": null
+      },
+      "ollama-ui": {
+        "command": "# wait for ollama to be ready\nuntil ollama list; do sleep 1; done\n\nexport NEXT_CACHE_DIR=\"$FLOX_ENV_CACHE/next\"\nmkdir -p $NEXT_CACHE_DIR\nnextjs-ollama-llm-ui\n",
+        "vars": null,
+        "is-daemon": null,
+        "shutdown": null,
+        "systems": null
       }
     }
   },
@@ -149,6 +163,126 @@
       ],
       "outputs": {
         "out": "/nix/store/2ih40ris6bi3vaz3bkqvkffmdv178dbi-ollama-0.2.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nextjs-ollama-llm-ui",
+      "broken": false,
+      "derivation": "/nix/store/d8ls4kid5zxp0r7sxcf3v70011ajqarb-nextjs-ollama-llm-ui-1.0.1.drv",
+      "description": "Simple chat web interface for Ollama LLMs",
+      "install_id": "ollama-ui",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ad0b5eed1b6031efaed382844806550c3dcb4206",
+      "name": "nextjs-ollama-llm-ui-1.0.1",
+      "pname": "nextjs-ollama-llm-ui",
+      "rev": "ad0b5eed1b6031efaed382844806550c3dcb4206",
+      "rev_count": 654036,
+      "rev_date": "2024-07-16T14:01:16Z",
+      "scrape_date": "2024-07-19T05:30:25Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.0.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/v8zkwpfmaq9cw5q0jqc1iy5akb4ra293-nextjs-ollama-llm-ui-1.0.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nextjs-ollama-llm-ui",
+      "broken": false,
+      "derivation": "/nix/store/vlwdblwl7a9l440f068wsva41zszch7h-nextjs-ollama-llm-ui-1.0.1.drv",
+      "description": "Simple chat web interface for Ollama LLMs",
+      "install_id": "ollama-ui",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ad0b5eed1b6031efaed382844806550c3dcb4206",
+      "name": "nextjs-ollama-llm-ui-1.0.1",
+      "pname": "nextjs-ollama-llm-ui",
+      "rev": "ad0b5eed1b6031efaed382844806550c3dcb4206",
+      "rev_count": 654036,
+      "rev_date": "2024-07-16T14:01:16Z",
+      "scrape_date": "2024-07-19T05:30:25Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.0.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/1mhvs37sfdslsphab553qzwdbgcwq0yn-nextjs-ollama-llm-ui-1.0.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nextjs-ollama-llm-ui",
+      "broken": false,
+      "derivation": "/nix/store/xir063b2m45sw3xjgw602m6pqd33dsah-nextjs-ollama-llm-ui-1.0.1.drv",
+      "description": "Simple chat web interface for Ollama LLMs",
+      "install_id": "ollama-ui",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ad0b5eed1b6031efaed382844806550c3dcb4206",
+      "name": "nextjs-ollama-llm-ui-1.0.1",
+      "pname": "nextjs-ollama-llm-ui",
+      "rev": "ad0b5eed1b6031efaed382844806550c3dcb4206",
+      "rev_count": 654036,
+      "rev_date": "2024-07-16T14:01:16Z",
+      "scrape_date": "2024-07-19T05:30:25Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.0.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/1j68j5jpb2ranhiwx7himknzn66m968j-nextjs-ollama-llm-ui-1.0.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nextjs-ollama-llm-ui",
+      "broken": false,
+      "derivation": "/nix/store/iwp1d460i1lbklp7sl0z00bhbdqa9avn-nextjs-ollama-llm-ui-1.0.1.drv",
+      "description": "Simple chat web interface for Ollama LLMs",
+      "install_id": "ollama-ui",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ad0b5eed1b6031efaed382844806550c3dcb4206",
+      "name": "nextjs-ollama-llm-ui-1.0.1",
+      "pname": "nextjs-ollama-llm-ui",
+      "rev": "ad0b5eed1b6031efaed382844806550c3dcb4206",
+      "rev_count": 654036,
+      "rev_date": "2024-07-16T14:01:16Z",
+      "scrape_date": "2024-07-19T05:30:25Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.0.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/fqbjcljrg3synqi46xldsqghh54j5xpy-nextjs-ollama-llm-ui-1.0.1"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
