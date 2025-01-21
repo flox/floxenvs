@@ -1,108 +1,222 @@
 version = 1
 
-
 [install]
+python.pkg-path = "python3"
+python.version = "3.12"
 
-pytorch-bin.pkg-path = "python311Packages.pytorch-bin"
-pytorch-bin.version = "python3.11-torch-2.4.1"
 
-diffusers.pkg-path = "python311Packages.diffusers"
-diffusers.version = "python3.11-diffusers-0.30.0"
-
-accelerate.pkg-path = "python311Packages.accelerate"
-accelerate.version = "python3.11-accelerate-1.0.0"
-
-transformers.pkg-path = "python311Packages.transformers"
-transformers.version = "python3.11-transformers-4.45.2"
-
-sentencepiece.pkg-path = "python311Packages.sentencepiece"
-sentencepiece.version = "python3.11-sentencepiece-0.2.0"
-
+# Helper tools
 gum.pkg-path = "gum"
+curl.pkg-path = "curl"
+coreutils.pkg-path = "coreutils"
 figlet.pkg-path = "toilet"
 
-jupyterlab.pkg-path = "python311Packages.jupyterlab"
-ipywidgets.pkg-path = "python311Packages.ipywidgets"
-
+# Required for stdc linking
+gcc-unwrapped.pkg-path = "gcc-unwrapped"
+gcc-unwrapped.systems = [ "aarch64-linux", "x86_64-linux" ]
 
 [vars]
 # This token will be used in the query string for our Jupyter
 # server. When you clone this environment for your own uses,
 # recommend using a proper Identity Provider.
-JUPYTER_SERVER_TOKEN    = "floxfan123456"
+JUPYTER_SERVER_TOKEN="floxfan123456"
 
+# We don't need to see the python venv in our prompt
 VIRTUAL_ENV_DISABLE_PROMPT="1"
 
-# These are example scripts that can be used later on to
-# generate a sample image and test acceleration
-
-generate_image="[(importlib := __import__('importlib')), (warnings := importlib.import_module('warnings')), warnings.filterwarnings('ignore'), (sys := importlib.import_module('sys')), (torch := importlib.import_module('torch')), (sixel := importlib.import_module('sixel')), (__ol_mod_tqgdpsmggw := __import__('io', globals(), locals(), ['BytesIO'], 0)), (BytesIO := __ol_mod_tqgdpsmggw.BytesIO), (__ol_mod_rdfadkcuju := __import__('diffusers', globals(), locals(), ['StableDiffusionPipeline'], 0)), (StableDiffusionPipeline := __ol_mod_rdfadkcuju.StableDiffusionPipeline), (__ol_mod_rrergazjfx := __import__('diffusers', globals(), locals(), ['logging'], 0)), (logging := __ol_mod_rrergazjfx.logging), (draw := (lambda image: [(__ol_retv_yarsjpxwtm := None), (buffer := BytesIO()), (writer := sixel.SixelWriter()), image.save(buffer, format='png'), writer.draw(buffer), __ol_retv_yarsjpxwtm][-1])), logging.set_verbosity(50), logging.disable_progress_bar(), (pipe := StableDiffusionPipeline.from_pretrained('IDKiro/sdxs-512-0.9', torch_dtype=torch.float32)), pipe.to('cuda') if torch.cuda.is_available() else pipe.to('mps') if torch.backends.mps.is_available() else ..., (prompt := (sys.argv[1] if len(sys.argv) > 1 else 'a fox in a henhouse')), pipe.set_progress_bar_config(disable=True), (image := pipe(prompt=prompt, num_inference_steps=1, guidance_scale=0).images[0]), image.save(f'{prompt}.png'), draw(image)]"
-
-test_acceleration="[(importlib := __import__('importlib')), (warnings := importlib.import_module('warnings')), warnings.filterwarnings('ignore'), (torch := importlib.import_module('torch')), print('CUDA is available 🔥') if torch.cuda.is_available() else print('Metal is available 🍏') if torch.backends.mps.is_available() else print('I only see a CPU 😞')]"
-
+# The location of an *additional* requirements file containing
+# packages to be installed in addition to the Flaim ones
+FLOX_FLAIM_ADDITIONAL_REQUIREMENTS_FILE = "requirements.txt"
 
 [hook]
 on-activate = '''
-# If there is a requirements.txt file in the current directory,
-# let's make our venv in the same place. Otherwise, in the cache.
-if [[ -f requirements.txt ]]; then
-  export VENV_DIR='./.venv/'
-  req_text=1
+
+# Store our venv and requirements.txt file in the env cache
+export FLOX_FLAIM_CACHE_DIR="$FLOX_ENV_CACHE/flaim"
+mkdir -p "$FLOX_FLAIM_CACHE_DIR"
+
+export FLOX_FLAIM_REQUIREMENTS_FILE="$FLOX_FLAIM_CACHE_DIR/requirements.txt"
+
+export FLOX_FLAIM_HELPER_DIR="$FLOX_FLAIM_CACHE_DIR/helpers"
+mkdir -p "$FLOX_FLAIM_HELPER_DIR"
+
+export FLOX_FLAIM_VENV_PATH="$FLOX_FLAIM_CACHE_DIR/venv"
+export FLOX_FLAIM_VENV_INTERPRETER="$(cat "$FLOX_FLAIM_CACHE_DIR/venv.interpreter" 2> /dev/null || echo false )"
+export FLOX_FLAIM_INTERPRETER="$(realpath $(which python3))"
+
+# Make sure any tools are not attempting to use the Python interpreter from any
+# existing virtual environment.
+unset VIRTUAL_ENV
+
+
+function indent() {
+  echo -e '{{ Foreground "#cccccc" " │ "}}' | \
+    gum format -t template --theme=auto
+}
+
+function with_spinner() {
+  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+    bash -c "$1"
+  else
+    echo
+    gum spin \
+      --show-error \
+      --spinner line \
+      --spinner.foreground="#cccccc" \
+      --title " >>> $2 ..." \
+      --title.foreground="#cccccc" \
+        -- bash -c "$1"
+    echo -en "\033[2A\033[K"
+  fi
+}
+
+function ensure_venv() {
+  "$FLOX_FLAIM_INTERPRETER" -m venv --upgrade-deps "$FLOX_FLAIM_VENV_PATH"
+  source "$FLOX_FLAIM_VENV_PATH/bin/activate"
+}
+export -f ensure_venv
+
+function install_flaim_packages() {
+  source "$FLOX_FLAIM_VENV_PATH/bin/activate"
+  pip install -r "$FLOX_FLAIM_REQUIREMENTS_FILE"
+}
+export -f install_flaim_packages
+
+function install_packages() {
+  source "$FLOX_FLAIM_VENV_PATH/bin/activate"
+  pip install -r "$FLOX_FLAIM_ADDITIONAL_REQUIREMENTS_FILE"
+}
+export -f install_packages
+
+function create_requirements_file() {
+  cat << EOF > "$FLOX_FLAIM_REQUIREMENTS_FILE"
+torch
+torchvision
+diffusers
+accelerate
+transformers
+sentencepiece
+bitsandbytes
+protobuf
+sixel
+jupyterlab
+ipywidgets
+EOF
+}
+export -f create_requirements_file
+
+function gather_helpers() {
+  mkdir -p "$FLOX_FLAIM_HELPER_DIR/"
+
+  for helper in testaccel genimg; do
+    curl -Ls -o "$FLOX_FLAIM_HELPER_DIR/$helper" "https://github.com/flox/floxenvs/raw/main/flaim/helpers/$helper.py"
+    chmod +x "$FLOX_FLAIM_HELPER_DIR/$helper"
+  done
+}
+export -f gather_helpers
+
+
+indent && echo
+indent && echo
+
+if [ "$FLOX_FLAIM_VENV_INTERPRETER" != "$FLOX_FLAIM_INTERPRETER" ]; then
+  with_spinner ensure_venv "Creating virtual environment"
+  indent && echo -e "{{ Foreground \"#ffffff\" \"✅ Virtual environment was created.\" }}\n" \
+    | gum format -t template
 else
-  export VENV_DIR="$FLOX_ENV_CACHE/python"
-  req_text=0
+  indent && echo -e "{{ Foreground \"#ffffff\" \"✅ Virtual environment already exists.\" }}\n" \
+    | gum format -t template
 fi
 
+indent && echo
 
-# Make the venv if it does not already exist
-if [ ! -d "$VENV_DIR" ]; then
-  gum spin --spinner dot --title "Creating python venv in $VENV_DIR" -- python3 -m venv "$VENV_DIR"
-  if [ "$req_text" == "1" ]; then
-    echo "✅ Virtual environment created in $VENV_DIR"
-  fi
+if [ ! -f "$FLOX_FLAIM_REQUIREMENTS_FILE" ]; then
+  with_spinner create_requirements_file "Creating Flaim requirements file"
+  indent && echo -e "{{ Foreground \"#ffffff\" \"✅ Flaim requirements file was created.\" }}\n" \
+    | gum format -t template
+else
+  indent && echo -e "{{ Foreground \"#ffffff\" \"✅ Flaim requirements file already exists.\" }}\n" \
+    | gum format -t template
 fi
 
-# Install or update packages in the venv
+indent && echo
+
+with_spinner install_flaim_packages "Installing Flaim Python packages"
+indent && echo -e "{{ Foreground \"#ffffff\" \"✅ Python packages installed.\" }}\n" \
+  | gum format -t template
+
+indent && echo
+
+if [ -f "$FLOX_FLAIM_ADDITIONAL_REQUIREMENTS_FILE" ]; then
+  with_spinner install_packages "Installing additional Python packages"
+  indent && echo -e "{{ Foreground \"#ffffff\" \"✅ Python additional packages installed.\" }}\n" \
+    | gum format -t template
+else
+  indent && echo -e "{{ Foreground \"#ffffff\" \"✅ No need to install additional Python packages.\" }}\n" \
+    | gum format -t template
+fi
+
+indent && echo
+
+with_spinner gather_helpers "Gathering helper scripts"
+indent && echo -e "{{ Foreground \"#ffffff\" \"✅ Helper scripts gathered.\" }}\n" \
+  | gum format -t template
+export PATH="$FLOX_FLAIM_HELPER_DIR:$PATH"
+
+indent && echo
+
 (
-  source "$VENV_DIR/bin/activate"
-  gum spin --spinner dot --title "Managing packages in $VENV_DIR" -- pip3 install --quiet sixel
-  if [[ -f requirements.txt ]]; then
-    gum spin --spinner dot --title "Managing packages in $VENV_DIR" -- pip3 install --quiet -r requirements.txt
-  fi
+  source "$FLOX_FLAIM_VENV_PATH/bin/activate"
+  indent && $FLOX_FLAIM_HELPER_DIR/testaccel
 )
 
+indent && echo
+
 toilet -f smmono9 --metal "flaim"
-echo ""
-$FLOX_ENV/bin/python3 -c "$test_acceleration"
+
 echo "Run 'testaccel' to retest acceleration."
 echo "Run 'genimg <string>' for an image."
 '''
 
+[services.jupyter-lab]
+command = """
+source "$FLOX_FLAIM_VENV_PATH/bin/activate"
+jupyter-lab --no-browser --IdentityProvider.token=${JUPYTER_SERVER_TOKEN} --ip=0.0.0.0
+"""
 
 [profile]
-common = '''
-if [ -d "$VENV_DIR" ]; then source "$VENV_DIR/bin/activate"; fi
-
-alias genimg="python3 -c \"$generate_image\""
-alias testaccel="python3 -c \"$test_acceleration\""
-
-if [[ "$FLOX_ACTIVATE_START_SERVICES" == "true" ]]; then
+bash = '''
+source "$FLOX_FLAIM_VENV_PATH/bin/activate"
+if [ "$FLOX_ACTIVATE_START_SERVICES" == "true" ]; then
   echo
-  sleep 1
   jupyter-lab list
   echo
 fi
 '''
 
+fish = '''
+source "$FLOX_FLAIM_VENV_PATH/bin/activate.fish"
+'''
 
-[services.jupyter-server]
-command = "jupyter-lab --IdentityProvider.token=${JUPYTER_SERVER_TOKEN} --ip=0.0.0.0"
+tcsh = '''
+source "$FLOX_FLAIM_VENV_PATH/bin/activate.csh"
+'''
 
+zsh = '''
+source "$FLOX_FLAIM_VENV_PATH/bin/activate"
+if [[ "$FLOX_ACTIVATE_START_SERVICES" == "true" ]]; then
+  echo
+  jupyter-lab list
+  echo
+fi
+'''
 
 [options]
 systems = [
   "aarch64-darwin",
   "aarch64-linux",
-#  "x86_64-linux", # ❌ ERROR: Failed to build package 'pytorch-bin': error: 1 dependencies of derivation '/nix/store/f18009m3gdj8a43kbw5pl8bir3hxwrp2-python3.11-torch-2.4.1.drv' failed to build
-#  "x86_64-darwin",
+  "x86_64-darwin",
+  "x86_64-linux",
 ]
+
+

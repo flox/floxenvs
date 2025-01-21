@@ -3,55 +3,50 @@
   "manifest": {
     "version": 1,
     "install": {
-      "accelerate": {
-        "pkg-path": "python311Packages.accelerate",
-        "version": "python3.11-accelerate-1.0.0"
+      "coreutils": {
+        "pkg-path": "coreutils"
       },
-      "diffusers": {
-        "pkg-path": "python311Packages.diffusers",
-        "version": "python3.11-diffusers-0.30.0"
+      "curl": {
+        "pkg-path": "curl"
       },
       "figlet": {
         "pkg-path": "toilet"
       },
+      "gcc-unwrapped": {
+        "pkg-path": "gcc-unwrapped",
+        "systems": [
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "gum": {
         "pkg-path": "gum"
       },
-      "ipywidgets": {
-        "pkg-path": "python311Packages.ipywidgets"
-      },
-      "jupyterlab": {
-        "pkg-path": "python311Packages.jupyterlab"
-      },
-      "pytorch-bin": {
-        "pkg-path": "python311Packages.pytorch-bin",
-        "version": "python3.11-torch-2.4.1"
-      },
-      "sentencepiece": {
-        "pkg-path": "python311Packages.sentencepiece",
-        "version": "python3.11-sentencepiece-0.2.0"
-      },
-      "transformers": {
-        "pkg-path": "python311Packages.transformers",
-        "version": "python3.11-transformers-4.45.2"
+      "python": {
+        "pkg-path": "python3",
+        "version": "3.12"
       }
     },
     "vars": {
+      "FLOX_FLAIM_ADDITIONAL_REQUIREMENTS_FILE": "requirements.txt",
       "JUPYTER_SERVER_TOKEN": "floxfan123456",
-      "VIRTUAL_ENV_DISABLE_PROMPT": "1",
-      "generate_image": "[(importlib := __import__('importlib')), (warnings := importlib.import_module('warnings')), warnings.filterwarnings('ignore'), (sys := importlib.import_module('sys')), (torch := importlib.import_module('torch')), (sixel := importlib.import_module('sixel')), (__ol_mod_tqgdpsmggw := __import__('io', globals(), locals(), ['BytesIO'], 0)), (BytesIO := __ol_mod_tqgdpsmggw.BytesIO), (__ol_mod_rdfadkcuju := __import__('diffusers', globals(), locals(), ['StableDiffusionPipeline'], 0)), (StableDiffusionPipeline := __ol_mod_rdfadkcuju.StableDiffusionPipeline), (__ol_mod_rrergazjfx := __import__('diffusers', globals(), locals(), ['logging'], 0)), (logging := __ol_mod_rrergazjfx.logging), (draw := (lambda image: [(__ol_retv_yarsjpxwtm := None), (buffer := BytesIO()), (writer := sixel.SixelWriter()), image.save(buffer, format='png'), writer.draw(buffer), __ol_retv_yarsjpxwtm][-1])), logging.set_verbosity(50), logging.disable_progress_bar(), (pipe := StableDiffusionPipeline.from_pretrained('IDKiro/sdxs-512-0.9', torch_dtype=torch.float32)), pipe.to('cuda') if torch.cuda.is_available() else pipe.to('mps') if torch.backends.mps.is_available() else ..., (prompt := (sys.argv[1] if len(sys.argv) > 1 else 'a fox in a henhouse')), pipe.set_progress_bar_config(disable=True), (image := pipe(prompt=prompt, num_inference_steps=1, guidance_scale=0).images[0]), image.save(f'{prompt}.png'), draw(image)]",
-      "test_acceleration": "[(importlib := __import__('importlib')), (warnings := importlib.import_module('warnings')), warnings.filterwarnings('ignore'), (torch := importlib.import_module('torch')), print('CUDA is available 🔥') if torch.cuda.is_available() else print('Metal is available 🍏') if torch.backends.mps.is_available() else print('I only see a CPU 😞')]"
+      "VIRTUAL_ENV_DISABLE_PROMPT": "1"
     },
     "hook": {
-      "on-activate": "# If there is a requirements.txt file in the current directory,\n# let's make our venv in the same place. Otherwise, in the cache.\nif [[ -f requirements.txt ]]; then\n  export VENV_DIR='./.venv/'\n  req_text=1\nelse\n  export VENV_DIR=\"$FLOX_ENV_CACHE/python\"\n  req_text=0\nfi\n\n\n# Make the venv if it does not already exist\nif [ ! -d \"$VENV_DIR\" ]; then\n  gum spin --spinner dot --title \"Creating python venv in $VENV_DIR\" -- python3 -m venv \"$VENV_DIR\"\n  if [ \"$req_text\" == \"1\" ]; then\n    echo \"✅ Virtual environment created in $VENV_DIR\"\n  fi\nfi\n\n# Install or update packages in the venv\n(\n  source \"$VENV_DIR/bin/activate\"\n  gum spin --spinner dot --title \"Managing packages in $VENV_DIR\" -- pip3 install --quiet sixel\n  if [[ -f requirements.txt ]]; then\n    gum spin --spinner dot --title \"Managing packages in $VENV_DIR\" -- pip3 install --quiet -r requirements.txt\n  fi\n)\n\ntoilet -f smmono9 --metal \"flaim\"\necho \"\"\n$FLOX_ENV/bin/python3 -c \"$test_acceleration\"\necho \"Run 'testaccel' to retest acceleration.\"\necho \"Run 'genimg <string>' for an image.\"\n"
+      "on-activate": "\n# Store our venv and requirements.txt file in the env cache\nexport FLOX_FLAIM_CACHE_DIR=\"$FLOX_ENV_CACHE/flaim\"\nmkdir -p \"$FLOX_FLAIM_CACHE_DIR\"\n\nexport FLOX_FLAIM_REQUIREMENTS_FILE=\"$FLOX_FLAIM_CACHE_DIR/requirements.txt\"\n\nexport FLOX_FLAIM_HELPER_DIR=\"$FLOX_FLAIM_CACHE_DIR/helpers\"\nmkdir -p \"$FLOX_FLAIM_HELPER_DIR\"\n\nexport FLOX_FLAIM_VENV_PATH=\"$FLOX_FLAIM_CACHE_DIR/venv\"\nexport FLOX_FLAIM_VENV_INTERPRETER=\"$(cat \"$FLOX_FLAIM_CACHE_DIR/venv.interpreter\" 2> /dev/null || echo false )\"\nexport FLOX_FLAIM_INTERPRETER=\"$(realpath $(which python3))\"\n\n# Make sure any tools are not attempting to use the Python interpreter from any\n# existing virtual environment.\nunset VIRTUAL_ENV\n\n\nfunction indent() {\n  echo -e '{{ Foreground \"#cccccc\" \" │ \"}}' | \\\n    gum format -t template --theme=auto\n}\n\nfunction with_spinner() {\n  if [[ \"$FLOX_ENVS_TESTING\" == \"1\" ]]; then\n    bash -c \"$1\"\n  else\n    echo\n    gum spin \\\n      --show-error \\\n      --spinner line \\\n      --spinner.foreground=\"#cccccc\" \\\n      --title \" >>> $2 ...\" \\\n      --title.foreground=\"#cccccc\" \\\n        -- bash -c \"$1\"\n    echo -en \"\\033[2A\\033[K\"\n  fi\n}\n\nfunction ensure_venv() {\n  \"$FLOX_FLAIM_INTERPRETER\" -m venv --upgrade-deps \"$FLOX_FLAIM_VENV_PATH\"\n  source \"$FLOX_FLAIM_VENV_PATH/bin/activate\"\n}\nexport -f ensure_venv\n\nfunction install_flaim_packages() {\n  source \"$FLOX_FLAIM_VENV_PATH/bin/activate\"\n  pip install -r \"$FLOX_FLAIM_REQUIREMENTS_FILE\"\n}\nexport -f install_flaim_packages\n\nfunction install_packages() {\n  source \"$FLOX_FLAIM_VENV_PATH/bin/activate\"\n  pip install -r \"$FLOX_FLAIM_ADDITIONAL_REQUIREMENTS_FILE\"\n}\nexport -f install_packages\n\nfunction create_requirements_file() {\n  cat << EOF > \"$FLOX_FLAIM_REQUIREMENTS_FILE\"\ntorch\ntorchvision\ndiffusers\naccelerate\ntransformers\nsentencepiece\nbitsandbytes\nprotobuf\nsixel\njupyterlab\nipywidgets\nEOF\n}\nexport -f create_requirements_file\n\nfunction gather_helpers() {\n  mkdir -p \"$FLOX_FLAIM_HELPER_DIR/\"\n\n  for helper in testaccel genimg; do\n    curl -Ls -o \"$FLOX_FLAIM_HELPER_DIR/$helper\" \"https://github.com/flox/floxenvs/raw/main/flaim/helpers/$helper.py\"\n    chmod +x \"$FLOX_FLAIM_HELPER_DIR/$helper\"\n  done\n}\nexport -f gather_helpers\n\n\nindent && echo\nindent && echo\n\nif [ \"$FLOX_FLAIM_VENV_INTERPRETER\" != \"$FLOX_FLAIM_INTERPRETER\" ]; then\n  with_spinner ensure_venv \"Creating virtual environment\"\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Virtual environment was created.\\\" }}\\n\" \\\n    | gum format -t template\nelse\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Virtual environment already exists.\\\" }}\\n\" \\\n    | gum format -t template\nfi\n\nindent && echo\n\nif [ ! -f \"$FLOX_FLAIM_REQUIREMENTS_FILE\" ]; then\n  with_spinner create_requirements_file \"Creating Flaim requirements file\"\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Flaim requirements file was created.\\\" }}\\n\" \\\n    | gum format -t template\nelse\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Flaim requirements file already exists.\\\" }}\\n\" \\\n    | gum format -t template\nfi\n\nindent && echo\n\nwith_spinner install_flaim_packages \"Installing Flaim Python packages\"\nindent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Python packages installed.\\\" }}\\n\" \\\n  | gum format -t template\n\nindent && echo\n\nif [ -f \"$FLOX_FLAIM_ADDITIONAL_REQUIREMENTS_FILE\" ]; then\n  with_spinner install_packages \"Installing additional Python packages\"\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Python additional packages installed.\\\" }}\\n\" \\\n    | gum format -t template\nelse\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ No need to install additional Python packages.\\\" }}\\n\" \\\n    | gum format -t template\nfi\n\nindent && echo\n\nwith_spinner gather_helpers \"Gathering helper scripts\"\nindent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Helper scripts gathered.\\\" }}\\n\" \\\n  | gum format -t template\nexport PATH=\"$FLOX_FLAIM_HELPER_DIR:$PATH\"\n\nindent && echo\n\n(\n  source \"$FLOX_FLAIM_VENV_PATH/bin/activate\"\n  indent && $FLOX_FLAIM_HELPER_DIR/testaccel\n)\n\nindent && echo\n\ntoilet -f smmono9 --metal \"flaim\"\n\necho \"Run 'testaccel' to retest acceleration.\"\necho \"Run 'genimg <string>' for an image.\"\n"
     },
     "profile": {
-      "common": "if [ -d \"$VENV_DIR\" ]; then source \"$VENV_DIR/bin/activate\"; fi\n\nalias genimg=\"python3 -c \\\"$generate_image\\\"\"\nalias testaccel=\"python3 -c \\\"$test_acceleration\\\"\"\n\nif [[ \"$FLOX_ACTIVATE_START_SERVICES\" == \"true\" ]]; then\n  echo\n  sleep 1\n  jupyter-lab list\n  echo\nfi\n"
+      "bash": "source \"$FLOX_FLAIM_VENV_PATH/bin/activate\"\nif [ \"$FLOX_ACTIVATE_START_SERVICES\" == \"true\" ]; then\n  echo\n  jupyter-lab list\n  echo\nfi\n",
+      "zsh": "source \"$FLOX_FLAIM_VENV_PATH/bin/activate\"\nif [[ \"$FLOX_ACTIVATE_START_SERVICES\" == \"true\" ]]; then\n  echo\n  jupyter-lab list\n  echo\nfi\n",
+      "fish": "source \"$FLOX_FLAIM_VENV_PATH/bin/activate.fish\"\n",
+      "tcsh": "source \"$FLOX_FLAIM_VENV_PATH/bin/activate.csh\"\n"
     },
     "options": {
       "systems": [
         "aarch64-darwin",
-        "aarch64-linux"
+        "aarch64-linux",
+        "x86_64-darwin",
+        "x86_64-linux"
       ],
       "allow": {
         "licenses": []
@@ -59,8 +54,8 @@
       "semver": {}
     },
     "services": {
-      "jupyter-server": {
-        "command": "jupyter-lab --IdentityProvider.token=${JUPYTER_SERVER_TOKEN} --ip=0.0.0.0",
+      "jupyter-lab": {
+        "command": "source \"$FLOX_FLAIM_VENV_PATH/bin/activate\"\njupyter-lab --no-browser --IdentityProvider.token=${JUPYTER_SERVER_TOKEN} --ip=0.0.0.0\n",
         "vars": null,
         "is-daemon": null,
         "shutdown": null,
@@ -70,139 +65,279 @@
   },
   "packages": [
     {
-      "attr_path": "python311Packages.accelerate",
+      "attr_path": "coreutils",
       "broken": false,
-      "derivation": "/nix/store/jjlp13bjmpfyfg4nw8ak9v9hz5nnjixf-python3.11-accelerate-1.0.0.drv",
-      "description": "Simple way to train and use PyTorch models with multi-GPU, TPU, mixed-precision",
-      "install_id": "accelerate",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "name": "python3.11-accelerate-1.0.0",
-      "pname": "accelerate",
-      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "rev_count": 695081,
-      "rev_date": "2024-10-20T08:35:21Z",
-      "scrape_date": "2024-10-23T03:58:08Z",
+      "derivation": "/nix/store/llsrcrh3a4nyqc16qiil45j5ndypcp2v-coreutils-9.5.drv",
+      "description": "GNU Core Utilities",
+      "install_id": "coreutils",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "name": "coreutils-9.5",
+      "pname": "coreutils",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "python3.11-accelerate-1.0.0",
+      "version": "9.5",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/m96wqhdfzqfwr1qxxq648axpcc0p5pk0-python3.11-accelerate-1.0.0-dist",
-        "out": "/nix/store/q3wb5jaw7rbb7rd1dvk0a259v5n5sa0i-python3.11-accelerate-1.0.0"
+        "info": "/nix/store/c263jjqg2mpap2fagjl34lziidkgph3i-coreutils-9.5-info",
+        "out": "/nix/store/p9m0bsw49c5m6wnm3m4fs97yx5rxcmfj-coreutils-9.5"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "python311Packages.accelerate",
+      "attr_path": "coreutils",
       "broken": false,
-      "derivation": "/nix/store/lxrdgx4k8qjw3qg4ajrfd6d35kryjzgw-python3.11-accelerate-1.0.0.drv",
-      "description": "Simple way to train and use PyTorch models with multi-GPU, TPU, mixed-precision",
-      "install_id": "accelerate",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "name": "python3.11-accelerate-1.0.0",
-      "pname": "accelerate",
-      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "rev_count": 695081,
-      "rev_date": "2024-10-20T08:35:21Z",
-      "scrape_date": "2024-10-23T03:58:08Z",
+      "derivation": "/nix/store/18ysbs708pj8ps18fdjj81z7zn4c6fla-coreutils-9.5.drv",
+      "description": "GNU Core Utilities",
+      "install_id": "coreutils",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "name": "coreutils-9.5",
+      "pname": "coreutils",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "python3.11-accelerate-1.0.0",
+      "version": "9.5",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/wqaa29l9ib4l5wcqd3csayqzdk17y855-python3.11-accelerate-1.0.0-dist",
-        "out": "/nix/store/6xmqzj0ry29yv2cd4l4cqhgn1h72lgs3-python3.11-accelerate-1.0.0"
+        "debug": "/nix/store/r1x885lysldxid2575k87nld06pkbf4v-coreutils-9.5-debug",
+        "info": "/nix/store/xqglm4755lgpjrdyxi5f52fljrcarvqc-coreutils-9.5-info",
+        "out": "/nix/store/lhd4sbpf3l9jxmb8sl6881l924q151j0-coreutils-9.5"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "python311Packages.diffusers",
+      "attr_path": "coreutils",
       "broken": false,
-      "derivation": "/nix/store/662ksdgr6zm5c5s29pz1237i0srgnp0w-python3.11-diffusers-0.30.0.drv",
-      "description": "State-of-the-art diffusion models for image and audio generation in PyTorch",
-      "install_id": "diffusers",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "name": "python3.11-diffusers-0.30.0",
-      "pname": "diffusers",
-      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "rev_count": 695081,
-      "rev_date": "2024-10-20T08:35:21Z",
-      "scrape_date": "2024-10-23T03:58:08Z",
+      "derivation": "/nix/store/kbycv389y9ybys6xrgbqj82z039s9i20-coreutils-9.5.drv",
+      "description": "GNU Core Utilities",
+      "install_id": "coreutils",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "name": "coreutils-9.5",
+      "pname": "coreutils",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "python3.11-diffusers-0.30.0",
+      "version": "9.5",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/ham7wpi5mxdf2vxwrxx34gaji1f6392w-python3.11-diffusers-0.30.0-dist",
-        "out": "/nix/store/s4yjng3yri4dwvd4q8i5r1jlcjvvdiq3-python3.11-diffusers-0.30.0"
+        "info": "/nix/store/aghncv047lvr0xhil8fwwxpk6bi5yalh-coreutils-9.5-info",
+        "out": "/nix/store/ka9bhk1lwdqyv47kkw6ppqgx010xwghn-coreutils-9.5"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "coreutils",
+      "broken": false,
+      "derivation": "/nix/store/rzf4njjb1pfpc2csazccxjn9452d96mi-coreutils-9.5.drv",
+      "description": "GNU Core Utilities",
+      "install_id": "coreutils",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "name": "coreutils-9.5",
+      "pname": "coreutils",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/zs8k0d5dx7nkvs6vmxmkr1jdz3px2fhi-coreutils-9.5-debug",
+        "info": "/nix/store/hm7bqb710681rxgrq8b6l9zms50aj4k5-coreutils-9.5-info",
+        "out": "/nix/store/4s9rah4cwaxflicsk5cndnknqlk9n4p3-coreutils-9.5"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/dnqmvibg27990vinfrdj6anwxrlj8vav-curl-8.11.0.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "name": "curl-8.11.0",
+      "pname": "curl",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.11.0",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/s4idvq3pgjprcjg7sqp2h5cgp1pn8frs-curl-8.11.0-bin",
+        "dev": "/nix/store/i4z3xbailna79bxycv6apy5f6phr3q0v-curl-8.11.0-dev",
+        "devdoc": "/nix/store/2grp27ghxrmg56rzmc9cfqy6wvcv4mp0-curl-8.11.0-devdoc",
+        "man": "/nix/store/gjv4ljqxdby4bm8z21rspqd247aprpcc-curl-8.11.0-man",
+        "out": "/nix/store/ifcj5pbackbazl7b91g64m3kbd4v1q01-curl-8.11.0"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "python311Packages.diffusers",
+      "attr_path": "curl",
       "broken": false,
-      "derivation": "/nix/store/6508zczv1j7b3kk5h448l8a9glj34793-python3.11-diffusers-0.30.0.drv",
-      "description": "State-of-the-art diffusion models for image and audio generation in PyTorch",
-      "install_id": "diffusers",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "name": "python3.11-diffusers-0.30.0",
-      "pname": "diffusers",
-      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "rev_count": 695081,
-      "rev_date": "2024-10-20T08:35:21Z",
-      "scrape_date": "2024-10-23T03:58:08Z",
+      "derivation": "/nix/store/85rxa1mpby6wj24n9n149zg9k7phl8n1-curl-8.11.0.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "name": "curl-8.11.0",
+      "pname": "curl",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "python3.11-diffusers-0.30.0",
+      "version": "8.11.0",
       "outputs_to_install": [
-        "out"
+        "bin",
+        "man"
       ],
       "outputs": {
-        "dist": "/nix/store/h2vimmhbhdd24154awqxnlbdrz93ib3g-python3.11-diffusers-0.30.0-dist",
-        "out": "/nix/store/brldhx0m4gs95qg9r31h2fqlr6ca1nin-python3.11-diffusers-0.30.0"
+        "bin": "/nix/store/yq8dwiyxrflg270359yvxk8xckkid04q-curl-8.11.0-bin",
+        "debug": "/nix/store/hrzm29djj4n2l61pc3555kw3g17sr7z1-curl-8.11.0-debug",
+        "dev": "/nix/store/kjri2i96wsg99wqd4yaj50rdjh3hz531-curl-8.11.0-dev",
+        "devdoc": "/nix/store/02aq6i8g4mzs5bf0gvb562wcq51hizas-curl-8.11.0-devdoc",
+        "man": "/nix/store/y3bzv3q3226l5w1ia8ybb4rfwi0z5y0d-curl-8.11.0-man",
+        "out": "/nix/store/y340kr2q8x0y40krwzpv32x7d5c31jy7-curl-8.11.0"
       },
       "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/c5pr3nfanr80zbnc7nrkm1j8n96rqyaj-curl-8.11.0.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "name": "curl-8.11.0",
+      "pname": "curl",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.11.0",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/fmrh9cvrsfxv5bvv3cq853sz0y2q3cpd-curl-8.11.0-bin",
+        "dev": "/nix/store/ipjg6nffgq68mwdkqnj8nf5jri3hs1xf-curl-8.11.0-dev",
+        "devdoc": "/nix/store/gqbnhsqw8m6cz49apl1cj2llgsbz5mic-curl-8.11.0-devdoc",
+        "man": "/nix/store/c4n42gazswc9l8iiirv23xbpdk923gfw-curl-8.11.0-man",
+        "out": "/nix/store/32qkm0f9j9qdc91m4jnvj9imp6mfxxfz-curl-8.11.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/wjy2jwhbwc4s3g6ayd1p8nh6wri76qd2-curl-8.11.0.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "name": "curl-8.11.0",
+      "pname": "curl",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.11.0",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/yckhqngmx90bakzhcyrsk7dww1fm352s-curl-8.11.0-bin",
+        "debug": "/nix/store/qb1m3if99v266fzlwvrhsh3sq8wxcdg6-curl-8.11.0-debug",
+        "dev": "/nix/store/g26bs63hz87c9s3sg0v42d6d8gjk36qw-curl-8.11.0-dev",
+        "devdoc": "/nix/store/9fpcw3582c7p7rbq6v3hzj89gd7ibgif-curl-8.11.0-devdoc",
+        "man": "/nix/store/fpm2i0k76mxbdjpwn8nifqpm25py1pfz-curl-8.11.0-man",
+        "out": "/nix/store/8yfak7dis3yqqls4mclzp5jb1ic2jzab-curl-8.11.0"
+      },
+      "system": "x86_64-linux",
       "group": "toplevel",
       "priority": 5
     },
     {
       "attr_path": "toilet",
       "broken": false,
-      "derivation": "/nix/store/lgaai7cl966wsmfs827qk58gvlw4d9iy-toilet-0.3.drv",
+      "derivation": "/nix/store/ycj4vssvb7cd48xga94cfr76mgmvhywb-toilet-0.3.drv",
       "description": "Display large colourful characters in text mode",
       "install_id": "figlet",
       "license": "WTFPL",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
       "name": "toilet-0.3",
       "pname": "toilet",
-      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "rev_count": 695081,
-      "rev_date": "2024-10-20T08:35:21Z",
-      "scrape_date": "2024-10-23T03:58:08Z",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
       "stabilities": [
         "unstable"
       ],
@@ -212,7 +347,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/81y48wdxx4drg0k70d3ngrx84vc6gfxz-toilet-0.3"
+        "out": "/nix/store/1vq43kdphcc6zrmchrvwfx9aszb6iyxc-toilet-0.3"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -221,17 +356,17 @@
     {
       "attr_path": "toilet",
       "broken": false,
-      "derivation": "/nix/store/67ikv4cvq11s1dbqca372nfwminfbdhh-toilet-0.3.drv",
+      "derivation": "/nix/store/14v01m2q7dhxf7fq2p3f3p4ylwf6fjqs-toilet-0.3.drv",
       "description": "Display large colourful characters in text mode",
       "install_id": "figlet",
       "license": "WTFPL",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
       "name": "toilet-0.3",
       "pname": "toilet",
-      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "rev_count": 695081,
-      "rev_date": "2024-10-20T08:35:21Z",
-      "scrape_date": "2024-10-23T03:58:08Z",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
       "stabilities": [
         "unstable"
       ],
@@ -241,26 +376,154 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/0a7v94cwkc46b3ynd15w3xdsi9wisdms-toilet-0.3"
+        "out": "/nix/store/43f73scmdimwp8jl9mymj3p1z7p9zgc2-toilet-0.3"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
       "priority": 5
     },
     {
+      "attr_path": "toilet",
+      "broken": false,
+      "derivation": "/nix/store/c7h05djsrva35mvkagscgy278lll5hg1-toilet-0.3.drv",
+      "description": "Display large colourful characters in text mode",
+      "install_id": "figlet",
+      "license": "WTFPL",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "name": "toilet-0.3",
+      "pname": "toilet",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/67zdn99v8wi9mkc3a6b404mlsqvjj29v-toilet-0.3"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "toilet",
+      "broken": false,
+      "derivation": "/nix/store/sm04pglhpkalv47x1bm4sccvn0fnfcc1-toilet-0.3.drv",
+      "description": "Display large colourful characters in text mode",
+      "install_id": "figlet",
+      "license": "WTFPL",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "name": "toilet-0.3",
+      "pname": "toilet",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/aahm49lhd2gn1ml9pikpli8vd7xm7gp4-toilet-0.3"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gcc-unwrapped",
+      "broken": false,
+      "derivation": "/nix/store/3acjvbs3w4yxv1rwhww5cnwrmwbaiihi-gcc-14-20241116.drv",
+      "description": "GNU Compiler Collection, version 14-20241116",
+      "install_id": "gcc-unwrapped",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "name": "gcc-14-20241116",
+      "pname": "gcc-unwrapped",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "gcc-14-20241116",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "checksum": "/nix/store/l7wzh1jhiqa2vhaw8dpxj4rircpfhvxi-gcc-14-20241116-checksum",
+        "info": "/nix/store/s2lnnmhrswf5zmxi8662z08hc260m8ps-gcc-14-20241116-info",
+        "lib": "/nix/store/k7zrgs3l3ifa9qpz8i3ndaa0xvsmcb9n-gcc-14-20241116-lib",
+        "libgcc": "/nix/store/g0fg0qk212665jy2bmhrqvi7cqfzz90q-gcc-14-20241116-libgcc",
+        "man": "/nix/store/bl35c3073sg260lnp5k36bkjk6p6g3gs-gcc-14-20241116-man",
+        "out": "/nix/store/qbvp2h1f5a03nwmw0nwqimnk4kjhzv19-gcc-14-20241116"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gcc-unwrapped",
+      "broken": false,
+      "derivation": "/nix/store/2hwjfka1izg8hyzan7ki90pcwv3y604g-gcc-14-20241116.drv",
+      "description": "GNU Compiler Collection, version 14-20241116",
+      "install_id": "gcc-unwrapped",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "name": "gcc-14-20241116",
+      "pname": "gcc-unwrapped",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "gcc-14-20241116",
+      "outputs_to_install": [
+        "out",
+        "man"
+      ],
+      "outputs": {
+        "checksum": "/nix/store/h60zrhfdw173cffn5iyb52f64sn40jyc-gcc-14-20241116-checksum",
+        "info": "/nix/store/bmb9bqw7fxac08wc46cizd7dzlw64860-gcc-14-20241116-info",
+        "lib": "/nix/store/bpq1s72cw9qb2fs8mnmlw6hn2c7iy0ss-gcc-14-20241116-lib",
+        "libgcc": "/nix/store/17v0ywnr3akp85pvdi56gwl99ljv95kx-gcc-14-20241116-libgcc",
+        "man": "/nix/store/5kr602ywkyfpvzx6sl4d3zkksp4iakhb-gcc-14-20241116-man",
+        "out": "/nix/store/l89iqc7am6i60y8vk507zwrzxf0wcd3v-gcc-14-20241116"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/ippvngi4fvlm7wcjv66q35882kk0d782-gum-0.14.5.drv",
+      "derivation": "/nix/store/0lxr3l6jxkvc1ckrjs65bkmr6wkm12ib-gum-0.14.5.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
       "name": "gum-0.14.5",
       "pname": "gum",
-      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "rev_count": 695081,
-      "rev_date": "2024-10-20T08:35:21Z",
-      "scrape_date": "2024-10-23T03:58:08Z",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
       "stabilities": [
         "unstable"
       ],
@@ -270,7 +533,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/s4yb9a7cvj5vd5yw0nvssf51lmpa5id0-gum-0.14.5"
+        "out": "/nix/store/p87f1zvabjckkam5f8p5n8s0p9dy2z8d-gum-0.14.5"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -279,17 +542,17 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/yjf86f3qgpirr5lc9wsds4nlqyf8riw0-gum-0.14.5.drv",
+      "derivation": "/nix/store/flfac2jgxzw1zx2xk81w322qyzzbsni3-gum-0.14.5.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
       "name": "gum-0.14.5",
       "pname": "gum",
-      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "rev_count": 695081,
-      "rev_date": "2024-10-20T08:35:21Z",
-      "scrape_date": "2024-10-23T03:58:08Z",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
       "stabilities": [
         "unstable"
       ],
@@ -299,309 +562,185 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/bw0ii1jjvxd8albrmvi0lin6h1ssz4yi-gum-0.14.5"
+        "out": "/nix/store/i8ks7qinadmk77dmknnrpi4iczv8p8gj-gum-0.14.5"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "python311Packages.ipywidgets",
+      "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/bjll4ib611ivkcimxfflg7zc7a6ng7qy-python3.11-ipywidgets-8.1.5.drv",
-      "description": "IPython HTML widgets for Jupyter",
-      "install_id": "ipywidgets",
-      "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "name": "python3.11-ipywidgets-8.1.5",
-      "pname": "ipywidgets",
-      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "rev_count": 695081,
-      "rev_date": "2024-10-20T08:35:21Z",
-      "scrape_date": "2024-10-23T03:58:08Z",
+      "derivation": "/nix/store/5jaz36kssi10wjrsasi7wxf3rj9854hm-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "python3.11-ipywidgets-8.1.5",
+      "version": "0.14.5",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/wkbsx19shwp072bbqq1zqm3nvwvmn4gm-python3.11-ipywidgets-8.1.5-dist",
-        "out": "/nix/store/fcir97z7xks89dz4cjf5wa9z1ng993wb-python3.11-ipywidgets-8.1.5"
+        "out": "/nix/store/1s4jc1kmqksngyhanl76iibb19b7sd2v-gum-0.14.5"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/mjp6pldbmq5d6q0cl8brimzf0h3fdqpz-gum-0.14.5.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "name": "gum-0.14.5",
+      "pname": "gum",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.14.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/z96hiw9h45mph9qilm4hp4j4ncf19qbl-gum-0.14.5"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "python3",
+      "broken": false,
+      "derivation": "/nix/store/i2dv1bhyf4s7h75am3r1i0hch0477r0n-python3-3.12.8.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "name": "python3-3.12.8",
+      "pname": "python3",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.12.8",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/8zc3wcplydp8gsxms24scpzdca438dk5-python3-3.12.8"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "python311Packages.ipywidgets",
+      "attr_path": "python3",
       "broken": false,
-      "derivation": "/nix/store/fkwdw759ixbbaqrrxzkmzqx03nanc8vb-python3.11-ipywidgets-8.1.5.drv",
-      "description": "IPython HTML widgets for Jupyter",
-      "install_id": "ipywidgets",
-      "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "name": "python3.11-ipywidgets-8.1.5",
-      "pname": "ipywidgets",
-      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "rev_count": 695081,
-      "rev_date": "2024-10-20T08:35:21Z",
-      "scrape_date": "2024-10-23T03:58:08Z",
+      "derivation": "/nix/store/22lnksddxfiwc7may5a6x0fmf2q74ksx-python3-3.12.8.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "name": "python3-3.12.8",
+      "pname": "python3",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "python3.11-ipywidgets-8.1.5",
+      "version": "3.12.8",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/71k6b1ycnmvzbix9q1i7afafdpb0rzj5-python3.11-ipywidgets-8.1.5-dist",
-        "out": "/nix/store/0q4lwaza3chckfabmdj61952kf2fbkx3-python3.11-ipywidgets-8.1.5"
+        "debug": "/nix/store/brcg3a34fi45ffky63g5pqd22sksvq13-python3-3.12.8-debug",
+        "out": "/nix/store/66pn6ysmvx675061xaq2vz93s9vdc5p4-python3-3.12.8"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "python311Packages.jupyterlab",
+      "attr_path": "python3",
       "broken": false,
-      "derivation": "/nix/store/xxwks70p5vqmy8vjzcrlw20csfn7g1c3-python3.11-jupyterlab-4.2.5.drv",
-      "description": "Jupyter lab environment notebook server extension",
-      "install_id": "jupyterlab",
-      "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "name": "python3.11-jupyterlab-4.2.5",
-      "pname": "jupyterlab",
-      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "rev_count": 695081,
-      "rev_date": "2024-10-20T08:35:21Z",
-      "scrape_date": "2024-10-23T03:58:08Z",
+      "derivation": "/nix/store/nxvw9y7bam0gjf6f515bz7183h2r5qhk-python3-3.12.8.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "name": "python3-3.12.8",
+      "pname": "python3",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "python3.11-jupyterlab-4.2.5",
+      "version": "3.12.8",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/yqcqdxyak1kzj8s5plv03sfl725z56w0-python3.11-jupyterlab-4.2.5-dist",
-        "out": "/nix/store/h66kb4f8wnhaqr8hmff5fzdngaw978p1-python3.11-jupyterlab-4.2.5"
+        "out": "/nix/store/fpmkmdzgd1q7kqadc7czcjdhjj7bsc0i-python3-3.12.8"
       },
-      "system": "aarch64-darwin",
+      "system": "x86_64-darwin",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "python311Packages.jupyterlab",
+      "attr_path": "python3",
       "broken": false,
-      "derivation": "/nix/store/b1djf7q3zps5xi558zsqq2611r7zjyjg-python3.11-jupyterlab-4.2.5.drv",
-      "description": "Jupyter lab environment notebook server extension",
-      "install_id": "jupyterlab",
-      "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "name": "python3.11-jupyterlab-4.2.5",
-      "pname": "jupyterlab",
-      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "rev_count": 695081,
-      "rev_date": "2024-10-20T08:35:21Z",
-      "scrape_date": "2024-10-23T03:58:08Z",
+      "derivation": "/nix/store/ixs5a8kyvw6rd2xbingm0sxc2lgwli54-python3-3.12.8.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "name": "python3-3.12.8",
+      "pname": "python3",
+      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "rev_count": 738982,
+      "rev_date": "2025-01-16T21:27:11Z",
+      "scrape_date": "2025-01-18T00:14:56Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "python3.11-jupyterlab-4.2.5",
+      "version": "3.12.8",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/s97wynd8yaylb6g8any3vhycsfdn97cm-python3.11-jupyterlab-4.2.5-dist",
-        "out": "/nix/store/rvwwi5ibnk681dyni3y9z4pvsa1sz34p-python3.11-jupyterlab-4.2.5"
+        "debug": "/nix/store/cicfrcjr8pky8qd0gxw0x84ynyviy6b5-python3-3.12.8-debug",
+        "out": "/nix/store/c9m6yd8fg1flz2j5r4bif1ib5j20a0cy-python3-3.12.8"
       },
-      "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "python311Packages.pytorch-bin",
-      "broken": false,
-      "derivation": "/nix/store/lndyyvaw5a640j11ym1pyh98qbycs035-python3.11-torch-2.4.1.drv",
-      "description": "PyTorch: Tensors and Dynamic neural networks in Python with strong GPU acceleration",
-      "install_id": "pytorch-bin",
-      "license": "[ BSD-3-Clause, Intel Simplified Software License, Unfree redistributable ]",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "name": "python3.11-torch-2.4.1",
-      "pname": "pytorch-bin",
-      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "rev_count": 695081,
-      "rev_date": "2024-10-20T08:35:21Z",
-      "scrape_date": "2024-10-23T03:58:08Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": true,
-      "version": "python3.11-torch-2.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "dist": "/nix/store/qaxfm1fz0xmdiyqlsxmc23cfnsf9mnd5-python3.11-torch-2.4.1-dist",
-        "out": "/nix/store/1mis97hbq4v6nx3x47jfp0h6fxjlxgv6-python3.11-torch-2.4.1"
-      },
-      "system": "aarch64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "python311Packages.pytorch-bin",
-      "broken": false,
-      "derivation": "/nix/store/jnk2ahslrsnnz46q0414jv86ab8c067b-python3.11-torch-2.4.1.drv",
-      "description": "PyTorch: Tensors and Dynamic neural networks in Python with strong GPU acceleration",
-      "install_id": "pytorch-bin",
-      "license": "[ BSD-3-Clause, Intel Simplified Software License, Unfree redistributable ]",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "name": "python3.11-torch-2.4.1",
-      "pname": "pytorch-bin",
-      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "rev_count": 695081,
-      "rev_date": "2024-10-20T08:35:21Z",
-      "scrape_date": "2024-10-23T03:58:08Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": true,
-      "version": "python3.11-torch-2.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "dist": "/nix/store/lp2xy7w1jxmvvax267g98a8a9xmhwp12-python3.11-torch-2.4.1-dist",
-        "out": "/nix/store/ksljnhsfahv4r64c3rj8d7fc24pm0wc5-python3.11-torch-2.4.1"
-      },
-      "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "python311Packages.sentencepiece",
-      "broken": false,
-      "derivation": "/nix/store/mjdsp8lj846z29jmc53h387kb4wgj00l-python3.11-sentencepiece-0.2.0.drv",
-      "description": "Unsupervised text tokenizer for Neural Network-based text generation",
-      "install_id": "sentencepiece",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "name": "python3.11-sentencepiece-0.2.0",
-      "pname": "sentencepiece",
-      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "rev_count": 695081,
-      "rev_date": "2024-10-20T08:35:21Z",
-      "scrape_date": "2024-10-23T03:58:08Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "python3.11-sentencepiece-0.2.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "dist": "/nix/store/m1w3yrc885vbkv57xdab8yxgl6ir66mw-python3.11-sentencepiece-0.2.0-dist",
-        "out": "/nix/store/vk1vnd44cfda32qb9b49927l5myahrhr-python3.11-sentencepiece-0.2.0"
-      },
-      "system": "aarch64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "python311Packages.sentencepiece",
-      "broken": false,
-      "derivation": "/nix/store/s43y3qy2071m9zsj8yq7dbnm3v5mhln0-python3.11-sentencepiece-0.2.0.drv",
-      "description": "Unsupervised text tokenizer for Neural Network-based text generation",
-      "install_id": "sentencepiece",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "name": "python3.11-sentencepiece-0.2.0",
-      "pname": "sentencepiece",
-      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "rev_count": 695081,
-      "rev_date": "2024-10-20T08:35:21Z",
-      "scrape_date": "2024-10-23T03:58:08Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "python3.11-sentencepiece-0.2.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "dist": "/nix/store/w7z65qpcsmix34swpvf3d4i12nhzqhmx-python3.11-sentencepiece-0.2.0-dist",
-        "out": "/nix/store/rppc6v66yv6zh8s5dnxzi0b33a1hrxp5-python3.11-sentencepiece-0.2.0"
-      },
-      "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "python311Packages.transformers",
-      "broken": false,
-      "derivation": "/nix/store/w78y8yr1dvnzcvksv6jnspndjk82kfmm-python3.11-transformers-4.45.2.drv",
-      "description": "Natural Language Processing for TensorFlow 2.0 and PyTorch",
-      "install_id": "transformers",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "name": "python3.11-transformers-4.45.2",
-      "pname": "transformers",
-      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "rev_count": 695081,
-      "rev_date": "2024-10-20T08:35:21Z",
-      "scrape_date": "2024-10-23T03:58:08Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "python3.11-transformers-4.45.2",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "dist": "/nix/store/pxsiy005ky1c31xsqnvcsz1y628y3g1q-python3.11-transformers-4.45.2-dist",
-        "out": "/nix/store/bi1f7df6vjmhls9167ma2cjdx5cj0dc0-python3.11-transformers-4.45.2"
-      },
-      "system": "aarch64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "python311Packages.transformers",
-      "broken": false,
-      "derivation": "/nix/store/ayn7kvcjfyrgx1m34mqw142f2w5ypmj0-python3.11-transformers-4.45.2.drv",
-      "description": "Natural Language Processing for TensorFlow 2.0 and PyTorch",
-      "install_id": "transformers",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "name": "python3.11-transformers-4.45.2",
-      "pname": "transformers",
-      "rev": "1997e4aa514312c1af7e2bda7fad1644e778ff26",
-      "rev_count": 695081,
-      "rev_date": "2024-10-20T08:35:21Z",
-      "scrape_date": "2024-10-23T03:58:08Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "python3.11-transformers-4.45.2",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "dist": "/nix/store/5y8d384j9v4ccv4f3n6pdx79pz3h8a6k-python3.11-transformers-4.45.2-dist",
-        "out": "/nix/store/9gc166ax5hmmj8pamz0gf7043fimq2qi-python3.11-transformers-4.45.2"
-      },
-      "system": "aarch64-linux",
+      "system": "x86_64-linux",
       "group": "toplevel",
       "priority": 5
     }

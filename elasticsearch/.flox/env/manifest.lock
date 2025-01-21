@@ -1,1 +1,687 @@
-{"lockfile-version":1,"manifest":{"hook":{"on-activate":"\nexport ES_HOME=\"$FLOX_ENV_CACHE/elasticsearch\"\nexport ES_PATH_CONF=\"$ES_HOME/config\"\nexport ES_CONFIG_FILE=\"$ES_PATH_CONF/elasticsearch.yml\"\nexport ES_CONFIG_LOG_FILE=\"$ES_PATH_CONF/log4j2.properties\"\nexport ES_CONFIG_JVM_FILE=\"$ES_PATH_CONF/jvm.options\"\nexport ES_BIN=\"$(realpath $(which elasticsearch))\"\nexport ES_PKG=\"${ES_BIN::-17}\"\n\nif [[ ! -d \"$ES_HOME\" ]]; then\n  mkdir -m 0700 -p \"$ES_HOME\"\nfi\n\nrm -f \"$ES_HOME/lib\"     && ln -sf \"$ES_PKG/lib\"         \"$ES_HOME/lib\"\nrm -f \"$ES_HOME/modules\" && ln -sf \"$ES_PKG/modules\"     \"$ES_HOME/modules\"\n\n# Elasticsearch configuration\nmkdir -m 0700 -p \"$ES_HOME/config\"\nrm -f \"$ES_CONFIG_FILE\"\ntee -a \"$ES_CONFIG_FILE\" > /dev/null << EOF\nnetwork.host: \"$ES_ADDR\"\nhttp.port: $ES_PORT\ncluster.name: \"$ES_CLUSTER_NAME\"\ndiscovery.type: \"single-node\"\ntransport.port: $ES_TRANSPORT_PORT\nEOF\n\n# Logging configuration\nrm -f \"$ES_HOME/logging.yml\" \"$ES_CONFIG_LOG_FILE\"\ntee -a \"$ES_CONFIG_LOG_FILE\" > /dev/null << EOF\nlogger.action.name = org.elasticsearch.action\nlogger.action.level = info\nappender.console.type = Console\nappender.console.name = console\nappender.console.layout.type = PatternLayout\nappender.console.layout.pattern = [%d{ISO8601}][%-5p][%-25c{1.}] %marker%m%n\nrootLogger.level = info\nrootLogger.appenderRef.console.ref = console\ningest.geoip.downloader.enabled = false\nEOF\n\n# JVM configuration\nrm -f \"$ES_CONFIG_JVM_FILE\"\ncp \"$ES_PKG/config/jvm.options\" \"$ES_CONFIG_JVM_FILE\"\n\n# Scripts\nmkdir -p \"$ES_HOME/scripts\"\n\n# Plugins\nmkdir -p \"$ES_HOME/plugins\"\n\n# Create log dir\nmkdir -m 0700 -p \"$ES_HOME/logs\"\n"},"install":{"coreutils":{"pkg-path":"coreutils"},"curl":{"pkg-path":"curl"},"elasticsearch":{"pkg-path":"elasticsearch7"},"jq":{"pkg-path":"jq"},"which":{"pkg-path":"which"}},"options":{"allow":{"licenses":[]},"semver":{},"systems":["aarch64-darwin","aarch64-linux","x86_64-darwin","x86_64-linux"]},"profile":{"common":"echo \"\"\necho \"     ╔═════════════════════════════════════════════╗\"\necho \"     ║                                             ║\"\necho \"     ║  Start Elasticsearch in the background:     ║\"\necho \"     ║  👉 flox services start                     ║\"\necho \"     ║  👉 flox activate --start-services          ║\"\necho \"     ║                                             ║\"\necho \"     ║  Point your Elasticsearch client to:        ║\"\necho \"     ║  👉 http://\\$ES_ADDR:\\$ES_PORT                ║\"\necho \"     ║                                             ║\"\necho \"     ╚═════════════════════════════════════════════╝\"\necho \"\"\n"},"services":{"elasticsearch":{"command":"elasticsearch","is-daemon":null,"shutdown":null,"systems":null,"vars":null}},"vars":{"ES_ADDR":"127.0.0.1","ES_CLUSTER_NAME":"elasticsearch","ES_JAVA_OPTS":"","ES_PORT":"19200","ES_TRANSPORT_PORT":"19300"},"version":1},"packages":[{"attr_path":"coreutils","broken":false,"derivation":"/nix/store/5naisiq61kp39x9mi4nnlh4h0agrv6ix-coreutils-9.5.drv","description":"GNU Core Utilities","group":"toplevel","install_id":"coreutils","license":"GPL-3.0-or-later","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"coreutils-9.5","outputs":{"info":"/nix/store/ydfklbdc7sdv9jl2jy0prq0wa4cv2zzf-coreutils-9.5-info","out":"/nix/store/5g6np23z9q7vwwp1s5pxkgn8f8wrmihh-coreutils-9.5"},"outputs_to_install":["out"],"pname":"coreutils","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"aarch64-darwin","unfree":false,"version":"9.5"},{"attr_path":"coreutils","broken":false,"derivation":"/nix/store/ir8y199idsk97agpjjkxk24nrrhlygiz-coreutils-9.5.drv","description":"GNU Core Utilities","group":"toplevel","install_id":"coreutils","license":"GPL-3.0-or-later","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"coreutils-9.5","outputs":{"debug":"/nix/store/q70vk5m0nlz0qpy7z6nfczi8ksyaszap-coreutils-9.5-debug","info":"/nix/store/cbk08ylbni3vx41g1hdd013146yvcf5c-coreutils-9.5-info","out":"/nix/store/g5manmr2a4jc9m06cf2lpnx1092wvvjh-coreutils-9.5"},"outputs_to_install":["out"],"pname":"coreutils","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"aarch64-linux","unfree":false,"version":"9.5"},{"attr_path":"coreutils","broken":false,"derivation":"/nix/store/5qkwxai9nx4hszq8m25ralrg5nrjfs6n-coreutils-9.5.drv","description":"GNU Core Utilities","group":"toplevel","install_id":"coreutils","license":"GPL-3.0-or-later","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"coreutils-9.5","outputs":{"info":"/nix/store/64g8lpl80mprjql96w0wsqc3n2q753l3-coreutils-9.5-info","out":"/nix/store/w95g6dz0b7byi4w2mgvmwpl692pilqf1-coreutils-9.5"},"outputs_to_install":["out"],"pname":"coreutils","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"x86_64-darwin","unfree":false,"version":"9.5"},{"attr_path":"coreutils","broken":false,"derivation":"/nix/store/gk6as4in5fphr7ds30l9cyn70icxr54a-coreutils-9.5.drv","description":"GNU Core Utilities","group":"toplevel","install_id":"coreutils","license":"GPL-3.0-or-later","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"coreutils-9.5","outputs":{"debug":"/nix/store/h42j46bwd0fqsg70axqpkn49fzfgsxkd-coreutils-9.5-debug","info":"/nix/store/kszl2ij9l8ql5ai95h357rkwg77g2f68-coreutils-9.5-info","out":"/nix/store/k48bha2fjqzarg52picsdfwlqx75aqbb-coreutils-9.5"},"outputs_to_install":["out"],"pname":"coreutils","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"x86_64-linux","unfree":false,"version":"9.5"},{"attr_path":"curl","broken":false,"derivation":"/nix/store/60xxwy8fpbdifjlh9lx9ffg44rmhwkca-curl-8.11.0.drv","description":"Command line tool for transferring files with URL syntax","group":"toplevel","install_id":"curl","license":"curl","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"curl-8.11.0","outputs":{"bin":"/nix/store/nnikik66h1i9pirm86685gsx12cr9fix-curl-8.11.0-bin","dev":"/nix/store/7rmqp8prvgxac73s6sqymnkff18kmhxb-curl-8.11.0-dev","devdoc":"/nix/store/q63dfwa5zlgya57vgk1wrsv1cggx17ag-curl-8.11.0-devdoc","man":"/nix/store/ird5cbdpbf3zjlmnvrbk54vw26x511kk-curl-8.11.0-man","out":"/nix/store/b4mz7xlyv99bdrdb9z0yq1imgjwlx20l-curl-8.11.0"},"outputs_to_install":["bin","man"],"pname":"curl","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"aarch64-darwin","unfree":false,"version":"8.11.0"},{"attr_path":"curl","broken":false,"derivation":"/nix/store/3ywrmiw7fb8b22h3yw8vrg4vv945idd9-curl-8.11.0.drv","description":"Command line tool for transferring files with URL syntax","group":"toplevel","install_id":"curl","license":"curl","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"curl-8.11.0","outputs":{"bin":"/nix/store/3h40h6q80knif55wvdx0qcz72fjw8crc-curl-8.11.0-bin","debug":"/nix/store/cfjpyw5bbslnl6a8n43bl1yjqnp8vbc1-curl-8.11.0-debug","dev":"/nix/store/6ydf7d2j8lcszzvmadnyxsf11ikx517h-curl-8.11.0-dev","devdoc":"/nix/store/img4rmd3gd8wiahagrfsscq812a7aggw-curl-8.11.0-devdoc","man":"/nix/store/wx27cnm4x44gs13kdyiplrmvj03ab4q8-curl-8.11.0-man","out":"/nix/store/ygwnjglxwvmladk25fsdghzh2cacczfg-curl-8.11.0"},"outputs_to_install":["bin","man"],"pname":"curl","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"aarch64-linux","unfree":false,"version":"8.11.0"},{"attr_path":"curl","broken":false,"derivation":"/nix/store/zyi9364hscqw6zrccb67j5g2sc28nrfp-curl-8.11.0.drv","description":"Command line tool for transferring files with URL syntax","group":"toplevel","install_id":"curl","license":"curl","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"curl-8.11.0","outputs":{"bin":"/nix/store/740pphyabn1dmrl58p26xdqfnfckbcir-curl-8.11.0-bin","dev":"/nix/store/d3y9362zhb6jjw3aj98xnkj7a2f5ris0-curl-8.11.0-dev","devdoc":"/nix/store/bzng06n0agwkxbgrk5rfm0i6hv6l8b6z-curl-8.11.0-devdoc","man":"/nix/store/jgnjz8ibbrnkm3ga27mfvwrqhqz3h0dx-curl-8.11.0-man","out":"/nix/store/zjgsyb3n5sasw8jmixx97jh32ywrzspx-curl-8.11.0"},"outputs_to_install":["bin","man"],"pname":"curl","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"x86_64-darwin","unfree":false,"version":"8.11.0"},{"attr_path":"curl","broken":false,"derivation":"/nix/store/lyayny5miyiz1pccqfpqnygnyq0hf5kn-curl-8.11.0.drv","description":"Command line tool for transferring files with URL syntax","group":"toplevel","install_id":"curl","license":"curl","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"curl-8.11.0","outputs":{"bin":"/nix/store/glxqkgx86mir5f756zr7a7clgzhggg43-curl-8.11.0-bin","debug":"/nix/store/1ydpd4pdb2cqm3cxy0awa62628cm04ab-curl-8.11.0-debug","dev":"/nix/store/nnsm67hycch65y7pandck3c28g9q5p7h-curl-8.11.0-dev","devdoc":"/nix/store/8h3prj4fzbc2jl6df6l82hgf3yhvss1z-curl-8.11.0-devdoc","man":"/nix/store/0pas219azsv4hpriqcwrr3fxis0g6fr1-curl-8.11.0-man","out":"/nix/store/lz8snrzdzwkcbdjccqxd2r4f792cnwsg-curl-8.11.0"},"outputs_to_install":["bin","man"],"pname":"curl","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"x86_64-linux","unfree":false,"version":"8.11.0"},{"attr_path":"elasticsearch7","broken":false,"derivation":"/nix/store/pay6k3chylar7spz1zlibl1f7xd096vh-elasticsearch-7.17.16.drv","description":"Open Source, Distributed, RESTful Search Engine","group":"toplevel","install_id":"elasticsearch","license":"Elastic-2.0","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"elasticsearch-7.17.16","outputs":{"out":"/nix/store/rn4dlyyxr5a80nsmhhz09c5bq7q5v0kj-elasticsearch-7.17.16"},"outputs_to_install":["out"],"pname":"elasticsearch7","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"aarch64-darwin","unfree":true,"version":"elasticsearch-7.17.16"},{"attr_path":"elasticsearch7","broken":false,"derivation":"/nix/store/hjnwg2657sb6f5wnnf5ilr37sjx3spww-elasticsearch-7.17.16.drv","description":"Open Source, Distributed, RESTful Search Engine","group":"toplevel","install_id":"elasticsearch","license":"Elastic-2.0","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"elasticsearch-7.17.16","outputs":{"out":"/nix/store/0hprndiqck38q4frh6gf2qjk34n75p67-elasticsearch-7.17.16"},"outputs_to_install":["out"],"pname":"elasticsearch7","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"aarch64-linux","unfree":true,"version":"elasticsearch-7.17.16"},{"attr_path":"elasticsearch7","broken":false,"derivation":"/nix/store/h0n6j02xx9sh6r6frpb19vx3vvc6mc49-elasticsearch-7.17.16.drv","description":"Open Source, Distributed, RESTful Search Engine","group":"toplevel","install_id":"elasticsearch","license":"Elastic-2.0","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"elasticsearch-7.17.16","outputs":{"out":"/nix/store/akr4ph209cyq3ymrxlqc4ssgx4pvywgd-elasticsearch-7.17.16"},"outputs_to_install":["out"],"pname":"elasticsearch7","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"x86_64-darwin","unfree":true,"version":"elasticsearch-7.17.16"},{"attr_path":"elasticsearch7","broken":false,"derivation":"/nix/store/71j42wmkgzwcf44609rgn4qcckw53wh8-elasticsearch-7.17.16.drv","description":"Open Source, Distributed, RESTful Search Engine","group":"toplevel","install_id":"elasticsearch","license":"Elastic-2.0","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"elasticsearch-7.17.16","outputs":{"out":"/nix/store/g23n2c4fqrgnp4ck5ir6g1hxgd9hc3v4-elasticsearch-7.17.16"},"outputs_to_install":["out"],"pname":"elasticsearch7","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"x86_64-linux","unfree":true,"version":"elasticsearch-7.17.16"},{"attr_path":"jq","broken":false,"derivation":"/nix/store/cbv85z7dsvkmskklg821vvp8vwpr4hf1-jq-1.7.1.drv","description":"Lightweight and flexible command-line JSON processor","group":"toplevel","install_id":"jq","license":"MIT","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"jq-1.7.1","outputs":{"bin":"/nix/store/1ayrnq8zpljx4m3kvgfs6kqv9vrm6zik-jq-1.7.1-bin","dev":"/nix/store/05c8mk6qnrxgyazs2acg3816h57lvsvb-jq-1.7.1-dev","doc":"/nix/store/zm4966xz8nyp9nzkn6ghhzh8hcw87bmv-jq-1.7.1-doc","man":"/nix/store/fy9h4wlb4a8r34jrqif25n2i24vaw9x2-jq-1.7.1-man","out":"/nix/store/1ldq0nn6gjpxqjxihzdd7vlppmxvmpxn-jq-1.7.1"},"outputs_to_install":["bin","man"],"pname":"jq","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"aarch64-darwin","unfree":false,"version":"1.7.1"},{"attr_path":"jq","broken":false,"derivation":"/nix/store/6zzykid21phpdi914nag9sb36an76iy9-jq-1.7.1.drv","description":"Lightweight and flexible command-line JSON processor","group":"toplevel","install_id":"jq","license":"MIT","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"jq-1.7.1","outputs":{"bin":"/nix/store/pixiqvakc6rxc10qfpy2w4dsgnmsdayv-jq-1.7.1-bin","dev":"/nix/store/gn12vqlhg68r5gwsacsiksqm6255nl3s-jq-1.7.1-dev","doc":"/nix/store/v8cvxadadrrvi8as046wiyzb96xvih19-jq-1.7.1-doc","man":"/nix/store/fgjncriv2sc52b8lwm5kzabkq26kirvk-jq-1.7.1-man","out":"/nix/store/5xm3x3a9jaq9fy4jrg44rk7b6hl9sgbv-jq-1.7.1"},"outputs_to_install":["bin","man"],"pname":"jq","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"aarch64-linux","unfree":false,"version":"1.7.1"},{"attr_path":"jq","broken":false,"derivation":"/nix/store/b2m8mmxr0wgqwhqnv5wgd9455kq2mzl0-jq-1.7.1.drv","description":"Lightweight and flexible command-line JSON processor","group":"toplevel","install_id":"jq","license":"MIT","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"jq-1.7.1","outputs":{"bin":"/nix/store/g6m0ggpijkm26ygd8vvhyd07sgriz26j-jq-1.7.1-bin","dev":"/nix/store/cybp745j7fvdnxkf9889wiscn9cgbwjp-jq-1.7.1-dev","doc":"/nix/store/0yhbxjsrbh7g6x7ngfc1qg6q613qbqhp-jq-1.7.1-doc","man":"/nix/store/gr5mmlwr3y511brhq7nihbyixjhcn80k-jq-1.7.1-man","out":"/nix/store/ganc2d577ffr1h3qcvxln1d5gn6z3m83-jq-1.7.1"},"outputs_to_install":["bin","man"],"pname":"jq","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"x86_64-darwin","unfree":false,"version":"1.7.1"},{"attr_path":"jq","broken":false,"derivation":"/nix/store/v9r017rn3g6zfz45ncra2bb93qafxipm-jq-1.7.1.drv","description":"Lightweight and flexible command-line JSON processor","group":"toplevel","install_id":"jq","license":"MIT","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"jq-1.7.1","outputs":{"bin":"/nix/store/75q9nlm0zn7cg6w151cc4mkqqk0mwaxa-jq-1.7.1-bin","dev":"/nix/store/f5y04jklz034w0y55bnqhcfnd271spwa-jq-1.7.1-dev","doc":"/nix/store/j0i0bzx90l10l3vxdwj29xjji1avp15a-jq-1.7.1-doc","man":"/nix/store/3wwkjcpxyrryfb1dbxjp82kj8g8jaxzw-jq-1.7.1-man","out":"/nix/store/cpzlrkcbp2s87aya4hfxigj6a68m6yzz-jq-1.7.1"},"outputs_to_install":["bin","man"],"pname":"jq","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"x86_64-linux","unfree":false,"version":"1.7.1"},{"attr_path":"which","broken":false,"derivation":"/nix/store/qgr19qsi8bci504ysn21lvy2lj8v7s0i-which-2.21.drv","description":"Shows the full path of (shell) commands","group":"toplevel","install_id":"which","license":"GPL-3.0-or-later","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"which-2.21","outputs":{"out":"/nix/store/3njbfjzp8rs1gci6piwfgcjim4kz0mvh-which-2.21"},"outputs_to_install":["out"],"pname":"which","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"aarch64-darwin","unfree":false,"version":"2.21"},{"attr_path":"which","broken":false,"derivation":"/nix/store/bjk0p4144yyffv9wi36h0s8zbmlsrg57-which-2.21.drv","description":"Shows the full path of (shell) commands","group":"toplevel","install_id":"which","license":"GPL-3.0-or-later","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"which-2.21","outputs":{"out":"/nix/store/nmm227n8fgij8yqba78q5dgnid0gfrbv-which-2.21"},"outputs_to_install":["out"],"pname":"which","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"aarch64-linux","unfree":false,"version":"2.21"},{"attr_path":"which","broken":false,"derivation":"/nix/store/yvvczg580mkn5qwfasmyxxwg4yx4f6cq-which-2.21.drv","description":"Shows the full path of (shell) commands","group":"toplevel","install_id":"which","license":"GPL-3.0-or-later","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"which-2.21","outputs":{"out":"/nix/store/8axi57jgpmsxbyy1lyhxz203w37m3j7y-which-2.21"},"outputs_to_install":["out"],"pname":"which","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"x86_64-darwin","unfree":false,"version":"2.21"},{"attr_path":"which","broken":false,"derivation":"/nix/store/6dnsbl1drhag7aylsmrqpdilk1nlh7v2-which-2.21.drv","description":"Shows the full path of (shell) commands","group":"toplevel","install_id":"which","license":"GPL-3.0-or-later","locked_url":"https://github.com/flox/nixpkgs?rev=5e4fbfb6b3de1aa2872b76d49fafc942626e2add","name":"which-2.21","outputs":{"out":"/nix/store/20mggxpyrbcbs2vxdk3zr7wlgnblwk74-which-2.21"},"outputs_to_install":["out"],"pname":"which","priority":5,"rev":"5e4fbfb6b3de1aa2872b76d49fafc942626e2add","rev_count":708622,"rev_date":"2024-11-15T13:07:34Z","scrape_date":"2024-11-17T03:59:12Z","stabilities":["unstable"],"system":"x86_64-linux","unfree":false,"version":"2.21"}]}
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "version": 1,
+    "install": {
+      "coreutils": {
+        "pkg-path": "coreutils"
+      },
+      "curl": {
+        "pkg-path": "curl"
+      },
+      "elasticsearch": {
+        "pkg-path": "elasticsearch7"
+      },
+      "jq": {
+        "pkg-path": "jq"
+      },
+      "which": {
+        "pkg-path": "which"
+      }
+    },
+    "vars": {
+      "ES_ADDR": "127.0.0.1",
+      "ES_CLUSTER_NAME": "elasticsearch",
+      "ES_JAVA_OPTS": "",
+      "ES_PORT": "19200",
+      "ES_TRANSPORT_PORT": "19300"
+    },
+    "hook": {
+      "on-activate": "\nexport ES_HOME=\"$FLOX_ENV_CACHE/elasticsearch\"\nexport ES_PATH_CONF=\"$ES_HOME/config\"\nexport ES_CONFIG_FILE=\"$ES_PATH_CONF/elasticsearch.yml\"\nexport ES_CONFIG_LOG_FILE=\"$ES_PATH_CONF/log4j2.properties\"\nexport ES_CONFIG_JVM_FILE=\"$ES_PATH_CONF/jvm.options\"\nexport ES_BIN=\"$(realpath $(which elasticsearch))\"\nexport ES_PKG=\"${ES_BIN::-17}\"\n\nif [[ ! -d \"$ES_HOME\" ]]; then\n  mkdir -m 0700 -p \"$ES_HOME\"\nfi\n\nrm -f \"$ES_HOME/lib\"     && ln -sf \"$ES_PKG/lib\"         \"$ES_HOME/lib\"\nrm -f \"$ES_HOME/modules\" && ln -sf \"$ES_PKG/modules\"     \"$ES_HOME/modules\"\n\n# Elasticsearch configuration\nmkdir -m 0700 -p \"$ES_HOME/config\"\nrm -f \"$ES_CONFIG_FILE\"\ntee -a \"$ES_CONFIG_FILE\" > /dev/null << EOF\nnetwork.host: \"$ES_ADDR\"\nhttp.port: $ES_PORT\ncluster.name: \"$ES_CLUSTER_NAME\"\ndiscovery.type: \"single-node\"\ntransport.port: $ES_TRANSPORT_PORT\nEOF\n\n# Logging configuration\nrm -f \"$ES_HOME/logging.yml\" \"$ES_CONFIG_LOG_FILE\"\ntee -a \"$ES_CONFIG_LOG_FILE\" > /dev/null << EOF\nlogger.action.name = org.elasticsearch.action\nlogger.action.level = info\nappender.console.type = Console\nappender.console.name = console\nappender.console.layout.type = PatternLayout\nappender.console.layout.pattern = [%d{ISO8601}][%-5p][%-25c{1.}] %marker%m%n\nrootLogger.level = info\nrootLogger.appenderRef.console.ref = console\ningest.geoip.downloader.enabled = false\nEOF\n\n# JVM configuration\nrm -f \"$ES_CONFIG_JVM_FILE\"\ncp \"$ES_PKG/config/jvm.options\" \"$ES_CONFIG_JVM_FILE\"\n\n# Scripts\nmkdir -p \"$ES_HOME/scripts\"\n\n# Plugins\nmkdir -p \"$ES_HOME/plugins\"\n\n# Create log dir\nmkdir -m 0700 -p \"$ES_HOME/logs\"\n"
+    },
+    "profile": {
+      "common": "echo \"\"\necho \"     ╔═════════════════════════════════════════════╗\"\necho \"     ║                                             ║\"\necho \"     ║  Start Elasticsearch in the background:     ║\"\necho \"     ║  👉 flox services start                     ║\"\necho \"     ║  👉 flox activate --start-services          ║\"\necho \"     ║                                             ║\"\necho \"     ║  Point your Elasticsearch client to:        ║\"\necho \"     ║  👉 http://\\$ES_ADDR:\\$ES_PORT                ║\"\necho \"     ║                                             ║\"\necho \"     ╚═════════════════════════════════════════════╝\"\necho \"\"\n"
+    },
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-darwin",
+        "x86_64-linux"
+      ],
+      "allow": {
+        "licenses": []
+      },
+      "semver": {}
+    },
+    "services": {
+      "elasticsearch": {
+        "command": "elasticsearch",
+        "vars": null,
+        "is-daemon": null,
+        "shutdown": null,
+        "systems": null
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "coreutils",
+      "broken": false,
+      "derivation": "/nix/store/nm1mg4ilciiwhzkj26scwybw6x4ijpf0-coreutils-9.5.drv",
+      "description": "GNU Core Utilities",
+      "install_id": "coreutils",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=634fd46801442d760e09493a794c4f15db2d0cbb",
+      "name": "coreutils-9.5",
+      "pname": "coreutils",
+      "rev": "634fd46801442d760e09493a794c4f15db2d0cbb",
+      "rev_count": 729082,
+      "rev_date": "2024-12-27T09:21:16Z",
+      "scrape_date": "2024-12-28T03:56:01Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/c263jjqg2mpap2fagjl34lziidkgph3i-coreutils-9.5-info",
+        "out": "/nix/store/p9m0bsw49c5m6wnm3m4fs97yx5rxcmfj-coreutils-9.5"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "coreutils",
+      "broken": false,
+      "derivation": "/nix/store/18ysbs708pj8ps18fdjj81z7zn4c6fla-coreutils-9.5.drv",
+      "description": "GNU Core Utilities",
+      "install_id": "coreutils",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=634fd46801442d760e09493a794c4f15db2d0cbb",
+      "name": "coreutils-9.5",
+      "pname": "coreutils",
+      "rev": "634fd46801442d760e09493a794c4f15db2d0cbb",
+      "rev_count": 729082,
+      "rev_date": "2024-12-27T09:21:16Z",
+      "scrape_date": "2024-12-28T03:56:01Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/r1x885lysldxid2575k87nld06pkbf4v-coreutils-9.5-debug",
+        "info": "/nix/store/xqglm4755lgpjrdyxi5f52fljrcarvqc-coreutils-9.5-info",
+        "out": "/nix/store/lhd4sbpf3l9jxmb8sl6881l924q151j0-coreutils-9.5"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "coreutils",
+      "broken": false,
+      "derivation": "/nix/store/67skpxi4kbs1nqf2xyvprbhxpsw6vmpy-coreutils-9.5.drv",
+      "description": "GNU Core Utilities",
+      "install_id": "coreutils",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=634fd46801442d760e09493a794c4f15db2d0cbb",
+      "name": "coreutils-9.5",
+      "pname": "coreutils",
+      "rev": "634fd46801442d760e09493a794c4f15db2d0cbb",
+      "rev_count": 729082,
+      "rev_date": "2024-12-27T09:21:16Z",
+      "scrape_date": "2024-12-28T03:56:01Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/aghncv047lvr0xhil8fwwxpk6bi5yalh-coreutils-9.5-info",
+        "out": "/nix/store/ka9bhk1lwdqyv47kkw6ppqgx010xwghn-coreutils-9.5"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "coreutils",
+      "broken": false,
+      "derivation": "/nix/store/rzf4njjb1pfpc2csazccxjn9452d96mi-coreutils-9.5.drv",
+      "description": "GNU Core Utilities",
+      "install_id": "coreutils",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=634fd46801442d760e09493a794c4f15db2d0cbb",
+      "name": "coreutils-9.5",
+      "pname": "coreutils",
+      "rev": "634fd46801442d760e09493a794c4f15db2d0cbb",
+      "rev_count": 729082,
+      "rev_date": "2024-12-27T09:21:16Z",
+      "scrape_date": "2024-12-28T03:56:01Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.5",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/zs8k0d5dx7nkvs6vmxmkr1jdz3px2fhi-coreutils-9.5-debug",
+        "info": "/nix/store/hm7bqb710681rxgrq8b6l9zms50aj4k5-coreutils-9.5-info",
+        "out": "/nix/store/4s9rah4cwaxflicsk5cndnknqlk9n4p3-coreutils-9.5"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/ljas0gkxh1lcw65fx17mcs3cvbjivz57-curl-8.11.0.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=634fd46801442d760e09493a794c4f15db2d0cbb",
+      "name": "curl-8.11.0",
+      "pname": "curl",
+      "rev": "634fd46801442d760e09493a794c4f15db2d0cbb",
+      "rev_count": 729082,
+      "rev_date": "2024-12-27T09:21:16Z",
+      "scrape_date": "2024-12-28T03:56:01Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.11.0",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/s4idvq3pgjprcjg7sqp2h5cgp1pn8frs-curl-8.11.0-bin",
+        "dev": "/nix/store/i4z3xbailna79bxycv6apy5f6phr3q0v-curl-8.11.0-dev",
+        "devdoc": "/nix/store/2grp27ghxrmg56rzmc9cfqy6wvcv4mp0-curl-8.11.0-devdoc",
+        "man": "/nix/store/gjv4ljqxdby4bm8z21rspqd247aprpcc-curl-8.11.0-man",
+        "out": "/nix/store/ifcj5pbackbazl7b91g64m3kbd4v1q01-curl-8.11.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/6cqbg626w2zdssnhkyp5mj2fkypypykl-curl-8.11.0.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=634fd46801442d760e09493a794c4f15db2d0cbb",
+      "name": "curl-8.11.0",
+      "pname": "curl",
+      "rev": "634fd46801442d760e09493a794c4f15db2d0cbb",
+      "rev_count": 729082,
+      "rev_date": "2024-12-27T09:21:16Z",
+      "scrape_date": "2024-12-28T03:56:01Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.11.0",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/yq8dwiyxrflg270359yvxk8xckkid04q-curl-8.11.0-bin",
+        "debug": "/nix/store/hrzm29djj4n2l61pc3555kw3g17sr7z1-curl-8.11.0-debug",
+        "dev": "/nix/store/kjri2i96wsg99wqd4yaj50rdjh3hz531-curl-8.11.0-dev",
+        "devdoc": "/nix/store/02aq6i8g4mzs5bf0gvb562wcq51hizas-curl-8.11.0-devdoc",
+        "man": "/nix/store/y3bzv3q3226l5w1ia8ybb4rfwi0z5y0d-curl-8.11.0-man",
+        "out": "/nix/store/y340kr2q8x0y40krwzpv32x7d5c31jy7-curl-8.11.0"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/zwy97fvvn4zf07fqy5dhbxhh0fyjrwbg-curl-8.11.0.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=634fd46801442d760e09493a794c4f15db2d0cbb",
+      "name": "curl-8.11.0",
+      "pname": "curl",
+      "rev": "634fd46801442d760e09493a794c4f15db2d0cbb",
+      "rev_count": 729082,
+      "rev_date": "2024-12-27T09:21:16Z",
+      "scrape_date": "2024-12-28T03:56:01Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.11.0",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/fmrh9cvrsfxv5bvv3cq853sz0y2q3cpd-curl-8.11.0-bin",
+        "dev": "/nix/store/ipjg6nffgq68mwdkqnj8nf5jri3hs1xf-curl-8.11.0-dev",
+        "devdoc": "/nix/store/gqbnhsqw8m6cz49apl1cj2llgsbz5mic-curl-8.11.0-devdoc",
+        "man": "/nix/store/c4n42gazswc9l8iiirv23xbpdk923gfw-curl-8.11.0-man",
+        "out": "/nix/store/32qkm0f9j9qdc91m4jnvj9imp6mfxxfz-curl-8.11.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/m7di48m22z13xdfzakhlrqi8hvh13ygg-curl-8.11.0.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=634fd46801442d760e09493a794c4f15db2d0cbb",
+      "name": "curl-8.11.0",
+      "pname": "curl",
+      "rev": "634fd46801442d760e09493a794c4f15db2d0cbb",
+      "rev_count": 729082,
+      "rev_date": "2024-12-27T09:21:16Z",
+      "scrape_date": "2024-12-28T03:56:01Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.11.0",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/yckhqngmx90bakzhcyrsk7dww1fm352s-curl-8.11.0-bin",
+        "debug": "/nix/store/qb1m3if99v266fzlwvrhsh3sq8wxcdg6-curl-8.11.0-debug",
+        "dev": "/nix/store/g26bs63hz87c9s3sg0v42d6d8gjk36qw-curl-8.11.0-dev",
+        "devdoc": "/nix/store/9fpcw3582c7p7rbq6v3hzj89gd7ibgif-curl-8.11.0-devdoc",
+        "man": "/nix/store/fpm2i0k76mxbdjpwn8nifqpm25py1pfz-curl-8.11.0-man",
+        "out": "/nix/store/8yfak7dis3yqqls4mclzp5jb1ic2jzab-curl-8.11.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "elasticsearch7",
+      "broken": false,
+      "derivation": "/nix/store/d6r5fcrs5mlnd82bvwvh2n3fwhh38j6r-elasticsearch-7.17.16.drv",
+      "description": "Open Source, Distributed, RESTful Search Engine",
+      "install_id": "elasticsearch",
+      "license": "Elastic-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=634fd46801442d760e09493a794c4f15db2d0cbb",
+      "name": "elasticsearch-7.17.16",
+      "pname": "elasticsearch7",
+      "rev": "634fd46801442d760e09493a794c4f15db2d0cbb",
+      "rev_count": 729082,
+      "rev_date": "2024-12-27T09:21:16Z",
+      "scrape_date": "2024-12-28T03:56:01Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "elasticsearch-7.17.16",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kxdklj9hmis72vmc203dnh152y3bdrln-elasticsearch-7.17.16"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "elasticsearch7",
+      "broken": false,
+      "derivation": "/nix/store/mcwpjjifv7ld739ypkvlkh62fq2djjq1-elasticsearch-7.17.16.drv",
+      "description": "Open Source, Distributed, RESTful Search Engine",
+      "install_id": "elasticsearch",
+      "license": "Elastic-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=634fd46801442d760e09493a794c4f15db2d0cbb",
+      "name": "elasticsearch-7.17.16",
+      "pname": "elasticsearch7",
+      "rev": "634fd46801442d760e09493a794c4f15db2d0cbb",
+      "rev_count": 729082,
+      "rev_date": "2024-12-27T09:21:16Z",
+      "scrape_date": "2024-12-28T03:56:01Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "elasticsearch-7.17.16",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/d9znf86v21xa1lzyspbavyv047ax213y-elasticsearch-7.17.16"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "elasticsearch7",
+      "broken": false,
+      "derivation": "/nix/store/870zp9bfmzsiw7fm0x8wmc94mhdnl8ya-elasticsearch-7.17.16.drv",
+      "description": "Open Source, Distributed, RESTful Search Engine",
+      "install_id": "elasticsearch",
+      "license": "Elastic-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=634fd46801442d760e09493a794c4f15db2d0cbb",
+      "name": "elasticsearch-7.17.16",
+      "pname": "elasticsearch7",
+      "rev": "634fd46801442d760e09493a794c4f15db2d0cbb",
+      "rev_count": 729082,
+      "rev_date": "2024-12-27T09:21:16Z",
+      "scrape_date": "2024-12-28T03:56:01Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "elasticsearch-7.17.16",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/krk8bmn083n42dr352i186k16d8wipga-elasticsearch-7.17.16"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "elasticsearch7",
+      "broken": false,
+      "derivation": "/nix/store/9v0ly5avkiywg4c2xqw7imm6aanps39s-elasticsearch-7.17.16.drv",
+      "description": "Open Source, Distributed, RESTful Search Engine",
+      "install_id": "elasticsearch",
+      "license": "Elastic-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=634fd46801442d760e09493a794c4f15db2d0cbb",
+      "name": "elasticsearch-7.17.16",
+      "pname": "elasticsearch7",
+      "rev": "634fd46801442d760e09493a794c4f15db2d0cbb",
+      "rev_count": 729082,
+      "rev_date": "2024-12-27T09:21:16Z",
+      "scrape_date": "2024-12-28T03:56:01Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "elasticsearch-7.17.16",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/2y9zc3606y98kcnkdy8rdhcjmh35i6a2-elasticsearch-7.17.16"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "jq",
+      "broken": false,
+      "derivation": "/nix/store/i68d7y99nw2kz34bqr3w68rp2p5yanmb-jq-1.7.1.drv",
+      "description": "Lightweight and flexible command-line JSON processor",
+      "install_id": "jq",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=634fd46801442d760e09493a794c4f15db2d0cbb",
+      "name": "jq-1.7.1",
+      "pname": "jq",
+      "rev": "634fd46801442d760e09493a794c4f15db2d0cbb",
+      "rev_count": 729082,
+      "rev_date": "2024-12-27T09:21:16Z",
+      "scrape_date": "2024-12-28T03:56:01Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.7.1",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/x07x6ixbqrh7javaz84sh7lxy5zjwc66-jq-1.7.1-bin",
+        "dev": "/nix/store/lhqbi2g0dpiv87341gzzd3vlkcs817yq-jq-1.7.1-dev",
+        "doc": "/nix/store/viyl0y7dbapp79ibwliqfljxr13n89b9-jq-1.7.1-doc",
+        "man": "/nix/store/fik16kqw21fpfknda8xpmqi94brmdy5m-jq-1.7.1-man",
+        "out": "/nix/store/kkymhin05qdfplfnv5k50x0fb9qbvrbl-jq-1.7.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "jq",
+      "broken": false,
+      "derivation": "/nix/store/grbm3p3f1xx5b07nryinz7mc40634cbc-jq-1.7.1.drv",
+      "description": "Lightweight and flexible command-line JSON processor",
+      "install_id": "jq",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=634fd46801442d760e09493a794c4f15db2d0cbb",
+      "name": "jq-1.7.1",
+      "pname": "jq",
+      "rev": "634fd46801442d760e09493a794c4f15db2d0cbb",
+      "rev_count": 729082,
+      "rev_date": "2024-12-27T09:21:16Z",
+      "scrape_date": "2024-12-28T03:56:01Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.7.1",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/bs198wj6yi71yzbiykizj5y79ll1y5a5-jq-1.7.1-bin",
+        "dev": "/nix/store/ibh2q48q1xn2bfyvjm6kr3wkphi3rb9r-jq-1.7.1-dev",
+        "doc": "/nix/store/wjjkav2gqfj67wzzkfw9gmp878dxpy0r-jq-1.7.1-doc",
+        "man": "/nix/store/0brmnz2q55dkzqbnld9s2l53hzyi82yg-jq-1.7.1-man",
+        "out": "/nix/store/cpxcnasas8nnwib686pbhzrkz1cnq0p6-jq-1.7.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "jq",
+      "broken": false,
+      "derivation": "/nix/store/8sgh0mivrrr6pyga0ajy8y9bgaq7jvnb-jq-1.7.1.drv",
+      "description": "Lightweight and flexible command-line JSON processor",
+      "install_id": "jq",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=634fd46801442d760e09493a794c4f15db2d0cbb",
+      "name": "jq-1.7.1",
+      "pname": "jq",
+      "rev": "634fd46801442d760e09493a794c4f15db2d0cbb",
+      "rev_count": 729082,
+      "rev_date": "2024-12-27T09:21:16Z",
+      "scrape_date": "2024-12-28T03:56:01Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.7.1",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/ingdf4pkbkm85bfl0j95j834lvhllp3a-jq-1.7.1-bin",
+        "dev": "/nix/store/zvwl6lq9xq1sk9vapx51vajz00c80087-jq-1.7.1-dev",
+        "doc": "/nix/store/22qfscingx32vgap2kg9gcrgcrvv6ykn-jq-1.7.1-doc",
+        "man": "/nix/store/w6aijc6k90s04jx5a7pk8j1gmacyllqc-jq-1.7.1-man",
+        "out": "/nix/store/0g44qcyxjr944pn560l3mr884akh7il4-jq-1.7.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "jq",
+      "broken": false,
+      "derivation": "/nix/store/g40vzh1csbvl17rygg3mzk0pg86hvxy7-jq-1.7.1.drv",
+      "description": "Lightweight and flexible command-line JSON processor",
+      "install_id": "jq",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=634fd46801442d760e09493a794c4f15db2d0cbb",
+      "name": "jq-1.7.1",
+      "pname": "jq",
+      "rev": "634fd46801442d760e09493a794c4f15db2d0cbb",
+      "rev_count": 729082,
+      "rev_date": "2024-12-27T09:21:16Z",
+      "scrape_date": "2024-12-28T03:56:01Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.7.1",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/c79nkzxaiki5r7igd4a5lawwdds38f2l-jq-1.7.1-bin",
+        "dev": "/nix/store/4nrxcmjis6bahcr6gphczjfhz12f2vnd-jq-1.7.1-dev",
+        "doc": "/nix/store/kbp9hjh0zcqdc04kiya3wazs50g3mhnp-jq-1.7.1-doc",
+        "man": "/nix/store/bj4b7al7f1x6lvsk1p5gza26ya5is8zn-jq-1.7.1-man",
+        "out": "/nix/store/s8vyrf9xh2yh66ilivw3gi8hzxv7d44c-jq-1.7.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "which",
+      "broken": false,
+      "derivation": "/nix/store/z4snb0dh6sf6dcjk0k30ams292xjx1qh-which-2.21.drv",
+      "description": "Shows the full path of (shell) commands",
+      "install_id": "which",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=634fd46801442d760e09493a794c4f15db2d0cbb",
+      "name": "which-2.21",
+      "pname": "which",
+      "rev": "634fd46801442d760e09493a794c4f15db2d0cbb",
+      "rev_count": 729082,
+      "rev_date": "2024-12-27T09:21:16Z",
+      "scrape_date": "2024-12-28T03:56:01Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.21",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/wfsrz4gibj527l8hqiiqw1kmmvcdvah8-which-2.21"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "which",
+      "broken": false,
+      "derivation": "/nix/store/myyrllp619jb1mn19bk9x2mj505zp6al-which-2.21.drv",
+      "description": "Shows the full path of (shell) commands",
+      "install_id": "which",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=634fd46801442d760e09493a794c4f15db2d0cbb",
+      "name": "which-2.21",
+      "pname": "which",
+      "rev": "634fd46801442d760e09493a794c4f15db2d0cbb",
+      "rev_count": 729082,
+      "rev_date": "2024-12-27T09:21:16Z",
+      "scrape_date": "2024-12-28T03:56:01Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.21",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/0r0vs9c8h75w6b474xlhjawa2gvi0vn2-which-2.21"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "which",
+      "broken": false,
+      "derivation": "/nix/store/xw1qdhk3522r0d6s0dg5p64fwj8ysqz5-which-2.21.drv",
+      "description": "Shows the full path of (shell) commands",
+      "install_id": "which",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=634fd46801442d760e09493a794c4f15db2d0cbb",
+      "name": "which-2.21",
+      "pname": "which",
+      "rev": "634fd46801442d760e09493a794c4f15db2d0cbb",
+      "rev_count": 729082,
+      "rev_date": "2024-12-27T09:21:16Z",
+      "scrape_date": "2024-12-28T03:56:01Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.21",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/dl1g1ww2bzc18s4avnm0yb2pw71xajgl-which-2.21"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "which",
+      "broken": false,
+      "derivation": "/nix/store/9vxljahmhshlj052vxjhb4a5f1bh4pji-which-2.21.drv",
+      "description": "Shows the full path of (shell) commands",
+      "install_id": "which",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=634fd46801442d760e09493a794c4f15db2d0cbb",
+      "name": "which-2.21",
+      "pname": "which",
+      "rev": "634fd46801442d760e09493a794c4f15db2d0cbb",
+      "rev_count": 729082,
+      "rev_date": "2024-12-27T09:21:16Z",
+      "scrape_date": "2024-12-28T03:56:01Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.21",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/4v2jp43ag2kynby75pnpvy34c3cbd18j-which-2.21"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ]
+}

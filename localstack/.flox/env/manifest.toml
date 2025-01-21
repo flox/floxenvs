@@ -1,0 +1,74 @@
+version = 1
+
+[install]
+localstack.pkg-path = "localstack"
+kubectl.pkg-path = "kubectl"
+gum.pkg-path = "gum"
+python3.pkg-path = "python3"
+awscli2.pkg-path = "awscli2"
+
+[services]
+localstack.command = "localstack start -d"
+localstack.is-daemon = true
+localstack.shutdown.command = "localstack stop"
+
+[vars]
+AWSCLILOCAL_PACKAGE="awscli-local"
+
+[hook]
+on-activate = '''
+# Make a spinner we can skip this in CI
+function with_spinner() {
+  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+    bash -c "$2"
+  else
+    gum spin \
+      --show-error \
+      --spinner line \
+      --title "$1" \
+        -- bash -c "$2"
+  fi
+}
+
+# Make a venv
+export PYTHON_DIR="$FLOX_ENV_CACHE/python"
+if [ ! -d "$PYTHON_DIR" ]; then
+  with_spinner "Creating venv in $PYTHON_DIR..." "python -m venv \"$PYTHON_DIR\""
+  echo "✅ Created venv"
+fi
+
+(
+  source "$PYTHON_DIR/bin/activate"
+  with_spinner "Installing $AWSCLILOCAL_PACKAGE..." "pip install $AWSCLILOCAL_PACKAGE"
+  echo "✅ Installed $AWSCLILOCAL_PACKAGE"
+)
+
+if [[ "$FLOX_ACTIVATE_START_SERVICES" == "true" ]]; then
+  gum style --border double --margin "1 2" --padding "1 4" \
+    'Localstack may take a few moments to start.' '' \
+    'Once it starts, see available services with:' \
+    '  localstack status services'
+else
+  gum style --border double --margin "1 2" --padding "1 4" \
+    'You may need to start localstack using:' \
+    '  flox services start'
+fi
+'''
+
+[profile]
+bash = '''
+source "$PYTHON_DIR/bin/activate"
+'''
+fish = '''
+source "$PYTHON_DIR/bin/activate.fish"
+'''
+tcsh = '''
+source "$PYTHON_DIR/bin/activate.csh"
+'''
+zsh = '''
+source "$PYTHON_DIR/bin/activate"
+'''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
+
