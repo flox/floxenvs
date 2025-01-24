@@ -1,0 +1,296 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "version": 1,
+    "install": {
+      "mongodb-ce": {
+        "pkg-path": "mongodb-ce",
+        "version": "7.0.12"
+      },
+      "mongosh": {
+        "pkg-path": "mongosh"
+      }
+    },
+    "vars": {
+      "MONGO_HOST": "127.0.0.1",
+      "MONGO_PORT": "27017"
+    },
+    "hook": {
+      "on-activate": "export MONGO_HOME=\"$FLOX_ENV_CACHE/mongodb\"\nexport MONGO_CONFIG=\"$MONGO_HOME/mongod.conf\"\nif [ ! -d \"$MONGO_HOME\" ]; then\n  mkdir -m 0700 -p \"$MONGO_HOME\"\nfi\nif [ ! -d \"$MONGO_HOME/logs\" ]; then\n  mkdir -m 0700 -p \"$MONGO_HOME/logs\"\nfi\n\ncat >$MONGO_CONFIG <<EOF \nstorage:\n  dbPath: \"$MONGO_HOME\"\nnet:\n  bindIp: $MONGO_HOST, ::1\n  ipv6: true\nreplication:\n  replSetName: dev-rs\nEOF\n"
+    },
+    "profile": {
+      "common": "echo \"\"\necho \"     ╔══════════════════════════════════════════════════════╗\"\necho \"     ║                                                      ║\"\necho \"     ║  Start Mongodb in the background:                    ║\"\necho \"     ║  👉 flox services start                              ║\"\necho \"     ║  👉 flox activate --start-services                   ║\"\necho \"     ║                                                      ║\"\necho \"     ║  Try to connect to MongoDB:                          ║\"\necho \"     ║  👉 mongosh --host $MONGO_HOST --port $MONGO_PORT    ║\"\necho \"     ║                                                      ║\"\necho \"     ╚══════════════════════════════════════════════════════╝\"\necho \"\"\n"
+    },
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-darwin",
+        "x86_64-linux"
+      ],
+      "allow": {
+        "licenses": []
+      },
+      "semver": {}
+    },
+    "services": {
+      "mongodb": {
+        "command": "mongod --config $MONGO_HOME/mongod.conf",
+        "vars": null,
+        "is-daemon": null,
+        "shutdown": null,
+        "systems": null
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "mongodb-ce",
+      "broken": false,
+      "derivation": "/nix/store/l3jis161l9fhp6ncvxawzam1cz2bc1d7-mongodb-ce-7.0.12.drv",
+      "description": "MongoDB is a general purpose, document-based, distributed database.",
+      "install_id": "mongodb-ce",
+      "license": "[ Server Side Public License ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=71e91c409d1e654808b2621f28a327acfdad8dc2",
+      "name": "mongodb-ce-7.0.12",
+      "pname": "mongodb-ce",
+      "rev": "71e91c409d1e654808b2621f28a327acfdad8dc2",
+      "rev_count": 672439,
+      "rev_date": "2024-08-28T04:32:53Z",
+      "scrape_date": "2024-08-30T05:22:14Z",
+      "stabilities": [
+        "stable",
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "7.0.12",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/hv3yir19hrlah781cf7pxjjjxzpv6lxj-mongodb-ce-7.0.12"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mongodb-ce",
+      "broken": false,
+      "derivation": "/nix/store/cyaj07z5cph51ypnq4ari3lvr0qbgykr-mongodb-ce-7.0.12.drv",
+      "description": "MongoDB is a general purpose, document-based, distributed database.",
+      "install_id": "mongodb-ce",
+      "license": "[ Server Side Public License ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=71e91c409d1e654808b2621f28a327acfdad8dc2",
+      "name": "mongodb-ce-7.0.12",
+      "pname": "mongodb-ce",
+      "rev": "71e91c409d1e654808b2621f28a327acfdad8dc2",
+      "rev_count": 672439,
+      "rev_date": "2024-08-28T04:32:53Z",
+      "scrape_date": "2024-08-30T05:22:14Z",
+      "stabilities": [
+        "stable",
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "7.0.12",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/c4ksf6hp38ayqc0m7agy47nk5bm1syr5-mongodb-ce-7.0.12"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mongodb-ce",
+      "broken": false,
+      "derivation": "/nix/store/jlpfhsddwk4fg0cpgjmicvmw3v2609zn-mongodb-ce-7.0.12.drv",
+      "description": "MongoDB is a general purpose, document-based, distributed database.",
+      "install_id": "mongodb-ce",
+      "license": "[ Server Side Public License ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=71e91c409d1e654808b2621f28a327acfdad8dc2",
+      "name": "mongodb-ce-7.0.12",
+      "pname": "mongodb-ce",
+      "rev": "71e91c409d1e654808b2621f28a327acfdad8dc2",
+      "rev_count": 672439,
+      "rev_date": "2024-08-28T04:32:53Z",
+      "scrape_date": "2024-08-30T05:22:14Z",
+      "stabilities": [
+        "stable",
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "7.0.12",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/fbd13fybfw35yg2nv0v5sws54g570dfi-mongodb-ce-7.0.12"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mongodb-ce",
+      "broken": false,
+      "derivation": "/nix/store/jr3q5i6fmlw8fwbsmvh2mc80i5vs16i5-mongodb-ce-7.0.12.drv",
+      "description": "MongoDB is a general purpose, document-based, distributed database.",
+      "install_id": "mongodb-ce",
+      "license": "[ Server Side Public License ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=71e91c409d1e654808b2621f28a327acfdad8dc2",
+      "name": "mongodb-ce-7.0.12",
+      "pname": "mongodb-ce",
+      "rev": "71e91c409d1e654808b2621f28a327acfdad8dc2",
+      "rev_count": 672439,
+      "rev_date": "2024-08-28T04:32:53Z",
+      "scrape_date": "2024-08-30T05:22:14Z",
+      "stabilities": [
+        "stable",
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "7.0.12",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/gs07a3wj1vsx433j59yrigq0lbwrczx4-mongodb-ce-7.0.12"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mongosh",
+      "broken": false,
+      "derivation": "/nix/store/1iskndxb0cchak563090vrqi41pif6y4-mongosh-2.3.0.drv",
+      "description": "MongoDB Shell",
+      "install_id": "mongosh",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=71e91c409d1e654808b2621f28a327acfdad8dc2",
+      "name": "mongosh-2.3.0",
+      "pname": "mongosh",
+      "rev": "71e91c409d1e654808b2621f28a327acfdad8dc2",
+      "rev_count": 672439,
+      "rev_date": "2024-08-28T04:32:53Z",
+      "scrape_date": "2024-08-30T05:22:14Z",
+      "stabilities": [
+        "stable",
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.3.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/wvl39r8ayk2fvgahirncxzmfpi5vakk2-mongosh-2.3.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mongosh",
+      "broken": false,
+      "derivation": "/nix/store/60ha2vv58hzgxkp16cj1n4xcdph4annx-mongosh-2.3.0.drv",
+      "description": "MongoDB Shell",
+      "install_id": "mongosh",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=71e91c409d1e654808b2621f28a327acfdad8dc2",
+      "name": "mongosh-2.3.0",
+      "pname": "mongosh",
+      "rev": "71e91c409d1e654808b2621f28a327acfdad8dc2",
+      "rev_count": 672439,
+      "rev_date": "2024-08-28T04:32:53Z",
+      "scrape_date": "2024-08-30T05:22:14Z",
+      "stabilities": [
+        "stable",
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.3.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cd6r771v02r6hxf47x5zfl30h4bbviwr-mongosh-2.3.0"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mongosh",
+      "broken": false,
+      "derivation": "/nix/store/qlaydbv1jzlm1l0bkrnjm58l6xfidby9-mongosh-2.3.0.drv",
+      "description": "MongoDB Shell",
+      "install_id": "mongosh",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=71e91c409d1e654808b2621f28a327acfdad8dc2",
+      "name": "mongosh-2.3.0",
+      "pname": "mongosh",
+      "rev": "71e91c409d1e654808b2621f28a327acfdad8dc2",
+      "rev_count": 672439,
+      "rev_date": "2024-08-28T04:32:53Z",
+      "scrape_date": "2024-08-30T05:22:14Z",
+      "stabilities": [
+        "stable",
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.3.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/66prjy5kwvlf7liqdfy2jkgk9580sf8x-mongosh-2.3.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mongosh",
+      "broken": false,
+      "derivation": "/nix/store/yj2j7rj191pcqg0dvv1a12w09db4dhqq-mongosh-2.3.0.drv",
+      "description": "MongoDB Shell",
+      "install_id": "mongosh",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=71e91c409d1e654808b2621f28a327acfdad8dc2",
+      "name": "mongosh-2.3.0",
+      "pname": "mongosh",
+      "rev": "71e91c409d1e654808b2621f28a327acfdad8dc2",
+      "rev_count": 672439,
+      "rev_date": "2024-08-28T04:32:53Z",
+      "scrape_date": "2024-08-30T05:22:14Z",
+      "stabilities": [
+        "stable",
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.3.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/0kclrh4x6y44dkdzwbx95i8326p0kg79-mongosh-2.3.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ]
+}
