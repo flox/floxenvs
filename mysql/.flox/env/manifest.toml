@@ -6,10 +6,11 @@ which.pkg-path = "which"
 coreutils.pkg-path = "coreutils"
 
 ## MySQL:
-mysql.pkg-path = "mysql84"
+#mysql.pkg-path = "mysql84"
 #mysql.pkg-path = "mysql80"
 #mysql.pkg-path = "mysql57"
 ## MariaDB:
+mysql.pkg-path = "mariadb"
 #mysql.pkg-path = "mariadb_110"
 #mysql.pkg-path = "mariadb_1011"
 #mysql.pkg-path = "mariadb_109"
@@ -21,7 +22,6 @@ MYSQL_DATABASE = "mydb"
 MYSQL_USER = ""
 MYSQL_PWD= "mypass"
 MYSQL_HOST = "127.0.0.1"
-
 
 [hook]
 on-activate = '''
@@ -148,8 +148,7 @@ fi
 
 # XXX: --defaults-file needs to be first argument for some reason
 export MYSQLD_ARGS="\
- --defaults-file=$MYSQL_CONFIG_FILE \
- --mysql-native-password=ON \
+ --defaults-file=$MYSQL_CONFIG_FILE
 "
 export MYSQLD_ARGS_TMP="$MYSQLD_ARGS \
  --socket=$MYSQL_UNIX_PORT_TMP \
@@ -207,7 +206,7 @@ create_db() {
   mysql $MYSQL_ARGS_TMP -u root -N -e "CREATE DATABASE \`$MYSQL_DATABASE\`;"
 }
 create_user() {
-  mysql $MYSQL_ARGS_TMP -u root -N -e "CREATE USER IF NOT EXISTS '$MYSQL_USER'@'localhost' IDENTIFIED WITH caching_sha2_password BY '$MYSQL_PWD_TMP'; GRANT ALL PRIVILEGES ON *.* TO '$MYSQL_USER'@'localhost' WITH GRANT OPTION;"
+  mysql $MYSQL_ARGS_TMP -u root -N -e "CREATE USER IF NOT EXISTS '$MYSQL_USER'@'localhost' IDENTIFIED BY '$MYSQL_PWD_TMP'; GRANT ALL PRIVILEGES ON *.* TO '$MYSQL_USER'@'localhost' WITH GRANT OPTION;"
 }
 export -f create_db
 export -f create_user
@@ -260,7 +259,6 @@ echo ""
 
 [services]
 mysql.command = "mysqld $MYSQLD_ARGS"
-
 
 [options]
 systems = [
