@@ -25,6 +25,9 @@
       "python": {
         "pkg-path": "python3",
         "version": "3.12"
+      },
+      "viu": {
+        "pkg-path": "viu"
       }
     },
     "vars": {
@@ -33,7 +36,7 @@
       "VIRTUAL_ENV_DISABLE_PROMPT": "1"
     },
     "hook": {
-      "on-activate": "\n# Store our venv and requirements.txt file in the env cache\nexport FLOX_FLAIM_CACHE_DIR=\"$FLOX_ENV_CACHE/flaim\"\nmkdir -p \"$FLOX_FLAIM_CACHE_DIR\"\n\nexport FLOX_FLAIM_REQUIREMENTS_FILE=\"$FLOX_FLAIM_CACHE_DIR/requirements.txt\"\n\nexport FLOX_FLAIM_HELPER_DIR=\"$FLOX_FLAIM_CACHE_DIR/helpers\"\nmkdir -p \"$FLOX_FLAIM_HELPER_DIR\"\n\nexport FLOX_FLAIM_VENV_PATH=\"$FLOX_FLAIM_CACHE_DIR/venv\"\nexport FLOX_FLAIM_VENV_INTERPRETER=\"$(cat \"$FLOX_FLAIM_CACHE_DIR/venv.interpreter\" 2> /dev/null || echo false )\"\nexport FLOX_FLAIM_INTERPRETER=\"$(realpath $(which python3))\"\n\n# Make sure any tools are not attempting to use the Python interpreter from any\n# existing virtual environment.\nunset VIRTUAL_ENV\n\n\nfunction indent() {\n  echo -e '{{ Foreground \"#cccccc\" \" │ \"}}' | \\\n    gum format -t template --theme=auto\n}\n\nfunction with_spinner() {\n  if [[ \"$FLOX_ENVS_TESTING\" == \"1\" ]]; then\n    bash -c \"$1\"\n  else\n    echo\n    gum spin \\\n      --show-error \\\n      --spinner line \\\n      --spinner.foreground=\"#cccccc\" \\\n      --title \" >>> $2 ...\" \\\n      --title.foreground=\"#cccccc\" \\\n        -- bash -c \"$1\"\n    echo -en \"\\033[2A\\033[K\"\n  fi\n}\n\nfunction ensure_venv() {\n  \"$FLOX_FLAIM_INTERPRETER\" -m venv --upgrade-deps \"$FLOX_FLAIM_VENV_PATH\"\n  source \"$FLOX_FLAIM_VENV_PATH/bin/activate\"\n}\nexport -f ensure_venv\n\nfunction install_flaim_packages() {\n  source \"$FLOX_FLAIM_VENV_PATH/bin/activate\"\n  pip install -r \"$FLOX_FLAIM_REQUIREMENTS_FILE\"\n}\nexport -f install_flaim_packages\n\nfunction install_packages() {\n  source \"$FLOX_FLAIM_VENV_PATH/bin/activate\"\n  pip install -r \"$FLOX_FLAIM_ADDITIONAL_REQUIREMENTS_FILE\"\n}\nexport -f install_packages\n\nfunction create_requirements_file() {\n  cat << EOF > \"$FLOX_FLAIM_REQUIREMENTS_FILE\"\ntorch\ntorchvision\ndiffusers\naccelerate\ntransformers\nsentencepiece\nbitsandbytes\nprotobuf\nsixel\njupyterlab\nipywidgets\nEOF\n}\nexport -f create_requirements_file\n\nfunction gather_helpers() {\n  mkdir -p \"$FLOX_FLAIM_HELPER_DIR/\"\n\n  for helper in testaccel genimg; do\n    curl -Ls -o \"$FLOX_FLAIM_HELPER_DIR/$helper\" \"https://github.com/flox/floxenvs/raw/main/flaim/helpers/$helper.py\"\n    chmod +x \"$FLOX_FLAIM_HELPER_DIR/$helper\"\n  done\n}\nexport -f gather_helpers\n\n\nindent && echo\nindent && echo\n\nif [ \"$FLOX_FLAIM_VENV_INTERPRETER\" != \"$FLOX_FLAIM_INTERPRETER\" ]; then\n  with_spinner ensure_venv \"Creating virtual environment\"\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Virtual environment was created.\\\" }}\\n\" \\\n    | gum format -t template\nelse\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Virtual environment already exists.\\\" }}\\n\" \\\n    | gum format -t template\nfi\n\nindent && echo\n\nif [ ! -f \"$FLOX_FLAIM_REQUIREMENTS_FILE\" ]; then\n  with_spinner create_requirements_file \"Creating Flaim requirements file\"\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Flaim requirements file was created.\\\" }}\\n\" \\\n    | gum format -t template\nelse\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Flaim requirements file already exists.\\\" }}\\n\" \\\n    | gum format -t template\nfi\n\nindent && echo\n\nwith_spinner install_flaim_packages \"Installing Flaim Python packages\"\nindent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Python packages installed.\\\" }}\\n\" \\\n  | gum format -t template\n\nindent && echo\n\nif [ -f \"$FLOX_FLAIM_ADDITIONAL_REQUIREMENTS_FILE\" ]; then\n  with_spinner install_packages \"Installing additional Python packages\"\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Python additional packages installed.\\\" }}\\n\" \\\n    | gum format -t template\nelse\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ No need to install additional Python packages.\\\" }}\\n\" \\\n    | gum format -t template\nfi\n\nindent && echo\n\nwith_spinner gather_helpers \"Gathering helper scripts\"\nindent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Helper scripts gathered.\\\" }}\\n\" \\\n  | gum format -t template\nexport PATH=\"$FLOX_FLAIM_HELPER_DIR:$PATH\"\n\nindent && echo\n\n(\n  source \"$FLOX_FLAIM_VENV_PATH/bin/activate\"\n  indent && $FLOX_FLAIM_HELPER_DIR/testaccel\n)\n\nindent && echo\n\ntoilet -f smmono9 --metal \"flaim\"\n\necho \"Run 'testaccel' to retest acceleration.\"\necho \"Run 'genimg <string>' for an image.\"\n"
+      "on-activate": "\n# Store our venv and requirements.txt file in the env cache\nexport FLOX_FLAIM_CACHE_DIR=\"$FLOX_ENV_CACHE/flaim\"\nmkdir -p \"$FLOX_FLAIM_CACHE_DIR\"\n\nexport FLOX_FLAIM_REQUIREMENTS_FILE=\"$FLOX_FLAIM_CACHE_DIR/requirements.txt\"\n\nexport FLOX_FLAIM_HELPER_DIR=\"$FLOX_FLAIM_CACHE_DIR/helpers\"\nmkdir -p \"$FLOX_FLAIM_HELPER_DIR\"\n\nexport FLOX_FLAIM_VENV_PATH=\"$FLOX_FLAIM_CACHE_DIR/venv\"\nexport FLOX_FLAIM_VENV_INTERPRETER=\"$(cat \"$FLOX_FLAIM_CACHE_DIR/venv.interpreter\" 2> /dev/null || echo false )\"\nexport FLOX_FLAIM_INTERPRETER=\"$(realpath $(which python3))\"\n\n# Make sure any tools are not attempting to use the Python interpreter from any\n# existing virtual environment.\nunset VIRTUAL_ENV\n\n\nfunction indent() {\n  echo -e '{{ Foreground \"#cccccc\" \" │ \"}}' | \\\n    gum format -t template --theme=auto\n}\n\nfunction with_spinner() {\n  if [[ \"$FLOX_ENVS_TESTING\" == \"1\" ]]; then\n    bash -c \"$1\"\n  else\n    echo\n    gum spin \\\n      --show-error \\\n      --spinner line \\\n      --spinner.foreground=\"#cccccc\" \\\n      --title \" >>> $2 ...\" \\\n      --title.foreground=\"#cccccc\" \\\n        -- bash -c \"$1\"\n    echo -en \"\\033[2A\\033[K\"\n  fi\n}\n\nfunction ensure_venv() {\n  \"$FLOX_FLAIM_INTERPRETER\" -m venv --upgrade-deps \"$FLOX_FLAIM_VENV_PATH\"\n  source \"$FLOX_FLAIM_VENV_PATH/bin/activate\"\n}\nexport -f ensure_venv\n\nfunction install_flaim_packages() {\n  source \"$FLOX_FLAIM_VENV_PATH/bin/activate\"\n  pip install -r \"$FLOX_FLAIM_REQUIREMENTS_FILE\"\n}\nexport -f install_flaim_packages\n\nfunction install_packages() {\n  source \"$FLOX_FLAIM_VENV_PATH/bin/activate\"\n  pip install -r \"$FLOX_FLAIM_ADDITIONAL_REQUIREMENTS_FILE\"\n}\nexport -f install_packages\n\nfunction create_requirements_file() {\n  cat << EOF > \"$FLOX_FLAIM_REQUIREMENTS_FILE\"\ntorch\ntorchvision\ndiffusers\naccelerate\ntransformers\nsentencepiece\nbitsandbytes\nprotobuf\njupyterlab\nipywidgets\nEOF\n}\nexport -f create_requirements_file\n\nfunction gather_helpers() {\n  mkdir -p \"$FLOX_FLAIM_HELPER_DIR/\"\n\n  for helper in testaccel genimg; do\n    curl -Ls -o \"$FLOX_FLAIM_HELPER_DIR/$helper\" \"https://github.com/flox/floxenvs/raw/main/flaim/helpers/$helper.py\"\n    chmod +x \"$FLOX_FLAIM_HELPER_DIR/$helper\"\n  done\n}\nexport -f gather_helpers\n\n\nindent && echo\nindent && echo\n\nif [ \"$FLOX_FLAIM_VENV_INTERPRETER\" != \"$FLOX_FLAIM_INTERPRETER\" ]; then\n  with_spinner ensure_venv \"Creating virtual environment\"\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Virtual environment was created.\\\" }}\\n\" \\\n    | gum format -t template\nelse\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Virtual environment already exists.\\\" }}\\n\" \\\n    | gum format -t template\nfi\n\nindent && echo\n\nif [ ! -f \"$FLOX_FLAIM_REQUIREMENTS_FILE\" ]; then\n  with_spinner create_requirements_file \"Creating Flaim requirements file\"\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Flaim requirements file was created.\\\" }}\\n\" \\\n    | gum format -t template\nelse\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Flaim requirements file already exists.\\\" }}\\n\" \\\n    | gum format -t template\nfi\n\nindent && echo\n\nwith_spinner install_flaim_packages \"Installing Flaim Python packages\"\nindent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Python packages installed.\\\" }}\\n\" \\\n  | gum format -t template\n\nindent && echo\n\nif [ -f \"$FLOX_FLAIM_ADDITIONAL_REQUIREMENTS_FILE\" ]; then\n  with_spinner install_packages \"Installing additional Python packages\"\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Python additional packages installed.\\\" }}\\n\" \\\n    | gum format -t template\nelse\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ No need to install additional Python packages.\\\" }}\\n\" \\\n    | gum format -t template\nfi\n\nindent && echo\n\nwith_spinner gather_helpers \"Gathering helper scripts\"\nindent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Helper scripts gathered.\\\" }}\\n\" \\\n  | gum format -t template\nexport PATH=\"$FLOX_FLAIM_HELPER_DIR:$PATH\"\n\nindent && echo\n\n(\n  source \"$FLOX_FLAIM_VENV_PATH/bin/activate\"\n  indent && $FLOX_FLAIM_HELPER_DIR/testaccel\n)\n\nindent && echo\n\ntoilet -f smmono9 --metal \"flaim\"\n\necho \"Run 'testaccel' to retest acceleration.\"\necho \"Run 'genimg <string>' for an image.\"\n"
     },
     "profile": {
       "bash": "source \"$FLOX_FLAIM_VENV_PATH/bin/activate\"\nif [ \"$FLOX_ACTIVATE_START_SERVICES\" == \"true\" ]; then\n  echo\n  jupyter-lab list\n  echo\nfi\n",
@@ -67,17 +70,17 @@
     {
       "attr_path": "coreutils",
       "broken": false,
-      "derivation": "/nix/store/llsrcrh3a4nyqc16qiil45j5ndypcp2v-coreutils-9.5.drv",
+      "derivation": "/nix/store/p4pz1gryg87wqlnxray9dnn57a0pskzv-coreutils-9.5.drv",
       "description": "GNU Core Utilities",
       "install_id": "coreutils",
       "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
       "name": "coreutils-9.5",
       "pname": "coreutils",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
@@ -87,8 +90,8 @@
         "out"
       ],
       "outputs": {
-        "info": "/nix/store/c263jjqg2mpap2fagjl34lziidkgph3i-coreutils-9.5-info",
-        "out": "/nix/store/p9m0bsw49c5m6wnm3m4fs97yx5rxcmfj-coreutils-9.5"
+        "info": "/nix/store/979pacq29h2rinv4qql89sim79jz5mg5-coreutils-9.5-info",
+        "out": "/nix/store/27hlrqpjy40ifmmy3rw2fbi5b57l8cmw-coreutils-9.5"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -97,17 +100,17 @@
     {
       "attr_path": "coreutils",
       "broken": false,
-      "derivation": "/nix/store/18ysbs708pj8ps18fdjj81z7zn4c6fla-coreutils-9.5.drv",
+      "derivation": "/nix/store/c39ybky06sx0r0zcfcbpl986gwsvsdv5-coreutils-9.5.drv",
       "description": "GNU Core Utilities",
       "install_id": "coreutils",
       "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
       "name": "coreutils-9.5",
       "pname": "coreutils",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
@@ -117,9 +120,9 @@
         "out"
       ],
       "outputs": {
-        "debug": "/nix/store/r1x885lysldxid2575k87nld06pkbf4v-coreutils-9.5-debug",
-        "info": "/nix/store/xqglm4755lgpjrdyxi5f52fljrcarvqc-coreutils-9.5-info",
-        "out": "/nix/store/lhd4sbpf3l9jxmb8sl6881l924q151j0-coreutils-9.5"
+        "debug": "/nix/store/xpymgypy20b4m8rkvykxsby5wnlv82ca-coreutils-9.5-debug",
+        "info": "/nix/store/a5m80hqh1y2dx5qzff24whf724lgpgnw-coreutils-9.5-info",
+        "out": "/nix/store/j78cpriz6wkn9p2mkw742iix9hbkpbv2-coreutils-9.5"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -128,17 +131,17 @@
     {
       "attr_path": "coreutils",
       "broken": false,
-      "derivation": "/nix/store/kbycv389y9ybys6xrgbqj82z039s9i20-coreutils-9.5.drv",
+      "derivation": "/nix/store/06qs10ix97ya55qflv9a84jhj0lmdphq-coreutils-9.5.drv",
       "description": "GNU Core Utilities",
       "install_id": "coreutils",
       "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
       "name": "coreutils-9.5",
       "pname": "coreutils",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
@@ -148,8 +151,8 @@
         "out"
       ],
       "outputs": {
-        "info": "/nix/store/aghncv047lvr0xhil8fwwxpk6bi5yalh-coreutils-9.5-info",
-        "out": "/nix/store/ka9bhk1lwdqyv47kkw6ppqgx010xwghn-coreutils-9.5"
+        "info": "/nix/store/bqll1y5m159r35zxks1cqrdv8zb9y34a-coreutils-9.5-info",
+        "out": "/nix/store/5r1vifkx3r6frjv7ry294wr5ripyfcq8-coreutils-9.5"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
@@ -158,17 +161,17 @@
     {
       "attr_path": "coreutils",
       "broken": false,
-      "derivation": "/nix/store/rzf4njjb1pfpc2csazccxjn9452d96mi-coreutils-9.5.drv",
+      "derivation": "/nix/store/pk46bbjafzrrms7h72namzi3wlin9p06-coreutils-9.5.drv",
       "description": "GNU Core Utilities",
       "install_id": "coreutils",
       "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
       "name": "coreutils-9.5",
       "pname": "coreutils",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
@@ -178,9 +181,9 @@
         "out"
       ],
       "outputs": {
-        "debug": "/nix/store/zs8k0d5dx7nkvs6vmxmkr1jdz3px2fhi-coreutils-9.5-debug",
-        "info": "/nix/store/hm7bqb710681rxgrq8b6l9zms50aj4k5-coreutils-9.5-info",
-        "out": "/nix/store/4s9rah4cwaxflicsk5cndnknqlk9n4p3-coreutils-9.5"
+        "debug": "/nix/store/xj07rb0rlpdy7xlkc6g8p4rqqqm7513b-coreutils-9.5-debug",
+        "info": "/nix/store/slrzma6vm0w75qwn4b8ana9h0x1rh8wi-coreutils-9.5-info",
+        "out": "/nix/store/pw26z7msfmv291jq1qpp8bbaprs5hkfk-coreutils-9.5"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -189,32 +192,32 @@
     {
       "attr_path": "curl",
       "broken": false,
-      "derivation": "/nix/store/dnqmvibg27990vinfrdj6anwxrlj8vav-curl-8.11.0.drv",
+      "derivation": "/nix/store/scsn11fd9x6b9nwv244ar08q3v0lcaz7-curl-8.11.1.drv",
       "description": "Command line tool for transferring files with URL syntax",
       "install_id": "curl",
       "license": "curl",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "name": "curl-8.11.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "name": "curl-8.11.1",
       "pname": "curl",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "8.11.0",
+      "version": "8.11.1",
       "outputs_to_install": [
         "bin",
         "man"
       ],
       "outputs": {
-        "bin": "/nix/store/s4idvq3pgjprcjg7sqp2h5cgp1pn8frs-curl-8.11.0-bin",
-        "dev": "/nix/store/i4z3xbailna79bxycv6apy5f6phr3q0v-curl-8.11.0-dev",
-        "devdoc": "/nix/store/2grp27ghxrmg56rzmc9cfqy6wvcv4mp0-curl-8.11.0-devdoc",
-        "man": "/nix/store/gjv4ljqxdby4bm8z21rspqd247aprpcc-curl-8.11.0-man",
-        "out": "/nix/store/ifcj5pbackbazl7b91g64m3kbd4v1q01-curl-8.11.0"
+        "bin": "/nix/store/4wb2gw5y4d1s9lmll744k7mdkgza1mz1-curl-8.11.1-bin",
+        "dev": "/nix/store/2qfdjp13bid9g5axp74q1sas73wk4kmv-curl-8.11.1-dev",
+        "devdoc": "/nix/store/l88q3phl5gvv848slpzp9j5kl3gb7qi2-curl-8.11.1-devdoc",
+        "man": "/nix/store/02mrnrg0mqps1x6sqaw5dp79gcr010rh-curl-8.11.1-man",
+        "out": "/nix/store/bqkra3fwg9jn301gi14gcizpyrmxqb20-curl-8.11.1"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -223,33 +226,33 @@
     {
       "attr_path": "curl",
       "broken": false,
-      "derivation": "/nix/store/85rxa1mpby6wj24n9n149zg9k7phl8n1-curl-8.11.0.drv",
+      "derivation": "/nix/store/4cc5q4hbnd9j06k0v7kgciv0vg0nnnfc-curl-8.11.1.drv",
       "description": "Command line tool for transferring files with URL syntax",
       "install_id": "curl",
       "license": "curl",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "name": "curl-8.11.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "name": "curl-8.11.1",
       "pname": "curl",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "8.11.0",
+      "version": "8.11.1",
       "outputs_to_install": [
         "bin",
         "man"
       ],
       "outputs": {
-        "bin": "/nix/store/yq8dwiyxrflg270359yvxk8xckkid04q-curl-8.11.0-bin",
-        "debug": "/nix/store/hrzm29djj4n2l61pc3555kw3g17sr7z1-curl-8.11.0-debug",
-        "dev": "/nix/store/kjri2i96wsg99wqd4yaj50rdjh3hz531-curl-8.11.0-dev",
-        "devdoc": "/nix/store/02aq6i8g4mzs5bf0gvb562wcq51hizas-curl-8.11.0-devdoc",
-        "man": "/nix/store/y3bzv3q3226l5w1ia8ybb4rfwi0z5y0d-curl-8.11.0-man",
-        "out": "/nix/store/y340kr2q8x0y40krwzpv32x7d5c31jy7-curl-8.11.0"
+        "bin": "/nix/store/b4bfdh987ankyl4dl8hyqka0icbm7ch5-curl-8.11.1-bin",
+        "debug": "/nix/store/3nxwcrw2nz4psxfa298gz2rvxcxkgwrj-curl-8.11.1-debug",
+        "dev": "/nix/store/hmrxq7fax0jb25f0p6v77c9idl369wf3-curl-8.11.1-dev",
+        "devdoc": "/nix/store/xhyfvy56bpwk2xg0sjy0a72p86dbzzny-curl-8.11.1-devdoc",
+        "man": "/nix/store/cz541skcfa3sv96d7fgfl72jln28ai55-curl-8.11.1-man",
+        "out": "/nix/store/5nr2v31bm8zdxky9jci5m7kjqc5dqjvz-curl-8.11.1"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -258,32 +261,32 @@
     {
       "attr_path": "curl",
       "broken": false,
-      "derivation": "/nix/store/c5pr3nfanr80zbnc7nrkm1j8n96rqyaj-curl-8.11.0.drv",
+      "derivation": "/nix/store/3ashzizq4rkswvzm211fz0lyd33r2wrm-curl-8.11.1.drv",
       "description": "Command line tool for transferring files with URL syntax",
       "install_id": "curl",
       "license": "curl",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "name": "curl-8.11.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "name": "curl-8.11.1",
       "pname": "curl",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "8.11.0",
+      "version": "8.11.1",
       "outputs_to_install": [
         "bin",
         "man"
       ],
       "outputs": {
-        "bin": "/nix/store/fmrh9cvrsfxv5bvv3cq853sz0y2q3cpd-curl-8.11.0-bin",
-        "dev": "/nix/store/ipjg6nffgq68mwdkqnj8nf5jri3hs1xf-curl-8.11.0-dev",
-        "devdoc": "/nix/store/gqbnhsqw8m6cz49apl1cj2llgsbz5mic-curl-8.11.0-devdoc",
-        "man": "/nix/store/c4n42gazswc9l8iiirv23xbpdk923gfw-curl-8.11.0-man",
-        "out": "/nix/store/32qkm0f9j9qdc91m4jnvj9imp6mfxxfz-curl-8.11.0"
+        "bin": "/nix/store/778ny8fq90spak0p7gwlfa78dxqj4x0s-curl-8.11.1-bin",
+        "dev": "/nix/store/j43v0gxd8n29mlm9v79fnwcnshc73kyg-curl-8.11.1-dev",
+        "devdoc": "/nix/store/mq7bgy6r8bjjj450b63p1l68k1pmr7lp-curl-8.11.1-devdoc",
+        "man": "/nix/store/w8wfvgpmpiyvmyn94x34bs2sl7w66iqk-curl-8.11.1-man",
+        "out": "/nix/store/05i854l3qagyd129f1fzg5ybz5fbs8lb-curl-8.11.1"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
@@ -292,33 +295,33 @@
     {
       "attr_path": "curl",
       "broken": false,
-      "derivation": "/nix/store/wjy2jwhbwc4s3g6ayd1p8nh6wri76qd2-curl-8.11.0.drv",
+      "derivation": "/nix/store/sfwy2kgnh8bhbx1n3rif9b4gxq25bxyp-curl-8.11.1.drv",
       "description": "Command line tool for transferring files with URL syntax",
       "install_id": "curl",
       "license": "curl",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "name": "curl-8.11.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "name": "curl-8.11.1",
       "pname": "curl",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "8.11.0",
+      "version": "8.11.1",
       "outputs_to_install": [
         "bin",
         "man"
       ],
       "outputs": {
-        "bin": "/nix/store/yckhqngmx90bakzhcyrsk7dww1fm352s-curl-8.11.0-bin",
-        "debug": "/nix/store/qb1m3if99v266fzlwvrhsh3sq8wxcdg6-curl-8.11.0-debug",
-        "dev": "/nix/store/g26bs63hz87c9s3sg0v42d6d8gjk36qw-curl-8.11.0-dev",
-        "devdoc": "/nix/store/9fpcw3582c7p7rbq6v3hzj89gd7ibgif-curl-8.11.0-devdoc",
-        "man": "/nix/store/fpm2i0k76mxbdjpwn8nifqpm25py1pfz-curl-8.11.0-man",
-        "out": "/nix/store/8yfak7dis3yqqls4mclzp5jb1ic2jzab-curl-8.11.0"
+        "bin": "/nix/store/wzlmn9jq15pbw61nmqcy5nnwv6dhpq09-curl-8.11.1-bin",
+        "debug": "/nix/store/nidhaw2lykjd4svj0xhh0a7p492r3n05-curl-8.11.1-debug",
+        "dev": "/nix/store/azfhp07yysbxvdhm78n43cjiwh1lb111-curl-8.11.1-dev",
+        "devdoc": "/nix/store/fb5dprl6p0rk1hv76wrg695yh2dzhrhv-curl-8.11.1-devdoc",
+        "man": "/nix/store/qabwv9rmysj9q6pxv9f85zavmw26y9dx-curl-8.11.1-man",
+        "out": "/nix/store/gj70mjxd5zy310wq81znzr73rx6badsl-curl-8.11.1"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -327,17 +330,17 @@
     {
       "attr_path": "toilet",
       "broken": false,
-      "derivation": "/nix/store/ycj4vssvb7cd48xga94cfr76mgmvhywb-toilet-0.3.drv",
+      "derivation": "/nix/store/lz4z6d040b1am77kqjlml69vw3m1x8ni-toilet-0.3.drv",
       "description": "Display large colourful characters in text mode",
       "install_id": "figlet",
       "license": "WTFPL",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
       "name": "toilet-0.3",
       "pname": "toilet",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
@@ -347,7 +350,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/1vq43kdphcc6zrmchrvwfx9aszb6iyxc-toilet-0.3"
+        "out": "/nix/store/jxadvpzzwl683p6hi2yvr4ck3jaf633v-toilet-0.3"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -356,17 +359,17 @@
     {
       "attr_path": "toilet",
       "broken": false,
-      "derivation": "/nix/store/14v01m2q7dhxf7fq2p3f3p4ylwf6fjqs-toilet-0.3.drv",
+      "derivation": "/nix/store/7v9k762ikn7fxr7z3p9k1zm8ncmjb8bb-toilet-0.3.drv",
       "description": "Display large colourful characters in text mode",
       "install_id": "figlet",
       "license": "WTFPL",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
       "name": "toilet-0.3",
       "pname": "toilet",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
@@ -376,7 +379,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/43f73scmdimwp8jl9mymj3p1z7p9zgc2-toilet-0.3"
+        "out": "/nix/store/0bz433n5dzs4dc8ggfd3w1b4icafhlpf-toilet-0.3"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -385,17 +388,17 @@
     {
       "attr_path": "toilet",
       "broken": false,
-      "derivation": "/nix/store/c7h05djsrva35mvkagscgy278lll5hg1-toilet-0.3.drv",
+      "derivation": "/nix/store/4rhhgpjryp0f030pnzd54n14blc1l7r2-toilet-0.3.drv",
       "description": "Display large colourful characters in text mode",
       "install_id": "figlet",
       "license": "WTFPL",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
       "name": "toilet-0.3",
       "pname": "toilet",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
@@ -405,7 +408,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/67zdn99v8wi9mkc3a6b404mlsqvjj29v-toilet-0.3"
+        "out": "/nix/store/f774bgapmdbv02b1fm0yijlbbffy454y-toilet-0.3"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
@@ -414,17 +417,17 @@
     {
       "attr_path": "toilet",
       "broken": false,
-      "derivation": "/nix/store/sm04pglhpkalv47x1bm4sccvn0fnfcc1-toilet-0.3.drv",
+      "derivation": "/nix/store/0fgwhqfksmmfa5ijlgvqr5n63gkis2z8-toilet-0.3.drv",
       "description": "Display large colourful characters in text mode",
       "install_id": "figlet",
       "license": "WTFPL",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
       "name": "toilet-0.3",
       "pname": "toilet",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
@@ -434,7 +437,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/aahm49lhd2gn1ml9pikpli8vd7xm7gp4-toilet-0.3"
+        "out": "/nix/store/8wvljkbw8wwn0y35y2qqxim3hl79gdar-toilet-0.3"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -443,17 +446,17 @@
     {
       "attr_path": "gcc-unwrapped",
       "broken": false,
-      "derivation": "/nix/store/3acjvbs3w4yxv1rwhww5cnwrmwbaiihi-gcc-14-20241116.drv",
+      "derivation": "/nix/store/ifr08jrblzrkxwy4ip7wasg5i7332288-gcc-14-20241116.drv",
       "description": "GNU Compiler Collection, version 14-20241116",
       "install_id": "gcc-unwrapped",
       "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
       "name": "gcc-14-20241116",
       "pname": "gcc-unwrapped",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
@@ -464,12 +467,12 @@
         "man"
       ],
       "outputs": {
-        "checksum": "/nix/store/l7wzh1jhiqa2vhaw8dpxj4rircpfhvxi-gcc-14-20241116-checksum",
-        "info": "/nix/store/s2lnnmhrswf5zmxi8662z08hc260m8ps-gcc-14-20241116-info",
-        "lib": "/nix/store/k7zrgs3l3ifa9qpz8i3ndaa0xvsmcb9n-gcc-14-20241116-lib",
-        "libgcc": "/nix/store/g0fg0qk212665jy2bmhrqvi7cqfzz90q-gcc-14-20241116-libgcc",
-        "man": "/nix/store/bl35c3073sg260lnp5k36bkjk6p6g3gs-gcc-14-20241116-man",
-        "out": "/nix/store/qbvp2h1f5a03nwmw0nwqimnk4kjhzv19-gcc-14-20241116"
+        "checksum": "/nix/store/x9jggha6wbc3g6qnzkrm62xj54jqsrk7-gcc-14-20241116-checksum",
+        "info": "/nix/store/ir80cpifqm0pbwbd2n0a53fw9wgns7l0-gcc-14-20241116-info",
+        "lib": "/nix/store/jz74r8n6z6vnar0rqr4wy19s1b2mva1h-gcc-14-20241116-lib",
+        "libgcc": "/nix/store/m3b6gjylfhjssq3qj8jzdg6w2mndl2y1-gcc-14-20241116-libgcc",
+        "man": "/nix/store/h9svkir9ry9cgcf6l7fmp4gldawqp7wr-gcc-14-20241116-man",
+        "out": "/nix/store/9km0dymqp5vf4rjhycdpfry1cip6q3r9-gcc-14-20241116"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -478,17 +481,17 @@
     {
       "attr_path": "gcc-unwrapped",
       "broken": false,
-      "derivation": "/nix/store/2hwjfka1izg8hyzan7ki90pcwv3y604g-gcc-14-20241116.drv",
+      "derivation": "/nix/store/hszac7zz2wn5891b3x0viab3hvb9fv17-gcc-14-20241116.drv",
       "description": "GNU Compiler Collection, version 14-20241116",
       "install_id": "gcc-unwrapped",
       "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
       "name": "gcc-14-20241116",
       "pname": "gcc-unwrapped",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
@@ -499,12 +502,12 @@
         "man"
       ],
       "outputs": {
-        "checksum": "/nix/store/h60zrhfdw173cffn5iyb52f64sn40jyc-gcc-14-20241116-checksum",
-        "info": "/nix/store/bmb9bqw7fxac08wc46cizd7dzlw64860-gcc-14-20241116-info",
-        "lib": "/nix/store/bpq1s72cw9qb2fs8mnmlw6hn2c7iy0ss-gcc-14-20241116-lib",
-        "libgcc": "/nix/store/17v0ywnr3akp85pvdi56gwl99ljv95kx-gcc-14-20241116-libgcc",
-        "man": "/nix/store/5kr602ywkyfpvzx6sl4d3zkksp4iakhb-gcc-14-20241116-man",
-        "out": "/nix/store/l89iqc7am6i60y8vk507zwrzxf0wcd3v-gcc-14-20241116"
+        "checksum": "/nix/store/7y1zwglc174a0fxj1ly2lzjlarg24ayp-gcc-14-20241116-checksum",
+        "info": "/nix/store/pi90ks4xi92ssiczfxbvg2qd9p0x40kn-gcc-14-20241116-info",
+        "lib": "/nix/store/9bzm5g670567swmg6vd1l7l4q5spvc80-gcc-14-20241116-lib",
+        "libgcc": "/nix/store/nmwhzmw3jxk5xx09jji890hqpx5vyvd4-gcc-14-20241116-libgcc",
+        "man": "/nix/store/1lcjyigc3f60cajv1aw8r2v8hf3aybi3-gcc-14-20241116-man",
+        "out": "/nix/store/gnf3mv68i5g6jmabnbbncsar3kbg13zd-gcc-14-20241116"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -513,27 +516,27 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/0lxr3l6jxkvc1ckrjs65bkmr6wkm12ib-gum-0.14.5.drv",
+      "derivation": "/nix/store/raaly6mg1ss2cxcgcqvxihz3ixznirlk-gum-0.15.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "name": "gum-0.14.5",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "name": "gum-0.15.0",
       "pname": "gum",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "0.14.5",
+      "version": "0.15.0",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/p87f1zvabjckkam5f8p5n8s0p9dy2z8d-gum-0.14.5"
+        "out": "/nix/store/ld2rmch33w6ig07ihds260hl0ivknj73-gum-0.15.0"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -542,27 +545,27 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/flfac2jgxzw1zx2xk81w322qyzzbsni3-gum-0.14.5.drv",
+      "derivation": "/nix/store/3bx4p4p2lvggp9qznbkaw28kr3xx0rm1-gum-0.15.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "name": "gum-0.14.5",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "name": "gum-0.15.0",
       "pname": "gum",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "0.14.5",
+      "version": "0.15.0",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/i8ks7qinadmk77dmknnrpi4iczv8p8gj-gum-0.14.5"
+        "out": "/nix/store/j547gbafhydwhf11fnwpwdmx68pswa5z-gum-0.15.0"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -571,27 +574,27 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/5jaz36kssi10wjrsasi7wxf3rj9854hm-gum-0.14.5.drv",
+      "derivation": "/nix/store/1am4g318rf9dkhwbbwylbi1ka78g4jh5-gum-0.15.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "name": "gum-0.14.5",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "name": "gum-0.15.0",
       "pname": "gum",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "0.14.5",
+      "version": "0.15.0",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/1s4jc1kmqksngyhanl76iibb19b7sd2v-gum-0.14.5"
+        "out": "/nix/store/dfp3k2v6kkshnma6y38rjby1xwf1arx0-gum-0.15.0"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
@@ -600,27 +603,27 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/mjp6pldbmq5d6q0cl8brimzf0h3fdqpz-gum-0.14.5.drv",
+      "derivation": "/nix/store/mnhbfrsb4m73dzbq1rhszyzw89x31kcb-gum-0.15.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "name": "gum-0.14.5",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "name": "gum-0.15.0",
       "pname": "gum",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "0.14.5",
+      "version": "0.15.0",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/z96hiw9h45mph9qilm4hp4j4ncf19qbl-gum-0.14.5"
+        "out": "/nix/store/wy3w37by807bszh6rvmbw4mqck3awjr1-gum-0.15.0"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -629,17 +632,17 @@
     {
       "attr_path": "python3",
       "broken": false,
-      "derivation": "/nix/store/i2dv1bhyf4s7h75am3r1i0hch0477r0n-python3-3.12.8.drv",
+      "derivation": "/nix/store/fl940lg3mxbaipy5zx7wcd952yclnkg5-python3-3.12.8.drv",
       "description": "High-level dynamically-typed programming language",
       "install_id": "python",
       "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
       "name": "python3-3.12.8",
       "pname": "python3",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
@@ -649,7 +652,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/8zc3wcplydp8gsxms24scpzdca438dk5-python3-3.12.8"
+        "out": "/nix/store/ffxlyz7jrxxyxg70cn3h961lr91lan2j-python3-3.12.8"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -658,17 +661,17 @@
     {
       "attr_path": "python3",
       "broken": false,
-      "derivation": "/nix/store/22lnksddxfiwc7may5a6x0fmf2q74ksx-python3-3.12.8.drv",
+      "derivation": "/nix/store/zxifdbxg585m8k58i5n52jf48s1jzf5j-python3-3.12.8.drv",
       "description": "High-level dynamically-typed programming language",
       "install_id": "python",
       "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
       "name": "python3-3.12.8",
       "pname": "python3",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
@@ -678,8 +681,8 @@
         "out"
       ],
       "outputs": {
-        "debug": "/nix/store/brcg3a34fi45ffky63g5pqd22sksvq13-python3-3.12.8-debug",
-        "out": "/nix/store/66pn6ysmvx675061xaq2vz93s9vdc5p4-python3-3.12.8"
+        "debug": "/nix/store/zgss40jlwqkb22z37bi8nb3jwg28sj10-python3-3.12.8-debug",
+        "out": "/nix/store/p3nlssl5qqib5kysa30mqzzzp364z6fb-python3-3.12.8"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -688,17 +691,17 @@
     {
       "attr_path": "python3",
       "broken": false,
-      "derivation": "/nix/store/nxvw9y7bam0gjf6f515bz7183h2r5qhk-python3-3.12.8.drv",
+      "derivation": "/nix/store/0ccx6365q8i75k06jv3ypwngldmdi9l4-python3-3.12.8.drv",
       "description": "High-level dynamically-typed programming language",
       "install_id": "python",
       "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
       "name": "python3-3.12.8",
       "pname": "python3",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
@@ -708,7 +711,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/fpmkmdzgd1q7kqadc7czcjdhjj7bsc0i-python3-3.12.8"
+        "out": "/nix/store/45g1q2ama4j033d5qi2lgfzy1xmagnmf-python3-3.12.8"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
@@ -717,17 +720,17 @@
     {
       "attr_path": "python3",
       "broken": false,
-      "derivation": "/nix/store/ixs5a8kyvw6rd2xbingm0sxc2lgwli54-python3-3.12.8.drv",
+      "derivation": "/nix/store/f7lzb562wb7wjvmlr2vh53llhjhz6i9v-python3-3.12.8.drv",
       "description": "High-level dynamically-typed programming language",
       "install_id": "python",
       "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=5df43628fdf08d642be8ba5b3625a6c70731c19c",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
       "name": "python3-3.12.8",
       "pname": "python3",
-      "rev": "5df43628fdf08d642be8ba5b3625a6c70731c19c",
-      "rev_count": 738982,
-      "rev_date": "2025-01-16T21:27:11Z",
-      "scrape_date": "2025-01-18T00:14:56Z",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
       "stabilities": [
         "unstable"
       ],
@@ -737,8 +740,124 @@
         "out"
       ],
       "outputs": {
-        "debug": "/nix/store/cicfrcjr8pky8qd0gxw0x84ynyviy6b5-python3-3.12.8-debug",
-        "out": "/nix/store/c9m6yd8fg1flz2j5r4bif1ib5j20a0cy-python3-3.12.8"
+        "debug": "/nix/store/yg7pavnh3hhw0lwfm9c4jr9yi3rq8h4r-python3-3.12.8-debug",
+        "out": "/nix/store/qrc496n6fsqp4p5m5h8wmw5d5jwyw5mr-python3-3.12.8"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "viu",
+      "broken": false,
+      "derivation": "/nix/store/c7qxxmdzrblsrhgm14agjrcvr4wqkyfz-viu-1.5.1.drv",
+      "description": "Command-line application to view images from the terminal written in Rust",
+      "install_id": "viu",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "name": "viu-1.5.1",
+      "pname": "viu",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.5.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/g7qh742ms7wrmvy00cq3qf3fcxhg3nra-viu-1.5.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "viu",
+      "broken": false,
+      "derivation": "/nix/store/a2p1dwfj70s5g9j9rklxcr8d8xa8ajzc-viu-1.5.1.drv",
+      "description": "Command-line application to view images from the terminal written in Rust",
+      "install_id": "viu",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "name": "viu-1.5.1",
+      "pname": "viu",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.5.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/r9bnlh8m9r39d1kyy5wwxn3d8lm5axmb-viu-1.5.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "viu",
+      "broken": false,
+      "derivation": "/nix/store/xs6pcg3gf046w3sixl2g1nnqfyl53pln-viu-1.5.1.drv",
+      "description": "Command-line application to view images from the terminal written in Rust",
+      "install_id": "viu",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "name": "viu-1.5.1",
+      "pname": "viu",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.5.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cb33szzznr42xqhl69lglx15ywh5yi0c-viu-1.5.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "viu",
+      "broken": false,
+      "derivation": "/nix/store/rnvpfgwd4c192lz4jcdq9vj4vd4xj76k-viu-1.5.1.drv",
+      "description": "Command-line application to view images from the terminal written in Rust",
+      "install_id": "viu",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "name": "viu-1.5.1",
+      "pname": "viu",
+      "rev": "0aa475546ed21629c4f5bbf90e38c846a99ec9e9",
+      "rev_count": 742845,
+      "rev_date": "2025-01-23T11:41:03Z",
+      "scrape_date": "2025-01-25T03:27:46Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.5.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/8a7k3mwbyr04ini9sh05w063iaf71qvf-viu-1.5.1"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
