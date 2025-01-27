@@ -27,8 +27,6 @@ import torch
 
 # grab some image tools
 from PIL import Image
-from io import BytesIO
-import sixel
 import sys
 import gc
 
@@ -44,10 +42,15 @@ logging.disable_progress_bar()
 
 # draw images in the terminal
 def draw(image):
-    buffer = BytesIO()
-    writer = sixel.SixelWriter()
-    image.save(buffer, format='png')
-    writer.draw(buffer)
+    import tempfile
+    import subprocess
+    import os
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as temp_file:
+        output_file = temp_file.name
+        image.save(output_file)
+
+    subprocess.run(['viu', output_file], check=True)
+    os.remove(output_file)
 
 # set our device and nope out if we don't have either CUDA or Metal
 if torch.cuda.is_available():
@@ -153,7 +156,6 @@ try:
             protocomp.paste(im, (x_offset, -212))
             x_offset += im.size[0]
 
-        # this requires a sixel terminal to do anything, sadly
         draw(protocomp)
         print("\n")
 
