@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - "main"
+      - "preview"
   pull_request:
   schedule:
     - cron: "0 0 * * *"
@@ -106,7 +107,7 @@ jobs:
           ssh-private-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
 
       - name: "Setup Tailscale"
-        uses: "tailscale/github-action@v2"
+        uses: "tailscale/github-action@v3"
         with:
           args: "--timeout 30s --login-server ${{ vars.MANAGED_TAILSCALE_URL }}"
           tags: "tag:ci"
@@ -180,6 +181,7 @@ jobs:
 
       - name: "Containarize"
         run: |
+          export NIX_CONFIG='extra-experimental-features = nix-command flakes'
           flox containerize -d ./${{ matrix.example }}
 
       - name: "Tag & Push"
