@@ -21,6 +21,7 @@
 | `cassandra` | ✅ | ✅ | ✅ | |
 | `elasticsearch` | ✅ | ✅ | ✅ | |
 | `mysql` | ✅ | ✅ | ✅ | |
+| `mongodb` | ✅ | ✅ | | |
 | **Shell:** |
 | `dotenv` | ✅ | ✅ | ✅ | Load .env environment variables |
 | `mkcert` | ✅ | ✅ | ✅ | A tool to make locally trusted development certificates |
