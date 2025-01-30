@@ -273,11 +273,8 @@ jobs:
       - "push"
       - "containarize"
     
-    outputs:
-      message: "${{ steps.envs.outputs.message }}"
-
     steps:
-      - name: "Find environment"
+      - name: "Prepare message"
         id: "envs"
         run: |
           message="$(echo '${{toJSON(needs)}}' | jq -r 'map(select(.result == "failure")) | .[] | "floxenvs: \(.outputs.job) on \(.outputs.system) had \(.result)"')"
