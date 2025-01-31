@@ -41,7 +41,7 @@
 | `fooocus`         |  |  |  | |
 | `metabase`        |  |  |  | |
 | `openai`          |  |  |  | |
-| `podman`          |  |  |  | |
+| `podman` | ✅ | ✅ | ✅ | |
 | `verba`           |  |  |  | |
 
 
