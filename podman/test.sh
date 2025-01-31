@@ -3,8 +3,8 @@
 set -euo pipefail
 
 if [ "$(uname -s)" != 'Linux' ]; then
-  echo "The podman test should only be run on Linux"
-  exit 1
+  echo "Skipping; the podman test should only be run on Linux"
+  exit 0
 fi
 
 RESULT="$(podman run -it quay.io/podman/hello)"
