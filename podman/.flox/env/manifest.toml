@@ -30,7 +30,7 @@ on-activate = """
 
         # Confirm policy.json exits
         if [ "$(uname -s)" = 'Linux' ] && [ ! -f ~/.config/containers/policy.json ]; then
-            if gum confirm "Create containers/policy.json file?" --default=true --affirmative "Yes" --negative "No"; then
+            if [ ! -t 0 ] || gum confirm "Create containers/policy.json file?" --default=true --affirmative "Yes" --negative "No"; then
                 mkdir -p ~/.config/containers/
                 printf '%s\n' '{"default": [{"type": "insecureAcceptAnything"}]}' > ~/.config/containers/policy.json
                 echo "✅ Podman policy created at ~/.config/containers/policy.json"
