@@ -37,6 +37,7 @@
 | `gource` | ✅ | ✅ | ✅ | Create a video of your Git history, with avatars |
 | `localstack` | ✅ | ✅ | ✅ | Run a local version of AWS services for testing and development |
 | `ollama` | ✅ | ✅ | ✅ | Turnkey local LLMs with a Next.JS UI |
+| `sharing` | ✅ | ✅ | ✅ | Simple file sharing via a built-in webserver |
 | `anthropic`       |  |  |  | |
 | `fooocus`         |  |  |  | |
 | `metabase`        |  |  |  | |
