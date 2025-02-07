@@ -261,6 +261,21 @@ jobs:
           $FLOX_BIN push --dir "remote"
           popd
 
+  auto-merge:
+    name: "Auto Merge PRs"
+    runs-on: "ubuntu-latest"
+
+    # if: ${{ github.actor == 'floxbot' && github.event_name == 'pull_request'}} # Detect that the PR author is floxbot
+    steps:
+      - name: "Enable auto-merge for Dependabot PRs"
+        run: |
+          echo Header
+          echo gh pr merge --auto --merge "$PR_URL"
+          echo Footer
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
 
   report-failure:
     name: "Report Failure"
