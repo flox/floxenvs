@@ -1,0 +1,16 @@
+version = 1
+
+[install]
+sharing.pkg-path = "sharing"
+
+[hook]
+on-activate = "echo 'To share a directory, type: sharing [dir]'"
+
+[options]
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]
+cuda-detection = false
