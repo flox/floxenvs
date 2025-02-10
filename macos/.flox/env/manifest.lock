@@ -11,7 +11,7 @@
       }
     },
     "hook": {
-      "on-activate": "if [ -d $FLOX_ENV/Applications ]; then \n  FLOX_ENV_NAME=$(echo $_FLOX_ACTIVE_ENVIRONMENTS | jq '.[0].pointer.name')\n  mac-app-util sync-trampolines \\\n    \"$FLOX_ENV/Applications\" \\\n    \"$HOME/Applications/Flox ($FLOX_ENV_NAME) Apps\"\nfi\n"
+      "on-activate": "FLOX_ENV_NAME=$(echo $_FLOX_ACTIVE_ENVIRONMENTS | jq -r '.[0].pointer.name')\nFLOX_ENV_APPS=\"$HOME/Applications/Flox ($FLOX_ENV_NAME) Apps\"\necho \"$FLOX_ENV_APPS\"\nif [[ -d $FLOX_ENV_APPS ]]; then\n  echo \"REMOVING\"\n  rm -rf \"$FLOX_ENV_APPS\"\nfi\n\nif [ -d $FLOX_ENV/Applications ]; then \n  mac-app-util sync-trampolines \\\n    \"$FLOX_ENV/Applications\" \\\n    \"$FLOX_ENV_APPS\"\nfi\n"
     },
     "profile": {},
     "options": {

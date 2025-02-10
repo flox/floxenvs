@@ -11,11 +11,17 @@ jq.pkg-path = "jq"
 
 [hook]
 on-activate = '''
+FLOX_ENV_NAME=$(echo $_FLOX_ACTIVE_ENVIRONMENTS | jq -r '.[0].pointer.name')
+FLOX_ENV_APPS="$HOME/Applications/Flox ($FLOX_ENV_NAME) Apps"
+
+if [[ -d $FLOX_ENV_APPS ]]; then
+  rm -rf "$FLOX_ENV_APPS"
+fi
+
 if [ -d $FLOX_ENV/Applications ]; then 
-  FLOX_ENV_NAME=$(echo $_FLOX_ACTIVE_ENVIRONMENTS | jq '.[0].pointer.name')
   mac-app-util sync-trampolines \
     "$FLOX_ENV/Applications" \
-    "$HOME/Applications/Flox ($FLOX_ENV_NAME) Apps"
+    "$FLOX_ENV_APPS"
 fi
 '''
 
