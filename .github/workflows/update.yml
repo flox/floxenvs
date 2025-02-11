@@ -80,11 +80,11 @@ jobs:
         with:
           token: "${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}"
           add-paths: "${{ matrix.example }}/.flox"
-          commit-message: "chore: Update manifest of `${{ matrix.example }}` environment"
+          commit-message: "chore: Update lockfile of `${{ matrix.example }}` environment"
           commiter: "FloxBot <bot@flox.dev>"
           author: "FloxBot <bot@flox.dev>"
           branch: "chore-update-${{ matrix.example }}-environment"
           delete-branch: true
-          title: "chore: Update manifest of `${{ matrix.example }}` flox environment"
+          title: "chore: Update lockfile of `${{ matrix.example }}` flox environment"
           body: "This PR was automatically created by [Update workflow](https://github.com/flox/floxenvs/actions/workflows/update.yml)."
           labels: "team-developer-support"

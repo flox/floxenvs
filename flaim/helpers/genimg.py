@@ -5,16 +5,19 @@ warnings.filterwarnings("ignore")
 
 import sys
 import torch
-import sixel
-from io import BytesIO
 from diffusers import StableDiffusionPipeline
 from diffusers import logging
 
 def draw(image):
-    buffer = BytesIO()
-    writer = sixel.SixelWriter()
-    image.save(buffer, format='png')
-    writer.draw(buffer)
+    import tempfile
+    import subprocess
+    import os
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as temp_file:
+        output_file = temp_file.name
+        image.save(output_file)
+
+    subprocess.run(['viu', output_file], check=True)
+    os.remove(output_file)
 
 logging.set_verbosity(50)
 logging.disable_progress_bar()

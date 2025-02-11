@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - "main"
+      - "preview"
   pull_request:
   schedule:
     - cron: "0 0 * * *"
@@ -106,7 +107,7 @@ jobs:
           ssh-private-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
 
       - name: "Setup Tailscale"
-        uses: "tailscale/github-action@v2"
+        uses: "tailscale/github-action@v3"
         with:
           args: "--timeout 30s --login-server ${{ vars.MANAGED_TAILSCALE_URL }}"
           tags: "tag:ci"
@@ -136,6 +137,10 @@ jobs:
                 --extra-experimental-features '"nix-command flakes"' \
                 --option access-tokens "github.com=${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}" \
                 github:flox/floxenvs/${{ github.sha }}#apps.${{ matrix.system }}.test-${{ matrix.example }} -- ${{ matrix.start_services }}
+
+    outputs:
+      job: "${{ matrix.example }}"
+      system: "${{ matrix.system }}"
 
   containarize:
     name: "Containarize '${{ matrix.example }}'"
@@ -180,6 +185,7 @@ jobs:
 
       - name: "Containarize"
         run: |
+          export NIX_CONFIG='extra-experimental-features = nix-command flakes'
           flox containerize -d ./${{ matrix.example }}
 
       - name: "Tag & Push"
@@ -255,6 +261,21 @@ jobs:
           $FLOX_BIN push --dir "remote"
           popd
 
+  auto-merge:
+    name: "Auto Merge PRs"
+    runs-on: "ubuntu-latest"
+
+    # if: ${{ github.actor == 'floxbot' && github.event_name == 'pull_request'}} # Detect that the PR author is floxbot
+    steps:
+      - name: "Enable auto-merge for Dependabot PRs"
+        run: |
+          echo Header
+          echo gh pr merge --auto --merge "$PR_URL"
+          echo Footer
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
 
   report-failure:
     name: "Report Failure"
@@ -266,14 +287,19 @@ jobs:
       - "test"
       - "push"
       - "containarize"
-
+    
     steps:
+      - name: "Prepare message"
+        id: "envs"
+        run: |
+          message="$(echo '${{toJSON(needs)}}' | jq -r 'map(select(.result == "failure")) | .[] | "floxenvs: \(.outputs.job) on \(.outputs.system) had \(.result)"')"
+          echo "message='$message'" >> "$GITHUB_OUTPUT"
       - name: "Slack Notification"
         uses: "rtCamp/action-slack-notify@v2"
         env:
           SLACK_CHANNEL:    "team-content"
-          SLACK_TITLE:      "Something broke CI for floxenvs"
-          SLACK_FOOTER:     "Thank you for caring"
+          SLACK_TITLE:      "${{ steps.envs.outputs.message }}"
+          SLACK_FOOTER:     "Thanks for looking at it."
           SLACK_WEBHOOK:    "${{ secrets.MANAGED_SLACK_WEBHOOK }}"
           SLACK_USERNAME:   "GitHub"
           SLACK_ICON_EMOJI: ":poop:"

@@ -1,219 +1,511 @@
 {
-  "lockfile-version": 0,
+  "lockfile-version": 1,
   "manifest": {
-    "hook": {},
+    "version": 1,
     "install": {
       "gum": {
         "pkg-path": "gum"
       },
-      "jupyter": {
-        "pkg-path": "jupyter"
-      },
       "llm": {
         "pkg-path": "llm"
       },
+      "mods": {
+        "pkg-path": "mods"
+      },
       "openai": {
         "pkg-path": "openai"
-      },
-      "vscode": {
-        "pkg-path": "vscode"
       }
     },
+    "hook": {
+      "on-activate": "# First, check if $OPENAI_API_KEY is set\nif [[ \"${OPENAI_API_KEY}\" ]]; then\n  echo \"🤖 OpenAI configured with key from existing environment\"\n  return 0\nfi\n\n# Then, check to see if the dotfile exists\nif [[ -f ~/.config/openai.key ]]; then\n  export OPENAI_API_KEY=$(cat ~/.config/openai.key)\n  echo \"🤖 OpenAI configured with key from ~/.config/openai.key\"\n  return 0\nfi\n\n# We got nothing! Let's ask.\necho \"OpenAI key not detected.\"\n\n# exit in CI, be kind to github\nif [[ \"$FLOX_ENVS_TESTING\" == \"1\" ]]; then\n  return 0\nfi\n\nif gum confirm \"Would you like to provide one now?\" --default=true --affirmative \"Yes\" --negative \"No\"; then\n  OPENAI_API_KEY=$(gum input --placeholder \"OpenAI API key\")\n  if gum confirm \"Write this into ~/.config/openai.key for next time?\" --default=true --affirmative \"Yes\" --negative \"No\"; then\n    echo \"$OPENAI_API_KEY\" > ~/.config/openai.key\n    chmod 600 ~/.config/openai.key\n  fi\n  export OPENAI_API_KEY\n  echo \"🤖 OpenAI configured with provided key\"\n  return 0\nfi\n\necho \"An OpenAI key is required. You can provide one by setting OPENAI_API_KEY.\"\necho; echo \"🚨 OpenAI client is available (no key)\"\n"
+    },
+    "profile": {},
     "options": {
       "systems": [
-        "aarch64-darwin"
-      ]
-    },
-    "profile": {
-      "common": "\n  # First, check if $OPENAI_API_KEY is set\n  if [[ \"${OPENAI_API_KEY}\" ]]; then\n    echo \"🤖 OpenAI configured with key from existing environment\"\n    return 0\n  fi\n\n  # Then, check to see if the dotfile exists\n  if [[ -f ~/.config/openai.key ]]; then\n    export OPENAI_API_KEY=$(cat ~/.config/openai.key)\n    echo \"🤖 OpenAI configured with key from ~/.config/openai.key\"\n    return 0\n  fi\n\n  # We got nothing! Let's ask.\n  echo \"OpenAI key not detected.\"\n  \n  if gum confirm \"Would you like to provide one now?\" --default=true --affirmative \"Yes\" --negative \"No\"; then\n    OPENAI_API_KEY=$(gum input --placeholder \"OpenAI API key\")\n    if gum confirm \"Write this into ~/.config/openai.key for next time?\" --default=true --affirmative \"Yes\" --negative \"No\"; then\n      echo \"$OPENAI_API_KEY\" > ~/.config/openai.key\n      chmod 600 ~/.config/openai.key\n    fi\n    echo \"🤖 OpenAI configured with provided key\"\n    return 0\n  fi\n\n  echo \"An OpenAI key is required. You can provide one by setting OPENAI_API_KEY.\"\n  echo; echo \"🚨 OpenAI client is available (no key)\"\n\n"
-    },
-    "registry": {
-      "defaults": {
-        "subtrees": null
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-darwin",
+        "x86_64-linux"
+      ],
+      "allow": {
+        "licenses": []
       },
-      "inputs": {
-        "nixpkgs": {
-          "from": {
-            "owner": "NixOS",
-            "ref": "release-23.11",
-            "repo": "nixpkgs",
-            "type": "github"
-          },
-          "subtrees": [
-            "legacyPackages"
-          ]
-        }
-      },
-      "priority": [
-        "nixpkgs"
-      ]
+      "semver": {},
+      "cuda-detection": false
     }
   },
-  "packages": {
-    "aarch64-darwin": {
-      "gum": {
-        "attr-path": [
-          "legacyPackages",
-          "aarch64-darwin",
-          "gum"
-        ],
-        "info": {
-          "broken": false,
-          "description": "Tasty Bubble Gum for your shell",
-          "license": "MIT",
-          "pname": "gum",
-          "unfree": false,
-          "version": "0.13.0"
-        },
-        "input": {
-          "attrs": {
-            "lastModified": 1712670302,
-            "narHash": "sha256-iV3ChPOnUTEx2Bb+hsUoTEMUT1u4uOnwdssvfNI95Zw=",
-            "owner": "NixOS",
-            "repo": "nixpkgs",
-            "rev": "466b061d6faf82721ed437865d081a57908ebebf",
-            "type": "github"
-          },
-          "fingerprint": "c0a5815c4843588f176933d9214312afd0aef3203db6f2416ca44176cef2a5ec",
-          "url": "github:NixOS/nixpkgs/466b061d6faf82721ed437865d081a57908ebebf"
-        },
-        "priority": 5
+  "packages": [
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/gccd71rh0832pa50dv7gmn4r6ap9qw4d-gum-0.15.1.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "name": "gum-0.15.1",
+      "pname": "gum",
+      "rev": "a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "rev_count": 750629,
+      "rev_date": "2025-02-08T13:21:17Z",
+      "scrape_date": "2025-02-09T05:15:18Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.15.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/xdllwvxv5817vyspsxz9md15mkw0jnpk-gum-0.15.1"
       },
-      "jupyter": {
-        "attr-path": [
-          "legacyPackages",
-          "aarch64-darwin",
-          "jupyter"
-        ],
-        "info": {
-          "broken": false,
-          "description": "A high-level dynamically-typed programming language",
-          "license": "Python-2.0",
-          "pname": "python3",
-          "unfree": false,
-          "version": "3.11.8-env"
-        },
-        "input": {
-          "attrs": {
-            "lastModified": 1712670302,
-            "narHash": "sha256-iV3ChPOnUTEx2Bb+hsUoTEMUT1u4uOnwdssvfNI95Zw=",
-            "owner": "NixOS",
-            "repo": "nixpkgs",
-            "rev": "466b061d6faf82721ed437865d081a57908ebebf",
-            "type": "github"
-          },
-          "fingerprint": "c0a5815c4843588f176933d9214312afd0aef3203db6f2416ca44176cef2a5ec",
-          "url": "github:NixOS/nixpkgs/466b061d6faf82721ed437865d081a57908ebebf"
-        },
-        "priority": 5
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/icbs467zrbkbwzj0iq6yqgqcrfflnzdd-gum-0.15.1.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "name": "gum-0.15.1",
+      "pname": "gum",
+      "rev": "a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "rev_count": 750629,
+      "rev_date": "2025-02-08T13:21:17Z",
+      "scrape_date": "2025-02-09T05:15:18Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.15.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/a32cysf4yz5vh6jv8kapywxpr52mpza5-gum-0.15.1"
       },
-      "llm": {
-        "attr-path": [
-          "legacyPackages",
-          "aarch64-darwin",
-          "llm"
-        ],
-        "info": {
-          "broken": false,
-          "description": "Access large language models from the command-line",
-          "license": "Apache-2.0",
-          "pname": "llm",
-          "unfree": false,
-          "version": "0.13.1"
-        },
-        "input": {
-          "attrs": {
-            "lastModified": 1712670302,
-            "narHash": "sha256-iV3ChPOnUTEx2Bb+hsUoTEMUT1u4uOnwdssvfNI95Zw=",
-            "owner": "NixOS",
-            "repo": "nixpkgs",
-            "rev": "466b061d6faf82721ed437865d081a57908ebebf",
-            "type": "github"
-          },
-          "fingerprint": "c0a5815c4843588f176933d9214312afd0aef3203db6f2416ca44176cef2a5ec",
-          "url": "github:NixOS/nixpkgs/466b061d6faf82721ed437865d081a57908ebebf"
-        },
-        "priority": 5
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/9wzfi8lrq715wayvvn0jk411xm21nwx3-gum-0.15.1.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "name": "gum-0.15.1",
+      "pname": "gum",
+      "rev": "a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "rev_count": 750629,
+      "rev_date": "2025-02-08T13:21:17Z",
+      "scrape_date": "2025-02-09T05:15:18Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.15.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/dc27pakvsy1cihqz64nmqlvk9kfvaqsx-gum-0.15.1"
       },
-      "openai": {
-        "attr-path": [
-          "legacyPackages",
-          "aarch64-darwin",
-          "openai"
-        ],
-        "info": {
-          "broken": false,
-          "description": "Python client library for the OpenAI API",
-          "license": "MIT",
-          "pname": "openai",
-          "unfree": false,
-          "version": "1.16.2"
-        },
-        "input": {
-          "attrs": {
-            "lastModified": 1712670302,
-            "narHash": "sha256-iV3ChPOnUTEx2Bb+hsUoTEMUT1u4uOnwdssvfNI95Zw=",
-            "owner": "NixOS",
-            "repo": "nixpkgs",
-            "rev": "466b061d6faf82721ed437865d081a57908ebebf",
-            "type": "github"
-          },
-          "fingerprint": "c0a5815c4843588f176933d9214312afd0aef3203db6f2416ca44176cef2a5ec",
-          "url": "github:NixOS/nixpkgs/466b061d6faf82721ed437865d081a57908ebebf"
-        },
-        "priority": 5
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/96il3fayyk011rizdw7sn92dzifbrkyk-gum-0.15.1.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "name": "gum-0.15.1",
+      "pname": "gum",
+      "rev": "a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "rev_count": 750629,
+      "rev_date": "2025-02-08T13:21:17Z",
+      "scrape_date": "2025-02-09T05:15:18Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.15.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/izlkj83sbvsxvj2ss9p479jhxljdvy5r-gum-0.15.1"
       },
-      "vscode": {
-        "attr-path": [
-          "legacyPackages",
-          "aarch64-darwin",
-          "vscode"
-        ],
-        "info": {
-          "broken": false,
-          "description": "Open source source code editor developed by Microsoft for Windows,\nLinux and macOS\n",
-          "license": null,
-          "pname": "vscode",
-          "unfree": true,
-          "version": "1.88.0"
-        },
-        "input": {
-          "attrs": {
-            "lastModified": 1712670302,
-            "narHash": "sha256-iV3ChPOnUTEx2Bb+hsUoTEMUT1u4uOnwdssvfNI95Zw=",
-            "owner": "NixOS",
-            "repo": "nixpkgs",
-            "rev": "466b061d6faf82721ed437865d081a57908ebebf",
-            "type": "github"
-          },
-          "fingerprint": "c0a5815c4843588f176933d9214312afd0aef3203db6f2416ca44176cef2a5ec",
-          "url": "github:NixOS/nixpkgs/466b061d6faf82721ed437865d081a57908ebebf"
-        },
-        "priority": 5
-      }
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "llm",
+      "broken": false,
+      "derivation": "/nix/store/f3dx65b93wpyp0hfmf5jzrinvh6jwj9z-python3.12-llm-0.21.drv",
+      "description": "Access large language models from the command-line",
+      "install_id": "llm",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "name": "llm-0.21",
+      "pname": "llm",
+      "rev": "a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "rev_count": 750629,
+      "rev_date": "2025-02-08T13:21:17Z",
+      "scrape_date": "2025-02-09T05:15:18Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.21",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/pnb8bdp5nz3gczsn6qzhp894d09himi7-python3.12-llm-0.21-dist",
+        "out": "/nix/store/pz3lhxixl2ff8a6xbc50xmjljmfn1ccv-python3.12-llm-0.21"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "llm",
+      "broken": false,
+      "derivation": "/nix/store/642hnxxhci89sav06gazh4bhzi10mnsf-python3.12-llm-0.21.drv",
+      "description": "Access large language models from the command-line",
+      "install_id": "llm",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "name": "llm-0.21",
+      "pname": "llm",
+      "rev": "a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "rev_count": 750629,
+      "rev_date": "2025-02-08T13:21:17Z",
+      "scrape_date": "2025-02-09T05:15:18Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.21",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/z88y6i7iwp0jsmaincp1mbf3ks93i0x8-python3.12-llm-0.21-dist",
+        "out": "/nix/store/cgz30zdw15qkpnny9jkyrw7m3718cgci-python3.12-llm-0.21"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "llm",
+      "broken": false,
+      "derivation": "/nix/store/565wrm4vriql89c7nk5fbs1gsq5z0qlx-python3.12-llm-0.21.drv",
+      "description": "Access large language models from the command-line",
+      "install_id": "llm",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "name": "llm-0.21",
+      "pname": "llm",
+      "rev": "a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "rev_count": 750629,
+      "rev_date": "2025-02-08T13:21:17Z",
+      "scrape_date": "2025-02-09T05:15:18Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.21",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/rhs6fxjfzgk740zjh0qsmdx9q01iirpy-python3.12-llm-0.21-dist",
+        "out": "/nix/store/92lq89zrmgki731yzc402xp4i12sfxgq-python3.12-llm-0.21"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "llm",
+      "broken": false,
+      "derivation": "/nix/store/0s9bngj2azzqpvdjqhij2g6rj78xvl9m-python3.12-llm-0.21.drv",
+      "description": "Access large language models from the command-line",
+      "install_id": "llm",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "name": "llm-0.21",
+      "pname": "llm",
+      "rev": "a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "rev_count": 750629,
+      "rev_date": "2025-02-08T13:21:17Z",
+      "scrape_date": "2025-02-09T05:15:18Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.21",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/qdcvhzdjhw5v162zl9sasqbrslmky6r8-python3.12-llm-0.21-dist",
+        "out": "/nix/store/z1kbllcl1xl4f0h1aly51bhdi1b8df4f-python3.12-llm-0.21"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mods",
+      "broken": false,
+      "derivation": "/nix/store/k7aqrjdxbczpa4pf65arx7iw1kqzpix1-mods-1.6.0.drv",
+      "description": "AI on the command line",
+      "install_id": "mods",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "name": "mods-1.6.0",
+      "pname": "mods",
+      "rev": "a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "rev_count": 750629,
+      "rev_date": "2025-02-08T13:21:17Z",
+      "scrape_date": "2025-02-09T05:15:18Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.6.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/fg5hzpqxsbra8xsqzxdivbwg3fijfxln-mods-1.6.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mods",
+      "broken": false,
+      "derivation": "/nix/store/1wkl3b6g1k0vh7j12l4jqas3s7mrnq4i-mods-1.6.0.drv",
+      "description": "AI on the command line",
+      "install_id": "mods",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "name": "mods-1.6.0",
+      "pname": "mods",
+      "rev": "a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "rev_count": 750629,
+      "rev_date": "2025-02-08T13:21:17Z",
+      "scrape_date": "2025-02-09T05:15:18Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.6.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/prghpb9bq9v0xzzfvzaid0liqdjnrf00-mods-1.6.0"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mods",
+      "broken": false,
+      "derivation": "/nix/store/4grx1kf6rvr1ygdcnhdy7zij2ajmcj5y-mods-1.6.0.drv",
+      "description": "AI on the command line",
+      "install_id": "mods",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "name": "mods-1.6.0",
+      "pname": "mods",
+      "rev": "a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "rev_count": 750629,
+      "rev_date": "2025-02-08T13:21:17Z",
+      "scrape_date": "2025-02-09T05:15:18Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.6.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/disbgbdm68pi83xx2cfr9xmkpyr972c8-mods-1.6.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mods",
+      "broken": false,
+      "derivation": "/nix/store/f0s5kdrrafp09b37v1z5q71w9cg69yyb-mods-1.6.0.drv",
+      "description": "AI on the command line",
+      "install_id": "mods",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "name": "mods-1.6.0",
+      "pname": "mods",
+      "rev": "a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "rev_count": 750629,
+      "rev_date": "2025-02-08T13:21:17Z",
+      "scrape_date": "2025-02-09T05:15:18Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.6.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/nqridr4m3jajmxpy6zyafqb64pi2wc3i-mods-1.6.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "openai",
+      "broken": false,
+      "derivation": "/nix/store/a3l0d1s31zf6zyxyw50nsbl7ry4zhw3v-python3.12-openai-1.59.9.drv",
+      "description": "Python client library for the OpenAI API",
+      "install_id": "openai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "name": "openai-1.59.9",
+      "pname": "openai",
+      "rev": "a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "rev_count": 750629,
+      "rev_date": "2025-02-08T13:21:17Z",
+      "scrape_date": "2025-02-09T05:15:18Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.59.9",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/d61pwvnm50wmkbxj8427h11bazl9gh8x-python3.12-openai-1.59.9-dist",
+        "out": "/nix/store/qjiwzfrjb0ga8a0jh0g2g79cj5a1w51m-python3.12-openai-1.59.9"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "openai",
+      "broken": false,
+      "derivation": "/nix/store/a1px24vhv1g6xrfp7yf1wsii3wbc5xd6-python3.12-openai-1.59.9.drv",
+      "description": "Python client library for the OpenAI API",
+      "install_id": "openai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "name": "openai-1.59.9",
+      "pname": "openai",
+      "rev": "a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "rev_count": 750629,
+      "rev_date": "2025-02-08T13:21:17Z",
+      "scrape_date": "2025-02-09T05:15:18Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.59.9",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/f08mq8m1xcfinim15m8prav96vm8hx5j-python3.12-openai-1.59.9-dist",
+        "out": "/nix/store/9zaban0aayzrda9fisimvy56lxbvy9aj-python3.12-openai-1.59.9"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "openai",
+      "broken": false,
+      "derivation": "/nix/store/05rzsaqgbldrag5prnazmiys20j9link-python3.12-openai-1.59.9.drv",
+      "description": "Python client library for the OpenAI API",
+      "install_id": "openai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "name": "openai-1.59.9",
+      "pname": "openai",
+      "rev": "a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "rev_count": 750629,
+      "rev_date": "2025-02-08T13:21:17Z",
+      "scrape_date": "2025-02-09T05:15:18Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.59.9",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/9ff9c22vw6468kv41pq0105s7ipkprgl-python3.12-openai-1.59.9-dist",
+        "out": "/nix/store/0435pxb7di8rhca6l478dxccfysx6gfz-python3.12-openai-1.59.9"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "openai",
+      "broken": false,
+      "derivation": "/nix/store/dsfvq16kx2yq5cfylcl5q325jdkds5jx-python3.12-openai-1.59.9.drv",
+      "description": "Python client library for the OpenAI API",
+      "install_id": "openai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "name": "openai-1.59.9",
+      "pname": "openai",
+      "rev": "a79cfe0ebd24952b580b1cf08cd906354996d547",
+      "rev_count": 750629,
+      "rev_date": "2025-02-08T13:21:17Z",
+      "scrape_date": "2025-02-09T05:15:18Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.59.9",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/ys2sakm16hs3n422p650kz7584hz7kwk-python3.12-openai-1.59.9-dist",
+        "out": "/nix/store/n1hahvknl1dmpqp1y0v2imd0vrk7bsdn-python3.12-openai-1.59.9"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
     }
-  },
-  "registry": {
-    "defaults": {
-      "subtrees": null
-    },
-    "inputs": {
-      "nixpkgs": {
-        "from": {
-          "lastModified": 1712670302,
-          "narHash": "sha256-iV3ChPOnUTEx2Bb+hsUoTEMUT1u4uOnwdssvfNI95Zw=",
-          "owner": "NixOS",
-          "repo": "nixpkgs",
-          "rev": "466b061d6faf82721ed437865d081a57908ebebf",
-          "type": "github"
-        },
-        "subtrees": [
-          "legacyPackages"
-        ]
-      }
-    },
-    "priority": [
-      "nixpkgs"
-    ]
-  }
+  ]
 }
