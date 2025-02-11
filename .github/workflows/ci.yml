@@ -269,11 +269,9 @@ jobs:
     steps:
       - name: "Enable auto-merge for Dependabot PRs"
         run: |
-          echo Header
           echo "${{ github.actor }}"
           echo "${{ github.event_name }}"
           gh pr merge --auto --merge "$PR_URL"
-          echo Footer
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
