@@ -40,5 +40,5 @@ flox services status
 echo ">>> flox services logs dagger-engine"
 flox services logs dagger-engine
 
-dagger call container-echo --string-arg="WORKS"
+dagger call container-echo --string-arg="WORKS" stdout
 echo ">>> Dagger works"
