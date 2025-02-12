@@ -28,6 +28,7 @@
 | `a-perfect-shell` | ✅ | ✅ | ✅ | An opinionated shell environment |
 | `direnv`          |  |  |  | |
 | **Applications:** |
+| `dagger`          | ✅ | ✅ | ✅ | Dagger - write your pipelines in Go/Python/Typescript |
 | `1password` | ✅ | ✅ | ✅ | 1Password + a simple shell helper |
 | `nginx`           | ✅ | ✅ | ✅ | A HTTP web server and much more... |
 | `jupyterlab`              | ✅ | ✅ | ✅ | Jupyter Lab notebook |
