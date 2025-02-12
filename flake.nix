@@ -3,7 +3,8 @@
 
   inputs.flake-utils.url = "github:numtide/flake-utils";
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-  inputs.flox.url = "github:flox/flox/refs/tags/v1.3.5";
+
+  inputs.flox.url = "github:flox/flox/refs/tags/v1.3.12";
 
   outputs =
     {

@@ -1,0 +1,56 @@
+version = 1
+
+[install]
+mongodb-ce.pkg-path = "mongodb-ce"
+mongodb-ce.version = "7.0.12"
+mongosh.pkg-path = "mongosh"
+
+[vars]
+
+MONGO_HOST = "127.0.0.1"
+MONGO_PORT = "27017"
+
+[hook]
+on-activate = '''
+export MONGO_HOME="$FLOX_ENV_CACHE/mongodb"
+export MONGO_CONFIG="$MONGO_HOME/mongod.conf"
+if [ ! -d "$MONGO_HOME" ]; then
+  mkdir -m 0700 -p "$MONGO_HOME"
+fi
+
+cat >$MONGO_CONFIG <<EOF 
+storage:
+  dbPath: "$MONGO_HOME"
+net:
+  bindIp: $MONGO_HOST, ::1
+  ipv6: true
+EOF
+'''
+
+
+[profile]
+common = '''
+echo ""
+echo "     ╔══════════════════════════════════════════════════════╗"
+echo "     ║                                                      ║"
+echo "     ║  Start Mongodb in the background:                    ║"
+echo "     ║  👉 flox services start                              ║"
+echo "     ║  👉 flox activate --start-services                   ║"
+echo "     ║                                                      ║"
+echo "     ║  Try to connect to MongoDB:                          ║"
+echo "     ║  👉 mongosh --host $MONGO_HOST --port $MONGO_PORT    ║"
+echo "     ║                                                      ║"
+echo "     ╚══════════════════════════════════════════════════════╝"
+echo ""
+'''
+
+[services]
+mongodb.command = "mongod --config $MONGO_HOME/mongod.conf"
+
+[options]
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]

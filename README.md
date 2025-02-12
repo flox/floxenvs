@@ -21,6 +21,7 @@
 | `cassandra` | ✅ | ✅ | ✅ | |
 | `elasticsearch` | ✅ | ✅ | ✅ | |
 | `mysql` | ✅ | ✅ | ✅ | |
+| `mongodb` | ✅ | ✅ | | |
 | **Shell:** |
 | `dotenv` | ✅ | ✅ | ✅ | Load .env environment variables |
 | `mkcert` | ✅ | ✅ | ✅ | A tool to make locally trusted development certificates |
@@ -30,18 +31,19 @@
 | `dagger`          | ✅ | ✅ | ✅ | Dagger - write your pipelines in Go/Python/Typescript |
 | `1password` | ✅ | ✅ | ✅ | 1Password + a simple shell helper |
 | `nginx`           | ✅ | ✅ | ✅ | A HTTP web server and much more... |
-| `nb`              | ✅ | ✅ | ✅ | IPython notebook |
+| `jupyterlab`              | ✅ | ✅ | ✅ | Jupyter Lab notebook |
 | `flaim` | ✅ | ✅ | ✅ | A stack of Python modules for Stable Diffusion |
 | `crispy-doom` | ✅ | ✅ | ✅ | The Crispy Doom game engine w/a hook that downloads a Doom game library |
 | `colima` | ✅ | ✅ | ✅ | Turnkey Docker with Containers on Linux Machines |
 | `gource` | ✅ | ✅ | ✅ | Create a video of your Git history, with avatars |
 | `localstack` | ✅ | ✅ | ✅ | Run a local version of AWS services for testing and development |
+| `ollama` | ✅ | ✅ | ✅ | Turnkey local LLMs with a Next.JS UI |
+| `sharing` | ✅ | ✅ | ✅ | Simple file sharing via a built-in webserver |
 | `anthropic`       |  |  |  | |
 | `fooocus`         |  |  |  | |
 | `metabase`        |  |  |  | |
-| `ollama`          |  |  |  | |
 | `openai`          |  |  |  | |
-| `podman`          |  |  |  | |
+| `podman` | ✅ | ✅ | ✅ | |
 | `verba`           |  |  |  | |
 
 
