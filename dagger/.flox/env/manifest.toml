@@ -57,7 +57,7 @@ fi
 export _DE_ARGS=""
 export _DE_ARGS="$_DE_ARGS --name $DAGGER_ENGINE_NAME"
 export _DE_ARGS="$_DE_ARGS --volume dagger-engine:/var/lib/dagger"
-export _DE_ARGS="$_DE_ARGS --volume $DAGGER_ENGINE_CONFIG:/etc/dagger/engine.toml"
+export _DE_ARGS="$_DE_ARGS --volume $DAGGER_HOME:/etc/dagger/"
 export _DE_ARGS="$_DE_ARGS --volume $DAGGER_CERTS_DIR:/usr/local/share/ca-certificates"
 if [ ! -z "$GOPROXY" ]; then
   export _DE_ARGS="$_DE_ARGS --env _DAGGER_ENGINE_SYSTEMENV_GOPROXY=\"$GOPROXY\""
