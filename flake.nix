@@ -39,15 +39,17 @@
           export LC_TIME="C"
           export LC_ALL=
 
+          mkdir -p /tmp/floxenvs
           # copy self/nb into temp dir
-          export TESTDIR="$(mktemp -d --suffix floxenvs-${name}-example)"
+          export TESTDIR="$(mktemp --directory --tmpdir=/tmp/floxenvs --suffix floxenvs-${name}-example)"
+          chmod g=rwx "$TESTDIR"
           cp -R ${path}/* $TESTDIR
           cp -R ${path}/.flox* $TESTDIR
           if [ -f ${path}/.env ]; then
             cp -R ${path}/.env $TESTDIR
           fi
           chown -R $(whoami) $TESTDIR/.flox*
-          chmod -R +w $TESTDIR/.flox*
+          chmod -R a+w,g+rw $TESTDIR/.flox*
 
           # switch to root for the test
           cd $TESTDIR
