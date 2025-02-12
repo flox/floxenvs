@@ -22,10 +22,10 @@
       "NOTHANKS": "1"
     },
     "hook": {
-      "on-activate": "\n# Check that docker is running using `docker info`\nif ! docker info > /dev/null 2>&1; then\n  echo \"❌ Docker is not running. Please start Docker and try again.\"\n  exit 1\nfi\n\nexport DAGGER_HOME=\"$FLOX_ENV_CACHE/dagger\"\nexport DAGGER_ENGINE_CONFIG=\"$DAGGER_HOME/engine.toml\"\nexport DAGGER_CERTS_DIR=\"$DAGGER_HOME/certs\"\n\nexport DAGGER_VERSION=$(dagger version | cut -d 'v' -f 2 | cut -d ' ' -f 1)\nexport DAGGER_ENGINE_IMAGE=\"registry.dagger.io/engine:v$DAGGER_VERSION\"\nexport DAGGER_ENGINE_NAME=\"flox-dagger-engine-v$DAGGER_VERSION\"\n\nexport _EXPERIMENTAL_DAGGER_RUNNER_HOST=\"docker-container://$DAGGER_ENGINE_NAME\"\nexport _EXPERIMENTAL_DAGGER_CLI_BIN=\"$(which dagger)\"\n\nmkdir -p \"$DAGGER_HOME\"\n\n# XXX: Write dagger engine config below\n#   -> https://docs.dagger.io/configuration/custom-runner\n#   -> https://docs.dagger.io/configuration/custom-registry\n#   -> https://docs.dagger.io/configuration/custom-ca\n#   -> https://docs.dagger.io/configuration/proxy\nif [ ! -f \"$DAGGER_ENGINE_CONFIG\" ]; then\ncat > \"$DAGGER_ENGINE_CONFIG\" <<EOF\n#debug = true\n#insecure-entitlements = [\"security.insecure\"]\n#\n#[registry.\"docker.io\"]\n#  mirrors = [\"mirror.gcr.io\"]\nEOF\nfi\n\nexport _DE_ARGS=\"\"\nexport _DE_ARGS=\"$_DE_ARGS --name $DAGGER_ENGINE_NAME\"\nexport _DE_ARGS=\"$_DE_ARGS --volume dagger-engine:/var/lib/dagger\"\nexport _DE_ARGS=\"$_DE_ARGS --volume $DAGGER_ENGINE_CONFIG:/etc/dagger/engine.toml\"\nexport _DE_ARGS=\"$_DE_ARGS --volume $DAGGER_CERTS_DIR:/usr/local/share/ca-certificates\"\nif [ ! -z \"$GOPROXY\" ]; then\n  export _DE_ARGS=\"$_DE_ARGS --env _DAGGER_ENGINE_SYSTEMENV_GOPROXY=\\\"$GOPROXY\\\"\"\nfi\n"
+      "on-activate": "\n# Check that docker is running using `docker info`\nif ! docker info > /dev/null 2>&1; then\n  echo \"❌ Docker is not running. Please start Docker and try again.\"\n  exit 1\nfi\n\nexport DAGGER_HOME=\"$FLOX_ENV_CACHE/dagger\"\nexport DAGGER_ENGINE_CONFIG=\"$DAGGER_HOME/engine.toml\"\nexport DAGGER_CERTS_DIR=\"$DAGGER_HOME/certs\"\n\nexport DAGGER_VERSION=$(dagger version | cut -d 'v' -f 2 | cut -d ' ' -f 1)\nexport DAGGER_ENGINE_IMAGE=\"registry.dagger.io/engine:v$DAGGER_VERSION\"\nexport DAGGER_ENGINE_NAME=\"flox-dagger-engine-v$DAGGER_VERSION\"\n\nexport _EXPERIMENTAL_DAGGER_RUNNER_HOST=\"docker-container://$DAGGER_ENGINE_NAME\"\nexport _EXPERIMENTAL_DAGGER_CLI_BIN=\"$(which dagger)\"\n\nmkdir -p \"$DAGGER_HOME\"\n\n# XXX: Write dagger engine config below\n#   -> https://docs.dagger.io/configuration/custom-runner\n#   -> https://docs.dagger.io/configuration/custom-registry\n#   -> https://docs.dagger.io/configuration/custom-ca\n#   -> https://docs.dagger.io/configuration/proxy\nif [ ! -f \"$DAGGER_ENGINE_CONFIG\" ]; then\ncat > \"$DAGGER_ENGINE_CONFIG\" <<EOF\n#debug = true\n#insecure-entitlements = [\"security.insecure\"]\n#\n#[registry.\"docker.io\"]\n#  mirrors = [\"mirror.gcr.io\"]\nEOF\nfi\n\nexport _DE_ARGS=\"\"\nexport _DE_ARGS=\"$_DE_ARGS --name $DAGGER_ENGINE_NAME\"\nexport _DE_ARGS=\"$_DE_ARGS --volume dagger-engine:/var/lib/dagger\"\nexport _DE_ARGS=\"$_DE_ARGS --volume $DAGGER_HOME:/etc/dagger/\"\nexport _DE_ARGS=\"$_DE_ARGS --volume $DAGGER_CERTS_DIR:/usr/local/share/ca-certificates\"\nif [ ! -z \"$GOPROXY\" ]; then\n  export _DE_ARGS=\"$_DE_ARGS --env _DAGGER_ENGINE_SYSTEMENV_GOPROXY=\\\"$GOPROXY\\\"\"\nfi\n"
     },
     "profile": {
-      "common": "echo \"\"\necho \"     ╔═══════════════════════════════════════════════════╗\"\necho \"     ║                                                   ║\"\necho \"     ║  Dagger environment with custom dagger engine!    ║\"\necho \"     ║                                                   ║\"\necho \"     ║  Start new dagger project:                        ║\"\necho \"     ║  👉 dagger init --sdk=python                      ║\"\necho \"     ║  👉 dagger develop                                ║\"\necho \"     ║  👉 dagger develop                                ║\"\necho \"     ║  👉 dagger call container-echo --string-arg=\"OK\"  ║\"\necho \"     ║                                                   ║\"\necho \"     ╚═══════════════════════════════════════════════════╝\"\necho \"\"\n"
+      "common": "echo \"\"\necho \"     ╔═══════════════════════════════════════════════════╗\"\necho \"     ║                                                   ║\"\necho \"     ║  Dagger environment with custom dagger engine!    ║\"\necho \"     ║                                                   ║\"\necho \"     ║  Start new dagger project:                        ║\"\necho \"     ║  👉 dagger init --sdk=python                      ║\"\necho \"     ║  👉 dagger develop                                ║\"\necho \"     ║  👉 dagger call container-echo --string-arg=\"OK\"  ║\"\necho \"     ║                                                   ║\"\necho \"     ╚═══════════════════════════════════════════════════╝\"\necho \"\"\n"
     },
     "options": {
       "systems": [
@@ -422,12 +422,12 @@
     },
     {
       "install_id": "dagger",
-      "locked-url": "github:dagger/nix/a571c974309b64692f9fb6abb09795201c6f5402?narHash=sha256-cosgDY/jljg2Ha41MEypQ2wm14/iYdbUR/UscT7WVh8%3D",
+      "locked-url": "github:dagger/nix/4247e1fcb92981bcad5fec447a2994ea29c8d344?narHash=sha256-Zg72xzAhu29yysTL1Gc/QQnJjsefeCankzqc1CO864E%3D",
       "flake-description": "Dagger NUR repository",
       "locked-flake-attr-path": "packages.aarch64-darwin.dagger",
-      "derivation": "/nix/store/c5b7wn46mnv53j0fl4wzph622d44jdii-dagger-0.15.3.drv",
+      "derivation": "/nix/store/q54v5jymlkzfd75br33v8zgbgs28ixrn-dagger-0.15.4.drv",
       "outputs": {
-        "out": "/nix/store/8fcpg9cjlbnwrvfaq4w4nwfdw5mnnknf-dagger-0.15.3"
+        "out": "/nix/store/12h7kz8ffh28a750ci2c9p4rjrwfh0d1-dagger-0.15.4"
       },
       "output-names": [
         "out"
@@ -438,9 +438,9 @@
       "requested-outputs-to-install": [],
       "package-system": "aarch64-darwin",
       "system": "aarch64-darwin",
-      "name": "dagger-0.15.3",
+      "name": "dagger-0.15.4",
       "pname": "dagger",
-      "version": "0.15.3",
+      "version": "0.15.4",
       "description": "Dagger is an integrated platform to orchestrate the delivery of applications",
       "licenses": [
         "Apache-2.0"
@@ -451,12 +451,12 @@
     },
     {
       "install_id": "dagger",
-      "locked-url": "github:dagger/nix/a571c974309b64692f9fb6abb09795201c6f5402?narHash=sha256-cosgDY/jljg2Ha41MEypQ2wm14/iYdbUR/UscT7WVh8%3D",
+      "locked-url": "github:dagger/nix/4247e1fcb92981bcad5fec447a2994ea29c8d344?narHash=sha256-Zg72xzAhu29yysTL1Gc/QQnJjsefeCankzqc1CO864E%3D",
       "flake-description": "Dagger NUR repository",
       "locked-flake-attr-path": "packages.aarch64-linux.dagger",
-      "derivation": "/nix/store/z724xlhgk35hiib57h6zcrs78hm3a5c8-dagger-0.15.3.drv",
+      "derivation": "/nix/store/1hjz7l3hpfqpj801arp8j532bx6rwmn8-dagger-0.15.4.drv",
       "outputs": {
-        "out": "/nix/store/jjfvq4b7nx7rdwnwid1mhj8ikj32habp-dagger-0.15.3"
+        "out": "/nix/store/3igrf8dvyb6dz2273vq1piw8lclr27kn-dagger-0.15.4"
       },
       "output-names": [
         "out"
@@ -467,9 +467,9 @@
       "requested-outputs-to-install": [],
       "package-system": "aarch64-linux",
       "system": "aarch64-linux",
-      "name": "dagger-0.15.3",
+      "name": "dagger-0.15.4",
       "pname": "dagger",
-      "version": "0.15.3",
+      "version": "0.15.4",
       "description": "Dagger is an integrated platform to orchestrate the delivery of applications",
       "licenses": [
         "Apache-2.0"
@@ -480,12 +480,12 @@
     },
     {
       "install_id": "dagger",
-      "locked-url": "github:dagger/nix/a571c974309b64692f9fb6abb09795201c6f5402?narHash=sha256-cosgDY/jljg2Ha41MEypQ2wm14/iYdbUR/UscT7WVh8%3D",
+      "locked-url": "github:dagger/nix/4247e1fcb92981bcad5fec447a2994ea29c8d344?narHash=sha256-Zg72xzAhu29yysTL1Gc/QQnJjsefeCankzqc1CO864E%3D",
       "flake-description": "Dagger NUR repository",
       "locked-flake-attr-path": "packages.x86_64-darwin.dagger",
-      "derivation": "/nix/store/zpgd86z60vqr6y4wl2r0k7i917i9sjxb-dagger-0.15.3.drv",
+      "derivation": "/nix/store/ri7zn96i2dlr674ssqrljcdp4kbzlbq6-dagger-0.15.4.drv",
       "outputs": {
-        "out": "/nix/store/4k5ddfy9vr7dzpsazjf2jiq0jdqj5v62-dagger-0.15.3"
+        "out": "/nix/store/dhns3sgjjv9ycycq82853r34cpw7x50l-dagger-0.15.4"
       },
       "output-names": [
         "out"
@@ -496,9 +496,9 @@
       "requested-outputs-to-install": [],
       "package-system": "x86_64-darwin",
       "system": "x86_64-darwin",
-      "name": "dagger-0.15.3",
+      "name": "dagger-0.15.4",
       "pname": "dagger",
-      "version": "0.15.3",
+      "version": "0.15.4",
       "description": "Dagger is an integrated platform to orchestrate the delivery of applications",
       "licenses": [
         "Apache-2.0"
@@ -509,12 +509,12 @@
     },
     {
       "install_id": "dagger",
-      "locked-url": "github:dagger/nix/a571c974309b64692f9fb6abb09795201c6f5402?narHash=sha256-cosgDY/jljg2Ha41MEypQ2wm14/iYdbUR/UscT7WVh8%3D",
+      "locked-url": "github:dagger/nix/4247e1fcb92981bcad5fec447a2994ea29c8d344?narHash=sha256-Zg72xzAhu29yysTL1Gc/QQnJjsefeCankzqc1CO864E%3D",
       "flake-description": "Dagger NUR repository",
       "locked-flake-attr-path": "packages.x86_64-linux.dagger",
-      "derivation": "/nix/store/n87rmlvrralw5v8r13m90lb1c0d4649p-dagger-0.15.3.drv",
+      "derivation": "/nix/store/r2cy0k9sdni6zlgjhvv5wcjvdgl9np44-dagger-0.15.4.drv",
       "outputs": {
-        "out": "/nix/store/ij8wis6dgf1wdlxb8z9mpqnxbzj9sm5f-dagger-0.15.3"
+        "out": "/nix/store/6iyvkmd9b0b15f103c4kds4jnq0ril55-dagger-0.15.4"
       },
       "output-names": [
         "out"
@@ -525,9 +525,9 @@
       "requested-outputs-to-install": [],
       "package-system": "x86_64-linux",
       "system": "x86_64-linux",
-      "name": "dagger-0.15.3",
+      "name": "dagger-0.15.4",
       "pname": "dagger",
-      "version": "0.15.3",
+      "version": "0.15.4",
       "description": "Dagger is an integrated platform to orchestrate the delivery of applications",
       "licenses": [
         "Apache-2.0"
