@@ -5,19 +5,13 @@ on:
     workflows: ['CI']
     types: [completed]
     branches:
-      - "report-to-sentry"
-      # - "main"
-      # - "preview"
-
+      - "main"
 
 jobs:
 
   report:
     name: "Report"
     runs-on: "ubuntu-latest"
-
-    env:
-      TESTIS: "${{ toJSON(github.event.workflow_run }}"
 
     steps:
       - name: "Setup Sentry CLI"
@@ -27,11 +21,7 @@ jobs:
           organization: "flox-dev"
           project:      "floxenvs"
 
-      - name: DEBUG
-        uses: mxschmitt/action-tmate@v3
-
-
-        # 1. fetch jobs
-        # 2. send them to sentry
-
-
+      # 1. fetch jobs
+      # 2. send them to sentry
+      #- name: DEBUG
+      #  uses: mxschmitt/action-tmate@v3
