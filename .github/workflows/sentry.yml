@@ -1,0 +1,27 @@
+name: "Sentry"
+
+on:
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
+    branches:
+      - "main"
+
+jobs:
+
+  report:
+    name: "Report"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Setup Sentry CLI"
+        uses: "matbour/setup-sentry-cli@v2"
+        with:
+          token:        "${{ secrets.MANAGED_FLOXENVS_SENTRY_TOKEN }}"
+          organization: "flox-dev"
+          project:      "floxenvs"
+
+      # 1. fetch jobs
+      # 2. send them to sentry
+      #- name: DEBUG
+      #  uses: mxschmitt/action-tmate@v3
