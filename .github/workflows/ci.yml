@@ -264,6 +264,8 @@ jobs:
   auto-merge:
     name: "Auto Merge PRs"
     runs-on: "ubuntu-latest"
+    needs:
+      - "test"
 
     if: ${{ success() && github.actor == 'floxbot' && github.event_name == 'pull_request'}} # Detect that the PR author is floxbot
     steps:
@@ -271,6 +273,7 @@ jobs:
         run: |
           echo "${{ github.actor }}"
           echo "${{ github.event_name }}"
+          gh pr review --approve "$PR_URL"
           gh pr merge --auto --merge "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
