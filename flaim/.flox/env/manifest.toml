@@ -91,16 +91,16 @@ export -f install_packages
 
 function create_requirements_file() {
   cat << EOF > "$FLOX_FLAIM_REQUIREMENTS_FILE"
-torch
-torchvision
-diffusers
-accelerate
-transformers
-sentencepiece
-bitsandbytes
-protobuf
-jupyterlab
-ipywidgets
+torch==2.6.0
+torchvision==0.21.0
+diffusers==0.32.2
+accelerate==1.4.0
+transformers==4.48.3
+bitsandbytes==0.45.3
+sentencepiece==0.2.0
+protobuf==5.29.3
+jupyterlab==4.3.5
+ipywidgets==8.1.5
 EOF
 }
 export -f create_requirements_file
