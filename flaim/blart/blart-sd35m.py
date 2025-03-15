@@ -121,7 +121,6 @@ try:
     else:
         pipe = StableDiffusion3Pipeline.from_pretrained(
             model_id, 
-            torch_dtype=torch.bfloat16,
             token=token
         )
         pipe.to('mps')

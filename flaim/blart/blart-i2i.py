@@ -77,21 +77,20 @@ try:
     )
 
     image = load_image(infile)
+    mounted_image = Image.new("RGB", (1024, 1024))
 
     if image.width > image.height:
         aspect_ratio = 1024 / float(image.width)
         new_size = (1024, int(image.height * aspect_ratio))
+        resized_image = image.resize(new_size)
+        mounted_image.paste(resized_image, (0, int((1024-resized_image.height)/2)))
+    elif image.width == image.height:
+        resized_image = image.resize((1024,1024))
+        mounted_image.paste(resized_image, (0, 0))
     else:
         aspect_ratio = 1024 / float(image.height)
         new_size = (int(image.width * aspect_ratio), 1024)
-
-    resized_image = image.resize(new_size)
-
-    mounted_image = Image.new("RGB", (1024, 1024))
-
-    if resized_image.width > resized_image.height:
-        mounted_image.paste(resized_image, (0, int((1024-resized_image.height)/2)))
-    else:
+        resized_image = image.resize(new_size)
         mounted_image.paste(resized_image, (int((1024-resized_image.width)/2)), 0)
 
     print(
