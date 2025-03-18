@@ -30,6 +30,8 @@
 
           export FLOX_DISABLE_METRICS=true
           export FLOX_ENVS_TESTING=1
+          export FLOX_CATALOG_URL="https://api.preview.flox.dev"
+
           export PATH="${lib.makeBinPath packages}:$PATH"
           export LANG=
           export LC_COLLATE="C"
