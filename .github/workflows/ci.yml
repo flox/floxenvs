@@ -74,7 +74,7 @@ jobs:
               if [ "$envs_only" != "[" ]; then comma_only=","; fi
               envs_only="$envs_only$comma_only{\"example\":\"$name\"}"
             fi
-          done <<< "$(find $PWD -name manifest.toml)"
+          done <<< "$(find $PWD -maxdepth 4 -name manifest.toml)"
           envs_per_system="$envs_per_system]"
           envs_only="$envs_only]"
 
