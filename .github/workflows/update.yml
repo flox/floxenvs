@@ -39,7 +39,7 @@ jobs:
               if [ "$envs" != "[" ]; then comma=","; fi
               envs="$envs$comma{\"example\":\"$name\"}"
             fi
-          done <<< "$(find ./ -name manifest.toml)"
+          done <<< "$(find ./ -maxdepth 4 -name manifest.toml)"
           envs="$envs]"
 
           echo "-- ENVS --------------------"
