@@ -10,6 +10,9 @@ on:
   schedule:
     - cron: "0 0 * * *"
 
+concurrency:
+  group: floxenvs-tests
+
 env:
   FLOX_DISABLE_METRICS: "true"
 
@@ -71,7 +74,7 @@ jobs:
               if [ "$envs_only" != "[" ]; then comma_only=","; fi
               envs_only="$envs_only$comma_only{\"example\":\"$name\"}"
             fi
-          done <<< "$(find $PWD -name manifest.toml)"
+          done <<< "$(find $PWD -maxdepth 4 -name manifest.toml)"
           envs_per_system="$envs_per_system]"
           envs_only="$envs_only]"
 
@@ -89,14 +92,14 @@ jobs:
   test:
     name: "Test '${{ matrix.example }}' example on '${{ matrix.system }}'"
     runs-on: "ubuntu-latest"
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     needs:
       - "envs"
 
     strategy:
       fail-fast: false
-      max-parallel: 8
+      max-parallel: ${{ github.ref == 'refs/head/main' && 1 || 4 }}
       matrix:
         include: ${{ fromJSON(needs.envs.outputs.envs_per_system ) }}
 
