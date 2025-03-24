@@ -26,7 +26,7 @@
             flox.packages."${system}".default
           ],
         }: pkgs.writeShellScriptBin "test-${name}" ''
-          set -eo pipefail
+          set -exo pipefail
 
           export FLOX_DISABLE_METRICS=true
           export FLOX_ENVS_TESTING=1
@@ -42,7 +42,14 @@
 
           mkdir -p /tmp/floxenvs
           # copy self/nb into temp dir
-          export TESTDIR="$(mktemp --directory --tmpdir=/tmp/floxenvs --suffix floxenvs-${name}-example)"
+          # fallback to non-subdirectory to work around /tmp/floxenv resets on x86_64-darwin
+          export TESTDIR="$(mktemp --directory --tmpdir=/tmp/floxenvs --suffix floxenvs-${name}-example || mktemp --directory --tmpdir=/tmp --suffix floxenvs-${name}-example )"
+          ret=$?
+          if [ $ret -ne 0 ] || [ "$TESTDIR" = ""] ; then
+            echo "Error: unable to create temp directory"
+            exit $ret
+          fi
+
           chmod g=rwx "$TESTDIR"
           cp -R ${path}/* $TESTDIR
           cp -R ${path}/.flox* $TESTDIR
