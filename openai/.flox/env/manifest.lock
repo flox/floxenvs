@@ -19,7 +19,6 @@
     "hook": {
       "on-activate": "# First, check if $OPENAI_API_KEY is set\nif [[ \"${OPENAI_API_KEY}\" ]]; then\n  echo \"🤖 OpenAI configured with key from existing environment\"\n  return 0\nfi\n\n# Then, check to see if the dotfile exists\nif [[ -f ~/.config/openai.key ]]; then\n  export OPENAI_API_KEY=$(cat ~/.config/openai.key)\n  echo \"🤖 OpenAI configured with key from ~/.config/openai.key\"\n  return 0\nfi\n\n# We got nothing! Let's ask.\necho \"OpenAI key not detected.\"\n\n# exit in CI, be kind to github\nif [[ \"$FLOX_ENVS_TESTING\" == \"1\" ]]; then\n  return 0\nfi\n\nif gum confirm \"Would you like to provide one now?\" --default=true --affirmative \"Yes\" --negative \"No\"; then\n  OPENAI_API_KEY=$(gum input --placeholder \"OpenAI API key\")\n  if gum confirm \"Write this into ~/.config/openai.key for next time?\" --default=true --affirmative \"Yes\" --negative \"No\"; then\n    echo \"$OPENAI_API_KEY\" > ~/.config/openai.key\n    chmod 600 ~/.config/openai.key\n  fi\n  export OPENAI_API_KEY\n  echo \"🤖 OpenAI configured with provided key\"\n  return 0\nfi\n\necho \"An OpenAI key is required. You can provide one by setting OPENAI_API_KEY.\"\necho; echo \"🚨 OpenAI client is available (no key)\"\n"
     },
-    "profile": {},
     "options": {
       "systems": [
         "aarch64-darwin",
@@ -27,10 +26,6 @@
         "x86_64-darwin",
         "x86_64-linux"
       ],
-      "allow": {
-        "licenses": []
-      },
-      "semver": {},
       "cuda-detection": false
     }
   },
@@ -38,18 +33,19 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/rs3gh60pcnvw9gfmgflinhqmyl8klwp5-gum-0.16.0.drv",
+      "derivation": "/nix/store/kbf3lrdp865dlb0yc2n8cbxn1dvcfpz4-gum-0.16.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "gum-0.16.0",
       "pname": "gum",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:09:07.386038Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:11:03.572745Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -58,7 +54,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/kwkfj9ifihlfzv7damvf0x42w1l904ld-gum-0.16.0"
+        "out": "/nix/store/i2lcxxzcaylphmmjm2nqxlywq6xzqya8-gum-0.16.0"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -67,18 +63,19 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/rfdkq3mnxjbn28fr3w9a8wlb6id80lpy-gum-0.16.0.drv",
+      "derivation": "/nix/store/58i0s7yhdp8vvz439gmsix573ym8c5q2-gum-0.16.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "gum-0.16.0",
       "pname": "gum",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:25:55.926011Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:28:47.678511Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -87,7 +84,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/fflgnfjyizrfp3kb9kg1rb13zh8iqgpa-gum-0.16.0"
+        "out": "/nix/store/d3xf6ih9k89ibb1lmch962fby3q3yxnk-gum-0.16.0"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -96,18 +93,19 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/lqp6sr5qq6zd802sfxrkb9m9jd63ymrz-gum-0.16.0.drv",
+      "derivation": "/nix/store/yjr81v2ziaymg72hjwndhgaldvm7gia4-gum-0.16.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "gum-0.16.0",
       "pname": "gum",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:41:11.860263Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:45:00.311988Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -116,7 +114,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/854g6bmylzpaz7s1xdccfq9x2xkx6fcc-gum-0.16.0"
+        "out": "/nix/store/rr8sls8dyy2sfaxy2nfx3bcb6a4lzzi1-gum-0.16.0"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
@@ -125,18 +123,19 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/24a1pj733gimjh92rd6biprlpql2fdaa-gum-0.16.0.drv",
+      "derivation": "/nix/store/n1sip83yr4s0ffhwacxvnib3acdgzb75-gum-0.16.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "gum-0.16.0",
       "pname": "gum",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:59:13.062040Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T02:04:25.716953Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -145,7 +144,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/hn1dl52063dlljmzjlx0cw1f59yk5r2n-gum-0.16.0"
+        "out": "/nix/store/nr5f79bif524lvnd1ynlpag9bgc0ipph-gum-0.16.0"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -154,18 +153,19 @@
     {
       "attr_path": "llm",
       "broken": false,
-      "derivation": "/nix/store/s785ybd56j903w1dp3s9s94djbj6bqsa-python3.12-llm-0.23.drv",
+      "derivation": "/nix/store/7a95c7jvk3yc5s9qw9icxl51g0yzv36m-python3.12-llm-0.23.drv",
       "description": "Access large language models from the command-line",
       "install_id": "llm",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "llm-0.23",
       "pname": "llm",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:09:08.209759Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:11:04.502597Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -174,8 +174,8 @@
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/i901a4pi5m67lgkafggs02yz76cwgpl4-python3.12-llm-0.23-dist",
-        "out": "/nix/store/y13rrn0zkd6p0avimjsnam5didc3g4wf-python3.12-llm-0.23"
+        "dist": "/nix/store/nqzjmxlcmlcjnxq7nrlwxzn642hfailv-python3.12-llm-0.23-dist",
+        "out": "/nix/store/zg7nfi671wibpnk6p0i997fdkznnvi3r-python3.12-llm-0.23"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -184,18 +184,19 @@
     {
       "attr_path": "llm",
       "broken": false,
-      "derivation": "/nix/store/rm1rjmvqns3jn5knrn68dv0lhjjasm8b-python3.12-llm-0.23.drv",
+      "derivation": "/nix/store/0iqkd3v6rdds8qlpgi690bxj7acgbyz1-python3.12-llm-0.23.drv",
       "description": "Access large language models from the command-line",
       "install_id": "llm",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "llm-0.23",
       "pname": "llm",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:26:01.477009Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:28:53.686472Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -204,8 +205,8 @@
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/5czshbf5vz7ghd34lcjl9w8hhp7hb3lg-python3.12-llm-0.23-dist",
-        "out": "/nix/store/vi3bldddg6s639n45dnvdsl1rrvhh1yj-python3.12-llm-0.23"
+        "dist": "/nix/store/6z8hkmkjprxmw20vb7llbmpnn8q7pynw-python3.12-llm-0.23-dist",
+        "out": "/nix/store/r71c6ln6ks1bnyv21fyvykz3q3rl7psq-python3.12-llm-0.23"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -214,18 +215,19 @@
     {
       "attr_path": "llm",
       "broken": false,
-      "derivation": "/nix/store/rlblwwiw2hv7xvhc5ai3zsybl60aacc3-python3.12-llm-0.23.drv",
+      "derivation": "/nix/store/9c9zfrcsv4xdyd7d38bizldj743y0vj1-python3.12-llm-0.23.drv",
       "description": "Access large language models from the command-line",
       "install_id": "llm",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "llm-0.23",
       "pname": "llm",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:41:12.687431Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:45:01.262037Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -234,8 +236,8 @@
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/2ww073jazjs2c1sdk9kxnprgwgf9jrzb-python3.12-llm-0.23-dist",
-        "out": "/nix/store/63wkm50hxgwd4jks2g1x98azmzi3brrp-python3.12-llm-0.23"
+        "dist": "/nix/store/wrlx63rbzjgr60nk5s9fkrhpxqk7llr7-python3.12-llm-0.23-dist",
+        "out": "/nix/store/d2f2p2m5zh5f52sf3igpwa0ak4kypsm9-python3.12-llm-0.23"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
@@ -244,18 +246,19 @@
     {
       "attr_path": "llm",
       "broken": false,
-      "derivation": "/nix/store/9qwk6nasy1ygql9sxp4f873z3rckapcl-python3.12-llm-0.23.drv",
+      "derivation": "/nix/store/mc4l6jv97whl7cdg6w0mgp5545ipfmgm-python3.12-llm-0.23.drv",
       "description": "Access large language models from the command-line",
       "install_id": "llm",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "llm-0.23",
       "pname": "llm",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:59:19.911794Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T02:04:32.847310Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -264,8 +267,8 @@
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/r17zaj989vw52nqnyxahw8l9dq2flkls-python3.12-llm-0.23-dist",
-        "out": "/nix/store/h6bh98ng2j9a96jpi1sdqyyabflajamg-python3.12-llm-0.23"
+        "dist": "/nix/store/snsqljjvykic5a4653nhzkrqs45zcws9-python3.12-llm-0.23-dist",
+        "out": "/nix/store/qbrrhl6zc9c1qr20qbcjhhqd8gq39xjb-python3.12-llm-0.23"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -274,18 +277,19 @@
     {
       "attr_path": "mods",
       "broken": false,
-      "derivation": "/nix/store/w7ab4m8ydim0h7hql3k144syzsizfrhx-mods-1.7.0.drv",
+      "derivation": "/nix/store/4r3kpcv7d9rsx75w2jk90ifr53zdvrwv-mods-1.7.0.drv",
       "description": "AI on the command line",
       "install_id": "mods",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "mods-1.7.0",
       "pname": "mods",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:09:08.990536Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:11:05.371326Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -294,7 +298,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/h2sgy7j834xbi63djrmi3x2w5s1syzpq-mods-1.7.0"
+        "out": "/nix/store/71cjga41y2kdfh3hqy5z17wflamdqfs6-mods-1.7.0"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -303,18 +307,19 @@
     {
       "attr_path": "mods",
       "broken": false,
-      "derivation": "/nix/store/0cnsmjrmgz2jljq4zh60ka1v2m8w0bnv-mods-1.7.0.drv",
+      "derivation": "/nix/store/h4p06fm1z79b2aynwfghv5isiyi0xq7b-mods-1.7.0.drv",
       "description": "AI on the command line",
       "install_id": "mods",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "mods-1.7.0",
       "pname": "mods",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:26:03.389042Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:28:55.772040Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -323,7 +328,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/lpnb9fcbvakf5lipb0jf3qcn82jvbhzy-mods-1.7.0"
+        "out": "/nix/store/wmq2330afb48mbhvbssnw17ri7i1ilda-mods-1.7.0"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -332,18 +337,19 @@
     {
       "attr_path": "mods",
       "broken": false,
-      "derivation": "/nix/store/w6g6j0c9619lnqy1mvm2yp73gyf1g3rk-mods-1.7.0.drv",
+      "derivation": "/nix/store/hd9zakwzg64pnx6zgdq0gxr24w2r6h8s-mods-1.7.0.drv",
       "description": "AI on the command line",
       "install_id": "mods",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "mods-1.7.0",
       "pname": "mods",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:41:13.471906Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:45:02.149568Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -352,7 +358,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/5bzxznm722y6xzgrzr7h20xpmd6xqrf9-mods-1.7.0"
+        "out": "/nix/store/xw94wzl9qkb34q75m7plfkrjjv8k7prh-mods-1.7.0"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
@@ -361,18 +367,19 @@
     {
       "attr_path": "mods",
       "broken": false,
-      "derivation": "/nix/store/l9ych7qsyli3xqimz5h0vhy4nqnf257y-mods-1.7.0.drv",
+      "derivation": "/nix/store/vkmy0wm2vbf53fdhlnqf10wbrsxm58qk-mods-1.7.0.drv",
       "description": "AI on the command line",
       "install_id": "mods",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "mods-1.7.0",
       "pname": "mods",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:59:22.067634Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T02:04:35.113829Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -381,7 +388,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/bl99k5pdqc9k9jf72yqcqqdd5fz2b6km-mods-1.7.0"
+        "out": "/nix/store/zimpb5gc6pjzjfldqfcr8fzprrvdhr9m-mods-1.7.0"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -390,28 +397,29 @@
     {
       "attr_path": "openai",
       "broken": false,
-      "derivation": "/nix/store/m64ryihflxx7fzmmhljafffp22k739pg-python3.12-openai-1.66.3.drv",
+      "derivation": "/nix/store/knbspc7rh3zvzysij5i9c6rrs7maj84q-python3.12-openai-1.69.0.drv",
       "description": "Python client library for the OpenAI API",
       "install_id": "openai",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "name": "openai-1.66.3",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "name": "openai-1.69.0",
       "pname": "openai",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:09:09.988533Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:11:06.448349Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "1.66.3",
+      "version": "1.69.0",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/zpr6s6agfzsnypnd47nvb51z8qm7wbgf-python3.12-openai-1.66.3-dist",
-        "out": "/nix/store/c66z07dimsxdnp4gx1nrj8p9a82wa6kn-python3.12-openai-1.66.3"
+        "dist": "/nix/store/zdhnp35p2ngszy4z0kln046fr46dc842-python3.12-openai-1.69.0-dist",
+        "out": "/nix/store/bi5w93a3n1i4iq44c1gh8mkg13yyl8k9-python3.12-openai-1.69.0"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -420,28 +428,29 @@
     {
       "attr_path": "openai",
       "broken": false,
-      "derivation": "/nix/store/a5p8mmvl4xmjki49slpwndykvwk2g6sm-python3.12-openai-1.66.3.drv",
+      "derivation": "/nix/store/sw8m3fv7fsbrdgli03a19v75cpzgjh6i-python3.12-openai-1.69.0.drv",
       "description": "Python client library for the OpenAI API",
       "install_id": "openai",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "name": "openai-1.66.3",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "name": "openai-1.69.0",
       "pname": "openai",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:26:05.607062Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:28:58.160757Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "1.66.3",
+      "version": "1.69.0",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/5sgmaggylmg7mp6jq3a56zq1xyapr0cy-python3.12-openai-1.66.3-dist",
-        "out": "/nix/store/5ffhcs9lqsifmx13vxkrdiasyji0nxhj-python3.12-openai-1.66.3"
+        "dist": "/nix/store/41rzzr0q2qkfhspy992csxvj62k48zw5-python3.12-openai-1.69.0-dist",
+        "out": "/nix/store/kp7hj3g7by4z4pp2qf194l5zvb6q61c8-python3.12-openai-1.69.0"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -450,28 +459,29 @@
     {
       "attr_path": "openai",
       "broken": false,
-      "derivation": "/nix/store/qarmq1v2hphd42c218zkmkvj3q3z3nc5-python3.12-openai-1.66.3.drv",
+      "derivation": "/nix/store/jzpfsngh5b74wghi66g31gjp84my5m1g-python3.12-openai-1.69.0.drv",
       "description": "Python client library for the OpenAI API",
       "install_id": "openai",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "name": "openai-1.66.3",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "name": "openai-1.69.0",
       "pname": "openai",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:41:14.470332Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:45:03.245808Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "1.66.3",
+      "version": "1.69.0",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/82429szv3dhv4kf4aj419dxd19a9zb3s-python3.12-openai-1.66.3-dist",
-        "out": "/nix/store/xswpw6kxqjcrpqhx089279l6wnry8x4b-python3.12-openai-1.66.3"
+        "dist": "/nix/store/6w61nsd0m7zhrldlvrb1dsycmqvm27mi-python3.12-openai-1.69.0-dist",
+        "out": "/nix/store/4jxlqpmbs8izcqk6grd8qn1hf0ly99v3-python3.12-openai-1.69.0"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
@@ -480,28 +490,29 @@
     {
       "attr_path": "openai",
       "broken": false,
-      "derivation": "/nix/store/zk4czfpjpczkb79fmncjd6n2lqr7krjb-python3.12-openai-1.66.3.drv",
+      "derivation": "/nix/store/qcafzfnmrlnxammk88lymslwajlcsmd9-python3.12-openai-1.69.0.drv",
       "description": "Python client library for the OpenAI API",
       "install_id": "openai",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "name": "openai-1.66.3",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "name": "openai-1.69.0",
       "pname": "openai",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:59:24.575788Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T02:04:37.711875Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "1.66.3",
+      "version": "1.69.0",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/6v3kxdxigi74xs20pjzfvbqyq3slnchs-python3.12-openai-1.66.3-dist",
-        "out": "/nix/store/3v24r7yvxffxi861qv3xja0kg0zscrn4-python3.12-openai-1.66.3"
+        "dist": "/nix/store/gdnq1fnspwl1j1gnsmd2ikjjd4s6iyl6-python3.12-openai-1.69.0-dist",
+        "out": "/nix/store/avzwl402abbm77w8cch8901v612lq0zl-python3.12-openai-1.69.0"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
