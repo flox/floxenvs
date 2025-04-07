@@ -16,36 +16,32 @@
     "hook": {
       "on-activate": "\nexport FLOX_JAVASCRIPT_DENO_CACHE_DIR=\"$FLOX_ENV_CACHE/javascript-deno\"\nmkdir -p \"$FLOX_JAVASCRIPT_DENO_CACHE_DIR\"\n\nexport FLOX_JAVASCRIPT_DENO_PACKAGES_HASH_FILE=\"$FLOX_JAVASCRIPT_DENO_CACHE_DIR/packages-hash\"\n\nfunction with_spinner() {\n  if [[ \"$FLOX_ENVS_TESTING\" == \"1\" ]]; then\n    bash -c \"$1\"\n  else\n    gum spin \\\n      --show-error \\\n      --spinner line \\\n      --spinner.foreground=\"#cccccc\" \\\n      --title \">>> $2 ...\" \\\n      --title.foreground=\"#cccccc\" \\\n        -- bash -c \"$1\"\n  fi\n}\n\nfunction install_packages() { \n  deno install\n}\nexport -f install_packages\n\n\nif [ -f \"deno.json\" ] && [ -f \"deno.lock\" ]; then\n  export FLOX_JAVASCRIPT_DENO_PACKAGES_HASH=\"false\"\n  if [ -f \"$FLOX_JAVASCRIPT_DENO_PACKAGES_HASH_FILE\" ] ; then\n    export FLOX_JAVASCRIPT_DENO_PACKAGES_HASH=$(cat deno.json deno.lock | sha256sum | cut -d\" \" -f 1)\n  fi\n  if [ \"$FLOX_JAVASCRIPT_DENO_PACKAGES_HASH\" != \"$(cat $FLOX_JAVASCRIPT_DENO_PACKAGES_HASH_FILE 2>/dev/null)\" ]; then\n    with_spinner install_packages \"Installing Javascript packages (with Deno)\"\n    echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Javascript packages installed (with Deno).\\\" }}\\n\" \\\n      | gum format -t template\n    echo \"$FLOX_JAVASCRIPT_DENO_PACKAGES_HASH\" > \"$FLOX_JAVASCRIPT_DENO_PACKAGES_HASH_FILE\"\n  fi\nfi\n"
     },
-    "profile": {},
     "options": {
       "systems": [
         "aarch64-darwin",
         "aarch64-linux",
         "x86_64-darwin",
         "x86_64-linux"
-      ],
-      "allow": {
-        "licenses": []
-      },
-      "semver": {}
+      ]
     }
   },
   "packages": [
     {
       "attr_path": "coreutils",
       "broken": false,
-      "derivation": "/nix/store/sh06wr55kazqfpz0lc3r4kjp00wsj3ks-coreutils-9.6.drv",
+      "derivation": "/nix/store/vgpd706nh33jmrzsjhn08kyxj9ix7iq8-coreutils-9.6.drv",
       "description": "GNU Core Utilities",
       "install_id": "coreutils",
       "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "coreutils-9.6",
       "pname": "coreutils",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:09:06.813221Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:11:02.889367Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -54,8 +50,8 @@
         "out"
       ],
       "outputs": {
-        "info": "/nix/store/65m47sn1g6yv3g6ncmf0x4gsw5wl880g-coreutils-9.6-info",
-        "out": "/nix/store/a8lb0q3y83n0bn5s4gayyvfkgjn13ial-coreutils-9.6"
+        "info": "/nix/store/k0hz5d3y6f6lk8mgzlggw6rqhdw65y56-coreutils-9.6-info",
+        "out": "/nix/store/4idwmksk4s5bdmzl1sz1z17bj0yfqgkj-coreutils-9.6"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -64,18 +60,19 @@
     {
       "attr_path": "coreutils",
       "broken": false,
-      "derivation": "/nix/store/pjyw4w3z7i6ansg34b72a8ykj3h9m9yv-coreutils-9.6.drv",
+      "derivation": "/nix/store/nwwcs1c805a51ihrhx4lzxvk2jm4crfh-coreutils-9.6.drv",
       "description": "GNU Core Utilities",
       "install_id": "coreutils",
       "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "coreutils-9.6",
       "pname": "coreutils",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:25:54.636334Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:28:46.184062Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -84,9 +81,9 @@
         "out"
       ],
       "outputs": {
-        "debug": "/nix/store/inl1iq5cgy3rxx22apxcjkrk1lq9scjz-coreutils-9.6-debug",
-        "info": "/nix/store/njr94ajn51h23kvwqsxpqf8n7q7qkrvi-coreutils-9.6-info",
-        "out": "/nix/store/c9cz24jydkkk3w1iqdy1vcd1886slp1z-coreutils-9.6"
+        "debug": "/nix/store/r82rf3iq14gpcgn134snrrvjfc7cwxhs-coreutils-9.6-debug",
+        "info": "/nix/store/zi75ncfk3kanibc2rz5ym2vdf1ph47q7-coreutils-9.6-info",
+        "out": "/nix/store/ch9dmykfvimybpb0qm7ppi3zap8fx5s0-coreutils-9.6"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -95,18 +92,19 @@
     {
       "attr_path": "coreutils",
       "broken": false,
-      "derivation": "/nix/store/acvn96kghjs069i9js8z1ykc0vd3g1qp-coreutils-9.6.drv",
+      "derivation": "/nix/store/9v1iwgkdpx37i257i2ml7nq70xbakjzz-coreutils-9.6.drv",
       "description": "GNU Core Utilities",
       "install_id": "coreutils",
       "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "coreutils-9.6",
       "pname": "coreutils",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:41:11.276978Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:44:59.599896Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -115,8 +113,8 @@
         "out"
       ],
       "outputs": {
-        "info": "/nix/store/35b050qms17afzs3hspjcmmc5knvnlds-coreutils-9.6-info",
-        "out": "/nix/store/dylz6jypr1wcicja4d64gsgl5ncqwl5y-coreutils-9.6"
+        "info": "/nix/store/3abcqd1gc89j9nqzgp6whfcvqsni6p1a-coreutils-9.6-info",
+        "out": "/nix/store/9rafq6wr1m4k3kcrq3p7z2v5q5r66j50-coreutils-9.6"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
@@ -125,18 +123,19 @@
     {
       "attr_path": "coreutils",
       "broken": false,
-      "derivation": "/nix/store/y0kvispp5rspdq7w1krdn71crwkdmxv5-coreutils-9.6.drv",
+      "derivation": "/nix/store/5h55gpcb1nljrqg6hzrp7bblgjk47h1s-coreutils-9.6.drv",
       "description": "GNU Core Utilities",
       "install_id": "coreutils",
       "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "coreutils-9.6",
       "pname": "coreutils",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:59:11.638466Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T02:04:24.095502Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -145,9 +144,9 @@
         "out"
       ],
       "outputs": {
-        "debug": "/nix/store/lcvs98533i7plnqgra5v9y7ar93g571n-coreutils-9.6-debug",
-        "info": "/nix/store/drpnpibm22qiqby1y9cqngp100hlzd25-coreutils-9.6-info",
-        "out": "/nix/store/vz67zaqyfln2jcqwar682kdlrxfx9vq1-coreutils-9.6"
+        "debug": "/nix/store/m6z0fyhip7nhls7bg65fzdpnzb4dyw42-coreutils-9.6-debug",
+        "info": "/nix/store/g1jlc3r1ca84cw21kggs3cq3vr677rhr-coreutils-9.6-info",
+        "out": "/nix/store/yh6qg1nsi5h2xblcr67030pz58fsaxx3-coreutils-9.6"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -156,27 +155,28 @@
     {
       "attr_path": "deno",
       "broken": false,
-      "derivation": "/nix/store/32rjchmqc5nglrfib5qhynvcvdr3yfnp-deno-2.2.4.drv",
+      "derivation": "/nix/store/66swahh0vfhbzsm0q29ks8wjqzi8i9xy-deno-2.2.6.drv",
       "description": "Secure runtime for JavaScript and TypeScript",
       "install_id": "deno",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "name": "deno-2.2.4",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "name": "deno-2.2.6",
       "pname": "deno",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:09:06.868529Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:11:02.956697Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "2.2.4",
+      "version": "2.2.6",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/69vhcxcfq63bmpak5djk75q5jycdvi55-deno-2.2.4"
+        "out": "/nix/store/mwhnx26f3mf2i6fw79a22ahnzrxqxdrd-deno-2.2.6"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -185,27 +185,28 @@
     {
       "attr_path": "deno",
       "broken": false,
-      "derivation": "/nix/store/vknb2jdaxycm1c32j7rnnwfc8pjng3y8-deno-2.2.4.drv",
+      "derivation": "/nix/store/pd2mqmyfa1zyxjp2s9l4h60727gnps3a-deno-2.2.6.drv",
       "description": "Secure runtime for JavaScript and TypeScript",
       "install_id": "deno",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "name": "deno-2.2.4",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "name": "deno-2.2.6",
       "pname": "deno",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:25:54.771623Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:28:46.354324Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "2.2.4",
+      "version": "2.2.6",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/08akrddhkm5l79p6dzpjfla683d5l2v7-deno-2.2.4"
+        "out": "/nix/store/px1w3yk23455lg6h2jfvs5pnjb6s0gcw-deno-2.2.6"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -214,27 +215,28 @@
     {
       "attr_path": "deno",
       "broken": false,
-      "derivation": "/nix/store/3il966z4933p2cqiww8v4xc4ihr2169j-deno-2.2.4.drv",
+      "derivation": "/nix/store/6r1ym7pa664r2r62i41r8h9ydqkk0izz-deno-2.2.6.drv",
       "description": "Secure runtime for JavaScript and TypeScript",
       "install_id": "deno",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "name": "deno-2.2.4",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "name": "deno-2.2.6",
       "pname": "deno",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:41:11.330388Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:44:59.668409Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "2.2.4",
+      "version": "2.2.6",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/0vi7npf6ik9893jcfp4256jma0vyclg1-deno-2.2.4"
+        "out": "/nix/store/9fw3pi37rav1jmsg50a2pay8s51fphzz-deno-2.2.6"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
@@ -243,27 +245,28 @@
     {
       "attr_path": "deno",
       "broken": false,
-      "derivation": "/nix/store/mp6dp5jy40d7w5bp3wxyfcy765df8wqj-deno-2.2.4.drv",
+      "derivation": "/nix/store/3f9rz4z63bahc3dzw702y28jwhr20ffb-deno-2.2.6.drv",
       "description": "Secure runtime for JavaScript and TypeScript",
       "install_id": "deno",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "name": "deno-2.2.4",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "name": "deno-2.2.6",
       "pname": "deno",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:59:11.809236Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T02:04:24.284477Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "2.2.4",
+      "version": "2.2.6",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/ivwfss6sxbab6vyklimyyhgsbyr35g4l-deno-2.2.4"
+        "out": "/nix/store/i4l161m0k42x9y871sah79gijm5wr4k2-deno-2.2.6"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -272,18 +275,19 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/rs3gh60pcnvw9gfmgflinhqmyl8klwp5-gum-0.16.0.drv",
+      "derivation": "/nix/store/kbf3lrdp865dlb0yc2n8cbxn1dvcfpz4-gum-0.16.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "gum-0.16.0",
       "pname": "gum",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:09:07.386038Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:11:03.572745Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -292,7 +296,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/kwkfj9ifihlfzv7damvf0x42w1l904ld-gum-0.16.0"
+        "out": "/nix/store/i2lcxxzcaylphmmjm2nqxlywq6xzqya8-gum-0.16.0"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -301,18 +305,19 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/rfdkq3mnxjbn28fr3w9a8wlb6id80lpy-gum-0.16.0.drv",
+      "derivation": "/nix/store/58i0s7yhdp8vvz439gmsix573ym8c5q2-gum-0.16.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "gum-0.16.0",
       "pname": "gum",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:25:55.926011Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:28:47.678511Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -321,7 +326,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/fflgnfjyizrfp3kb9kg1rb13zh8iqgpa-gum-0.16.0"
+        "out": "/nix/store/d3xf6ih9k89ibb1lmch962fby3q3yxnk-gum-0.16.0"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -330,18 +335,19 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/lqp6sr5qq6zd802sfxrkb9m9jd63ymrz-gum-0.16.0.drv",
+      "derivation": "/nix/store/yjr81v2ziaymg72hjwndhgaldvm7gia4-gum-0.16.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "gum-0.16.0",
       "pname": "gum",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:41:11.860263Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:45:00.311988Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -350,7 +356,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/854g6bmylzpaz7s1xdccfq9x2xkx6fcc-gum-0.16.0"
+        "out": "/nix/store/rr8sls8dyy2sfaxy2nfx3bcb6a4lzzi1-gum-0.16.0"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
@@ -359,18 +365,19 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/24a1pj733gimjh92rd6biprlpql2fdaa-gum-0.16.0.drv",
+      "derivation": "/nix/store/n1sip83yr4s0ffhwacxvnib3acdgzb75-gum-0.16.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "gum-0.16.0",
       "pname": "gum",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:59:13.062040Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T02:04:25.716953Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -379,7 +386,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/hn1dl52063dlljmzjlx0cw1f59yk5r2n-gum-0.16.0"
+        "out": "/nix/store/nr5f79bif524lvnd1ynlpag9bgc0ipph-gum-0.16.0"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
