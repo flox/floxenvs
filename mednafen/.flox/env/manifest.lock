@@ -30,7 +30,6 @@
     "hook": {
       "on-activate": "\nwrite_mednafen_cfg() {\n    local mednafen_cfg_file=\"$FLOX_ENV_CACHE/mednafen.cfg\"\n\n    if [[ -f \"$mednafen_cfg_file\" ]]; then\n        return\n    fi\n\n    cat > \"$mednafen_cfg_file\" <<EOL\n; Mednafen Configuration File\n\n; Specify the sound driver (default: pulse)\nsound.driver sdl\n\n; Specify the video driver (default: default unless overridden)\nvideo.driver ${VIDEO_DRIVER:-default}\nEOL\n}\n\nwrite_broot_cfg() {\n    local broot_cfg_dir=\"${FLOX_ENV_CACHE}/broot\"\n    local broot_cfg_file=\"${broot_cfg_dir}/conf.toml\"\n\n    if [[ -f \"$broot_cfg_file\" ]]; then\n        return\n    fi\n\n    mkdir -p \"$broot_cfg_dir\"\n\n    cat > \"$broot_cfg_file\" <<EOL\n[[verbs]]\ninvocation = \"mednafen\"\nexecution = \"mednafen {file}\"\nshortcut = \"m\"\napply_to = \"file\"\n\n[[verbs]]\ninvocation = \"edit\"\nexecution = \"nvim {file}\"\nshortcut = \"e\"\napply_to = \"file\"\n\n[[verbs]]\ninvocation = \"open\"\nexecution = \"xdg-open {file}\"\nshortcut = \"o\"\napply_to = \"file\"\nEOL\n\n}\n\n# export mednafen and broot config\nexport MEDNAFEN_HOME=\"$FLOX_ENV_CACHE\"\nexport BROOT_CONFIG_DIR=\"${FLOX_ENV_CACHE}/broot\"\n\n# write broot config file\nwrite_broot_cfg\n\n# write mednafen config file (if on Linux)\nif [[ \"$(uname)\" == \"Linux\" ]]; then\n    write_mednafen_cfg\nfi\n\nexport GAMEDIR=\"snes-games\"\n\n# exit in CI, be kind to github\nif [[ \"$FLOX_ENVS_TESTING\" == \"1\" ]]; then\n  return\nfi\n\nif [[ ! -d \"$GAMEDIR\" ]] && gum confirm \"Download homebrew SNES collection into cwd?\"; then\n  mkdir -p \"$GAMEDIR\"\n  filename=${GAME_COLLECTION##*/}\n  gum spin --spinner dot --title \"Grabbing homebrew SNES collection...\" -- \\\n    curl --output-dir \"$GAMEDIR\" -LsO \"$GAME_COLLECTION\"\n  gum spin --spinner dot --title \"Unzipping...\" -- \\\n    unzip -jqq \"$GAMEDIR/$filename\" -d \"$GAMEDIR\"\nfi\n\n# run broot\nbroot\n\n"
     },
-    "profile": {},
     "options": {
       "systems": [
         "aarch64-darwin",
@@ -38,10 +37,6 @@
         "x86_64-darwin",
         "x86_64-linux"
       ],
-      "allow": {
-        "licenses": []
-      },
-      "semver": {},
       "cuda-detection": false
     }
   },
@@ -49,18 +44,19 @@
     {
       "attr_path": "mednafen",
       "broken": false,
-      "derivation": "/nix/store/249p6sayr2xsxnj4ga5gc0lh7x3c5p6y-mednafen-1.32.1.drv",
+      "derivation": "/nix/store/zri1vn22xppjmh0cnysgyabixlddm66z-mednafen-1.32.1.drv",
       "description": "Portable, CLI-driven, SDL+OpenGL-based, multi-system emulator",
       "install_id": "mednafen",
       "license": "GPL-2.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "mednafen-1.32.1",
       "pname": "mednafen",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:09:08.875846Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:11:05.246242Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -69,8 +65,8 @@
         "out"
       ],
       "outputs": {
-        "doc": "/nix/store/nv31m5ksbnv4rz1mkcwc4zkqdzz5pxbk-mednafen-1.32.1-doc",
-        "out": "/nix/store/l5hza4clgd3y44sar39i8i3lql8n2r2h-mednafen-1.32.1"
+        "doc": "/nix/store/sbw1rgncff3wfmgv0ysmqnpa4ykx259i-mednafen-1.32.1-doc",
+        "out": "/nix/store/p4j563z56222bvxq6xi77crqzblm5kyk-mednafen-1.32.1"
       },
       "system": "aarch64-darwin",
       "group": "mednafen",
@@ -79,18 +75,19 @@
     {
       "attr_path": "mednafen",
       "broken": false,
-      "derivation": "/nix/store/z4gw3b6003rniyzivr2f5vgn0rcp3sia-mednafen-1.32.1.drv",
+      "derivation": "/nix/store/swkkk9w54yhxhrqsib45gdsnlfdgwckx-mednafen-1.32.1.drv",
       "description": "Portable, CLI-driven, SDL+OpenGL-based, multi-system emulator",
       "install_id": "mednafen",
       "license": "GPL-2.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "mednafen-1.32.1",
       "pname": "mednafen",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:26:03.077333Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:28:55.437727Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -99,8 +96,8 @@
         "out"
       ],
       "outputs": {
-        "doc": "/nix/store/py8wyil2xin5lcbm8i97c5wy3cgq0nj7-mednafen-1.32.1-doc",
-        "out": "/nix/store/z4q9sfbssvds5x901i7gd3nx6vg3h04w-mednafen-1.32.1"
+        "doc": "/nix/store/vk6qnb8f4x6bfa5y8aq0hbpckshghfi2-mednafen-1.32.1-doc",
+        "out": "/nix/store/w1vwg5vgbbi241ywdpi2q9zxlh4084zx-mednafen-1.32.1"
       },
       "system": "aarch64-linux",
       "group": "mednafen",
@@ -109,18 +106,19 @@
     {
       "attr_path": "mednafen",
       "broken": false,
-      "derivation": "/nix/store/g74dwxsimqhwcgrja3dny3shiwbyy3kx-mednafen-1.32.1.drv",
+      "derivation": "/nix/store/fg4rx8mp4q05w2knc7s5izm9ds5xk61k-mednafen-1.32.1.drv",
       "description": "Portable, CLI-driven, SDL+OpenGL-based, multi-system emulator",
       "install_id": "mednafen",
       "license": "GPL-2.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "mednafen-1.32.1",
       "pname": "mednafen",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:41:13.355368Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:45:02.020584Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -129,8 +127,8 @@
         "out"
       ],
       "outputs": {
-        "doc": "/nix/store/dlzqs0jv5srmggksa53v3bgzrq7ib0k8-mednafen-1.32.1-doc",
-        "out": "/nix/store/4wdfilj3h27mnaj8xfmv6q85jfc2dmr3-mednafen-1.32.1"
+        "doc": "/nix/store/xqrq6yxam5yyas36ydd2c242jsx3fpf4-mednafen-1.32.1-doc",
+        "out": "/nix/store/4pnx9z4njzpkl50kzr02ckfgw6m5bf32-mednafen-1.32.1"
       },
       "system": "x86_64-darwin",
       "group": "mednafen",
@@ -139,18 +137,19 @@
     {
       "attr_path": "mednafen",
       "broken": false,
-      "derivation": "/nix/store/v78mv62xskklgzg0kgbb3f7271dgz0yn-mednafen-1.32.1.drv",
+      "derivation": "/nix/store/z4g1biw26c304ah2g6kybb4s3k8kn3ab-mednafen-1.32.1.drv",
       "description": "Portable, CLI-driven, SDL+OpenGL-based, multi-system emulator",
       "install_id": "mednafen",
       "license": "GPL-2.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "mednafen-1.32.1",
       "pname": "mednafen",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:59:21.685781Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T02:04:34.718997Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -159,8 +158,8 @@
         "out"
       ],
       "outputs": {
-        "doc": "/nix/store/mj3bpmay2dbak9dh24qzlbnzssnczqzn-mednafen-1.32.1-doc",
-        "out": "/nix/store/ybq16fhpqhsk46yff0js83yvv7m48qhp-mednafen-1.32.1"
+        "doc": "/nix/store/fcgfra7ghmywzmywhb1xaa8zpghrnrv6-mednafen-1.32.1-doc",
+        "out": "/nix/store/n4w3ixdwfyzr2bpma62skgr5x60z23y8-mednafen-1.32.1"
       },
       "system": "x86_64-linux",
       "group": "mednafen",
@@ -169,28 +168,29 @@
     {
       "attr_path": "SDL2",
       "broken": false,
-      "derivation": "/nix/store/dbffzm7kmv0bcc8vrbikbn7qp86jm218-SDL2-2.32.0.drv",
+      "derivation": "/nix/store/405kr3xi85mp5b044xvii88iqs5ss5y2-SDL2-2.32.2.drv",
       "description": "Cross-platform multimedia library",
       "install_id": "SDL2",
       "license": "Zlib",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "name": "SDL2-2.32.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "name": "SDL2-2.32.2",
       "pname": "SDL2",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:25:54.304578Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:28:45.645727Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "2.32.0",
+      "version": "2.32.2",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dev": "/nix/store/ih0mkibw8k4grnw7g682ccjb5ijlplqz-SDL2-2.32.0-dev",
-        "out": "/nix/store/nc9ar8iyi2ijgyh3rw2d59jjqmij5gyj-SDL2-2.32.0"
+        "dev": "/nix/store/8yjm4x5fk1wyzng4ln90c7dhi8ibddfx-SDL2-2.32.2-dev",
+        "out": "/nix/store/c8zdmg1w6v6x9rj1pvhd6wmh6ilbpg5l-SDL2-2.32.2"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -199,28 +199,29 @@
     {
       "attr_path": "SDL2",
       "broken": false,
-      "derivation": "/nix/store/42ypsk3xp8v5wks0yby96mp42s3y0s15-SDL2-2.32.0.drv",
+      "derivation": "/nix/store/b5wkq0ghr7sfgixb3gabgbi5v78lcr1r-SDL2-2.32.2.drv",
       "description": "Cross-platform multimedia library",
       "install_id": "SDL2",
       "license": "Zlib",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "name": "SDL2-2.32.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "name": "SDL2-2.32.2",
       "pname": "SDL2",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:59:11.271296Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T02:04:23.533613Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "2.32.0",
+      "version": "2.32.2",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dev": "/nix/store/0l3j7qyfz3z63nf58xc405c43xb2g8r5-SDL2-2.32.0-dev",
-        "out": "/nix/store/9q8k8gs7n03finqhcvip6q7l14wrbrsd-SDL2-2.32.0"
+        "dev": "/nix/store/a5fl02ia255z97f8qly456p14a1x5yv6-SDL2-2.32.2-dev",
+        "out": "/nix/store/dazcj1317dmil20vvmb3rs8vsl75b2ah-SDL2-2.32.2"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -229,27 +230,28 @@
     {
       "attr_path": "broot",
       "broken": false,
-      "derivation": "/nix/store/z1px042sgn45x3c2a7npxvc2vwqvgbsd-broot-1.45.0.drv",
+      "derivation": "/nix/store/h7gv6x0qdbnw9abh791kb62gf3lgdq8w-broot-1.45.1.drv",
       "description": "Interactive tree view, a fuzzy search, a balanced BFS descent and customizable commands",
       "install_id": "broot",
       "license": "[ MIT ]",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "name": "broot-1.45.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "name": "broot-1.45.1",
       "pname": "broot",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:09:06.648915Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:11:02.666751Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "1.45.0",
+      "version": "1.45.1",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/hvhv1fzfvjkkcdrc6d7rn9swaab9jslv-broot-1.45.0"
+        "out": "/nix/store/qyxv2a6m0056j8qpsnsc92m880lvf5gp-broot-1.45.1"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -258,27 +260,28 @@
     {
       "attr_path": "broot",
       "broken": false,
-      "derivation": "/nix/store/83zzlhpfbgihv9gc3nddd7a4iknz5vwd-broot-1.45.0.drv",
+      "derivation": "/nix/store/cv7zzda6jz02dk3fm7bypwfk2dp7ckhf-broot-1.45.1.drv",
       "description": "Interactive tree view, a fuzzy search, a balanced BFS descent and customizable commands",
       "install_id": "broot",
       "license": "[ MIT ]",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "name": "broot-1.45.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "name": "broot-1.45.1",
       "pname": "broot",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:25:54.411872Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:28:45.886286Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "1.45.0",
+      "version": "1.45.1",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/pzsbvbqyiyvk1fq17yabyfhvcx2xy9f4-broot-1.45.0"
+        "out": "/nix/store/nq9dvmi2yjpka4whv5d6m87gwyw61i9c-broot-1.45.1"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -287,27 +290,28 @@
     {
       "attr_path": "broot",
       "broken": false,
-      "derivation": "/nix/store/am80xwsys0ibwn99vi0q90q2qvcvrk0b-broot-1.45.0.drv",
+      "derivation": "/nix/store/79rn3pr4cpnlikhhrzcl68a5gp0651nk-broot-1.45.1.drv",
       "description": "Interactive tree view, a fuzzy search, a balanced BFS descent and customizable commands",
       "install_id": "broot",
       "license": "[ MIT ]",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "name": "broot-1.45.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "name": "broot-1.45.1",
       "pname": "broot",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:41:11.124212Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:44:59.385881Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "1.45.0",
+      "version": "1.45.1",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/hdilbc3bli6mwks2g95i4jsbrw6bpsa1-broot-1.45.0"
+        "out": "/nix/store/rx5fxp26m2g7jysscc6k11ymlvvn2c5f-broot-1.45.1"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
@@ -316,27 +320,28 @@
     {
       "attr_path": "broot",
       "broken": false,
-      "derivation": "/nix/store/ggdc122i62h71279814sd1d0nxbywx62-broot-1.45.0.drv",
+      "derivation": "/nix/store/hpjnp0736jf1s1gmnvvvwm59lcs1hffq-broot-1.45.1.drv",
       "description": "Interactive tree view, a fuzzy search, a balanced BFS descent and customizable commands",
       "install_id": "broot",
       "license": "[ MIT ]",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "name": "broot-1.45.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "name": "broot-1.45.1",
       "pname": "broot",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:59:11.398509Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T02:04:23.780454Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "1.45.0",
+      "version": "1.45.1",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/bljcvbbjz5l446wlsw2ymsfddr4c7hnj-broot-1.45.0"
+        "out": "/nix/store/q0ywcb3jc110zd5id80abq4f8qpvrbbi-broot-1.45.1"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -345,18 +350,19 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/rs3gh60pcnvw9gfmgflinhqmyl8klwp5-gum-0.16.0.drv",
+      "derivation": "/nix/store/kbf3lrdp865dlb0yc2n8cbxn1dvcfpz4-gum-0.16.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "gum-0.16.0",
       "pname": "gum",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:09:07.386038Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:11:03.572745Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -365,7 +371,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/kwkfj9ifihlfzv7damvf0x42w1l904ld-gum-0.16.0"
+        "out": "/nix/store/i2lcxxzcaylphmmjm2nqxlywq6xzqya8-gum-0.16.0"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -374,18 +380,19 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/rfdkq3mnxjbn28fr3w9a8wlb6id80lpy-gum-0.16.0.drv",
+      "derivation": "/nix/store/58i0s7yhdp8vvz439gmsix573ym8c5q2-gum-0.16.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "gum-0.16.0",
       "pname": "gum",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:25:55.926011Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:28:47.678511Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -394,7 +401,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/fflgnfjyizrfp3kb9kg1rb13zh8iqgpa-gum-0.16.0"
+        "out": "/nix/store/d3xf6ih9k89ibb1lmch962fby3q3yxnk-gum-0.16.0"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -403,18 +410,19 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/lqp6sr5qq6zd802sfxrkb9m9jd63ymrz-gum-0.16.0.drv",
+      "derivation": "/nix/store/yjr81v2ziaymg72hjwndhgaldvm7gia4-gum-0.16.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "gum-0.16.0",
       "pname": "gum",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:41:11.860263Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:45:00.311988Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -423,7 +431,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/854g6bmylzpaz7s1xdccfq9x2xkx6fcc-gum-0.16.0"
+        "out": "/nix/store/rr8sls8dyy2sfaxy2nfx3bcb6a4lzzi1-gum-0.16.0"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
@@ -432,18 +440,19 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/24a1pj733gimjh92rd6biprlpql2fdaa-gum-0.16.0.drv",
+      "derivation": "/nix/store/n1sip83yr4s0ffhwacxvnib3acdgzb75-gum-0.16.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "gum-0.16.0",
       "pname": "gum",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:59:13.062040Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T02:04:25.716953Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -452,7 +461,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/hn1dl52063dlljmzjlx0cw1f59yk5r2n-gum-0.16.0"
+        "out": "/nix/store/nr5f79bif524lvnd1ynlpag9bgc0ipph-gum-0.16.0"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -461,18 +470,19 @@
     {
       "attr_path": "unzip",
       "broken": false,
-      "derivation": "/nix/store/z132s5qfb06fyximgiv9iv6x1c3w1waz-unzip-6.0.drv",
+      "derivation": "/nix/store/37n1ks8aawrfvzhxf3g5789k7b911g77-unzip-6.0.drv",
       "description": "Extraction utility for archives compressed in .zip format",
       "install_id": "unzip",
       "license": "Info-ZIP",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "unzip-6.0",
       "pname": "unzip",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:09:55.598610Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:11:53.407017Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -481,7 +491,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/zr6wmhcrkbkc7z4007f9fh8s3miq9npr-unzip-6.0"
+        "out": "/nix/store/dcv5jgp3r4zjl2mam4s9225xcinaxgq1-unzip-6.0"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -490,18 +500,19 @@
     {
       "attr_path": "unzip",
       "broken": false,
-      "derivation": "/nix/store/l10hrdfqh084259rgk2syd99jr9asc1s-unzip-6.0.drv",
+      "derivation": "/nix/store/9g386vzcmh21hfrpkiw1mniy5nnlvw3h-unzip-6.0.drv",
       "description": "Extraction utility for archives compressed in .zip format",
       "install_id": "unzip",
       "license": "Info-ZIP",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "unzip-6.0",
       "pname": "unzip",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:27:12.966090Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:30:09.819572Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -510,7 +521,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/lcrn9i1wnygvv6kvvxb0nxsjx2hiijqc-unzip-6.0"
+        "out": "/nix/store/x9y13igdvyn7j4sv4lq6j5z8a0s3kyyv-unzip-6.0"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -519,18 +530,19 @@
     {
       "attr_path": "unzip",
       "broken": false,
-      "derivation": "/nix/store/64ikmmivhp7clxn9vkxs19zm5z5i61sx-unzip-6.0.drv",
+      "derivation": "/nix/store/qxqf7c9rk63zp49xg506bfl5izf2hblh-unzip-6.0.drv",
       "description": "Extraction utility for archives compressed in .zip format",
       "install_id": "unzip",
       "license": "Info-ZIP",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "unzip-6.0",
       "pname": "unzip",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T01:41:59.253054Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T01:45:50.255518Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -539,7 +551,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/nd34c407gp101l0z0jpdf3pm9p9702gf-unzip-6.0"
+        "out": "/nix/store/sd7nqwwiaghdvjr1padwq74v2ibxnfhr-unzip-6.0"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
@@ -548,18 +560,19 @@
     {
       "attr_path": "unzip",
       "broken": false,
-      "derivation": "/nix/store/cad0zbbm8932sj6bksqyyg1bjrbr8wk9-unzip-6.0.drv",
+      "derivation": "/nix/store/k94ixyd5zn0h7r2ybvqn9k9nrkzpkz8z-unzip-6.0.drv",
       "description": "Extraction utility for archives compressed in .zip format",
       "install_id": "unzip",
       "license": "Info-ZIP",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
       "name": "unzip-6.0",
       "pname": "unzip",
-      "rev": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
-      "rev_count": 770807,
-      "rev_date": "2025-03-19T22:12:44Z",
-      "scrape_date": "2025-03-22T02:00:36.190259Z",
+      "rev": "2c8d3f48d33929642c1c12cd243df4cc7d2ce434",
+      "rev_count": 778048,
+      "rev_date": "2025-04-02T08:40:04Z",
+      "scrape_date": "2025-04-03T02:05:51.452729Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -568,7 +581,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/9476npas7nxlj8j898jvvvjk7cciyw0c-unzip-6.0"
+        "out": "/nix/store/ycli2afmijaqi9vmv6rwz4jbcrbly3x7-unzip-6.0"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
