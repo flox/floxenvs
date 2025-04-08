@@ -276,7 +276,6 @@ jobs:
         run: |
           echo "${{ github.actor }}"
           echo "${{ github.event_name }}"
-          gh pr review --approve "$PR_URL"
           gh pr merge --auto --merge "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
