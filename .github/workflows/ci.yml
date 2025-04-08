@@ -11,9 +11,11 @@ on:
 
 concurrency:
   group: floxenvs-tests
+  cancel-in-progress: false
 
 env:
   FLOX_DISABLE_METRICS: "true"
+  CI: true
 
 jobs:
 
@@ -98,7 +100,7 @@ jobs:
 
     strategy:
       fail-fast: false
-      max-parallel: ${{ github.ref == 'refs/head/main' && 1 || 4 }}
+      max-parallel: ${{ github.ref == 'refs/head/main' && 2 || 8 }}
       matrix:
         include: ${{ fromJSON(needs.envs.outputs.envs_per_system ) }}
 
