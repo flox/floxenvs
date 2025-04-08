@@ -18,7 +18,7 @@ systems  = ["x86_64-darwin", "aarch64-darwin"]
 
 [profile]
 common = """
-    if [ "$(uname -s)" = 'Darwin' ]; then
+    if [ "$(uname -s)" = 'Darwin' ] && [ "$FLOX_ENVS_TESTING" != "1" ]; then
         trap 'gum confirm "Stop virtual machine?" && gum spin --spinner dot --title "Stopping machine ...." -- podman machine stop ; echo; echo "✅ Podman virtual machine stopped"' EXIT
     fi
 """
@@ -45,6 +45,10 @@ on-activate = """
 
         # We need a virtual machine
         autostart="$HOME/.config/podman-env/autostart"
+        if [ "$FLOX_ENVS_TESTING" = "1" ]; then
+          mkdir -p "$HOME"/.config/podman-env
+          echo "1" > "$autostart"
+        fi
         choice=
         if [ ! -f "$autostart" ]; then
             echo "Would you like to create and start the Podman virtual machine?"
@@ -58,7 +62,7 @@ on-activate = """
             fi
         fi
 
-        if [ -f "$autostart" ] || [ "${choice:0:1}" = "A" ] || [ "${choice:0:1}" = "Y" ] ; then
+        if [ -f "$autostart" ] || [ "${choice:0:1}" = "A" ] || [ "${choice:0:1}" = "Y" ]; then
             gum spin --spinner dot --title "Initializing machine..." -- podman machine init || true
             gum spin --spinner dot --title "Starting machine..." -- podman machine start
             if [ "$(podman machine ssh -- uname -s 2>/dev/null)" = "Linux" ]; then
