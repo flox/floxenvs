@@ -4,14 +4,11 @@ on:
   workflow_dispatch:
   push:
     branches:
+      - "main"
       - "preview"
   pull_request:
   schedule:
     - cron: "0 0 * * *"
-
-concurrency:
-  group: floxenvs-tests
-  cancel-in-progress: false
 
 env:
   FLOX_DISABLE_METRICS: "true"
@@ -94,13 +91,14 @@ jobs:
     name: "Test '${{ matrix.example }}' example on '${{ matrix.system }}'"
     runs-on: "ubuntu-latest"
     timeout-minutes: 60
+    if: ${{ github.event_name == 'pull_request' }}
 
     needs:
       - "envs"
 
     strategy:
       fail-fast: false
-      max-parallel: ${{ github.ref == 'refs/head/main' && 2 || 8 }}
+      max-parallel: ${{ github.ref == 'refs/head/main' && 4 || 8 }}
       matrix:
         include: ${{ fromJSON(needs.envs.outputs.envs_per_system ) }}
 

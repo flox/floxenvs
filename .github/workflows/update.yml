@@ -58,7 +58,7 @@ jobs:
 
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 1
       matrix:
         include: ${{ fromJSON(needs.envs.outputs.envs) }}
 
@@ -76,6 +76,7 @@ jobs:
           popd
 
       - name: "Create Pull Request"
+        id: "create-pr"
         uses: "peter-evans/create-pull-request@v7"
         with:
           token: "${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}"
@@ -88,3 +89,12 @@ jobs:
           title: "chore: Update lockfile of `${{ matrix.example }}` flox environment"
           body: "This PR was automatically created by [Update workflow](https://github.com/flox/floxenvs/actions/workflows/update.yml)."
           labels: "team-developer-support"
+
+      - name: "Sleep to slow down PRs"
+        if: ${{ steps.create-pr.outputs.pull-request-operation != 'none' }}
+        run: |
+          set -x
+          echo xx ${{ steps.create-pr.outputs.pull-request-operation }} xx
+          echo Sleeping to reduce the number of PRs created
+          echo This is because GitHub Actions does not support a proper job queue.
+          sleep "$((RANDOM % 60 + 240))"
