@@ -157,7 +157,6 @@ jobs:
 
     needs:
       - "envs"
-      - "test"
 
     env:
       FLOX_BIN: "flox -vvv"
@@ -209,7 +208,7 @@ jobs:
 
     needs:
       - "envs"
-      - "test"
+      - "containarize"
 
     env:
       FLOX_BIN:           "flox -vvv"
