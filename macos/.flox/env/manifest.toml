@@ -5,10 +5,6 @@ version = 1
 mac-app-util.flake = "github:hraban/mac-app-util"
 jq.pkg-path = "jq"
 
-# Example package to test
-#raycast.pkg-path = "raycast"
-
-
 [hook]
 on-activate = '''
 FLOX_ENV_NAME=$(echo $_FLOX_ACTIVE_ENVIRONMENTS | jq -r '.[0].pointer.name')

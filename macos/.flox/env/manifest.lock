@@ -1,0 +1,143 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "version": 1,
+    "install": {
+      "jq": {
+        "pkg-path": "jq"
+      },
+      "mac-app-util": {
+        "flake": "github:hraban/mac-app-util"
+      }
+    },
+    "hook": {
+      "on-activate": "FLOX_ENV_NAME=$(echo $_FLOX_ACTIVE_ENVIRONMENTS | jq -r '.[0].pointer.name')\nFLOX_ENV_APPS=\"$HOME/Applications/Flox ($FLOX_ENV_NAME) Apps\"\n\nif [[ -d $FLOX_ENV_APPS ]]; then\n  rm -rf \"$FLOX_ENV_APPS\"\nfi\n\nif [ -d $FLOX_ENV/Applications ]; then \n  mac-app-util sync-trampolines \\\n    \"$FLOX_ENV/Applications\" \\\n    \"$FLOX_ENV_APPS\"\nfi\n"
+    },
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "x86_64-darwin"
+      ]
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "jq",
+      "broken": false,
+      "derivation": "/nix/store/kysqbgfgwgifws19mgz09d4044rzl03f-jq-1.7.1.drv",
+      "description": "Lightweight and flexible command-line JSON processor",
+      "install_id": "jq",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=f771eb401a46846c1aebd20552521b233dd7e18b",
+      "name": "jq-1.7.1",
+      "pname": "jq",
+      "rev": "f771eb401a46846c1aebd20552521b233dd7e18b",
+      "rev_count": 789333,
+      "rev_date": "2025-04-24T20:20:57Z",
+      "scrape_date": "2025-04-27T04:18:43.164752Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.7.1",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/d0r880glv6pvpxibssrcl2v7v4sqijfx-jq-1.7.1-bin",
+        "dev": "/nix/store/d3w37gvgsapsh612vyy0b0lnjq81bhhd-jq-1.7.1-dev",
+        "doc": "/nix/store/31mydlnw005lpaslc5yqgmxy5mfhzs98-jq-1.7.1-doc",
+        "man": "/nix/store/51dbhjrpi3dnj3jv9npjk1wvqcjfpz2n-jq-1.7.1-man",
+        "out": "/nix/store/kd68ckkv7lqnfb46rk1746mhig0hhpl5-jq-1.7.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "jq",
+      "broken": false,
+      "derivation": "/nix/store/h2pw48h5vwkabjrvq7ff08y6gdfl7dqw-jq-1.7.1.drv",
+      "description": "Lightweight and flexible command-line JSON processor",
+      "install_id": "jq",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=f771eb401a46846c1aebd20552521b233dd7e18b",
+      "name": "jq-1.7.1",
+      "pname": "jq",
+      "rev": "f771eb401a46846c1aebd20552521b233dd7e18b",
+      "rev_count": 789333,
+      "rev_date": "2025-04-24T20:20:57Z",
+      "scrape_date": "2025-04-27T04:53:40.357520Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.7.1",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/d7scikakdayw3xjw8pm55q8j146qwxwd-jq-1.7.1-bin",
+        "dev": "/nix/store/h80zvna5sb5klg3q56l22rw2cac35pzm-jq-1.7.1-dev",
+        "doc": "/nix/store/v51p982wn5hrjvfprr5h5f7ffakj86iq-jq-1.7.1-doc",
+        "man": "/nix/store/giabrd1iawzw666w62n4dw7czs6k580i-jq-1.7.1-man",
+        "out": "/nix/store/8fd0arnj59yvp8clz9a14p61dhchp8kk-jq-1.7.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "install_id": "mac-app-util",
+      "locked-url": "github:hraban/mac-app-util/341ede93f290df7957047682482c298e47291b4d?narHash=sha256-aTM/2CrNN5utdVEQGsOA%2Bkl4UozgH7VPLBQL5OXtBrg%3D",
+      "locked-flake-attr-path": "packages.aarch64-darwin.default",
+      "derivation": "/nix/store/kfjrl52wga87qr8n97f4rpsf0njxrnyx-mac-app-util.drv",
+      "outputs": {
+        "out": "/nix/store/fwgfpqmb7q7psa2wk5mxgiwk5qmqnywq-mac-app-util"
+      },
+      "output-names": [
+        "out"
+      ],
+      "outputs-to-install": [
+        "out"
+      ],
+      "requested-outputs-to-install": [],
+      "package-system": "aarch64-darwin",
+      "system": "aarch64-darwin",
+      "name": "mac-app-util",
+      "licenses": [
+        "AGPL-3.0-only"
+      ],
+      "broken": false,
+      "unfree": false,
+      "priority": 5
+    },
+    {
+      "install_id": "mac-app-util",
+      "locked-url": "github:hraban/mac-app-util/341ede93f290df7957047682482c298e47291b4d?narHash=sha256-aTM/2CrNN5utdVEQGsOA%2Bkl4UozgH7VPLBQL5OXtBrg%3D",
+      "locked-flake-attr-path": "packages.x86_64-darwin.default",
+      "derivation": "/nix/store/rf79rpcp65ylabbcik7pasz3x76yh721-mac-app-util.drv",
+      "outputs": {
+        "out": "/nix/store/fzi14gz2k2njp4y097bpp6ggwvhs9c2d-mac-app-util"
+      },
+      "output-names": [
+        "out"
+      ],
+      "outputs-to-install": [
+        "out"
+      ],
+      "requested-outputs-to-install": [],
+      "package-system": "x86_64-darwin",
+      "system": "x86_64-darwin",
+      "name": "mac-app-util",
+      "licenses": [
+        "AGPL-3.0-only"
+      ],
+      "broken": false,
+      "unfree": false,
+      "priority": 5
+    }
+  ]
+}
