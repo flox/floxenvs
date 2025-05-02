@@ -79,25 +79,17 @@ else
 fi
 pg_ctl -D "$PGDATA" -m fast -w stop > /dev/null
 
+gum style --border double --margin "1 2" --padding "1 4" \
+  'Start PostgreSQL in the background:' \
+  '  👉 flox services start' \
+  '  👉 flox activate --start-services' '' \
+  'Try to connect to PostgreSQL:' \
+  '  👉 psql' '' \
+  'Connection information:' \
+  "  listen_addresses=$PGHOSTADDR" \
+  "  port=$PGPORT"
+
 '''
-
-
-[profile]
-common = '''
-echo ""
-echo "     ╔═══════════════════════════════════════════════╗"
-echo "     ║                                               ║"
-echo "     ║  Start PostgreSQL in the background:          ║"
-echo "     ║  👉 flox services start                       ║"
-echo "     ║  👉 flox activate --start-services            ║"
-echo "     ║                                               ║"
-echo "     ║  Try to connect to PostgreSQL:                ║"
-echo "     ║  👉 psql                                      ║"
-echo "     ║                                               ║"
-echo "     ╚═══════════════════════════════════════════════╝"
-echo ""
-'''
-
 
 [services]
 postgres.command = "postgres -D $PGDATA -c unix_socket_directories=$PGHOST -c listen_addresses=$PGHOSTADDR -p $PGPORT"
