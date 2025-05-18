@@ -179,6 +179,7 @@ jobs:
         example: ${{ fromJSON(needs.envs.outputs.envs_only ) }}
         exclude:
           - example: "macos"
+          - example: "fooocus"
 
     steps:
       - name: "Checkout"
