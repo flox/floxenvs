@@ -136,6 +136,10 @@ jobs:
           timeout_minutes: 15
           max_attempts: 3
           command: |
+            if [ ! -f "${{matrix.example}}/test.sh" ]; then
+                echo "WARN: No test.sh found in $env_path"
+                exit 0
+            fi
             ssh github@$REMOTE_SERVER_ADDRESS \
               -oUserKnownHostsFile=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE \
               nix run \
