@@ -227,6 +227,8 @@ jobs:
       max-parallel: 8
       matrix:
         example: ${{ fromJSON(needs.envs.outputs.envs_only ) }}
+        exclude:
+          - example: "macos"
 
     steps:
       - name: "Checkout"
