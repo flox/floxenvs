@@ -61,8 +61,6 @@ jobs:
       max-parallel: 1
       matrix:
         include: ${{ fromJSON(needs.envs.outputs.envs) }}
-        exclude:
-          - example: "macos"
 
     steps:
       - name: "Checkout"
@@ -75,6 +73,10 @@ jobs:
 
       - name: "Run upgrade"
         run: |
+          if [ ${{matrix.example}} == "macos" ]; then
+            echo "Skipping macos. TODO: use macos runner"
+            exit 0
+          fi
           pushd ./${{ matrix.example }}
           flox -vvv upgrade
           popd
