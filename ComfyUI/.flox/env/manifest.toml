@@ -1,0 +1,106 @@
+
+# Setup:
+#
+# 1. clone the repo
+#
+# ```
+# git clone git@github.com:ComfyAnonymous/ComfyUI.git
+# ```
+#
+# 2. get comfy-manager
+#
+# ```
+# git clone git@github.com:ltdrdata/ComfyUI-Manager custom_nodes/comfyui-manager
+# ```
+#
+# 3. activate the environment
+#
+# ```
+# flox activate -s
+# ```
+#
+# Future plans:
+# 1. have the environment create / update a git clone into $COMFYUI_DIR (somewhere in $FLOX_ENV_CACHE)
+# 2. ask the user where they want their comfyui project directory, defaulting to $FLOX_PROJECT_DIR
+# 3. update service to do:
+#
+# ```
+# $FLOX_ENV/bin/python $COMFYUI_DIR/main.py --base-directory $FLOX_PROJECT_DIR --log-stdout --listen 127.0.0.1 --port 8000
+# ```
+#
+
+
+version = 1
+
+[install]
+python312.pkg-path = "python312"
+gcc-unwrapped.pkg-path = "gcc-unwrapped"
+zlib.pkg-path = "zlib"
+libGL.pkg-path = "libGL"
+glib.pkg-path = "glib"
+
+[vars]
+VIRTUAL_ENV_DISABLE_PROMPT="1"
+
+[hook]
+on-activate = '''
+
+# Create a venv
+export PYTHON_DIR="$FLOX_ENV_CACHE/python"
+
+if [ ! -d "$PYTHON_DIR" ]; then
+  python -m venv "$PYTHON_DIR"
+fi
+
+# Update python packages
+(
+  source "$PYTHON_DIR/bin/activate"
+  pip install -r "$FLOX_ENV_PROJECT/requirements.txt" --quiet
+)
+
+# Interpolate LISTEN_IP from parent environment
+export LISTEN_IP="${LISTEN_IP:-0.0.0.0}"
+
+echo "http://$LISTEN_IP:8188"
+
+'''
+
+[profile]
+bash = '''
+source "$PYTHON_DIR/bin/activate"
+'''
+
+fish = '''
+source "$PYTHON_DIR/bin/activate.fish"
+'''
+
+tcsh = '''
+source "$PYTHON_DIR/bin/activate.csh"
+'''
+
+zsh = '''
+source "$PYTHON_DIR/bin/activate"
+'''
+
+[services]
+comfyui.command = '''
+(
+  cd $FLOX_ENV_PROJECT
+  source "$PYTHON_DIR/bin/activate"
+  python main.py --listen "$LISTEN_IP"
+)
+'''
+
+getmodels.command = '''
+curl -Lo models/checkpoints/v1-5-pruned-emaonly-fp16.safetensors \
+  https://huggingface.co/Comfy-Org/stable-diffusion-v1-5-archive/resolve/main/v1-5-pruned-emaonly-fp16.safetensors
+'''
+
+[options]
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]
+
