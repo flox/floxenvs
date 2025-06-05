@@ -202,8 +202,9 @@ jobs:
 
       - name: "Tag & Push"
         run: |
-          docker tag ${{ matrix.example }}:latest ghcr.io/flox/floxenvs:${{ matrix.example }}-latest
-          docker push ghcr.io/flox/floxenvs:${{ matrix.example }}-latest
+          tag=$(echo -n "${{ matrix.example }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g')
+          docker tag "$tag:latest" "ghcr.io/flox/floxenvs:$tag-latest"
+          docker push "ghcr.io/flox/floxenvs:$tag-latest"
 
 
   push:
