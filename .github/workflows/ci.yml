@@ -240,6 +240,9 @@ jobs:
 
       - name: "Get FloxHub token"
         run: |
+          echo "FLOX_FLOXHUB_TOKEN=${{secrets.FLOX_FLOXHUB_TOKEN}}" >> $GITHUB_ENV
+          echo skipping fetching new token until we have more tokens
+          exit 0
           echo "FLOX_FLOXHUB_TOKEN=$(
             curl --request POST \
               --url $FLOX_AUTH0_URL/oauth/token \
