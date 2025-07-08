@@ -103,6 +103,9 @@ jobs:
         include: ${{ fromJSON(needs.envs.outputs.envs_per_system ) }}
 
     steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v4"
+
       - name: "Setup SSH"
         uses: "webfactory/ssh-agent@v0.9.1"
         with:
