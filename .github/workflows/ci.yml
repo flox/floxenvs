@@ -143,6 +143,7 @@ jobs:
                 echo "WARN: No test.sh found in $env_path"
                 exit 0
             fi
+            tailscale ping "$REMOTE_SERVER_ADDRESS"
             ssh github@$REMOTE_SERVER_ADDRESS \
               -oUserKnownHostsFile=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE \
               nix run \
