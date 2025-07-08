@@ -103,6 +103,9 @@ jobs:
         include: ${{ fromJSON(needs.envs.outputs.envs_per_system ) }}
 
     steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v4"
+
       - name: "Setup SSH"
         uses: "webfactory/ssh-agent@v0.9.1"
         with:
@@ -140,6 +143,7 @@ jobs:
                 echo "WARN: No test.sh found in $env_path"
                 exit 0
             fi
+            tailscale ping "$REMOTE_SERVER_ADDRESS"
             ssh github@$REMOTE_SERVER_ADDRESS \
               -oUserKnownHostsFile=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE \
               nix run \
