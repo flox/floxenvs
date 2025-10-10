@@ -114,15 +114,15 @@ jobs:
       - name: "Setup Tailscale"
         uses: "tailscale/github-action@v3"
         with:
-          args: "--timeout 30s --login-server ${{ vars.MANAGED_TAILSCALE_URL }}"
+          oauth-secret: "${{ secrets.MANAGED_TAILSCALE_AUTH_KEY }}"
           tags: "tag:ci"
-          authkey: "${{ secrets.MANAGED_TAILSCALE_AUTH_KEY }}"
+          timeout: "30s"
+          use-cache: true
 
       - name: "Find remote server to run tests on"
         run: |
           set -eo pipefail
-          echo "${{ vars.MANAGED_REMOTE_BUILDERS }}" > machines
-          export REMOTE_SERVER_ENTRY=$(cat machines | shuf | grep ${{ matrix.system }} | head -1 ; )
+          export REMOTE_SERVER_ENTRY=$(cat /etc/nix/machines | shuf | grep ${{ matrix.system }} | head -1 ; )
           export REMOTE_SERVER_ADDRESS=$(echo "$REMOTE_SERVER_ENTRY" | cut -f1 -d' ' | cut -f3 -d'/' | sed 's/nixbld@//' ; )
           export REMOTE_SERVER_USER_KNOWN_HOSTS_FILE=$(mktemp)
           export REMOTE_SERVER_PUBLIC_HOST_KEY=$(echo "$REMOTE_SERVER_ENTRY" | tr -s ' ' | cut -f8 -d' ' | base64 -d ; )
@@ -132,6 +132,9 @@ jobs:
           cat $REMOTE_SERVER_USER_KNOWN_HOSTS_FILE
           echo "REMOTE_SERVER_ADDRESS=$REMOTE_SERVER_ADDRESS" >> $GITHUB_ENV
           echo "REMOTE_SERVER_USER_KNOWN_HOSTS_FILE=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE" >> $GITHUB_ENV
+          if [ -n "$REMOTE_SERVER_ADDRESS" ]; then
+            tailscale -- ping "$REMOTE_SERVER_ADDRESS"
+          fi
 
       - name: "Test environment"
         uses: nick-fields/retry@v3
