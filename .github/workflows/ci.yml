@@ -133,7 +133,7 @@ jobs:
           echo "REMOTE_SERVER_ADDRESS=$REMOTE_SERVER_ADDRESS" >> $GITHUB_ENV
           echo "REMOTE_SERVER_USER_KNOWN_HOSTS_FILE=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE" >> $GITHUB_ENV
           if [ -n "$REMOTE_SERVER_ADDRESS" ]; then
-            tailscale -- ping "$REMOTE_SERVER_ADDRESS"
+            tailscale ping "$REMOTE_SERVER_ADDRESS"
           fi
 
       - name: "Test environment"
@@ -146,7 +146,6 @@ jobs:
                 echo "WARN: No test.sh found in $env_path"
                 exit 0
             fi
-            tailscale ping "$REMOTE_SERVER_ADDRESS"
             ssh github@$REMOTE_SERVER_ADDRESS \
               -oUserKnownHostsFile=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE \
               nix run \
