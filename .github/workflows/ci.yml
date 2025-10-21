@@ -106,13 +106,8 @@ jobs:
       - name: "Checkout"
         uses: "actions/checkout@v5"
 
-      - name: "Setup SSH"
-        uses: "webfactory/ssh-agent@v0.9.1"
-        with:
-          ssh-private-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
-
       - name: "Setup Tailscale"
-        uses: "tailscale/github-action@v3"
+        uses: "tailscale/github-action@v4"
         with:
           oauth-secret: "${{ secrets.MANAGED_TAILSCALE_AUTH_KEY }}"
           tags: "tag:ci"
