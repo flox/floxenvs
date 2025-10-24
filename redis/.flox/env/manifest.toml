@@ -14,9 +14,6 @@ REDISPORT = "16379"
 [hook]
 on-activate = '''
 
-# XXX: https://github.com/flox/flox/issues/1341
-unset LD_AUDIT
-
 export REDISHOME="$FLOX_ENV_CACHE/redis"
 export REDISDATA="$REDISHOME/data"
 export REDISCONFIG="$REDISHOME/redis.conf"

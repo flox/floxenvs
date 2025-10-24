@@ -15,7 +15,7 @@
       "REDISPORT": "16379"
     },
     "hook": {
-      "on-activate": "\n# XXX: https://github.com/flox/flox/issues/1341\nunset LD_AUDIT\n\nexport REDISHOME=\"$FLOX_ENV_CACHE/redis\"\nexport REDISDATA=\"$REDISHOME/data\"\nexport REDISCONFIG=\"$REDISHOME/redis.conf\"\n\nif [ ! -d \"$REDISDATA\" ]; then\n  mkdir -p \"$REDISDATA\"\nfi\n\ncat >$REDISCONFIG <<EOF\nbind $REDISBIND\nport $REDISPORT\nEOF\n\n"
+      "on-activate": "\nexport REDISHOME=\"$FLOX_ENV_CACHE/redis\"\nexport REDISDATA=\"$REDISHOME/data\"\nexport REDISCONFIG=\"$REDISHOME/redis.conf\"\n\nif [ ! -d \"$REDISDATA\" ]; then\n  mkdir -p \"$REDISDATA\"\nfi\n\ncat >$REDISCONFIG <<EOF\nbind $REDISBIND\nport $REDISPORT\nEOF\n\n"
     },
     "profile": {
       "common": "echo \"\"\necho \"     ╔═════════════════════════════════════╗\"\necho \"     ║                                     ║\"\necho \"     ║  Start Redis in the background:     ║\"\necho \"     ║  👉 flox services start             ║\"\necho \"     ║  👉 flox activate --start-services  ║\"\necho \"     ║                                     ║\"\necho \"     ║  Try to connect to Redis:           ║\"\necho \"     ║  👉redis-cli -p \\$REDISPORT ping     ║\"\necho \"     ║                                     ║\"\necho \"     ╚═════════════════════════════════════╝\"\necho \"\"\n"
