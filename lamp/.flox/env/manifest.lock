@@ -1,0 +1,411 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "version": 1,
+    "install": {
+      "apacheHttpd": {
+        "pkg-path": "apacheHttpd"
+      },
+      "mariadb": {
+        "pkg-path": "mariadb"
+      },
+      "php": {
+        "pkg-path": "php"
+      }
+    },
+    "vars": {
+      "MYSQL_PORT": "3306",
+      "WORDPRESS_DB_NAME": "wordpress",
+      "WORDPRESS_DB_PASSWORD": "wordpress",
+      "WORDPRESS_DB_USER": "wordpress",
+      "WORDPRESS_PORT": "8080"
+    },
+    "hook": {
+      "on-activate": "  echo \"🚀 Setting up LAMP stack with WordPress...\"\n\n  # Create necessary directories\n  mkdir -p \"$FLOX_ENV_CACHE/www\"\n  mkdir -p \"$FLOX_ENV_CACHE/mysql-data\"\n  mkdir -p \"$FLOX_ENV_CACHE/apache-logs\"\n  mkdir -p \"$FLOX_ENV_CACHE/apache-conf\"\n  mkdir -p \"$FLOX_ENV_CACHE/tmp\"\n\n  # Set permissions\n  chmod -R 755 \"$FLOX_ENV_CACHE/www\"\n\n  # Download and install WordPress if not already present\n  if [ ! -f \"$FLOX_ENV_CACHE/www/wp-config-sample.php\" ]; then\n    echo \"📦 Downloading latest WordPress...\"\n    cd \"$FLOX_ENV_CACHE/tmp\"\n    curl -O https://wordpress.org/latest.tar.gz\n\n    if [ -f latest.tar.gz ]; then\n      echo \"📂 Extracting WordPress...\"\n      tar -xzf latest.tar.gz\n      cp -r wordpress/* \"$FLOX_ENV_CACHE/www/\"\n      rm -rf wordpress latest.tar.gz\n      echo \"✅ WordPress downloaded and extracted\"\n    else\n      echo \"❌ Failed to download WordPress\"\n      exit 1\n    fi\n  else\n    echo \"✅ WordPress already installed\"\n  fi\n\n  # Create Apache configuration\n  cat > \"$FLOX_ENV_CACHE/apache-conf/httpd.conf\" << 'APACHE_EOF'\nServerRoot \"$FLOX_ENV_CACHE\"\nListen $WORDPRESS_PORT\n\nLoadModule mpm_prefork_module lib/httpd/modules/mod_mpm_prefork.so\nLoadModule authz_core_module lib/httpd/modules/mod_authz_core.so\nLoadModule dir_module lib/httpd/modules/mod_dir.so\nLoadModule mime_module lib/httpd/modules/mod_mime.so\nLoadModule log_config_module lib/httpd/modules/mod_log_config.so\nLoadModule unixd_module lib/httpd/modules/mod_unixd.so\nLoadModule rewrite_module lib/httpd/modules/mod_rewrite.so\nLoadModule php_module lib/httpd/modules/libphp.so\n\n<IfModule dir_module>\n    DirectoryIndex index.php index.html\n</IfModule>\n\n<FilesMatch \\.php$>\n    SetHandler application/x-httpd-php\n</FilesMatch>\n\nServerAdmin admin@localhost\nDocumentRoot \"$FLOX_ENV_CACHE/www\"\n\n<Directory \"$FLOX_ENV_CACHE/www\">\n    Options Indexes FollowSymLinks\n    AllowOverride All\n    Require all granted\n</Directory>\n\nErrorLog \"$FLOX_ENV_CACHE/apache-logs/error.log\"\nCustomLog \"$FLOX_ENV_CACHE/apache-logs/access.log\" combined\n\nLogLevel warn\n\nTypesConfig etc/httpd/mime.types\nAPACHE_EOF\n\n  # Initialize MariaDB if needed\n  if [ ! -d \"$FLOX_ENV_CACHE/mysql-data/mysql\" ]; then\n    echo \"🗄️  Initializing MariaDB...\"\n    mysql_install_db --datadir=\"$FLOX_ENV_CACHE/mysql-data\" --auth-root-authentication-method=normal\n    echo \"✅ MariaDB initialized\"\n  else\n    echo \"✅ MariaDB already initialized\"\n  fi\n\n  # Start MariaDB temporarily for database setup\n  echo \"🔧 Starting MariaDB for configuration...\"\n  mysqld --datadir=\"$FLOX_ENV_CACHE/mysql-data\" --socket=\"$FLOX_ENV_CACHE/mysql.sock\" --pid-file=\"$FLOX_ENV_CACHE/mysql.pid\" --skip-networking --skip-grant-tables &\n  MYSQL_PID=$!\n\n  # Wait for MariaDB to start\n  sleep 5\n\n  # Create WordPress database and user\n  if mysql --socket=\"$FLOX_ENV_CACHE/mysql.sock\" -e \"USE $WORDPRESS_DB_NAME;\" 2>/dev/null; then\n    echo \"✅ WordPress database already exists\"\n  else\n    echo \"🗄️  Setting up WordPress database...\"\n    mysql --socket=\"$FLOX_ENV_CACHE/mysql.sock\" << MYSQL_EOF\nCREATE DATABASE IF NOT EXISTS $WORDPRESS_DB_NAME;\nFLUSH PRIVILEGES;\nMYSQL_EOF\n\n    # Stop MariaDB\n    kill $MYSQL_PID 2>/dev/null\n    wait $MYSQL_PID 2>/dev/null\n\n    # Restart without skip-grant-tables to create user\n    echo \"🔧 Restarting MariaDB to create user...\"\n    mysqld --datadir=\"$FLOX_ENV_CACHE/mysql-data\" --socket=\"$FLOX_ENV_CACHE/mysql.sock\" --pid-file=\"$FLOX_ENV_CACHE/mysql.pid\" --skip-networking &\n    MYSQL_PID=$!\n    sleep 5\n\n    mysql --socket=\"$FLOX_ENV_CACHE/mysql.sock\" -u root << MYSQL_EOF\nCREATE USER IF NOT EXISTS '$WORDPRESS_DB_USER'@'localhost' IDENTIFIED BY '$WORDPRESS_DB_PASSWORD';\nGRANT ALL PRIVILEGES ON $WORDPRESS_DB_NAME.* TO '$WORDPRESS_DB_USER'@'localhost';\nFLUSH PRIVILEGES;\nMYSQL_EOF\n    echo \"✅ Database and user configured\"\n  fi\n\n  # Stop temporary MariaDB\n  kill $MYSQL_PID 2>/dev/null\n  wait $MYSQL_PID 2>/dev/null\n\n  # Create wp-config.php if it doesn't exist\n  if [ ! -f \"$FLOX_ENV_CACHE/www/wp-config.php\" ]; then\n    echo \"⚙️  Creating wp-config.php...\"\n    cd \"$FLOX_ENV_CACHE/www\"\n\n    # Get unique salts from WordPress API\n    SALTS=$(curl -s https://api.wordpress.org/secret-key/1.1/salt/)\n\n    cat > wp-config.php << WPCONFIG_EOF\n<?php\ndefine( 'DB_NAME', '$WORDPRESS_DB_NAME' );\ndefine( 'DB_USER', '$WORDPRESS_DB_USER' );\ndefine( 'DB_PASSWORD', '$WORDPRESS_DB_PASSWORD' );\ndefine( 'DB_HOST', 'localhost:$FLOX_ENV_CACHE/mysql.sock' );\ndefine( 'DB_CHARSET', 'utf8mb4' );\ndefine( 'DB_COLLATE', '' );\n\n$SALTS\n\n\\$table_prefix = 'wp_';\n\ndefine( 'WP_DEBUG', false );\n\nif ( ! defined( 'ABSPATH' ) ) {\n    define( 'ABSPATH', __DIR__ . '/' );\n}\n\nrequire_once ABSPATH . 'wp-settings.php';\nWPCONFIG_EOF\n\n    echo \"✅ wp-config.php created\"\n  else\n    echo \"✅ wp-config.php already exists\"\n  fi\n\n  echo \"\"\n  echo \"✨ LAMP stack with WordPress is ready!\"\n  echo \"\"\n  echo \"📋 Next steps:\"\n  echo \"  1. Start MariaDB: mysqld --datadir=\\\"\\$FLOX_ENV_CACHE/mysql-data\\\" --socket=\\\"\\$FLOX_ENV_CACHE/mysql.sock\\\" &\"\n  echo \"  2. Start Apache: httpd -f \\\"\\$FLOX_ENV_CACHE/apache-conf/httpd.conf\\\" -DFOREGROUND &\"\n  echo \"  3. Visit: http://localhost:$WORDPRESS_PORT\"\n  echo \"\"\n"
+    },
+    "profile": {},
+    "options": {},
+    "services": {
+      "apache": {
+        "command": "httpd -f \"$FLOX_ENV_CACHE/apache-conf/httpd.conf\" -DFOREGROUND"
+      },
+      "mariadb": {
+        "command": "mysqld --datadir=\"$FLOX_ENV_CACHE/mysql-data\" --socket=\"$FLOX_ENV_CACHE/mysql.sock\" --pid-file=\"$FLOX_ENV_CACHE/mysql.pid\""
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "apacheHttpd",
+      "broken": false,
+      "derivation": "/nix/store/s03bjcwx670v5v5m3k69ww8w41kk5f5s-apache-httpd-2.4.65.drv",
+      "description": "Apache HTTPD, the world's most popular web server",
+      "install_id": "apacheHttpd",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "name": "apache-httpd-2.4.65",
+      "pname": "apacheHttpd",
+      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "rev_count": 883951,
+      "rev_date": "2025-10-25T06:24:58Z",
+      "scrape_date": "2025-10-27T02:08:14.602301Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.4.65",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/s8blx27s443lnwbyqvj8swkbsajz3fp8-apache-httpd-2.4.65-dev",
+        "doc": "/nix/store/85sy614f43z5f3h64jwgbg3z5ddwhiyk-apache-httpd-2.4.65-doc",
+        "man": "/nix/store/bsd08vyk3d8grp269rgjw7jvwpg6hjjk-apache-httpd-2.4.65-man",
+        "out": "/nix/store/hrdxx0x1hxrbvx07yghvc8gb8ggj3spp-apache-httpd-2.4.65"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "apacheHttpd",
+      "broken": false,
+      "derivation": "/nix/store/h1mg3nlj2w18hjvi1gjqgm8fzlp30hjy-apache-httpd-2.4.65.drv",
+      "description": "Apache HTTPD, the world's most popular web server",
+      "install_id": "apacheHttpd",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "name": "apache-httpd-2.4.65",
+      "pname": "apacheHttpd",
+      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "rev_count": 883951,
+      "rev_date": "2025-10-25T06:24:58Z",
+      "scrape_date": "2025-10-27T02:18:25.719389Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.4.65",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/vf963hwbzfv4f7vhrayz3mg0f51vxfan-apache-httpd-2.4.65-dev",
+        "doc": "/nix/store/5kfqajzmcy7x9x7pnbqwn1bhr4wda7bd-apache-httpd-2.4.65-doc",
+        "man": "/nix/store/xy5mf8wmxqca08ahxy0f7msz1ji1n0wc-apache-httpd-2.4.65-man",
+        "out": "/nix/store/ncsz65i8gcymxiakrg305jj0f5591ks0-apache-httpd-2.4.65"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "apacheHttpd",
+      "broken": false,
+      "derivation": "/nix/store/n98iasv01j77fjq9cjwf9rbh9ds5d9d0-apache-httpd-2.4.65.drv",
+      "description": "Apache HTTPD, the world's most popular web server",
+      "install_id": "apacheHttpd",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "name": "apache-httpd-2.4.65",
+      "pname": "apacheHttpd",
+      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "rev_count": 883951,
+      "rev_date": "2025-10-25T06:24:58Z",
+      "scrape_date": "2025-10-27T02:29:21.223806Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.4.65",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/y3nknigy6cr2kp4wapf7vqhvbblmf52n-apache-httpd-2.4.65-dev",
+        "doc": "/nix/store/vjzi5ly8vid93rcakz77wq4radqi239p-apache-httpd-2.4.65-doc",
+        "man": "/nix/store/vb7m8p2ld0xdxw235igcd0hrfnh92vwj-apache-httpd-2.4.65-man",
+        "out": "/nix/store/7ymnsrq5bmdwkw7ibjm18d6r9ppkw5lg-apache-httpd-2.4.65"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "apacheHttpd",
+      "broken": false,
+      "derivation": "/nix/store/zw6azsf9gw5iarviiva77d6j8gp68970-apache-httpd-2.4.65.drv",
+      "description": "Apache HTTPD, the world's most popular web server",
+      "install_id": "apacheHttpd",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "name": "apache-httpd-2.4.65",
+      "pname": "apacheHttpd",
+      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "rev_count": 883951,
+      "rev_date": "2025-10-25T06:24:58Z",
+      "scrape_date": "2025-10-27T03:00:53.844356Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.4.65",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/16wimwy1fajj5qgv3bmb7h8nv7756kdr-apache-httpd-2.4.65-dev",
+        "doc": "/nix/store/lpsn0jgd03ixkqdks4als2lm8ldlyi5b-apache-httpd-2.4.65-doc",
+        "man": "/nix/store/3cbv61vdhgxkq8wmr969djhdb5lq3p2f-apache-httpd-2.4.65-man",
+        "out": "/nix/store/rdda3163sqdbbr6zgy1fwnbgcnlafyrj-apache-httpd-2.4.65"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mariadb",
+      "broken": false,
+      "derivation": "/nix/store/qlcfkfabdbic8233d403sjf68rrrj1i4-mariadb-server-11.4.8.drv",
+      "description": "Enhanced, drop-in replacement for MySQL",
+      "install_id": "mariadb",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "name": "mariadb-server-11.4.8",
+      "pname": "mariadb",
+      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "rev_count": 883951,
+      "rev_date": "2025-10-25T06:24:58Z",
+      "scrape_date": "2025-10-27T02:08:34.934811Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "11.4.8",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "man": "/nix/store/0r39rjzkjslqzr6c7q7q5svibl795j48-mariadb-server-11.4.8-man",
+        "out": "/nix/store/pqr1lz4mxwna1mp1p9a3gj31inga6qwm-mariadb-server-11.4.8"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mariadb",
+      "broken": false,
+      "derivation": "/nix/store/yz7g8as3j8aifkpvkd13wkr2r6pl0h47-mariadb-server-11.4.8.drv",
+      "description": "Enhanced, drop-in replacement for MySQL",
+      "install_id": "mariadb",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "name": "mariadb-server-11.4.8",
+      "pname": "mariadb",
+      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "rev_count": 883951,
+      "rev_date": "2025-10-25T06:24:58Z",
+      "scrape_date": "2025-10-27T02:18:57.854536Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "11.4.8",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "man": "/nix/store/wq0slyrwyxaiwja7yf70ir8cmsxx1bmb-mariadb-server-11.4.8-man",
+        "out": "/nix/store/b7hqlvaz0jwb26ycwmbr01g2yjpbsp81-mariadb-server-11.4.8"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mariadb",
+      "broken": false,
+      "derivation": "/nix/store/nv77q870bhi6lzkh4j99yy0yjpbkv2rp-mariadb-server-11.4.8.drv",
+      "description": "Enhanced, drop-in replacement for MySQL",
+      "install_id": "mariadb",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "name": "mariadb-server-11.4.8",
+      "pname": "mariadb",
+      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "rev_count": 883951,
+      "rev_date": "2025-10-25T06:24:58Z",
+      "scrape_date": "2025-10-27T02:29:40.792392Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "11.4.8",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "man": "/nix/store/pi2awrkr77rf8f5zn2k8n9b8hgs61m2v-mariadb-server-11.4.8-man",
+        "out": "/nix/store/0ldlsxs8z1vzvsddf20272lhsvla0z74-mariadb-server-11.4.8"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "mariadb",
+      "broken": false,
+      "derivation": "/nix/store/06lydf4ax5sbnidhvfcarrw8vdbp58b4-mariadb-server-11.4.8.drv",
+      "description": "Enhanced, drop-in replacement for MySQL",
+      "install_id": "mariadb",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "name": "mariadb-server-11.4.8",
+      "pname": "mariadb",
+      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "rev_count": 883951,
+      "rev_date": "2025-10-25T06:24:58Z",
+      "scrape_date": "2025-10-27T03:01:29.664580Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "11.4.8",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "man": "/nix/store/bj7qlb084hbr73kl5akir4z8nfhnqz54-mariadb-server-11.4.8-man",
+        "out": "/nix/store/kkw2q24ikm0bm41sk2fya04fb3qk5907-mariadb-server-11.4.8"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "php",
+      "broken": false,
+      "derivation": "/nix/store/m7ycbv3mpli0hic5yyl8mqlz0vavzhm2-php-with-extensions-8.4.13.drv",
+      "description": "HTML-embedded scripting language",
+      "install_id": "php",
+      "license": "PHP-3.01",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "name": "php-with-extensions-8.4.13",
+      "pname": "php",
+      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "rev_count": 883951,
+      "rev_date": "2025-10-25T06:24:58Z",
+      "scrape_date": "2025-10-27T02:08:50.577829Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.4.13",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/j8xm10pajigfn39i7n4hr063534rf0by-php-with-extensions-8.4.13"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "php",
+      "broken": false,
+      "derivation": "/nix/store/r80br2ah4zjm3spbb0376rf7q7hikwjs-php-with-extensions-8.4.13.drv",
+      "description": "HTML-embedded scripting language",
+      "install_id": "php",
+      "license": "PHP-3.01",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "name": "php-with-extensions-8.4.13",
+      "pname": "php",
+      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "rev_count": 883951,
+      "rev_date": "2025-10-25T06:24:58Z",
+      "scrape_date": "2025-10-27T02:19:21.301693Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.4.13",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/0a6vw6088kvlv4mrmfjm6d9q511a6zg0-php-with-extensions-8.4.13"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "php",
+      "broken": false,
+      "derivation": "/nix/store/cqqxnn6zxshhb52z0drb23mwvl051m2s-php-with-extensions-8.4.13.drv",
+      "description": "HTML-embedded scripting language",
+      "install_id": "php",
+      "license": "PHP-3.01",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "name": "php-with-extensions-8.4.13",
+      "pname": "php",
+      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "rev_count": 883951,
+      "rev_date": "2025-10-25T06:24:58Z",
+      "scrape_date": "2025-10-27T02:29:56.250013Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.4.13",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kirn1pnr0g31jzc1nc0dcfzhc9kxc44f-php-with-extensions-8.4.13"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "php",
+      "broken": false,
+      "derivation": "/nix/store/n7rzcf4kzgdhaq35y46mn2kixsd9c5vz-php-with-extensions-8.4.13.drv",
+      "description": "HTML-embedded scripting language",
+      "install_id": "php",
+      "license": "PHP-3.01",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "name": "php-with-extensions-8.4.13",
+      "pname": "php",
+      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "rev_count": 883951,
+      "rev_date": "2025-10-25T06:24:58Z",
+      "scrape_date": "2025-10-27T03:01:54.106933Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.4.13",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/5n5rm6fl3jjjxjy71wzxzk8glwhcmzlk-php-with-extensions-8.4.13"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ]
+}

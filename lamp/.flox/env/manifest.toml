@@ -1,0 +1,268 @@
+## Flox Environment Manifest -----------------------------------------
+##
+##   _Everything_ you need to know about the _manifest_ is here:
+##
+##   https://flox.dev/docs/reference/command-reference/manifest.toml/
+##
+## -------------------------------------------------------------------
+# Flox manifest version managed by Flox CLI
+version = 1
+
+
+## Install Packages --------------------------------------------------
+##  $ flox install gum  <- puts a package in [install] section below
+##  $ flox search gum   <- search for a package
+##  $ flox show gum     <- show all versions of a package
+## -------------------------------------------------------------------
+[install]
+apacheHttpd.pkg-path = "apacheHttpd"
+mariadb.pkg-path = "mariadb"
+php.pkg-path = "php"
+# gum.pkg-path = "gum"
+# gum.version = "^0.14.5"
+
+
+## Environment Variables ---------------------------------------------
+##  ... available for use in the activated environment
+##      as well as [hook], [profile] scripts and [services] below.
+## -------------------------------------------------------------------
+[vars]
+WORDPRESS_DB_NAME = "wordpress"
+WORDPRESS_DB_USER = "wordpress"
+WORDPRESS_DB_PASSWORD = "wordpress"
+WORDPRESS_PORT = "8080"
+MYSQL_PORT = "3306"
+
+
+## Activation Hook ---------------------------------------------------
+##  ... run by _bash_ shell when you run 'flox activate'.
+## -------------------------------------------------------------------
+[hook]
+on-activate = '''
+  echo "🚀 Setting up LAMP stack with WordPress..."
+
+  # Create necessary directories
+  mkdir -p "$FLOX_ENV_CACHE/www"
+  mkdir -p "$FLOX_ENV_CACHE/mysql-data"
+  mkdir -p "$FLOX_ENV_CACHE/apache-logs"
+  mkdir -p "$FLOX_ENV_CACHE/apache-conf"
+  mkdir -p "$FLOX_ENV_CACHE/tmp"
+
+  # Set permissions
+  chmod -R 755 "$FLOX_ENV_CACHE/www"
+
+  # Download and install WordPress if not already present
+  if [ ! -f "$FLOX_ENV_CACHE/www/wp-config-sample.php" ]; then
+    echo "📦 Downloading latest WordPress..."
+    cd "$FLOX_ENV_CACHE/tmp"
+    curl -O https://wordpress.org/latest.tar.gz
+
+    if [ -f latest.tar.gz ]; then
+      echo "📂 Extracting WordPress..."
+      tar -xzf latest.tar.gz
+      cp -r wordpress/* "$FLOX_ENV_CACHE/www/"
+      rm -rf wordpress latest.tar.gz
+      echo "✅ WordPress downloaded and extracted"
+    else
+      echo "❌ Failed to download WordPress"
+      exit 1
+    fi
+  else
+    echo "✅ WordPress already installed"
+  fi
+
+  # Create Apache configuration
+  cat > "$FLOX_ENV_CACHE/apache-conf/httpd.conf" << 'APACHE_EOF'
+ServerRoot "$FLOX_ENV_CACHE"
+Listen $WORDPRESS_PORT
+
+LoadModule mpm_prefork_module lib/httpd/modules/mod_mpm_prefork.so
+LoadModule authz_core_module lib/httpd/modules/mod_authz_core.so
+LoadModule dir_module lib/httpd/modules/mod_dir.so
+LoadModule mime_module lib/httpd/modules/mod_mime.so
+LoadModule log_config_module lib/httpd/modules/mod_log_config.so
+LoadModule unixd_module lib/httpd/modules/mod_unixd.so
+LoadModule rewrite_module lib/httpd/modules/mod_rewrite.so
+LoadModule php_module lib/httpd/modules/libphp.so
+
+<IfModule dir_module>
+    DirectoryIndex index.php index.html
+</IfModule>
+
+<FilesMatch \.php$>
+    SetHandler application/x-httpd-php
+</FilesMatch>
+
+ServerAdmin admin@localhost
+DocumentRoot "$FLOX_ENV_CACHE/www"
+
+<Directory "$FLOX_ENV_CACHE/www">
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>
+
+ErrorLog "$FLOX_ENV_CACHE/apache-logs/error.log"
+CustomLog "$FLOX_ENV_CACHE/apache-logs/access.log" combined
+
+LogLevel warn
+
+TypesConfig etc/httpd/mime.types
+APACHE_EOF
+
+  # Initialize MariaDB if needed
+  if [ ! -d "$FLOX_ENV_CACHE/mysql-data/mysql" ]; then
+    echo "🗄️  Initializing MariaDB..."
+    mysql_install_db --datadir="$FLOX_ENV_CACHE/mysql-data" --auth-root-authentication-method=normal
+    echo "✅ MariaDB initialized"
+  else
+    echo "✅ MariaDB already initialized"
+  fi
+
+  # Start MariaDB temporarily for database setup
+  echo "🔧 Starting MariaDB for configuration..."
+  mysqld --datadir="$FLOX_ENV_CACHE/mysql-data" --socket="$FLOX_ENV_CACHE/mysql.sock" --pid-file="$FLOX_ENV_CACHE/mysql.pid" --skip-networking --skip-grant-tables &
+  MYSQL_PID=$!
+
+  # Wait for MariaDB to start
+  sleep 5
+
+  # Create WordPress database and user
+  if mysql --socket="$FLOX_ENV_CACHE/mysql.sock" -e "USE $WORDPRESS_DB_NAME;" 2>/dev/null; then
+    echo "✅ WordPress database already exists"
+  else
+    echo "🗄️  Setting up WordPress database..."
+    mysql --socket="$FLOX_ENV_CACHE/mysql.sock" << MYSQL_EOF
+CREATE DATABASE IF NOT EXISTS $WORDPRESS_DB_NAME;
+FLUSH PRIVILEGES;
+MYSQL_EOF
+
+    # Stop MariaDB
+    kill $MYSQL_PID 2>/dev/null
+    wait $MYSQL_PID 2>/dev/null
+
+    # Restart without skip-grant-tables to create user
+    echo "🔧 Restarting MariaDB to create user..."
+    mysqld --datadir="$FLOX_ENV_CACHE/mysql-data" --socket="$FLOX_ENV_CACHE/mysql.sock" --pid-file="$FLOX_ENV_CACHE/mysql.pid" --skip-networking &
+    MYSQL_PID=$!
+    sleep 5
+
+    mysql --socket="$FLOX_ENV_CACHE/mysql.sock" -u root << MYSQL_EOF
+CREATE USER IF NOT EXISTS '$WORDPRESS_DB_USER'@'localhost' IDENTIFIED BY '$WORDPRESS_DB_PASSWORD';
+GRANT ALL PRIVILEGES ON $WORDPRESS_DB_NAME.* TO '$WORDPRESS_DB_USER'@'localhost';
+FLUSH PRIVILEGES;
+MYSQL_EOF
+    echo "✅ Database and user configured"
+  fi
+
+  # Stop temporary MariaDB
+  kill $MYSQL_PID 2>/dev/null
+  wait $MYSQL_PID 2>/dev/null
+
+  # Create wp-config.php if it doesn't exist
+  if [ ! -f "$FLOX_ENV_CACHE/www/wp-config.php" ]; then
+    echo "⚙️  Creating wp-config.php..."
+    cd "$FLOX_ENV_CACHE/www"
+
+    # Get unique salts from WordPress API
+    SALTS=$(curl -s https://api.wordpress.org/secret-key/1.1/salt/)
+
+    cat > wp-config.php << WPCONFIG_EOF
+<?php
+define( 'DB_NAME', '$WORDPRESS_DB_NAME' );
+define( 'DB_USER', '$WORDPRESS_DB_USER' );
+define( 'DB_PASSWORD', '$WORDPRESS_DB_PASSWORD' );
+define( 'DB_HOST', 'localhost:$FLOX_ENV_CACHE/mysql.sock' );
+define( 'DB_CHARSET', 'utf8mb4' );
+define( 'DB_COLLATE', '' );
+
+$SALTS
+
+\$table_prefix = 'wp_';
+
+define( 'WP_DEBUG', false );
+
+if ( ! defined( 'ABSPATH' ) ) {
+    define( 'ABSPATH', __DIR__ . '/' );
+}
+
+require_once ABSPATH . 'wp-settings.php';
+WPCONFIG_EOF
+
+    echo "✅ wp-config.php created"
+  else
+    echo "✅ wp-config.php already exists"
+  fi
+
+  echo ""
+  echo "✨ LAMP stack with WordPress is ready!"
+  echo ""
+  echo "📋 Next steps:"
+  echo "  1. Start MariaDB: mysqld --datadir=\"\$FLOX_ENV_CACHE/mysql-data\" --socket=\"\$FLOX_ENV_CACHE/mysql.sock\" &"
+  echo "  2. Start Apache: httpd -f \"\$FLOX_ENV_CACHE/apache-conf/httpd.conf\" -DFOREGROUND &"
+  echo "  3. Visit: http://localhost:$WORDPRESS_PORT"
+  echo ""
+'''
+
+
+## Profile script ----------------------------------------------------
+## ... sourced by _your shell_ when you run 'flox activate'.
+## -------------------------------------------------------------------
+[profile]
+# common = '''
+#   gum style \
+#   --foreground 212 --border-foreground 212 --border double \
+#   --align center --width 50 --margin "1 2" --padding "2 4" \
+#     $INTRO_MESSAGE
+# '''
+## Shell-specific customizations such as setting aliases go here:
+# bash = ...
+# zsh  = ...
+# fish = ...
+
+
+## Services ---------------------------------------------------------
+##  $ flox services start             <- Starts all services
+##  $ flox services status            <- Status of running services
+##  $ flox activate --start-services  <- Activates & starts all
+## ------------------------------------------------------------------
+[services]
+mariadb.command = "mysqld --datadir=\"$FLOX_ENV_CACHE/mysql-data\" --socket=\"$FLOX_ENV_CACHE/mysql.sock\" --pid-file=\"$FLOX_ENV_CACHE/mysql.pid\""
+apache.command = "httpd -f \"$FLOX_ENV_CACHE/apache-conf/httpd.conf\" -DFOREGROUND"
+
+
+## Include ----------------------------------------------------------
+## ... environments to create a composed environment
+## ------------------------------------------------------------------
+[include]
+# environments = [
+#     { dir = "../common" }
+# ]
+
+
+## Build and publish your own packages ------------------------------
+##  $ flox build
+##  $ flox publish
+## ------------------------------------------------------------------
+[build]
+# [build.myproject]
+# description = "The coolest project ever"
+# version = "0.0.1"
+# command = """
+#   mkdir -p $out/bin
+#   cargo build --release
+#   cp target/release/myproject $out/bin/myproject
+# """
+
+
+## Other Environment Options -----------------------------------------
+[options]
+# Systems that environment is compatible with
+# systems = [
+#   "aarch64-darwin",
+#   "aarch64-linux",
+#   "x86_64-darwin",
+#   "x86_64-linux",
+# ]
+# Uncomment to disable CUDA detection.
+# cuda-detection = false
