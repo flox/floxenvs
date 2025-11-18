@@ -10,7 +10,12 @@ version = 1
 
 [install]
 ollama-ui.pkg-path = "nextjs-ollama-llm-ui"
+ollama-cuda.pkg-path = "flox/ollama-cuda"
+ollama-cuda.priority = 6
+ollama-cuda.systems = ["x86_64-linux", "aarch64-linux"]
+
 ollama.pkg-path = "ollama"
+ollama.systems = ["x86_64-darwin", "aarch64-darwin"]
 
 [vars]
 NEXT_PUBLIC_OLLAMA_URL="http://localhost:11434"
@@ -40,4 +45,4 @@ common = '''
 
 [options]
 systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux", "x86_64-darwin"]
-cuda-detection = false
+#cuda-detection = false
