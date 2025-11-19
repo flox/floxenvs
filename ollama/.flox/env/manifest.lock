@@ -4,7 +4,19 @@
     "version": 1,
     "install": {
       "ollama": {
-        "pkg-path": "ollama"
+        "pkg-path": "ollama",
+        "systems": [
+          "x86_64-darwin",
+          "aarch64-darwin"
+        ]
+      },
+      "ollama-cuda": {
+        "pkg-path": "flox/ollama-cuda",
+        "priority": 6,
+        "systems": [
+          "x86_64-linux",
+          "aarch64-linux"
+        ]
       },
       "ollama-ui": {
         "pkg-path": "nextjs-ollama-llm-ui"
@@ -22,8 +34,7 @@
         "aarch64-linux",
         "x86_64-linux",
         "x86_64-darwin"
-      ],
-      "cuda-detection": false
+      ]
     },
     "services": {
       "ollama": {
@@ -38,28 +49,28 @@
     {
       "attr_path": "ollama",
       "broken": false,
-      "derivation": "/nix/store/mdw020yz2gw448jqik81c29w0yc8l54q-ollama-0.12.9.drv",
+      "derivation": "/nix/store/dhgr2z66qpjv79ni5ghjz262nj45xyxy-ollama-0.12.6.drv",
       "description": "Get up and running with large language models locally",
       "install_id": "ollama",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c5ae371f1a6a7fd27823bc500d9390b38c05fa55",
-      "name": "ollama-0.12.9",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=08dacfca559e1d7da38f3cf05f1f45ee9bfd213c",
+      "name": "ollama-0.12.6",
       "pname": "ollama",
-      "rev": "c5ae371f1a6a7fd27823bc500d9390b38c05fa55",
-      "rev_count": 895122,
-      "rev_date": "2025-11-12T20:02:36Z",
-      "scrape_date": "2025-11-14T16:41:41.122063Z",
+      "rev": "08dacfca559e1d7da38f3cf05f1f45ee9bfd213c",
+      "rev_count": 886100,
+      "rev_date": "2025-10-28T17:26:24Z",
+      "scrape_date": "2025-10-31T03:32:22.112711Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0.12.9",
+      "version": "0.12.6",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/3khvcwrv2dplxlnwpd9i58w0f85dy85k-ollama-0.12.9"
+        "out": "/nix/store/qmj8pj0xc62ch9km72i9yhzrkn677jsd-ollama-0.12.6"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -68,107 +79,107 @@
     {
       "attr_path": "ollama",
       "broken": false,
-      "derivation": "/nix/store/jsgvz3s82rn3nbbrf19pz5wq0wx4q444-ollama-0.12.9.drv",
+      "derivation": "/nix/store/zmban09zf8riiwmyixi1k526yz1spsgp-ollama-0.12.6.drv",
       "description": "Get up and running with large language models locally",
       "install_id": "ollama",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c5ae371f1a6a7fd27823bc500d9390b38c05fa55",
-      "name": "ollama-0.12.9",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=08dacfca559e1d7da38f3cf05f1f45ee9bfd213c",
+      "name": "ollama-0.12.6",
       "pname": "ollama",
-      "rev": "c5ae371f1a6a7fd27823bc500d9390b38c05fa55",
-      "rev_count": 895122,
-      "rev_date": "2025-11-12T20:02:36Z",
-      "scrape_date": "2025-11-14T17:19:05.718515Z",
+      "rev": "08dacfca559e1d7da38f3cf05f1f45ee9bfd213c",
+      "rev_count": 886100,
+      "rev_date": "2025-10-28T17:26:24Z",
+      "scrape_date": "2025-11-05T16:45:43.130757Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0.12.9",
+      "version": "0.12.6",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/kn6klcazg5d5qwlq9r495w17mymc8anl-ollama-0.12.9"
-      },
-      "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "ollama",
-      "broken": false,
-      "derivation": "/nix/store/fg268g3v38s0cvw8nwjb7fdbk97n9061-ollama-0.12.9.drv",
-      "description": "Get up and running with large language models locally",
-      "install_id": "ollama",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c5ae371f1a6a7fd27823bc500d9390b38c05fa55",
-      "name": "ollama-0.12.9",
-      "pname": "ollama",
-      "rev": "c5ae371f1a6a7fd27823bc500d9390b38c05fa55",
-      "rev_count": 895122,
-      "rev_date": "2025-11-12T20:02:36Z",
-      "scrape_date": "2025-11-14T17:52:41.809490Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.12.9",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/939fjvdkmn77bpz7kndfrpiqxrn1bbsz-ollama-0.12.9"
+        "out": "/nix/store/a0h583zbxl2kpzc1rnpjgxhw3d94khhc-ollama-0.12.6"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "ollama",
+      "attr_path": "ollama-cuda",
       "broken": false,
-      "derivation": "/nix/store/kryfmmrin51qm7w6407d1hhrmgnva3ip-ollama-0.12.9.drv",
-      "description": "Get up and running with large language models locally",
-      "install_id": "ollama",
+      "derivation": "/nix/store/8whq14v5zgjxz45fiyrnyxlfv7s1j4id-ollama-0.12.6.drv",
+      "description": "Get up and running with large language models locally, using CUDA for NVIDIA GPU acceleration",
+      "install_id": "ollama-cuda",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c5ae371f1a6a7fd27823bc500d9390b38c05fa55",
-      "name": "ollama-0.12.9",
+      "locked_url": "https://github.com/barstoolbluz/ollama-cuda?rev=ddfec7057b493804cc9e3bdfd8452638f496c551",
+      "name": "ollama-0.12.6",
       "pname": "ollama",
-      "rev": "c5ae371f1a6a7fd27823bc500d9390b38c05fa55",
-      "rev_count": 895122,
-      "rev_date": "2025-11-12T20:02:36Z",
-      "scrape_date": "2025-11-14T18:32:20.461350Z",
+      "rev": "ddfec7057b493804cc9e3bdfd8452638f496c551",
+      "rev_count": 17,
+      "rev_date": "2025-11-06T02:11:10Z",
+      "scrape_date": "2025-11-19T11:06:29.940687996Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0.12.9",
+      "version": "0.12.6",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/ddpli05pa7n76nvlsw8fc44cwac53azm-ollama-0.12.9"
+        "out": "/nix/store/c9757rcmaa3w1xrks2yrywf919w3pyj2-ollama-0.12.6"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 6
+    },
+    {
+      "attr_path": "ollama-cuda",
+      "broken": false,
+      "derivation": "/nix/store/aafbqbjbfy2nyr8k0i03rxgcj57kf8pa-ollama-0.12.6.drv",
+      "description": "Get up and running with large language models locally, using CUDA for NVIDIA GPU acceleration",
+      "install_id": "ollama-cuda",
+      "license": "MIT",
+      "locked_url": "https://github.com/barstoolbluz/ollama-cuda?rev=ddfec7057b493804cc9e3bdfd8452638f496c551",
+      "name": "ollama-0.12.6",
+      "pname": "ollama",
+      "rev": "ddfec7057b493804cc9e3bdfd8452638f496c551",
+      "rev_count": 17,
+      "rev_date": "2025-11-06T02:11:10Z",
+      "scrape_date": "2025-11-19T11:06:29.940689138Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.12.6",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/grr9x96avfn4816j9qadwqda6i7d6dj3-ollama-0.12.6"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
-      "priority": 5
+      "priority": 6
     },
     {
       "attr_path": "nextjs-ollama-llm-ui",
       "broken": false,
-      "derivation": "/nix/store/8q9j1gq4wpf46d0z2ha1adna7xa6c6j5-nextjs-ollama-llm-ui-1.2.0.drv",
+      "derivation": "/nix/store/sfj8fn1pp10418sk9i28xlhwlh6ic5va-nextjs-ollama-llm-ui-1.2.0.drv",
       "description": "Simple chat web interface for Ollama LLMs",
       "install_id": "ollama-ui",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c5ae371f1a6a7fd27823bc500d9390b38c05fa55",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=08dacfca559e1d7da38f3cf05f1f45ee9bfd213c",
       "name": "nextjs-ollama-llm-ui-1.2.0",
       "pname": "nextjs-ollama-llm-ui",
-      "rev": "c5ae371f1a6a7fd27823bc500d9390b38c05fa55",
-      "rev_count": 895122,
-      "rev_date": "2025-11-12T20:02:36Z",
-      "scrape_date": "2025-11-14T16:41:37.451461Z",
+      "rev": "08dacfca559e1d7da38f3cf05f1f45ee9bfd213c",
+      "rev_count": 886100,
+      "rev_date": "2025-10-28T17:26:24Z",
+      "scrape_date": "2025-10-31T03:32:18.490393Z",
       "stabilities": [
         "staging",
         "unstable"
@@ -179,7 +190,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/d0x8z3qhpq5fmsq7jw513rkpfdaiccbz-nextjs-ollama-llm-ui-1.2.0"
+        "out": "/nix/store/hr78nmhc8pk0ab0280i7srzs4wzbfsl6-nextjs-ollama-llm-ui-1.2.0"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -188,17 +199,17 @@
     {
       "attr_path": "nextjs-ollama-llm-ui",
       "broken": false,
-      "derivation": "/nix/store/53zz5f0qp6bw4aw68r2anmg72ck2144b-nextjs-ollama-llm-ui-1.2.0.drv",
+      "derivation": "/nix/store/zvis3bzvivhws0kmxdqyxabi14skmvja-nextjs-ollama-llm-ui-1.2.0.drv",
       "description": "Simple chat web interface for Ollama LLMs",
       "install_id": "ollama-ui",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c5ae371f1a6a7fd27823bc500d9390b38c05fa55",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=08dacfca559e1d7da38f3cf05f1f45ee9bfd213c",
       "name": "nextjs-ollama-llm-ui-1.2.0",
       "pname": "nextjs-ollama-llm-ui",
-      "rev": "c5ae371f1a6a7fd27823bc500d9390b38c05fa55",
-      "rev_count": 895122,
-      "rev_date": "2025-11-12T20:02:36Z",
-      "scrape_date": "2025-11-14T17:19:00.596136Z",
+      "rev": "08dacfca559e1d7da38f3cf05f1f45ee9bfd213c",
+      "rev_count": 886100,
+      "rev_date": "2025-10-28T17:26:24Z",
+      "scrape_date": "2025-11-05T16:19:09.101132Z",
       "stabilities": [
         "staging",
         "unstable"
@@ -209,7 +220,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/8dpldz7zmz6h4ddqzb0vfc47qwczhqyc-nextjs-ollama-llm-ui-1.2.0"
+        "out": "/nix/store/nwx96z0v6amkhdrrxz1lrdymsyj20grf-nextjs-ollama-llm-ui-1.2.0"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -218,17 +229,17 @@
     {
       "attr_path": "nextjs-ollama-llm-ui",
       "broken": false,
-      "derivation": "/nix/store/zsmsj0jgxvsckdcyscf6lssh9l7aj7xn-nextjs-ollama-llm-ui-1.2.0.drv",
+      "derivation": "/nix/store/w5x6f3m632rrzws6ninzknd6n8g9yacq-nextjs-ollama-llm-ui-1.2.0.drv",
       "description": "Simple chat web interface for Ollama LLMs",
       "install_id": "ollama-ui",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c5ae371f1a6a7fd27823bc500d9390b38c05fa55",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=08dacfca559e1d7da38f3cf05f1f45ee9bfd213c",
       "name": "nextjs-ollama-llm-ui-1.2.0",
       "pname": "nextjs-ollama-llm-ui",
-      "rev": "c5ae371f1a6a7fd27823bc500d9390b38c05fa55",
-      "rev_count": 895122,
-      "rev_date": "2025-11-12T20:02:36Z",
-      "scrape_date": "2025-11-14T17:52:38.122380Z",
+      "rev": "08dacfca559e1d7da38f3cf05f1f45ee9bfd213c",
+      "rev_count": 886100,
+      "rev_date": "2025-10-28T17:26:24Z",
+      "scrape_date": "2025-11-05T16:45:39.256835Z",
       "stabilities": [
         "staging",
         "unstable"
@@ -239,7 +250,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/z1bz9p0yk6lqhcd9ivvh4cmcrnbpyj5g-nextjs-ollama-llm-ui-1.2.0"
+        "out": "/nix/store/k5scpmhlfwfby9wwpznhgbzhm0k8y8hz-nextjs-ollama-llm-ui-1.2.0"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
@@ -248,17 +259,17 @@
     {
       "attr_path": "nextjs-ollama-llm-ui",
       "broken": false,
-      "derivation": "/nix/store/i88bj6z391q7qh3qhq7zqrp2hfc31m7x-nextjs-ollama-llm-ui-1.2.0.drv",
+      "derivation": "/nix/store/9swy4syf6z6i5ymvk9r80qji3xm58zlc-nextjs-ollama-llm-ui-1.2.0.drv",
       "description": "Simple chat web interface for Ollama LLMs",
       "install_id": "ollama-ui",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c5ae371f1a6a7fd27823bc500d9390b38c05fa55",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=08dacfca559e1d7da38f3cf05f1f45ee9bfd213c",
       "name": "nextjs-ollama-llm-ui-1.2.0",
       "pname": "nextjs-ollama-llm-ui",
-      "rev": "c5ae371f1a6a7fd27823bc500d9390b38c05fa55",
-      "rev_count": 895122,
-      "rev_date": "2025-11-12T20:02:36Z",
-      "scrape_date": "2025-11-14T18:32:15.050294Z",
+      "rev": "08dacfca559e1d7da38f3cf05f1f45ee9bfd213c",
+      "rev_count": 886100,
+      "rev_date": "2025-10-28T17:26:24Z",
+      "scrape_date": "2025-11-05T17:10:38.684870Z",
       "stabilities": [
         "staging",
         "unstable"
@@ -269,7 +280,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/mh9lhwid2gci0s5x6s7z24gqx30hx2sk-nextjs-ollama-llm-ui-1.2.0"
+        "out": "/nix/store/b01flkwv4w3zc8gg4jgw52189iq7l9h3-nextjs-ollama-llm-ui-1.2.0"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
