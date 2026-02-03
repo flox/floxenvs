@@ -74,7 +74,7 @@
           fi
 
           echo "👉 Running ${name} test..."
-          flox activate$start_services -- ${pkgs.bashInteractive}/bin/bash test.sh
+          flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'
 
           ret=$?
           if [ $ret -ne 0 ]; then
