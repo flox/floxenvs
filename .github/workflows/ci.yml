@@ -50,6 +50,10 @@ jobs:
             rel_env_path="${env_path#$PWD/}"
             echo "env_path=$env_path"
             echo "rel_env_path=$rel_env_path"
+            if [ "$rel_env_path" == rust ] || [ "$rel_env_path" == javascript-bun ]; then
+              echo "skipping rust to workaround https://github.com/mikefarah/yq/issues/2600"
+              continue
+            fi
             if [ -f "$env_path/test.sh" ] && [ "$update_all" == "true" ] || ( git diff --name-only $BASE_SHA HEAD | grep -q "$rel_env_path/" ; ); then
               name=$(basename $env_path)
 

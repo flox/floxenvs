@@ -3,7 +3,7 @@
 
   inputs.flake-utils.url = "github:numtide/flake-utils";
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-  inputs.flox.url = "github:flox/flox/refs/tags/v1.8.3";
+  inputs.flox.url = "github:flox/flox/refs/tags/v1.9.0";
 
   outputs =
     {
@@ -74,7 +74,7 @@
           fi
 
           echo "👉 Running ${name} test..."
-          flox activate$start_services -- ${pkgs.bashInteractive}/bin/bash test.sh
+          flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'
 
           ret=$?
           if [ $ret -ne 0 ]; then
