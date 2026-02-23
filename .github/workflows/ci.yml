@@ -263,8 +263,8 @@ jobs:
       - name: "Pull or Create remote environment"
         run: |
           pushd ./${{ matrix.example }}
-          if flox list --config --remote "$FLOX_REMOTE_OWNER/${{ matrix.example }}" >/dev/null; then
-            $FLOX_BIN pull --remote "$FLOX_REMOTE_OWNER/${{ matrix.example }}" --dir "remote"
+          if flox list --config -r "$FLOX_REMOTE_OWNER/${{ matrix.example }}" >/dev/null; then
+            $FLOX_BIN pull "$FLOX_REMOTE_OWNER/${{ matrix.example }}" --dir "remote"
           else
             echo "WARN: No environment $FLOX_REMOTE_OWNER/${{ matrix.example }} found on FloxHub"
             echo "WARN: Creating a new environment ${{ matrix.example }}"
