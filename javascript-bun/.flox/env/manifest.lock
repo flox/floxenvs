@@ -19,13 +19,7 @@
     "hook": {
       "on-activate": "\nexport FLOX_JAVASCRIPT_BUN_CACHE_DIR=\"$FLOX_ENV_CACHE/javascript-bun\"\nmkdir -p \"$FLOX_JAVASCRIPT_BUN_CACHE_DIR\"\n\nexport FLOX_JAVASCRIPT_BUN_PACKAGES_HASH_FILE=\"$FLOX_JAVASCRIPT_BUN_CACHE_DIR/packages-hash\"\n\nfunction with_spinner() {\n  if [[ \"$FLOX_ENVS_TESTING\" == \"1\" ]]; then\n    bash -c \"$1\"\n  else\n    gum spin \\\n      --show-error \\\n      --spinner line \\\n      --spinner.foreground=\"#cccccc\" \\\n      --title \">>> $2 ...\" \\\n      --title.foreground=\"#cccccc\" \\\n        -- bash -c \"$1\"\n  fi\n}\n\nfunction install_packages() { \n  bun install --frozen-lockfile\n}\nexport -f install_packages\n\n\nif [ -f \"package.json\" ] && [ -f \"bun.lockb\" ]; then\n  export FLOX_JAVASCRIPT_BUN_PACKAGES_HASH=\"false\"\n  if [ -f \"$FLOX_JAVASCRIPT_BUN_PACKAGES_HASH_FILE\" ] ; then\n    export FLOX_JAVASCRIPT_BUN_PACKAGES_HASH=$(cat package.json bun.lockb | sha256sum | cut -d\" \" -f 1)\n  fi\n  if [ \"$FLOX_JAVASCRIPT_BUN_PACKAGES_HASH\" != \"$(cat $FLOX_JAVASCRIPT_BUN_PACKAGES_HASH_FILE 2>/dev/null)\" ]; then\n    with_spinner install_packages \"Installing Javascript packages (with Bun)\"\n    echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Javascript packages installed (with Bun).\\\" }}\\n\" \\\n      | gum format -t template\n    echo \"$FLOX_JAVASCRIPT_BUN_PACKAGES_HASH\" > \"$FLOX_JAVASCRIPT_BUN_PACKAGES_HASH_FILE\"\n  fi\nfi\n"
     },
-    "options": {
-      "systems": [
-        "aarch64-darwin",
-        "aarch64-linux",
-        "x86_64-linux"
-      ]
-    }
+    "options": {}
   },
   "packages": [
     {
@@ -43,6 +37,7 @@
       "rev_date": "2026-01-26T21:10:04Z",
       "scrape_date": "2026-01-29T04:35:22.838666Z",
       "stabilities": [
+        "stable",
         "staging",
         "unstable"
       ],
@@ -73,6 +68,7 @@
       "rev_date": "2026-01-26T21:10:04Z",
       "scrape_date": "2026-01-29T05:05:10.197733Z",
       "stabilities": [
+        "stable",
         "staging",
         "unstable"
       ],
@@ -91,6 +87,37 @@
     {
       "attr_path": "bun",
       "broken": false,
+      "derivation": "/nix/store/pl4bmhwkwn0jrzgbjh0pizxl7b90y538-bun-1.3.6.drv",
+      "description": "Incredibly fast JavaScript runtime, bundler, transpiler and package manager – all in one",
+      "install_id": "bun",
+      "license": "[ MIT, LGPL-2.1-only ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=bfc1b8a4574108ceef22f02bafcf6611380c100d",
+      "name": "bun-1.3.6",
+      "pname": "bun",
+      "rev": "bfc1b8a4574108ceef22f02bafcf6611380c100d",
+      "rev_count": 935279,
+      "rev_date": "2026-01-26T21:10:04Z",
+      "scrape_date": "2026-01-29T05:33:07.785612Z",
+      "stabilities": [
+        "stable",
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.3.6",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/2bg6bm7hqi7yqfcx34an9nhpnjjrldnl-bun-1.3.6"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "bun",
+      "broken": false,
       "derivation": "/nix/store/x54nslyggc778mg2cxz9lwvhv86xc6y1-bun-1.3.6.drv",
       "description": "Incredibly fast JavaScript runtime, bundler, transpiler and package manager – all in one",
       "install_id": "bun",
@@ -103,6 +130,7 @@
       "rev_date": "2026-01-26T21:10:04Z",
       "scrape_date": "2026-01-29T06:06:21.263141Z",
       "stabilities": [
+        "stable",
         "staging",
         "unstable"
       ],
@@ -133,12 +161,16 @@
       "rev_date": "2026-01-26T21:10:04Z",
       "scrape_date": "2026-01-29T04:35:23.212322Z",
       "stabilities": [
+        "stable",
         "staging",
         "unstable"
       ],
       "unfree": false,
       "version": "9.9",
       "outputs_to_install": [
+        "out",
+        "out",
+        "out",
         "out",
         "out"
       ],
@@ -165,12 +197,14 @@
       "rev_date": "2026-01-26T21:10:04Z",
       "scrape_date": "2026-01-29T05:05:10.562474Z",
       "stabilities": [
+        "stable",
         "staging",
         "unstable"
       ],
       "unfree": false,
       "version": "9.9",
       "outputs_to_install": [
+        "out",
         "out",
         "out"
       ],
@@ -180,6 +214,38 @@
         "out": "/nix/store/5pwllqskykz2by85b87kp1a8af587vcn-coreutils-9.9"
       },
       "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "coreutils",
+      "broken": false,
+      "derivation": "/nix/store/pndlg8n0jw1azfixrn9x2wlaw1rpib6b-coreutils-9.9.drv",
+      "description": "GNU Core Utilities",
+      "install_id": "coreutils",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=bfc1b8a4574108ceef22f02bafcf6611380c100d",
+      "name": "coreutils-9.9",
+      "pname": "coreutils",
+      "rev": "bfc1b8a4574108ceef22f02bafcf6611380c100d",
+      "rev_count": 935279,
+      "rev_date": "2026-01-26T21:10:04Z",
+      "scrape_date": "2026-01-29T05:33:08.065600Z",
+      "stabilities": [
+        "stable",
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.9",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/fvsrfwspi4w7kkn2wvmhjv0f9jrzwqja-coreutils-9.9-info",
+        "out": "/nix/store/qgdq763j9ddmj7aq45x3s5108qvq4z7q-coreutils-9.9"
+      },
+      "system": "x86_64-darwin",
       "group": "toplevel",
       "priority": 5
     },
@@ -198,12 +264,19 @@
       "rev_date": "2026-01-26T21:10:04Z",
       "scrape_date": "2026-01-29T06:06:21.654068Z",
       "stabilities": [
+        "stable",
         "staging",
         "unstable"
       ],
       "unfree": false,
       "version": "9.9",
       "outputs_to_install": [
+        "out",
+        "out",
+        "out",
+        "out",
+        "out",
+        "out",
         "out",
         "out"
       ],
@@ -231,12 +304,14 @@
       "rev_date": "2026-01-26T21:10:04Z",
       "scrape_date": "2026-01-29T04:35:24.322606Z",
       "stabilities": [
+        "stable",
         "staging",
         "unstable"
       ],
       "unfree": false,
       "version": "0.17.0",
       "outputs_to_install": [
+        "out",
         "out"
       ],
       "outputs": {
@@ -261,6 +336,7 @@
       "rev_date": "2026-01-26T21:10:04Z",
       "scrape_date": "2026-01-29T05:05:12.673015Z",
       "stabilities": [
+        "stable",
         "staging",
         "unstable"
       ],
@@ -279,6 +355,37 @@
     {
       "attr_path": "gum",
       "broken": false,
+      "derivation": "/nix/store/wd6qk0640rnnxi361ry2x2fb7bxsdixv-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=bfc1b8a4574108ceef22f02bafcf6611380c100d",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "bfc1b8a4574108ceef22f02bafcf6611380c100d",
+      "rev_count": 935279,
+      "rev_date": "2026-01-26T21:10:04Z",
+      "scrape_date": "2026-01-29T05:33:09.122318Z",
+      "stabilities": [
+        "stable",
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/xff8di1nlgqx2k7q5z6ma7jc02k5ravf-gum-0.17.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
       "derivation": "/nix/store/wkbcrdfhd3cifqw3gllsz2bsmik82c7v-gum-0.17.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
@@ -291,12 +398,15 @@
       "rev_date": "2026-01-26T21:10:04Z",
       "scrape_date": "2026-01-29T06:06:23.897839Z",
       "stabilities": [
+        "stable",
         "staging",
         "unstable"
       ],
       "unfree": false,
       "version": "0.17.0",
       "outputs_to_install": [
+        "out",
+        "out",
         "out"
       ],
       "outputs": {
