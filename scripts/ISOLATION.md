@@ -1,5 +1,8 @@
 # Test Isolation for floxenvs
 
+For the full Nix-native isolation proposal (recommended),
+see [nix-isolation-proposal.md](nix-isolation-proposal.md).
+
 ## Problem
 
 When multiple environment tests run on the same builder
