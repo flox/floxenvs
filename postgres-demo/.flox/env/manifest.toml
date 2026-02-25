@@ -1,0 +1,188 @@
+version = 1
+
+# ============================================================
+# PostgreSQL Demo Environment
+# ============================================================
+#
+# This environment walks you through setting up PostgreSQL
+# with Flox. It showcases configuration options, version
+# selection, and service management.
+#
+# For a minimal environment you can include in your own
+# manifest, see flox/postgres instead.
+#
+# Activate this demo:
+#   flox activate -r flox/postgres-demo --start-services
+#
+# ============================================================
+
+
+[install]
+
+# --- PostgreSQL version ---
+#
+# Uncomment the version you want. Only one can be active.
+# Each maps to a specific major version in the Flox catalog.
+#
+# Version compatibility notes:
+#   - pg 16 (default): latest stable, SCRAM auth, logical
+#     replication improvements
+#   - pg 15: MERGE command, JSON logging, public schema
+#     permission changes
+#   - pg 14: multirange types, connection pooling improvements
+#   - pg 13 and older: legacy, use only if your app requires it
+#
+postgresql.pkg-path = "postgresql_16"
+#postgresql.pkg-path = "postgresql_15"
+#postgresql.pkg-path = "postgresql_14"
+#postgresql.pkg-path = "postgresql_13"
+
+# --- UI tools (for the demo experience) ---
+gum.pkg-path = "gum"
+
+# --- Optional: add extensions ---
+#
+# Common PostgreSQL extensions available in the Flox catalog:
+#
+# postgis.pkg-path = "postgresqlPackages.postgis"
+# pgvector.pkg-path = "postgresqlPackages.pgvector"
+# pg_cron.pkg-path = "postgresqlPackages.pg_cron"
+# pgtap.pkg-path = "postgresqlPackages.pgtap"
+#
+# Search for more:
+#   flox search postgresqlPackages
+
+
+# ============================================================
+# Environment variables
+# ============================================================
+#
+# These vars configure the PostgreSQL connection. Override any
+# of them in your own manifest when using [include].
+
+[vars]
+
+# Network settings
+PGHOSTADDR = "127.0.0.1"
+
+# Port: using 15432 to avoid conflicts with system PostgreSQL.
+# Change this if you run multiple Flox postgres environments.
+PGPORT = "15432"
+
+# Authentication
+PGUSER = "pguser"
+PGPASS = "pgpass"
+
+# Default database created on first activation
+PGDATABASE = "pgdb"
+
+
+# ============================================================
+# Activation hook
+# ============================================================
+#
+# This runs every time the environment is activated. It:
+# 1. Sets up directory paths for data, sockets, and config
+# 2. Initializes the database cluster if needed
+# 3. Creates the default database if it doesn't exist
+# 4. Displays connection information
+
+[hook]
+on-activate = '''
+
+export PGDIR="$FLOX_ENV_CACHE/postgres"
+export PGDATA=$PGDIR/data
+export PGHOST=$PGDIR/run
+export PGCONFIGFILE="$PGDIR/postgresql.conf"
+export LOG_PATH=$PGHOST/LOG
+export SESSION_SECRET="$USER-session-secret"
+export DATABASE_URL="postgresql:///$PGDATABASE?host=$PGHOST&port=$PGPORT"
+
+if [[ ! -d "$PGHOST" ]]; then
+  mkdir -p "$PGHOST"
+fi
+
+if [[ ! -d "$PGDATA" ]]; then
+  mkdir -p "$PGDATA"
+  pg_initdb() {
+    initdb "$PGDATA" \
+      --locale=C \
+      --encoding=UTF8 \
+      -A md5 \
+      --auth=trust \
+      --username $PGUSER \
+      --pwfile=<(echo $PGPASS)
+  }
+  export -f pg_initdb
+  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+    pg_initdb
+  else
+    gum spin --spinner dot --title "Running initdb in $PGDATA" -- bash -c pg_initdb
+  fi
+  echo "Initialize PostgreSQL ($PGDATA)"
+fi
+
+if [[ ! -f "$PGCONFIGFILE" ]]; then
+  tee -a $PGCONFIGFILE > /dev/null << EOF
+listen_addresses = '$PGHOSTADDR';
+port = '$PGPORT';
+unix_socket_directories = '$PGHOST';
+unix_socket_permissions = '0700';
+EOF
+  echo "Configure PostgreSQL ($PGCONFIGFILE)"
+fi
+
+pg_ctl -D "$PGDATA" -w start -o "-c unix_socket_directories=$PGHOST -c listen_addresses=$PGHOSTADDR -p $PGPORT" > /dev/null
+if psql -lqt | cut -d \| -f 1 | grep -qw $PGDATABASE; then
+  true
+else
+  createdb
+  echo "Database '$PGDATABASE' created"
+fi
+pg_ctl -D "$PGDATA" -m fast -w stop > /dev/null
+
+if [[ "$FLOX_ENVS_TESTING" != "1" ]]; then
+  gum style --border double --margin "1 2" --padding "1 4" \
+    'Start PostgreSQL in the background:' \
+    '  flox services start' \
+    '  flox activate --start-services' '' \
+    'Connect to PostgreSQL:' \
+    '  psql' '' \
+    'Connection information:' \
+    "  listen_addresses=$PGHOSTADDR" \
+    "  port=$PGPORT" \
+    "  user=$PGUSER" \
+    "  database=$PGDATABASE" \
+    "  DATABASE_URL=$DATABASE_URL"
+fi
+
+'''
+
+
+# ============================================================
+# Services
+# ============================================================
+#
+# The postgres service starts the server in the background.
+# Use these commands to manage it:
+#
+#   flox services start       # start all services
+#   flox services stop        # stop all services
+#   flox services status      # check running services
+#   flox services logs postgres  # view postgres logs
+
+[services]
+postgres.command = "postgres -D $PGDATA -c unix_socket_directories=$PGHOST -c listen_addresses=$PGHOSTADDR -p $PGPORT"
+
+
+# ============================================================
+# Supported systems
+# ============================================================
+
+[options]
+systems = [
+  "aarch64-darwin",
+  "aarch64-linux",
+  "x86_64-darwin",
+  "x86_64-linux",
+]
