@@ -125,7 +125,7 @@
           builtins.map mkFloxEnvApp environmentsWithTest
         );
         devShells.default = pkgs.mkShell {
-          packages = [];
+          packages = [ pkgs.just ];
         };
       }
     );
