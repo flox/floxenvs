@@ -21,18 +21,25 @@ version = 1
 
 # --- PostgreSQL version ---
 #
-# Uncomment the version you want. Only one can be active.
-# Each maps to a specific major version in the Flox catalog.
+# By default we use "postgresql" which tracks the latest
+# stable version (currently 16). Flox auto-upgrades this
+# when a new major version becomes the default in nixpkgs.
 #
-# Version compatibility notes:
-#   - pg 16 (default): latest stable, SCRAM auth, logical
-#     replication improvements
-#   - pg 15: MERGE command, JSON logging, public schema
-#     permission changes
-#   - pg 14: multirange types, connection pooling improvements
-#   - pg 13 and older: legacy, use only if your app requires it
+# If you need to pin a specific major version — for example,
+# because your production database runs pg 15 and you want
+# your dev environment to match — use a versioned package
+# like "postgresql_15" instead.
 #
-postgresql.pkg-path = "postgresql_16"
+# Trade-off:
+#   "postgresql"     -> always latest, auto-upgrades
+#   "postgresql_16"  -> pinned to pg 16, won't jump to 17
+#
+# When you pin, remember to delete your data directory
+# after changing versions:
+#   rm -rf "$FLOX_ENV_CACHE/postgres"
+#
+postgresql.pkg-path = "postgresql"
+#postgresql.pkg-path = "postgresql_16"
 #postgresql.pkg-path = "postgresql_15"
 #postgresql.pkg-path = "postgresql_14"
 #postgresql.pkg-path = "postgresql_13"

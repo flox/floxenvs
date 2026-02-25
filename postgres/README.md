@@ -27,11 +27,38 @@ add extensions, or change the port.
 
 | Setting | Value |
 | ------- | ----- |
-| Version | PostgreSQL 16 |
+| Version | Latest stable (currently 16) |
 | Port | 15432 |
 | User | pguser |
+| Password | pgpass |
 | Database | pgdb |
 | Data dir | `$FLOX_ENV_CACHE/postgres/data` |
+
+## Customizing
+
+Override these vars in your own manifest to change the
+defaults:
+
+```toml
+[vars]
+PGPORT = "25432"        # different port
+PGUSER = "myapp"        # different user
+PGPASS = "secret"       # different password
+PGDATABASE = "myappdb"  # different database
+PGHOSTADDR = "0.0.0.0"  # listen on all interfaces
+```
+
+To pin a specific PostgreSQL major version instead of
+tracking the latest:
+
+```toml
+[install]
+postgresql.pkg-path = "postgresql_15"
+```
+
+Available versions: `postgresql_13`, `postgresql_14`,
+`postgresql_15`, `postgresql_16`. Use `flox search postgresql`
+to see all options.
 
 ## See also
 
