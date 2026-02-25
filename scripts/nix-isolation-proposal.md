@@ -274,18 +274,62 @@ overhead for postgres, mysql, elasticsearch, redis, etc.
 | Complexity | Low | Low | Medium |
 | Deps on builder | util-linux | None (Nix provides) | None (Nix provides) |
 
+## Darwin / macOS: no namespace support
+
+**Confirmed:** macOS has no equivalent to `unshare --net`.
+Darwin's kernel does not support Linux namespaces. There is
+no way to give a process its own network stack on macOS
+without a full VM.
+
+What macOS does have:
+
+- **`sandbox-exec` (Seatbelt):** Can deny network access
+  but cannot isolate port spaces. Two processes still share
+  the same loopback — port conflicts remain. Also
+  deprecated by Apple (but still used by system software).
+- **Virtualization.framework (Tart):** Full VM isolation,
+  ~15-30s boot. This is the only real option for port
+  isolation on macOS.
+- **Darwin Containers:** Requires disabling SIP.
+  Experimental, not production-ready.
+
+### macOS mitigation options
+
+1. **Accept no isolation on macOS.** Port conflicts are
+   less likely on macOS because fewer builders and fewer
+   concurrent test runs. Current behavior continues.
+
+2. **Randomize ports per test run.** Instead of hardcoded
+   `PGPORT=15432`, generate a random port. Doesn't solve
+   orphaned services but prevents most port conflicts.
+   Lightweight but fragile.
+
+3. **Tart VMs on Mac minis (phase 3).** Full isolation via
+   Virtualization.framework. Heavier but actually works.
+   Requires Mac mini fleet provisioning.
+
+### Recommendation for macOS
+
+Start with option 1 (no isolation) — it matches current
+behavior and macOS conflicts are rare. If they become a
+problem, go straight to option 3 (Tart VMs). Port
+randomization (option 2) is fragile and not worth the
+complexity for a temporary workaround.
+
 ## Recommended approach
 
-**Phase 1 (now):** Solution 2 (Nix+unshare). Modify
-`mkFloxEnvPkg` to wrap tests in namespaces. Zero CI changes.
-Solves port conflicts and orphaned services immediately.
+**Phase 1 (now):** Solution 2 (Nix+unshare) on Linux.
+Modify `mkFloxEnvPkg` to wrap tests in namespaces. Zero CI
+changes. Solves port conflicts and orphaned services on
+Linux builders immediately. macOS continues without
+isolation (current behavior).
 
-**Phase 2 (if needed):** Solution 3 (NixOS VMs) for service
-environments that need stronger isolation. Nix+unshare for
-non-service environments (go, python, rust).
+**Phase 2 (if needed):** Solution 3 (NixOS VMs) for Linux
+service environments that need stronger isolation.
+Nix+unshare for non-service environments (go, python, rust).
 
-**Phase 3 (future):** GPU testing via QEMU+VFIO on
-dedicated hardware. macOS isolation via Tart on Mac minis.
+**Phase 3 (future):** macOS isolation via Tart on Mac minis.
+GPU testing via QEMU+VFIO on dedicated hardware.
 
 ## Files in this directory
 
