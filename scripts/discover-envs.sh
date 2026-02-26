@@ -2,9 +2,9 @@
 #
 # Discover flox environments and produce CI matrix JSON.
 #
-# No dependencies beyond coreutils, git, jq (all present on
-# ubuntu-latest). Replaces yq-based TOML parsing that broke
-# on manifests containing comments.
+# Parses manifest.lock (JSON) instead of manifest.toml to
+# avoid brittle TOML parsing. Only needs coreutils, git, jq
+# (all present on ubuntu-latest).
 #
 # Environment variables (inputs):
 #   BASE_SHA    - git diff base (default: HEAD~1)
@@ -20,101 +20,97 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
-# ── TOML helpers ────────────────────────────────────────────
+# ── Lock file helpers ─────────────────────────────────────
 
-# Check if manifest has real (uncommented) service commands.
+# Check if environment has services defined in lock file.
 has_services() {
-  local manifest="$1"
-  # Match lines like: name.command = "..." that are NOT comments
-  grep -qE '^[^#]*\.command[[:space:]]*=' "$manifest"
+  local lock="$1"
+  jq -e '.manifest.services // {} | length > 0' "$lock" \
+    >/dev/null 2>&1
 }
 
-# Extract systems list from [options] section.
-# Handles both single-line and multi-line arrays.
-# Returns empty string if no systems found.
+# Extract systems list from lock file (one per line).
 get_systems() {
-  local manifest="$1"
-  local raw
-  raw="$(sed -n '/^\[options\]/,/^\[/p' "$manifest")" || true
-  if [ -z "$raw" ]; then
-    return 0
-  fi
-  echo "$raw" \
-    | sed -n '/^systems[[:space:]]*=/,/\]/p' \
-    | { grep -oE '"[^"]+"' || true; } \
-    | tr -d '"'
+  local lock="$1"
+  jq -r '.manifest.options.systems // [] | .[]' "$lock"
 }
 
 # ── Environment discovery ──────────────────────────────────
 
-find_manifests() {
-  find "$REPO_ROOT" -maxdepth 4 -path '*/.flox/env/manifest.toml' \
+find_locks() {
+  find "$REPO_ROOT" -maxdepth 4 -path '*/.flox/env/manifest.lock' \
     -not -path '*/_worktrees/*' \
     -not -path '*/remote/*' \
     -not -path '*/.git/*' \
     | sort
 }
 
-# Resolve manifest path to the env directory (two levels up
-# from .flox/env/manifest.toml).
-manifest_to_env() {
-  local manifest="$1"
-  dirname "$(dirname "$(dirname "$manifest")")"
+# Resolve lock path to the env directory (two levels up
+# from .flox/env/manifest.lock).
+lock_to_env() {
+  local lock="$1"
+  dirname "$(dirname "$(dirname "$lock")")"
 }
 
 # ── Modes ──────────────────────────────────────────────────
 
 mode_validate() {
-  local errors=0
-  while IFS= read -r manifest; do
+  local warnings=0
+  while IFS= read -r lock; do
     local env_path
-    env_path="$(manifest_to_env "$manifest")"
+    env_path="$(lock_to_env "$lock")"
     local name
     name="$(basename "$env_path")"
 
+    if ! jq empty "$lock" 2>/dev/null; then
+      echo "FAIL: $name - invalid JSON in manifest.lock"
+      warnings=$((warnings + 1))
+      continue
+    fi
+
     local systems
-    systems="$(get_systems "$manifest")"
+    systems="$(get_systems "$lock")"
     if [ -z "$systems" ]; then
       echo "WARN: $name - no systems found (skipped in CI)"
       continue
     fi
 
     local svc="false"
-    if has_services "$manifest"; then
+    if has_services "$lock"; then
       svc="true"
     fi
 
     echo "OK:   $name  systems=$(echo "$systems" | tr '\n' ',' | sed 's/,$//')  services=$svc"
-  done < <(find_manifests)
+  done < <(find_locks)
 
-  if [ "$errors" -gt 0 ]; then
+  if [ "$warnings" -gt 0 ]; then
     echo ""
-    echo "$errors manifest(s) failed validation"
+    echo "$warnings lock file(s) have issues"
     exit 1
   fi
   echo ""
-  echo "All manifests valid."
+  echo "All lock files valid."
 }
 
 mode_list() {
   printf "%-25s %-8s %-40s\n" "ENVIRONMENT" "SERVICES" "SYSTEMS"
   printf "%-25s %-8s %-40s\n" "-----------" "--------" "-------"
-  while IFS= read -r manifest; do
+  while IFS= read -r lock; do
     local env_path
-    env_path="$(manifest_to_env "$manifest")"
+    env_path="$(lock_to_env "$lock")"
     local name
     name="$(basename "$env_path")"
 
     local svc="no"
-    if has_services "$manifest"; then
+    if has_services "$lock"; then
       svc="yes"
     fi
 
     local systems
-    systems="$(get_systems "$manifest" | tr '\n' ',' | sed 's/,$//')"
+    systems="$(get_systems "$lock" | tr '\n' ',' | sed 's/,$//')"
 
     printf "%-25s %-8s %-40s\n" "$name" "$svc" "$systems"
-  done < <(find_manifests)
+  done < <(find_locks)
 }
 
 mode_discover() {
@@ -133,9 +129,9 @@ mode_discover() {
   local envs_per_system=()
   local envs_only=()
 
-  while IFS= read -r manifest; do
+  while IFS= read -r lock; do
     local env_path
-    env_path="$(manifest_to_env "$manifest")"
+    env_path="$(lock_to_env "$lock")"
     local name
     name="$(basename "$env_path")"
     local rel_env_path
@@ -155,12 +151,12 @@ mode_discover() {
 
     if [ "$include" = "true" ]; then
       local start_services="false"
-      if has_services "$manifest"; then
+      if has_services "$lock"; then
         start_services="true"
       fi
 
       local systems
-      systems="$(get_systems "$manifest")"
+      systems="$(get_systems "$lock")"
 
       while IFS= read -r sys; do
         [ -z "$sys" ] && continue
@@ -169,7 +165,7 @@ mode_discover() {
 
       envs_only+=("\"$name\"")
     fi
-  done < <(find_manifests)
+  done < <(find_locks)
 
   # Build JSON arrays
   local per_system_json
