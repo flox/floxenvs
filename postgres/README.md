@@ -1,7 +1,8 @@
 # postgres
 
-Minimal PostgreSQL environment. Include it in your own manifest
-to get a working PostgreSQL setup with sane defaults.
+Minimal PostgreSQL environment. Include it in your own
+manifest to get a working PostgreSQL setup with sane
+defaults.
 
 ## Quick start
 
@@ -20,8 +21,8 @@ Add to your `manifest.toml`:
 environments = ["flox/postgres"]
 ```
 
-Then customize in your own manifest as needed — override vars,
-add extensions, or change the port.
+Then customize in your own manifest as needed -- override
+vars, add extensions, or change the port.
 
 ## Defaults
 
@@ -32,7 +33,7 @@ add extensions, or change the port.
 | User | pguser |
 | Password | pgpass |
 | Database | pgdb |
-| Data dir | `$FLOX_ENV_CACHE/postgres/data` |
+| Data dir | `.flox/data/postgres/data` |
 
 ## Customizing
 
@@ -57,11 +58,11 @@ postgresql.pkg-path = "postgresql_15"
 ```
 
 Available versions: `postgresql_13`, `postgresql_14`,
-`postgresql_15`, `postgresql_16`. Use `flox search postgresql`
-to see all options.
+`postgresql_15`, `postgresql_16`. Use
+`flox search postgresql` to see all options.
 
 ## See also
 
-For a full walkthrough with version selection, extensions, and
-configuration examples, see
+For a full walkthrough with version selection, extensions,
+and configuration examples, see
 [postgres-demo](../postgres-demo/).

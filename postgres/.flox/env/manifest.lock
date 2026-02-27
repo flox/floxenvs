@@ -3,11 +3,8 @@
   "manifest": {
     "schema-version": "1.10.0",
     "install": {
-      "gum": {
-        "pkg-path": "gum"
-      },
       "postgresql": {
-        "pkg-path": "postgresql_16",
+        "pkg-path": "postgresql",
         "outputs": "all"
       }
     },
@@ -19,16 +16,9 @@
       "PGUSER": "pguser"
     },
     "hook": {
-      "on-activate": "\nexport PGDIR=\"$FLOX_ENV_CACHE/postgres\"\nexport PGDATA=$PGDIR/data\nexport PGHOST=$PGDIR/run\nexport PGCONFIGFILE=\"$PGDIR/postgresql.conf\"\nexport LOG_PATH=$PGHOST/LOG\nexport SESSION_SECRET=\"$USER-session-secret\"\nexport DATABASE_URL=\"postgresql:///$PGDATABASE?host=$PGHOST&port=$PGPORT\"\n\nif [[ ! -d \"$PGHOST\" ]]; then\n  mkdir -p \"$PGHOST\"\nfi\n\nif [[ ! -d \"$PGDATA\" ]]; then\n  mkdir -p \"$PGDATA\"\n  pg_initdb() {\n    initdb \"$PGDATA\" \\\n      --locale=C \\\n      --encoding=UTF8 \\\n      -A md5 \\\n      --auth=trust \\\n      --username $PGUSER \\\n      --pwfile=<(echo $PGPASS)\n  }\n  export -f pg_initdb  # This is needed for gum to be able to call function\n  if [[ \"$FLOX_ENVS_TESTING\" == \"1\" ]]; then\n    pg_initdb\n  else\n    gum spin --spinner dot --title \"Running initdb in $PGDATA\" -- bash -c pg_initdb\n  fi\n  echo \"✅ Initialize PostgreSQL ($PGDATA)\"\n\nfi\n\n\n#\nif [[ ! -f \"$PGCONFIGFILE\" ]]; then\n  tee -a $PGCONFIGFILE > /dev/null << EOF\nlisten_addresses = '$PGHOSTADDR';\nport = '$PGPORT';\nunix_socket_directories = '$PGHOST';\nunix_socket_permissions = '0700';\nEOF\n  echo \"✅ Configure PostgreSQL ($PGCONFIGFILE)\"\nfi\n\npg_ctl -D \"$PGDATA\" -w start -o \"-c unix_socket_directories=$PGHOST -c listen_addresses=$PGHOSTADDR -p $PGPORT\" > /dev/null\nif psql -lqt | cut -d \\| -f 1 | grep -qw $PGDATABASE; then\n  echo \"✅ Database '$PGDATABASE' already exists\"\nelse\n  createdb\n  echo \"✅ Database '$PGDATABASE' created\"\nfi\npg_ctl -D \"$PGDATA\" -m fast -w stop > /dev/null\n\ngum style --border double --margin \"1 2\" --padding \"1 4\" \\\n  'Start PostgreSQL in the background:' \\\n  '  👉 flox services start' \\\n  '  👉 flox activate --start-services' '' \\\n  'Try to connect to PostgreSQL:' \\\n  '  👉 psql' '' \\\n  'Connection information:' \\\n  \"  listen_addresses=$PGHOSTADDR\" \\\n  \"  port=$PGPORT\"\n\n"
+      "on-activate": "export PGDIR=\"$FLOX_ENV_PROJECT/.flox/data/postgres\"\nexport PGDATA=\"$PGDIR/data\"\nexport PGHOST=\"$PGDIR/run\"\nexport PGCONFIGFILE=\"$PGDIR/postgresql.conf\"\nexport LOG_PATH=\"$PGHOST/LOG\"\nexport DATABASE_URL=\"postgresql:///$PGDATABASE?host=$PGHOST&port=$PGPORT\"\n\nif [[ ! -d \"$PGHOST\" ]]; then\n  mkdir -p \"$PGHOST\"\nfi\n\nif [[ ! -d \"$PGDATA\" ]]; then\n  mkdir -p \"$PGDATA\"\n  initdb \"$PGDATA\" \\\n    --locale=C \\\n    --encoding=UTF8 \\\n    -A md5 \\\n    --auth=trust \\\n    --username \"$PGUSER\" \\\n    --pwfile=<(echo \"$PGPASS\")\nfi\n\nif [[ ! -f \"$PGCONFIGFILE\" ]]; then\n  tee -a \"$PGCONFIGFILE\" > /dev/null << EOF\nlisten_addresses = '$PGHOSTADDR';\nport = '$PGPORT';\nunix_socket_directories = '$PGHOST';\nunix_socket_permissions = '0700';\nEOF\nfi\n\npg_ctl -D \"$PGDATA\" -w start \\\n  -o \"-c unix_socket_directories=$PGHOST -c listen_addresses=$PGHOSTADDR -p $PGPORT\" \\\n  > /dev/null\nif psql -lqt | cut -d \\| -f 1 | grep -qw \"$PGDATABASE\"; then\n  true\nelse\n  createdb\nfi\npg_ctl -D \"$PGDATA\" -m fast -w stop > /dev/null\n"
     },
-    "options": {
-      "systems": [
-        "aarch64-darwin",
-        "aarch64-linux",
-        "x86_64-darwin",
-        "x86_64-linux"
-      ]
-    },
+    "options": {},
     "services": {
       "postgres": {
         "command": "postgres -D $PGDATA -c unix_socket_directories=$PGHOST -c listen_addresses=$PGHOSTADDR -p $PGPORT"
@@ -37,270 +27,154 @@
   },
   "packages": [
     {
-      "attr_path": "gum",
+      "attr_path": "postgresql",
       "broken": false,
-      "derivation": "/nix/store/0q3saf0py9fifyx6h6jwzjvg7y707x8a-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
-      "rev_count": 962836,
-      "rev_date": "2026-03-13T08:19:52Z",
-      "scrape_date": "2026-03-15T04:41:41.932137Z",
+      "derivation": "/nix/store/4w2dly57axppxfnz87z2k09ci9k0jwzf-postgresql-17.9.drv",
+      "description": "Powerful, open source object-relational database system",
+      "install_id": "postgresql",
+      "license": "PostgreSQL",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "name": "postgresql-17.9",
+      "pname": "postgresql",
+      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "rev_count": 964859,
+      "rev_date": "2026-03-18T08:17:15Z",
+      "scrape_date": "2026-03-20T00:40:50.136442Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "0.17.0",
+      "version": "17.9",
       "outputs_to_install": [
+        "man",
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/x5ngj85sp5paq6la0g60qrx7p6z6h9iz-gum-0.17.0"
+        "dev": "/nix/store/ny6a51cah5hm8g0mwxa4ipmb00qcy5li-postgresql-17.9-dev",
+        "doc": "/nix/store/7m58vavcd4i6q4xd8miyj6myb6wnsvim-postgresql-17.9-doc",
+        "jit": "/nix/store/7bzzx5flyqnp8wnz63d6jsy2ac392mpd-postgresql-17.9-jit",
+        "lib": "/nix/store/ip0b62hbx5mn3z5vmj2z0pac7h5xd3ww-postgresql-17.9-lib",
+        "man": "/nix/store/svmr4pfxslhwzd55k8rrs6cj8nxhckmv-postgresql-17.9-man",
+        "out": "/nix/store/limr115mja7zak2n7mjgiwj2xk99lcm2-postgresql-17.9",
+        "plperl": "/nix/store/ljkcq0m7b0807q11kxzvvx927xni0a5r-postgresql-17.9-plperl",
+        "plpython3": "/nix/store/fl011f68symja9rk5by4n3j9vnifkz57-postgresql-17.9-plpython3",
+        "pltcl": "/nix/store/igif9zy3n083136656jia0d6q05nrc9f-postgresql-17.9-pltcl"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "gum",
+      "attr_path": "postgresql",
       "broken": false,
-      "derivation": "/nix/store/nrc9wm1wydfjsch8hxbwqs78fw5r0640-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
-      "rev_count": 962836,
-      "rev_date": "2026-03-13T08:19:52Z",
-      "scrape_date": "2026-03-15T05:15:07.698898Z",
+      "derivation": "/nix/store/svnqlxlynqrnq29lk509ni3i4wsbwv34-postgresql-17.9.drv",
+      "description": "Powerful, open source object-relational database system",
+      "install_id": "postgresql",
+      "license": "PostgreSQL",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "name": "postgresql-17.9",
+      "pname": "postgresql",
+      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "rev_count": 964859,
+      "rev_date": "2026-03-18T08:17:15Z",
+      "scrape_date": "2026-03-20T01:12:37.815469Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "0.17.0",
+      "version": "17.9",
       "outputs_to_install": [
+        "man",
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/8492ypc20ys8kghyq4c9n8bfip85rg0n-gum-0.17.0"
+        "debug": "/nix/store/5697vp6jad7lfy5mvxhbrv8md95vdg3c-postgresql-17.9-debug",
+        "dev": "/nix/store/f03dyanv4ljg55wkg0cai8ixl6cnjws2-postgresql-17.9-dev",
+        "doc": "/nix/store/pc514dpqa6sywpk3mnl3m5rnffjll2xp-postgresql-17.9-doc",
+        "jit": "/nix/store/26kyy45iclzq8hr2hr31cjsmljqgjqrm-postgresql-17.9-jit",
+        "lib": "/nix/store/mg6jc5712p12apv2ici9kcsm9m2l6938-postgresql-17.9-lib",
+        "man": "/nix/store/j05j289npjz5wb6ihj15q42cgghqqi9x-postgresql-17.9-man",
+        "out": "/nix/store/45baw2dafa75w3b92zv67kjrv53xazlw-postgresql-17.9",
+        "plperl": "/nix/store/39bm001bhlxdx4rlwwjb2905pws0i61r-postgresql-17.9-plperl",
+        "plpython3": "/nix/store/zx20wyxlywgjrqv7qri2w9021v1bvx9c-postgresql-17.9-plpython3",
+        "pltcl": "/nix/store/pgjmm7m5cdd475g964yli2g1rw0k6bc2-postgresql-17.9-pltcl"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "gum",
+      "attr_path": "postgresql",
       "broken": false,
-      "derivation": "/nix/store/lbvrps681bf8vb41v42xxwcvx0n2k7r0-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
-      "rev_count": 962836,
-      "rev_date": "2026-03-13T08:19:52Z",
-      "scrape_date": "2026-03-15T05:44:49.292132Z",
+      "derivation": "/nix/store/rrgg3vc396isak5dq68vchz2lqdnz5hq-postgresql-17.9.drv",
+      "description": "Powerful, open source object-relational database system",
+      "install_id": "postgresql",
+      "license": "PostgreSQL",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "name": "postgresql-17.9",
+      "pname": "postgresql",
+      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "rev_count": 964859,
+      "rev_date": "2026-03-18T08:17:15Z",
+      "scrape_date": "2026-03-20T01:42:14.138274Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "0.17.0",
+      "version": "17.9",
       "outputs_to_install": [
+        "man",
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/948mlcmz4vhy43ij44iw86gcazb6j7bq-gum-0.17.0"
+        "dev": "/nix/store/cr67s4q2n0hcf8q9pg1mx99rq96415bf-postgresql-17.9-dev",
+        "doc": "/nix/store/7cnid9l1ipsvwa1kywvmilnrfzyg5303-postgresql-17.9-doc",
+        "jit": "/nix/store/cvzl0q7jjbfd2ividyb4h84x43axxpp1-postgresql-17.9-jit",
+        "lib": "/nix/store/01yimv6caq1z617lpj7ax4sx17pnjx23-postgresql-17.9-lib",
+        "man": "/nix/store/gs7bidpbhaaayyxc82r723ym305378yv-postgresql-17.9-man",
+        "out": "/nix/store/93q3m07j6cvz5q0barxci10y2vk33x5q-postgresql-17.9",
+        "plperl": "/nix/store/p6ibwacv9bnhv02557jr56z12znh94d0-postgresql-17.9-plperl",
+        "plpython3": "/nix/store/r1pi1vm0w0x26w07svp5p1vfpqb3kkpr-postgresql-17.9-plpython3",
+        "pltcl": "/nix/store/7675fp0rplhszx1c6pnamrkz8l5f8xab-postgresql-17.9-pltcl"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
       "priority": 5
     },
     {
-      "attr_path": "gum",
+      "attr_path": "postgresql",
       "broken": false,
-      "derivation": "/nix/store/6zn2267d9ynz2jnbvfcz035sfbpql4r1-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
-      "rev_count": 962836,
-      "rev_date": "2026-03-13T08:19:52Z",
-      "scrape_date": "2026-03-15T06:19:36.119708Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/x5bn6qhx5qr16w5nz0mh5bh9ww4530h8-gum-0.17.0"
-      },
-      "system": "x86_64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "postgresql_16",
-      "broken": false,
-      "derivation": "/nix/store/vjnk75gxzfhfnp98l12ds2ha77g959ss-postgresql-16.13.drv",
+      "derivation": "/nix/store/9sx1l5ld60a0b5gnzqs7y38cxhdl9h87-postgresql-17.9.drv",
       "description": "Powerful, open source object-relational database system",
       "install_id": "postgresql",
       "license": "PostgreSQL",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
-      "name": "postgresql-16.13",
-      "pname": "postgresql_16",
-      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
-      "rev_count": 962836,
-      "rev_date": "2026-03-13T08:19:52Z",
-      "scrape_date": "2026-03-15T04:42:20.138508Z",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "name": "postgresql-17.9",
+      "pname": "postgresql",
+      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "rev_count": 964859,
+      "rev_date": "2026-03-18T08:17:15Z",
+      "scrape_date": "2026-03-20T02:17:29.728610Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "16.13",
+      "version": "17.9",
       "outputs_to_install": [
         "man",
         "out"
       ],
       "outputs": {
-        "dev": "/nix/store/8za6hl4pjrsdls8zpk1kyxwvxvzrljj5-postgresql-16.13-dev",
-        "doc": "/nix/store/h9i9rfwmbynb2lg0l91ck8nyyiz8z28r-postgresql-16.13-doc",
-        "jit": "/nix/store/x1a0cr4p3xd4sr6y8yqiym17vvn8j2dl-postgresql-16.13-jit",
-        "lib": "/nix/store/l1a9jsv3b9jaapzjkmzd3b3ca0jns4g9-postgresql-16.13-lib",
-        "man": "/nix/store/r6vxf8zvmki39sr5q4nhdhwlgakgnazh-postgresql-16.13-man",
-        "out": "/nix/store/v3giva26w7ilvgn05szkl487kgk6nabc-postgresql-16.13",
-        "plperl": "/nix/store/ygdf2hqdy97g3j1y37qsn4qwfd9r2942-postgresql-16.13-plperl",
-        "plpython3": "/nix/store/9g7rlkw9cbp79pk6fqm2ylgfnxcqrxax-postgresql-16.13-plpython3",
-        "pltcl": "/nix/store/cbc01rv5znvmibgw82y0p8q1clpvjnn9-postgresql-16.13-pltcl"
-      },
-      "system": "aarch64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "postgresql_16",
-      "broken": false,
-      "derivation": "/nix/store/003wg1zrf7vz0s5iwqdjg6ypbfpvpcmk-postgresql-16.13.drv",
-      "description": "Powerful, open source object-relational database system",
-      "install_id": "postgresql",
-      "license": "PostgreSQL",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
-      "name": "postgresql-16.13",
-      "pname": "postgresql_16",
-      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
-      "rev_count": 962836,
-      "rev_date": "2026-03-13T08:19:52Z",
-      "scrape_date": "2026-03-15T05:16:04.331186Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "16.13",
-      "outputs_to_install": [
-        "man",
-        "out"
-      ],
-      "outputs": {
-        "debug": "/nix/store/mmhj3dsxzrl109xh3fiml2x9jbag6wwr-postgresql-16.13-debug",
-        "dev": "/nix/store/w3ksk2bwxm8rv99b29rki901psmhjzf9-postgresql-16.13-dev",
-        "doc": "/nix/store/ksszkddvd9g2dfg36ym03x469x0cyy8q-postgresql-16.13-doc",
-        "jit": "/nix/store/kxvlvzgw8g3pg9x356231vnq42c84fib-postgresql-16.13-jit",
-        "lib": "/nix/store/646fqwkrrcdv4axx9wjfmd8scby1ihdw-postgresql-16.13-lib",
-        "man": "/nix/store/qryrx2kkn8iv0qc6rx0w3wikaqd6vpa1-postgresql-16.13-man",
-        "out": "/nix/store/853fklyrf9ayqxhsfd28wwplwccb3pys-postgresql-16.13",
-        "plperl": "/nix/store/zh2sps2z12a1vx3nkzb2nq6rjp9zam25-postgresql-16.13-plperl",
-        "plpython3": "/nix/store/jqsbvzmj6rrgr4k268q3z2639dnijbam-postgresql-16.13-plpython3",
-        "pltcl": "/nix/store/715gcm6hpg1k636i6r4pa1zc5q2jjckm-postgresql-16.13-pltcl"
-      },
-      "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "postgresql_16",
-      "broken": false,
-      "derivation": "/nix/store/l2czdzxk1q6iwglh1xysjlcni88z04cf-postgresql-16.13.drv",
-      "description": "Powerful, open source object-relational database system",
-      "install_id": "postgresql",
-      "license": "PostgreSQL",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
-      "name": "postgresql-16.13",
-      "pname": "postgresql_16",
-      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
-      "rev_count": 962836,
-      "rev_date": "2026-03-13T08:19:52Z",
-      "scrape_date": "2026-03-15T05:45:27.620580Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "16.13",
-      "outputs_to_install": [
-        "man",
-        "out"
-      ],
-      "outputs": {
-        "dev": "/nix/store/mh3a0l3r6m61nx2yv4vliyy4y1rbyj0r-postgresql-16.13-dev",
-        "doc": "/nix/store/2aw8x67x70qr85kqsj8gg055kk5kbavh-postgresql-16.13-doc",
-        "jit": "/nix/store/jnnv09qxvahy5brv5jc9jr1d347xkrbm-postgresql-16.13-jit",
-        "lib": "/nix/store/12khp936k7whhz6d4v9kh2lgnybxv3q4-postgresql-16.13-lib",
-        "man": "/nix/store/aj6hhv1l18zgx405yh9j4ghblhz95xpb-postgresql-16.13-man",
-        "out": "/nix/store/psdk89snwqxgyv4zlz3hicvnbyi8zr8d-postgresql-16.13",
-        "plperl": "/nix/store/ckk3id2q1a97cx08vf6jh4db8i9hc87z-postgresql-16.13-plperl",
-        "plpython3": "/nix/store/qi9b6z0y8lkl0663fqn7prdz75xvip8j-postgresql-16.13-plpython3",
-        "pltcl": "/nix/store/0n6vzpnw4y55swrirnhl8l02xv428ipf-postgresql-16.13-pltcl"
-      },
-      "system": "x86_64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "postgresql_16",
-      "broken": false,
-      "derivation": "/nix/store/qpinqs1x5dnc7f96ss5bdf05knf16ka9-postgresql-16.13.drv",
-      "description": "Powerful, open source object-relational database system",
-      "install_id": "postgresql",
-      "license": "PostgreSQL",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
-      "name": "postgresql-16.13",
-      "pname": "postgresql_16",
-      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
-      "rev_count": 962836,
-      "rev_date": "2026-03-13T08:19:52Z",
-      "scrape_date": "2026-03-15T06:20:46.753474Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "16.13",
-      "outputs_to_install": [
-        "man",
-        "out"
-      ],
-      "outputs": {
-        "debug": "/nix/store/akv1z2nqg7l99j6rkwqdflbl5cs55v1l-postgresql-16.13-debug",
-        "dev": "/nix/store/q5g0g8lbf86qy4b8iwbd5rzd5ijl2a5r-postgresql-16.13-dev",
-        "doc": "/nix/store/is4f1jxhbiacwrwaxk55rr4x1q8kyikf-postgresql-16.13-doc",
-        "jit": "/nix/store/3xdhhp4wpkwwb1mizbdagc3cigp4rfzi-postgresql-16.13-jit",
-        "lib": "/nix/store/llaaplajalzrcfpl5bvnw2qbwkngvjws-postgresql-16.13-lib",
-        "man": "/nix/store/7d9ckinjmjpvay5xia68l9b3za214q3k-postgresql-16.13-man",
-        "out": "/nix/store/xngq5kg7mdmi3qp1ii5zdb9rl73ii6na-postgresql-16.13",
-        "plperl": "/nix/store/x2yz36s5h6s56jx6vjjjjcc718zyj5y8-postgresql-16.13-plperl",
-        "plpython3": "/nix/store/fck58brcpv2vkgc2n3asfcrwni43rmv4-postgresql-16.13-plpython3",
-        "pltcl": "/nix/store/4xywiqwv0pmhhr881bbmvr8fyka6hybd-postgresql-16.13-pltcl"
+        "debug": "/nix/store/q0v4vl4qhqg6nxwjf7mpnhzs31v83xjm-postgresql-17.9-debug",
+        "dev": "/nix/store/3mcjypw1qj576b2ddkhsfvjar6d45j0y-postgresql-17.9-dev",
+        "doc": "/nix/store/mh0z88308rf36n136acv18yzqly2if96-postgresql-17.9-doc",
+        "jit": "/nix/store/a2dswlklwhrprn7ja0dhmk5knjc2m5lg-postgresql-17.9-jit",
+        "lib": "/nix/store/2f2ixpn0qsdxpq4q20kvnn64alnm48dv-postgresql-17.9-lib",
+        "man": "/nix/store/smvjbss2nmbbizc845fkbrvplifd3390-postgresql-17.9-man",
+        "out": "/nix/store/ykvag2qla5kf1jcf8jlpjgsy79xns0cp-postgresql-17.9",
+        "plperl": "/nix/store/9m8rqcg1q3cp4zvkkgmkhznjvzawawyy-postgresql-17.9-plperl",
+        "plpython3": "/nix/store/9sbz35gw78afdwdv5kgwjfhka9r5gxpc-postgresql-17.9-plpython3",
+        "pltcl": "/nix/store/yb9pdb19qy2638rgn5n7lh2jbah5kr2p-postgresql-17.9-pltcl"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
