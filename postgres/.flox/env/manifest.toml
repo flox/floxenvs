@@ -23,7 +23,7 @@ PGDATABASE = "pgdb"
 
 [hook]
 on-activate = '''
-export PGDIR="$FLOX_ENV_CACHE/postgres"
+export PGDIR="$FLOX_ENV_PROJECT/.flox/data/postgres"
 export PGDATA="$PGDIR/data"
 export PGHOST="$PGDIR/run"
 export PGCONFIGFILE="$PGDIR/postgresql.conf"
@@ -67,11 +67,3 @@ pg_ctl -D "$PGDATA" -m fast -w stop > /dev/null
 
 [services]
 postgres.command = "postgres -D $PGDATA -c unix_socket_directories=$PGHOST -c listen_addresses=$PGHOSTADDR -p $PGPORT"
-
-[options]
-systems = [
-  "aarch64-darwin",
-  "aarch64-linux",
-  "x86_64-darwin",
-  "x86_64-linux",
-]

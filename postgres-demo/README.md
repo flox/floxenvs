@@ -4,8 +4,9 @@ Full PostgreSQL demo environment that walks you through
 configuration options, version selection, and service
 management with Flox.
 
-For a minimal environment to include in your own project, see
-[postgres](../postgres/) or use `flox/postgres` on FloxHub.
+For a minimal environment to include in your own project,
+see [postgres](../postgres/) or use `flox/postgres` on
+FloxHub.
 
 ## Quick start
 
@@ -19,10 +20,21 @@ Then connect:
 psql
 ```
 
+## Inline documentation
+
+After activation, use the `helpf` command to view this
+README in your terminal:
+
+```bash
+helpf              # show README
+helpf --force      # refresh cached copy
+```
+
 ## What this demo includes
 
 - PostgreSQL 16 (with commented alternatives for 13-15)
 - `gum` for interactive UI during setup
+- `bat` and `helpf` for inline documentation
 - Automatic database initialization on first activation
 - Service definition for background postgres
 - Connection info display on activation
@@ -34,7 +46,7 @@ Edit the manifest to uncomment your preferred version:
 ```toml
 [install]
 # postgresql.pkg-path = "postgresql_16"   # default
-postgresql.pkg-path = "postgresql_15"     # activate this one
+postgresql.pkg-path = "postgresql_15"     # activate this
 ```
 
 Version trade-offs:
@@ -50,7 +62,7 @@ After changing versions, delete the data directory to
 reinitialize:
 
 ```bash
-rm -rf "$FLOX_ENV_CACHE/postgres"
+rm -rf "$FLOX_ENV_PROJECT/.flox/data/postgres"
 ```
 
 ## Adding extensions
@@ -78,6 +90,15 @@ Override any of these vars in your own manifest:
 PGPORT = "25432"        # different port
 PGUSER = "myapp"        # different user
 PGDATABASE = "myappdb"  # different database
+```
+
+## Data directory
+
+PostgreSQL data is stored in `.flox/data/postgres/data`.
+This persists across activations. To start fresh:
+
+```bash
+rm -rf "$FLOX_ENV_PROJECT/.flox/data/postgres"
 ```
 
 ## Using the minimal version

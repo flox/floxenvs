@@ -36,7 +36,7 @@ version = 1
 #
 # When you pin, remember to delete your data directory
 # after changing versions:
-#   rm -rf "$FLOX_ENV_CACHE/postgres"
+#   rm -rf "$FLOX_ENV_PROJECT/.flox/data/postgres"
 #
 postgresql.pkg-path = "postgresql"
 #postgresql.pkg-path = "postgresql_16"
@@ -44,8 +44,10 @@ postgresql.pkg-path = "postgresql"
 #postgresql.pkg-path = "postgresql_14"
 #postgresql.pkg-path = "postgresql_13"
 
-# --- UI tools (for the demo experience) ---
+# --- UI and documentation tools (for the demo experience) ---
 gum.pkg-path = "gum"
+bat.pkg-path = "bat"
+curl.pkg-path = "curl"
 
 # --- Optional: add extensions ---
 #
@@ -92,18 +94,33 @@ PGDATABASE = "pgdb"
 # 1. Sets up directory paths for data, sockets, and config
 # 2. Initializes the database cluster if needed
 # 3. Creates the default database if it doesn't exist
-# 4. Displays connection information
+# 4. Provides a helpf command for inline documentation
+# 5. Displays connection information
 
 [hook]
 on-activate = '''
 
-export PGDIR="$FLOX_ENV_CACHE/postgres"
-export PGDATA=$PGDIR/data
-export PGHOST=$PGDIR/run
+export PGDIR="$FLOX_ENV_PROJECT/.flox/data/postgres"
+export PGDATA="$PGDIR/data"
+export PGHOST="$PGDIR/run"
 export PGCONFIGFILE="$PGDIR/postgresql.conf"
-export LOG_PATH=$PGHOST/LOG
-export SESSION_SECRET="$USER-session-secret"
+export LOG_PATH="$PGHOST/LOG"
 export DATABASE_URL="postgresql:///$PGDATABASE?host=$PGHOST&port=$PGPORT"
+
+# --- helpf: inline documentation ---
+helpf() {
+  local readme_url="https://raw.githubusercontent.com/flox/floxenvs/main/postgres-demo/README.md"
+  local cache_dir="$FLOX_ENV_PROJECT/.flox/data/postgres"
+  local cached_readme="$cache_dir/README.md"
+  mkdir -p "$cache_dir"
+  if [[ "${1:-}" == "--force" ]] || [[ ! -f "$cached_readme" ]]; then
+    curl -fsSL "$readme_url" -o "$cached_readme" 2>/dev/null \
+      || cp "$FLOX_ENV_PROJECT/README.md" "$cached_readme" 2>/dev/null \
+      || { echo "Could not fetch README"; return 1; }
+  fi
+  bat --style=plain --language=md "$cached_readme"
+}
+export -f helpf
 
 if [[ ! -d "$PGHOST" ]]; then
   mkdir -p "$PGHOST"
@@ -117,8 +134,8 @@ if [[ ! -d "$PGDATA" ]]; then
       --encoding=UTF8 \
       -A md5 \
       --auth=trust \
-      --username $PGUSER \
-      --pwfile=<(echo $PGPASS)
+      --username "$PGUSER" \
+      --pwfile=<(echo "$PGPASS")
   }
   export -f pg_initdb
   if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
@@ -130,7 +147,7 @@ if [[ ! -d "$PGDATA" ]]; then
 fi
 
 if [[ ! -f "$PGCONFIGFILE" ]]; then
-  tee -a $PGCONFIGFILE > /dev/null << EOF
+  tee -a "$PGCONFIGFILE" > /dev/null << EOF
 listen_addresses = '$PGHOSTADDR';
 port = '$PGPORT';
 unix_socket_directories = '$PGHOST';
@@ -140,7 +157,7 @@ EOF
 fi
 
 pg_ctl -D "$PGDATA" -w start -o "-c unix_socket_directories=$PGHOST -c listen_addresses=$PGHOSTADDR -p $PGPORT" > /dev/null
-if psql -lqt | cut -d \| -f 1 | grep -qw $PGDATABASE; then
+if psql -lqt | cut -d \| -f 1 | grep -qw "$PGDATABASE"; then
   true
 else
   createdb
@@ -160,7 +177,10 @@ if [[ "$FLOX_ENVS_TESTING" != "1" ]]; then
     "  port=$PGPORT" \
     "  user=$PGUSER" \
     "  database=$PGDATABASE" \
-    "  DATABASE_URL=$DATABASE_URL"
+    "  DATABASE_URL=$DATABASE_URL" '' \
+    'Inline documentation:' \
+    '  helpf              # show README' \
+    '  helpf --force      # refresh cached README'
 fi
 
 '''
@@ -180,16 +200,3 @@ fi
 
 [services]
 postgres.command = "postgres -D $PGDATA -c unix_socket_directories=$PGHOST -c listen_addresses=$PGHOSTADDR -p $PGPORT"
-
-
-# ============================================================
-# Supported systems
-# ============================================================
-
-[options]
-systems = [
-  "aarch64-darwin",
-  "aarch64-linux",
-  "x86_64-darwin",
-  "x86_64-linux",
-]
