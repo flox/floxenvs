@@ -1,0 +1,202 @@
+version = 1
+
+# ============================================================
+# PostgreSQL Demo Environment
+# ============================================================
+#
+# This environment walks you through setting up PostgreSQL
+# with Flox. It showcases configuration options, version
+# selection, and service management.
+#
+# For a minimal environment you can include in your own
+# manifest, see flox/postgres instead.
+#
+# Activate this demo:
+#   flox activate -r flox/postgres-demo --start-services
+#
+# ============================================================
+
+
+[install]
+
+# --- PostgreSQL version ---
+#
+# By default we use "postgresql" which tracks the latest
+# stable version (currently 16). Flox auto-upgrades this
+# when a new major version becomes the default in nixpkgs.
+#
+# If you need to pin a specific major version — for example,
+# because your production database runs pg 15 and you want
+# your dev environment to match — use a versioned package
+# like "postgresql_15" instead.
+#
+# Trade-off:
+#   "postgresql"     -> always latest, auto-upgrades
+#   "postgresql_16"  -> pinned to pg 16, won't jump to 17
+#
+# When you pin, remember to delete your data directory
+# after changing versions:
+#   rm -rf "$FLOX_ENV_PROJECT/.flox/data/postgres"
+#
+postgresql.pkg-path = "postgresql"
+#postgresql.pkg-path = "postgresql_16"
+#postgresql.pkg-path = "postgresql_15"
+#postgresql.pkg-path = "postgresql_14"
+#postgresql.pkg-path = "postgresql_13"
+
+# --- UI and documentation tools (for the demo experience) ---
+gum.pkg-path = "gum"
+bat.pkg-path = "bat"
+curl.pkg-path = "curl"
+
+# --- Optional: add extensions ---
+#
+# Common PostgreSQL extensions available in the Flox catalog:
+#
+# postgis.pkg-path = "postgresqlPackages.postgis"
+# pgvector.pkg-path = "postgresqlPackages.pgvector"
+# pg_cron.pkg-path = "postgresqlPackages.pg_cron"
+# pgtap.pkg-path = "postgresqlPackages.pgtap"
+#
+# Search for more:
+#   flox search postgresqlPackages
+
+
+# ============================================================
+# Environment variables
+# ============================================================
+#
+# These vars configure the PostgreSQL connection. Override any
+# of them in your own manifest when using [include].
+
+[vars]
+
+# Network settings
+PGHOSTADDR = "127.0.0.1"
+
+# Port: using 15432 to avoid conflicts with system PostgreSQL.
+# Change this if you run multiple Flox postgres environments.
+PGPORT = "15432"
+
+# Authentication
+PGUSER = "pguser"
+PGPASS = "pgpass"
+
+# Default database created on first activation
+PGDATABASE = "pgdb"
+
+
+# ============================================================
+# Activation hook
+# ============================================================
+#
+# This runs every time the environment is activated. It:
+# 1. Sets up directory paths for data, sockets, and config
+# 2. Initializes the database cluster if needed
+# 3. Creates the default database if it doesn't exist
+# 4. Provides a helpf command for inline documentation
+# 5. Displays connection information
+
+[hook]
+on-activate = '''
+
+export PGDIR="$FLOX_ENV_PROJECT/.flox/data/postgres"
+export PGDATA="$PGDIR/data"
+export PGHOST="$PGDIR/run"
+export PGCONFIGFILE="$PGDIR/postgresql.conf"
+export LOG_PATH="$PGHOST/LOG"
+export DATABASE_URL="postgresql:///$PGDATABASE?host=$PGHOST&port=$PGPORT"
+
+# --- helpf: inline documentation ---
+helpf() {
+  local readme_url="https://raw.githubusercontent.com/flox/floxenvs/main/postgres-demo/README.md"
+  local cache_dir="$FLOX_ENV_PROJECT/.flox/data/postgres"
+  local cached_readme="$cache_dir/README.md"
+  mkdir -p "$cache_dir"
+  if [[ "${1:-}" == "--force" ]] || [[ ! -f "$cached_readme" ]]; then
+    curl -fsSL "$readme_url" -o "$cached_readme" 2>/dev/null \
+      || cp "$FLOX_ENV_PROJECT/README.md" "$cached_readme" 2>/dev/null \
+      || { echo "Could not fetch README"; return 1; }
+  fi
+  bat --style=plain --language=md "$cached_readme"
+}
+export -f helpf
+
+if [[ ! -d "$PGHOST" ]]; then
+  mkdir -p "$PGHOST"
+fi
+
+if [[ ! -d "$PGDATA" ]]; then
+  mkdir -p "$PGDATA"
+  pg_initdb() {
+    initdb "$PGDATA" \
+      --locale=C \
+      --encoding=UTF8 \
+      -A md5 \
+      --auth=trust \
+      --username "$PGUSER" \
+      --pwfile=<(echo "$PGPASS")
+  }
+  export -f pg_initdb
+  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
+    pg_initdb
+  else
+    gum spin --spinner dot --title "Running initdb in $PGDATA" -- bash -c pg_initdb
+  fi
+  echo "Initialize PostgreSQL ($PGDATA)"
+fi
+
+if [[ ! -f "$PGCONFIGFILE" ]]; then
+  tee -a "$PGCONFIGFILE" > /dev/null << EOF
+listen_addresses = '$PGHOSTADDR';
+port = '$PGPORT';
+unix_socket_directories = '$PGHOST';
+unix_socket_permissions = '0700';
+EOF
+  echo "Configure PostgreSQL ($PGCONFIGFILE)"
+fi
+
+pg_ctl -D "$PGDATA" -w start -o "-c unix_socket_directories=$PGHOST -c listen_addresses=$PGHOSTADDR -p $PGPORT" > /dev/null
+if psql -lqt | cut -d \| -f 1 | grep -qw "$PGDATABASE"; then
+  true
+else
+  createdb
+  echo "Database '$PGDATABASE' created"
+fi
+pg_ctl -D "$PGDATA" -m fast -w stop > /dev/null
+
+if [[ "$FLOX_ENVS_TESTING" != "1" ]]; then
+  gum style --border double --margin "1 2" --padding "1 4" \
+    'Start PostgreSQL in the background:' \
+    '  flox services start' \
+    '  flox activate --start-services' '' \
+    'Connect to PostgreSQL:' \
+    '  psql' '' \
+    'Connection information:' \
+    "  listen_addresses=$PGHOSTADDR" \
+    "  port=$PGPORT" \
+    "  user=$PGUSER" \
+    "  database=$PGDATABASE" \
+    "  DATABASE_URL=$DATABASE_URL" '' \
+    'Inline documentation:' \
+    '  helpf              # show README' \
+    '  helpf --force      # refresh cached README'
+fi
+
+'''
+
+
+# ============================================================
+# Services
+# ============================================================
+#
+# The postgres service starts the server in the background.
+# Use these commands to manage it:
+#
+#   flox services start       # start all services
+#   flox services stop        # stop all services
+#   flox services status      # check running services
+#   flox services logs postgres  # view postgres logs
+
+[services]
+postgres.command = "postgres -D $PGDATA -c unix_socket_directories=$PGHOST -c listen_addresses=$PGHOSTADDR -p $PGPORT"
