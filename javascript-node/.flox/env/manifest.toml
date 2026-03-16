@@ -1,12 +1,14 @@
-version = 1
+schema-version = "1.10.0"
 
 [install]
 nodejs.pkg-path = "nodejs"
 nodejs.version = "20"
+nodejs.outputs = "all"
 
 # helper tools
 gum.pkg-path = "gum"
 coreutils.pkg-path = "coreutils"
+coreutils.outputs = "all"
 
 
 [vars]
@@ -59,9 +61,4 @@ fi
 
 
 [options]
-systems = [
-  "aarch64-darwin",
-  "aarch64-linux",
-  "x86_64-darwin",
-  "x86_64-linux",
-]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
