@@ -1,22 +1,29 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "version": 1,
+    "schema-version": "1.10.0",
     "install": {
       "gcc-unwrapped": {
-        "pkg-path": "gcc-unwrapped"
+        "pkg-path": "gcc-unwrapped",
+        "outputs": "all"
       },
       "glib": {
-        "pkg-path": "glib"
+        "pkg-path": "glib",
+        "outputs": "all"
       },
       "libGL": {
         "pkg-path": "libGL"
+      },
+      "pkg-confg": {
+        "pkg-path": "pkg-config",
+        "outputs": "all"
       },
       "python312": {
         "pkg-path": "python312"
       },
       "zlib": {
-        "pkg-path": "zlib"
+        "pkg-path": "zlib",
+        "outputs": "all"
       }
     },
     "vars": {
@@ -64,8 +71,8 @@
       "rev_date": "2025-05-04T03:14:55Z",
       "scrape_date": "2025-05-05T04:19:29.091081Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "14.2.1.20250322",
@@ -98,8 +105,8 @@
       "rev_date": "2025-05-04T03:14:55Z",
       "scrape_date": "2025-05-05T04:37:20.416205Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "14.2.1.20250322",
@@ -134,8 +141,8 @@
       "rev_date": "2025-05-04T03:14:55Z",
       "scrape_date": "2025-05-05T04:54:29.718930Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "14.2.1.20250322",
@@ -168,8 +175,8 @@
       "rev_date": "2025-05-04T03:14:55Z",
       "scrape_date": "2025-05-05T05:15:55.339590Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "14.2.1.20250322",
@@ -204,8 +211,8 @@
       "rev_date": "2025-05-04T03:14:55Z",
       "scrape_date": "2025-05-05T04:19:29.196897Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "2.82.5",
@@ -237,8 +244,8 @@
       "rev_date": "2025-05-04T03:14:55Z",
       "scrape_date": "2025-05-05T04:37:20.580060Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "2.82.5",
@@ -271,8 +278,8 @@
       "rev_date": "2025-05-04T03:14:55Z",
       "scrape_date": "2025-05-05T04:54:29.827286Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "2.82.5",
@@ -304,8 +311,8 @@
       "rev_date": "2025-05-04T03:14:55Z",
       "scrape_date": "2025-05-05T05:15:55.517151Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "2.82.5",
@@ -336,8 +343,8 @@
       "rev_date": "2025-05-04T03:14:55Z",
       "scrape_date": "2025-05-05T04:19:29.923965Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "11.0",
@@ -366,8 +373,8 @@
       "rev_date": "2025-05-04T03:14:55Z",
       "scrape_date": "2025-05-05T04:37:22.966919Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "1.7.0",
@@ -395,8 +402,8 @@
       "rev_date": "2025-05-04T03:14:55Z",
       "scrape_date": "2025-05-05T04:54:30.603797Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "11.0",
@@ -425,8 +432,8 @@
       "rev_date": "2025-05-04T03:14:55Z",
       "scrape_date": "2025-05-05T05:15:58.109176Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "1.7.0",
@@ -436,6 +443,138 @@
       "outputs": {
         "dev": "/nix/store/fax005wb0br7zmdrkr34zb14z53kq7nl-libglvnd-1.7.0-dev",
         "out": "/nix/store/sq50878z0rdxwdyjw3fvbgf6wkpcnpcp-libglvnd-1.7.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "pkg-config",
+      "broken": false,
+      "derivation": "/nix/store/mdkzl0m3s6x39v2ksqj2dkbkhnn7vfdr-pkg-config-wrapper-0.29.2.drv",
+      "description": "Tool that allows packages to find out information about other packages (wrapper script)",
+      "install_id": "pkg-confg",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=979daf34c8cacebcd917d540070b52a3c2b9b16e",
+      "name": "pkg-config-wrapper-0.29.2",
+      "pname": "pkg-config",
+      "rev": "979daf34c8cacebcd917d540070b52a3c2b9b16e",
+      "rev_count": 793735,
+      "rev_date": "2025-05-04T03:14:55Z",
+      "scrape_date": "2025-05-05T04:19:36.602209Z",
+      "stabilities": [
+        "unstable",
+        "staging"
+      ],
+      "unfree": false,
+      "version": "0.29.2",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/893mq0rp0wmpqyd76b1j7ys6zhh6aff7-pkg-config-wrapper-0.29.2-doc",
+        "man": "/nix/store/nd2y3dcrg2k77y665ck6fykyjysk9q6s-pkg-config-wrapper-0.29.2-man",
+        "out": "/nix/store/hj7iydwvhkslzsvw82iilv8say0xv5n7-pkg-config-wrapper-0.29.2"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "pkg-config",
+      "broken": false,
+      "derivation": "/nix/store/ackjpq13s7r06vp9c78rvbrv1fl8npl6-pkg-config-wrapper-0.29.2.drv",
+      "description": "Tool that allows packages to find out information about other packages (wrapper script)",
+      "install_id": "pkg-confg",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=979daf34c8cacebcd917d540070b52a3c2b9b16e",
+      "name": "pkg-config-wrapper-0.29.2",
+      "pname": "pkg-config",
+      "rev": "979daf34c8cacebcd917d540070b52a3c2b9b16e",
+      "rev_count": 793735,
+      "rev_date": "2025-05-04T03:14:55Z",
+      "scrape_date": "2025-05-05T04:37:39.700951Z",
+      "stabilities": [
+        "unstable",
+        "staging"
+      ],
+      "unfree": false,
+      "version": "0.29.2",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/dhq8xj50fv2xpswih45mf7j3dam7dx62-pkg-config-wrapper-0.29.2-doc",
+        "man": "/nix/store/8d5xsrv73ibsgs985hwh58xvrz7gj7cq-pkg-config-wrapper-0.29.2-man",
+        "out": "/nix/store/whs8d6yi944jfsb7iwc4qkc7hn52z07h-pkg-config-wrapper-0.29.2"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "pkg-config",
+      "broken": false,
+      "derivation": "/nix/store/1m96a58v603a57bx752vj9h5wywj4hlf-pkg-config-wrapper-0.29.2.drv",
+      "description": "Tool that allows packages to find out information about other packages (wrapper script)",
+      "install_id": "pkg-confg",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=979daf34c8cacebcd917d540070b52a3c2b9b16e",
+      "name": "pkg-config-wrapper-0.29.2",
+      "pname": "pkg-config",
+      "rev": "979daf34c8cacebcd917d540070b52a3c2b9b16e",
+      "rev_count": 793735,
+      "rev_date": "2025-05-04T03:14:55Z",
+      "scrape_date": "2025-05-05T04:54:37.356389Z",
+      "stabilities": [
+        "unstable",
+        "staging"
+      ],
+      "unfree": false,
+      "version": "0.29.2",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/2wxc6i00xjph99cn4klkd57rli306na6-pkg-config-wrapper-0.29.2-doc",
+        "man": "/nix/store/xj37p1qmvrkz60ina77hn672bxqj0hzi-pkg-config-wrapper-0.29.2-man",
+        "out": "/nix/store/4vzwqmyagz1aq6a6204hlwnj6dc9ip6a-pkg-config-wrapper-0.29.2"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "pkg-config",
+      "broken": false,
+      "derivation": "/nix/store/7nhryzl55g04w205svcaf6qm5p3lzirg-pkg-config-wrapper-0.29.2.drv",
+      "description": "Tool that allows packages to find out information about other packages (wrapper script)",
+      "install_id": "pkg-confg",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=979daf34c8cacebcd917d540070b52a3c2b9b16e",
+      "name": "pkg-config-wrapper-0.29.2",
+      "pname": "pkg-config",
+      "rev": "979daf34c8cacebcd917d540070b52a3c2b9b16e",
+      "rev_count": 793735,
+      "rev_date": "2025-05-04T03:14:55Z",
+      "scrape_date": "2025-05-05T05:16:17.259982Z",
+      "stabilities": [
+        "unstable",
+        "staging"
+      ],
+      "unfree": false,
+      "version": "0.29.2",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/7gbj5n0rg43li2hidn78i2dml4agl5g9-pkg-config-wrapper-0.29.2-doc",
+        "man": "/nix/store/zf1nw8vgv090hxsfp080mqpr5bx77yl0-pkg-config-wrapper-0.29.2-man",
+        "out": "/nix/store/bbp56ai8w43xkfisar83h37imjdlcx6r-pkg-config-wrapper-0.29.2"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -456,8 +595,8 @@
       "rev_date": "2025-05-04T03:14:55Z",
       "scrape_date": "2025-05-05T04:19:37.757960Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "python3-3.12.9",
@@ -486,8 +625,8 @@
       "rev_date": "2025-05-04T03:14:55Z",
       "scrape_date": "2025-05-05T04:37:42.270991Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "python3-3.12.9",
@@ -517,8 +656,8 @@
       "rev_date": "2025-05-04T03:14:55Z",
       "scrape_date": "2025-05-05T04:54:38.518983Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "python3-3.12.9",
@@ -547,8 +686,8 @@
       "rev_date": "2025-05-04T03:14:55Z",
       "scrape_date": "2025-05-05T05:16:20.023498Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "python3-3.12.9",
@@ -578,8 +717,8 @@
       "rev_date": "2025-05-04T03:14:55Z",
       "scrape_date": "2025-05-05T04:20:33.268330Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "1.3.1",
@@ -610,8 +749,8 @@
       "rev_date": "2025-05-04T03:14:55Z",
       "scrape_date": "2025-05-05T04:39:04.115719Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "1.3.1",
@@ -642,8 +781,8 @@
       "rev_date": "2025-05-04T03:14:55Z",
       "scrape_date": "2025-05-05T04:55:33.812946Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "1.3.1",
@@ -674,8 +813,8 @@
       "rev_date": "2025-05-04T03:14:55Z",
       "scrape_date": "2025-05-05T05:17:46.382006Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "1.3.1",
