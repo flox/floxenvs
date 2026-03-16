@@ -30,15 +30,19 @@
 #
 
 
-version = 1
+schema-version = "1.10.0"
 
 [install]
 python312.pkg-path = "python312"
 gcc-unwrapped.pkg-path = "gcc-unwrapped"
+gcc-unwrapped.outputs = "all"
 zlib.pkg-path = "zlib"
+zlib.outputs = "all"
 libGL.pkg-path = "libGL"
 glib.pkg-path = "glib"
+glib.outputs = "all"
 pkg-confg.pkg-path = "pkg-config"
+pkg-confg.outputs = "all"
 
 [vars]
 VIRTUAL_ENV_DISABLE_PROMPT="1"
@@ -98,10 +102,5 @@ curl -Lo models/checkpoints/v1-5-pruned-emaonly-fp16.safetensors \
 '''
 
 [options]
-systems = [
-  "aarch64-darwin",
-  "aarch64-linux",
-  "x86_64-darwin",
-  "x86_64-linux",
-]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
 
