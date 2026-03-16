@@ -16,7 +16,7 @@
       "MONGO_PORT": "27017"
     },
     "hook": {
-      "on-activate": "export MONGO_HOME=\"$FLOX_ENV_CACHE/mongodb\"\nexport MONGO_CONFIG=\"$MONGO_HOME/mongod.conf\"\nif [ ! -d \"$MONGO_HOME\" ]; then\n  mkdir -m 0700 -p \"$MONGO_HOME\"\nfi\nif [ ! -d \"$MONGO_HOME/logs\" ]; then\n  mkdir -m 0700 -p \"$MONGO_HOME/logs\"\nfi\n\ncat >$MONGO_CONFIG <<EOF \nstorage:\n  dbPath: \"$MONGO_HOME\"\nnet:\n  bindIp: $MONGO_HOST, ::1\n  ipv6: true\nreplication:\n  replSetName: dev-rs\nEOF\n"
+      "on-activate": "export MONGO_HOME=\"$FLOX_ENV_CACHE/mongodb\"\nexport MONGO_CONFIG=\"$MONGO_HOME/mongod.conf\"\nif [ ! -d \"$MONGO_HOME\" ]; then\n  mkdir -m 0700 -p \"$MONGO_HOME\"\nfi\n\ncat >$MONGO_CONFIG <<EOF \nstorage:\n  dbPath: \"$MONGO_HOME\"\nnet:\n  bindIp: $MONGO_HOST, ::1\n  ipv6: true\nEOF\n"
     },
     "profile": {
       "common": "echo \"\"\necho \"     ╔══════════════════════════════════════════════════════╗\"\necho \"     ║                                                      ║\"\necho \"     ║  Start Mongodb in the background:                    ║\"\necho \"     ║  👉 flox services start                              ║\"\necho \"     ║  👉 flox activate --start-services                   ║\"\necho \"     ║                                                      ║\"\necho \"     ║  Try to connect to MongoDB:                          ║\"\necho \"     ║  👉 mongosh --host $MONGO_HOST --port $MONGO_PORT    ║\"\necho \"     ║                                                      ║\"\necho \"     ╚══════════════════════════════════════════════════════╝\"\necho \"\"\n"
@@ -31,11 +31,7 @@
     },
     "services": {
       "mongodb": {
-        "command": "mongod --config $MONGO_HOME/mongod.conf",
-        "vars": null,
-        "is-daemon": null,
-        "shutdown": null,
-        "systems": null
+        "command": "mongod --config $MONGO_HOME/mongod.conf"
       }
     }
   },
