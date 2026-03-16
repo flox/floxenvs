@@ -1,17 +1,19 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "version": 1,
+    "schema-version": "1.10.0",
     "install": {
       "coreutils": {
-        "pkg-path": "coreutils"
+        "pkg-path": "coreutils",
+        "outputs": "all"
       },
       "gum": {
         "pkg-path": "gum"
       },
       "nodejs": {
         "pkg-path": "nodejs",
-        "version": "20"
+        "version": "20",
+        "outputs": "all"
       }
     },
     "vars": {
@@ -20,7 +22,6 @@
     "hook": {
       "on-activate": "\nexport FLOX_JAVASCRIPT_NODE_CACHE_DIR=\"$FLOX_ENV_CACHE/javascript-node\"\nmkdir -p \"$FLOX_JAVASCRIPT_NODE_CACHE_DIR\"\n\nexport FLOX_JAVASCRIPT_NODE_PACKAGES_HASH_FILE=\"$FLOX_JAVASCRIPT_NODE_CACHE_DIR/packages-hash\"\n\n\nfunction with_spinner() {\n  if [[ \"$FLOX_ENVS_TESTING\" == \"1\" ]]; then\n    bash -c \"$1\"\n  else\n    gum spin \\\n      --show-error \\\n      --spinner line \\\n      --spinner.foreground=\"#cccccc\" \\\n      --title \">>> $2 ...\" \\\n      --title.foreground=\"#cccccc\" \\\n        -- bash -c \"$1\"\n  fi\n}\n\nfunction install_packages() { \n  npm install\n}\nexport -f install_packages\n\n\n\nif [ -f \"package.json\" ] && [ -f \"package-lock.json\" ]; then\n  export FLOX_JAVASCRIPT_NODE_PACKAGES_HASH=\"false\"\n  if [ -f \"$FLOX_JAVASCRIPT_NODE_PACKAGES_HASH_FILE\" ] ; then\n    export FLOX_JAVASCRIPT_NODE_PACKAGES_HASH=$(cat package.json package-lock.json | sha256sum | cut -d\" \" -f 1)\n  fi\n  if [ \"$FLOX_JAVASCRIPT_NODE_PACKAGES_HASH\" != \"$(cat $FLOX_JAVASCRIPT_NODE_PACKAGES_HASH_FILE 2>/dev/null)\" ]; then\n    with_spinner install_packages \"Installing Javascript packages (with NPM)\"\n    echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Javascript packages installed (with NPM).\\\" }}\\n\" \\\n      | gum format -t template\n    echo \"$FLOX_JAVASCRIPT_NODE_PACKAGES_HASH\" > \"$FLOX_JAVASCRIPT_NODE_PACKAGES_HASH_FILE\"\n  fi\nfi\n"
     },
-    "profile": {},
     "options": {
       "systems": [
         "aarch64-darwin",
