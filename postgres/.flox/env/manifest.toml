@@ -10,6 +10,12 @@ schema-version = "1.10.0"
 #
 # Then customize vars, add extensions, or override the service
 # definition in your own manifest as needed.
+#
+# By default, clients connect via unix socket. To use TCP
+# instead, set PGPORT in your manifest:
+#
+#   [vars]
+#   PGPORT = "15432"
 
 [install]
 postgresql.pkg-path = "postgresql"
@@ -17,22 +23,31 @@ postgresql.outputs = "all"
 
 [vars]
 PGHOSTADDR = "127.0.0.1"
-PGPORT = "15432"
 PGUSER = "pguser"
 PGPASS = "pgpass"
 PGDATABASE = "pgdb"
 
 [hook]
 on-activate = '''
-export PGDIR="$FLOX_ENV_PROJECT/.flox/data/postgres"
+export PGDIR="$FLOX_ENV_CACHE/postgres"
 export PGDATA="$PGDIR/data"
-export PGHOST="$PGDIR/run"
-export PGCONFIGFILE="$PGDIR/postgresql.conf"
-export LOG_PATH="$PGHOST/LOG"
-export DATABASE_URL="postgresql:///$PGDATABASE?host=$PGHOST&port=$PGPORT"
+SOCKETDIR="$PGDIR/run"
 
-if [[ ! -d "$PGHOST" ]]; then
-  mkdir -p "$PGHOST"
+if [[ ! -d "$SOCKETDIR" ]]; then
+  mkdir -p "$SOCKETDIR"
+fi
+
+if [[ -n "${PGPORT:-}" ]]; then
+  # TCP mode: PGPORT is set, clients connect via host:port
+  export PGHOST="$PGHOSTADDR"
+  export DATABASE_URL="postgresql://$PGUSER:$PGPASS@$PGHOSTADDR:$PGPORT/$PGDATABASE"
+  PG_LISTEN_FLAGS="-c listen_addresses=$PGHOSTADDR -p $PGPORT"
+else
+  # Socket mode: no PGPORT, clients connect via unix socket
+  unset PGHOSTADDR
+  export PGHOST="$SOCKETDIR"
+  export DATABASE_URL="postgresql:///$PGDATABASE?host=$SOCKETDIR"
+  PG_LISTEN_FLAGS=""
 fi
 
 if [[ ! -d "$PGDATA" ]]; then
@@ -40,23 +55,12 @@ if [[ ! -d "$PGDATA" ]]; then
   initdb "$PGDATA" \
     --locale=C \
     --encoding=UTF8 \
-    -A md5 \
     --auth=trust \
-    --username "$PGUSER" \
-    --pwfile=<(echo "$PGPASS")
-fi
-
-if [[ ! -f "$PGCONFIGFILE" ]]; then
-  tee -a "$PGCONFIGFILE" > /dev/null << EOF
-listen_addresses = '$PGHOSTADDR';
-port = '$PGPORT';
-unix_socket_directories = '$PGHOST';
-unix_socket_permissions = '0700';
-EOF
+    --username "$PGUSER"
 fi
 
 pg_ctl -D "$PGDATA" -w start \
-  -o "-c unix_socket_directories=$PGHOST -c listen_addresses=$PGHOSTADDR -p $PGPORT" \
+  -o "-c unix_socket_directories=$SOCKETDIR $PG_LISTEN_FLAGS" \
   > /dev/null
 if psql -lqt | cut -d \| -f 1 | grep -qw "$PGDATABASE"; then
   true
@@ -67,4 +71,12 @@ pg_ctl -D "$PGDATA" -m fast -w stop > /dev/null
 '''
 
 [services]
-postgres.command = "postgres -D $PGDATA -c unix_socket_directories=$PGHOST -c listen_addresses=$PGHOSTADDR -p $PGPORT"
+postgres.command = '''
+  PGDATA="$FLOX_ENV_CACHE/postgres/data"
+  SOCKETDIR="$FLOX_ENV_CACHE/postgres/run"
+  if [[ -n "${PGPORT:-}" ]]; then
+    exec postgres -D "$PGDATA" -c unix_socket_directories="$SOCKETDIR" -c listen_addresses="$PGHOSTADDR" -p "$PGPORT"
+  else
+    exec postgres -D "$PGDATA" -c unix_socket_directories="$SOCKETDIR" -c listen_addresses=""
+  fi
+'''

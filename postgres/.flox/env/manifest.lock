@@ -12,16 +12,15 @@
       "PGDATABASE": "pgdb",
       "PGHOSTADDR": "127.0.0.1",
       "PGPASS": "pgpass",
-      "PGPORT": "15432",
       "PGUSER": "pguser"
     },
     "hook": {
-      "on-activate": "export PGDIR=\"$FLOX_ENV_PROJECT/.flox/data/postgres\"\nexport PGDATA=\"$PGDIR/data\"\nexport PGHOST=\"$PGDIR/run\"\nexport PGCONFIGFILE=\"$PGDIR/postgresql.conf\"\nexport LOG_PATH=\"$PGHOST/LOG\"\nexport DATABASE_URL=\"postgresql:///$PGDATABASE?host=$PGHOST&port=$PGPORT\"\n\nif [[ ! -d \"$PGHOST\" ]]; then\n  mkdir -p \"$PGHOST\"\nfi\n\nif [[ ! -d \"$PGDATA\" ]]; then\n  mkdir -p \"$PGDATA\"\n  initdb \"$PGDATA\" \\\n    --locale=C \\\n    --encoding=UTF8 \\\n    -A md5 \\\n    --auth=trust \\\n    --username \"$PGUSER\" \\\n    --pwfile=<(echo \"$PGPASS\")\nfi\n\nif [[ ! -f \"$PGCONFIGFILE\" ]]; then\n  tee -a \"$PGCONFIGFILE\" > /dev/null << EOF\nlisten_addresses = '$PGHOSTADDR';\nport = '$PGPORT';\nunix_socket_directories = '$PGHOST';\nunix_socket_permissions = '0700';\nEOF\nfi\n\npg_ctl -D \"$PGDATA\" -w start \\\n  -o \"-c unix_socket_directories=$PGHOST -c listen_addresses=$PGHOSTADDR -p $PGPORT\" \\\n  > /dev/null\nif psql -lqt | cut -d \\| -f 1 | grep -qw \"$PGDATABASE\"; then\n  true\nelse\n  createdb\nfi\npg_ctl -D \"$PGDATA\" -m fast -w stop > /dev/null\n"
+      "on-activate": "export PGDIR=\"$FLOX_ENV_CACHE/postgres\"\nexport PGDATA=\"$PGDIR/data\"\nSOCKETDIR=\"$PGDIR/run\"\n\nif [[ ! -d \"$SOCKETDIR\" ]]; then\n  mkdir -p \"$SOCKETDIR\"\nfi\n\nif [[ -n \"${PGPORT:-}\" ]]; then\n  # TCP mode: PGPORT is set, clients connect via host:port\n  export PGHOST=\"$PGHOSTADDR\"\n  export DATABASE_URL=\"postgresql://$PGUSER:$PGPASS@$PGHOSTADDR:$PGPORT/$PGDATABASE\"\n  PG_LISTEN_FLAGS=\"-c listen_addresses=$PGHOSTADDR -p $PGPORT\"\nelse\n  # Socket mode: no PGPORT, clients connect via unix socket\n  unset PGHOSTADDR\n  export PGHOST=\"$SOCKETDIR\"\n  export DATABASE_URL=\"postgresql:///$PGDATABASE?host=$SOCKETDIR\"\n  PG_LISTEN_FLAGS=\"\"\nfi\n\nif [[ ! -d \"$PGDATA\" ]]; then\n  mkdir -p \"$PGDATA\"\n  initdb \"$PGDATA\" \\\n    --locale=C \\\n    --encoding=UTF8 \\\n    --auth=trust \\\n    --username \"$PGUSER\"\nfi\n\npg_ctl -D \"$PGDATA\" -w start \\\n  -o \"-c unix_socket_directories=$SOCKETDIR $PG_LISTEN_FLAGS\" \\\n  > /dev/null\nif psql -lqt | cut -d \\| -f 1 | grep -qw \"$PGDATABASE\"; then\n  true\nelse\n  createdb\nfi\npg_ctl -D \"$PGDATA\" -m fast -w stop > /dev/null\n"
     },
     "options": {},
     "services": {
       "postgres": {
-        "command": "postgres -D $PGDATA -c unix_socket_directories=$PGHOST -c listen_addresses=$PGHOSTADDR -p $PGPORT"
+        "command": "  PGDATA=\"$FLOX_ENV_CACHE/postgres/data\"\n  SOCKETDIR=\"$FLOX_ENV_CACHE/postgres/run\"\n  if [[ -n \"${PGPORT:-}\" ]]; then\n    exec postgres -D \"$PGDATA\" -c unix_socket_directories=\"$SOCKETDIR\" -c listen_addresses=\"$PGHOSTADDR\" -p \"$PGPORT\"\n  else\n    exec postgres -D \"$PGDATA\" -c unix_socket_directories=\"$SOCKETDIR\" -c listen_addresses=\"\"\n  fi\n"
       }
     }
   },
