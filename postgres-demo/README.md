@@ -32,7 +32,7 @@ helpf --force      # refresh cached copy
 
 ## What this demo includes
 
-- PostgreSQL 16 (with commented alternatives for 13-15)
+- PostgreSQL (latest stable)
 - `gum` for interactive UI during setup
 - `bat` and `helpf` for inline documentation
 - Automatic database initialization on first activation
@@ -62,7 +62,7 @@ After changing versions, delete the data directory to
 reinitialize:
 
 ```bash
-rm -rf "$FLOX_ENV_PROJECT/.flox/data/postgres"
+rm -rf "$FLOX_ENV_CACHE/postgres"
 ```
 
 ## Adding extensions
@@ -94,11 +94,11 @@ PGDATABASE = "myappdb"  # different database
 
 ## Data directory
 
-PostgreSQL data is stored in `.flox/data/postgres/data`.
+PostgreSQL data is stored in `$FLOX_ENV_CACHE/postgres/data`.
 This persists across activations. To start fresh:
 
 ```bash
-rm -rf "$FLOX_ENV_PROJECT/.flox/data/postgres"
+rm -rf "$FLOX_ENV_CACHE/postgres"
 ```
 
 ## Using the minimal version
@@ -111,7 +111,7 @@ environment in your own manifest:
 environments = ["flox/postgres"]
 ```
 
-This gives you PostgreSQL 16 with sane defaults. Override
+This gives you PostgreSQL with sane defaults. Override
 vars and add packages in your own manifest as needed.
 
 ## Service management
