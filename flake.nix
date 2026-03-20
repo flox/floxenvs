@@ -60,26 +60,56 @@
           export LC_ALL=
 
           mkdir -p /tmp/floxenvs
-          export TESTDIR="$(mktemp --directory --tmpdir=/tmp/floxenvs --suffix "floxenvs-$name-example" || mktemp --directory --tmpdir=/tmp --suffix "floxenvs-$name-example")"
+          export TESTDIR="$(mktemp --directory --tmpdir=/tmp/floxenvs --suffix "-$name" || mktemp --directory --tmpdir=/tmp --suffix "-$name")"
           ret=$?
           if [ $ret -ne 0 ] || [ -z "$TESTDIR" ]; then
             echo "Error: unable to create temp directory"
             exit $ret
           fi
 
-          cleanup() { rm -rf "$TESTDIR"; }
+          cleanup() {
+            cd /
+            flox services stop --dir "$envdir" 2>/dev/null || true
+            chmod -R u+w "$TESTDIR" 2>/dev/null
+            rm -rf "$TESTDIR"
+          }
           trap cleanup EXIT
 
-          chmod g=rwx "$TESTDIR"
-          cp -R "$path"/* "$TESTDIR"
-          cp -R "$path"/.flox* "$TESTDIR"
-          if [ -f "$path/.env" ]; then
-            cp -R "$path/.env" "$TESTDIR"
-          fi
-          chown -R "$(whoami)" "$TESTDIR"/.flox*
-          chmod -R a+w,g+rw "$TESTDIR"/.flox*
+          # Use a parent dir so relative [include] paths work
+          envdir="$TESTDIR/env"
+          mkdir -p "$envdir"
 
-          cd "$TESTDIR"
+          chmod g=rwx "$TESTDIR"
+          cp -R "$path"/* "$envdir"
+          cp -R "$path"/.flox* "$envdir"
+          if [ -f "$path/.env" ]; then
+            cp -R "$path/.env" "$envdir"
+          fi
+          chmod -R u+w "$envdir"
+
+          # Copy any [include] dir dependencies
+          if [ -f "$envdir/.flox/env/manifest.toml" ]; then
+            for inc_dir in $(${pkgs.gnugrep}/bin/grep -oP 'dir\s*=\s*"\K[^"]+' "$envdir/.flox/env/manifest.toml"); do
+              # Resolve relative to the env dir inside the temp tree
+              inc_dest="$(realpath -m "$envdir/$inc_dir")"
+              # Resolve the source from the repo
+              inc_name="$(basename "$inc_dest")"
+              inc_src="${inputs.self}/$inc_name"
+              if [ -d "$inc_src" ] && [ ! -d "$inc_dest" ]; then
+                mkdir -p "$inc_dest"
+                cp -R "$inc_src"/* "$inc_dest" 2>/dev/null || true
+                cp -R "$inc_src"/.flox* "$inc_dest"
+                chmod -R u+w "$inc_dest"
+                chown -R "$(whoami)" "$inc_dest"/.flox*
+                chmod -R a+w,g+rw "$inc_dest"/.flox*
+              fi
+            done
+          fi
+
+          chown -R "$(whoami)" "$envdir"/.flox*
+          chmod -R a+w,g+rw "$envdir"/.flox*
+
+          cd "$envdir"
           echo "👉 Running tests in $TESTDIR"
 
           start_services=""

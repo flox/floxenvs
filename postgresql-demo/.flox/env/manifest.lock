@@ -17,6 +17,7 @@
       },
       "postgresql": {
         "pkg-path": "postgresql",
+        "pkg-group": "postgresql",
         "outputs": "all"
       }
     },
@@ -28,30 +29,184 @@
       "PGUSER": "pguser"
     },
     "hook": {
-      "on-activate": "export PGDIR=\"$FLOX_ENV_CACHE/postgres\"\nexport PGDATA=\"$PGDIR/data\"\nSOCKETDIR=\"$PGDIR/run\"\n\nif [[ ! -d \"$SOCKETDIR\" ]]; then\n  mkdir -p \"$SOCKETDIR\"\nfi\n\nif [[ -n \"${PGPORT:-}\" ]]; then\n  # TCP mode: PGPORT is set, clients connect via host:port\n  export PGHOST=\"$PGHOSTADDR\"\n  export DATABASE_URL=\"postgresql://$PGUSER:$PGPASS@$PGHOSTADDR:$PGPORT/$PGDATABASE\"\n  PG_LISTEN_FLAGS=\"-c listen_addresses=$PGHOSTADDR -p $PGPORT\"\nelse\n  # Socket mode: no PGPORT, clients connect via unix socket\n  unset PGHOSTADDR\n  export PGHOST=\"$SOCKETDIR\"\n  export DATABASE_URL=\"postgresql:///$PGDATABASE?host=$SOCKETDIR\"\n  PG_LISTEN_FLAGS=\"\"\nfi\n\nif [[ ! -d \"$PGDATA\" ]]; then\n  mkdir -p \"$PGDATA\"\n  initdb \"$PGDATA\" \\\n    --locale=C \\\n    --encoding=UTF8 \\\n    --auth=trust \\\n    --username \"$PGUSER\"\nfi\n\npg_ctl -D \"$PGDATA\" -w start \\\n  -o \"-c unix_socket_directories=$SOCKETDIR $PG_LISTEN_FLAGS\" \\\n  > /dev/null\nif psql -lqt | cut -d \\| -f 1 | grep -qw \"$PGDATABASE\"; then\n  true\nelse\n  createdb\nfi\npg_ctl -D \"$PGDATA\" -m fast -w stop > /dev/null\n\n\n# --- helpf: inline documentation ---\nhelpf() {\n  local readme_url=\"https://raw.githubusercontent.com/flox/floxenvs/main/postgres-demo/README.md\"\n  local cache_dir=\"$FLOX_ENV_CACHE/postgres\"\n  local cached_readme=\"$cache_dir/README.md\"\n  mkdir -p \"$cache_dir\"\n  if [[ \"${1:-}\" == \"--force\" ]] || [[ ! -f \"$cached_readme\" ]]; then\n    curl -fsSL \"$readme_url\" -o \"$cached_readme\" 2>/dev/null \\\n      || cp \"$FLOX_ENV_PROJECT/README.md\" \"$cached_readme\" 2>/dev/null \\\n      || { echo \"Could not fetch README\"; return 1; }\n  fi\n  bat --style=plain --language=md \"$cached_readme\"\n}\nexport -f helpf\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin \"1 2\" --padding \"1 4\" \\\n    'Start PostgreSQL in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to PostgreSQL:' \\\n    '  psql' '' \\\n    'Connection information:' \\\n    \"  listen_addresses=$PGHOSTADDR\" \\\n    \"  port=$PGPORT\" \\\n    \"  user=$PGUSER\" \\\n    \"  database=$PGDATABASE\" \\\n    \"  DATABASE_URL=$DATABASE_URL\" '' \\\n    'Inline documentation:' \\\n    '  helpf              # show README' \\\n    '  helpf --force      # refresh cached README'\nfi\n\n"
+      "on-activate": "export PGDIR=\"$FLOX_ENV_CACHE/postgres\"\nexport PGDATA=\"$PGDIR/data\"\n\n# Socket dir must be short to stay under the 103-byte\n# unix socket path limit. Use a hash of $PGDIR to keep\n# it unique per environment.\nSOCKETDIR=\"/tmp/flox-pg-$(echo \"$PGDIR\" | cksum | cut -d' ' -f1)\"\n\nif [[ ! -d \"$SOCKETDIR\" ]]; then\n  mkdir -p \"$SOCKETDIR\"\nfi\n\nif [[ -n \"${PGPORT:-}\" ]]; then\n  # TCP mode: PGPORT is set, clients connect via host:port\n  export PGHOST=\"$PGHOSTADDR\"\n  export DATABASE_URL=\"postgresql://$PGUSER:$PGPASS@$PGHOSTADDR:$PGPORT/$PGDATABASE\"\n  PG_LISTEN_FLAGS=\"-c listen_addresses=$PGHOSTADDR -p $PGPORT\"\nelse\n  # Socket mode: no PGPORT, clients connect via unix socket\n  unset PGHOSTADDR\n  export PGHOST=\"$SOCKETDIR\"\n  export DATABASE_URL=\"postgresql:///$PGDATABASE?host=$SOCKETDIR\"\n  PG_LISTEN_FLAGS=\"\"\nfi\n\nif [[ ! -d \"$PGDATA\" ]]; then\n  mkdir -p \"$PGDATA\"\n  initdb \"$PGDATA\" \\\n    --locale=C \\\n    --encoding=UTF8 \\\n    --auth=trust \\\n    --username \"$PGUSER\"\nfi\n\npg_ctl -D \"$PGDATA\" -w start \\\n  -o \"-c unix_socket_directories=$SOCKETDIR $PG_LISTEN_FLAGS\" \\\n  > /dev/null\nif psql -lqt | cut -d \\| -f 1 | grep -qw \"$PGDATABASE\"; then\n  true\nelse\n  createdb\nfi\npg_ctl -D \"$PGDATA\" -m fast -w stop > /dev/null\n\n\n# --- helpf: inline documentation ---\nhelpf() {\n  local readme_url=\"https://raw.githubusercontent.com/flox/floxenvs/main/postgresql-demo/README.md\"\n  local cache_dir=\"$FLOX_ENV_CACHE/postgres\"\n  local cached_readme=\"$cache_dir/README.md\"\n  mkdir -p \"$cache_dir\"\n  if [[ \"${1:-}\" == \"--force\" ]] || [[ ! -f \"$cached_readme\" ]]; then\n    curl -fsSL \"$readme_url\" -o \"$cached_readme\" 2>/dev/null \\\n      || cp \"$FLOX_ENV_PROJECT/README.md\" \"$cached_readme\" 2>/dev/null \\\n      || { echo \"Could not fetch README\"; return 1; }\n  fi\n  bat --style=plain --language=md \"$cached_readme\"\n}\nexport -f helpf\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin \"1 2\" --padding \"1 4\" \\\n    'Start PostgreSQL in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to PostgreSQL:' \\\n    '  psql' '' \\\n    'Connection information:' \\\n    \"  listen_addresses=$PGHOSTADDR\" \\\n    \"  port=$PGPORT\" \\\n    \"  user=$PGUSER\" \\\n    \"  database=$PGDATABASE\" \\\n    \"  DATABASE_URL=$DATABASE_URL\" '' \\\n    'Inline documentation:' \\\n    '  helpf              # show README' \\\n    '  helpf --force      # refresh cached README'\nfi\n\n"
     },
     "options": {},
     "services": {
       "postgres": {
-        "command": "  PGDATA=\"$FLOX_ENV_CACHE/postgres/data\"\n  SOCKETDIR=\"$FLOX_ENV_CACHE/postgres/run\"\n  if [[ -n \"${PGPORT:-}\" ]]; then\n    exec postgres -D \"$PGDATA\" -c unix_socket_directories=\"$SOCKETDIR\" -c listen_addresses=\"$PGHOSTADDR\" -p \"$PGPORT\"\n  else\n    exec postgres -D \"$PGDATA\" -c unix_socket_directories=\"$SOCKETDIR\" -c listen_addresses=\"\"\n  fi\n"
+        "command": "  PGDATA=\"$FLOX_ENV_CACHE/postgres/data\"\n  SOCKETDIR=\"/tmp/flox-pg-$(echo \"$FLOX_ENV_CACHE/postgres\" | cksum | cut -d' ' -f1)\"\n  mkdir -p \"$SOCKETDIR\"\n  if [[ -n \"${PGPORT:-}\" ]]; then\n    exec postgres -D \"$PGDATA\" -c unix_socket_directories=\"$SOCKETDIR\" -c listen_addresses=\"$PGHOSTADDR\" -p \"$PGPORT\"\n  else\n    exec postgres -D \"$PGDATA\" -c unix_socket_directories=\"$SOCKETDIR\" -c listen_addresses=\"\"\n  fi\n"
       }
     }
   },
   "packages": [
     {
+      "attr_path": "postgresql",
+      "broken": false,
+      "derivation": "/nix/store/4w2dly57axppxfnz87z2k09ci9k0jwzf-postgresql-17.9.drv",
+      "description": "Powerful, open source object-relational database system",
+      "install_id": "postgresql",
+      "license": "PostgreSQL",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "name": "postgresql-17.9",
+      "pname": "postgresql",
+      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "rev_count": 964859,
+      "rev_date": "2026-03-18T08:17:15Z",
+      "scrape_date": "2026-03-20T00:40:50.136442Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "17.9",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/ny6a51cah5hm8g0mwxa4ipmb00qcy5li-postgresql-17.9-dev",
+        "doc": "/nix/store/7m58vavcd4i6q4xd8miyj6myb6wnsvim-postgresql-17.9-doc",
+        "jit": "/nix/store/7bzzx5flyqnp8wnz63d6jsy2ac392mpd-postgresql-17.9-jit",
+        "lib": "/nix/store/ip0b62hbx5mn3z5vmj2z0pac7h5xd3ww-postgresql-17.9-lib",
+        "man": "/nix/store/svmr4pfxslhwzd55k8rrs6cj8nxhckmv-postgresql-17.9-man",
+        "out": "/nix/store/limr115mja7zak2n7mjgiwj2xk99lcm2-postgresql-17.9",
+        "plperl": "/nix/store/ljkcq0m7b0807q11kxzvvx927xni0a5r-postgresql-17.9-plperl",
+        "plpython3": "/nix/store/fl011f68symja9rk5by4n3j9vnifkz57-postgresql-17.9-plpython3",
+        "pltcl": "/nix/store/igif9zy3n083136656jia0d6q05nrc9f-postgresql-17.9-pltcl"
+      },
+      "system": "aarch64-darwin",
+      "group": "postgresql",
+      "priority": 5
+    },
+    {
+      "attr_path": "postgresql",
+      "broken": false,
+      "derivation": "/nix/store/svnqlxlynqrnq29lk509ni3i4wsbwv34-postgresql-17.9.drv",
+      "description": "Powerful, open source object-relational database system",
+      "install_id": "postgresql",
+      "license": "PostgreSQL",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "name": "postgresql-17.9",
+      "pname": "postgresql",
+      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "rev_count": 964859,
+      "rev_date": "2026-03-18T08:17:15Z",
+      "scrape_date": "2026-03-20T01:12:37.815469Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "17.9",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/5697vp6jad7lfy5mvxhbrv8md95vdg3c-postgresql-17.9-debug",
+        "dev": "/nix/store/f03dyanv4ljg55wkg0cai8ixl6cnjws2-postgresql-17.9-dev",
+        "doc": "/nix/store/pc514dpqa6sywpk3mnl3m5rnffjll2xp-postgresql-17.9-doc",
+        "jit": "/nix/store/26kyy45iclzq8hr2hr31cjsmljqgjqrm-postgresql-17.9-jit",
+        "lib": "/nix/store/mg6jc5712p12apv2ici9kcsm9m2l6938-postgresql-17.9-lib",
+        "man": "/nix/store/j05j289npjz5wb6ihj15q42cgghqqi9x-postgresql-17.9-man",
+        "out": "/nix/store/45baw2dafa75w3b92zv67kjrv53xazlw-postgresql-17.9",
+        "plperl": "/nix/store/39bm001bhlxdx4rlwwjb2905pws0i61r-postgresql-17.9-plperl",
+        "plpython3": "/nix/store/zx20wyxlywgjrqv7qri2w9021v1bvx9c-postgresql-17.9-plpython3",
+        "pltcl": "/nix/store/pgjmm7m5cdd475g964yli2g1rw0k6bc2-postgresql-17.9-pltcl"
+      },
+      "system": "aarch64-linux",
+      "group": "postgresql",
+      "priority": 5
+    },
+    {
+      "attr_path": "postgresql",
+      "broken": false,
+      "derivation": "/nix/store/rrgg3vc396isak5dq68vchz2lqdnz5hq-postgresql-17.9.drv",
+      "description": "Powerful, open source object-relational database system",
+      "install_id": "postgresql",
+      "license": "PostgreSQL",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "name": "postgresql-17.9",
+      "pname": "postgresql",
+      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "rev_count": 964859,
+      "rev_date": "2026-03-18T08:17:15Z",
+      "scrape_date": "2026-03-20T01:42:14.138274Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "17.9",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/cr67s4q2n0hcf8q9pg1mx99rq96415bf-postgresql-17.9-dev",
+        "doc": "/nix/store/7cnid9l1ipsvwa1kywvmilnrfzyg5303-postgresql-17.9-doc",
+        "jit": "/nix/store/cvzl0q7jjbfd2ividyb4h84x43axxpp1-postgresql-17.9-jit",
+        "lib": "/nix/store/01yimv6caq1z617lpj7ax4sx17pnjx23-postgresql-17.9-lib",
+        "man": "/nix/store/gs7bidpbhaaayyxc82r723ym305378yv-postgresql-17.9-man",
+        "out": "/nix/store/93q3m07j6cvz5q0barxci10y2vk33x5q-postgresql-17.9",
+        "plperl": "/nix/store/p6ibwacv9bnhv02557jr56z12znh94d0-postgresql-17.9-plperl",
+        "plpython3": "/nix/store/r1pi1vm0w0x26w07svp5p1vfpqb3kkpr-postgresql-17.9-plpython3",
+        "pltcl": "/nix/store/7675fp0rplhszx1c6pnamrkz8l5f8xab-postgresql-17.9-pltcl"
+      },
+      "system": "x86_64-darwin",
+      "group": "postgresql",
+      "priority": 5
+    },
+    {
+      "attr_path": "postgresql",
+      "broken": false,
+      "derivation": "/nix/store/9sx1l5ld60a0b5gnzqs7y38cxhdl9h87-postgresql-17.9.drv",
+      "description": "Powerful, open source object-relational database system",
+      "install_id": "postgresql",
+      "license": "PostgreSQL",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "name": "postgresql-17.9",
+      "pname": "postgresql",
+      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "rev_count": 964859,
+      "rev_date": "2026-03-18T08:17:15Z",
+      "scrape_date": "2026-03-20T02:17:29.728610Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "17.9",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/q0v4vl4qhqg6nxwjf7mpnhzs31v83xjm-postgresql-17.9-debug",
+        "dev": "/nix/store/3mcjypw1qj576b2ddkhsfvjar6d45j0y-postgresql-17.9-dev",
+        "doc": "/nix/store/mh0z88308rf36n136acv18yzqly2if96-postgresql-17.9-doc",
+        "jit": "/nix/store/a2dswlklwhrprn7ja0dhmk5knjc2m5lg-postgresql-17.9-jit",
+        "lib": "/nix/store/2f2ixpn0qsdxpq4q20kvnn64alnm48dv-postgresql-17.9-lib",
+        "man": "/nix/store/smvjbss2nmbbizc845fkbrvplifd3390-postgresql-17.9-man",
+        "out": "/nix/store/ykvag2qla5kf1jcf8jlpjgsy79xns0cp-postgresql-17.9",
+        "plperl": "/nix/store/9m8rqcg1q3cp4zvkkgmkhznjvzawawyy-postgresql-17.9-plperl",
+        "plpython3": "/nix/store/9sbz35gw78afdwdv5kgwjfhka9r5gxpc-postgresql-17.9-plpython3",
+        "pltcl": "/nix/store/yb9pdb19qy2638rgn5n7lh2jbah5kr2p-postgresql-17.9-pltcl"
+      },
+      "system": "x86_64-linux",
+      "group": "postgresql",
+      "priority": 5
+    },
+    {
       "attr_path": "bat",
       "broken": false,
-      "derivation": "/nix/store/af8k9xdyc36dlnb4nyldf7flkkcvrnz9-bat-0.26.1.drv",
+      "derivation": "/nix/store/d5xn1bnbsi1lghlrhyalnp6kr25i8qvn-bat-0.26.1.drv",
       "description": "Cat(1) clone with syntax highlighting and Git integration",
       "install_id": "bat",
       "license": "[ Apache-2.0, MIT ]",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=2fc6539b481e1d2569f25f8799236694180c0993",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
       "name": "bat-0.26.1",
       "pname": "bat",
-      "rev": "2fc6539b481e1d2569f25f8799236694180c0993",
-      "rev_count": 953160,
-      "rev_date": "2026-02-23T12:05:20Z",
-      "scrape_date": "2026-02-25T04:46:01.569670Z",
+      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "rev_count": 964859,
+      "rev_date": "2026-03-18T08:17:15Z",
+      "scrape_date": "2026-03-20T00:40:11.034385Z",
       "stabilities": [
         "unstable"
       ],
@@ -70,17 +225,17 @@
     {
       "attr_path": "bat",
       "broken": false,
-      "derivation": "/nix/store/7fpvbibn1dmyhycaz1fi1nv2pm70n23b-bat-0.26.1.drv",
+      "derivation": "/nix/store/lc5lc07xn5x1qb81iq83v0vg4xcbh2sl-bat-0.26.1.drv",
       "description": "Cat(1) clone with syntax highlighting and Git integration",
       "install_id": "bat",
       "license": "[ Apache-2.0, MIT ]",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=2fc6539b481e1d2569f25f8799236694180c0993",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
       "name": "bat-0.26.1",
       "pname": "bat",
-      "rev": "2fc6539b481e1d2569f25f8799236694180c0993",
-      "rev_count": 953160,
-      "rev_date": "2026-02-23T12:05:20Z",
-      "scrape_date": "2026-02-25T05:24:01.019431Z",
+      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "rev_count": 964859,
+      "rev_date": "2026-03-18T08:17:15Z",
+      "scrape_date": "2026-03-20T01:11:37.375167Z",
       "stabilities": [
         "unstable"
       ],
@@ -99,17 +254,17 @@
     {
       "attr_path": "bat",
       "broken": false,
-      "derivation": "/nix/store/bq7l423sa14b71c13d8ggj2wng4llr2d-bat-0.26.1.drv",
+      "derivation": "/nix/store/5bnap5yl0pr6mb4x7da51530qg6bq494-bat-0.26.1.drv",
       "description": "Cat(1) clone with syntax highlighting and Git integration",
       "install_id": "bat",
       "license": "[ Apache-2.0, MIT ]",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=2fc6539b481e1d2569f25f8799236694180c0993",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
       "name": "bat-0.26.1",
       "pname": "bat",
-      "rev": "2fc6539b481e1d2569f25f8799236694180c0993",
-      "rev_count": 953160,
-      "rev_date": "2026-02-23T12:05:20Z",
-      "scrape_date": "2026-02-25T06:09:08.190464Z",
+      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "rev_count": 964859,
+      "rev_date": "2026-03-18T08:17:15Z",
+      "scrape_date": "2026-03-20T01:41:35.604289Z",
       "stabilities": [
         "unstable"
       ],
@@ -128,17 +283,17 @@
     {
       "attr_path": "bat",
       "broken": false,
-      "derivation": "/nix/store/5qr2122ywcfyhqj36ghygh9agpgmn2ay-bat-0.26.1.drv",
+      "derivation": "/nix/store/bqwv83g63x8r7ipys9swxcil1fsrq3mb-bat-0.26.1.drv",
       "description": "Cat(1) clone with syntax highlighting and Git integration",
       "install_id": "bat",
       "license": "[ Apache-2.0, MIT ]",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=2fc6539b481e1d2569f25f8799236694180c0993",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
       "name": "bat-0.26.1",
       "pname": "bat",
-      "rev": "2fc6539b481e1d2569f25f8799236694180c0993",
-      "rev_count": 953160,
-      "rev_date": "2026-02-23T12:05:20Z",
-      "scrape_date": "2026-02-25T07:00:09.560023Z",
+      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "rev_count": 964859,
+      "rev_date": "2026-03-18T08:17:15Z",
+      "scrape_date": "2026-03-20T02:16:24.440513Z",
       "stabilities": [
         "unstable"
       ],
@@ -157,17 +312,17 @@
     {
       "attr_path": "curl",
       "broken": false,
-      "derivation": "/nix/store/wvl7hqcz6qzm3898h5m9k21s1llym462-curl-8.18.0.drv",
+      "derivation": "/nix/store/ldiz9gjc13ky10yh7vf64zvfqf2cw53s-curl-8.18.0.drv",
       "description": "Command line tool for transferring files with URL syntax",
       "install_id": "curl",
       "license": "curl",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=2fc6539b481e1d2569f25f8799236694180c0993",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
       "name": "curl-8.18.0",
       "pname": "curl",
-      "rev": "2fc6539b481e1d2569f25f8799236694180c0993",
-      "rev_count": 953160,
-      "rev_date": "2026-02-23T12:05:20Z",
-      "scrape_date": "2026-02-25T04:46:02.030715Z",
+      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "rev_count": 964859,
+      "rev_date": "2026-03-18T08:17:15Z",
+      "scrape_date": "2026-03-20T00:40:11.460318Z",
       "stabilities": [
         "unstable"
       ],
@@ -191,17 +346,17 @@
     {
       "attr_path": "curl",
       "broken": false,
-      "derivation": "/nix/store/znw6g6hn63d1a6j5pwd02cb45r3g83zy-curl-8.18.0.drv",
+      "derivation": "/nix/store/n5sciz6wlskk8hyazrfsqqqv7w8v6lww-curl-8.18.0.drv",
       "description": "Command line tool for transferring files with URL syntax",
       "install_id": "curl",
       "license": "curl",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=2fc6539b481e1d2569f25f8799236694180c0993",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
       "name": "curl-8.18.0",
       "pname": "curl",
-      "rev": "2fc6539b481e1d2569f25f8799236694180c0993",
-      "rev_count": 953160,
-      "rev_date": "2026-02-23T12:05:20Z",
-      "scrape_date": "2026-02-25T05:24:01.603294Z",
+      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "rev_count": 964859,
+      "rev_date": "2026-03-18T08:17:15Z",
+      "scrape_date": "2026-03-20T01:11:38.026190Z",
       "stabilities": [
         "unstable"
       ],
@@ -228,17 +383,17 @@
     {
       "attr_path": "curl",
       "broken": false,
-      "derivation": "/nix/store/602mkdpx5vcpzclxk28x3cb28cl1h25n-curl-8.18.0.drv",
+      "derivation": "/nix/store/k0hzn7jbamw9znjvbfb8g2idwxyzr0kr-curl-8.18.0.drv",
       "description": "Command line tool for transferring files with URL syntax",
       "install_id": "curl",
       "license": "curl",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=2fc6539b481e1d2569f25f8799236694180c0993",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
       "name": "curl-8.18.0",
       "pname": "curl",
-      "rev": "2fc6539b481e1d2569f25f8799236694180c0993",
-      "rev_count": 953160,
-      "rev_date": "2026-02-23T12:05:20Z",
-      "scrape_date": "2026-02-25T06:09:08.610366Z",
+      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "rev_count": 964859,
+      "rev_date": "2026-03-18T08:17:15Z",
+      "scrape_date": "2026-03-20T01:41:36.025494Z",
       "stabilities": [
         "unstable"
       ],
@@ -262,17 +417,17 @@
     {
       "attr_path": "curl",
       "broken": false,
-      "derivation": "/nix/store/x7hls4932gggjg59r8950nksz2an5fvl-curl-8.18.0.drv",
+      "derivation": "/nix/store/8p5j7awa6h8ic3dp7s9hf3inzqn4mmgb-curl-8.18.0.drv",
       "description": "Command line tool for transferring files with URL syntax",
       "install_id": "curl",
       "license": "curl",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=2fc6539b481e1d2569f25f8799236694180c0993",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
       "name": "curl-8.18.0",
       "pname": "curl",
-      "rev": "2fc6539b481e1d2569f25f8799236694180c0993",
-      "rev_count": 953160,
-      "rev_date": "2026-02-23T12:05:20Z",
-      "scrape_date": "2026-02-25T07:00:10.311891Z",
+      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "rev_count": 964859,
+      "rev_date": "2026-03-18T08:17:15Z",
+      "scrape_date": "2026-03-20T02:16:25.119997Z",
       "stabilities": [
         "unstable"
       ],
@@ -299,17 +454,17 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/sb4n6pfsyz7m3jb8ndqxm47g0c8ywldg-gum-0.17.0.drv",
+      "derivation": "/nix/store/0q3saf0py9fifyx6h6jwzjvg7y707x8a-gum-0.17.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=2fc6539b481e1d2569f25f8799236694180c0993",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
       "name": "gum-0.17.0",
       "pname": "gum",
-      "rev": "2fc6539b481e1d2569f25f8799236694180c0993",
-      "rev_count": 953160,
-      "rev_date": "2026-02-23T12:05:20Z",
-      "scrape_date": "2026-02-25T04:46:03.157426Z",
+      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "rev_count": 964859,
+      "rev_date": "2026-03-18T08:17:15Z",
+      "scrape_date": "2026-03-20T00:40:12.583589Z",
       "stabilities": [
         "unstable"
       ],
@@ -328,17 +483,17 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/d5bwzs2qn9njkglzjixqdp9phmd5zq7k-gum-0.17.0.drv",
+      "derivation": "/nix/store/nrc9wm1wydfjsch8hxbwqs78fw5r0640-gum-0.17.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=2fc6539b481e1d2569f25f8799236694180c0993",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
       "name": "gum-0.17.0",
       "pname": "gum",
-      "rev": "2fc6539b481e1d2569f25f8799236694180c0993",
-      "rev_count": 953160,
-      "rev_date": "2026-02-23T12:05:20Z",
-      "scrape_date": "2026-02-25T05:24:03.634147Z",
+      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "rev_count": 964859,
+      "rev_date": "2026-03-18T08:17:15Z",
+      "scrape_date": "2026-03-20T01:11:40.228114Z",
       "stabilities": [
         "unstable"
       ],
@@ -357,17 +512,17 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/4ddfwh5l925yf5i8ssb0wlxa1552148x-gum-0.17.0.drv",
+      "derivation": "/nix/store/lbvrps681bf8vb41v42xxwcvx0n2k7r0-gum-0.17.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=2fc6539b481e1d2569f25f8799236694180c0993",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
       "name": "gum-0.17.0",
       "pname": "gum",
-      "rev": "2fc6539b481e1d2569f25f8799236694180c0993",
-      "rev_count": 953160,
-      "rev_date": "2026-02-23T12:05:20Z",
-      "scrape_date": "2026-02-25T06:09:09.739437Z",
+      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "rev_count": 964859,
+      "rev_date": "2026-03-18T08:17:15Z",
+      "scrape_date": "2026-03-20T01:41:37.106353Z",
       "stabilities": [
         "unstable"
       ],
@@ -386,17 +541,17 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/k0lfdn1frizxk94212hlyl6aj4dq4z7x-gum-0.17.0.drv",
+      "derivation": "/nix/store/6zn2267d9ynz2jnbvfcz035sfbpql4r1-gum-0.17.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=2fc6539b481e1d2569f25f8799236694180c0993",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
       "name": "gum-0.17.0",
       "pname": "gum",
-      "rev": "2fc6539b481e1d2569f25f8799236694180c0993",
-      "rev_count": 953160,
-      "rev_date": "2026-02-23T12:05:20Z",
-      "scrape_date": "2026-02-25T07:00:12.656821Z",
+      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
+      "rev_count": 964859,
+      "rev_date": "2026-03-18T08:17:15Z",
+      "scrape_date": "2026-03-20T02:16:27.657434Z",
       "stabilities": [
         "unstable"
       ],
@@ -407,160 +562,6 @@
       ],
       "outputs": {
         "out": "/nix/store/x5bn6qhx5qr16w5nz0mh5bh9ww4530h8-gum-0.17.0"
-      },
-      "system": "x86_64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "postgresql",
-      "broken": false,
-      "derivation": "/nix/store/6wdnshnyd19rnn2yrjyfx426wp3cpail-postgresql-17.8.drv",
-      "description": "Powerful, open source object-relational database system",
-      "install_id": "postgresql",
-      "license": "PostgreSQL",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=2fc6539b481e1d2569f25f8799236694180c0993",
-      "name": "postgresql-17.8",
-      "pname": "postgresql",
-      "rev": "2fc6539b481e1d2569f25f8799236694180c0993",
-      "rev_count": 953160,
-      "rev_date": "2026-02-23T12:05:20Z",
-      "scrape_date": "2026-02-25T04:46:40.209913Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "17.8",
-      "outputs_to_install": [
-        "man",
-        "out"
-      ],
-      "outputs": {
-        "dev": "/nix/store/31fqdah00n9cmfhv7ysgb2128r3iz7f6-postgresql-17.8-dev",
-        "doc": "/nix/store/wvv14rx2w0md8dmzi41lfhlz3j279731-postgresql-17.8-doc",
-        "jit": "/nix/store/vdnhmk6xsq7dbypgmfh2bwr1f1h8561v-postgresql-17.8-jit",
-        "lib": "/nix/store/qwh7fylqi27xbaw0qzz1ja9vrffa8n3d-postgresql-17.8-lib",
-        "man": "/nix/store/c1zbv3lahkgy3csygk7j3q96rgwjjxzs-postgresql-17.8-man",
-        "out": "/nix/store/rszkdlfbhmpncdpsabkyj0mlsqyj6923-postgresql-17.8",
-        "plperl": "/nix/store/ac88lslhxr4gndgp97idfl614l040wa0-postgresql-17.8-plperl",
-        "plpython3": "/nix/store/ahgl3667c8xlxm66kihvz8lw463lkbmz-postgresql-17.8-plpython3",
-        "pltcl": "/nix/store/vbg744r1ms2rapch2knzh1nsmyvn5awg-postgresql-17.8-pltcl"
-      },
-      "system": "aarch64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "postgresql",
-      "broken": false,
-      "derivation": "/nix/store/7g61bdk29m3v8370qzkbx5xxnvdy9yhn-postgresql-17.8.drv",
-      "description": "Powerful, open source object-relational database system",
-      "install_id": "postgresql",
-      "license": "PostgreSQL",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=2fc6539b481e1d2569f25f8799236694180c0993",
-      "name": "postgresql-17.8",
-      "pname": "postgresql",
-      "rev": "2fc6539b481e1d2569f25f8799236694180c0993",
-      "rev_count": 953160,
-      "rev_date": "2026-02-23T12:05:20Z",
-      "scrape_date": "2026-02-25T05:24:56.385465Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "17.8",
-      "outputs_to_install": [
-        "man",
-        "out"
-      ],
-      "outputs": {
-        "debug": "/nix/store/2bz7q6z4867nsk6fyj7wk9hfiy5sif1h-postgresql-17.8-debug",
-        "dev": "/nix/store/xxi8i0z6qfhqv2mkzbdflx3rk078adjb-postgresql-17.8-dev",
-        "doc": "/nix/store/bq6c5ildvznqkvns73s7z0kn6fjnfw35-postgresql-17.8-doc",
-        "jit": "/nix/store/81c4g1zj0188g14rk7svv24ss70r6h9h-postgresql-17.8-jit",
-        "lib": "/nix/store/mp80mvzjab5mc9ww6kqdmhzpys47wdkm-postgresql-17.8-lib",
-        "man": "/nix/store/vmljx3hp0mlpgjzyy26clwrk3pqqvjv4-postgresql-17.8-man",
-        "out": "/nix/store/567pz9ld5zvag4608nqcplw2kiljrwzr-postgresql-17.8",
-        "plperl": "/nix/store/0dl6175r4yxlgk85azki3ygv9kisb8fc-postgresql-17.8-plperl",
-        "plpython3": "/nix/store/31dz0fhfabh46d8bg62djhfag1hh5qgx-postgresql-17.8-plpython3",
-        "pltcl": "/nix/store/3dydj4n2240kwdib31ax4bxi5573p36g-postgresql-17.8-pltcl"
-      },
-      "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "postgresql",
-      "broken": false,
-      "derivation": "/nix/store/0qbd5i6bhnrhddwnbkss7d38iw9mdwgz-postgresql-17.8.drv",
-      "description": "Powerful, open source object-relational database system",
-      "install_id": "postgresql",
-      "license": "PostgreSQL",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=2fc6539b481e1d2569f25f8799236694180c0993",
-      "name": "postgresql-17.8",
-      "pname": "postgresql",
-      "rev": "2fc6539b481e1d2569f25f8799236694180c0993",
-      "rev_count": 953160,
-      "rev_date": "2026-02-23T12:05:20Z",
-      "scrape_date": "2026-02-25T06:09:46.139387Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "17.8",
-      "outputs_to_install": [
-        "man",
-        "out"
-      ],
-      "outputs": {
-        "dev": "/nix/store/xql2ly5jqsjy4n3a78kadfi2i6rv062z-postgresql-17.8-dev",
-        "doc": "/nix/store/qj563if2aridhz4lv1591fs67vjjjic3-postgresql-17.8-doc",
-        "jit": "/nix/store/ybx3bhjr5r1xf83mxg0ncgwqz4anggk8-postgresql-17.8-jit",
-        "lib": "/nix/store/rp7gg54i1si8659fg30ldlgkq4b7zbx1-postgresql-17.8-lib",
-        "man": "/nix/store/ghqhlagv7d28n75avdkg4pa3lf4hn4r1-postgresql-17.8-man",
-        "out": "/nix/store/sz66j4qd02w9krsvqzjy293xmz6xdmjq-postgresql-17.8",
-        "plperl": "/nix/store/m36cng79j49hfafivfxvyczwqgx1nbnz-postgresql-17.8-plperl",
-        "plpython3": "/nix/store/s0y2y3zwq29wkx0b4zi0sg0h32wrsi0g-postgresql-17.8-plpython3",
-        "pltcl": "/nix/store/xi8dvgilicmdy81jvxzv7i35qrncpxja-postgresql-17.8-pltcl"
-      },
-      "system": "x86_64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "postgresql",
-      "broken": false,
-      "derivation": "/nix/store/a0jmax67m8agkixj71sva4iwmkxyb3yj-postgresql-17.8.drv",
-      "description": "Powerful, open source object-relational database system",
-      "install_id": "postgresql",
-      "license": "PostgreSQL",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=2fc6539b481e1d2569f25f8799236694180c0993",
-      "name": "postgresql-17.8",
-      "pname": "postgresql",
-      "rev": "2fc6539b481e1d2569f25f8799236694180c0993",
-      "rev_count": 953160,
-      "rev_date": "2026-02-23T12:05:20Z",
-      "scrape_date": "2026-02-25T07:01:12.194731Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "17.8",
-      "outputs_to_install": [
-        "man",
-        "out"
-      ],
-      "outputs": {
-        "debug": "/nix/store/m4mz4nm4l3wcas52n8mxcp90w09sjhb2-postgresql-17.8-debug",
-        "dev": "/nix/store/xydgaqq7mhh4mz8yl02ymbmqs06392p6-postgresql-17.8-dev",
-        "doc": "/nix/store/85zrhzp2f9rb2kjax7p0d1r5m7pngi7f-postgresql-17.8-doc",
-        "jit": "/nix/store/6ld351f2d533bwvqa0xi6l52r3iqwg40-postgresql-17.8-jit",
-        "lib": "/nix/store/rjzzxaj940qidr3gf31kr2sankgxm1yv-postgresql-17.8-lib",
-        "man": "/nix/store/r5iwbrdggixf71jm7bhy0j7xsdjyd6ji-postgresql-17.8-man",
-        "out": "/nix/store/y7dxkimrcga2y8hhyn4p11g4124ar5ly-postgresql-17.8",
-        "plperl": "/nix/store/6lpzdjaw8y2kqql5vg95id78an8ax8rp-postgresql-17.8-plperl",
-        "plpython3": "/nix/store/wj6ib93nm1d02wl5nv50naigypnh6k4i-postgresql-17.8-plpython3",
-        "pltcl": "/nix/store/jb3pf70fqg3i1xi01306a9w9c114ngy3-postgresql-17.8-pltcl"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -588,13 +589,13 @@
         "PGPORT": "15432"
       },
       "hook": {
-        "on-activate": "\n# --- helpf: inline documentation ---\nhelpf() {\n  local readme_url=\"https://raw.githubusercontent.com/flox/floxenvs/main/postgres-demo/README.md\"\n  local cache_dir=\"$FLOX_ENV_CACHE/postgres\"\n  local cached_readme=\"$cache_dir/README.md\"\n  mkdir -p \"$cache_dir\"\n  if [[ \"${1:-}\" == \"--force\" ]] || [[ ! -f \"$cached_readme\" ]]; then\n    curl -fsSL \"$readme_url\" -o \"$cached_readme\" 2>/dev/null \\\n      || cp \"$FLOX_ENV_PROJECT/README.md\" \"$cached_readme\" 2>/dev/null \\\n      || { echo \"Could not fetch README\"; return 1; }\n  fi\n  bat --style=plain --language=md \"$cached_readme\"\n}\nexport -f helpf\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin \"1 2\" --padding \"1 4\" \\\n    'Start PostgreSQL in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to PostgreSQL:' \\\n    '  psql' '' \\\n    'Connection information:' \\\n    \"  listen_addresses=$PGHOSTADDR\" \\\n    \"  port=$PGPORT\" \\\n    \"  user=$PGUSER\" \\\n    \"  database=$PGDATABASE\" \\\n    \"  DATABASE_URL=$DATABASE_URL\" '' \\\n    'Inline documentation:' \\\n    '  helpf              # show README' \\\n    '  helpf --force      # refresh cached README'\nfi\n\n"
+        "on-activate": "\n# --- helpf: inline documentation ---\nhelpf() {\n  local readme_url=\"https://raw.githubusercontent.com/flox/floxenvs/main/postgresql-demo/README.md\"\n  local cache_dir=\"$FLOX_ENV_CACHE/postgres\"\n  local cached_readme=\"$cache_dir/README.md\"\n  mkdir -p \"$cache_dir\"\n  if [[ \"${1:-}\" == \"--force\" ]] || [[ ! -f \"$cached_readme\" ]]; then\n    curl -fsSL \"$readme_url\" -o \"$cached_readme\" 2>/dev/null \\\n      || cp \"$FLOX_ENV_PROJECT/README.md\" \"$cached_readme\" 2>/dev/null \\\n      || { echo \"Could not fetch README\"; return 1; }\n  fi\n  bat --style=plain --language=md \"$cached_readme\"\n}\nexport -f helpf\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin \"1 2\" --padding \"1 4\" \\\n    'Start PostgreSQL in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to PostgreSQL:' \\\n    '  psql' '' \\\n    'Connection information:' \\\n    \"  listen_addresses=$PGHOSTADDR\" \\\n    \"  port=$PGPORT\" \\\n    \"  user=$PGUSER\" \\\n    \"  database=$PGDATABASE\" \\\n    \"  DATABASE_URL=$DATABASE_URL\" '' \\\n    'Inline documentation:' \\\n    '  helpf              # show README' \\\n    '  helpf --force      # refresh cached README'\nfi\n\n"
       },
       "options": {},
       "include": {
         "environments": [
           {
-            "dir": "../postgres"
+            "dir": "../postgresql"
           }
         ]
       }
@@ -606,6 +607,7 @@
           "install": {
             "postgresql": {
               "pkg-path": "postgresql",
+              "pkg-group": "postgresql",
               "outputs": "all"
             }
           },
@@ -616,18 +618,18 @@
             "PGUSER": "pguser"
           },
           "hook": {
-            "on-activate": "export PGDIR=\"$FLOX_ENV_CACHE/postgres\"\nexport PGDATA=\"$PGDIR/data\"\nSOCKETDIR=\"$PGDIR/run\"\n\nif [[ ! -d \"$SOCKETDIR\" ]]; then\n  mkdir -p \"$SOCKETDIR\"\nfi\n\nif [[ -n \"${PGPORT:-}\" ]]; then\n  # TCP mode: PGPORT is set, clients connect via host:port\n  export PGHOST=\"$PGHOSTADDR\"\n  export DATABASE_URL=\"postgresql://$PGUSER:$PGPASS@$PGHOSTADDR:$PGPORT/$PGDATABASE\"\n  PG_LISTEN_FLAGS=\"-c listen_addresses=$PGHOSTADDR -p $PGPORT\"\nelse\n  # Socket mode: no PGPORT, clients connect via unix socket\n  unset PGHOSTADDR\n  export PGHOST=\"$SOCKETDIR\"\n  export DATABASE_URL=\"postgresql:///$PGDATABASE?host=$SOCKETDIR\"\n  PG_LISTEN_FLAGS=\"\"\nfi\n\nif [[ ! -d \"$PGDATA\" ]]; then\n  mkdir -p \"$PGDATA\"\n  initdb \"$PGDATA\" \\\n    --locale=C \\\n    --encoding=UTF8 \\\n    --auth=trust \\\n    --username \"$PGUSER\"\nfi\n\npg_ctl -D \"$PGDATA\" -w start \\\n  -o \"-c unix_socket_directories=$SOCKETDIR $PG_LISTEN_FLAGS\" \\\n  > /dev/null\nif psql -lqt | cut -d \\| -f 1 | grep -qw \"$PGDATABASE\"; then\n  true\nelse\n  createdb\nfi\npg_ctl -D \"$PGDATA\" -m fast -w stop > /dev/null\n"
+            "on-activate": "export PGDIR=\"$FLOX_ENV_CACHE/postgres\"\nexport PGDATA=\"$PGDIR/data\"\n\n# Socket dir must be short to stay under the 103-byte\n# unix socket path limit. Use a hash of $PGDIR to keep\n# it unique per environment.\nSOCKETDIR=\"/tmp/flox-pg-$(echo \"$PGDIR\" | cksum | cut -d' ' -f1)\"\n\nif [[ ! -d \"$SOCKETDIR\" ]]; then\n  mkdir -p \"$SOCKETDIR\"\nfi\n\nif [[ -n \"${PGPORT:-}\" ]]; then\n  # TCP mode: PGPORT is set, clients connect via host:port\n  export PGHOST=\"$PGHOSTADDR\"\n  export DATABASE_URL=\"postgresql://$PGUSER:$PGPASS@$PGHOSTADDR:$PGPORT/$PGDATABASE\"\n  PG_LISTEN_FLAGS=\"-c listen_addresses=$PGHOSTADDR -p $PGPORT\"\nelse\n  # Socket mode: no PGPORT, clients connect via unix socket\n  unset PGHOSTADDR\n  export PGHOST=\"$SOCKETDIR\"\n  export DATABASE_URL=\"postgresql:///$PGDATABASE?host=$SOCKETDIR\"\n  PG_LISTEN_FLAGS=\"\"\nfi\n\nif [[ ! -d \"$PGDATA\" ]]; then\n  mkdir -p \"$PGDATA\"\n  initdb \"$PGDATA\" \\\n    --locale=C \\\n    --encoding=UTF8 \\\n    --auth=trust \\\n    --username \"$PGUSER\"\nfi\n\npg_ctl -D \"$PGDATA\" -w start \\\n  -o \"-c unix_socket_directories=$SOCKETDIR $PG_LISTEN_FLAGS\" \\\n  > /dev/null\nif psql -lqt | cut -d \\| -f 1 | grep -qw \"$PGDATABASE\"; then\n  true\nelse\n  createdb\nfi\npg_ctl -D \"$PGDATA\" -m fast -w stop > /dev/null\n"
           },
           "options": {},
           "services": {
             "postgres": {
-              "command": "  PGDATA=\"$FLOX_ENV_CACHE/postgres/data\"\n  SOCKETDIR=\"$FLOX_ENV_CACHE/postgres/run\"\n  if [[ -n \"${PGPORT:-}\" ]]; then\n    exec postgres -D \"$PGDATA\" -c unix_socket_directories=\"$SOCKETDIR\" -c listen_addresses=\"$PGHOSTADDR\" -p \"$PGPORT\"\n  else\n    exec postgres -D \"$PGDATA\" -c unix_socket_directories=\"$SOCKETDIR\" -c listen_addresses=\"\"\n  fi\n"
+              "command": "  PGDATA=\"$FLOX_ENV_CACHE/postgres/data\"\n  SOCKETDIR=\"/tmp/flox-pg-$(echo \"$FLOX_ENV_CACHE/postgres\" | cksum | cut -d' ' -f1)\"\n  mkdir -p \"$SOCKETDIR\"\n  if [[ -n \"${PGPORT:-}\" ]]; then\n    exec postgres -D \"$PGDATA\" -c unix_socket_directories=\"$SOCKETDIR\" -c listen_addresses=\"$PGHOSTADDR\" -p \"$PGPORT\"\n  else\n    exec postgres -D \"$PGDATA\" -c unix_socket_directories=\"$SOCKETDIR\" -c listen_addresses=\"\"\n  fi\n"
             }
           }
         },
-        "name": "postgres",
+        "name": "postgresql",
         "descriptor": {
-          "dir": "../postgres"
+          "dir": "../postgresql"
         }
       }
     ],

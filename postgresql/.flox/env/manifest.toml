@@ -34,7 +34,11 @@ PGDATABASE = "pgdb"
 on-activate = '''
 export PGDIR="$FLOX_ENV_CACHE/postgres"
 export PGDATA="$PGDIR/data"
-SOCKETDIR="$PGDIR/run"
+
+# Socket dir must be short to stay under the 103-byte
+# unix socket path limit. Use a hash of $PGDIR to keep
+# it unique per environment.
+SOCKETDIR="/tmp/flox-pg-$(echo "$PGDIR" | cksum | cut -d' ' -f1)"
 
 if [[ ! -d "$SOCKETDIR" ]]; then
   mkdir -p "$SOCKETDIR"
@@ -76,7 +80,8 @@ pg_ctl -D "$PGDATA" -m fast -w stop > /dev/null
 [services]
 postgres.command = '''
   PGDATA="$FLOX_ENV_CACHE/postgres/data"
-  SOCKETDIR="$FLOX_ENV_CACHE/postgres/run"
+  SOCKETDIR="/tmp/flox-pg-$(echo "$FLOX_ENV_CACHE/postgres" | cksum | cut -d' ' -f1)"
+  mkdir -p "$SOCKETDIR"
   if [[ -n "${PGPORT:-}" ]]; then
     exec postgres -D "$PGDATA" -c unix_socket_directories="$SOCKETDIR" -c listen_addresses="$PGHOSTADDR" -p "$PGPORT"
   else
