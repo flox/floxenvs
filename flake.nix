@@ -18,18 +18,38 @@
         lib = nixpkgs.lib;
         pkgs = nixpkgs.legacyPackages.${system};
 
-        mkFloxEnvPkg = name: {
-          path ? "${inputs.self}/${name}",
-          packages ? with pkgs; [
-            coreutils
-            flox.packages."${system}".default
-          ],
-        }: pkgs.writeShellScriptBin "test-${name}" ''
-          set -exo pipefail
+        # Single entry point: nix run .#run-test -- <env-name>
+        runTestScript = pkgs.writeShellScriptBin "run-test" ''
+          set -euo pipefail
+
+          if [ $# -eq 0 ]; then
+            echo "Usage: nix run .#run-test -- <env-name>"
+            echo ""
+            echo "Available environments with test.sh:"
+            for dir in ${inputs.self}/*/; do
+              name="$(basename "$dir")"
+              if [ -f "$dir/test.sh" ]; then
+                echo "  $name"
+              fi
+            done
+            exit 1
+          fi
+
+          name="$1"
+          path="${inputs.self}/$name"
+
+          if [ ! -d "$path/.flox" ]; then
+            echo "Error: environment '$name' not found"
+            exit 1
+          fi
+          if [ ! -f "$path/test.sh" ]; then
+            echo "Error: no test.sh in '$name'"
+            exit 1
+          fi
 
           export FLOX_DISABLE_METRICS=true
           export FLOX_ENVS_TESTING=1
-          export PATH="${lib.makeBinPath packages}:$PATH"
+          export PATH="${lib.makeBinPath (with pkgs; [ coreutils flox.packages."${system}".default ])}:$PATH"
           export LANG=
           export LC_COLLATE="C"
           export LC_CTYPE="C"
@@ -40,90 +60,72 @@
           export LC_ALL=
 
           mkdir -p /tmp/floxenvs
-          # copy self/nb into temp dir
-          # fallback to non-subdirectory to work around /tmp/floxenv resets on x86_64-darwin
-          export TESTDIR="$(mktemp --directory --tmpdir=/tmp/floxenvs --suffix floxenvs-${name}-example || mktemp --directory --tmpdir=/tmp --suffix floxenvs-${name}-example )"
+          export TESTDIR="$(mktemp --directory --tmpdir=/tmp/floxenvs --suffix "-$name" || mktemp --directory --tmpdir=/tmp --suffix "-$name")"
           ret=$?
-          if [ $ret -ne 0 ] || [ "$TESTDIR" = ""] ; then
+          if [ $ret -ne 0 ] || [ -z "$TESTDIR" ]; then
             echo "Error: unable to create temp directory"
             exit $ret
           fi
 
-          chmod g=rwx "$TESTDIR"
-          cp -R ${path}/* $TESTDIR
-          cp -R ${path}/.flox* $TESTDIR
-          if [ -f ${path}/.env ]; then
-            cp -R ${path}/.env $TESTDIR
-          fi
-          chown -R $(whoami) $TESTDIR/.flox*
-          chmod -R a+w,g+rw $TESTDIR/.flox*
+          cleanup() {
+            cd /
+            flox services stop --dir "$envdir" 2>/dev/null || true
+            chmod -R u+w "$TESTDIR" 2>/dev/null
+            rm -rf "$TESTDIR"
+          }
+          trap cleanup EXIT
 
-          # switch to root for the test
-          cd $TESTDIR
+          # Use a parent dir so relative [include] paths work
+          envdir="$TESTDIR/env"
+          mkdir -p "$envdir"
+
+          chmod g=rwx "$TESTDIR"
+          cp -R "$path"/* "$envdir"
+          cp -R "$path"/.flox* "$envdir"
+          if [ -f "$path/.env" ]; then
+            cp -R "$path/.env" "$envdir"
+          fi
+          chmod -R u+w "$envdir"
+
+          # Copy any [include] dir dependencies
+          if [ -f "$envdir/.flox/env/manifest.toml" ]; then
+            for inc_dir in $(${pkgs.gnugrep}/bin/grep -oP 'dir\s*=\s*"\K[^"]+' "$envdir/.flox/env/manifest.toml"); do
+              # Resolve relative to the env dir inside the temp tree
+              inc_dest="$(realpath -m "$envdir/$inc_dir")"
+              # Resolve the source from the repo
+              inc_name="$(basename "$inc_dest")"
+              inc_src="${inputs.self}/$inc_name"
+              if [ -d "$inc_src" ] && [ ! -d "$inc_dest" ]; then
+                mkdir -p "$inc_dest"
+                cp -R "$inc_src"/* "$inc_dest" 2>/dev/null || true
+                cp -R "$inc_src"/.flox* "$inc_dest"
+                chmod -R u+w "$inc_dest"
+                chown -R "$(whoami)" "$inc_dest"/.flox*
+                chmod -R a+w,g+rw "$inc_dest"/.flox*
+              fi
+            done
+          fi
+
+          chown -R "$(whoami)" "$envdir"/.flox*
+          chmod -R a+w,g+rw "$envdir"/.flox*
+
+          cd "$envdir"
           echo "👉 Running tests in $TESTDIR"
 
           start_services=""
-          if [ "$1" == "true" ]; then
+          if ${pkgs.jq}/bin/jq -e '.manifest.services // {} | length > 0' .flox/env/manifest.lock > /dev/null 2>&1; then
             start_services=" --start-services"
           fi
 
-          # run tests
-          if [ ! -f test.sh ]; then
-            echo "Error: No test.sh script found"
-            exit 1
-          fi
-
-          echo "👉 Running ${name} test..."
-          flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'
-
-          ret=$?
-          if [ $ret -ne 0 ]; then
-            echo "Error: Tests failed"
-            exit $ret
-          fi
+          echo "👉 Running $name test..."
+          eval "flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'"
         '';
-        mkFloxEnvApp = path: let 
-          name = builtins.baseNameOf path;
-          script = mkFloxEnvPkg name {};
-        in {
-          name = "test-${name}";
-          value = {
-            type = "app";
-            program = "${script}/bin/test-${name}";
-          };
-        };
-        manifestPath = ".flox/env/manifest.toml";
-        allEnvironments =
-          builtins.map
-            (x:
-              let
-                xs = builtins.toString x;
-                len = (builtins.stringLength xs) - (builtins.stringLength manifestPath);
-              in
-                builtins.substring 0 len xs
-            ) 
-            (
-              builtins.filter
-                (x: lib.hasSuffix manifestPath (builtins.toString x))
-                (lib.filesystem.listFilesRecursive ./.)
-            );
-        environmentsWithTest = 
-          builtins.filter
-            (x: builtins.pathExists "${x}/test.sh")
-            allEnvironments;
       in
       {
-        packages = builtins.listToAttrs (
-          builtins.map
-            (path: rec {
-              name = builtins.baseNameOf path;
-              value = mkFloxEnvPkg name {};
-            })
-            environmentsWithTest
-        );
-        apps = builtins.listToAttrs (
-          builtins.map mkFloxEnvApp environmentsWithTest
-        );
+        apps.run-test = {
+          type = "app";
+          program = "${runTestScript}/bin/run-test";
+        };
         devShells.default = pkgs.mkShell {
           packages = [ pkgs.just ];
         };

@@ -1,0 +1,83 @@
+schema-version = "1.10.0"
+[include]
+environments = [
+  { dir = "../postgresql" }
+]
+
+# ============================================================
+# Packages
+# ============================================================
+#
+# UI and documentation tools share a pkg-group so they
+# resolve independently from the service and consumer
+# packages.
+#
+# Extensions must use the same pkg-group as postgresql
+# (defined in the included postgresql environment) so
+# they resolve against the same PostgreSQL version.
+#
+# Search for more: flox search postgresqlPackages
+
+[install]
+
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+curl.pkg-path = "curl"
+curl.pkg-group = "demo-tools"
+
+pgvector.pkg-path = "postgresqlPackages.pgvector"
+pgvector.pkg-group = "postgresql"
+
+# Other common extensions (uncomment to add):
+# postgis.pkg-path = "postgresqlPackages.postgis"
+# postgis.pkg-group = "postgresql"
+# pg_cron.pkg-path = "postgresqlPackages.pg_cron"
+# pg_cron.pkg-group = "postgresql"
+# pgtap.pkg-path = "postgresqlPackages.pgtap"
+# pgtap.pkg-group = "postgresql"
+
+
+# ============================================================
+# Environment variables
+# ============================================================
+#
+# Setting PGPORT switches the included postgresql environment
+# from unix socket mode to TCP mode. The demo uses TCP to
+# showcase connection info and port configuration.
+
+[vars]
+PGPORT = "15432"
+
+
+# ============================================================
+# Activation hook
+# ============================================================
+#
+# The postgres initialization (initdb, data dir, service
+# setup) comes from the included flox/postgresql environment.
+#
+# This hook adds demo-specific features:
+# 1. Connection info display via gum
+
+[hook]
+on-activate = '''
+
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' --padding '1 4' \
+    'Start PostgreSQL in the background:' \
+    '  flox services start' \
+    '  flox activate --start-services' '' \
+    'Connect to PostgreSQL:' \
+    '  psql' '' \
+    'Connection information:' \
+    "  listen_addresses=$PGHOSTADDR" \
+    "  port=$PGPORT" \
+    "  user=$PGUSER" \
+    "  database=$PGDATABASE" \
+    "  DATABASE_URL=$DATABASE_URL" '' \
+    'Add extensions (use the postgresql pkg-group):' \
+    '  flox search postgresqlPackages' \
+    '  flox install postgresqlPackages.postgis -g postgresql'
+fi
+
+'''
