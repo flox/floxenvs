@@ -9,8 +9,6 @@ environments = [
 # --- UI and documentation tools (for the demo experience) ---
 gum.pkg-path = "gum"
 gum.outputs = "all"
-bat.pkg-path = "bat"
-bat.outputs = "all"
 curl.pkg-path = "curl"
 curl.outputs = "all"
 
@@ -47,26 +45,10 @@ PGPORT = "15432"
 # setup) comes from the included flox/postgresql environment.
 #
 # This hook adds demo-specific features:
-# 1. helpf command for inline documentation
-# 2. Connection info display via gum
+# 1. Connection info display via gum
 
 [hook]
 on-activate = '''
-
-# --- helpf: inline documentation ---
-helpf() {
-  local readme_url="https://raw.githubusercontent.com/flox/floxenvs/main/postgresql-demo/README.md"
-  local cache_dir="$FLOX_ENV_CACHE/postgres"
-  local cached_readme="$cache_dir/README.md"
-  mkdir -p "$cache_dir"
-  if [[ "${1:-}" == "--force" ]] || [[ ! -f "$cached_readme" ]]; then
-    curl -fsSL "$readme_url" -o "$cached_readme" 2>/dev/null \
-      || cp "$FLOX_ENV_PROJECT/README.md" "$cached_readme" 2>/dev/null \
-      || { echo "Could not fetch README"; return 1; }
-  fi
-  bat --style=plain --language=md "$cached_readme"
-}
-export -f helpf
 
 if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
   gum style --border double --margin "1 2" --padding "1 4" \
@@ -80,10 +62,7 @@ if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
     "  port=$PGPORT" \
     "  user=$PGUSER" \
     "  database=$PGDATABASE" \
-    "  DATABASE_URL=$DATABASE_URL" '' \
-    'Inline documentation:' \
-    '  helpf              # show README' \
-    '  helpf --force      # refresh cached README'
+    "  DATABASE_URL=$DATABASE_URL"
 fi
 
 '''

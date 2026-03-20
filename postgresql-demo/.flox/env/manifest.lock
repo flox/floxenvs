@@ -3,10 +3,6 @@
   "manifest": {
     "schema-version": "1.10.0",
     "install": {
-      "bat": {
-        "pkg-path": "bat",
-        "outputs": "all"
-      },
       "curl": {
         "pkg-path": "curl",
         "outputs": "all"
@@ -29,7 +25,7 @@
       "PGUSER": "pguser"
     },
     "hook": {
-      "on-activate": "export PGDIR=\"$FLOX_ENV_CACHE/postgres\"\nexport PGDATA=\"$PGDIR/data\"\n\n# Socket dir must be short to stay under the 103-byte\n# unix socket path limit. Use a hash of $PGDIR to keep\n# it unique per environment.\nSOCKETDIR=\"/tmp/flox-pg-$(echo \"$PGDIR\" | cksum | cut -d' ' -f1)\"\n\nif [[ ! -d \"$SOCKETDIR\" ]]; then\n  mkdir -p \"$SOCKETDIR\"\nfi\n\nif [[ -n \"${PGPORT:-}\" ]]; then\n  # TCP mode: PGPORT is set, clients connect via host:port\n  export PGHOST=\"$PGHOSTADDR\"\n  export DATABASE_URL=\"postgresql://$PGUSER:$PGPASS@$PGHOSTADDR:$PGPORT/$PGDATABASE\"\n  PG_LISTEN_FLAGS=\"-c listen_addresses=$PGHOSTADDR -p $PGPORT\"\nelse\n  # Socket mode: no PGPORT, clients connect via unix socket\n  unset PGHOSTADDR\n  export PGHOST=\"$SOCKETDIR\"\n  export DATABASE_URL=\"postgresql:///$PGDATABASE?host=$SOCKETDIR\"\n  PG_LISTEN_FLAGS=\"\"\nfi\n\nif [[ ! -d \"$PGDATA\" ]]; then\n  mkdir -p \"$PGDATA\"\n  initdb \"$PGDATA\" \\\n    --locale=C \\\n    --encoding=UTF8 \\\n    --auth=trust \\\n    --username \"$PGUSER\"\nfi\n\npg_ctl -D \"$PGDATA\" -w start \\\n  -o \"-c unix_socket_directories=$SOCKETDIR $PG_LISTEN_FLAGS\" \\\n  > /dev/null\nif psql -lqt | cut -d \\| -f 1 | grep -qw \"$PGDATABASE\"; then\n  true\nelse\n  createdb\nfi\npg_ctl -D \"$PGDATA\" -m fast -w stop > /dev/null\n\n\n# --- helpf: inline documentation ---\nhelpf() {\n  local readme_url=\"https://raw.githubusercontent.com/flox/floxenvs/main/postgresql-demo/README.md\"\n  local cache_dir=\"$FLOX_ENV_CACHE/postgres\"\n  local cached_readme=\"$cache_dir/README.md\"\n  mkdir -p \"$cache_dir\"\n  if [[ \"${1:-}\" == \"--force\" ]] || [[ ! -f \"$cached_readme\" ]]; then\n    curl -fsSL \"$readme_url\" -o \"$cached_readme\" 2>/dev/null \\\n      || cp \"$FLOX_ENV_PROJECT/README.md\" \"$cached_readme\" 2>/dev/null \\\n      || { echo \"Could not fetch README\"; return 1; }\n  fi\n  bat --style=plain --language=md \"$cached_readme\"\n}\nexport -f helpf\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin \"1 2\" --padding \"1 4\" \\\n    'Start PostgreSQL in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to PostgreSQL:' \\\n    '  psql' '' \\\n    'Connection information:' \\\n    \"  listen_addresses=$PGHOSTADDR\" \\\n    \"  port=$PGPORT\" \\\n    \"  user=$PGUSER\" \\\n    \"  database=$PGDATABASE\" \\\n    \"  DATABASE_URL=$DATABASE_URL\" '' \\\n    'Inline documentation:' \\\n    '  helpf              # show README' \\\n    '  helpf --force      # refresh cached README'\nfi\n\n"
+      "on-activate": "export PGDIR=\"$FLOX_ENV_CACHE/postgres\"\nexport PGDATA=\"$PGDIR/data\"\n\n# Socket dir must be short to stay under the 103-byte\n# unix socket path limit. Use a hash of $PGDIR to keep\n# it unique per environment.\nSOCKETDIR=\"/tmp/flox-pg-$(echo \"$PGDIR\" | cksum | cut -d' ' -f1)\"\n\nif [[ ! -d \"$SOCKETDIR\" ]]; then\n  mkdir -p \"$SOCKETDIR\"\nfi\n\nif [[ -n \"${PGPORT:-}\" ]]; then\n  # TCP mode: PGPORT is set, clients connect via host:port\n  export PGHOST=\"$PGHOSTADDR\"\n  export DATABASE_URL=\"postgresql://$PGUSER:$PGPASS@$PGHOSTADDR:$PGPORT/$PGDATABASE\"\n  PG_LISTEN_FLAGS=\"-c listen_addresses=$PGHOSTADDR -p $PGPORT\"\nelse\n  # Socket mode: no PGPORT, clients connect via unix socket\n  unset PGHOSTADDR\n  export PGHOST=\"$SOCKETDIR\"\n  export DATABASE_URL=\"postgresql:///$PGDATABASE?host=$SOCKETDIR\"\n  PG_LISTEN_FLAGS=\"\"\nfi\n\nif [[ ! -d \"$PGDATA\" ]]; then\n  mkdir -p \"$PGDATA\"\n  initdb \"$PGDATA\" \\\n    --locale=C \\\n    --encoding=UTF8 \\\n    --auth=trust \\\n    --username \"$PGUSER\"\nfi\n\npg_ctl -D \"$PGDATA\" -w start \\\n  -o \"-c unix_socket_directories=$SOCKETDIR $PG_LISTEN_FLAGS\" \\\n  > /dev/null\nif psql -lqt | cut -d \\| -f 1 | grep -qw \"$PGDATABASE\"; then\n  true\nelse\n  createdb\nfi\npg_ctl -D \"$PGDATA\" -m fast -w stop > /dev/null\n\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin \"1 2\" --padding \"1 4\" \\\n    'Start PostgreSQL in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to PostgreSQL:' \\\n    '  psql' '' \\\n    'Connection information:' \\\n    \"  listen_addresses=$PGHOSTADDR\" \\\n    \"  port=$PGPORT\" \\\n    \"  user=$PGUSER\" \\\n    \"  database=$PGDATABASE\" \\\n    \"  DATABASE_URL=$DATABASE_URL\"\nfi\n\n"
     },
     "options": {},
     "services": {
@@ -191,122 +187,6 @@
       },
       "system": "x86_64-linux",
       "group": "postgresql",
-      "priority": 5
-    },
-    {
-      "attr_path": "bat",
-      "broken": false,
-      "derivation": "/nix/store/d5xn1bnbsi1lghlrhyalnp6kr25i8qvn-bat-0.26.1.drv",
-      "description": "Cat(1) clone with syntax highlighting and Git integration",
-      "install_id": "bat",
-      "license": "[ Apache-2.0, MIT ]",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
-      "name": "bat-0.26.1",
-      "pname": "bat",
-      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
-      "rev_count": 964859,
-      "rev_date": "2026-03-18T08:17:15Z",
-      "scrape_date": "2026-03-20T00:40:11.034385Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.26.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/5ch0cvljzlpw6xm8ikr0pqlk687q5h6r-bat-0.26.1"
-      },
-      "system": "aarch64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "bat",
-      "broken": false,
-      "derivation": "/nix/store/lc5lc07xn5x1qb81iq83v0vg4xcbh2sl-bat-0.26.1.drv",
-      "description": "Cat(1) clone with syntax highlighting and Git integration",
-      "install_id": "bat",
-      "license": "[ Apache-2.0, MIT ]",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
-      "name": "bat-0.26.1",
-      "pname": "bat",
-      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
-      "rev_count": 964859,
-      "rev_date": "2026-03-18T08:17:15Z",
-      "scrape_date": "2026-03-20T01:11:37.375167Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.26.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/avpzbq4wsgbfdq8cx36v402l82zkzrj9-bat-0.26.1"
-      },
-      "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "bat",
-      "broken": false,
-      "derivation": "/nix/store/5bnap5yl0pr6mb4x7da51530qg6bq494-bat-0.26.1.drv",
-      "description": "Cat(1) clone with syntax highlighting and Git integration",
-      "install_id": "bat",
-      "license": "[ Apache-2.0, MIT ]",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
-      "name": "bat-0.26.1",
-      "pname": "bat",
-      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
-      "rev_count": 964859,
-      "rev_date": "2026-03-18T08:17:15Z",
-      "scrape_date": "2026-03-20T01:41:35.604289Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.26.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/0yabcj0xwrryngqn80s0jlmp8f2l4hnn-bat-0.26.1"
-      },
-      "system": "x86_64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "bat",
-      "broken": false,
-      "derivation": "/nix/store/bqwv83g63x8r7ipys9swxcil1fsrq3mb-bat-0.26.1.drv",
-      "description": "Cat(1) clone with syntax highlighting and Git integration",
-      "install_id": "bat",
-      "license": "[ Apache-2.0, MIT ]",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=b40629efe5d6ec48dd1efba650c797ddbd39ace0",
-      "name": "bat-0.26.1",
-      "pname": "bat",
-      "rev": "b40629efe5d6ec48dd1efba650c797ddbd39ace0",
-      "rev_count": 964859,
-      "rev_date": "2026-03-18T08:17:15Z",
-      "scrape_date": "2026-03-20T02:16:24.440513Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.26.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/38klmdi1f0xz2qqwpr1wkdh3dd2lzma0-bat-0.26.1"
-      },
-      "system": "x86_64-linux",
-      "group": "toplevel",
       "priority": 5
     },
     {
@@ -572,10 +452,6 @@
     "composer": {
       "schema-version": "1.10.0",
       "install": {
-        "bat": {
-          "pkg-path": "bat",
-          "outputs": "all"
-        },
         "curl": {
           "pkg-path": "curl",
           "outputs": "all"
@@ -589,7 +465,7 @@
         "PGPORT": "15432"
       },
       "hook": {
-        "on-activate": "\n# --- helpf: inline documentation ---\nhelpf() {\n  local readme_url=\"https://raw.githubusercontent.com/flox/floxenvs/main/postgresql-demo/README.md\"\n  local cache_dir=\"$FLOX_ENV_CACHE/postgres\"\n  local cached_readme=\"$cache_dir/README.md\"\n  mkdir -p \"$cache_dir\"\n  if [[ \"${1:-}\" == \"--force\" ]] || [[ ! -f \"$cached_readme\" ]]; then\n    curl -fsSL \"$readme_url\" -o \"$cached_readme\" 2>/dev/null \\\n      || cp \"$FLOX_ENV_PROJECT/README.md\" \"$cached_readme\" 2>/dev/null \\\n      || { echo \"Could not fetch README\"; return 1; }\n  fi\n  bat --style=plain --language=md \"$cached_readme\"\n}\nexport -f helpf\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin \"1 2\" --padding \"1 4\" \\\n    'Start PostgreSQL in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to PostgreSQL:' \\\n    '  psql' '' \\\n    'Connection information:' \\\n    \"  listen_addresses=$PGHOSTADDR\" \\\n    \"  port=$PGPORT\" \\\n    \"  user=$PGUSER\" \\\n    \"  database=$PGDATABASE\" \\\n    \"  DATABASE_URL=$DATABASE_URL\" '' \\\n    'Inline documentation:' \\\n    '  helpf              # show README' \\\n    '  helpf --force      # refresh cached README'\nfi\n\n"
+        "on-activate": "\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin \"1 2\" --padding \"1 4\" \\\n    'Start PostgreSQL in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to PostgreSQL:' \\\n    '  psql' '' \\\n    'Connection information:' \\\n    \"  listen_addresses=$PGHOSTADDR\" \\\n    \"  port=$PGPORT\" \\\n    \"  user=$PGUSER\" \\\n    \"  database=$PGDATABASE\" \\\n    \"  DATABASE_URL=$DATABASE_URL\"\nfi\n\n"
       },
       "options": {},
       "include": {

@@ -20,21 +20,10 @@ Then connect:
 psql
 ```
 
-## Inline documentation
-
-After activation, use the `helpf` command to view this
-README in your terminal:
-
-```bash
-helpf              # show README
-helpf --force      # refresh cached copy
-```
-
 ## What this demo includes
 
 - PostgreSQL (latest stable)
 - `gum` for interactive UI during setup
-- `bat` and `helpf` for inline documentation
 - Automatic database initialization on first activation
 - Service definition for background postgres
 - Connection info display on activation
