@@ -11,7 +11,7 @@ if ! command -v pg_isready 2>&1 >/dev/null; then
   exit 1
 fi
 
-echo -n "Waiting for PostgreSQL to start .."
+echo -n "Waiting for PostgreSQL to be ready .."
 MAX_ATTEMPTS=20
 while [[ "$MAX_ATTEMPTS" != "0" ]]; do
   if pg_isready -q 2>/dev/null; then

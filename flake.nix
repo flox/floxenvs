@@ -62,15 +62,15 @@
           cd $TESTDIR
           echo "👉 Running tests in $TESTDIR"
 
-          start_services=""
-          if [ "$1" == "true" ]; then
-            start_services=" --start-services"
-          fi
-
           # run tests
           if [ ! -f test.sh ]; then
             echo "Error: No test.sh script found"
             exit 1
+          fi
+
+          start_services=""
+          if ${pkgs.jq}/bin/jq -e '.manifest.services // {} | length > 0' .flox/env/manifest.lock > /dev/null 2>&1; then
+            start_services=" --start-services"
           fi
 
           echo "👉 Running ${name} test..."
