@@ -1,17 +1,17 @@
-# postgres-demo
+# postgresql-demo
 
 Full PostgreSQL demo environment that walks you through
 configuration options, version selection, and service
 management with Flox.
 
 For a minimal environment to include in your own project,
-see [postgres](../postgres/) or use `flox/postgres` on
-FloxHub.
+see [postgresql](../postgresql/) or use `flox/postgresql`
+on FloxHub.
 
 ## Quick start
 
 ```bash
-flox activate -r flox/postgres-demo --start-services
+flox activate -r flox/postgresql-demo --start-services
 ```
 
 Then connect:
@@ -108,7 +108,7 @@ environment in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/postgres"]
+environments = ["flox/postgresql"]
 ```
 
 This gives you PostgreSQL with sane defaults. Override

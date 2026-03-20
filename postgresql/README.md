@@ -1,4 +1,4 @@
-# postgres
+# postgresql
 
 Minimal PostgreSQL environment. Include it in your own
 manifest to get a working PostgreSQL setup with sane
@@ -9,7 +9,7 @@ defaults.
 Activate directly:
 
 ```bash
-flox activate -r flox/postgres --start-services
+flox activate -r flox/postgresql --start-services
 ```
 
 ## Include in your project
@@ -18,7 +18,7 @@ Add to your `manifest.toml`:
 
 ```toml
 [include]
-environments = ["flox/postgres"]
+environments = ["flox/postgresql"]
 ```
 
 Then customize in your own manifest as needed -- override
@@ -115,4 +115,4 @@ pg_ctl -D "$PGDATA" reload
 
 For a full walkthrough with version selection, extensions,
 and configuration examples, see
-[postgres-demo](../postgres-demo/).
+[postgresql-demo](../postgresql-demo/).

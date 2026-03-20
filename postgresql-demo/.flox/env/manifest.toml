@@ -1,7 +1,7 @@
 schema-version = "1.10.0"
 [include]
 environments = [
-  { dir = "../postgres" }
+  { dir = "../postgresql" }
 ]
 
 [install]
@@ -31,7 +31,7 @@ curl.outputs = "all"
 # Environment variables
 # ============================================================
 #
-# Setting PGPORT switches the included postgres environment
+# Setting PGPORT switches the included postgresql environment
 # from unix socket mode to TCP mode. The demo uses TCP to
 # showcase connection info and port configuration.
 
@@ -44,7 +44,7 @@ PGPORT = "15432"
 # ============================================================
 #
 # The postgres initialization (initdb, data dir, service
-# setup) comes from the included flox/postgres environment.
+# setup) comes from the included flox/postgresql environment.
 #
 # This hook adds demo-specific features:
 # 1. helpf command for inline documentation
@@ -55,7 +55,7 @@ on-activate = '''
 
 # --- helpf: inline documentation ---
 helpf() {
-  local readme_url="https://raw.githubusercontent.com/flox/floxenvs/main/postgres-demo/README.md"
+  local readme_url="https://raw.githubusercontent.com/flox/floxenvs/main/postgresql-demo/README.md"
   local cache_dir="$FLOX_ENV_CACHE/postgres"
   local cached_readme="$cache_dir/README.md"
   mkdir -p "$cache_dir"
