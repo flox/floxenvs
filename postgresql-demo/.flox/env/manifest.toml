@@ -4,25 +4,37 @@ environments = [
   { dir = "../postgresql" }
 ]
 
+# ============================================================
+# Packages
+# ============================================================
+#
+# UI and documentation tools share a pkg-group so they
+# resolve independently from the service and consumer
+# packages.
+#
+# Extensions must use the same pkg-group as postgresql
+# (defined in the included postgresql environment) so
+# they resolve against the same PostgreSQL version.
+#
+# Search for more: flox search postgresqlPackages
+
 [install]
 
-# --- UI and documentation tools (for the demo experience) ---
 gum.pkg-path = "gum"
-gum.outputs = "all"
+gum.pkg-group = "demo-tools"
 curl.pkg-path = "curl"
-curl.outputs = "all"
+curl.pkg-group = "demo-tools"
 
-# --- Optional: add extensions ---
-#
-# Common PostgreSQL extensions available in the Flox catalog:
-#
+pgvector.pkg-path = "postgresqlPackages.pgvector"
+pgvector.pkg-group = "postgresql"
+
+# Other common extensions (uncomment to add):
 # postgis.pkg-path = "postgresqlPackages.postgis"
-# pgvector.pkg-path = "postgresqlPackages.pgvector"
+# postgis.pkg-group = "postgresql"
 # pg_cron.pkg-path = "postgresqlPackages.pg_cron"
+# pg_cron.pkg-group = "postgresql"
 # pgtap.pkg-path = "postgresqlPackages.pgtap"
-#
-# Search for more:
-#   flox search postgresqlPackages
+# pgtap.pkg-group = "postgresql"
 
 
 # ============================================================
@@ -51,7 +63,7 @@ PGPORT = "15432"
 on-activate = '''
 
 if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
-  gum style --border double --margin "1 2" --padding "1 4" \
+  gum style --border double --margin '1 2' --padding '1 4' \
     'Start PostgreSQL in the background:' \
     '  flox services start' \
     '  flox activate --start-services' '' \
@@ -62,7 +74,10 @@ if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
     "  port=$PGPORT" \
     "  user=$PGUSER" \
     "  database=$PGDATABASE" \
-    "  DATABASE_URL=$DATABASE_URL"
+    "  DATABASE_URL=$DATABASE_URL" '' \
+    'Add extensions (use the postgresql pkg-group):' \
+    '  flox search postgresqlPackages' \
+    '  flox install postgresqlPackages.postgis -g postgresql'
 fi
 
 '''

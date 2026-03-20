@@ -42,3 +42,10 @@ else
   echo "Error: Something went wrong."
   exit 1
 fi
+
+echo ">>> Testing pgvector extension"
+psql -c "CREATE EXTENSION IF NOT EXISTS vector;"
+psql -c "CREATE TABLE IF NOT EXISTS items (id bigserial PRIMARY KEY, embedding vector(3));"
+psql -c "INSERT INTO items (embedding) VALUES ('[1,2,3]'), ('[4,5,6]');"
+psql -c "SELECT * FROM items ORDER BY embedding <-> '[3,1,2]' LIMIT 5;"
+echo ">>> pgvector working."

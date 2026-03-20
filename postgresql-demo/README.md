@@ -54,20 +54,39 @@ reinitialize:
 rm -rf "$FLOX_ENV_CACHE/postgres"
 ```
 
-## Adding extensions
+## Extensions
 
-Search for available extensions:
+This demo includes [pgvector](https://github.com/pgvector/pgvector)
+for vector similarity search. After starting the service:
 
-```bash
-flox search postgresqlPackages
+```sql
+CREATE EXTENSION vector;
+
+CREATE TABLE items (
+  id bigserial PRIMARY KEY,
+  embedding vector(3)
+);
+
+INSERT INTO items (embedding)
+  VALUES ('[1,2,3]'), ('[4,5,6]');
+
+SELECT * FROM items
+  ORDER BY embedding <-> '[3,1,2]' LIMIT 5;
 ```
 
-Add to your manifest:
+Extensions must use the same `pkg-group` as postgresql
+so they resolve against the same version:
 
 ```toml
 [install]
-postgis.pkg-path = "postgresqlPackages.postgis"
 pgvector.pkg-path = "postgresqlPackages.pgvector"
+pgvector.pkg-group = "postgresql"
+```
+
+Search for more extensions:
+
+```bash
+flox search postgresqlPackages
 ```
 
 ## Customizing connection settings
