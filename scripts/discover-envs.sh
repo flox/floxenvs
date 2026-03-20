@@ -30,18 +30,31 @@ has_services() {
 }
 
 # Extract systems list from lock file (one per line).
+# If manifest.options.systems is empty or absent, all
+# default systems are assumed (per ADR-004).
+ALL_SYSTEMS="aarch64-darwin
+aarch64-linux
+x86_64-darwin
+x86_64-linux"
+
 get_systems() {
   local lock="$1"
-  jq -r '.manifest.options.systems // [] | .[]' "$lock"
+  local systems
+  systems="$(jq -r '.manifest.options.systems // [] | .[]' "$lock")"
+  if [ -z "$systems" ]; then
+    systems="$ALL_SYSTEMS"
+  fi
+  echo "$systems"
 }
 
 # ── Environment discovery ──────────────────────────────────
 
 find_locks() {
   find "$REPO_ROOT" -maxdepth 4 -path '*/.flox/env/manifest.lock' \
-    -not -path '*/_worktrees/*' \
+    -not -path "$REPO_ROOT/_worktrees/*" \
     -not -path '*/remote/*' \
     -not -path '*/.git/*' \
+    -not -path '*-demo/.flox/*' \
     | sort
 }
 
