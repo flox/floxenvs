@@ -49,6 +49,9 @@
             exit $ret
           fi
 
+          cleanup() { rm -rf "$TESTDIR"; }
+          trap cleanup EXIT
+
           chmod g=rwx "$TESTDIR"
           cp -R ${path}/* $TESTDIR
           cp -R ${path}/.flox* $TESTDIR
