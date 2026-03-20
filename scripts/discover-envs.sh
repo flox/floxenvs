@@ -54,8 +54,12 @@ find_locks() {
     -not -path "$REPO_ROOT/_worktrees/*" \
     -not -path '*/remote/*' \
     -not -path '*/.git/*' \
-    -not -path '*-demo/.flox/*' \
     | sort
+}
+
+is_demo() {
+  local name="$1"
+  [[ "$name" == *-demo ]]
 }
 
 # Resolve lock path to the env directory (two levels up
@@ -141,6 +145,7 @@ mode_discover() {
 
   local envs_per_system=()
   local envs_only=()
+  local envs_deploy=()
 
   while IFS= read -r lock; do
     local env_path
@@ -177,6 +182,11 @@ mode_discover() {
       done <<< "$systems"
 
       envs_only+=("\"$name\"")
+
+      # Deploy list excludes demo environments
+      if ! is_demo "$name"; then
+        envs_deploy+=("\"$name\"")
+      fi
     fi
   done < <(find_locks)
 
@@ -185,6 +195,8 @@ mode_discover() {
   per_system_json="[$(IFS=,; echo "${envs_per_system[*]:-}")]"
   local only_json
   only_json="[$(IFS=,; echo "${envs_only[*]:-}")]"
+  local deploy_json
+  deploy_json="[$(IFS=,; echo "${envs_deploy[*]:-}")]"
 
   echo "-- envs_per_system ---------" >&2
   echo "$per_system_json" | jq . >&2
@@ -194,13 +206,19 @@ mode_discover() {
   echo "$only_json" | jq . >&2
   echo "----------------------------" >&2
 
+  echo "-- envs_deploy -------------" >&2
+  echo "$deploy_json" | jq . >&2
+  echo "----------------------------" >&2
+
   # Output for CI or stdout
   if [ -n "${GITHUB_OUTPUT:-}" ]; then
     echo "envs_per_system=$per_system_json" >> "$GITHUB_OUTPUT"
     echo "envs_only=$only_json" >> "$GITHUB_OUTPUT"
+    echo "envs_deploy=$deploy_json" >> "$GITHUB_OUTPUT"
   else
     echo "envs_per_system=$per_system_json"
     echo "envs_only=$only_json"
+    echo "envs_deploy=$deploy_json"
   fi
 }
 
