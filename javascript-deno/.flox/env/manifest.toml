@@ -1,4 +1,4 @@
-version = 1
+schema-version = "1.10.0"
 
 [install]
 deno.pkg-path = "deno"
@@ -6,6 +6,7 @@ deno.pkg-path = "deno"
 # helper tools
 gum.pkg-path = "gum"
 coreutils.pkg-path = "coreutils"
+coreutils.outputs = "all"
 
 
 [hook]
@@ -51,9 +52,4 @@ fi
 '''
 
 [options]
-systems = [
-  "aarch64-darwin",
-  "aarch64-linux",
-  "x86_64-darwin",
-  "x86_64-linux",
-]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
