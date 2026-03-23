@@ -1,4 +1,4 @@
-version = 1
+schema-version = "1.10.0"
 
 [install]
 # Rust toolchain, put them in the same package group
@@ -7,6 +7,7 @@ cargo.pkg-path = "cargo"
 cargo.pkg-group = "rust-toolchain"
 rustc.pkg-path = "rustc"
 rustc.pkg-group = "rust-toolchain"
+rustc.outputs = "all"
 clippy.pkg-path = "clippy"
 clippy.pkg-group = "rust-toolchain"
 rustfmt.pkg-path = "rustfmt"
@@ -25,10 +26,12 @@ clang.pkg-path = "clang"
 clang.systems = ["aarch64-darwin", "x86_64-darwin"]
 gcc.pkg-path = "gcc"
 gcc.systems = ["aarch64-linux", "x86_64-linux"]
+gcc.outputs = "all"
 
 # Platform-specific libraries
 libiconv.pkg-path = "libiconv"
 libiconv.systems = ["aarch64-darwin", "x86_64-darwin"]
+libiconv.outputs = "all"
 
 # Extra tools
 cargo-nextest.pkg-path = "cargo-nextest"
@@ -43,9 +46,4 @@ cargo-semver-checks.pkg-path = "cargo-semver-checks"
 [profile]
 
 [options]
-systems = [
-  "aarch64-darwin",
-  "x86_64-darwin",
-  "aarch64-linux",
-  "x86_64-linux",
-]
+systems = ["aarch64-darwin", "x86_64-darwin", "aarch64-linux", "x86_64-linux"]
