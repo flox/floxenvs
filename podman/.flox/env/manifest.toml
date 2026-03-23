@@ -1,4 +1,4 @@
-version = 1
+schema-version = "1.10.0"
 
 [options]
 systems = ["x86_64-linux", "aarch64-linux", "x86_64-darwin", "aarch64-darwin"]
@@ -6,6 +6,7 @@ systems = ["x86_64-linux", "aarch64-linux", "x86_64-darwin", "aarch64-darwin"]
 [install]
 podman.pkg-path         = "podman"
 podman-compose.pkg-path = "podman-compose"
+podman-compose.outputs = "all"
 undocker.pkg-path       = "undocker"
 podman-tui.pkg-path     = "podman-tui"
 gum.pkg-path            = "gum"
@@ -14,6 +15,7 @@ gum.pkg-path            = "gum"
 [install.qemu]
 pkg-path = "qemu"
 systems  = ["x86_64-darwin", "aarch64-darwin"]
+outputs = "all"
 
 
 [profile]
