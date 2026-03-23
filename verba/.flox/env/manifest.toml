@@ -1,4 +1,4 @@
-version = 1
+schema-version = "1.10.0"
 
 [install]
 
@@ -18,14 +18,20 @@ gum.pkg-path = "gum"
 # Deps for our service scripts
 bash.pkg-path = "bash"
 bash.priority = 0
+bash.outputs = "all"
 curl.pkg-path = "curl"
+curl.outputs = "all"
 git.pkg-path = "git"
+git.outputs = "all"
 
 # System/C deps
 gcc-unwrapped.pkg-path = "gcc-unwrapped"
+gcc-unwrapped.outputs = "all"
 pkg-config.pkg-path = "pkg-config"
+pkg-config.outputs = "all"
 glibc.pkg-path = "glibc"  # glibc only needed on linux builds
-glibc.systems = [ "x86_64-linux" , "aarch64-linux"]
+glibc.systems = ["x86_64-linux", "aarch64-linux"]
+glibc.outputs = "all"
 
 
 [vars]
@@ -136,9 +142,4 @@ ollama pull "$OLLAMA_EMBED_MODEL"
 
 
 [options]
-systems = [
-  "aarch64-darwin",
-  "aarch64-linux",
-  "x86_64-linux",
-  "x86_64-darwin",
-]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux", "x86_64-darwin"]
