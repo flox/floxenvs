@@ -6,10 +6,11 @@
 ##
 ## -------------------------------------------------------------------
 # Flox manifest version managed by Flox CLI
-version = 1
+schema-version = "1.10.0"
 
 [install]
 openai.pkg-path = "openai"
+openai.outputs = "all"
 mods.pkg-path = "mods"
 llm.pkg-path = "llm"
 gum.pkg-path = "gum"
@@ -53,11 +54,6 @@ echo; echo "🚨 OpenAI client is available (no key)"
 '''
 
 [options]
-systems = [
-  "aarch64-darwin",
-  "aarch64-linux",
-  "x86_64-darwin",
-  "x86_64-linux",
-]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
 cuda-detection = false
 
