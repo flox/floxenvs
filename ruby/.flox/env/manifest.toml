@@ -1,7 +1,8 @@
-version = 1
+schema-version = "1.10.0"
 
 [install]
 ruby.pkg-path = "ruby"
+ruby.outputs = "all"
 # ruby version options
 #ruby.version = "3.3.4"
 #ruby.version = "3.1.6"
@@ -9,18 +10,30 @@ ruby.pkg-path = "ruby"
 
 # Useful for building native extensions
 gcc-unwrapped.pkg-path = "gcc-unwrapped"
+gcc-unwrapped.outputs = "all"
 libxml2.pkg-path = "libxml2"
+libxml2.outputs = "all"
 libxslt.pkg-path = "libxslt"
+libxslt.outputs = "all"
 gnumake.pkg-path = "gnumake"
+gnumake.outputs = "all"
 binutils.pkg-path = "binutils"
+binutils.outputs = "all"
 pkg-config.pkg-path = "pkg-config"
+pkg-config.outputs = "all"
 glibc.pkg-path = "glibc"  # glibc only needed on linux builds
-glibc.systems = [ "x86_64-linux" , "aarch64-linux"]
+glibc.systems = ["x86_64-linux", "aarch64-linux"]
+glibc.outputs = "all"
 openssl.pkg-path = "openssl"
+openssl.outputs = "all"
 libyaml.pkg-path = "libyaml"
+libyaml.outputs = "all"
 imagemagick.pkg-path = "imagemagick"
+imagemagick.outputs = "all"
 postgresql.pkg-path = "postgresql"
+postgresql.outputs = "all"
 libmysqlclient.pkg-path = "libmysqlclient"
+libmysqlclient.outputs = "all"
 
 # Helpful for setup
 gum.pkg-path = "gum"
@@ -90,9 +103,4 @@ echo ''
 '''
 
 [options]
-systems = [
-  "aarch64-darwin",
-  "aarch64-linux",
-  "x86_64-darwin",
-  "x86_64-linux",
-]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
