@@ -1,9 +1,12 @@
-version = 1
+schema-version = "1.10.0"
 
 [install]
 nginx.pkg-path = "nginx"
+nginx.outputs = "all"
 curl.pkg-path = "curl"
+curl.outputs = "all"
 gnugrep.pkg-path = "gnugrep"
+gnugrep.outputs = "all"
 
 [vars]
 NGINX_WWW_DIR = ""
@@ -73,9 +76,4 @@ fi
 nginx.command = "nginx -c $NGINX_CONFIG -e $NGINX_ERROR_LOG -g 'daemon off;'"
 
 [options]
-systems = [
-    "aarch64-darwin",
-    "aarch64-linux",
-    "x86_64-darwin",
-    "x86_64-linux",
-]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
