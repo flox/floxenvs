@@ -1,11 +1,14 @@
-version = 1
+schema-version = "1.10.0"
 
 
 [install]
 coreutils.pkg-path = "coreutils"
+coreutils.outputs = "all"
 which.pkg-path = "which"
 jq.pkg-path = "jq"
+jq.outputs = "all"
 curl.pkg-path = "curl"
+curl.outputs = "all"
 
 # Elasticsearch / Opensearch
 elasticsearch.pkg-path = "elasticsearch7"
@@ -99,9 +102,4 @@ elasticsearch.command = "elasticsearch"
 
 
 [options]
-systems = [
-  "aarch64-darwin",
-  "aarch64-linux",
-  "x86_64-darwin",
-  "x86_64-linux",
-]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
