@@ -1,4 +1,4 @@
-version = 1
+schema-version = "1.10.0"
 
 
 [install]
@@ -6,6 +6,7 @@ mkcert.pkg-path = "mkcert"
 mkcert.version = "1.4.3"
 mkcert.pkg-group = "pin"
 nssTools.pkg-path = "nssTools"
+nssTools.outputs = "all"
 gum.pkg-path = "gum"
 
 
@@ -80,9 +81,4 @@ fi
 [profile]
 
 [options]
-systems = [
-  "aarch64-darwin",
-  "aarch64-linux",
-  "x86_64-darwin",
-  "x86_64-linux",
-]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
