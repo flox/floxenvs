@@ -121,14 +121,16 @@
 
           # On Linux, isolate in network+PID namespace so concurrent
           # tests don't fight over ports and orphaned services get
-          # killed automatically on exit.
+          # killed automatically on exit. Falls back to direct
+          # execution if unshare is unavailable or not permitted.
           if [ "$(uname)" = "Linux" ] && command -v unshare >/dev/null 2>&1; then
             echo "👉 Isolating test in network+PID namespace..."
             unshare --net --pid --fork ${pkgs.bashInteractive}/bin/bash -c \
-              "ip link set lo up 2>/dev/null || true; cd \"$envdir\"; eval \"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\""
-          else
-            eval "flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'"
+              "ip link set lo up 2>/dev/null || true; cd \"$envdir\"; eval \"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\"" \
+              && exit 0 \
+              || echo "👉 Namespace isolation failed, falling back to direct execution..."
           fi
+          eval "flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'"
         '';
       in
       {
