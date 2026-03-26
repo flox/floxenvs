@@ -49,7 +49,7 @@
 
           export FLOX_DISABLE_METRICS=true
           export FLOX_ENVS_TESTING=1
-          export PATH="${lib.makeBinPath (with pkgs; [ coreutils util-linux iproute2 flox.packages."${system}".default ])}:$PATH"
+          export PATH="${lib.makeBinPath (with pkgs; [ coreutils flox.packages."${system}".default ] ++ lib.optionals stdenv.isLinux [ util-linux iproute2 ])}:$PATH"
           export LANG=
           export LC_COLLATE="C"
           export LC_CTYPE="C"
