@@ -49,7 +49,7 @@
 
           export FLOX_DISABLE_METRICS=true
           export FLOX_ENVS_TESTING=1
-          export PATH="${lib.makeBinPath (with pkgs; [ coreutils flox.packages."${system}".default ])}:$PATH"
+          export PATH="${lib.makeBinPath (with pkgs; [ coreutils util-linux iproute2 flox.packages."${system}".default ])}:$PATH"
           export LANG=
           export LC_COLLATE="C"
           export LC_CTYPE="C"
@@ -118,7 +118,17 @@
           fi
 
           echo "👉 Running $name test..."
-          eval "flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'"
+
+          # On Linux, isolate in network+PID namespace so concurrent
+          # tests don't fight over ports and orphaned services get
+          # killed automatically on exit.
+          if [ "$(uname)" = "Linux" ] && command -v unshare >/dev/null 2>&1; then
+            echo "👉 Isolating test in network+PID namespace..."
+            unshare --net --pid --fork ${pkgs.bashInteractive}/bin/bash -c \
+              "ip link set lo up 2>/dev/null || true; cd \"$envdir\"; eval \"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\""
+          else
+            eval "flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'"
+          fi
         '';
       in
       {
