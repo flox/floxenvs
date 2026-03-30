@@ -124,8 +124,8 @@
           # killed automatically on exit. Falls back to direct
           # execution if unshare is unavailable or not permitted.
           if [ "$(uname)" = "Linux" ] && command -v unshare >/dev/null 2>&1; then
-            echo "👉 Isolating test in network+PID namespace..."
-            unshare --net --pid --fork ${pkgs.bashInteractive}/bin/bash -c \
+            echo "👉 Isolating test in user+network+PID namespace..."
+            unshare --user --net --pid --fork ${pkgs.bashInteractive}/bin/bash -c \
               "ip link set lo up 2>/dev/null || true; cd \"$envdir\"; eval \"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\"" \
               && exit 0 \
               || echo "👉 Namespace isolation failed, falling back to direct execution..."
