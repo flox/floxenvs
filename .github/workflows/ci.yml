@@ -65,7 +65,7 @@ jobs:
         uses: "actions/checkout@v6"
 
       - name: "Setup SSH"
-        uses: "webfactory/ssh-agent@v0.9.1"
+        uses: "webfactory/ssh-agent@v0.10.0"
         with:
           ssh-private-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
 
@@ -96,7 +96,7 @@ jobs:
           fi
 
       - name: "Test environment"
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@v4
         with:
           timeout_minutes: 15
           max_attempts: 3
