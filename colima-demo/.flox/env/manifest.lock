@@ -1,0 +1,844 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "colima": {
+        "pkg-path": "colima"
+      },
+      "ctop": {
+        "pkg-path": "ctop",
+        "pkg-group": "demo-tools"
+      },
+      "dive": {
+        "pkg-path": "dive",
+        "pkg-group": "demo-tools"
+      },
+      "docker": {
+        "pkg-path": "docker-client"
+      },
+      "docker-compose": {
+        "pkg-path": "docker-compose",
+        "pkg-group": "demo-tools"
+      },
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": "demo-tools"
+      },
+      "lazydocker": {
+        "pkg-path": "lazydocker",
+        "pkg-group": "demo-tools"
+      },
+      "oxker": {
+        "pkg-path": "oxker",
+        "pkg-group": "demo-tools"
+      }
+    },
+    "hook": {
+      "on-activate": "\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'Start Colima in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Once running, try:' \\\n    '  docker run hello-world' \\\n    '  docker-compose up' '' \\\n    'Container management TUIs:' \\\n    '  lazydocker    — full container/image/volume dashboard' \\\n    '  oxker         — lightweight container viewer' \\\n    '  ctop          — top-like container metrics' \\\n    '  dive <image>  — explore image layers'\nfi\n\n"
+    },
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    },
+    "services": {
+      "colima": {
+        "command": "colima start --foreground"
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "ctop",
+      "broken": false,
+      "derivation": "/nix/store/4k1xhcjkf413vvwk978sdbv51aq04xfw-ctop-0.7.7.drv",
+      "description": "Top-like interface for container metrics",
+      "install_id": "ctop",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "name": "ctop-0.7.7",
+      "pname": "ctop",
+      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "rev_count": 962836,
+      "rev_date": "2026-03-13T08:19:52Z",
+      "scrape_date": "2026-03-15T04:41:40.902382Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.7.7",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/nj68625fs79h10rbz5jfcsxq2fvv1864-ctop-0.7.7"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "ctop",
+      "broken": false,
+      "derivation": "/nix/store/r0fk5bd0djhgm8cyxnc4r37vw6l9j5kq-ctop-0.7.7.drv",
+      "description": "Top-like interface for container metrics",
+      "install_id": "ctop",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "name": "ctop-0.7.7",
+      "pname": "ctop",
+      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "rev_count": 962836,
+      "rev_date": "2026-03-13T08:19:52Z",
+      "scrape_date": "2026-03-15T05:15:05.392385Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.7.7",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/1lmgk818lr58ngrsqpf3l1yjb4djbnrj-ctop-0.7.7"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "ctop",
+      "broken": false,
+      "derivation": "/nix/store/8ln6p2ja25vw4bdiyzxyvzlbjpazps13-ctop-0.7.7.drv",
+      "description": "Top-like interface for container metrics",
+      "install_id": "ctop",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "name": "ctop-0.7.7",
+      "pname": "ctop",
+      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "rev_count": 962836,
+      "rev_date": "2026-03-13T08:19:52Z",
+      "scrape_date": "2026-03-15T06:19:33.489076Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.7.7",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/jrcmplq3mnmvbahl1ml6vdn2x0fb51wy-ctop-0.7.7"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "dive",
+      "broken": false,
+      "derivation": "/nix/store/hmqd4hfrdxld4sm2lsmr7l1bvjq1z938-dive-0.13.1.drv",
+      "description": "Tool for exploring each layer in a docker image",
+      "install_id": "dive",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "name": "dive-0.13.1",
+      "pname": "dive",
+      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "rev_count": 962836,
+      "rev_date": "2026-03-13T08:19:52Z",
+      "scrape_date": "2026-03-15T04:41:41.025773Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.13.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/25bwkbr3m44xm182nix62a8va8b0is0h-dive-0.13.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "dive",
+      "broken": false,
+      "derivation": "/nix/store/mhfm3bgw7a97lbh2zhmij5qj8b1qxf90-dive-0.13.1.drv",
+      "description": "Tool for exploring each layer in a docker image",
+      "install_id": "dive",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "name": "dive-0.13.1",
+      "pname": "dive",
+      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "rev_count": 962836,
+      "rev_date": "2026-03-13T08:19:52Z",
+      "scrape_date": "2026-03-15T05:15:05.587404Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.13.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/3bzsiz7c39lmvypiyp2yksrf6kwwsmmr-dive-0.13.1"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "dive",
+      "broken": false,
+      "derivation": "/nix/store/z0g3vpz60m2xypsyi23pgqyi1myz72kc-dive-0.13.1.drv",
+      "description": "Tool for exploring each layer in a docker image",
+      "install_id": "dive",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "name": "dive-0.13.1",
+      "pname": "dive",
+      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "rev_count": 962836,
+      "rev_date": "2026-03-13T08:19:52Z",
+      "scrape_date": "2026-03-15T06:19:33.724007Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.13.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/jqg483w3p19bq0mkvy4gqsicxxvqxh0x-dive-0.13.1"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "docker-compose",
+      "broken": false,
+      "derivation": "/nix/store/qf27i20wizyli62g16rxiv87ws3xanpn-docker-compose-5.0.2.drv",
+      "description": "Docker CLI plugin to define and run multi-container applications with Docker",
+      "install_id": "docker-compose",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "name": "docker-compose-5.0.2",
+      "pname": "docker-compose",
+      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "rev_count": 962836,
+      "rev_date": "2026-03-13T08:19:52Z",
+      "scrape_date": "2026-03-15T04:41:41.046233Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "5.0.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/97m9rbwq7rny6amvmyv1jx0p8ih378c2-docker-compose-5.0.2"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "docker-compose",
+      "broken": false,
+      "derivation": "/nix/store/0w4ivvrwhvss1csl6mn7dgx0kx2938lg-docker-compose-5.0.2.drv",
+      "description": "Docker CLI plugin to define and run multi-container applications with Docker",
+      "install_id": "docker-compose",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "name": "docker-compose-5.0.2",
+      "pname": "docker-compose",
+      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "rev_count": 962836,
+      "rev_date": "2026-03-13T08:19:52Z",
+      "scrape_date": "2026-03-15T05:15:05.621045Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "5.0.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cswckymidicwvhx77jbsyc663dfr6amv-docker-compose-5.0.2"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "docker-compose",
+      "broken": false,
+      "derivation": "/nix/store/6rwc3d25rfcwdbhf71wzqq4zdk3r3z24-docker-compose-5.0.2.drv",
+      "description": "Docker CLI plugin to define and run multi-container applications with Docker",
+      "install_id": "docker-compose",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "name": "docker-compose-5.0.2",
+      "pname": "docker-compose",
+      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "rev_count": 962836,
+      "rev_date": "2026-03-13T08:19:52Z",
+      "scrape_date": "2026-03-15T06:19:33.764911Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "5.0.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/q2d8xphgqlvvdzlnb3pciryjxljq6c09-docker-compose-5.0.2"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/0q3saf0py9fifyx6h6jwzjvg7y707x8a-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "rev_count": 962836,
+      "rev_date": "2026-03-13T08:19:52Z",
+      "scrape_date": "2026-03-15T04:41:41.932137Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/x5ngj85sp5paq6la0g60qrx7p6z6h9iz-gum-0.17.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/nrc9wm1wydfjsch8hxbwqs78fw5r0640-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "rev_count": 962836,
+      "rev_date": "2026-03-13T08:19:52Z",
+      "scrape_date": "2026-03-15T05:15:07.698898Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/8492ypc20ys8kghyq4c9n8bfip85rg0n-gum-0.17.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/6zn2267d9ynz2jnbvfcz035sfbpql4r1-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "rev_count": 962836,
+      "rev_date": "2026-03-13T08:19:52Z",
+      "scrape_date": "2026-03-15T06:19:36.119708Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/x5bn6qhx5qr16w5nz0mh5bh9ww4530h8-gum-0.17.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "lazydocker",
+      "broken": false,
+      "derivation": "/nix/store/kc570jgndfjhlcspgfpb8zxfnapfkyf8-lazydocker-0.24.4.drv",
+      "description": "Simple terminal UI for both docker and docker-compose",
+      "install_id": "lazydocker",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "name": "lazydocker-0.24.4",
+      "pname": "lazydocker",
+      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "rev_count": 962836,
+      "rev_date": "2026-03-13T08:19:52Z",
+      "scrape_date": "2026-03-15T04:41:57.765337Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.24.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/hdykj2m2kkassb3h9vsvarzxv92i8s12-lazydocker-0.24.4"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "lazydocker",
+      "broken": false,
+      "derivation": "/nix/store/692rgsbdnyavdr3v391zzfha0j4106bi-lazydocker-0.24.4.drv",
+      "description": "Simple terminal UI for both docker and docker-compose",
+      "install_id": "lazydocker",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "name": "lazydocker-0.24.4",
+      "pname": "lazydocker",
+      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "rev_count": 962836,
+      "rev_date": "2026-03-13T08:19:52Z",
+      "scrape_date": "2026-03-15T05:15:28.822928Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.24.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/fn18l1xydya17idm43y817fmqzggc7nf-lazydocker-0.24.4"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "lazydocker",
+      "broken": false,
+      "derivation": "/nix/store/kmy7lf2dzl8hakzr1m8213q4x02z2jnd-lazydocker-0.24.4.drv",
+      "description": "Simple terminal UI for both docker and docker-compose",
+      "install_id": "lazydocker",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "name": "lazydocker-0.24.4",
+      "pname": "lazydocker",
+      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "rev_count": 962836,
+      "rev_date": "2026-03-13T08:19:52Z",
+      "scrape_date": "2026-03-15T06:20:01.313378Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.24.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/fzjab14p92i3hlm0qpbkgw0xqpbv9fck-lazydocker-0.24.4"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "oxker",
+      "broken": false,
+      "derivation": "/nix/store/nph1sbs44c8kdc07wv80w796dlf5jhfh-oxker-0.12.0.drv",
+      "description": "Simple TUI to view & control docker containers",
+      "install_id": "oxker",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "name": "oxker-0.12.0",
+      "pname": "oxker",
+      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "rev_count": 962836,
+      "rev_date": "2026-03-13T08:19:52Z",
+      "scrape_date": "2026-03-15T04:42:10.517239Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.12.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/y83xp1alhgvd95q4mp0l77flks5mnlyv-oxker-0.12.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "oxker",
+      "broken": false,
+      "derivation": "/nix/store/kk2kzla6yqjs97aqs1gpmgyi70bpawkc-oxker-0.12.0.drv",
+      "description": "Simple TUI to view & control docker containers",
+      "install_id": "oxker",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "name": "oxker-0.12.0",
+      "pname": "oxker",
+      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "rev_count": 962836,
+      "rev_date": "2026-03-13T08:19:52Z",
+      "scrape_date": "2026-03-15T05:15:51.012906Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.12.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/aqv8kq52pcaz2plwdwczxcij8nh8ywir-oxker-0.12.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "oxker",
+      "broken": false,
+      "derivation": "/nix/store/jz7krkwpdqil5pv5g4s6w4pw6vxhy1bp-oxker-0.12.0.drv",
+      "description": "Simple TUI to view & control docker containers",
+      "install_id": "oxker",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "name": "oxker-0.12.0",
+      "pname": "oxker",
+      "rev": "c06b4ae3d6599a672a6210b7021d699c351eebda",
+      "rev_count": 962836,
+      "rev_date": "2026-03-13T08:19:52Z",
+      "scrape_date": "2026-03-15T06:20:30.698307Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.12.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cwbcj27skyyxxaqx9i9zfy5vc78cibpb-oxker-0.12.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "colima",
+      "broken": false,
+      "derivation": "/nix/store/2qmk6jq8wnk06fdrdv0zz8y5s20j4bay-colima-0.10.1.drv",
+      "description": "Container runtimes with minimal setup",
+      "install_id": "colima",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "colima-0.10.1",
+      "pname": "colima",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T03:37:19.991718Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.10.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rmkhqpjqkcpccbv046814ccg3ifbfbdl-colima-0.10.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "colima",
+      "broken": false,
+      "derivation": "/nix/store/32zyasvls725n36qb8nszz6rj70kiv6y-colima-0.10.1.drv",
+      "description": "Container runtimes with minimal setup",
+      "install_id": "colima",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "colima-0.10.1",
+      "pname": "colima",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:09:54.364007Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.10.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/16j2phln6w92phf3dbzq8amljq6dc8am-colima-0.10.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "colima",
+      "broken": false,
+      "derivation": "/nix/store/w55lal8iljf50gcwajafn9wqrz4i13cc-colima-0.10.1.drv",
+      "description": "Container runtimes with minimal setup",
+      "install_id": "colima",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "colima-0.10.1",
+      "pname": "colima",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T05:16:14.714871Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.10.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/fhapm79mypgv3ilm2310vqzsnxglpqkw-colima-0.10.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "docker-client",
+      "broken": false,
+      "derivation": "/nix/store/6n2xihc9vn5sdx3ih4fjqw7j2xic27zs-docker-29.3.0.drv",
+      "description": "Open source project to pack, ship and run any application as a lightweight container",
+      "install_id": "docker",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "docker-29.3.0",
+      "pname": "docker-client",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T03:37:20.229095Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "29.3.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/fbr0asx18w3r8y3yj8n16iyis0cnfnmh-docker-29.3.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "docker-client",
+      "broken": false,
+      "derivation": "/nix/store/gy66hvmhjldx5kbs8x5ha5amf6cigg8d-docker-29.3.0.drv",
+      "description": "Open source project to pack, ship and run any application as a lightweight container",
+      "install_id": "docker",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "docker-29.3.0",
+      "pname": "docker-client",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:09:54.722882Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "29.3.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/fnf3vdq91ikak1pf7jgm49p87f3jsv0j-docker-29.3.0"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "docker-client",
+      "broken": false,
+      "derivation": "/nix/store/45ha5bn13rq346vjq21ldavp02wbyxjp-docker-29.3.0.drv",
+      "description": "Open source project to pack, ship and run any application as a lightweight container",
+      "install_id": "docker",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "docker-29.3.0",
+      "pname": "docker-client",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T05:16:15.117827Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "29.3.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/vmmfkm199bz54797bcvs05j5ppw4m11n-docker-29.3.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ],
+  "compose": {
+    "composer": {
+      "schema-version": "1.11.0",
+      "install": {
+        "ctop": {
+          "pkg-path": "ctop",
+          "pkg-group": "demo-tools"
+        },
+        "dive": {
+          "pkg-path": "dive",
+          "pkg-group": "demo-tools"
+        },
+        "docker-compose": {
+          "pkg-path": "docker-compose",
+          "pkg-group": "demo-tools"
+        },
+        "gum": {
+          "pkg-path": "gum",
+          "pkg-group": "demo-tools"
+        },
+        "lazydocker": {
+          "pkg-path": "lazydocker",
+          "pkg-group": "demo-tools"
+        },
+        "oxker": {
+          "pkg-path": "oxker",
+          "pkg-group": "demo-tools"
+        }
+      },
+      "hook": {
+        "on-activate": "\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'Start Colima in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Once running, try:' \\\n    '  docker run hello-world' \\\n    '  docker-compose up' '' \\\n    'Container management TUIs:' \\\n    '  lazydocker    — full container/image/volume dashboard' \\\n    '  oxker         — lightweight container viewer' \\\n    '  ctop          — top-like container metrics' \\\n    '  dive <image>  — explore image layers'\nfi\n\n"
+      },
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
+      "include": {
+        "environments": [
+          {
+            "dir": "../colima"
+          }
+        ]
+      }
+    },
+    "include": [
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "colima": {
+              "pkg-path": "colima"
+            },
+            "docker": {
+              "pkg-path": "docker-client"
+            }
+          },
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          },
+          "services": {
+            "colima": {
+              "command": "colima start --foreground"
+            }
+          }
+        },
+        "name": "colima",
+        "descriptor": {
+          "dir": "../colima"
+        }
+      }
+    ],
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
+  }
+}

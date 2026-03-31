@@ -12,3 +12,8 @@ command_exists() {
 
 command_exists colima
 command_exists docker
+command_exists docker-compose
+command_exists lazydocker
+command_exists oxker
+command_exists ctop
+command_exists dive
