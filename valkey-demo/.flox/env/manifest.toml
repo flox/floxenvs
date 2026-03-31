@@ -1,0 +1,28 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../valkey" }
+]
+
+# gum is a demo-only tool for styled terminal output.
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'Start Valkey in the background:' \
+    '  flox services start' \
+    '  flox activate --start-services' '' \
+    'Connect to Valkey:' \
+    "  valkey-cli -h $VALKEY_HOST -p $VALKEY_PORT" '' \
+    'Connection information:' \
+    "  host=$VALKEY_HOST" \
+    "  port=$VALKEY_PORT"
+fi
+'''

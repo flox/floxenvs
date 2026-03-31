@@ -1,0 +1,143 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "valkey": {
+        "pkg-path": "valkey",
+        "pkg-group": "valkey"
+      }
+    },
+    "vars": {
+      "VALKEY_HOST": "127.0.0.1",
+      "VALKEY_PORT": "16380"
+    },
+    "hook": {
+      "on-activate": "export VALKEY_DATA=\"$FLOX_ENV_CACHE/valkey\"\n\nif [ ! -d \"$VALKEY_DATA\" ]; then\n  mkdir -p \"$VALKEY_DATA\"\nfi\n"
+    },
+    "options": {},
+    "services": {
+      "valkey": {
+        "command": "  VALKEY_DATA=\"$FLOX_ENV_CACHE/valkey\"\n  mkdir -p \"$VALKEY_DATA\"\n  exec valkey-server \\\n    --bind \"$VALKEY_HOST\" \\\n    --port \"$VALKEY_PORT\" \\\n    --dir \"$VALKEY_DATA\" \\\n    --daemonize no\n"
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "valkey",
+      "broken": false,
+      "derivation": "/nix/store/q54wq7xchvay1yn5fbb6qs5b10nxnn9q-valkey-9.0.3.drv",
+      "description": "High-performance data structure server that primarily serves key/value workloads",
+      "install_id": "valkey",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "valkey-9.0.3",
+      "pname": "valkey",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T03:39:47.455176Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.0.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/9yfjp53flpa72j4rasdlp9zrfm354w2c-valkey-9.0.3"
+      },
+      "system": "aarch64-darwin",
+      "group": "valkey",
+      "priority": 5
+    },
+    {
+      "attr_path": "valkey",
+      "broken": false,
+      "derivation": "/nix/store/796i4nj9h0glxmmar0a33xlp6pxbvjdg-valkey-9.0.3.drv",
+      "description": "High-performance data structure server that primarily serves key/value workloads",
+      "install_id": "valkey",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "valkey-9.0.3",
+      "pname": "valkey",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:13:16.698240Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.0.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/mdr5kwga7lx0ccqfjcplcb6yph2mh5m4-valkey-9.0.3"
+      },
+      "system": "aarch64-linux",
+      "group": "valkey",
+      "priority": 5
+    },
+    {
+      "attr_path": "valkey",
+      "broken": false,
+      "derivation": "/nix/store/wf6c4q96kw4w1sri5pccw7zz7dsypx51-valkey-9.0.3.drv",
+      "description": "High-performance data structure server that primarily serves key/value workloads",
+      "install_id": "valkey",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "valkey-9.0.3",
+      "pname": "valkey",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:43:05.801743Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.0.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/27pc2h8vlgfvrg8jk1px7sdj2lhzdjp5-valkey-9.0.3"
+      },
+      "system": "x86_64-darwin",
+      "group": "valkey",
+      "priority": 5
+    },
+    {
+      "attr_path": "valkey",
+      "broken": false,
+      "derivation": "/nix/store/79dg6xknnd2jk1hdwrdn9jc0ixzxxyvw-valkey-9.0.3.drv",
+      "description": "High-performance data structure server that primarily serves key/value workloads",
+      "install_id": "valkey",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "valkey-9.0.3",
+      "pname": "valkey",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T05:19:44.594890Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.0.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/915i10q2hxk5f6vk7h0n7sbkpafqll1r-valkey-9.0.3"
+      },
+      "system": "x86_64-linux",
+      "group": "valkey",
+      "priority": 5
+    }
+  ]
+}

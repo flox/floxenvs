@@ -31,4 +31,12 @@ flox services status
 echo ">>> flox services logs redis"
 flox services logs redis
 
-echo ">>> Redis is running on $REDIS_HOST:$REDIS_PORT"
+echo ">>> Testing SET/GET/DEL operations..."
+redis-cli -h "$REDIS_HOST" -p "$REDIS_PORT" SET flox_test "hello"
+RESULT=$(redis-cli -h "$REDIS_HOST" -p "$REDIS_PORT" GET flox_test)
+if [ "$RESULT" != "hello" ]; then
+  echo "Error: GET returned '$RESULT', expected 'hello'"
+  exit 1
+fi
+redis-cli -h "$REDIS_HOST" -p "$REDIS_PORT" DEL flox_test
+echo ">>> SET/GET/DEL operations ... OK"

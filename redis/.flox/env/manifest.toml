@@ -1,62 +1,41 @@
-version = 1
+schema-version = "1.10.0"
 
+# Minimal Redis environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/redis"]
+#
+# Customize vars in your manifest to override defaults:
+#
+#   [vars]
+#   REDIS_PORT = "6379"
 
 [install]
-gum.pkg-path = "gum"
 redis.pkg-path = "redis"
-
+redis.pkg-group = "redis"
 
 [vars]
-REDISBIND = "127.0.0.1"
-REDISPORT = "16379"
-
+REDIS_HOST = "127.0.0.1"
+REDIS_PORT = "16379"
 
 [hook]
 on-activate = '''
+export REDIS_DATA="$FLOX_ENV_CACHE/redis"
 
-export REDISHOME="$FLOX_ENV_CACHE/redis"
-export REDISDATA="$REDISHOME/data"
-export REDISCONFIG="$REDISHOME/redis.conf"
-
-if [ ! -d "$REDISDATA" ]; then
-  mkdir -p "$REDISDATA"
+if [ ! -d "$REDIS_DATA" ]; then
+  mkdir -p "$REDIS_DATA"
 fi
-
-cat >$REDISCONFIG <<EOF
-bind $REDISBIND
-port $REDISPORT
-EOF
-
-'''
-
-[profile]
-common = '''
-echo ""
-echo "     ╔═════════════════════════════════════╗"
-echo "     ║                                     ║"
-echo "     ║  Start Redis in the background:     ║"
-echo "     ║  👉 flox services start             ║"
-echo "     ║  👉 flox activate --start-services  ║"
-echo "     ║                                     ║"
-echo "     ║  Try to connect to Redis:           ║"
-echo "     ║  👉redis-cli -p \$REDISPORT ping     ║"
-echo "     ║                                     ║"
-echo "     ╚═════════════════════════════════════╝"
-echo ""
 '''
 
 [services]
 redis.command = '''
-redis-server "$REDISCONFIG" \
-  --daemonize no \
-  --dir "$REDISDATA"
+  REDIS_DATA="$FLOX_ENV_CACHE/redis"
+  mkdir -p "$REDIS_DATA"
+  exec redis-server \
+    --bind "$REDIS_HOST" \
+    --port "$REDIS_PORT" \
+    --dir "$REDIS_DATA" \
+    --daemonize no
 '''
-
-
-[options]
-systems = [
-  "aarch64-darwin",
-  "aarch64-linux",
-  "x86_64-darwin",
-  "x86_64-linux",
-]
