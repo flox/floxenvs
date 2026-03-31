@@ -2,30 +2,31 @@
 
 set -eo pipefail
 
-if ! command -v cqlsh 2>&1 >/dev/null
-then
-    echo "Error: 'cqlsh' command could not be found."
-    exit 1
+if ! command -v cqlsh >/dev/null 2>&1; then
+  echo "Error: 'cqlsh' command not found."
+  exit 1
+fi
+if ! command -v nodetool >/dev/null 2>&1; then
+  echo "Error: 'nodetool' command not found."
+  exit 1
 fi
 
-if ! command -v nodetool 2>&1 >/dev/null
-then
-    echo "Error: 'nodetool' command could not be found."
-    exit 1
-fi
-
-is_cassandra_up() {
-    nodetool status > /dev/null 2>&1
-}
-
-# Wait until Cassandra is up
-echo -n "Waiting for Cassandra to start .."
-until is_cassandra_up; do
-    echo -n ".."
-    sleep 1
+echo -n ">>> Waiting for Cassandra to start .."
+MAX_ATTEMPTS=60
+while [ "$MAX_ATTEMPTS" -gt 0 ]; do
+  if nodetool status >/dev/null 2>&1; then
+    echo -e "\n>>> Cassandra STARTED SUCCESSFULLY\n"
+    break
+  fi
+  echo -n ".."
+  MAX_ATTEMPTS=$((MAX_ATTEMPTS - 1))
+  sleep 1
 done
-echo -n "\n"
 
+if [ "$MAX_ATTEMPTS" -eq 0 ]; then
+  echo -e "\nError: Cassandra not ready after 60 attempts"
+  exit 1
+fi
 
 echo ">>> flox services status"
 flox services status
@@ -33,10 +34,7 @@ flox services status
 echo ">>> flox services logs cassandra"
 flox services logs cassandra
 
-if cqlsh -e "SELECT now() FROM system.local;" $CASSANDRA_HOST $CASSANDRA_PORT; then
-  echo
-  echo ">>> Cassandra is running."
-else
-  echo "Error: Something went wrong."
-  exit 1
-fi
+echo ">>> Checking Cassandra with cqlsh..."
+cqlsh "$CASSANDRA_HOST" "$CASSANDRA_PORT" \
+  -e "SELECT now() FROM system.local;"
+echo ">>> Cassandra cqlsh check ... OK"
