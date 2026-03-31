@@ -1,0 +1,327 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": "demo-tools"
+      },
+      "mysql": {
+        "pkg-path": "mysql84",
+        "pkg-group": "mysql"
+      }
+    },
+    "vars": {
+      "MYSQL_DATABASE": "mydb",
+      "MYSQL_HOST": "127.0.0.1",
+      "MYSQL_PORT": "13306",
+      "MYSQL_PWD": "mypass",
+      "MYSQL_USER": ""
+    },
+    "hook": {
+      "on-activate": "export MYSQL_HOME=\"$FLOX_ENV_CACHE/mysql\"\nexport MYSQL_CONFIG=\"$MYSQL_HOME/my.cnf\"\nexport MYSQL_DATADIR=\"$MYSQL_HOME/data\"\nexport MYSQL_TMPDIR=\"$MYSQL_HOME/tmp\"\nexport MYSQL_SOCKET=\"$MYSQL_HOME/mysql.sock\"\nexport MYSQL_TCP_PORT=\"$MYSQL_PORT\"\nINIT_LOG=\"$MYSQL_HOME/init.log\"\n\nif [ -z \"$MYSQL_USER\" ]; then\n  export MYSQL_USER=\"$USER\"\nfi\n\nMYSQL_BASEDIR=$(realpath -s \\\n  \"$(dirname $(realpath $(which mysqld)))/..\")\n\ninit_fail() {\n  echo \"ERROR: MySQL initialization failed.\" >&2\n  if [ -f \"$INIT_LOG\" ]; then\n    echo \"--- init.log ---\" >&2\n    cat \"$INIT_LOG\" >&2\n    echo \"--- end init.log ---\" >&2\n  fi\n  exit 1\n}\n\nif [ ! -d \"$MYSQL_DATADIR\" ]; then\n  mkdir -p \"$MYSQL_DATADIR\" \"$MYSQL_TMPDIR\"\n\n  cat > \"$MYSQL_CONFIG\" <<EOF\n[client]\nport   = $MYSQL_TCP_PORT\nsocket = $MYSQL_SOCKET\n\n[mysqld]\nuser     = $USER\nsocket   = $MYSQL_SOCKET\nport     = $MYSQL_TCP_PORT\nbasedir  = $MYSQL_BASEDIR\ndatadir  = $MYSQL_DATADIR\ntmpdir   = $MYSQL_TMPDIR\nbind-address = $MYSQL_HOST\nskip-external-locking\nEOF\n\n  echo \"Initializing MySQL database...\" >> \"$INIT_LOG\"\n  mysqld \\\n    --defaults-file=\"$MYSQL_CONFIG\" \\\n    --default-time-zone=SYSTEM \\\n    --initialize-insecure >> \"$INIT_LOG\" 2>&1 \\\n    || init_fail\n\n  echo \"Starting temporary MySQL server...\" >> \"$INIT_LOG\"\n  mysqld --defaults-file=\"$MYSQL_CONFIG\" \\\n    --skip-networking >> \"$INIT_LOG\" 2>&1 &\n  TMPID=$!\n\n  MAX_ATTEMPTS=15\n  while [ \"$MAX_ATTEMPTS\" -gt 0 ]; do\n    if mysqladmin --socket=\"$MYSQL_SOCKET\" \\\n        ping -u root 2>/dev/null | \\\n        grep -q alive; then\n      break\n    fi\n    sleep 1\n    MAX_ATTEMPTS=$((MAX_ATTEMPTS - 1))\n  done\n\n  if [ \"$MAX_ATTEMPTS\" -eq 0 ]; then\n    echo \"Temp server did not start\" >> \"$INIT_LOG\"\n    kill \"$TMPID\" 2>/dev/null || true\n    init_fail\n  fi\n\n  echo \"Creating database and user...\" >> \"$INIT_LOG\"\n  mysql --socket=\"$MYSQL_SOCKET\" -u root \\\n    -e \"CREATE DATABASE IF NOT EXISTS \\`$MYSQL_DATABASE\\`;\" \\\n    >> \"$INIT_LOG\" 2>&1 || init_fail\n\n  mysql --socket=\"$MYSQL_SOCKET\" -u root -e \\\n    \"CREATE USER IF NOT EXISTS '$MYSQL_USER'@'localhost' IDENTIFIED BY '$MYSQL_PWD'; GRANT ALL PRIVILEGES ON *.* TO '$MYSQL_USER'@'localhost' WITH GRANT OPTION; FLUSH PRIVILEGES;\" \\\n    >> \"$INIT_LOG\" 2>&1 || init_fail\n\n  mysqladmin --socket=\"$MYSQL_SOCKET\" \\\n    shutdown -u root >> \"$INIT_LOG\" 2>&1\n  wait \"$TMPID\" 2>/dev/null || true\n\n  rm -f \"$INIT_LOG\"\n  echo \"MySQL initialized successfully.\"\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start MySQL in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to MySQL:' \\\n    \"  mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USER -p\" '' \\\n    'Connection information:' \\\n    \"  host=$MYSQL_HOST\" \\\n    \"  port=$MYSQL_PORT\" \\\n    \"  database=$MYSQL_DATABASE\" \\\n    \"  user=$MYSQL_USER\"\nfi\n"
+    },
+    "options": {},
+    "services": {
+      "mysql": {
+        "command": "  exec mysqld \\\n    --defaults-file=\"$MYSQL_HOME/my.cnf\"\n"
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/bmz60mbb36nlipdn9n6zmcm6kjls8gll-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T03:37:21.147669Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cdpxgzcjwidrmrzsq0zkyr9nxccvy3p6-gum-0.17.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/yhvp5prpjjl5hqk6fhr5svdzf1yfacgk-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:09:56.689083Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kqcb9j9k6wdvb7pjvjzn3p8dc82qmk9x-gum-0.17.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/cngbjjxmgsmcbgvihq7q9472rb5rhgdj-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:40:40.363731Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rznkbgxflsbrfy5c359vhhqrrxw4pfkj-gum-0.17.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/f5ahd90j9s46j49lz8k2yn3cmvyq6mbn-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T05:16:17.301634Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rf0zlw5q4j051xkjk9djfw5dpb8nwbgm-gum-0.17.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "mysql84",
+      "broken": false,
+      "derivation": "/nix/store/4wm2wv7r7z09wa9s6rygcfd5jdxqf1i4-mysql-8.4.8.drv",
+      "description": "World's most popular open source database",
+      "install_id": "mysql",
+      "license": "GPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "mysql-8.4.8",
+      "pname": "mysql84",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T03:37:42.584089Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.4.8",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/476lcyamvkbycdwncqz7xrzzz3b5v5xg-mysql-8.4.8",
+        "static": "/nix/store/xd5cg4v0ja4inz4x10xr4dqdchfmkhrm-mysql-8.4.8-static"
+      },
+      "system": "aarch64-darwin",
+      "group": "mysql",
+      "priority": 5
+    },
+    {
+      "attr_path": "mysql84",
+      "broken": false,
+      "derivation": "/nix/store/wksplbnix61v22h88aa360afx0lyx0j5-mysql-8.4.8.drv",
+      "description": "World's most popular open source database",
+      "install_id": "mysql",
+      "license": "GPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "mysql-8.4.8",
+      "pname": "mysql84",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:10:30.668095Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.4.8",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/bpdhsq6m81jxh0s889s2mk4ymp1babhv-mysql-8.4.8",
+        "static": "/nix/store/pn3s45fhga0h5czly3152nr52jpx28sm-mysql-8.4.8-static"
+      },
+      "system": "aarch64-linux",
+      "group": "mysql",
+      "priority": 5
+    },
+    {
+      "attr_path": "mysql84",
+      "broken": false,
+      "derivation": "/nix/store/887rcwzfwmx6ad529dwmsqj18jq1rjgw-mysql-8.4.8.drv",
+      "description": "World's most popular open source database",
+      "install_id": "mysql",
+      "license": "GPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "mysql-8.4.8",
+      "pname": "mysql84",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:41:01.759904Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.4.8",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/g3n404q9n5iha3fp60ss194ji2kd8vfc-mysql-8.4.8",
+        "static": "/nix/store/9ijjwvrnzw45frs3mrs45jqrgv7535n9-mysql-8.4.8-static"
+      },
+      "system": "x86_64-darwin",
+      "group": "mysql",
+      "priority": 5
+    },
+    {
+      "attr_path": "mysql84",
+      "broken": false,
+      "derivation": "/nix/store/sjz6jn9gwm2504c9n14bkx5awzpz9jl6-mysql-8.4.8.drv",
+      "description": "World's most popular open source database",
+      "install_id": "mysql",
+      "license": "GPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "mysql-8.4.8",
+      "pname": "mysql84",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T05:16:53.465511Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.4.8",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/wm65s77q48xn54c4icy83r6m8dqj0ipy-mysql-8.4.8",
+        "static": "/nix/store/rssr8hmwlfgpi1qiz00p9zghcmc9nl9m-mysql-8.4.8-static"
+      },
+      "system": "x86_64-linux",
+      "group": "mysql",
+      "priority": 5
+    }
+  ],
+  "compose": {
+    "composer": {
+      "schema-version": "1.11.0",
+      "install": {
+        "gum": {
+          "pkg-path": "gum",
+          "pkg-group": "demo-tools"
+        }
+      },
+      "hook": {
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start MySQL in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to MySQL:' \\\n    \"  mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USER -p\" '' \\\n    'Connection information:' \\\n    \"  host=$MYSQL_HOST\" \\\n    \"  port=$MYSQL_PORT\" \\\n    \"  database=$MYSQL_DATABASE\" \\\n    \"  user=$MYSQL_USER\"\nfi\n"
+      },
+      "options": {},
+      "include": {
+        "environments": [
+          {
+            "dir": "../mysql"
+          }
+        ]
+      }
+    },
+    "include": [
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "mysql": {
+              "pkg-path": "mysql84",
+              "pkg-group": "mysql"
+            }
+          },
+          "vars": {
+            "MYSQL_DATABASE": "mydb",
+            "MYSQL_HOST": "127.0.0.1",
+            "MYSQL_PORT": "13306",
+            "MYSQL_PWD": "mypass",
+            "MYSQL_USER": ""
+          },
+          "hook": {
+            "on-activate": "export MYSQL_HOME=\"$FLOX_ENV_CACHE/mysql\"\nexport MYSQL_CONFIG=\"$MYSQL_HOME/my.cnf\"\nexport MYSQL_DATADIR=\"$MYSQL_HOME/data\"\nexport MYSQL_TMPDIR=\"$MYSQL_HOME/tmp\"\nexport MYSQL_SOCKET=\"$MYSQL_HOME/mysql.sock\"\nexport MYSQL_TCP_PORT=\"$MYSQL_PORT\"\nINIT_LOG=\"$MYSQL_HOME/init.log\"\n\nif [ -z \"$MYSQL_USER\" ]; then\n  export MYSQL_USER=\"$USER\"\nfi\n\nMYSQL_BASEDIR=$(realpath -s \\\n  \"$(dirname $(realpath $(which mysqld)))/..\")\n\ninit_fail() {\n  echo \"ERROR: MySQL initialization failed.\" >&2\n  if [ -f \"$INIT_LOG\" ]; then\n    echo \"--- init.log ---\" >&2\n    cat \"$INIT_LOG\" >&2\n    echo \"--- end init.log ---\" >&2\n  fi\n  exit 1\n}\n\nif [ ! -d \"$MYSQL_DATADIR\" ]; then\n  mkdir -p \"$MYSQL_DATADIR\" \"$MYSQL_TMPDIR\"\n\n  cat > \"$MYSQL_CONFIG\" <<EOF\n[client]\nport   = $MYSQL_TCP_PORT\nsocket = $MYSQL_SOCKET\n\n[mysqld]\nuser     = $USER\nsocket   = $MYSQL_SOCKET\nport     = $MYSQL_TCP_PORT\nbasedir  = $MYSQL_BASEDIR\ndatadir  = $MYSQL_DATADIR\ntmpdir   = $MYSQL_TMPDIR\nbind-address = $MYSQL_HOST\nskip-external-locking\nEOF\n\n  echo \"Initializing MySQL database...\" >> \"$INIT_LOG\"\n  mysqld \\\n    --defaults-file=\"$MYSQL_CONFIG\" \\\n    --default-time-zone=SYSTEM \\\n    --initialize-insecure >> \"$INIT_LOG\" 2>&1 \\\n    || init_fail\n\n  echo \"Starting temporary MySQL server...\" >> \"$INIT_LOG\"\n  mysqld --defaults-file=\"$MYSQL_CONFIG\" \\\n    --skip-networking >> \"$INIT_LOG\" 2>&1 &\n  TMPID=$!\n\n  MAX_ATTEMPTS=15\n  while [ \"$MAX_ATTEMPTS\" -gt 0 ]; do\n    if mysqladmin --socket=\"$MYSQL_SOCKET\" \\\n        ping -u root 2>/dev/null | \\\n        grep -q alive; then\n      break\n    fi\n    sleep 1\n    MAX_ATTEMPTS=$((MAX_ATTEMPTS - 1))\n  done\n\n  if [ \"$MAX_ATTEMPTS\" -eq 0 ]; then\n    echo \"Temp server did not start\" >> \"$INIT_LOG\"\n    kill \"$TMPID\" 2>/dev/null || true\n    init_fail\n  fi\n\n  echo \"Creating database and user...\" >> \"$INIT_LOG\"\n  mysql --socket=\"$MYSQL_SOCKET\" -u root \\\n    -e \"CREATE DATABASE IF NOT EXISTS \\`$MYSQL_DATABASE\\`;\" \\\n    >> \"$INIT_LOG\" 2>&1 || init_fail\n\n  mysql --socket=\"$MYSQL_SOCKET\" -u root -e \\\n    \"CREATE USER IF NOT EXISTS '$MYSQL_USER'@'localhost' IDENTIFIED BY '$MYSQL_PWD'; GRANT ALL PRIVILEGES ON *.* TO '$MYSQL_USER'@'localhost' WITH GRANT OPTION; FLUSH PRIVILEGES;\" \\\n    >> \"$INIT_LOG\" 2>&1 || init_fail\n\n  mysqladmin --socket=\"$MYSQL_SOCKET\" \\\n    shutdown -u root >> \"$INIT_LOG\" 2>&1\n  wait \"$TMPID\" 2>/dev/null || true\n\n  rm -f \"$INIT_LOG\"\n  echo \"MySQL initialized successfully.\"\nfi\n"
+          },
+          "options": {},
+          "services": {
+            "mysql": {
+              "command": "  exec mysqld \\\n    --defaults-file=\"$MYSQL_HOME/my.cnf\"\n"
+            }
+          }
+        },
+        "name": "mysql",
+        "descriptor": {
+          "dir": "../mysql"
+        }
+      }
+    ],
+    "warnings": []
+  }
+}
