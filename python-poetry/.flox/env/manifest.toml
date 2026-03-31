@@ -1,102 +1,87 @@
-version = 1
+schema-version = "1.10.0"
+
+# Minimal Python + Poetry environment for use with
+# [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/python-poetry"]
+#
+# Customize Python version in your manifest:
+#
+#   [install]
+#   python3.pkg-path = "python312"
 
 [install]
-gum.pkg-path = "gum"
-coreutils.pkg-path = "coreutils"
-python.pkg-path = "python3"
-python.version = "3.11.*"  # <-- Change this to the version of Python you want
+python3.pkg-path = "python3"
 poetry.pkg-path = "poetry"
+poetry.pkg-group = "python-tools"
 
 [vars]
+PYTHON_AUTO_INSTALL = "true"
 
 [hook]
 on-activate = '''
+export POETRY_CACHE="$FLOX_ENV_CACHE/python-poetry"
+export POETRY_VIRTUALENVS_PATH="$POETRY_CACHE/venvs"
 
-export POETRY_VIRTUALENVS_PATH="$FLOX_ENV_CACHE/python-poetry/venvs"
-export FLOX_HOME=$(realpath -s "$FLOX_ENV_CACHE/../..")
+mkdir -p "$POETRY_CACHE"
 
-if [ ! -f "$FLOX_HOME/pyproject.toml" ]; then
-  echo "❌ No pyproject.toml found in $FLOX_HOME. Cannot activate environment."
-  exit 1
-fi
+unset VIRTUAL_ENV
 
-export FLOX_PYENV_PATH=$(poetry env info --path)
+if [ -f pyproject.toml ]; then
+  POETRY_VENV="$(poetry env info --path 2>/dev/null || echo "")"
 
-create_python_env() {
-  poetry env use python
-}
-export -f create_python_env
-
-activate_python_env() {
-  source "$FLOX_PYENV_PATH/bin/activate"
-}
-export -f activate_python_env
-
-install_python_dependencies() {
-  poetry install
-}
-export -f install_python_dependencies
-
-
-if [ -z "$FLOX_PYENV_PATH" ]; then
-  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
-    create_python_env
-  else
-    gum spin --spinner dot --title "Creating python environment" -- bash -c create_python_env
+  if [ -z "$POETRY_VENV" ]; then
+    poetry env use python3
+    POETRY_VENV="$(poetry env info --path)"
   fi
-  echo "✅ Python environment created"
-else
-  echo "✅ Python environment already exists"
+
+  source "$POETRY_VENV/bin/activate"
+
+  if [ "$PYTHON_AUTO_INSTALL" = "true" ] \
+      && [ -f poetry.lock ]; then
+    HASH=$(md5sum poetry.lock 2>/dev/null \
+      || md5 -q poetry.lock)
+    HASH=$(echo "$HASH" | cut -d" " -f1)
+    LAST=$(cat "$POETRY_CACHE/.deps_hash" 2>/dev/null)
+    if [ "$HASH" != "$LAST" ]; then
+      poetry install --no-interaction
+      echo "$HASH" > "$POETRY_CACHE/.deps_hash"
+    fi
+  fi
 fi
-
-
-if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
-  activate_python_env
-else
-  gum spin --spinner dot --title "Activating python environment" -- bash -c activate_python_env
-fi
-echo "✅ Python environment activated"
-
-
-if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
-  install_python_dependencies
-else
-  gum spin --spinner dot --title "Installing python dependencies" -- bash -c install_python_dependencies
-fi
-echo "✅ Python project dependencies installed"
-
 '''
-
 
 [profile]
-common = '''
-echo ""
-echo "     ╔═════════════════════════════════════╗"
-echo "     ║                                     ║"
-echo "     ║  Your python environment is ready!  ║"
-echo "     ║                                     ║"
-echo "     ╚═════════════════════════════════════╝"
-echo ""
-'''
 bash = '''
-  source "$(poetry env info --path)/bin/activate"
-'''
-fish = '''
-  source "$(poetry env info --path)/bin/activate.fish"
-'''
-tcsh = '''
-  source "$(poetry env info --path)/bin/activate.csh"
+if [ -f pyproject.toml ]; then
+  POETRY_VENV="$(poetry env info --path 2>/dev/null)"
+  if [ -n "$POETRY_VENV" ]; then
+    source "$POETRY_VENV/bin/activate"
+  fi
+fi
 '''
 zsh = '''
-  source "$(poetry env info --path)/bin/activate"
+if [ -f pyproject.toml ]; then
+  POETRY_VENV="$(poetry env info --path 2>/dev/null)"
+  if [ -n "$POETRY_VENV" ]; then
+    source "$POETRY_VENV/bin/activate"
+  fi
+fi
 '''
-
-[services]
-
-[options]
-systems = [
-  "aarch64-darwin",
-  "aarch64-linux",
-  "x86_64-darwin",
-  "x86_64-linux",
-]
+fish = '''
+if test -f pyproject.toml
+  set POETRY_VENV (poetry env info --path 2>/dev/null)
+  if test -n "$POETRY_VENV"
+    source "$POETRY_VENV/bin/activate.fish"
+  end
+end
+'''
+tcsh = '''
+if ( -f pyproject.toml ) then
+  set POETRY_VENV=`poetry env info --path`
+  source "$POETRY_VENV/bin/activate.csh"
+endif
+'''
