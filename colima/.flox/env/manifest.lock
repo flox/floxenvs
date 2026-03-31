@@ -1,20 +1,14 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "version": 1,
+    "schema-version": "1.10.0",
     "install": {
       "colima": {
         "pkg-path": "colima"
       },
       "docker": {
         "pkg-path": "docker-client"
-      },
-      "gum": {
-        "pkg-path": "gum"
       }
-    },
-    "hook": {
-      "on-activate": "if [[ \"$FLOX_ACTIVATE_START_SERVICES\" == \"true\" ]]; then\n  gum style --border double --margin \"1 2\" --padding \"1 4\" \\\n    'Colima may take a few moments to start.' '' \\\n    'Once it starts, try it with:' \\\n    '  docker run hello-world'\nelse\n  if ! docker ps > /dev/null 2>&1; then\n    gum style --border double --margin \"1 2\" --padding \"1 4\" \\\n      'Colima is not running.' '' \\\n    'You may want to start it using:' \\\n    '  flox services start'\n  fi\nfi\n"
     },
     "options": {
       "systems": [
@@ -25,11 +19,7 @@
     },
     "services": {
       "colima": {
-        "command": "colima start",
-        "is-daemon": true,
-        "shutdown": {
-          "command": "colima stop"
-        }
+        "command": "colima start --foreground"
       }
     }
   },
@@ -209,97 +199,6 @@
       ],
       "outputs": {
         "out": "/nix/store/vmmfkm199bz54797bcvs05j5ppw4m11n-docker-29.3.0"
-      },
-      "system": "x86_64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/bmz60mbb36nlipdn9n6zmcm6kjls8gll-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=46db2e09e1d3f113a13c0d7b81e2f221c63b8ce9",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "46db2e09e1d3f113a13c0d7b81e2f221c63b8ce9",
-      "rev_count": 969196,
-      "rev_date": "2026-03-24T21:09:33Z",
-      "scrape_date": "2026-03-27T03:38:24.723458Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out",
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/cdpxgzcjwidrmrzsq0zkyr9nxccvy3p6-gum-0.17.0"
-      },
-      "system": "aarch64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/yhvp5prpjjl5hqk6fhr5svdzf1yfacgk-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=46db2e09e1d3f113a13c0d7b81e2f221c63b8ce9",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "46db2e09e1d3f113a13c0d7b81e2f221c63b8ce9",
-      "rev_count": 969196,
-      "rev_date": "2026-03-24T21:09:33Z",
-      "scrape_date": "2026-03-27T04:13:49.500162Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/kqcb9j9k6wdvb7pjvjzn3p8dc82qmk9x-gum-0.17.0"
-      },
-      "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/f5ahd90j9s46j49lz8k2yn3cmvyq6mbn-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=46db2e09e1d3f113a13c0d7b81e2f221c63b8ce9",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "46db2e09e1d3f113a13c0d7b81e2f221c63b8ce9",
-      "rev_count": 969196,
-      "rev_date": "2026-03-24T21:09:33Z",
-      "scrape_date": "2026-03-27T05:24:57.565086Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/rf0zlw5q4j051xkjk9djfw5dpb8nwbgm-gum-0.17.0"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
