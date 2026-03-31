@@ -1,0 +1,41 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../go" }
+]
+
+# Editor tooling and task runner for Go development.
+
+[install]
+go-task.pkg-path = "go-task"
+go-task.pkg-group = "go-tools"
+gopls.pkg-path = "gopls"
+gopls.pkg-group = "go-tools"
+gotools.pkg-path = "gotools"
+gotools.pkg-group = "go-tools"
+gomodifytags.pkg-path = "gomodifytags"
+gomodifytags.pkg-group = "go-tools"
+gotests.pkg-path = "gotests"
+gotests.pkg-group = "go-tools"
+gore.pkg-path = "gore"
+gore.pkg-group = "go-tools"
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'Go development environment' '' \
+    'Included tools:' \
+    '  go        - compiler and tools' \
+    '  gopls     - language server' \
+    '  gotools   - standard tools (goimports, etc.)' \
+    '  go-task   - task runner' \
+    '  gore      - REPL' '' \
+    'Try the sample app:' \
+    '  go build && ./hello'
+fi
+'''

@@ -10,4 +10,12 @@ fi
 echo ">>> go version"
 go version
 
-echo ">>> Go environment is working"
+echo ">>> go build"
+go build -o hello
+echo ">>> go build ... OK"
+
+echo ">>> Running hello binary"
+./hello
+echo ">>> Binary execution ... OK"
+
+rm -f hello
