@@ -1,0 +1,43 @@
+schema-version = "1.10.0"
+
+# Minimal Valkey environment for use with [include].
+#
+# Valkey is a Redis-compatible key/value store (fork).
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/valkey"]
+#
+# Customize vars in your manifest to override defaults:
+#
+#   [vars]
+#   VALKEY_PORT = "6379"
+
+[install]
+valkey.pkg-path = "valkey"
+valkey.pkg-group = "valkey"
+
+[vars]
+VALKEY_HOST = "127.0.0.1"
+VALKEY_PORT = "16380"
+
+[hook]
+on-activate = '''
+export VALKEY_DATA="$FLOX_ENV_CACHE/valkey"
+
+if [ ! -d "$VALKEY_DATA" ]; then
+  mkdir -p "$VALKEY_DATA"
+fi
+'''
+
+[services]
+valkey.command = '''
+  VALKEY_DATA="$FLOX_ENV_CACHE/valkey"
+  mkdir -p "$VALKEY_DATA"
+  exec valkey-server \
+    --bind "$VALKEY_HOST" \
+    --port "$VALKEY_PORT" \
+    --dir "$VALKEY_DATA" \
+    --daemonize no
+'''
