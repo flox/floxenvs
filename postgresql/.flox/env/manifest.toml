@@ -57,24 +57,40 @@ else
   PG_LISTEN_FLAGS=""
 fi
 
+INIT_LOG="$PGDIR/init.log"
+
+pg_init_fail() {
+  echo "ERROR: PostgreSQL initialization failed." >&2
+  if [ -f "$INIT_LOG" ]; then
+    echo "--- init.log ---" >&2
+    cat "$INIT_LOG" >&2
+    echo "--- end init.log ---" >&2
+  fi
+  exit 1
+}
+
 if [[ ! -d "$PGDATA" ]]; then
   mkdir -p "$PGDATA"
   initdb "$PGDATA" \
     --locale=C \
     --encoding=UTF8 \
     --auth=trust \
-    --username "$PGUSER"
+    --username "$PGUSER" \
+    >> "$INIT_LOG" 2>&1 \
+    || pg_init_fail
 fi
 
 pg_ctl -D "$PGDATA" -w start \
   -o "-c unix_socket_directories=$SOCKETDIR $PG_LISTEN_FLAGS" \
-  > /dev/null
+  >> "$INIT_LOG" 2>&1 \
+  || pg_init_fail
 if psql -lqt | cut -d \| -f 1 | grep -qw "$PGDATABASE"; then
   true
 else
-  createdb
+  createdb >> "$INIT_LOG" 2>&1 || pg_init_fail
 fi
-pg_ctl -D "$PGDATA" -m fast -w stop > /dev/null
+pg_ctl -D "$PGDATA" -m fast -w stop >> "$INIT_LOG" 2>&1
+rm -f "$INIT_LOG"
 '''
 
 [services]

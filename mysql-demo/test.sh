@@ -40,3 +40,14 @@ if [ "$RESULT" != "1" ]; then
   exit 1
 fi
 echo ">>> MySQL SELECT 1 ... OK"
+
+echo ">>> Testing CRUD operations..."
+mysql -e "CREATE TABLE IF NOT EXISTS $MYSQL_DATABASE.flox_test (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50));"
+mysql -e "INSERT INTO $MYSQL_DATABASE.flox_test (name) VALUES ('hello');"
+CRUD_RESULT=$(mysql -sN -e "SELECT name FROM $MYSQL_DATABASE.flox_test WHERE name='hello' LIMIT 1;")
+if [ "$CRUD_RESULT" != "hello" ]; then
+  echo "Error: CRUD test failed, got '$CRUD_RESULT'"
+  exit 1
+fi
+mysql -e "DROP TABLE $MYSQL_DATABASE.flox_test;"
+echo ">>> CRUD operations ... OK"

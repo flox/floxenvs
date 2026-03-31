@@ -69,9 +69,17 @@
 
           cleanup() {
             cd /
+            echo "👉 Stopping services..."
             flox services stop --dir "$envdir" 2>/dev/null || true
-            chmod -R u+w "$TESTDIR" 2>/dev/null
-            rm -rf "$TESTDIR"
+            echo "👉 Cleaning up $TESTDIR..."
+            for i in $(seq 1 10); do
+              chmod -R u+w "$TESTDIR" 2>/dev/null
+              rm -rf "$TESTDIR" 2>/dev/null && break
+              echo "👉 Cleanup attempt $i/10 failed, retrying in 2s..."
+              sleep 2
+            done
+            echo "👉 Cleanup done."
+            true
           }
           trap cleanup EXIT
 

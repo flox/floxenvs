@@ -1,0 +1,30 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../mysql" }
+]
+
+# gum is a demo-only tool for styled terminal output.
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'Start MySQL in the background:' \
+    '  flox services start' \
+    '  flox activate --start-services' '' \
+    'Connect to MySQL:' \
+    "  mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USER -p" '' \
+    'Connection information:' \
+    "  host=$MYSQL_HOST" \
+    "  port=$MYSQL_PORT" \
+    "  database=$MYSQL_DATABASE" \
+    "  user=$MYSQL_USER"
+fi
+'''

@@ -1,0 +1,122 @@
+schema-version = "1.10.0"
+
+# Minimal MariaDB environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/mariadb"]
+#
+# Customize vars in your manifest to override defaults:
+#
+#   [vars]
+#   MARIADB_PORT = "3306"
+
+[install]
+mariadb.pkg-path = "mariadb"
+mariadb.pkg-group = "mariadb"
+
+[vars]
+MARIADB_HOST = "127.0.0.1"
+MARIADB_PORT = "13307"
+MARIADB_DATABASE = "mydb"
+MARIADB_USER = ""
+MARIADB_PWD = "mypass"
+
+[hook]
+on-activate = '''
+export MARIADB_HOME="$FLOX_ENV_CACHE/mariadb"
+export MARIADB_CONFIG="$MARIADB_HOME/my.cnf"
+export MARIADB_DATADIR="$MARIADB_HOME/data"
+export MARIADB_TMPDIR="$MARIADB_HOME/tmp"
+export MARIADB_SOCKET="$MARIADB_HOME/mariadb.sock"
+INIT_LOG="$MARIADB_HOME/init.log"
+
+if [ -z "$MARIADB_USER" ]; then
+  export MARIADB_USER="$USER"
+fi
+
+MARIADB_BASEDIR=$(realpath -s \
+  "$(dirname $(realpath $(which mariadbd)))/..")
+
+init_fail() {
+  echo "ERROR: MariaDB initialization failed." >&2
+  if [ -f "$INIT_LOG" ]; then
+    echo "--- init.log ---" >&2
+    cat "$INIT_LOG" >&2
+    echo "--- end init.log ---" >&2
+  fi
+  exit 1
+}
+
+if [ ! -d "$MARIADB_DATADIR" ]; then
+  mkdir -p "$MARIADB_DATADIR" "$MARIADB_TMPDIR"
+
+  cat > "$MARIADB_CONFIG" <<EOF
+[client]
+port   = $MARIADB_PORT
+socket = $MARIADB_SOCKET
+
+[mysqld]
+user     = $USER
+socket   = $MARIADB_SOCKET
+port     = $MARIADB_PORT
+basedir  = $MARIADB_BASEDIR
+datadir  = $MARIADB_DATADIR
+tmpdir   = $MARIADB_TMPDIR
+bind-address = $MARIADB_HOST
+skip-external-locking
+EOF
+
+  echo "Initializing MariaDB database..." >> "$INIT_LOG"
+  mysql_install_db \
+    --defaults-file="$MARIADB_CONFIG" \
+    --auth-root-authentication-method=normal \
+    >> "$INIT_LOG" 2>&1 \
+    || init_fail
+
+  echo "Starting temporary MariaDB server..." >> "$INIT_LOG"
+  mariadbd --defaults-file="$MARIADB_CONFIG" \
+    --skip-networking >> "$INIT_LOG" 2>&1 &
+  TMPID=$!
+
+  MAX_ATTEMPTS=15
+  while [ "$MAX_ATTEMPTS" -gt 0 ]; do
+    if mariadb-admin --socket="$MARIADB_SOCKET" \
+        ping -u root 2>/dev/null | \
+        grep -q alive; then
+      break
+    fi
+    sleep 1
+    MAX_ATTEMPTS=$((MAX_ATTEMPTS - 1))
+  done
+
+  if [ "$MAX_ATTEMPTS" -eq 0 ]; then
+    echo "Temp server did not start" >> "$INIT_LOG"
+    kill "$TMPID" 2>/dev/null || true
+    init_fail
+  fi
+
+  echo "Creating database and user..." >> "$INIT_LOG"
+  mariadb --socket="$MARIADB_SOCKET" -u root \
+    -e "CREATE DATABASE IF NOT EXISTS \`$MARIADB_DATABASE\`;" \
+    >> "$INIT_LOG" 2>&1 || init_fail
+
+  mariadb --socket="$MARIADB_SOCKET" -u root -e \
+    "CREATE USER IF NOT EXISTS '$MARIADB_USER'@'localhost' IDENTIFIED BY '$MARIADB_PWD'; GRANT ALL PRIVILEGES ON *.* TO '$MARIADB_USER'@'localhost' WITH GRANT OPTION; FLUSH PRIVILEGES;" \
+    >> "$INIT_LOG" 2>&1 || init_fail
+
+  mariadb-admin --socket="$MARIADB_SOCKET" \
+    shutdown -u root >> "$INIT_LOG" 2>&1
+  wait "$TMPID" 2>/dev/null || true
+
+  rm -f "$INIT_LOG"
+  echo "MariaDB initialized successfully."
+fi
+'''
+
+[services]
+mariadb.command = '''
+  exec mariadbd \
+    --defaults-file="$MARIADB_HOME/my.cnf"
+'''
