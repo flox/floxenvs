@@ -1,303 +1,52 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "version": 1,
+    "schema-version": "1.10.0",
     "install": {
-      "coreutils": {
-        "pkg-path": "coreutils"
-      },
-      "gum": {
-        "pkg-path": "gum"
-      },
-      "python": {
-        "pkg-path": "python3",
-        "version": "3.12"
+      "python3": {
+        "pkg-path": "python3"
       }
     },
     "vars": {
-      "FLOX_PYTHON_PIP_REQUIREMENTS_FILE": "requirements.txt"
+      "PYTHON_AUTO_INSTALL": "true"
     },
     "hook": {
-      "on-activate": "\nexport FLOX_PYTHON_PIP_CACHE_DIR=\"$FLOX_ENV_CACHE/python-pip\"\nmkdir -p \"$FLOX_PYTHON_PIP_CACHE_DIR\"\n\nexport FLOX_PYTHON_PIP_VENV_PATH=\"$FLOX_PYTHON_PIP_CACHE_DIR/venv\"\nexport FLOX_PYTHON_PIP_VENV_INTERPRETER=\"$(cat \"$FLOX_PYTHON_PIP_CACHE_DIR/venv.interpreter\" 2> /dev/null || echo false )\"\nexport FLOX_PYTHON_PIP_INTERPRETER=\"$(realpath $(which python3))\"\n\n# Make sure any tools are not attempting to use the Python interpreter from any\n# existing virtual environment.\nunset VIRTUAL_ENV\n\n\nfunction indent() {\n  echo -e '{{ Foreground \"#cccccc\" \" │ \"}}' | \\\n    gum format -t template --theme=auto\n}\n\nfunction with_spinner() {\n  if [[ \"$FLOX_ENVS_TESTING\" == \"1\" ]]; then\n    bash -c \"$1\"\n  else\n    echo\n    gum spin \\\n      --show-error \\\n      --spinner line \\\n      --spinner.foreground=\"#cccccc\" \\\n      --title \" >>> $2 ...\" \\\n      --title.foreground=\"#cccccc\" \\\n        -- bash -c \"$1\"\n    echo -en \"\\033[2A\\033[K\"\n  fi\n}\n\nfunction ensure_venv() {\n  \"$FLOX_PYTHON_PIP_INTERPRETER\" -m venv --upgrade-deps \"$FLOX_PYTHON_PIP_VENV_PATH\"\n  source \"$FLOX_PYTHON_PIP_VENV_PATH/bin/activate\"\n}\nexport -f ensure_venv\n\nfunction install_packages() {\n  source \"$FLOX_PYTHON_PIP_VENV_PATH/bin/activate\"\n  pip install -r \"$FLOX_PYTHON_PIP_REQUIREMENTS_FILE\"\n}\nexport -f install_packages\n\n\n\nindent && echo\nindent && echo\n\nif [ \"$FLOX_PYTHON_PIP_VENV_INTERPRETER\" != \"$FLOX_PYTHON_PIP_INTERPRETER\" ]; then\n  with_spinner ensure_venv \"Creating virtual environment\"\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Virtual environment was created.\\\" }}\\n\" \\\n    | gum format -t template\nelse\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Virtual environment already exists.\\\" }}\\n\" \\\n    | gum format -t template\nfi\n\nindent && echo\n\nif [ -f \"$FLOX_PYTHON_PIP_REQUIREMENTS_FILE\" ]; then\n  with_spinner install_packages \"Installing Python packages\"\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ Python packages installed.\\\" }}\\n\" \\\n    | gum format -t template\nelse\n  indent && echo -e \"{{ Foreground \\\"#ffffff\\\" \\\"✅ No need to install Python packages.\\\" }}\\n\" \\\n    | gum format -t template\nfi\n\nindent && echo\n\n\n"
+      "on-activate": "export PIP_CACHE=\"$FLOX_ENV_CACHE/python-pip\"\nexport PIP_VENV=\"$PIP_CACHE/venv\"\n\nmkdir -p \"$PIP_CACHE\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$PIP_CACHE/venv.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$PIP_VENV\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  python3 -m venv --upgrade-deps \"$PIP_VENV\"\n  echo \"$CURRENT_INTERP\" > \"$PIP_CACHE/venv.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$PIP_VENV/bin/activate\"\n\nif [ \"$PYTHON_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f requirements.txt ]; then\n  HASH=$(md5sum requirements.txt 2>/dev/null \\\n    || md5 -q requirements.txt)\n  HASH=$(echo \"$HASH\" | cut -d\" \" -f1)\n  LAST=$(cat \"$PIP_VENV/.deps_hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    pip install -q -r requirements.txt\n    echo \"$HASH\" > \"$PIP_VENV/.deps_hash\"\n  fi\nfi\n"
     },
     "profile": {
-      "bash": "source \"$FLOX_PYTHON_PIP_VENV_PATH/bin/activate\"\n",
-      "zsh": "source \"$FLOX_PYTHON_PIP_VENV_PATH/bin/activate\"\n",
-      "fish": "source \"$FLOX_PYTHON_PIP_VENV_PATH/bin/activate.fish\"\n",
-      "tcsh": "source \"$FLOX_PYTHON_PIP_VENV_PATH/bin/activate.csh\"\n"
+      "bash": "source \"$FLOX_ENV_CACHE/python-pip/venv/bin/activate\"\n",
+      "zsh": "source \"$FLOX_ENV_CACHE/python-pip/venv/bin/activate\"\n",
+      "fish": "source \"$FLOX_ENV_CACHE/python-pip/venv/bin/activate.fish\"\n",
+      "tcsh": "source \"$FLOX_ENV_CACHE/python-pip/venv/bin/activate.csh\"\n"
     },
-    "options": {
-      "systems": [
-        "aarch64-darwin",
-        "aarch64-linux",
-        "x86_64-darwin",
-        "x86_64-linux"
-      ]
-    }
+    "options": {}
   },
   "packages": [
     {
-      "attr_path": "coreutils",
-      "broken": false,
-      "derivation": "/nix/store/z725scvzjbksjxzmwkjjp7r3vc6h3l6p-coreutils-9.7.drv",
-      "description": "GNU Core Utilities",
-      "install_id": "coreutils",
-      "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "name": "coreutils-9.7",
-      "pname": "coreutils",
-      "rev": "9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "rev_count": 816272,
-      "rev_date": "2025-06-17T04:31:58Z",
-      "scrape_date": "2025-06-18T00:36:15.813162Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "9.7",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "info": "/nix/store/pwrbl248x1f2a86z2lqcccl4qhb09bqg-coreutils-9.7-info",
-        "out": "/nix/store/d72z8b7fvvcin2p84x7h5s0abkggplzc-coreutils-9.7"
-      },
-      "system": "aarch64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "coreutils",
-      "broken": false,
-      "derivation": "/nix/store/c1b0wwqd8smp62dh1s734fipsih5fb93-coreutils-9.7.drv",
-      "description": "GNU Core Utilities",
-      "install_id": "coreutils",
-      "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "name": "coreutils-9.7",
-      "pname": "coreutils",
-      "rev": "9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "rev_count": 816272,
-      "rev_date": "2025-06-17T04:31:58Z",
-      "scrape_date": "2025-06-18T00:54:48.347962Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "9.7",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "debug": "/nix/store/51ys4glx5i8nw7fbp8wx0z5hqyjn8db4-coreutils-9.7-debug",
-        "info": "/nix/store/72ms1kb4rn6gwrszg8gha3cqaafz4z3s-coreutils-9.7-info",
-        "out": "/nix/store/jc7fgy3pl7mq4i1km1q6vz99s2jxn211-coreutils-9.7"
-      },
-      "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "coreutils",
-      "broken": false,
-      "derivation": "/nix/store/wzl6qvpzdn6f7x9a4dqdwnzd1vb5aakm-coreutils-9.7.drv",
-      "description": "GNU Core Utilities",
-      "install_id": "coreutils",
-      "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "name": "coreutils-9.7",
-      "pname": "coreutils",
-      "rev": "9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "rev_count": 816272,
-      "rev_date": "2025-06-17T04:31:58Z",
-      "scrape_date": "2025-06-18T01:12:23.058696Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "9.7",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "info": "/nix/store/zw8sd25441y3rfr68g30d2hh6xkl2w6b-coreutils-9.7-info",
-        "out": "/nix/store/dlpm52asjsca03s1mf96x21yyi619njn-coreutils-9.7"
-      },
-      "system": "x86_64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "coreutils",
-      "broken": false,
-      "derivation": "/nix/store/fgll938ckagw683wsg7fn7sv6anply4n-coreutils-9.7.drv",
-      "description": "GNU Core Utilities",
-      "install_id": "coreutils",
-      "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "name": "coreutils-9.7",
-      "pname": "coreutils",
-      "rev": "9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "rev_count": 816272,
-      "rev_date": "2025-06-17T04:31:58Z",
-      "scrape_date": "2025-06-18T01:32:27.776221Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "9.7",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "debug": "/nix/store/yabx8if8wqjhvcv2z112pxvvgx2cmmqs-coreutils-9.7-debug",
-        "info": "/nix/store/p5g6vix7lwrz6kw445dm8n2q5pnccfpl-coreutils-9.7-info",
-        "out": "/nix/store/87fck6hm17chxjq7badb11mq036zbyv9-coreutils-9.7"
-      },
-      "system": "x86_64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/9611az532yrja26hnb6knavbxdgy1yrl-gum-0.16.1.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "name": "gum-0.16.1",
-      "pname": "gum",
-      "rev": "9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "rev_count": 816272,
-      "rev_date": "2025-06-17T04:31:58Z",
-      "scrape_date": "2025-06-18T00:36:16.552075Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.16.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/k3hfaznp6m5zm7436gki029amjycscfs-gum-0.16.1"
-      },
-      "system": "aarch64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/bqjky4b54ncwq9p7zad781naya87vz6n-gum-0.16.1.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "name": "gum-0.16.1",
-      "pname": "gum",
-      "rev": "9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "rev_count": 816272,
-      "rev_date": "2025-06-17T04:31:58Z",
-      "scrape_date": "2025-06-18T00:54:49.885812Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.16.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/aaf6hhl897a6l2xv9jwgjsr5gwj000wl-gum-0.16.1"
-      },
-      "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/r5p08in9h18sy7hy0gxifnywpsdhzxph-gum-0.16.1.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "name": "gum-0.16.1",
-      "pname": "gum",
-      "rev": "9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "rev_count": 816272,
-      "rev_date": "2025-06-17T04:31:58Z",
-      "scrape_date": "2025-06-18T01:12:23.817011Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.16.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/djbqwg8la91xj8qnjp0nv1brqnvv69q5-gum-0.16.1"
-      },
-      "system": "x86_64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/pzc4cj00gsfwqszfcqxk8clprmshyi74-gum-0.16.1.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "name": "gum-0.16.1",
-      "pname": "gum",
-      "rev": "9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "rev_count": 816272,
-      "rev_date": "2025-06-17T04:31:58Z",
-      "scrape_date": "2025-06-18T01:32:29.505694Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.16.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/lyqs0m9rf0laldm1gfa439nd3pxpxsby-gum-0.16.1"
-      },
-      "system": "x86_64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
       "attr_path": "python3",
       "broken": false,
-      "derivation": "/nix/store/b3gcarlbbnfv6walgjbcf21ay5n609p1-python3-3.12.10.drv",
+      "derivation": "/nix/store/krwwaljrhx0f8rykjbxzwhjqhn8iq64d-python3-3.13.12.drv",
       "description": "High-level dynamically-typed programming language",
-      "install_id": "python",
+      "install_id": "python3",
       "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "name": "python3-3.12.10",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "python3-3.13.12",
       "pname": "python3",
-      "rev": "9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "rev_count": 816272,
-      "rev_date": "2025-06-17T04:31:58Z",
-      "scrape_date": "2025-06-18T00:36:24.954481Z",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T03:37:59.929420Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "3.12.10",
+      "version": "3.13.12",
       "outputs_to_install": [
+        "out",
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/v0vy1c59f0vf71h64caw17hzymvg0zms-python3-3.12.10"
+        "out": "/nix/store/qabiwfbf61gaky68k0klvyjvd8zavmxb-python3-3.13.12"
       },
       "system": "aarch64-darwin",
       "group": "toplevel",
@@ -306,28 +55,30 @@
     {
       "attr_path": "python3",
       "broken": false,
-      "derivation": "/nix/store/255a922py8f7cs97nwazx68jiz2zl0r8-python3-3.12.10.drv",
+      "derivation": "/nix/store/nxvwxd34qjxfwm1cx3kpalrd6xcsydla-python3-3.13.12.drv",
       "description": "High-level dynamically-typed programming language",
-      "install_id": "python",
+      "install_id": "python3",
       "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "name": "python3-3.12.10",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "python3-3.13.12",
       "pname": "python3",
-      "rev": "9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "rev_count": 816272,
-      "rev_date": "2025-06-17T04:31:58Z",
-      "scrape_date": "2025-06-18T00:55:10.781687Z",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:10:55.294364Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "3.12.10",
+      "version": "3.13.12",
       "outputs_to_install": [
+        "out",
+        "out",
         "out"
       ],
       "outputs": {
-        "debug": "/nix/store/p61ablwahkxdx97pwlz29b04zpncgmvg-python3-3.12.10-debug",
-        "out": "/nix/store/rpf3admp58i0lwmsbv0y3dg7l7qqj4a9-python3-3.12.10"
+        "debug": "/nix/store/q6kvsi3vgc4xvnp3yzibg03a22cw86r2-python3-3.13.12-debug",
+        "out": "/nix/store/nnz5k19wbai97d7y2x11qaq6dgxzhq4w-python3-3.13.12"
       },
       "system": "aarch64-linux",
       "group": "toplevel",
@@ -336,27 +87,27 @@
     {
       "attr_path": "python3",
       "broken": false,
-      "derivation": "/nix/store/6bz0xjfswjawj6anvyw9mbk8fh8rd6sw-python3-3.12.10.drv",
+      "derivation": "/nix/store/0bqzghzk3p5ss7wvxgfjw2k49wmiddkj-python3-3.13.12.drv",
       "description": "High-level dynamically-typed programming language",
-      "install_id": "python",
+      "install_id": "python3",
       "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "name": "python3-3.12.10",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "python3-3.13.12",
       "pname": "python3",
-      "rev": "9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "rev_count": 816272,
-      "rev_date": "2025-06-17T04:31:58Z",
-      "scrape_date": "2025-06-18T01:12:32.471151Z",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:41:19.242801Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "3.12.10",
+      "version": "3.13.12",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/g13l84j8gn1fdhl3pzkg2r9ip9jz1hhd-python3-3.12.10"
+        "out": "/nix/store/qcpx0pjlgkigibqijdy1wsy2kmc8shd2-python3-3.13.12"
       },
       "system": "x86_64-darwin",
       "group": "toplevel",
@@ -365,28 +116,30 @@
     {
       "attr_path": "python3",
       "broken": false,
-      "derivation": "/nix/store/h95xflanqqarxi1j9wxmmvsh62yz8nv1-python3-3.12.10.drv",
+      "derivation": "/nix/store/makmgpqhagbsvfs49dywc7r7a0kv8any-python3-3.13.12.drv",
       "description": "High-level dynamically-typed programming language",
-      "install_id": "python",
+      "install_id": "python3",
       "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "name": "python3-3.12.10",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "python3-3.13.12",
       "pname": "python3",
-      "rev": "9e83b64f727c88a7711a2c463a7b16eedb69a84c",
-      "rev_count": 816272,
-      "rev_date": "2025-06-17T04:31:58Z",
-      "scrape_date": "2025-06-18T01:32:53.612669Z",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T05:17:19.327814Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "3.12.10",
+      "version": "3.13.12",
       "outputs_to_install": [
+        "out",
+        "out",
         "out"
       ],
       "outputs": {
-        "debug": "/nix/store/fi03x2bn49bmm3h53snkdmkypilnd5n2-python3-3.12.10-debug",
-        "out": "/nix/store/8w718rm43x7z73xhw9d6vh8s4snrq67h-python3-3.12.10"
+        "debug": "/nix/store/nj0fy51wymai8wp1y7dbk08g6pvjw1a1-python3-3.13.12-debug",
+        "out": "/nix/store/pzdalg368npikvpq4ncz2saxnz19v53k-python3-3.13.12"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
