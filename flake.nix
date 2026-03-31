@@ -131,7 +131,7 @@
           if [ "$(uname)" = "Linux" ] && command -v unshare >/dev/null 2>&1; then
             echo "👉 Isolating test in user+network+PID namespace..."
             NS_HOME=$(mktemp -d)
-            HOME="$NS_HOME" unshare --user --net --pid --fork ${pkgs.bashInteractive}/bin/bash -c \
+            unshare --user --net --pid --fork /usr/bin/env HOME="$NS_HOME" ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
               "export HOME=\"$NS_HOME\"; ip link set lo up 2>/dev/null || true; cd \"$envdir\"; eval \"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\"" \
               && exit 0 \
               || echo "👉 Namespace isolation failed, falling back to direct execution..."
