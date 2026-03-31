@@ -49,7 +49,7 @@
 
           export FLOX_DISABLE_METRICS=true
           export FLOX_ENVS_TESTING=1
-          export PATH="${lib.makeBinPath (with pkgs; [ coreutils flox.packages."${system}".default ])}:$PATH"
+          export PATH="${lib.makeBinPath (with pkgs; [ coreutils flox.packages."${system}".default ] ++ lib.optionals stdenv.isLinux [ util-linux iproute2 ])}:$PATH"
           export LANG=
           export LC_COLLATE="C"
           export LC_CTYPE="C"
@@ -117,7 +117,25 @@
             start_services=" --start-services"
           fi
 
+          # Ensure HOME is writable — some builders set HOME=/var/empty
+          if [ ! -w "''${HOME:-/nonexistent}" ]; then
+            export HOME=$(mktemp -d)
+          fi
+
           echo "👉 Running $name test..."
+
+          # On Linux, isolate in network+PID namespace so concurrent
+          # tests don't fight over ports and orphaned services get
+          # killed automatically on exit. Falls back to direct
+          # execution if unshare is unavailable or not permitted.
+          if [ "$(uname)" = "Linux" ] && command -v unshare >/dev/null 2>&1; then
+            echo "👉 Isolating test in user+network+PID namespace..."
+            NS_HOME=$(mktemp -d)
+            unshare --user --net --pid --fork /usr/bin/env HOME="$NS_HOME" ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
+              "export HOME=\"$NS_HOME\"; ip link set lo up 2>/dev/null || true; cd \"$envdir\"; eval \"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\"" \
+              && exit 0 \
+              || echo "👉 Namespace isolation failed, falling back to direct execution..."
+          fi
           eval "flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'"
         '';
       in
