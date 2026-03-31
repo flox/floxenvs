@@ -1,12 +1,18 @@
 schema-version = "1.10.0"
 
+# Minimal Nginx environment for use with [include].
+#
+# This provides a working Nginx setup with sane defaults.
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/nginx"]
+#
+# Then customize vars or override the service definition
+# in your own manifest as needed.
+
 [install]
 nginx.pkg-path = "nginx"
-nginx.outputs = "all"
-curl.pkg-path = "curl"
-curl.outputs = "all"
-gnugrep.pkg-path = "gnugrep"
-gnugrep.outputs = "all"
 
 [vars]
 NGINX_WWW_DIR = ""
