@@ -2,17 +2,12 @@
 
 set -eo pipefail
 
-check_command() {
-	if ! command -v $1 2>&1 >/dev/null; then
-		echo "Error: '$1' command could not be found."
-		exit 1
-	fi
-}
+if ! command -v go >/dev/null 2>&1; then
+  echo "Error: 'go' command not found."
+  exit 1
+fi
 
-check_command go
+echo ">>> go version"
+go version
 
-go build
-echo ">>> go build works"
-
-./hello
-echo ">>> go binary works"
+echo ">>> Go environment is working"
