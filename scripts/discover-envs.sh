@@ -41,7 +41,7 @@ x86_64-linux"
 get_systems() {
   local lock="$1"
   local systems
-  systems="$(jq -r '.manifest.options.systems // [] | .[]' "$lock")"
+  systems="$(jq -r '.manifest.options.systems // [] | map(select(. != "x86_64-darwin")) | .[]' "$lock")"
   if [ -z "$systems" ]; then
     systems="$ALL_SYSTEMS"
   fi
