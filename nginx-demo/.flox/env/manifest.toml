@@ -1,0 +1,52 @@
+schema-version = "1.10.0"
+[include]
+environments = [
+  { dir = "../nginx" }
+]
+
+# ============================================================
+# Packages
+# ============================================================
+#
+# Testing and UI tools are grouped separately from the
+# nginx package defined in the included nginx environment.
+
+[install]
+
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+curl.pkg-path = "curl"
+curl.pkg-group = "demo-tools"
+
+
+# ============================================================
+# Activation hook
+# ============================================================
+#
+# The nginx config generation and service setup come from
+# the included nginx environment. This hook adds demo-
+# specific connection info.
+
+[hook]
+on-activate = '''
+
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' --padding '1 4' \
+    'Start Nginx in the background:' \
+    '  flox services start' \
+    '  flox activate --start-services' '' \
+    'Test the server:' \
+    "  curl http://localhost:$NGINX_PORT" '' \
+    'Configuration:' \
+    "  port=$NGINX_PORT" \
+    "  document_root=$NGINX_WWW_DIR" \
+    "  config=$NGINX_DIR/nginx.conf" \
+    "  error_log=$NGINX_DIR/error.log" \
+    "  access_log=$NGINX_DIR/access.log"
+fi
+
+'''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]

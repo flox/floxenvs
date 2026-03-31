@@ -6,6 +6,10 @@ if ! command -v nginx 2>&1 >/dev/null; then
   echo "Error: 'nginx' command could not be found."
   exit 1
 fi
+if ! command -v curl 2>&1 >/dev/null; then
+  echo "Error: 'curl' command could not be found."
+  exit 1
+fi
 
 echo -n "Waiting for Nginx to start .."
 MAX_ATTEMPTS=20

@@ -1,0 +1,506 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "curl": {
+        "pkg-path": "curl",
+        "pkg-group": "demo-tools"
+      },
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": "demo-tools"
+      },
+      "nginx": {
+        "pkg-path": "nginx"
+      }
+    },
+    "vars": {
+      "NGINX_PORT": "18181",
+      "NGINX_WORKER_CONNECTIONS": "1024",
+      "NGINX_WORKER_PROCESSES": "1",
+      "NGINX_WWW_DIR": ""
+    },
+    "hook": {
+      "on-activate": "\nexport NGINX_DIR=\"$FLOX_ENV_CACHE/nginx\"\nexport NGINX_CONFIG=\"$NGINX_DIR/nginx.conf\"\nexport NGINX_ERROR_LOG=\"$NGINX_DIR/error.log\"\nexport NGINX_ACCESS_LOG=\"$NGINX_DIR/access.log\"\n\nif [ -z \"$NGINX_WWW_DIR\" ]; then\n  export NGINX_WWW_DIR=\"$FLOX_ENV_CACHE/www\"\nfi\n\nmkdir -p \"$NGINX_DIR\"\n\ncat <<EOF > \"$NGINX_CONFIG\"\nworker_processes $NGINX_WORKER_PROCESSES;\n\nlock_file $NGINX_DIR/nginx.lock;\npid $NGINX_DIR/nginx.pid;\nerror_log $NGINX_ERROR_LOG;\n\nevents {\n  worker_connections $NGINX_WORKER_CONNECTIONS;\n}\n\nhttp {\n  access_log $NGINX_ACCESS_LOG;\n\n  server {\n    listen $NGINX_PORT;\n    root $NGINX_WWW_DIR;\n\n    location / {\n    }\n\n  }\n}\nEOF\n\nif [ ! -d \"$NGINX_WWW_DIR\" ]; then\n  mkdir -p \"$NGINX_WWW_DIR\"\n  cat <<EOF > \"$NGINX_WWW_DIR/index.html\"\n<!doctype html>\n<html>\n  <head>\n    <title>Hello Flox!</title>\n    <meta charset=\"utf-8\" />\n  </head>\n  <body>\n    <h1>\n      Hello from <a href=\"https://flox.dev\">Flox</a> environment!\n    </h1>\n  </body>\n</html>\nEOF\nfi\n\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'Start Nginx in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Test the server:' \\\n    \"  curl http://localhost:$NGINX_PORT\" '' \\\n    'Configuration:' \\\n    \"  port=$NGINX_PORT\" \\\n    \"  document_root=$NGINX_WWW_DIR\" \\\n    \"  config=$NGINX_DIR/nginx.conf\" \\\n    \"  error_log=$NGINX_DIR/error.log\" \\\n    \"  access_log=$NGINX_DIR/access.log\"\nfi\n\n"
+    },
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-darwin",
+        "x86_64-linux"
+      ]
+    },
+    "services": {
+      "nginx": {
+        "command": "nginx -c $NGINX_CONFIG -e $NGINX_ERROR_LOG -g 'daemon off;'"
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/9f2i20yq3jp4yhaxk3qnxhazp7syqmvn-curl-8.18.0.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "curl-8.18.0",
+      "pname": "curl",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T03:37:20.091362Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.18.0",
+      "outputs_to_install": [
+        "bin",
+        "bin",
+        "man",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/gki71gmvlp9d86rqh8b4b6wp7wg396qg-curl-8.18.0-bin",
+        "dev": "/nix/store/2xrq7swcyjrvsbp5wk4qivwbzrqxasxr-curl-8.18.0-dev",
+        "devdoc": "/nix/store/vrff2ib15qhdig8ich94visj28x9m931-curl-8.18.0-devdoc",
+        "man": "/nix/store/wd2w49jdql1n3c6cg4qimqbq5k6m6j4f-curl-8.18.0-man",
+        "out": "/nix/store/7bxrgix4f88r6xvidyl035vxdbn2rnyk-curl-8.18.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/g29rj5wpfqyckm3f1b3jrrslqgaw9rzm-curl-8.18.0.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "curl-8.18.0",
+      "pname": "curl",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:09:54.530795Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.18.0",
+      "outputs_to_install": [
+        "bin",
+        "bin",
+        "man",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/asrq77x05br50nmmv7akp0ry2n1xxrb4-curl-8.18.0-bin",
+        "debug": "/nix/store/b4mmgwziiqa4jirsrw162r794zi48fz6-curl-8.18.0-debug",
+        "dev": "/nix/store/nxarksm7m9ll9p3r87issf0389hwdz3l-curl-8.18.0-dev",
+        "devdoc": "/nix/store/canqrd4xwygamx7qw3j7dd923l7bmg9n-curl-8.18.0-devdoc",
+        "man": "/nix/store/8z4wa6lizr4gzfpmj3928c2wjk1ldslf-curl-8.18.0-man",
+        "out": "/nix/store/qxkiwf9mg5x9jijpmk0hmz9nkd4xlzph-curl-8.18.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/gkm06vy5lkp1n6wlgrr7vvfirf2zgs0g-curl-8.18.0.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "curl-8.18.0",
+      "pname": "curl",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:40:39.265073Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.18.0",
+      "outputs_to_install": [
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/0h4avs7960hxfgmlayshci76pdd7j1zp-curl-8.18.0-bin",
+        "dev": "/nix/store/rpw29w7jmwrp32bp72s805rh0rchp7fh-curl-8.18.0-dev",
+        "devdoc": "/nix/store/4sbv3g3n1nxlq5nfasd194h893k5nkm9-curl-8.18.0-devdoc",
+        "man": "/nix/store/lb59x8lcbiqjph4gfl5a99l8wh1ckvfy-curl-8.18.0-man",
+        "out": "/nix/store/sdf4br1wm1s10y67yz062mc1vmkykm0f-curl-8.18.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/1wrll60slxlmvb56g6zk7amw3pwylcng-curl-8.18.0.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "curl-8.18.0",
+      "pname": "curl",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T05:16:14.899430Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.18.0",
+      "outputs_to_install": [
+        "bin",
+        "bin",
+        "man",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/6j3b51rypymg5inhr27rcc7in5cxbvjz-curl-8.18.0-bin",
+        "debug": "/nix/store/9gvh3ymdh38n7lkbjd61cwx6ff510wpb-curl-8.18.0-debug",
+        "dev": "/nix/store/m2b7j4s1jlhlnpxhpf2sjwvd2nn0x8hx-curl-8.18.0-dev",
+        "devdoc": "/nix/store/r2xswgdxf2z7h9vnirhzkzj4k721nbhh-curl-8.18.0-devdoc",
+        "man": "/nix/store/gxspg74jdwaxdb80giixl4517nw6q139-curl-8.18.0-man",
+        "out": "/nix/store/dhdysbgmgqp936mvkf5f9s8fh2mk68k5-curl-8.18.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/bmz60mbb36nlipdn9n6zmcm6kjls8gll-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T03:37:21.147669Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cdpxgzcjwidrmrzsq0zkyr9nxccvy3p6-gum-0.17.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/yhvp5prpjjl5hqk6fhr5svdzf1yfacgk-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:09:56.689083Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kqcb9j9k6wdvb7pjvjzn3p8dc82qmk9x-gum-0.17.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/cngbjjxmgsmcbgvihq7q9472rb5rhgdj-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:40:40.363731Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rznkbgxflsbrfy5c359vhhqrrxw4pfkj-gum-0.17.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/f5ahd90j9s46j49lz8k2yn3cmvyq6mbn-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T05:16:17.301634Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rf0zlw5q4j051xkjk9djfw5dpb8nwbgm-gum-0.17.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "nginx",
+      "broken": false,
+      "derivation": "/nix/store/64993lglijh0ki2yixxljymf1chwpj3r-nginx-1.28.3.drv",
+      "description": "Reverse proxy and lightweight webserver",
+      "install_id": "nginx",
+      "license": "[ BSD-2-Clause, BSD-2-Clause, BSD-2-Clause, BSD-2-Clause ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "nginx-1.28.3",
+      "pname": "nginx",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T03:37:43.027292Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.28.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/wmrir15z0xaplx72gkd3yr9w9pisznxd-nginx-1.28.3-doc",
+        "out": "/nix/store/ra5gp9jsmh2a509nd3a5lyskmcv72ipk-nginx-1.28.3"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nginx",
+      "broken": false,
+      "derivation": "/nix/store/naw0swk6a4zvy5g78bg3lv9wdjic0dvr-nginx-1.28.3.drv",
+      "description": "Reverse proxy and lightweight webserver",
+      "install_id": "nginx",
+      "license": "[ BSD-2-Clause, BSD-2-Clause, BSD-2-Clause, BSD-2-Clause ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "nginx-1.28.3",
+      "pname": "nginx",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:10:31.433256Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.28.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/xwmjza7m0gynclxqsdw8qqlvv5hj894s-nginx-1.28.3-doc",
+        "out": "/nix/store/04a7l6nmcngnsqnri0i1kdb2zgr8xa7a-nginx-1.28.3"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nginx",
+      "broken": false,
+      "derivation": "/nix/store/rp3fc7kdl8wnb8fq05asdn2wynwpwsig-nginx-1.28.3.drv",
+      "description": "Reverse proxy and lightweight webserver",
+      "install_id": "nginx",
+      "license": "[ BSD-2-Clause, BSD-2-Clause, BSD-2-Clause, BSD-2-Clause ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "nginx-1.28.3",
+      "pname": "nginx",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:41:02.226827Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.28.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/048xbd4dj99c7pssjiynz5rjzh5fhpvx-nginx-1.28.3-doc",
+        "out": "/nix/store/6l9igpczbp6b6my5mkq3xr8jjdh8fdcr-nginx-1.28.3"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "nginx",
+      "broken": false,
+      "derivation": "/nix/store/9kq6hfl3avvrarr5s5686q4lnv42gbyi-nginx-1.28.3.drv",
+      "description": "Reverse proxy and lightweight webserver",
+      "install_id": "nginx",
+      "license": "[ BSD-2-Clause, BSD-2-Clause, BSD-2-Clause, BSD-2-Clause ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "nginx-1.28.3",
+      "pname": "nginx",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T05:16:54.272319Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.28.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/xvsjn34x1bba9hwkjgjfvc2mgjyx4q4y-nginx-1.28.3-doc",
+        "out": "/nix/store/d56vz94spzlixbsgyvxqgavmi3s0ig6f-nginx-1.28.3"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ],
+  "compose": {
+    "composer": {
+      "schema-version": "1.11.0",
+      "install": {
+        "curl": {
+          "pkg-path": "curl",
+          "pkg-group": "demo-tools"
+        },
+        "gum": {
+          "pkg-path": "gum",
+          "pkg-group": "demo-tools"
+        }
+      },
+      "hook": {
+        "on-activate": "\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'Start Nginx in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Test the server:' \\\n    \"  curl http://localhost:$NGINX_PORT\" '' \\\n    'Configuration:' \\\n    \"  port=$NGINX_PORT\" \\\n    \"  document_root=$NGINX_WWW_DIR\" \\\n    \"  config=$NGINX_DIR/nginx.conf\" \\\n    \"  error_log=$NGINX_DIR/error.log\" \\\n    \"  access_log=$NGINX_DIR/access.log\"\nfi\n\n"
+      },
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-darwin",
+          "x86_64-linux"
+        ]
+      },
+      "include": {
+        "environments": [
+          {
+            "dir": "../nginx"
+          }
+        ]
+      }
+    },
+    "include": [
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "nginx": {
+              "pkg-path": "nginx"
+            }
+          },
+          "vars": {
+            "NGINX_PORT": "18181",
+            "NGINX_WORKER_CONNECTIONS": "1024",
+            "NGINX_WORKER_PROCESSES": "1",
+            "NGINX_WWW_DIR": ""
+          },
+          "hook": {
+            "on-activate": "\nexport NGINX_DIR=\"$FLOX_ENV_CACHE/nginx\"\nexport NGINX_CONFIG=\"$NGINX_DIR/nginx.conf\"\nexport NGINX_ERROR_LOG=\"$NGINX_DIR/error.log\"\nexport NGINX_ACCESS_LOG=\"$NGINX_DIR/access.log\"\n\nif [ -z \"$NGINX_WWW_DIR\" ]; then\n  export NGINX_WWW_DIR=\"$FLOX_ENV_CACHE/www\"\nfi\n\nmkdir -p \"$NGINX_DIR\"\n\ncat <<EOF > \"$NGINX_CONFIG\"\nworker_processes $NGINX_WORKER_PROCESSES;\n\nlock_file $NGINX_DIR/nginx.lock;\npid $NGINX_DIR/nginx.pid;\nerror_log $NGINX_ERROR_LOG;\n\nevents {\n  worker_connections $NGINX_WORKER_CONNECTIONS;\n}\n\nhttp {\n  access_log $NGINX_ACCESS_LOG;\n\n  server {\n    listen $NGINX_PORT;\n    root $NGINX_WWW_DIR;\n\n    location / {\n    }\n\n  }\n}\nEOF\n\nif [ ! -d \"$NGINX_WWW_DIR\" ]; then\n  mkdir -p \"$NGINX_WWW_DIR\"\n  cat <<EOF > \"$NGINX_WWW_DIR/index.html\"\n<!doctype html>\n<html>\n  <head>\n    <title>Hello Flox!</title>\n    <meta charset=\"utf-8\" />\n  </head>\n  <body>\n    <h1>\n      Hello from <a href=\"https://flox.dev\">Flox</a> environment!\n    </h1>\n  </body>\n</html>\nEOF\nfi\n"
+          },
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-darwin",
+              "x86_64-linux"
+            ]
+          },
+          "services": {
+            "nginx": {
+              "command": "nginx -c $NGINX_CONFIG -e $NGINX_ERROR_LOG -g 'daemon off;'"
+            }
+          }
+        },
+        "name": "nginx",
+        "descriptor": {
+          "dir": "../nginx"
+        }
+      }
+    ],
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
+  }
+}
