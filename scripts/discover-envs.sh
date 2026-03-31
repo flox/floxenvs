@@ -32,9 +32,10 @@ has_services() {
 # Extract systems list from lock file (one per line).
 # If manifest.options.systems is empty or absent, all
 # default systems are assumed (per ADR-004).
+# We are skipping x86_64-darwin intentionally since
+# we don't have good enough CI for it.
 ALL_SYSTEMS="aarch64-darwin
 aarch64-linux
-x86_64-darwin
 x86_64-linux"
 
 get_systems() {
