@@ -70,12 +70,11 @@
           cleanup() {
             cd /
             flox services stop --dir "$envdir" 2>/dev/null || true
-            sleep 1
-            chmod -R u+w "$TESTDIR" 2>/dev/null
-            rm -rf "$TESTDIR" 2>/dev/null || {
+            for i in $(seq 1 10); do
+              chmod -R u+w "$TESTDIR" 2>/dev/null
+              rm -rf "$TESTDIR" 2>/dev/null && break
               sleep 2
-              rm -rf "$TESTDIR" 2>/dev/null || true
-            }
+            done
           }
           trap cleanup EXIT
 
