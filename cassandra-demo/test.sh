@@ -34,7 +34,13 @@ flox services status
 echo ">>> flox services logs cassandra"
 flox services logs cassandra
 
-echo ">>> Checking Cassandra with cqlsh..."
-cqlsh "$CASSANDRA_HOST" "$CASSANDRA_PORT" \
-  -e "SELECT now() FROM system.local;"
-echo ">>> Cassandra cqlsh check ... OK"
+echo ">>> Testing CQL operations..."
+cqlsh "$CASSANDRA_HOST" "$CASSANDRA_PORT" -e \
+  "CREATE KEYSPACE IF NOT EXISTS flox_test
+    WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
+  USE flox_test;
+  CREATE TABLE IF NOT EXISTS items (id UUID PRIMARY KEY, name text, value int);
+  INSERT INTO items (id, name, value) VALUES (uuid(), 'test', 42);
+  SELECT * FROM items WHERE name = 'test' ALLOW FILTERING;
+  DROP KEYSPACE flox_test;"
+echo ">>> CQL operations ... OK"

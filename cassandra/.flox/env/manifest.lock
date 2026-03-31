@@ -1,19 +1,15 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "version": 1,
+    "schema-version": "1.10.0",
     "install": {
-      "cassandra": {
-        "pkg-path": "cassandra_4"
-      },
-      "coreutils": {
-        "pkg-path": "coreutils"
+      "cassandra_4": {
+        "pkg-path": "cassandra_4",
+        "pkg-group": "cassandra"
       },
       "semver-tool": {
-        "pkg-path": "semver-tool"
-      },
-      "which": {
-        "pkg-path": "which"
+        "pkg-path": "semver-tool",
+        "pkg-group": "cassandra-tools"
       }
     },
     "vars": {
@@ -26,19 +22,9 @@
       "JVM_OPTS": ""
     },
     "hook": {
-      "on-activate": "\nexport CASSANDRA_CACHE=\"$FLOX_ENV_CACHE/cassandra\"\nexport CASSANDRA_CONFIG_FILE=\"$CASSANDRA_CACHE/cassandra.yaml\"\n\nif [[ ! -d \"$CASSANDRA_CACHE\" ]]; then\n    mkdir -p \"$CASSANDRA_CACHE\"\nfi\n\nCASSANDRA_PATH=\"$(realpath $(which cassandra))\"\nCASSANDRA_VERSION=\"${CASSANDRA_PATH:54:-14}\"\n# Only for cassandra >=4.0.0\nif [[ \"$(semver compare \"$CASSANDRA_VERSION\" \"4.0.0\")\" != \"-1\" ]]; then\n  JVM_OPTS=\"$JVM_OPTS -Xlog:gc=warning,heap*=warning,age*=warning,safepoint=warning,promotion*=warning\"\nfi\n\nif [[ ! -f \"$CASSANDRA_CONFIG_FILE\" ]]; then\n\n  tee -a $CASSANDRA_CONFIG_FILE > /dev/null << EOF\nlisten_address: \"$CASSANDRA_HOST\"\nnative_transport_port: \"$CASSANDRA_PORT\"\nstorage_port: \"$CASSANDRA_STORAGE_PORT\"\nstart_native_transport: \"$CASSANDRA_ALLOW_CLIENTS\"\ncluster_name: \"$CASSANDRA_CLUSTER_NAME\"\ndata_file_directories:\n  - \"$CASSANDRA_CACHE/data\"\ncommitlog_directory: \"$CASSANDRA_CACHE/commitlog\"\nsaved_caches_directory: \"$CASSANDRA_CACHE/saved_caches\"\nhints_directory: \"$CASSANDRA_CACHE/hints\"\nseed_provider:\n  - class_name: \"org.apache.cassandra.locator.SimpleSeedProvider\"\n    parameters:\n      - seeds: \"$CASSANDRA_SEED_ADDRS\"\ncommitlog_sync: \"batch\"\ncommitlog_sync_batch_window_in_ms: 2\npartitioner: \"org.apache.cassandra.dht.Murmur3Partitioner\"\nendpoint_snitch: \"SimpleSnitch\"\nEOF\n\nfi\n"
+      "on-activate": "export CASSANDRA_CACHE=\"$FLOX_ENV_CACHE/cassandra\"\nexport CASSANDRA_CONFIG_FILE=\"$CASSANDRA_CACHE/cassandra.yaml\"\n\nif [ ! -d \"$CASSANDRA_CACHE\" ]; then\n  mkdir -p \"$CASSANDRA_CACHE\"\nfi\n\n# Detect version for JVM options\nCASSANDRA_VERSION=\"$(cassandra -v)\"\nif [ \"$(semver compare \"$CASSANDRA_VERSION\" \"4.0.0\")\" != \"-1\" ]; then\n  JVM_OPTS=\"$JVM_OPTS -Xlog:gc=warning,heap*=warning,age*=warning,safepoint=warning,promotion*=warning\"\nfi\n\nif [ ! -f \"$CASSANDRA_CONFIG_FILE\" ]; then\n  cat > \"$CASSANDRA_CONFIG_FILE\" <<EOF\nlisten_address: \"$CASSANDRA_HOST\"\nnative_transport_port: \"$CASSANDRA_PORT\"\nstorage_port: \"$CASSANDRA_STORAGE_PORT\"\nstart_native_transport: \"$CASSANDRA_ALLOW_CLIENTS\"\ncluster_name: \"$CASSANDRA_CLUSTER_NAME\"\ndata_file_directories:\n  - \"$CASSANDRA_CACHE/data\"\ncommitlog_directory: \"$CASSANDRA_CACHE/commitlog\"\nsaved_caches_directory: \"$CASSANDRA_CACHE/saved_caches\"\nhints_directory: \"$CASSANDRA_CACHE/hints\"\nseed_provider:\n  - class_name: \"org.apache.cassandra.locator.SimpleSeedProvider\"\n    parameters:\n      - seeds: \"$CASSANDRA_SEED_ADDRS\"\ncommitlog_sync: \"batch\"\ncommitlog_sync_batch_window_in_ms: 2\npartitioner: \"org.apache.cassandra.dht.Murmur3Partitioner\"\nendpoint_snitch: \"SimpleSnitch\"\nEOF\nfi\n"
     },
-    "profile": {
-      "common": "echo \"\"\necho \"     ╔═══════════════════════════════════════════════╗\"\necho \"     ║                                               ║\"\necho \"     ║  Start Cassandra in the background:           ║\"\necho \"     ║  👉 flox services start                       ║\"\necho \"     ║  👉 flox activate --start-services            ║\"\necho \"     ║                                               ║\"\necho \"     ║  Try to connect to Cassandra:                 ║\"\necho \"     ║  👉 cqlsh \\$CASSANDRA_HOST \\$CASSANDRA_PORT \\   ║\"\necho \"     ║        -e \\\"SELECT ...;\\\"                       ║\"\necho \"     ║                                               ║\"\necho \"     ╚═══════════════════════════════════════════════╝\"\necho \"\"\n"
-    },
-    "options": {
-      "systems": [
-        "aarch64-darwin",
-        "aarch64-linux",
-        "x86_64-darwin",
-        "x86_64-linux"
-      ]
-    },
+    "options": {},
     "services": {
       "cassandra": {
         "command": "cassandra -Dcassandra.config=file://$CASSANDRA_CONFIG_FILE -f"
@@ -51,7 +37,7 @@
       "broken": false,
       "derivation": "/nix/store/njzd8r4zdpi3vp0qcrggbmk26g2b2pkl-cassandra-4.1.8.drv",
       "description": "Massively scalable open source NoSQL database",
-      "install_id": "cassandra",
+      "install_id": "cassandra_4",
       "license": "Apache-2.0",
       "locked_url": "https://github.com/flox/nixpkgs?rev=88d3861acdd3d2f0e361767018218e51810df8a1",
       "name": "cassandra-4.1.8",
@@ -61,8 +47,8 @@
       "rev_date": "2026-01-21T18:02:10Z",
       "scrape_date": "2026-01-23T04:32:30.192976Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "4.1.8",
@@ -73,7 +59,7 @@
         "out": "/nix/store/9r65hmaykh1y934lnlcvdj7f4isqkl9q-cassandra-4.1.8"
       },
       "system": "aarch64-darwin",
-      "group": "toplevel",
+      "group": "cassandra",
       "priority": 5
     },
     {
@@ -81,7 +67,7 @@
       "broken": false,
       "derivation": "/nix/store/84afbam5270i6bqyx488nfl8grq1jc5s-cassandra-4.1.8.drv",
       "description": "Massively scalable open source NoSQL database",
-      "install_id": "cassandra",
+      "install_id": "cassandra_4",
       "license": "Apache-2.0",
       "locked_url": "https://github.com/flox/nixpkgs?rev=88d3861acdd3d2f0e361767018218e51810df8a1",
       "name": "cassandra-4.1.8",
@@ -91,8 +77,8 @@
       "rev_date": "2026-01-21T18:02:10Z",
       "scrape_date": "2026-01-23T05:12:33.935626Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "4.1.8",
@@ -103,7 +89,7 @@
         "out": "/nix/store/l5hz4jv5f4406k60mzz37f02v5a7ijnn-cassandra-4.1.8"
       },
       "system": "aarch64-linux",
-      "group": "toplevel",
+      "group": "cassandra",
       "priority": 5
     },
     {
@@ -111,7 +97,7 @@
       "broken": false,
       "derivation": "/nix/store/ad097sh4x0kpihq35rdqwbirrrzidn7c-cassandra-4.1.8.drv",
       "description": "Massively scalable open source NoSQL database",
-      "install_id": "cassandra",
+      "install_id": "cassandra_4",
       "license": "Apache-2.0",
       "locked_url": "https://github.com/flox/nixpkgs?rev=88d3861acdd3d2f0e361767018218e51810df8a1",
       "name": "cassandra-4.1.8",
@@ -121,8 +107,8 @@
       "rev_date": "2026-01-21T18:02:10Z",
       "scrape_date": "2026-01-23T05:49:36.335525Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "4.1.8",
@@ -133,7 +119,7 @@
         "out": "/nix/store/r8564rzqrs8h4h82fpskirc4759jq4l1-cassandra-4.1.8"
       },
       "system": "x86_64-darwin",
-      "group": "toplevel",
+      "group": "cassandra",
       "priority": 5
     },
     {
@@ -141,7 +127,7 @@
       "broken": false,
       "derivation": "/nix/store/6p4pqwlqplrwji10hkvd9fv53rx0y7i5-cassandra-4.1.8.drv",
       "description": "Massively scalable open source NoSQL database",
-      "install_id": "cassandra",
+      "install_id": "cassandra_4",
       "license": "Apache-2.0",
       "locked_url": "https://github.com/flox/nixpkgs?rev=88d3861acdd3d2f0e361767018218e51810df8a1",
       "name": "cassandra-4.1.8",
@@ -151,8 +137,8 @@
       "rev_date": "2026-01-21T18:02:10Z",
       "scrape_date": "2026-01-23T06:35:54.666482Z",
       "stabilities": [
-        "staging",
-        "unstable"
+        "unstable",
+        "staging"
       ],
       "unfree": false,
       "version": "4.1.8",
@@ -163,379 +149,123 @@
         "out": "/nix/store/jwl3a4icymrsdchnr4qqazqrrmwkmabh-cassandra-4.1.8"
       },
       "system": "x86_64-linux",
-      "group": "toplevel",
+      "group": "cassandra",
       "priority": 5
     },
     {
-      "attr_path": "coreutils",
+      "attr_path": "semver-tool",
       "broken": false,
-      "derivation": "/nix/store/9qw42lbqn9rqhlzbq6hgrzvgvn5fpwvn-coreutils-9.8.drv",
-      "description": "GNU Core Utilities",
-      "install_id": "coreutils",
-      "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=88d3861acdd3d2f0e361767018218e51810df8a1",
-      "name": "coreutils-9.8",
-      "pname": "coreutils",
-      "rev": "88d3861acdd3d2f0e361767018218e51810df8a1",
-      "rev_count": 931542,
-      "rev_date": "2026-01-21T18:02:10Z",
-      "scrape_date": "2026-01-23T04:32:30.434086Z",
+      "derivation": "/nix/store/1bm481phflgpcbqf6959y1q5l8j0q38n-semver-tool-3.4.0.drv",
+      "description": "Semver bash implementation",
+      "install_id": "semver-tool",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "semver-tool-3.4.0",
+      "pname": "semver-tool",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T03:39:05.326262Z",
       "stabilities": [
-        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "9.8",
+      "version": "3.4.0",
       "outputs_to_install": [
-        "out",
-        "out",
         "out"
       ],
       "outputs": {
-        "info": "/nix/store/l10a9szzdyj4f7s4k7bz095hg7sa9yqf-coreutils-9.8-info",
-        "out": "/nix/store/l60153ymb6kdnavlpaghi7h5fz7gh7iw-coreutils-9.8"
+        "out": "/nix/store/43xg729607ps17l19ffv8ixri9kjx0yl-semver-tool-3.4.0"
       },
       "system": "aarch64-darwin",
-      "group": "toplevel",
+      "group": "cassandra-tools",
       "priority": 5
     },
     {
-      "attr_path": "coreutils",
+      "attr_path": "semver-tool",
       "broken": false,
-      "derivation": "/nix/store/97frh460kvlvnikqizqlpfpzhvgvbiik-coreutils-9.8.drv",
-      "description": "GNU Core Utilities",
-      "install_id": "coreutils",
-      "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=88d3861acdd3d2f0e361767018218e51810df8a1",
-      "name": "coreutils-9.8",
-      "pname": "coreutils",
-      "rev": "88d3861acdd3d2f0e361767018218e51810df8a1",
-      "rev_count": 931542,
-      "rev_date": "2026-01-21T18:02:10Z",
-      "scrape_date": "2026-01-23T05:12:34.248014Z",
+      "derivation": "/nix/store/lzfhi3z02xnv10dnf825p7jspz1vy9wd-semver-tool-3.4.0.drv",
+      "description": "Semver bash implementation",
+      "install_id": "semver-tool",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "semver-tool-3.4.0",
+      "pname": "semver-tool",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:12:17.855886Z",
       "stabilities": [
-        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "9.8",
+      "version": "3.4.0",
       "outputs_to_install": [
-        "out",
         "out"
       ],
       "outputs": {
-        "debug": "/nix/store/7v9sy1kpasb3g1yj8mh5nlz9iajp68jw-coreutils-9.8-debug",
-        "info": "/nix/store/24zy33w0r2baj4frfp39w0qch3k463gy-coreutils-9.8-info",
-        "out": "/nix/store/843ahdalwl120986c7ilk5q1c47biyap-coreutils-9.8"
+        "out": "/nix/store/6y3z9f5nsrxbf1801xawsal5gz6z1qj0-semver-tool-3.4.0"
       },
       "system": "aarch64-linux",
-      "group": "toplevel",
+      "group": "cassandra-tools",
       "priority": 5
     },
     {
-      "attr_path": "coreutils",
+      "attr_path": "semver-tool",
       "broken": false,
-      "derivation": "/nix/store/im3fjlb1r6qq90p4wf61b0x90my4vqyc-coreutils-9.8.drv",
-      "description": "GNU Core Utilities",
-      "install_id": "coreutils",
-      "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=88d3861acdd3d2f0e361767018218e51810df8a1",
-      "name": "coreutils-9.8",
-      "pname": "coreutils",
-      "rev": "88d3861acdd3d2f0e361767018218e51810df8a1",
-      "rev_count": 931542,
-      "rev_date": "2026-01-21T18:02:10Z",
-      "scrape_date": "2026-01-23T05:49:36.578642Z",
+      "derivation": "/nix/store/221y52mdrdlp8g1wcgbhbhk79jfbk5c5-semver-tool-3.4.0.drv",
+      "description": "Semver bash implementation",
+      "install_id": "semver-tool",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "semver-tool-3.4.0",
+      "pname": "semver-tool",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:42:23.702064Z",
       "stabilities": [
-        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "9.8",
+      "version": "3.4.0",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "info": "/nix/store/5lwyqgyd3xf0hg8rd26shj9malp9lpqw-coreutils-9.8-info",
-        "out": "/nix/store/i5j9js9ip06p0qjfrgrlv127bz4pdhy5-coreutils-9.8"
+        "out": "/nix/store/pavz7p8v7z3yq3m6nxgyn6gz0xl0k7nq-semver-tool-3.4.0"
       },
       "system": "x86_64-darwin",
-      "group": "toplevel",
+      "group": "cassandra-tools",
       "priority": 5
     },
     {
-      "attr_path": "coreutils",
+      "attr_path": "semver-tool",
       "broken": false,
-      "derivation": "/nix/store/x9sg4ch6n7z3flypyf5s305wgib7dd6f-coreutils-9.8.drv",
-      "description": "GNU Core Utilities",
-      "install_id": "coreutils",
-      "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=88d3861acdd3d2f0e361767018218e51810df8a1",
-      "name": "coreutils-9.8",
-      "pname": "coreutils",
-      "rev": "88d3861acdd3d2f0e361767018218e51810df8a1",
-      "rev_count": 931542,
-      "rev_date": "2026-01-21T18:02:10Z",
-      "scrape_date": "2026-01-23T06:35:55.013622Z",
+      "derivation": "/nix/store/026zk4cvr76by7k064nh2x2cykcvia6n-semver-tool-3.4.0.drv",
+      "description": "Semver bash implementation",
+      "install_id": "semver-tool",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "semver-tool-3.4.0",
+      "pname": "semver-tool",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T05:18:44.281377Z",
       "stabilities": [
-        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "9.8",
+      "version": "3.4.0",
       "outputs_to_install": [
-        "out",
         "out"
       ],
       "outputs": {
-        "debug": "/nix/store/75w8ha5j0a84j3bznvak84qg51hdvwqf-coreutils-9.8-debug",
-        "info": "/nix/store/f6kvimj4nmb89syl4pm61vdld7dvq6hm-coreutils-9.8-info",
-        "out": "/nix/store/d75200gb22v7p0703h5jrkgg8bqydk5q-coreutils-9.8"
+        "out": "/nix/store/5w2pji1q7ragmkxxwjvk2cisnk6k4wl7-semver-tool-3.4.0"
       },
       "system": "x86_64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "semver-tool",
-      "broken": false,
-      "derivation": "/nix/store/biryg0ry6id72m0l6zpn3z8dmb1ri0s3-semver-tool-3.4.0.drv",
-      "description": "Semver bash implementation",
-      "install_id": "semver-tool",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=88d3861acdd3d2f0e361767018218e51810df8a1",
-      "name": "semver-tool-3.4.0",
-      "pname": "semver-tool",
-      "rev": "88d3861acdd3d2f0e361767018218e51810df8a1",
-      "rev_count": 931542,
-      "rev_date": "2026-01-21T18:02:10Z",
-      "scrape_date": "2026-01-23T04:34:10.552170Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "3.4.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/9qvy87jr0y5ybmgyh46j096n7pycp107-semver-tool-3.4.0"
-      },
-      "system": "aarch64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "semver-tool",
-      "broken": false,
-      "derivation": "/nix/store/miiqybq9cjsjvfj1qps7fgz5snfzgbgk-semver-tool-3.4.0.drv",
-      "description": "Semver bash implementation",
-      "install_id": "semver-tool",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=88d3861acdd3d2f0e361767018218e51810df8a1",
-      "name": "semver-tool-3.4.0",
-      "pname": "semver-tool",
-      "rev": "88d3861acdd3d2f0e361767018218e51810df8a1",
-      "rev_count": 931542,
-      "rev_date": "2026-01-21T18:02:10Z",
-      "scrape_date": "2026-01-23T05:14:46.841173Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "3.4.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/zc7cqsc84lpccmvs81p7dmz9by0a0w0y-semver-tool-3.4.0"
-      },
-      "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "semver-tool",
-      "broken": false,
-      "derivation": "/nix/store/96x10b2n633vr3fyc54dry3wx31zczfp-semver-tool-3.4.0.drv",
-      "description": "Semver bash implementation",
-      "install_id": "semver-tool",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=88d3861acdd3d2f0e361767018218e51810df8a1",
-      "name": "semver-tool-3.4.0",
-      "pname": "semver-tool",
-      "rev": "88d3861acdd3d2f0e361767018218e51810df8a1",
-      "rev_count": 931542,
-      "rev_date": "2026-01-21T18:02:10Z",
-      "scrape_date": "2026-01-23T05:51:17.630575Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "3.4.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/xlrq7l2jk2pw9yqh769c2fpkflvq888j-semver-tool-3.4.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "semver-tool",
-      "broken": false,
-      "derivation": "/nix/store/v7g2mmii9zi9hw08mp6j3vf6z6m2p2vr-semver-tool-3.4.0.drv",
-      "description": "Semver bash implementation",
-      "install_id": "semver-tool",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=88d3861acdd3d2f0e361767018218e51810df8a1",
-      "name": "semver-tool-3.4.0",
-      "pname": "semver-tool",
-      "rev": "88d3861acdd3d2f0e361767018218e51810df8a1",
-      "rev_count": 931542,
-      "rev_date": "2026-01-21T18:02:10Z",
-      "scrape_date": "2026-01-23T06:38:14.927350Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "3.4.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/hxfqb6rc94n7q8fqxrb5g929s0zs7n3n-semver-tool-3.4.0"
-      },
-      "system": "x86_64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "which",
-      "broken": false,
-      "derivation": "/nix/store/zipizl1yxjarcsh8dlmgcpl0gsic9n25-which-2.23.drv",
-      "description": "Shows the full path of (shell) commands",
-      "install_id": "which",
-      "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=88d3861acdd3d2f0e361767018218e51810df8a1",
-      "name": "which-2.23",
-      "pname": "which",
-      "rev": "88d3861acdd3d2f0e361767018218e51810df8a1",
-      "rev_count": 931542,
-      "rev_date": "2026-01-21T18:02:10Z",
-      "scrape_date": "2026-01-23T04:35:00.915587Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.23",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/pv7rayqmz3x5g87hyqjga86h18ah57vy-which-2.23"
-      },
-      "system": "aarch64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "which",
-      "broken": false,
-      "derivation": "/nix/store/dpj7rdiqwkvrnp6k2a8y7iiwc10xgw27-which-2.23.drv",
-      "description": "Shows the full path of (shell) commands",
-      "install_id": "which",
-      "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=88d3861acdd3d2f0e361767018218e51810df8a1",
-      "name": "which-2.23",
-      "pname": "which",
-      "rev": "88d3861acdd3d2f0e361767018218e51810df8a1",
-      "rev_count": 931542,
-      "rev_date": "2026-01-21T18:02:10Z",
-      "scrape_date": "2026-01-23T05:15:53.217162Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.23",
-      "outputs_to_install": [
-        "out",
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/6li310zik5yligc9v7k3wqvvfj1hglfw-which-2.23"
-      },
-      "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "which",
-      "broken": false,
-      "derivation": "/nix/store/21jb18pp2pchac0h8hhfk5sqiq1qzpn5-which-2.23.drv",
-      "description": "Shows the full path of (shell) commands",
-      "install_id": "which",
-      "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=88d3861acdd3d2f0e361767018218e51810df8a1",
-      "name": "which-2.23",
-      "pname": "which",
-      "rev": "88d3861acdd3d2f0e361767018218e51810df8a1",
-      "rev_count": 931542,
-      "rev_date": "2026-01-21T18:02:10Z",
-      "scrape_date": "2026-01-23T05:52:08.440323Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.23",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/0bgfi1mfgjf7m16bmk5qcyvbn0g4l6y0-which-2.23"
-      },
-      "system": "x86_64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "which",
-      "broken": false,
-      "derivation": "/nix/store/rbiyqid2vy6mji1j3dwnwklsi5d440k8-which-2.23.drv",
-      "description": "Shows the full path of (shell) commands",
-      "install_id": "which",
-      "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=88d3861acdd3d2f0e361767018218e51810df8a1",
-      "name": "which-2.23",
-      "pname": "which",
-      "rev": "88d3861acdd3d2f0e361767018218e51810df8a1",
-      "rev_count": 931542,
-      "rev_date": "2026-01-21T18:02:10Z",
-      "scrape_date": "2026-01-23T06:39:23.507825Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.23",
-      "outputs_to_install": [
-        "out",
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/qx57h2zca1vilqmacx6a7gj7iwbxwpa3-which-2.23"
-      },
-      "system": "x86_64-linux",
-      "group": "toplevel",
+      "group": "cassandra-tools",
       "priority": 5
     }
   ]

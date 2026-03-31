@@ -1,0 +1,455 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "cassandra_4": {
+        "pkg-path": "cassandra_4",
+        "pkg-group": "cassandra"
+      },
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": "demo-tools"
+      },
+      "semver-tool": {
+        "pkg-path": "semver-tool",
+        "pkg-group": "cassandra-tools"
+      }
+    },
+    "vars": {
+      "CASSANDRA_ALLOW_CLIENTS": "true",
+      "CASSANDRA_CLUSTER_NAME": "My Cluster",
+      "CASSANDRA_HOST": "127.0.0.1",
+      "CASSANDRA_PORT": "19042",
+      "CASSANDRA_SEED_ADDRS": "127.0.0.1",
+      "CASSANDRA_STORAGE_PORT": "7070",
+      "JVM_OPTS": ""
+    },
+    "hook": {
+      "on-activate": "export CASSANDRA_CACHE=\"$FLOX_ENV_CACHE/cassandra\"\nexport CASSANDRA_CONFIG_FILE=\"$CASSANDRA_CACHE/cassandra.yaml\"\n\nif [ ! -d \"$CASSANDRA_CACHE\" ]; then\n  mkdir -p \"$CASSANDRA_CACHE\"\nfi\n\n# Detect version for JVM options\nCASSANDRA_VERSION=\"$(cassandra -v)\"\nif [ \"$(semver compare \"$CASSANDRA_VERSION\" \"4.0.0\")\" != \"-1\" ]; then\n  JVM_OPTS=\"$JVM_OPTS -Xlog:gc=warning,heap*=warning,age*=warning,safepoint=warning,promotion*=warning\"\nfi\n\nif [ ! -f \"$CASSANDRA_CONFIG_FILE\" ]; then\n  cat > \"$CASSANDRA_CONFIG_FILE\" <<EOF\nlisten_address: \"$CASSANDRA_HOST\"\nnative_transport_port: \"$CASSANDRA_PORT\"\nstorage_port: \"$CASSANDRA_STORAGE_PORT\"\nstart_native_transport: \"$CASSANDRA_ALLOW_CLIENTS\"\ncluster_name: \"$CASSANDRA_CLUSTER_NAME\"\ndata_file_directories:\n  - \"$CASSANDRA_CACHE/data\"\ncommitlog_directory: \"$CASSANDRA_CACHE/commitlog\"\nsaved_caches_directory: \"$CASSANDRA_CACHE/saved_caches\"\nhints_directory: \"$CASSANDRA_CACHE/hints\"\nseed_provider:\n  - class_name: \"org.apache.cassandra.locator.SimpleSeedProvider\"\n    parameters:\n      - seeds: \"$CASSANDRA_SEED_ADDRS\"\ncommitlog_sync: \"batch\"\ncommitlog_sync_batch_window_in_ms: 2\npartitioner: \"org.apache.cassandra.dht.Murmur3Partitioner\"\nendpoint_snitch: \"SimpleSnitch\"\nEOF\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Cassandra in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to Cassandra:' \\\n    \"  cqlsh $CASSANDRA_HOST $CASSANDRA_PORT\" '' \\\n    'Connection information:' \\\n    \"  host=$CASSANDRA_HOST\" \\\n    \"  port=$CASSANDRA_PORT\" \\\n    \"  cluster=$CASSANDRA_CLUSTER_NAME\"\nfi\n"
+    },
+    "options": {},
+    "services": {
+      "cassandra": {
+        "command": "cassandra -Dcassandra.config=file://$CASSANDRA_CONFIG_FILE -f"
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "cassandra_4",
+      "broken": false,
+      "derivation": "/nix/store/njzd8r4zdpi3vp0qcrggbmk26g2b2pkl-cassandra-4.1.8.drv",
+      "description": "Massively scalable open source NoSQL database",
+      "install_id": "cassandra_4",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=88d3861acdd3d2f0e361767018218e51810df8a1",
+      "name": "cassandra-4.1.8",
+      "pname": "cassandra_4",
+      "rev": "88d3861acdd3d2f0e361767018218e51810df8a1",
+      "rev_count": 931542,
+      "rev_date": "2026-01-21T18:02:10Z",
+      "scrape_date": "2026-01-23T04:32:30.192976Z",
+      "stabilities": [
+        "unstable",
+        "staging"
+      ],
+      "unfree": false,
+      "version": "4.1.8",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/9r65hmaykh1y934lnlcvdj7f4isqkl9q-cassandra-4.1.8"
+      },
+      "system": "aarch64-darwin",
+      "group": "cassandra",
+      "priority": 5
+    },
+    {
+      "attr_path": "cassandra_4",
+      "broken": false,
+      "derivation": "/nix/store/84afbam5270i6bqyx488nfl8grq1jc5s-cassandra-4.1.8.drv",
+      "description": "Massively scalable open source NoSQL database",
+      "install_id": "cassandra_4",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=88d3861acdd3d2f0e361767018218e51810df8a1",
+      "name": "cassandra-4.1.8",
+      "pname": "cassandra_4",
+      "rev": "88d3861acdd3d2f0e361767018218e51810df8a1",
+      "rev_count": 931542,
+      "rev_date": "2026-01-21T18:02:10Z",
+      "scrape_date": "2026-01-23T05:12:33.935626Z",
+      "stabilities": [
+        "unstable",
+        "staging"
+      ],
+      "unfree": false,
+      "version": "4.1.8",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/l5hz4jv5f4406k60mzz37f02v5a7ijnn-cassandra-4.1.8"
+      },
+      "system": "aarch64-linux",
+      "group": "cassandra",
+      "priority": 5
+    },
+    {
+      "attr_path": "cassandra_4",
+      "broken": false,
+      "derivation": "/nix/store/ad097sh4x0kpihq35rdqwbirrrzidn7c-cassandra-4.1.8.drv",
+      "description": "Massively scalable open source NoSQL database",
+      "install_id": "cassandra_4",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=88d3861acdd3d2f0e361767018218e51810df8a1",
+      "name": "cassandra-4.1.8",
+      "pname": "cassandra_4",
+      "rev": "88d3861acdd3d2f0e361767018218e51810df8a1",
+      "rev_count": 931542,
+      "rev_date": "2026-01-21T18:02:10Z",
+      "scrape_date": "2026-01-23T05:49:36.335525Z",
+      "stabilities": [
+        "unstable",
+        "staging"
+      ],
+      "unfree": false,
+      "version": "4.1.8",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/r8564rzqrs8h4h82fpskirc4759jq4l1-cassandra-4.1.8"
+      },
+      "system": "x86_64-darwin",
+      "group": "cassandra",
+      "priority": 5
+    },
+    {
+      "attr_path": "cassandra_4",
+      "broken": false,
+      "derivation": "/nix/store/6p4pqwlqplrwji10hkvd9fv53rx0y7i5-cassandra-4.1.8.drv",
+      "description": "Massively scalable open source NoSQL database",
+      "install_id": "cassandra_4",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=88d3861acdd3d2f0e361767018218e51810df8a1",
+      "name": "cassandra-4.1.8",
+      "pname": "cassandra_4",
+      "rev": "88d3861acdd3d2f0e361767018218e51810df8a1",
+      "rev_count": 931542,
+      "rev_date": "2026-01-21T18:02:10Z",
+      "scrape_date": "2026-01-23T06:35:54.666482Z",
+      "stabilities": [
+        "unstable",
+        "staging"
+      ],
+      "unfree": false,
+      "version": "4.1.8",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/jwl3a4icymrsdchnr4qqazqrrmwkmabh-cassandra-4.1.8"
+      },
+      "system": "x86_64-linux",
+      "group": "cassandra",
+      "priority": 5
+    },
+    {
+      "attr_path": "semver-tool",
+      "broken": false,
+      "derivation": "/nix/store/1bm481phflgpcbqf6959y1q5l8j0q38n-semver-tool-3.4.0.drv",
+      "description": "Semver bash implementation",
+      "install_id": "semver-tool",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "semver-tool-3.4.0",
+      "pname": "semver-tool",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T03:39:05.326262Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.4.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/43xg729607ps17l19ffv8ixri9kjx0yl-semver-tool-3.4.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "cassandra-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "semver-tool",
+      "broken": false,
+      "derivation": "/nix/store/lzfhi3z02xnv10dnf825p7jspz1vy9wd-semver-tool-3.4.0.drv",
+      "description": "Semver bash implementation",
+      "install_id": "semver-tool",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "semver-tool-3.4.0",
+      "pname": "semver-tool",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:12:17.855886Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.4.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/6y3z9f5nsrxbf1801xawsal5gz6z1qj0-semver-tool-3.4.0"
+      },
+      "system": "aarch64-linux",
+      "group": "cassandra-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "semver-tool",
+      "broken": false,
+      "derivation": "/nix/store/221y52mdrdlp8g1wcgbhbhk79jfbk5c5-semver-tool-3.4.0.drv",
+      "description": "Semver bash implementation",
+      "install_id": "semver-tool",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "semver-tool-3.4.0",
+      "pname": "semver-tool",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:42:23.702064Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.4.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/pavz7p8v7z3yq3m6nxgyn6gz0xl0k7nq-semver-tool-3.4.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "cassandra-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "semver-tool",
+      "broken": false,
+      "derivation": "/nix/store/026zk4cvr76by7k064nh2x2cykcvia6n-semver-tool-3.4.0.drv",
+      "description": "Semver bash implementation",
+      "install_id": "semver-tool",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "semver-tool-3.4.0",
+      "pname": "semver-tool",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T05:18:44.281377Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.4.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/5w2pji1q7ragmkxxwjvk2cisnk6k4wl7-semver-tool-3.4.0"
+      },
+      "system": "x86_64-linux",
+      "group": "cassandra-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/bmz60mbb36nlipdn9n6zmcm6kjls8gll-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T03:37:21.147669Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cdpxgzcjwidrmrzsq0zkyr9nxccvy3p6-gum-0.17.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/yhvp5prpjjl5hqk6fhr5svdzf1yfacgk-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:09:56.689083Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kqcb9j9k6wdvb7pjvjzn3p8dc82qmk9x-gum-0.17.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/cngbjjxmgsmcbgvihq7q9472rb5rhgdj-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:40:40.363731Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rznkbgxflsbrfy5c359vhhqrrxw4pfkj-gum-0.17.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/f5ahd90j9s46j49lz8k2yn3cmvyq6mbn-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T05:16:17.301634Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rf0zlw5q4j051xkjk9djfw5dpb8nwbgm-gum-0.17.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    }
+  ],
+  "compose": {
+    "composer": {
+      "schema-version": "1.11.0",
+      "install": {
+        "gum": {
+          "pkg-path": "gum",
+          "pkg-group": "demo-tools"
+        }
+      },
+      "hook": {
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Cassandra in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to Cassandra:' \\\n    \"  cqlsh $CASSANDRA_HOST $CASSANDRA_PORT\" '' \\\n    'Connection information:' \\\n    \"  host=$CASSANDRA_HOST\" \\\n    \"  port=$CASSANDRA_PORT\" \\\n    \"  cluster=$CASSANDRA_CLUSTER_NAME\"\nfi\n"
+      },
+      "options": {},
+      "include": {
+        "environments": [
+          {
+            "dir": "../cassandra"
+          }
+        ]
+      }
+    },
+    "include": [
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "cassandra_4": {
+              "pkg-path": "cassandra_4",
+              "pkg-group": "cassandra"
+            },
+            "semver-tool": {
+              "pkg-path": "semver-tool",
+              "pkg-group": "cassandra-tools"
+            }
+          },
+          "vars": {
+            "CASSANDRA_ALLOW_CLIENTS": "true",
+            "CASSANDRA_CLUSTER_NAME": "My Cluster",
+            "CASSANDRA_HOST": "127.0.0.1",
+            "CASSANDRA_PORT": "19042",
+            "CASSANDRA_SEED_ADDRS": "127.0.0.1",
+            "CASSANDRA_STORAGE_PORT": "7070",
+            "JVM_OPTS": ""
+          },
+          "hook": {
+            "on-activate": "export CASSANDRA_CACHE=\"$FLOX_ENV_CACHE/cassandra\"\nexport CASSANDRA_CONFIG_FILE=\"$CASSANDRA_CACHE/cassandra.yaml\"\n\nif [ ! -d \"$CASSANDRA_CACHE\" ]; then\n  mkdir -p \"$CASSANDRA_CACHE\"\nfi\n\n# Detect version for JVM options\nCASSANDRA_VERSION=\"$(cassandra -v)\"\nif [ \"$(semver compare \"$CASSANDRA_VERSION\" \"4.0.0\")\" != \"-1\" ]; then\n  JVM_OPTS=\"$JVM_OPTS -Xlog:gc=warning,heap*=warning,age*=warning,safepoint=warning,promotion*=warning\"\nfi\n\nif [ ! -f \"$CASSANDRA_CONFIG_FILE\" ]; then\n  cat > \"$CASSANDRA_CONFIG_FILE\" <<EOF\nlisten_address: \"$CASSANDRA_HOST\"\nnative_transport_port: \"$CASSANDRA_PORT\"\nstorage_port: \"$CASSANDRA_STORAGE_PORT\"\nstart_native_transport: \"$CASSANDRA_ALLOW_CLIENTS\"\ncluster_name: \"$CASSANDRA_CLUSTER_NAME\"\ndata_file_directories:\n  - \"$CASSANDRA_CACHE/data\"\ncommitlog_directory: \"$CASSANDRA_CACHE/commitlog\"\nsaved_caches_directory: \"$CASSANDRA_CACHE/saved_caches\"\nhints_directory: \"$CASSANDRA_CACHE/hints\"\nseed_provider:\n  - class_name: \"org.apache.cassandra.locator.SimpleSeedProvider\"\n    parameters:\n      - seeds: \"$CASSANDRA_SEED_ADDRS\"\ncommitlog_sync: \"batch\"\ncommitlog_sync_batch_window_in_ms: 2\npartitioner: \"org.apache.cassandra.dht.Murmur3Partitioner\"\nendpoint_snitch: \"SimpleSnitch\"\nEOF\nfi\n"
+          },
+          "options": {},
+          "services": {
+            "cassandra": {
+              "command": "cassandra -Dcassandra.config=file://$CASSANDRA_CONFIG_FILE -f"
+            }
+          }
+        },
+        "name": "cassandra",
+        "descriptor": {
+          "dir": "../cassandra"
+        }
+      }
+    ],
+    "warnings": []
+  }
+}
