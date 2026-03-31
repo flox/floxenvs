@@ -1,0 +1,68 @@
+schema-version = "1.10.0"
+[include]
+environments = [
+  { dir = "../colima" }
+]
+
+# ============================================================
+# Packages
+# ============================================================
+#
+# Container management and inspection tools are grouped
+# separately from the base colima/docker packages defined
+# in the included colima environment.
+
+[install]
+
+# UI and demo tools
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+# Docker Compose for multi-container workflows
+docker-compose.pkg-path = "docker-compose"
+docker-compose.pkg-group = "demo-tools"
+
+# Container TUI tools
+lazydocker.pkg-path = "lazydocker"
+lazydocker.pkg-group = "demo-tools"
+
+oxker.pkg-path = "oxker"
+oxker.pkg-group = "demo-tools"
+
+ctop.pkg-path = "ctop"
+ctop.pkg-group = "demo-tools"
+
+# Image layer inspector
+dive.pkg-path = "dive"
+dive.pkg-group = "demo-tools"
+
+
+# ============================================================
+# Activation hook
+# ============================================================
+#
+# The colima service setup comes from the included colima
+# environment. This hook adds demo-specific connection info.
+
+[hook]
+on-activate = '''
+
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' --padding '1 4' \
+    'Start Colima in the background:' \
+    '  flox services start' \
+    '  flox activate --start-services' '' \
+    'Once running, try:' \
+    '  docker run hello-world' \
+    '  docker-compose up' '' \
+    'Container management TUIs:' \
+    '  lazydocker    — full container/image/volume dashboard' \
+    '  oxker         — lightweight container viewer' \
+    '  ctop          — top-like container metrics' \
+    '  dive <image>  — explore image layers'
+fi
+
+'''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]
