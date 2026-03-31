@@ -1,49 +1,49 @@
-version = 1
+schema-version = "1.10.0"
 
+# Minimal Cassandra environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/cassandra"]
+#
+# Customize vars in your manifest to override defaults:
+#
+#   [vars]
+#   CASSANDRA_PORT = "9042"
 
 [install]
-coreutils.pkg-path = "coreutils"
-which.pkg-path = "which"
+cassandra_4.pkg-path = "cassandra_4"
+cassandra_4.pkg-group = "cassandra"
 semver-tool.pkg-path = "semver-tool"
-
-# Cassandra
-cassandra.pkg-path = "cassandra_4"
-#cassandra.pkg-path = "cassandra_3_0"
-#cassandra.pkg-path = "cassandra_2_2"
-#cassandra.pkg-path = "cassandra_2_1"
-#cassandra.pkg-path = "cassandra_3_11"
-
+semver-tool.pkg-group = "cassandra-tools"
 
 [vars]
-CASSANDRA_HOST="127.0.0.1"
-CASSANDRA_PORT="19042"
-CASSANDRA_STORAGE_PORT="7070"
-CASSANDRA_SEED_ADDRS = "127.0.0.1"  # comma separated
+CASSANDRA_HOST = "127.0.0.1"
+CASSANDRA_PORT = "19042"
+CASSANDRA_STORAGE_PORT = "7070"
+CASSANDRA_SEED_ADDRS = "127.0.0.1"
 CASSANDRA_CLUSTER_NAME = "My Cluster"
 CASSANDRA_ALLOW_CLIENTS = "true"
-JVM_OPTS= ""
-
+JVM_OPTS = ""
 
 [hook]
 on-activate = '''
-
 export CASSANDRA_CACHE="$FLOX_ENV_CACHE/cassandra"
 export CASSANDRA_CONFIG_FILE="$CASSANDRA_CACHE/cassandra.yaml"
 
-if [[ ! -d "$CASSANDRA_CACHE" ]]; then
-    mkdir -p "$CASSANDRA_CACHE"
+if [ ! -d "$CASSANDRA_CACHE" ]; then
+  mkdir -p "$CASSANDRA_CACHE"
 fi
 
-CASSANDRA_PATH="$(realpath $(which cassandra))"
-CASSANDRA_VERSION="${CASSANDRA_PATH:54:-14}"
-# Only for cassandra >=4.0.0
-if [[ "$(semver compare "$CASSANDRA_VERSION" "4.0.0")" != "-1" ]]; then
+# Detect version for JVM options
+CASSANDRA_VERSION="$(cassandra -v)"
+if [ "$(semver compare "$CASSANDRA_VERSION" "4.0.0")" != "-1" ]; then
   JVM_OPTS="$JVM_OPTS -Xlog:gc=warning,heap*=warning,age*=warning,safepoint=warning,promotion*=warning"
 fi
 
-if [[ ! -f "$CASSANDRA_CONFIG_FILE" ]]; then
-
-  tee -a $CASSANDRA_CONFIG_FILE > /dev/null << EOF
+if [ ! -f "$CASSANDRA_CONFIG_FILE" ]; then
+  cat > "$CASSANDRA_CONFIG_FILE" <<EOF
 listen_address: "$CASSANDRA_HOST"
 native_transport_port: "$CASSANDRA_PORT"
 storage_port: "$CASSANDRA_STORAGE_PORT"
@@ -63,36 +63,8 @@ commitlog_sync_batch_window_in_ms: 2
 partitioner: "org.apache.cassandra.dht.Murmur3Partitioner"
 endpoint_snitch: "SimpleSnitch"
 EOF
-
 fi
-'''
-
-
-[profile]
-common = '''
-echo ""
-echo "     ╔═══════════════════════════════════════════════╗"
-echo "     ║                                               ║"
-echo "     ║  Start Cassandra in the background:           ║"
-echo "     ║  👉 flox services start                       ║"
-echo "     ║  👉 flox activate --start-services            ║"
-echo "     ║                                               ║"
-echo "     ║  Try to connect to Cassandra:                 ║"
-echo "     ║  👉 cqlsh \$CASSANDRA_HOST \$CASSANDRA_PORT \   ║"
-echo "     ║        -e \"SELECT ...;\"                       ║"
-echo "     ║                                               ║"
-echo "     ╚═══════════════════════════════════════════════╝"
-echo ""
 '''
 
 [services]
 cassandra.command = "cassandra -Dcassandra.config=file://$CASSANDRA_CONFIG_FILE -f"
-
-
-[options]
-systems = [
-  "aarch64-darwin",
-  "aarch64-linux",
-  "x86_64-darwin",
-  "x86_64-linux",
-]
