@@ -117,6 +117,11 @@
             start_services=" --start-services"
           fi
 
+          # Ensure HOME is writable — some builders set HOME=/var/empty
+          if [ ! -w "''${HOME:-/nonexistent}" ]; then
+            export HOME=$(mktemp -d)
+          fi
+
           echo "👉 Running $name test..."
 
           # On Linux, isolate in network+PID namespace so concurrent
@@ -126,7 +131,7 @@
           if [ "$(uname)" = "Linux" ] && command -v unshare >/dev/null 2>&1; then
             echo "👉 Isolating test in user+network+PID namespace..."
             unshare --user --net --pid --fork ${pkgs.bashInteractive}/bin/bash -c \
-              "export HOME=\$(mktemp -d); ip link set lo up 2>/dev/null || true; cd \"$envdir\"; eval \"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\"" \
+              "ip link set lo up 2>/dev/null || true; cd \"$envdir\"; eval \"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\"" \
               && exit 0 \
               || echo "👉 Namespace isolation failed, falling back to direct execution..."
           fi
