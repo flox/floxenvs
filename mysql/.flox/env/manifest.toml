@@ -51,14 +51,8 @@ init_fail() {
 }
 
 if [ ! -d "$MYSQL_DATADIR" ]; then
-  # Save and unset MYSQL_PWD and MYSQL_HOST during init.
-  # Root has no password after --initialize-insecure, and
-  # MYSQL_HOST causes the client to try TCP instead of
-  # the socket (temp server runs with --skip-networking).
   SAVED_MYSQL_PWD="$MYSQL_PWD"
   SAVED_MYSQL_HOST="$MYSQL_HOST"
-  unset MYSQL_PWD
-  unset MYSQL_HOST
 
   mkdir -p "$MYSQL_DATADIR" "$MYSQL_TMPDIR"
 
@@ -76,7 +70,15 @@ datadir  = $MYSQL_DATADIR
 tmpdir   = $MYSQL_TMPDIR
 bind-address = $MYSQL_HOST
 skip-external-locking
+mysqlx = OFF
 EOF
+
+  # Unset MYSQL_PWD and MYSQL_HOST during init.
+  # Root has no password after --initialize-insecure, and
+  # MYSQL_HOST causes the client to try TCP instead of
+  # the socket (temp server runs with --skip-networking).
+  unset MYSQL_PWD
+  unset MYSQL_HOST
 
   echo "Initializing MySQL database..." >> "$INIT_LOG"
   mysqld \
