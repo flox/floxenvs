@@ -29,7 +29,7 @@ Then customize vars in your own manifest as needed.
 | ------- | ----- |
 | Version | Latest stable (tracks `mongodb-ce`) |
 | Host | `127.0.0.1` |
-| Port | `127017` |
+| Port | `27017` |
 | Data dir | `$FLOX_ENV_CACHE/mongodb` |
 
 ## Customizing
@@ -38,8 +38,8 @@ Override these vars in your own manifest:
 
 ```toml
 [vars]
-MONGO_HOST = "127.0.0.1"
-MONGO_PORT = "27017"
+MONGO_HOST = "0.0.0.0"
+MONGO_PORT = "37017"
 ```
 
 ## Connection string
@@ -51,7 +51,7 @@ mongodb://$MONGO_HOST:$MONGO_PORT
 With defaults:
 
 ```
-mongodb://127.0.0.1:127017
+mongodb://127.0.0.1:27017
 ```
 
 ## Environment variables

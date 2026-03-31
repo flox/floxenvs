@@ -18,7 +18,7 @@
     },
     "vars": {
       "MONGO_HOST": "127.0.0.1",
-      "MONGO_PORT": "127017"
+      "MONGO_PORT": "27017"
     },
     "hook": {
       "on-activate": "export MONGO_DATA=\"$FLOX_ENV_CACHE/mongodb\"\n\nif [ ! -d \"$MONGO_DATA\" ]; then\n  mkdir -m 0700 -p \"$MONGO_DATA\"\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start MongoDB in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to MongoDB:' \\\n    \"  mongosh --host $MONGO_HOST --port $MONGO_PORT\" \\\n    '' \\\n    'Connection information:' \\\n    \"  host=$MONGO_HOST\" \\\n    \"  port=$MONGO_PORT\"\nfi\n"
@@ -426,7 +426,7 @@
           },
           "vars": {
             "MONGO_HOST": "127.0.0.1",
-            "MONGO_PORT": "127017"
+            "MONGO_PORT": "27017"
           },
           "hook": {
             "on-activate": "export MONGO_DATA=\"$FLOX_ENV_CACHE/mongodb\"\n\nif [ ! -d \"$MONGO_DATA\" ]; then\n  mkdir -m 0700 -p \"$MONGO_DATA\"\nfi\n"

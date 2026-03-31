@@ -10,7 +10,7 @@
     },
     "vars": {
       "MONGO_HOST": "127.0.0.1",
-      "MONGO_PORT": "127017"
+      "MONGO_PORT": "27017"
     },
     "hook": {
       "on-activate": "export MONGO_DATA=\"$FLOX_ENV_CACHE/mongodb\"\n\nif [ ! -d \"$MONGO_DATA\" ]; then\n  mkdir -m 0700 -p \"$MONGO_DATA\"\nfi\n"

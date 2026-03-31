@@ -45,7 +45,7 @@ Default connection details:
 | Setting | Value |
 | ------- | ----- |
 | Host | 127.0.0.1 |
-| Port | 127017 |
+| Port | 27017 |
 
 ## CRUD walkthrough
 
@@ -80,8 +80,8 @@ Override vars in your own manifest:
 
 ```toml
 [vars]
-MONGO_PORT = "27017"
-MONGO_HOST = "127.0.0.1"
+MONGO_PORT = "37017"
+MONGO_HOST = "0.0.0.0"
 ```
 
 ## Data directory
