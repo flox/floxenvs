@@ -1,0 +1,144 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "temporal-cli": {
+        "pkg-path": "temporal-cli",
+        "pkg-group": "temporal"
+      }
+    },
+    "vars": {
+      "TEMPORAL_HOST": "127.0.0.1",
+      "TEMPORAL_PORT": "7233",
+      "TEMPORAL_UI_PORT": "8233"
+    },
+    "hook": {
+      "on-activate": "export TEMPORAL_DATA=\"$FLOX_ENV_CACHE/temporal\"\n\nif [ ! -d \"$TEMPORAL_DATA\" ]; then\n  mkdir -p \"$TEMPORAL_DATA\"\nfi\n"
+    },
+    "options": {},
+    "services": {
+      "temporal": {
+        "command": "  TEMPORAL_DATA=\"$FLOX_ENV_CACHE/temporal\"\n  mkdir -p \"$TEMPORAL_DATA\"\n  exec temporal server start-dev \\\n    --ip \"$TEMPORAL_HOST\" \\\n    --port \"$TEMPORAL_PORT\" \\\n    --ui-port \"$TEMPORAL_UI_PORT\" \\\n    --db-filename \"$TEMPORAL_DATA/temporal.db\"\n"
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "temporal-cli",
+      "broken": false,
+      "derivation": "/nix/store/s2wk8zqz22ya6955gr9l9mhv40rbhw5x-temporal-cli-1.6.1.drv",
+      "description": "Command-line interface for running Temporal Server and interacting with Workflows, Activities, Namespaces, and other parts of Temporal",
+      "install_id": "temporal-cli",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "temporal-cli-1.6.1",
+      "pname": "temporal-cli",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T03:39:09.258210Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.6.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/qz6rafsqd3011vvj75sqfa0a34g94vc8-temporal-cli-1.6.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "temporal",
+      "priority": 5
+    },
+    {
+      "attr_path": "temporal-cli",
+      "broken": false,
+      "derivation": "/nix/store/ffl1lrdi01p6qijyprshwi7r7h2clqw2-temporal-cli-1.6.1.drv",
+      "description": "Command-line interface for running Temporal Server and interacting with Workflows, Activities, Namespaces, and other parts of Temporal",
+      "install_id": "temporal-cli",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "temporal-cli-1.6.1",
+      "pname": "temporal-cli",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:12:24.278760Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.6.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/prd8v9vl6vgwxdb39y059p6zy5hp0i5r-temporal-cli-1.6.1"
+      },
+      "system": "aarch64-linux",
+      "group": "temporal",
+      "priority": 5
+    },
+    {
+      "attr_path": "temporal-cli",
+      "broken": false,
+      "derivation": "/nix/store/cdxlhh58pjdq1d56jlnzngkm0ka4c6li-temporal-cli-1.6.1.drv",
+      "description": "Command-line interface for running Temporal Server and interacting with Workflows, Activities, Namespaces, and other parts of Temporal",
+      "install_id": "temporal-cli",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "temporal-cli-1.6.1",
+      "pname": "temporal-cli",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:42:27.621553Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.6.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/d365hdq6d9mgqb5xi3xf5g2gg0v724cv-temporal-cli-1.6.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "temporal",
+      "priority": 5
+    },
+    {
+      "attr_path": "temporal-cli",
+      "broken": false,
+      "derivation": "/nix/store/83ybswckffdgra474bmbd2qgn77msc1g-temporal-cli-1.6.1.drv",
+      "description": "Command-line interface for running Temporal Server and interacting with Workflows, Activities, Namespaces, and other parts of Temporal",
+      "install_id": "temporal-cli",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "temporal-cli-1.6.1",
+      "pname": "temporal-cli",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T05:18:51.173850Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.6.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ck8idrh274jpd98kzpvfjmlfnxp48410-temporal-cli-1.6.1"
+      },
+      "system": "x86_64-linux",
+      "group": "temporal",
+      "priority": 5
+    }
+  ]
+}

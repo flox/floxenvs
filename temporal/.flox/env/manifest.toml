@@ -1,0 +1,45 @@
+schema-version = "1.10.0"
+
+# Minimal Temporal environment for use with [include].
+#
+# Provides a Temporal dev server with SQLite storage
+# and built-in Web UI. No external dependencies.
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/temporal"]
+#
+# Customize vars in your manifest to override defaults:
+#
+#   [vars]
+#   TEMPORAL_PORT = "17233"
+
+[install]
+temporal-cli.pkg-path = "temporal-cli"
+temporal-cli.pkg-group = "temporal"
+
+[vars]
+TEMPORAL_HOST = "127.0.0.1"
+TEMPORAL_PORT = "7233"
+TEMPORAL_UI_PORT = "8233"
+
+[hook]
+on-activate = '''
+export TEMPORAL_DATA="$FLOX_ENV_CACHE/temporal"
+
+if [ ! -d "$TEMPORAL_DATA" ]; then
+  mkdir -p "$TEMPORAL_DATA"
+fi
+'''
+
+[services]
+temporal.command = '''
+  TEMPORAL_DATA="$FLOX_ENV_CACHE/temporal"
+  mkdir -p "$TEMPORAL_DATA"
+  exec temporal server start-dev \
+    --ip "$TEMPORAL_HOST" \
+    --port "$TEMPORAL_PORT" \
+    --ui-port "$TEMPORAL_UI_PORT" \
+    --db-filename "$TEMPORAL_DATA/temporal.db"
+'''
