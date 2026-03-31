@@ -51,6 +51,12 @@ init_fail() {
 }
 
 if [ ! -d "$MYSQL_DATADIR" ]; then
+  # Save and unset MYSQL_PWD during init — root has no
+  # password after --initialize-insecure, and MYSQL_PWD
+  # from [vars] would cause auth failures.
+  SAVED_MYSQL_PWD="$MYSQL_PWD"
+  unset MYSQL_PWD
+
   mkdir -p "$MYSQL_DATADIR" "$MYSQL_TMPDIR"
 
   cat > "$MYSQL_CONFIG" <<EOF
@@ -110,6 +116,9 @@ EOF
   mysqladmin --socket="$MYSQL_SOCKET" \
     shutdown -u root >> "$INIT_LOG" 2>&1
   wait "$TMPID" 2>/dev/null || true
+
+  # Restore MYSQL_PWD for normal operation
+  export MYSQL_PWD="$SAVED_MYSQL_PWD"
 
   rm -f "$INIT_LOG"
   echo "MySQL initialized successfully."
