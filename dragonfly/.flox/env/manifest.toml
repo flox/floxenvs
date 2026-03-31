@@ -1,0 +1,57 @@
+version = 1
+
+
+[install]
+dragonflydb.pkg-path = "dragonflydb"
+redis.pkg-path = "redis"
+
+
+[vars]
+DRAGONFLY_BIND = "127.0.0.1"
+DRAGONFLY_PORT = "16379"
+
+
+[hook]
+on-activate = '''
+
+export DRAGONFLY_HOME="$FLOX_ENV_CACHE/dragonfly"
+export DRAGONFLY_DATA="$DRAGONFLY_HOME/data"
+
+if [ ! -d "$DRAGONFLY_DATA" ]; then
+  mkdir -p "$DRAGONFLY_DATA"
+fi
+
+'''
+
+[profile]
+common = '''
+echo ""
+echo "     ╔══════════════════════════════════════════╗"
+echo "     ║                                          ║"
+echo "     ║  Start Dragonfly in the background:      ║"
+echo "     ║  👉 flox services start                  ║"
+echo "     ║  👉 flox activate --start-services       ║"
+echo "     ║                                          ║"
+echo "     ║  Connect with redis-cli:                 ║"
+echo "     ║  👉 redis-cli -p \$DRAGONFLY_PORT ping    ║"
+echo "     ║                                          ║"
+echo "     ╚══════════════════════════════════════════╝"
+echo ""
+'''
+
+[services]
+dragonfly.command = '''
+dragonfly \
+  --logtostderr \
+  --bind "$DRAGONFLY_BIND" \
+  --port "$DRAGONFLY_PORT" \
+  --dir "$DRAGONFLY_DATA" \
+  --dbfilename dump
+'''
+
+
+[options]
+systems = [
+  "aarch64-linux",
+  "x86_64-linux",
+]
