@@ -51,11 +51,14 @@ init_fail() {
 }
 
 if [ ! -d "$MYSQL_DATADIR" ]; then
-  # Save and unset MYSQL_PWD during init — root has no
-  # password after --initialize-insecure, and MYSQL_PWD
-  # from [vars] would cause auth failures.
+  # Save and unset MYSQL_PWD and MYSQL_HOST during init.
+  # Root has no password after --initialize-insecure, and
+  # MYSQL_HOST causes the client to try TCP instead of
+  # the socket (temp server runs with --skip-networking).
   SAVED_MYSQL_PWD="$MYSQL_PWD"
+  SAVED_MYSQL_HOST="$MYSQL_HOST"
   unset MYSQL_PWD
+  unset MYSQL_HOST
 
   mkdir -p "$MYSQL_DATADIR" "$MYSQL_TMPDIR"
 
@@ -110,15 +113,16 @@ EOF
     >> "$INIT_LOG" 2>&1 || init_fail
 
   mysql --socket="$MYSQL_SOCKET" -u root -e \
-    "CREATE USER IF NOT EXISTS '$MYSQL_USER'@'localhost' IDENTIFIED BY '$MYSQL_PWD'; GRANT ALL PRIVILEGES ON *.* TO '$MYSQL_USER'@'localhost' WITH GRANT OPTION; FLUSH PRIVILEGES;" \
+    "CREATE USER IF NOT EXISTS '$MYSQL_USER'@'localhost' IDENTIFIED BY '$SAVED_MYSQL_PWD'; GRANT ALL PRIVILEGES ON *.* TO '$MYSQL_USER'@'localhost' WITH GRANT OPTION; FLUSH PRIVILEGES;" \
     >> "$INIT_LOG" 2>&1 || init_fail
 
   mysqladmin --socket="$MYSQL_SOCKET" \
     shutdown -u root >> "$INIT_LOG" 2>&1
   wait "$TMPID" 2>/dev/null || true
 
-  # Restore MYSQL_PWD for normal operation
+  # Restore MYSQL_PWD and MYSQL_HOST for normal operation
   export MYSQL_PWD="$SAVED_MYSQL_PWD"
+  export MYSQL_HOST="$SAVED_MYSQL_HOST"
 
   rm -f "$INIT_LOG"
   echo "MySQL initialized successfully."
