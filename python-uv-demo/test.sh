@@ -22,6 +22,11 @@ if [[ "$VENV_PREFIX" != *"python-uv"* ]]; then
 fi
 echo ">>> Virtual environment active: $VENV_PREFIX"
 
+# Verify sample package installed
+echo ">>> Verifying packages from pyproject.toml..."
+python3 -c "import cowsay; cowsay.cow('Moo from flox!')"
+echo ">>> Package import ... OK"
+
 # Run sample script if present
 if [ -f hello.py ]; then
   python3 hello.py
