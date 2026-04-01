@@ -31,10 +31,10 @@ JVM_OPTS = ""
 on-activate = '''
 export CASSANDRA_CACHE="$FLOX_ENV_CACHE/cassandra"
 export CASSANDRA_CONFIG_FILE="$CASSANDRA_CACHE/cassandra.yaml"
+# Redirect log dir out of the read-only nix store
+export CASSANDRA_LOG_DIR="$CASSANDRA_CACHE/logs"
 
-if [ ! -d "$CASSANDRA_CACHE" ]; then
-  mkdir -p "$CASSANDRA_CACHE"
-fi
+mkdir -p "$CASSANDRA_CACHE" "$CASSANDRA_LOG_DIR"
 
 # Detect version for JVM options
 CASSANDRA_VERSION="$(cassandra -v)"
