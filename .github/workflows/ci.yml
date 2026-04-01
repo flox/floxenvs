@@ -28,8 +28,11 @@ jobs:
         uses: "actions/github-script@v7"
         with:
           script: |
-            const sha = context.sha;
             const isPR = context.eventName === 'pull_request';
+            // For PRs, context.sha is the merge commit — use head SHA instead
+            const sha = isPR
+              ? context.payload.pull_request.head.sha
+              : context.sha;
             let prNumber = 0;
             let prAuthor = '';
 
@@ -38,7 +41,7 @@ jobs:
               prAuthor = context.payload.pull_request.user.login;
             }
 
-            core.info(`SHA: ${sha}`);
+            core.info(`SHA: ${sha} (${isPR ? 'PR head' : 'push'})`);
             core.info(`Event: ${context.eventName}`);
             core.info(`PR: #${prNumber} by ${prAuthor}`);
 
