@@ -29,6 +29,42 @@ jobs:
       - name: "Checkout"
         uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
 
+      - name: "Install flox"
+        uses: "flox/install-flox-action@c94e7e1ab56ae14fe98bae4fd84384fd135f0c2a" # main
+
+      - name: "Check lockfiles are up to date"
+        run: |
+          set -euo pipefail
+          ENV="${{ inputs.environment }}"
+
+          # Regenerate lock for minimal env
+          pushd "$ENV"
+          flox edit -f .flox/env/manifest.toml
+          popd
+
+          # Regenerate lock for demo env if present
+          DEMO_DIR="${ENV}-demo"
+          if [ -d "$DEMO_DIR" ] \
+              && [ -f "$DEMO_DIR/.flox/env/manifest.toml" ]; then
+            pushd "$DEMO_DIR"
+            flox include upgrade 2>/dev/null || true
+            flox edit -f .flox/env/manifest.toml
+            popd
+          fi
+
+          # Check for uncommitted lock changes
+          if ! git diff --quiet -- "*/manifest.lock"; then
+            echo "Error: lockfiles are out of date!"
+            echo ""
+            git diff --stat -- "*/manifest.lock"
+            echo ""
+            echo "Run 'flox edit -f' on the env and"
+            echo "'flox include upgrade' on the demo,"
+            echo "then commit the updated lockfiles."
+            exit 1
+          fi
+          echo "Lockfiles are up to date."
+
       - name: "Discover environment"
         id: "discover"
         run: |
