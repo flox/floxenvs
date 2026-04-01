@@ -1,50 +1,64 @@
 # Example Flox Environments
 
+A collection of ready-to-use
+[Flox](https://flox.dev) environments.
+
+## Dual-layer pattern
+
+Most environments follow a dual-layer pattern:
+
+- `<name>/` -- minimal base layer for `[include]`
+  composition
+- `<name>-demo/` -- demo with gum UI and sample
+  project files
+
+Include a minimal layer in your own manifest:
+
+```toml
+[include]
+environments = ["flox/<name>"]
+```
+
 ## Environments
 
-|      | Updated | Tested | FloxHub | Description |
-| :--- | :-----: | :----: | :-----: | :---------- |
-| |
-| **Languages:** |
-| `go`  | ✅ | ✅ | ✅ | |
-| `python-poetry`  | ✅ | ✅ | ✅ | Python environment using poerty |
-| `python-pip`  | ✅ | ✅ | ✅ | Python environment using pip |
-| `python-uv`  | ✅ | ✅ | ✅ | Python environment using uv |
-| `javascript-bun`  | ✅ | ✅ | ✅ | Javascript environment with Bun |
-| `javascript-deno`  | ✅ | ✅ | ✅ | Javascript environment with Deno |
-| `javascript-node`  | ✅ | ✅ | ✅ | Javascript environment with Node/NPM |
-| `ruby`  | ✅ | ✅ | ✅ | Ruby environment |
-| `rust`  | ✅ | ✅ | ✅ | Rust environment |
-| **Databases:** |
-| `postgres`  | ✅ | ✅ | ✅ | |
-| `redis`     | ✅ | ✅ | ✅ | |
-| `cassandra` | ✅ | ✅ | ✅ | |
-| `elasticsearch` | ✅ | ✅ | ✅ | |
-| `mysql` | ✅ | ✅ | ✅ | |
-| `mongodb` | ✅ | ✅ | | |
-| **Shell:** |
-| `dotenv` | ✅ | ✅ | ✅ | Load .env environment variables |
-| `mkcert` | ✅ | ✅ | ✅ | A tool to make locally trusted development certificates |
-| `a-perfect-shell` | ✅ | ✅ | ✅ | An opinionated shell environment |
-| `direnv`          |  |  |  | |
-| **Applications:** |
-| `dagger`          | ✅ | ✅ | ✅ | Dagger - write your pipelines in Go/Python/Typescript |
-| `1password` | ✅ | ✅ | ✅ | 1Password + a simple shell helper |
-| `nginx`           | ✅ | ✅ | ✅ | A HTTP web server and much more... |
-| `jupyterlab`              | ✅ | ✅ | ✅ | Jupyter Lab notebook |
-| `flaim` | ✅ | ✅ | ✅ | A stack of Python modules for Stable Diffusion |
-| `crispy-doom` | ✅ | ✅ | ✅ | The Crispy Doom game engine w/a hook that downloads a Doom game library |
-| `colima` | ✅ | ✅ | ✅ | Turnkey Docker with Containers on Linux Machines |
-| `gource` | ✅ | ✅ | ✅ | Create a video of your Git history, with avatars |
-| `localstack` | ✅ | ✅ | ✅ | Run a local version of AWS services for testing and development |
-| `ollama` | ✅ | ✅ | ✅ | Turnkey local LLMs with a Next.JS UI |
-| `sharing` | ✅ | ✅ | ✅ | Simple file sharing via a built-in webserver |
-| `anthropic`       |  |  |  | |
-| `fooocus`         |  |  |  | |
-| `metabase`        |  |  |  | |
-| `openai`          |  |  |  | |
-| `podman` | ✅ | ✅ | ✅ | |
-| `verba`           |  |  |  | |
+### Languages
 
+| Environment | Demo | Description |
+| ----------- | ---- | ----------- |
+| [go](https://hub.flox.dev/flox/go) | [go-demo](https://hub.flox.dev/flox/go-demo) | Go ([docs](go/README.md)) |
+| [python-pip](https://hub.flox.dev/flox/python-pip) | [python-pip-demo](https://hub.flox.dev/flox/python-pip-demo) | Python + pip ([docs](python-pip/README.md)) |
+| [python-poetry](https://hub.flox.dev/flox/python-poetry) | [python-poetry-demo](https://hub.flox.dev/flox/python-poetry-demo) | Python + Poetry ([docs](python-poetry/README.md)) |
+| [python-uv](https://hub.flox.dev/flox/python-uv) | [python-uv-demo](https://hub.flox.dev/flox/python-uv-demo) | Python + uv ([docs](python-uv/README.md)) |
+| [javascript-bun](https://hub.flox.dev/flox/javascript-bun) | | JavaScript with Bun ([docs](javascript-bun/README.md)) |
+| [javascript-deno](https://hub.flox.dev/flox/javascript-deno) | | JavaScript with Deno |
+| [javascript-node](https://hub.flox.dev/flox/javascript-node) | | JavaScript with Node/NPM |
+| [ruby](https://hub.flox.dev/flox/ruby) | | Ruby ([docs](ruby/README.md)) |
+| [rust](https://hub.flox.dev/flox/rust) | [rust-demo](https://hub.flox.dev/flox/rust-demo) | Rust ([docs](rust/README.md)) |
 
-See more examples in `./playground/` folder.
+### Databases & Services
+
+| Environment | Demo | Description |
+| ----------- | ---- | ----------- |
+| [postgresql](https://hub.flox.dev/flox/postgresql) | [postgresql-demo](https://hub.flox.dev/flox/postgresql-demo) | PostgreSQL ([docs](postgresql/README.md)) |
+| [mysql](https://hub.flox.dev/flox/mysql) | [mysql-demo](https://hub.flox.dev/flox/mysql-demo) | MySQL ([docs](mysql/README.md)) |
+| [mariadb](https://hub.flox.dev/flox/mariadb) | [mariadb-demo](https://hub.flox.dev/flox/mariadb-demo) | MariaDB ([docs](mariadb/README.md)) |
+| [mongodb](https://hub.flox.dev/flox/mongodb) | [mongodb-demo](https://hub.flox.dev/flox/mongodb-demo) | MongoDB ([docs](mongodb/README.md)) |
+| [redis](https://hub.flox.dev/flox/redis) | [redis-demo](https://hub.flox.dev/flox/redis-demo) | Redis ([docs](redis/README.md)) |
+| [valkey](https://hub.flox.dev/flox/valkey) | [valkey-demo](https://hub.flox.dev/flox/valkey-demo) | Valkey ([docs](valkey/README.md)) |
+| [cassandra](https://hub.flox.dev/flox/cassandra) | [cassandra-demo](https://hub.flox.dev/flox/cassandra-demo) | Apache Cassandra ([docs](cassandra/README.md)) |
+| [temporal](https://hub.flox.dev/flox/temporal) | [temporal-demo](https://hub.flox.dev/flox/temporal-demo) | Temporal ([docs](temporal/README.md)) |
+
+### Tools & Applications
+
+| Environment | Demo | Description |
+| ----------- | ---- | ----------- |
+| [1password](https://hub.flox.dev/flox/1password) | | 1Password CLI helper |
+| [colima](https://hub.flox.dev/flox/colima) | [colima-demo](https://hub.flox.dev/flox/colima-demo) | Docker via Colima ([docs](colima/README.md)) |
+| [dotenv](https://hub.flox.dev/flox/dotenv) | | Load `.env` variables |
+| [langchain](https://hub.flox.dev/flox/langchain) | | LangChain AI framework |
+| [localstack](https://hub.flox.dev/flox/localstack) | | Local AWS services |
+| [mkcert](https://hub.flox.dev/flox/mkcert) | | Local TLS certificates |
+| [nginx](https://hub.flox.dev/flox/nginx) | [nginx-demo](https://hub.flox.dev/flox/nginx-demo) | Nginx ([docs](nginx/README.md)) |
+| [podman](https://hub.flox.dev/flox/podman) | | Podman containers |
+| [ComfyUI](https://hub.flox.dev/flox/ComfyUI) | | ComfyUI for Stable Diffusion |
+| [verba](https://hub.flox.dev/flox/verba) | | Verba RAG application |
