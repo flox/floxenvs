@@ -22,4 +22,11 @@ if [[ "$VENV_PREFIX" != *"python-pip"* ]]; then
 fi
 echo ">>> Virtual environment active: $VENV_PREFIX"
 
-echo ">>> python-pip environment is working"
+# Verify sample package installed from requirements.txt
+if [ -f requirements.txt ]; then
+  echo ">>> Verifying packages from requirements.txt..."
+  python3 -c "import cowsay; cowsay.cow('Moo from flox!')"
+  echo ">>> Package import ... OK"
+fi
+
+echo ">>> python-pip-demo environment is working"

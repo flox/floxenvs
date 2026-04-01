@@ -3,19 +3,23 @@
   "manifest": {
     "schema-version": "1.10.0",
     "install": {
-      "python": {
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": "demo-tools"
+      },
+      "python3": {
         "pkg-path": "python3"
       },
       "uv": {
         "pkg-path": "uv",
-        "pkg-group": "python-uv"
+        "pkg-group": "python-tools"
       }
     },
     "vars": {
       "PYTHON_AUTO_INSTALL": "true"
     },
     "hook": {
-      "on-activate": "export UV_CACHE=\"$FLOX_ENV_CACHE/python-uv\"\nexport UV_VENV=\"$UV_CACHE/venv\"\nexport UV_PROJECT_ENVIRONMENT=\"$UV_VENV\"\n\nmkdir -p \"$UV_CACHE\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$UV_CACHE/venv.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$UV_VENV\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  uv venv -p python3 \"$UV_VENV\"\n  echo \"$CURRENT_INTERP\" > \"$UV_CACHE/venv.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$UV_VENV/bin/activate\"\n\nif [ \"$PYTHON_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f uv.lock ]; then\n  HASH=$(md5sum uv.lock 2>/dev/null \\\n    || md5 -q uv.lock)\n  HASH=$(echo \"$HASH\" | cut -d\" \" -f1)\n  LAST=$(cat \"$UV_VENV/.deps_hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    uv sync\n    echo \"$HASH\" > \"$UV_VENV/.deps_hash\"\n  fi\nfi\n"
+      "on-activate": "export UV_CACHE=\"$FLOX_ENV_CACHE/python-uv\"\nexport UV_VENV=\"$UV_CACHE/venv\"\nexport UV_PROJECT_ENVIRONMENT=\"$UV_VENV\"\n\nmkdir -p \"$UV_CACHE\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$UV_CACHE/venv.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$UV_VENV\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  uv venv -p python3 \"$UV_VENV\"\n  echo \"$CURRENT_INTERP\" > \"$UV_CACHE/venv.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$UV_VENV/bin/activate\"\n\nif [ \"$PYTHON_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f uv.lock ]; then\n  HASH=$(md5sum uv.lock 2>/dev/null \\\n    || md5 -q uv.lock)\n  HASH=$(echo \"$HASH\" | cut -d\" \" -f1)\n  LAST=$(cat \"$UV_VENV/.deps_hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    uv sync\n    echo \"$HASH\" > \"$UV_VENV/.deps_hash\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Python + uv environment ready!' '' \\\n    'Python version:' \\\n    \"  $(python3 --version 2>&1)\" '' \\\n    'uv commands:' \\\n    '  uv add <package>' \\\n    '  uv sync' \\\n    '  uv run <script>'\nfi\n"
     },
     "profile": {
       "bash": "source \"$FLOX_ENV_CACHE/python-uv/venv/bin/activate\"\n",
@@ -26,6 +30,123 @@
     "options": {}
   },
   "packages": [
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/bmz60mbb36nlipdn9n6zmcm6kjls8gll-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T03:37:21.147669Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cdpxgzcjwidrmrzsq0zkyr9nxccvy3p6-gum-0.17.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/yhvp5prpjjl5hqk6fhr5svdzf1yfacgk-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:09:56.689083Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kqcb9j9k6wdvb7pjvjzn3p8dc82qmk9x-gum-0.17.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/cngbjjxmgsmcbgvihq7q9472rb5rhgdj-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T04:40:40.363731Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rznkbgxflsbrfy5c359vhhqrrxw4pfkj-gum-0.17.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/f5ahd90j9s46j49lz8k2yn3cmvyq6mbn-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
+      "rev_count": 971119,
+      "rev_date": "2026-03-28T14:48:23Z",
+      "scrape_date": "2026-03-30T05:16:17.301634Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rf0zlw5q4j051xkjk9djfw5dpb8nwbgm-gum-0.17.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
     {
       "attr_path": "uv",
       "broken": false,
@@ -52,7 +173,7 @@
         "out": "/nix/store/xn8z7nwi93k6hdqrcvpkl3y9qk3zhr5k-uv-0.11.2"
       },
       "system": "aarch64-darwin",
-      "group": "python-uv",
+      "group": "python-tools",
       "priority": 5
     },
     {
@@ -81,7 +202,7 @@
         "out": "/nix/store/zpy7fkw340vjw45nz3dnvlzj28aq9p9m-uv-0.11.2"
       },
       "system": "aarch64-linux",
-      "group": "python-uv",
+      "group": "python-tools",
       "priority": 5
     },
     {
@@ -110,7 +231,7 @@
         "out": "/nix/store/vhixdscpv5zf4wygl66x4mc25kx8givn-uv-0.11.2"
       },
       "system": "x86_64-darwin",
-      "group": "python-uv",
+      "group": "python-tools",
       "priority": 5
     },
     {
@@ -139,7 +260,7 @@
         "out": "/nix/store/bh0mb740hx20n4x0zp234wk0r33a8pi7-uv-0.11.2"
       },
       "system": "x86_64-linux",
-      "group": "python-uv",
+      "group": "python-tools",
       "priority": 5
     },
     {
@@ -147,7 +268,7 @@
       "broken": false,
       "derivation": "/nix/store/krwwaljrhx0f8rykjbxzwhjqhn8iq64d-python3-3.13.12.drv",
       "description": "High-level dynamically-typed programming language",
-      "install_id": "python",
+      "install_id": "python3",
       "license": "Python-2.0",
       "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
       "name": "python3-3.13.12",
@@ -177,7 +298,7 @@
       "broken": false,
       "derivation": "/nix/store/nxvwxd34qjxfwm1cx3kpalrd6xcsydla-python3-3.13.12.drv",
       "description": "High-level dynamically-typed programming language",
-      "install_id": "python",
+      "install_id": "python3",
       "license": "Python-2.0",
       "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
       "name": "python3-3.13.12",
@@ -209,7 +330,7 @@
       "broken": false,
       "derivation": "/nix/store/0bqzghzk3p5ss7wvxgfjw2k49wmiddkj-python3-3.13.12.drv",
       "description": "High-level dynamically-typed programming language",
-      "install_id": "python",
+      "install_id": "python3",
       "license": "Python-2.0",
       "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
       "name": "python3-3.13.12",
@@ -238,7 +359,7 @@
       "broken": false,
       "derivation": "/nix/store/makmgpqhagbsvfs49dywc7r7a0kv8any-python3-3.13.12.drv",
       "description": "High-level dynamically-typed programming language",
-      "install_id": "python",
+      "install_id": "python3",
       "license": "Python-2.0",
       "locked_url": "https://github.com/flox/nixpkgs?rev=8110df5ad7abf5d4c0f6fb0f8f978390e77f9685",
       "name": "python3-3.13.12",
@@ -265,5 +386,61 @@
       "group": "toplevel",
       "priority": 5
     }
-  ]
+  ],
+  "compose": {
+    "composer": {
+      "schema-version": "1.11.0",
+      "install": {
+        "gum": {
+          "pkg-path": "gum",
+          "pkg-group": "demo-tools"
+        }
+      },
+      "hook": {
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Python + uv environment ready!' '' \\\n    'Python version:' \\\n    \"  $(python3 --version 2>&1)\" '' \\\n    'uv commands:' \\\n    '  uv add <package>' \\\n    '  uv sync' \\\n    '  uv run <script>'\nfi\n"
+      },
+      "options": {},
+      "include": {
+        "environments": [
+          {
+            "dir": "../python-uv"
+          }
+        ]
+      }
+    },
+    "include": [
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "python3": {
+              "pkg-path": "python3"
+            },
+            "uv": {
+              "pkg-path": "uv",
+              "pkg-group": "python-tools"
+            }
+          },
+          "vars": {
+            "PYTHON_AUTO_INSTALL": "true"
+          },
+          "hook": {
+            "on-activate": "export UV_CACHE=\"$FLOX_ENV_CACHE/python-uv\"\nexport UV_VENV=\"$UV_CACHE/venv\"\nexport UV_PROJECT_ENVIRONMENT=\"$UV_VENV\"\n\nmkdir -p \"$UV_CACHE\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$UV_CACHE/venv.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$UV_VENV\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  uv venv -p python3 \"$UV_VENV\"\n  echo \"$CURRENT_INTERP\" > \"$UV_CACHE/venv.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$UV_VENV/bin/activate\"\n\nif [ \"$PYTHON_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f uv.lock ]; then\n  HASH=$(md5sum uv.lock 2>/dev/null \\\n    || md5 -q uv.lock)\n  HASH=$(echo \"$HASH\" | cut -d\" \" -f1)\n  LAST=$(cat \"$UV_VENV/.deps_hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    uv sync\n    echo \"$HASH\" > \"$UV_VENV/.deps_hash\"\n  fi\nfi\n"
+          },
+          "profile": {
+            "bash": "source \"$FLOX_ENV_CACHE/python-uv/venv/bin/activate\"\n",
+            "zsh": "source \"$FLOX_ENV_CACHE/python-uv/venv/bin/activate\"\n",
+            "fish": "source \"$FLOX_ENV_CACHE/python-uv/venv/bin/activate.fish\"\n",
+            "tcsh": "source \"$FLOX_ENV_CACHE/python-uv/venv/bin/activate.csh\"\n"
+          },
+          "options": {}
+        },
+        "name": "python-uv",
+        "descriptor": {
+          "dir": "../python-uv"
+        }
+      }
+    ],
+    "warnings": []
+  }
 }

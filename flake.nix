@@ -49,7 +49,7 @@
 
           export FLOX_DISABLE_METRICS=true
           export FLOX_ENVS_TESTING=1
-          export PATH="${lib.makeBinPath (with pkgs; [ coreutils flox.packages."${system}".default ] ++ lib.optionals stdenv.isLinux [ util-linux iproute2 ])}:$PATH"
+          export PATH="${lib.makeBinPath (with pkgs; [ coreutils flox.packages."${system}".default ] ++ lib.optionals stdenv.isLinux [ util-linux iproute2 slirp4netns ])}:$PATH"
           export LANG=
           export LC_COLLATE="C"
           export LC_CTYPE="C"
@@ -151,30 +151,50 @@
           # concurrent tests don't fight over ports and orphaned
           # services get killed automatically on exit.
           #
-          # Namespace flags:
-          #   --user              unprivileged user namespace (no root needed)
-          #   --map-root-user     map caller to uid 0 inside the namespace,
-          #                       which grants CAP_NET_ADMIN to bring up lo
-          #   --mount             private mount table so we can bind-mount
-          #                       a writable dir over /root
-          #   --net               isolated network stack (own loopback)
-          #   --pid --fork        isolated PID namespace
+          # Namespace setup:
           #
-          # Inside the namespace uid=0 (root), but /root is read-only.
-          # Nix reads /root/.nix-defexpr/channels for uid 0, and flox
-          # reads /root/.config/flox — both fail without a writable
-          # /root. We fix this by bind-mounting NS_HOME over /root and
-          # seeding .nix-defexpr/channels so nix doesn't error out.
+          #   unshare flags:
+          #     --user              unprivileged user namespace
+          #     --map-root-user     map caller to uid 0 inside,
+          #                         grants CAP_NET_ADMIN for lo
+          #     --mount             private mount table for
+          #                         bind-mounting /root
+          #     --net               isolated network stack
+          #     --pid --fork        isolated PID namespace
           #
-          # XDG overrides ensure flox writes config/data/cache into
-          # the writable NS_HOME instead of /root.
+          #   slirp4netns:
+          #     Provides internet inside the network namespace.
+          #     Without it, --net gives only loopback — no route
+          #     to the internet (pip/poetry/uv can't reach PyPI).
+          #     slirp4netns creates a userspace TAP device (tap0)
+          #     that tunnels outbound traffic to the host network:
+          #       tap0 10.0.2.100 → slirp → host → internet
+          #     Localhost stays isolated (each namespace has its
+          #     own 127.0.0.1), so services don't collide.
           #
-          # Falls back to direct execution if unshare is unavailable
-          # or not permitted.
+          #   /root workaround:
+          #     Inside the namespace uid=0 (root), but /root is
+          #     read-only. Nix reads /root/.nix-defexpr/channels
+          #     and flox reads /root/.config/flox — both fail.
+          #     We bind-mount a writable tmpdir over /root and
+          #     seed .nix-defexpr/channels so nix doesn't error.
+          #     XDG overrides direct flox config/data/cache to
+          #     the writable tmpdir.
+          #
+          # Synchronization:
+          #   The namespace process writes a ready-file, then
+          #   waits for slirp4netns to set up networking (signaled
+          #   by a .done file). This ensures tap0 is configured
+          #   before flox activate tries to reach the network.
+          #
+          # Falls back to direct execution if unshare fails.
           if [ "$(uname)" = "Linux" ] && command -v unshare >/dev/null 2>&1; then
             echo "👉 Isolating test in user+network+PID namespace..."
             NS_HOME=$(mktemp -d)
             mkdir -p "$NS_HOME/.nix-defexpr/channels"
+            NS_READY=$(mktemp -u)
+            NS_DONE=$(mktemp -u)
+
             unshare --user --map-root-user --mount --net --pid --fork ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
               "mount --bind \"$NS_HOME\" /root 2>/dev/null || true; \
                export HOME=\"$NS_HOME\"; \
@@ -183,10 +203,31 @@
                export XDG_CACHE_HOME=\"$NS_HOME/.cache\"; \
                export FLOX_DISABLE_METRICS=true; \
                ip link set lo up 2>/dev/null || true; \
+               touch \"$NS_READY\"; \
+               while [ ! -f \"$NS_DONE\" ]; do sleep 0.1; done; \
                cd \"$envdir\"; \
-               eval \"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\"" \
-              && exit 0 \
-              || echo "👉 Namespace isolation failed, falling back to direct execution..."
+               eval \"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\"" &
+            NS_PID=$!
+
+            # Wait for namespace to be ready, then start slirp4netns
+            while [ ! -f "$NS_READY" ]; do sleep 0.1; done
+            slirp4netns --configure --mtu=65520 $NS_PID tap0 &
+            SLIRP_PID=$!
+            sleep 1
+            touch "$NS_DONE"
+
+            # Wait for the test to finish
+            wait $NS_PID
+            NS_EXIT=$?
+            kill $SLIRP_PID 2>/dev/null || true
+            wait $SLIRP_PID 2>/dev/null || true
+            rm -f "$NS_READY" "$NS_DONE"
+
+            if [ $NS_EXIT -eq 0 ]; then
+              exit 0
+            else
+              echo "👉 Namespace isolation failed (exit=$NS_EXIT), falling back to direct execution..."
+            fi
           fi
           eval "flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'"
         '';
