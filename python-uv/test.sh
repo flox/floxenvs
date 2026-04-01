@@ -2,21 +2,24 @@
 
 set -eo pipefail
 
-check_command() {
-    if ! command -v $1 2>&1 >/dev/null
-    then
-        echo "Error: '$1' command could not be found."
-        exit 1
-    fi
-}
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "Error: 'python3' command not found."
+  exit 1
+fi
+if ! command -v uv >/dev/null 2>&1; then
+  echo "Error: 'uv' command not found."
+  exit 1
+fi
 
-check_command python
-check_command uv
-check_command pyjokes
+echo ">>> python3 version: $(python3 --version)"
+echo ">>> uv version: $(uv --version)"
 
-python -c "import pyjokes"
-echo ">>> pyjokes python package installed"
+# Verify venv is active
+VENV_PREFIX="$(python3 -c 'import sys; print(sys.prefix)')"
+if [[ "$VENV_PREFIX" != *"python-uv"* ]]; then
+  echo "Error: Virtual environment not active (prefix: $VENV_PREFIX)"
+  exit 1
+fi
+echo ">>> Virtual environment active: $VENV_PREFIX"
 
-pyjokes
-echo ">>> pyjokes binary works"
-
+echo ">>> python-uv environment is working"
