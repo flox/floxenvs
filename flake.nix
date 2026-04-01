@@ -49,7 +49,7 @@
 
           export FLOX_DISABLE_METRICS=true
           export FLOX_ENVS_TESTING=1
-          export PATH="${lib.makeBinPath (with pkgs; [ coreutils flox.packages."${system}".default ] ++ lib.optionals stdenv.isLinux [ util-linux slirp4netns ])}:$PATH"
+          export PATH="${lib.makeBinPath (with pkgs; [ coreutils flox.packages."${system}".default ] ++ lib.optionals stdenv.isLinux [ util-linux passt ])}:$PATH"
           export LANG=
           export LC_COLLATE="C"
           export LC_CTYPE="C"
@@ -147,81 +147,135 @@
 
           echo "👉 Running $name test..."
 
-          # On Linux, isolate in a user+network+PID namespace so
-          # concurrent tests don't fight over ports and orphaned
-          # services get killed automatically on exit.
+          # ── Linux namespace isolation ──────────────────────
           #
-          # Namespace flags:
-          #   --user        unprivileged user namespace; maps
-          #                 caller to uid 65534 (nobody) inside
-          #   --net         isolated network stack (own loopback)
-          #   --pid --fork  isolated PID namespace; all children
-          #                 are reaped when the namespace exits
+          # On Linux we isolate each test in its own network
+          # and PID namespace so that:
+          #   • concurrent tests don't fight over localhost
+          #     ports (each gets its own 127.0.0.1)
+          #   • orphaned service processes are reaped
+          #     automatically when the namespace exits
           #
-          # Why nobody (not root):
-          #   --map-root-user would give CAP_NET_ADMIN (for lo)
-          #   but PostgreSQL's initdb refuses to run as uid 0.
-          #   We use plain --user so the process runs as nobody,
-          #   which all services accept.
+          # Different environments impose different
+          # requirements on the namespace:
           #
-          # slirp4netns:
-          #   Provides internet inside the network namespace.
-          #   Without it, --net gives only loopback — no route
-          #   to the internet (pip/poetry/uv can't reach PyPI).
-          #   slirp4netns creates a userspace TAP device (tap0)
-          #   that tunnels outbound traffic to the host network:
-          #     tap0 10.0.2.100 → slirp → host → internet
-          #   It also brings up lo automatically (--configure),
-          #   so we don't need CAP_NET_ADMIN.
+          #   Port isolation (redis, postgresql, nginx, ...):
+          #     Services bind to 127.0.0.1:<port>. Without
+          #     isolation, concurrent tests collide.
+          #     → need: isolated loopback (--net)
+          #
+          #   Internet access (python-pip, python-uv, go, ...):
+          #     Package managers download from the internet
+          #     during activation (pip install, go mod, ...).
+          #     → need: outbound connectivity (pasta)
+          #
+          #   DNS resolution (go, rust, ...):
+          #     Go's pure resolver reads /etc/resolv.conf and
+          #     dials the nameserver directly (127.0.0.53 for
+          #     systemd-resolved). This is dead in the
+          #     namespace. Go is compiled without cgo so
+          #     GODEBUG=netdns=cgo doesn't work.
+          #     → need: custom /etc/resolv.conf (bind-mount)
+          #
+          #   Non-root uid (postgresql, ...):
+          #     PostgreSQL's initdb checks geteuid() == 0 and
+          #     refuses to run as root.
+          #     → need: uid != 0 (inner unshare --user)
+          #
+          #   Writable /root (nix):
+          #     When mapped as root (uid 0), nix reads
+          #     /root/.nix-defexpr/channels which is
+          #     read-only on the builders.
+          #     → need: bind-mount writable dir over /root
+          #
+          #   Writable $HOME (flox, go, pip, ...):
+          #     uid 65534 (nobody) has home /var/empty which
+          #     is read-only. Tools write to $HOME.
+          #     → need: HOME + XDG vars pointing to tmpdir
+          #
+          # Two tools, layered:
+          #
+          #   pasta (from passt project, https://passt.top)
+          #     Provides internet inside the network namespace.
+          #     Attached by PID after the namespace starts —
+          #     configures an eth0 interface with internet
+          #     access via L4 socket mapping (no TAP/NAT) and
+          #     exits. Flags:
+          #       --config-net  configure the interface
+          #       -t none       don't forward host TCP ports
+          #       -u none       don't forward host UDP ports
+          #
+          #   Double unshare (outer + inner):
+          #     Outer: --user --map-root-user --mount --net
+          #            --pid --fork
+          #       Maps caller to uid 0 inside so we can:
+          #       • bind-mount a custom /etc/resolv.conf
+          #         pointing to pasta's DNS (the host's
+          #         resolv.conf points to 127.0.0.53 which is
+          #         systemd-resolved — dead in the namespace;
+          #         pasta exposes DNS via the gateway IP)
+          #       • bind-mount a writable dir over /root so
+          #         nix can read /root/.nix-defexpr/channels
+          #     Inner: --user
+          #       Drops from uid 0 to uid 65534 (nobody).
+          #       Services like PostgreSQL's initdb refuse to
+          #       run as root — this makes them happy.
+          #       The mount namespace from the outer unshare
+          #       is inherited, so resolv.conf stays mounted.
+          #
+          # The result: uid=nobody, isolated network with
+          # internet + DNS, PID namespace for cleanup.
           #
           # Home directory:
-          #   Inside the namespace uid=65534 (nobody) whose home
-          #   is /var/empty (read-only). We set HOME and XDG
-          #   vars to a writable tmpdir so flox and nix can
-          #   write config/cache. We also seed
-          #   .nix-defexpr/channels so nix doesn't error on the
-          #   missing directory.
+          #   uid 65534 (nobody) has home /var/empty which is
+          #   read-only. We set HOME and XDG vars to a
+          #   writable tmpdir.
           #
           # Synchronization:
-          #   The namespace process writes a ready-file, then
-          #   waits for slirp4netns to set up networking
-          #   (signaled by a .done file). This ensures tap0 is
-          #   configured before flox activate tries to reach
-          #   the network.
+          #   Namespace signals readiness via a temp file,
+          #   we attach pasta, then signal it to proceed.
           #
-          # Falls back to direct execution if unshare fails.
-          if [ "$(uname)" = "Linux" ] && command -v unshare >/dev/null 2>&1; then
-            echo "👉 Isolating test in user+network+PID namespace..."
+          # Falls back to direct execution if pasta or
+          # unshare are unavailable.
+          if [ "$(uname)" = "Linux" ] && command -v pasta >/dev/null 2>&1; then
+            echo "👉 Isolating test in network+PID namespace (pasta)..."
             NS_HOME=$(mktemp -d)
             mkdir -p "$NS_HOME/.nix-defexpr/channels"
             chmod 777 "$NS_HOME"
             NS_READY=$(mktemp -u)
             NS_DONE=$(mktemp -u)
 
-            unshare --user --net --pid --fork ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
-               "export HOME=\"$NS_HOME\"; \
-               export XDG_CONFIG_HOME=\"$NS_HOME/.config\"; \
-               export XDG_DATA_HOME=\"$NS_HOME/.local/share\"; \
-               export XDG_CACHE_HOME=\"$NS_HOME/.cache\"; \
-               export FLOX_DISABLE_METRICS=true; \
+            # Outer namespace: root + mount for bind-mounts
+            unshare --user --map-root-user --mount --net --pid --fork ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
+               "echo 'nameserver PASTA_DNS' > \"$NS_HOME/resolv.conf\"; \
+               mount --bind \"$NS_HOME/resolv.conf\" /etc/resolv.conf; \
+               mount --bind \"$NS_HOME\" /root; \
                touch \"$NS_READY\"; \
                while [ ! -f \"$NS_DONE\" ]; do sleep 0.1; done; \
-               cd \"$envdir\"; \
-               eval \"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\"" &
+               unshare --user ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
+                 \"export HOME=\\\"$NS_HOME\\\"; \
+                 export XDG_CONFIG_HOME=\\\"$NS_HOME/.config\\\"; \
+                 export XDG_DATA_HOME=\\\"$NS_HOME/.local/share\\\"; \
+                 export XDG_CACHE_HOME=\\\"$NS_HOME/.cache\\\"; \
+                 export FLOX_DISABLE_METRICS=true; \
+                 cd \\\"$envdir\\\"; \
+                 eval \\\"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\\\"\"" &
             NS_PID=$!
 
-            # Wait for namespace to be ready, then start slirp4netns
+            # Wait for namespace, attach pasta for networking
             while [ ! -f "$NS_READY" ]; do sleep 0.1; done
-            slirp4netns --configure --mtu=65520 $NS_PID tap0 &
-            SLIRP_PID=$!
-            sleep 1
+            # pasta prints the gateway IP which is also the
+            # DNS server; capture it and patch resolv.conf
+            PASTA_OUT=$(pasta --config-net -t none -u none $NS_PID 2>&1)
+            PASTA_DNS=$(echo "$PASTA_OUT" | grep -A1 "^DNS:" | tail -1 | tr -d ' ')
+            if [ -n "$PASTA_DNS" ]; then
+              echo "nameserver $PASTA_DNS" > "$NS_HOME/resolv.conf"
+            fi
             touch "$NS_DONE"
 
             # Wait for the test to finish
             wait $NS_PID
             NS_EXIT=$?
-            kill $SLIRP_PID 2>/dev/null || true
-            wait $SLIRP_PID 2>/dev/null || true
             rm -f "$NS_READY" "$NS_DONE"
 
             if [ $NS_EXIT -eq 0 ]; then
