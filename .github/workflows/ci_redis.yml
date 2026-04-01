@@ -20,6 +20,12 @@ on:
       - ".github/workflows/environment.yml"
   workflow_dispatch:
 
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
 jobs:
   ci:
     uses: "./.github/workflows/environment.yml"
