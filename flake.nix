@@ -49,7 +49,7 @@
 
           export FLOX_DISABLE_METRICS=true
           export FLOX_ENVS_TESTING=1
-          export PATH="${lib.makeBinPath (with pkgs; [ coreutils flox.packages."${system}".default ] ++ lib.optionals stdenv.isLinux [ util-linux iproute2 slirp4netns ])}:$PATH"
+          export PATH="${lib.makeBinPath (with pkgs; [ coreutils flox.packages."${system}".default ] ++ lib.optionals stdenv.isLinux [ util-linux slirp4netns ])}:$PATH"
           export LANG=
           export LC_COLLATE="C"
           export LC_CTYPE="C"
@@ -151,58 +151,59 @@
           # concurrent tests don't fight over ports and orphaned
           # services get killed automatically on exit.
           #
-          # Namespace setup:
+          # Namespace flags:
+          #   --user        unprivileged user namespace; maps
+          #                 caller to uid 65534 (nobody) inside
+          #   --net         isolated network stack (own loopback)
+          #   --pid --fork  isolated PID namespace; all children
+          #                 are reaped when the namespace exits
           #
-          #   unshare flags:
-          #     --user              unprivileged user namespace
-          #     --map-root-user     map caller to uid 0 inside,
-          #                         grants CAP_NET_ADMIN for lo
-          #     --mount             private mount table for
-          #                         bind-mounting /root
-          #     --net               isolated network stack
-          #     --pid --fork        isolated PID namespace
+          # Why nobody (not root):
+          #   --map-root-user would give CAP_NET_ADMIN (for lo)
+          #   but PostgreSQL's initdb refuses to run as uid 0.
+          #   We use plain --user so the process runs as nobody,
+          #   which all services accept.
           #
-          #   slirp4netns:
-          #     Provides internet inside the network namespace.
-          #     Without it, --net gives only loopback — no route
-          #     to the internet (pip/poetry/uv can't reach PyPI).
-          #     slirp4netns creates a userspace TAP device (tap0)
-          #     that tunnels outbound traffic to the host network:
-          #       tap0 10.0.2.100 → slirp → host → internet
-          #     Localhost stays isolated (each namespace has its
-          #     own 127.0.0.1), so services don't collide.
+          # slirp4netns:
+          #   Provides internet inside the network namespace.
+          #   Without it, --net gives only loopback — no route
+          #   to the internet (pip/poetry/uv can't reach PyPI).
+          #   slirp4netns creates a userspace TAP device (tap0)
+          #   that tunnels outbound traffic to the host network:
+          #     tap0 10.0.2.100 → slirp → host → internet
+          #   It also brings up lo automatically (--configure),
+          #   so we don't need CAP_NET_ADMIN.
           #
-          #   /root workaround:
-          #     Inside the namespace uid=0 (root), but /root is
-          #     read-only. Nix reads /root/.nix-defexpr/channels
-          #     and flox reads /root/.config/flox — both fail.
-          #     We bind-mount a writable tmpdir over /root and
-          #     seed .nix-defexpr/channels so nix doesn't error.
-          #     XDG overrides direct flox config/data/cache to
-          #     the writable tmpdir.
+          # Home directory:
+          #   Inside the namespace uid=65534 (nobody) whose home
+          #   is /var/empty (read-only). We set HOME and XDG
+          #   vars to a writable tmpdir so flox and nix can
+          #   write config/cache. We also seed
+          #   .nix-defexpr/channels so nix doesn't error on the
+          #   missing directory.
           #
           # Synchronization:
           #   The namespace process writes a ready-file, then
-          #   waits for slirp4netns to set up networking (signaled
-          #   by a .done file). This ensures tap0 is configured
-          #   before flox activate tries to reach the network.
+          #   waits for slirp4netns to set up networking
+          #   (signaled by a .done file). This ensures tap0 is
+          #   configured before flox activate tries to reach
+          #   the network.
           #
           # Falls back to direct execution if unshare fails.
           if [ "$(uname)" = "Linux" ] && command -v unshare >/dev/null 2>&1; then
             echo "👉 Isolating test in user+network+PID namespace..."
             NS_HOME=$(mktemp -d)
             mkdir -p "$NS_HOME/.nix-defexpr/channels"
+            chmod 777 "$NS_HOME"
             NS_READY=$(mktemp -u)
             NS_DONE=$(mktemp -u)
 
-            unshare --user --map-root-user --mount --net --pid --fork ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
-              "mount --bind \"$NS_HOME\" /root 2>/dev/null || true; \
-               export HOME=\"$NS_HOME\"; \
+            unshare --user --net --pid --fork ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
+               "export HOME=\"$NS_HOME\"; \
                export XDG_CONFIG_HOME=\"$NS_HOME/.config\"; \
                export XDG_DATA_HOME=\"$NS_HOME/.local/share\"; \
                export XDG_CACHE_HOME=\"$NS_HOME/.cache\"; \
                export FLOX_DISABLE_METRICS=true; \
-               ip link set lo up 2>/dev/null || true; \
                touch \"$NS_READY\"; \
                while [ ! -f \"$NS_DONE\" ]; do sleep 0.1; done; \
                cd \"$envdir\"; \
