@@ -154,6 +154,8 @@
           # Namespace flags:
           #   --user        unprivileged user namespace; maps
           #                 caller to uid 65534 (nobody) inside
+          #   --mount       private mount table so we can
+          #                 bind-mount a custom resolv.conf
           #   --net         isolated network stack (own loopback)
           #   --pid --fork  isolated PID namespace; all children
           #                 are reaped when the namespace exits
@@ -173,6 +175,13 @@
           #     tap0 10.0.2.100 → slirp → host → internet
           #   It also brings up lo automatically (--configure),
           #   so we don't need CAP_NET_ADMIN.
+          #
+          # DNS:
+          #   The host's /etc/resolv.conf typically points to
+          #   127.0.0.53 (systemd-resolved stub) which doesn't
+          #   exist in the isolated network namespace.
+          #   slirp4netns provides DNS at 10.0.2.3, so we
+          #   bind-mount a custom resolv.conf pointing there.
           #
           # Home directory:
           #   Inside the namespace uid=65534 (nobody) whose home
@@ -198,8 +207,16 @@
             NS_READY=$(mktemp -u)
             NS_DONE=$(mktemp -u)
 
-            unshare --user --net --pid --fork ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
-               "export HOME=\"$NS_HOME\"; \
+            # slirp4netns provides DNS at 10.0.2.3 but the host's
+            # /etc/resolv.conf points to 127.0.0.53 (systemd-resolved
+            # stub) which doesn't exist in the namespace. Write a
+            # custom resolv.conf and bind-mount it over /etc/resolv.conf.
+            NS_RESOLV="$NS_HOME/resolv.conf"
+            echo "nameserver 10.0.2.3" > "$NS_RESOLV"
+
+            unshare --user --mount --net --pid --fork ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
+               "mount --bind \"$NS_RESOLV\" /etc/resolv.conf 2>/dev/null || true; \
+               export HOME=\"$NS_HOME\"; \
                export XDG_CONFIG_HOME=\"$NS_HOME/.config\"; \
                export XDG_DATA_HOME=\"$NS_HOME/.local/share\"; \
                export XDG_CACHE_HOME=\"$NS_HOME/.cache\"; \
