@@ -71,6 +71,28 @@
             cd /
             echo "👉 Stopping services..."
             flox services stop --dir "$envdir" 2>/dev/null || true
+
+            # On Darwin there's no namespace isolation, so
+            # processes spawned by flox activate can outlive the
+            # test if `flox services stop` fails or hangs. Find
+            # and kill any processes still referencing our temp
+            # directory (process-compose, service daemons, etc).
+            if [ "$(uname)" = "Darwin" ] || [ -z "''${IN_NAMESPACE:-}" ]; then
+              echo "👉 Killing orphaned processes..."
+              ${pkgs.procps}/bin/pgrep -f "$TESTDIR" 2>/dev/null \
+                | while read pid; do
+                    echo "  killing $pid"
+                    kill "$pid" 2>/dev/null || true
+                  done
+              sleep 1
+              # SIGKILL stragglers
+              ${pkgs.procps}/bin/pgrep -f "$TESTDIR" 2>/dev/null \
+                | while read pid; do
+                    echo "  force killing $pid"
+                    kill -9 "$pid" 2>/dev/null || true
+                  done
+            fi
+
             echo "👉 Cleaning up $TESTDIR..."
             for i in $(seq 1 10); do
               chmod -R u+w "$TESTDIR" 2>/dev/null
