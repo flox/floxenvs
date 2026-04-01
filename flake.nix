@@ -77,7 +77,7 @@
             # test if `flox services stop` fails or hangs. Find
             # and kill any processes still referencing our temp
             # directory (process-compose, service daemons, etc).
-            if [ "$(uname)" = "Darwin" ] || [ -z "''${IN_NAMESPACE:-}" ]; then
+            if [ "$(uname)" = "Darwin" ]; then
               echo "👉 Killing orphaned processes..."
               ${pkgs.procps}/bin/pgrep -f "$TESTDIR" 2>/dev/null \
                 | while read pid; do
@@ -189,7 +189,6 @@
                export XDG_DATA_HOME=\"$NS_HOME/.local/share\"; \
                export XDG_CACHE_HOME=\"$NS_HOME/.cache\"; \
                export FLOX_DISABLE_METRICS=true; \
-               export IN_NAMESPACE=1; \
                ip link set lo up 2>/dev/null || true; \
                cd \"$envdir\"; \
                eval \"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\"" \
