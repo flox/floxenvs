@@ -1,0 +1,34 @@
+name: "CI: python-uv"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "python-uv/**"
+      - "python-uv-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+  pull_request:
+    paths:
+      - "python-uv/**"
+      - "python-uv-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "python-uv"
+    secrets: inherit
