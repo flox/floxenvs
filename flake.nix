@@ -172,9 +172,14 @@
           #         device or NAT needed
           #       • Localhost is isolated — 127.0.0.1 inside
           #         the namespace is separate from the host
-          #     pasta creates the namespace, runs the command,
-          #     and exits when the command finishes — no
-          #     unshare --net needed. Flags:
+          #     pasta creates the namespace and runs the
+          #     command inside it — no unshare --net needed.
+          #     Flags:
+          #       -f            stay in foreground (without
+          #                     this, pasta daemonizes and
+          #                     the child loses connectivity)
+          #       -P FILE       write pasta's PID so we can
+          #                     kill it after the child exits
           #       --config-net  configure the tap interface
           #       -t none       don't forward TCP ports from
           #                     host into namespace
@@ -208,7 +213,8 @@
             mkdir -p "$NS_HOME/.nix-defexpr/channels"
             chmod 777 "$NS_HOME"
 
-            pasta --config-net -t none -u none -- \
+            PASTA_PIDFILE=$(mktemp -u)
+            pasta --config-net -t none -u none -f -P "$PASTA_PIDFILE" -- \
               unshare --user ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
                "export HOME=\"$NS_HOME\"; \
                export XDG_CONFIG_HOME=\"$NS_HOME/.config\"; \
@@ -216,9 +222,21 @@
                export XDG_CACHE_HOME=\"$NS_HOME/.cache\"; \
                export FLOX_DISABLE_METRICS=true; \
                cd \"$envdir\"; \
-               eval \"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\"" \
-              && exit 0 \
-              || echo "👉 Namespace isolation failed, falling back to direct execution..."
+               eval \"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\""
+            NS_EXIT=$?
+
+            # pasta -f stays running after the child exits;
+            # kill it so we don't leave orphan processes
+            if [ -f "$PASTA_PIDFILE" ]; then
+              kill "$(cat "$PASTA_PIDFILE")" 2>/dev/null || true
+              rm -f "$PASTA_PIDFILE"
+            fi
+
+            if [ $NS_EXIT -eq 0 ]; then
+              exit 0
+            else
+              echo "👉 Namespace isolation failed (exit=$NS_EXIT), falling back to direct execution..."
+            fi
           fi
           eval "flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'"
         '';
