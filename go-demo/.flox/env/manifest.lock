@@ -36,7 +36,7 @@
       }
     },
     "hook": {
-      "on-activate": "export GOENV=\"$FLOX_ENV_CACHE/go\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Go development environment' '' \\\n    'Included tools:' \\\n    '  go        - compiler and tools' \\\n    '  gopls     - language server' \\\n    '  gotools   - standard tools (goimports, etc.)' \\\n    '  go-task   - task runner' \\\n    '  gore      - REPL' '' \\\n    'Try the sample app:' \\\n    '  go build && ./hello'\nfi\n"
+      "on-activate": "export GOENV=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$FLOX_ENV_CACHE/go/pkg/mod\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Go development environment' '' \\\n    'Included tools:' \\\n    '  go        - compiler and tools' \\\n    '  gopls     - language server' \\\n    '  gotools   - standard tools (goimports, etc.)' \\\n    '  go-task   - task runner' \\\n    '  gore      - REPL' '' \\\n    'Try the sample app:' \\\n    '  go build && ./hello'\nfi\n"
     },
     "options": {}
   },
@@ -1026,7 +1026,7 @@
             }
           },
           "hook": {
-            "on-activate": "export GOENV=\"$FLOX_ENV_CACHE/go\"\n"
+            "on-activate": "export GOENV=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$FLOX_ENV_CACHE/go/pkg/mod\"\n"
           },
           "options": {}
         },
