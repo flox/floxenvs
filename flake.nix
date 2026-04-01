@@ -172,8 +172,13 @@
           #         device or NAT needed
           #       • Localhost is isolated — 127.0.0.1 inside
           #         the namespace is separate from the host
-          #     pasta runs in the foreground (-f) and creates
-          #     the namespace itself — no unshare --net needed.
+          #     pasta creates the namespace, runs the command,
+          #     and exits when the command finishes — no
+          #     unshare --net needed. Flags:
+          #       --config-net  configure the tap interface
+          #       -t none       don't forward TCP ports from
+          #                     host into namespace
+          #       -u none       don't forward UDP ports either
           #
           #   unshare --user (nested inside pasta)
           #     Drops from uid 0 (root, as mapped by pasta's
@@ -203,7 +208,7 @@
             mkdir -p "$NS_HOME/.nix-defexpr/channels"
             chmod 777 "$NS_HOME"
 
-            pasta -f -- \
+            pasta --config-net -t none -u none -- \
               unshare --user ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
                "export HOME=\"$NS_HOME\"; \
                export XDG_CONFIG_HOME=\"$NS_HOME/.config\"; \
