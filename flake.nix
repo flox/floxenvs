@@ -189,6 +189,7 @@
                export XDG_DATA_HOME=\"$NS_HOME/.local/share\"; \
                export XDG_CACHE_HOME=\"$NS_HOME/.cache\"; \
                export FLOX_DISABLE_METRICS=true; \
+               export IN_NAMESPACE=1; \
                ip link set lo up 2>/dev/null || true; \
                cd \"$envdir\"; \
                eval \"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\"" \
