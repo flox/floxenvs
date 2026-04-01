@@ -15,7 +15,8 @@ jobs:
 
     steps:
       - name: "Setup Sentry CLI"
-        uses: "matbour/setup-sentry-cli@v2"
+        uses: "matbour/setup-sentry-cli@3e938c54b3018bdd019973689ef984e033b0454b"
+ # v2
         with:
           token:        "${{ secrets.MANAGED_FLOXENVS_SENTRY_TOKEN }}"
           organization: "flox-dev"
@@ -24,4 +25,4 @@ jobs:
       # 1. fetch jobs
       # 2. send them to sentry
       #- name: DEBUG
-      #  uses: mxschmitt/action-tmate@v3
+      #  uses: mxschmitt/action-tmate@c0afd6f790e3a5564914980036ebf83216678101 # v3
