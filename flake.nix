@@ -156,52 +156,47 @@
           #   • orphaned service processes are reaped
           #     automatically when the namespace exits
           #
-          # We use two tools, layered:
+          # Two tools, layered:
           #
           #   pasta (from passt project, https://passt.top)
-          #     Creates the network namespace and provides
-          #     connectivity. Unlike slirp4netns, pasta
-          #     forwards loopback traffic between the
-          #     namespace and the host. This means:
-          #       • DNS works out of the box — the host's
-          #         /etc/resolv.conf (typically 127.0.0.53
-          #         for systemd-resolved) stays valid because
-          #         pasta forwards those packets to the host
-          #       • Internet access works — outbound TCP/UDP
-          #         is mapped to host sockets at L4, no TAP
-          #         device or NAT needed
-          #       • Localhost is isolated — 127.0.0.1 inside
-          #         the namespace is separate from the host
-          #     We start the namespace with unshare first,
-          #     then attach pasta to it by PID. This way
-          #     pasta configures networking and exits, while
-          #     the namespace process keeps running with
-          #     full connectivity. Flags:
-          #       --config-net  configure the tap interface
-          #       -t none       don't forward TCP ports from
-          #                     host into namespace
-          #       -u none       don't forward UDP ports either
+          #     Provides internet inside the network namespace.
+          #     Attached by PID after the namespace starts —
+          #     configures an eth0 interface with internet
+          #     access via L4 socket mapping (no TAP/NAT) and
+          #     exits. Flags:
+          #       --config-net  configure the interface
+          #       -t none       don't forward host TCP ports
+          #       -u none       don't forward host UDP ports
           #
-          #   unshare --user --net --pid --fork
-          #     Creates the isolated namespace. The process
-          #     runs as uid 65534 (nobody) — important because
-          #     services like PostgreSQL's initdb refuse root.
+          #   Double unshare (outer + inner):
+          #     Outer: --user --map-root-user --mount --net
+          #            --pid --fork
+          #       Maps caller to uid 0 inside so we can:
+          #       • bind-mount a custom /etc/resolv.conf
+          #         pointing to pasta's DNS (the host's
+          #         resolv.conf points to 127.0.0.53 which is
+          #         systemd-resolved — dead in the namespace;
+          #         pasta exposes DNS via the gateway IP)
+          #       • bind-mount a writable dir over /root so
+          #         nix can read /root/.nix-defexpr/channels
+          #     Inner: --user
+          #       Drops from uid 0 to uid 65534 (nobody).
+          #       Services like PostgreSQL's initdb refuse to
+          #       run as root — this makes them happy.
+          #       The mount namespace from the outer unshare
+          #       is inherited, so resolv.conf stays mounted.
           #
           # The result: uid=nobody, isolated network with
           # internet + DNS, PID namespace for cleanup.
           #
-          # Synchronization:
-          #   The namespace process signals readiness via a
-          #   temp file, then waits for pasta to configure
-          #   networking (signaled by a .done file).
-          #
           # Home directory:
           #   uid 65534 (nobody) has home /var/empty which is
-          #   read-only. We set HOME, XDG_CONFIG_HOME,
-          #   XDG_DATA_HOME, and XDG_CACHE_HOME to a writable
-          #   tmpdir. We also seed .nix-defexpr/channels so
-          #   nix doesn't error when looking up channels for
-          #   the nobody user.
+          #   read-only. We set HOME and XDG vars to a
+          #   writable tmpdir.
+          #
+          # Synchronization:
+          #   Namespace signals readiness via a temp file,
+          #   we attach pasta, then signal it to proceed.
           #
           # Falls back to direct execution if pasta or
           # unshare are unavailable.
@@ -213,26 +208,32 @@
             NS_READY=$(mktemp -u)
             NS_DONE=$(mktemp -u)
 
-            # Start the test in an isolated namespace, then
-            # attach pasta to it by PID for connectivity.
-            # The namespace process signals readiness, we
-            # start pasta, then signal it to proceed.
-            unshare --user --net --pid --fork ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
-               "export HOME=\"$NS_HOME\"; \
-               export XDG_CONFIG_HOME=\"$NS_HOME/.config\"; \
-               export XDG_DATA_HOME=\"$NS_HOME/.local/share\"; \
-               export XDG_CACHE_HOME=\"$NS_HOME/.cache\"; \
-               export FLOX_DISABLE_METRICS=true; \
+            # Outer namespace: root + mount for bind-mounts
+            unshare --user --map-root-user --mount --net --pid --fork ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
+               "echo 'nameserver PASTA_DNS' > \"$NS_HOME/resolv.conf\"; \
+               mount --bind \"$NS_HOME/resolv.conf\" /etc/resolv.conf; \
+               mount --bind \"$NS_HOME\" /root; \
                touch \"$NS_READY\"; \
                while [ ! -f \"$NS_DONE\" ]; do sleep 0.1; done; \
-               cd \"$envdir\"; \
-               eval \"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\"" &
+               unshare --user ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
+                 \"export HOME=\\\"$NS_HOME\\\"; \
+                 export XDG_CONFIG_HOME=\\\"$NS_HOME/.config\\\"; \
+                 export XDG_DATA_HOME=\\\"$NS_HOME/.local/share\\\"; \
+                 export XDG_CACHE_HOME=\\\"$NS_HOME/.cache\\\"; \
+                 export FLOX_DISABLE_METRICS=true; \
+                 cd \\\"$envdir\\\"; \
+                 eval \\\"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\\\"\"" &
             NS_PID=$!
 
-            # Wait for namespace, then attach pasta for
-            # network connectivity (internet + DNS)
+            # Wait for namespace, attach pasta for networking
             while [ ! -f "$NS_READY" ]; do sleep 0.1; done
-            pasta --config-net -t none -u none $NS_PID
+            # pasta prints the gateway IP which is also the
+            # DNS server; capture it and patch resolv.conf
+            PASTA_OUT=$(pasta --config-net -t none -u none $NS_PID 2>&1)
+            PASTA_DNS=$(echo "$PASTA_OUT" | grep -A1 "^DNS:" | tail -1 | tr -d ' ')
+            if [ -n "$PASTA_DNS" ]; then
+              echo "nameserver $PASTA_DNS" > "$NS_HOME/resolv.conf"
+            fi
             touch "$NS_DONE"
 
             # Wait for the test to finish
