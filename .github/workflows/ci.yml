@@ -133,6 +133,26 @@ jobs:
 
             core.setFailed('Timed out waiting for environment workflows');
 
+  result:
+    name: "CI result"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 5
+    needs: ["wait-for-environments"]
+    if: always()
+
+    steps:
+      - name: "Check result"
+        run: |
+          if [ "${{ needs.wait-for-environments.result }}" != "success" ]; then
+            echo "wait-for-environments failed"
+            exit 1
+          fi
+          if [ "${{ needs.wait-for-environments.outputs.any_failed }}" = "true" ]; then
+            echo "Failed workflows: ${{ needs.wait-for-environments.outputs.failed_workflows }}"
+            exit 1
+          fi
+          echo "All ${{ needs.wait-for-environments.outputs.total_workflows }} environment workflows passed"
+
   auto-merge:
     name: "Auto Merge"
     runs-on: "ubuntu-latest"
