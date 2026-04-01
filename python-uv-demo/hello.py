@@ -1,6 +1,3 @@
-def main():
-    print("Hello from python-uv!")
+import cowsay
 
-
-if __name__ == "__main__":
-    main()
+cowsay.cow("Moo from flox!")

@@ -24,7 +24,7 @@ echo ">>> Poetry venv: $POETRY_VENV"
 
 # Verify sample package
 if [ -f pyproject.toml ]; then
-  python3 -c "import pyjokes; print(pyjokes.get_joke())"
+  python3 -c "import cowsay; cowsay.cow('Moo from flox!')"
   echo ">>> Package import ... OK"
 fi
 

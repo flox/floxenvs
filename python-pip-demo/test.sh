@@ -25,7 +25,7 @@ echo ">>> Virtual environment active: $VENV_PREFIX"
 # Verify sample package installed from requirements.txt
 if [ -f requirements.txt ]; then
   echo ">>> Verifying packages from requirements.txt..."
-  python3 -c "import pyjokes; print(pyjokes.get_joke())"
+  python3 -c "import cowsay; cowsay.cow('Moo from flox!')"
   echo ">>> Package import ... OK"
 fi
 
