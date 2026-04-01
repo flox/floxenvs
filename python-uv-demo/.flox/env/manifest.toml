@@ -1,0 +1,27 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../python-uv" }
+]
+
+# gum is a demo-only tool for styled terminal output.
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'Python + uv environment ready!' '' \
+    'Python version:' \
+    "  $(python3 --version 2>&1)" '' \
+    'uv commands:' \
+    '  uv add <package>' \
+    '  uv sync' \
+    '  uv run <script>'
+fi
+'''
