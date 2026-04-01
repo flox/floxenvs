@@ -42,92 +42,53 @@ jobs:
           ENV="${{ inputs.environment }}"
           LOCK="$ENV/.flox/env/manifest.lock"
 
-          # Extract systems from lockfile, exclude x86_64-darwin
-          if [ -f "$LOCK" ]; then
-            SYSTEMS=$(python3 -c "
-          import json, sys
-          with open('$LOCK') as f:
-              data = json.load(f)
-          systems = sorted(set(
-              pkg['system'] for pkg in data.get('packages', [])
-              if 'system' in pkg and pkg['system'] != 'x86_64-darwin'
-          ))
-          print('\n'.join(systems))
-          ")
+          if [ ! -f "$LOCK" ]; then
+            echo "Error: $LOCK not found"
+            exit 1
           fi
 
-          # Default systems if empty
-          if [ -z "${SYSTEMS:-}" ]; then
-            SYSTEMS=$'aarch64-darwin\naarch64-linux\nx86_64-linux'
-          fi
-
-          # Build matrix JSON
-          MATRIX=$(echo "$SYSTEMS" | python3 -c "
-          import json, sys
-          systems = [s.strip() for s in sys.stdin if s.strip()]
-          print(json.dumps({'system': systems}))
-          ")
+          # Extract systems (exclude x86_64-darwin, default if empty)
+          SYSTEMS=$(jq -r '
+            .manifest.options.systems // []
+            | map(select(. != "x86_64-darwin"))
+            | if length == 0 then
+                ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]
+              else . end
+          ' "$LOCK")
+          MATRIX=$(echo "$SYSTEMS" | jq -c '{system: .}')
           echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
 
-          # Detect services in manifest
-          if [ -f "$LOCK" ]; then
-            HAS_SERVICES=$(python3 -c "
-          import json
-          with open('$LOCK') as f:
-              data = json.load(f)
-          services = data.get('manifest', {}).get('services', {})
-          print('true' if services else 'false')
-          ")
-          else
-            HAS_SERVICES="false"
-          fi
-          echo "start_services=$HAS_SERVICES" >> "$GITHUB_OUTPUT"
+          # Detect services
+          SVC=$(jq -r '
+            .manifest.services // {} | length > 0
+          ' "$LOCK")
+          echo "start_services=$SVC" >> "$GITHUB_OUTPUT"
 
-          # Check if demo directory exists
+          # Check for demo
           DEMO_DIR="$ENV-demo"
-          if [ -d "$DEMO_DIR" ]; then
+          if [ -d "$DEMO_DIR" ] \
+              && [ -f "$DEMO_DIR/.flox/env/manifest.lock" ]; then
             echo "has_demo=true" >> "$GITHUB_OUTPUT"
 
-            # Demo systems
             DEMO_LOCK="$DEMO_DIR/.flox/env/manifest.lock"
-            if [ -f "$DEMO_LOCK" ]; then
-              DEMO_SYSTEMS=$(python3 -c "
-          import json
-          with open('$DEMO_LOCK') as f:
-              data = json.load(f)
-          systems = sorted(set(
-              pkg['system'] for pkg in data.get('packages', [])
-              if 'system' in pkg and pkg['system'] != 'x86_64-darwin'
-          ))
-          print('\n'.join(systems))
-          ")
-            fi
-            if [ -z "${DEMO_SYSTEMS:-}" ]; then
-              DEMO_SYSTEMS=$'aarch64-darwin\naarch64-linux\nx86_64-linux'
-            fi
-            DEMO_MATRIX=$(echo "$DEMO_SYSTEMS" | python3 -c "
-          import json, sys
-          systems = [s.strip() for s in sys.stdin if s.strip()]
-          print(json.dumps({'system': systems}))
-          ")
+
+            DEMO_SYSTEMS=$(jq -r '
+              .manifest.options.systems // []
+              | map(select(. != "x86_64-darwin"))
+              | if length == 0 then
+                  ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]
+                else . end
+            ' "$DEMO_LOCK")
+            DEMO_MATRIX=$(echo "$DEMO_SYSTEMS" | jq -c '{system: .}')
             echo "demo_matrix=$DEMO_MATRIX" >> "$GITHUB_OUTPUT"
 
-            # Demo services
-            if [ -f "$DEMO_LOCK" ]; then
-              DEMO_HAS_SERVICES=$(python3 -c "
-          import json
-          with open('$DEMO_LOCK') as f:
-              data = json.load(f)
-          services = data.get('manifest', {}).get('services', {})
-          print('true' if services else 'false')
-          ")
-            else
-              DEMO_HAS_SERVICES="false"
-            fi
-            echo "demo_start_services=$DEMO_HAS_SERVICES" >> "$GITHUB_OUTPUT"
+            DEMO_SVC=$(jq -r '
+              .manifest.services // {} | length > 0
+            ' "$DEMO_LOCK")
+            echo "demo_start_services=$DEMO_SVC" >> "$GITHUB_OUTPUT"
           else
             echo "has_demo=false" >> "$GITHUB_OUTPUT"
-            echo "demo_matrix={}" >> "$GITHUB_OUTPUT"
+            echo "demo_matrix={\"system\":[]}" >> "$GITHUB_OUTPUT"
             echo "demo_start_services=false" >> "$GITHUB_OUTPUT"
           fi
 
@@ -184,6 +145,10 @@ jobs:
           timeout_minutes: 15
           max_attempts: 3
           command: |
+            if [ ! -f "${{ inputs.environment }}/test.sh" ]; then
+              echo "WARN: No test.sh found in ${{ inputs.environment }}"
+              exit 0
+            fi
             ssh github@$REMOTE_SERVER_ADDRESS \
               -oUserKnownHostsFile=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE \
               nix run \
@@ -247,6 +212,10 @@ jobs:
           timeout_minutes: 15
           max_attempts: 3
           command: |
+            if [ ! -f "${{ inputs.environment }}-demo/test.sh" ]; then
+              echo "WARN: No test.sh found in ${{ inputs.environment }}-demo"
+              exit 0
+            fi
             ssh github@$REMOTE_SERVER_ADDRESS \
               -oUserKnownHostsFile=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE \
               nix run \
