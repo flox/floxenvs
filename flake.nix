@@ -156,6 +156,43 @@
           #   • orphaned service processes are reaped
           #     automatically when the namespace exits
           #
+          # Different environments impose different
+          # requirements on the namespace:
+          #
+          #   Port isolation (redis, postgresql, nginx, ...):
+          #     Services bind to 127.0.0.1:<port>. Without
+          #     isolation, concurrent tests collide.
+          #     → need: isolated loopback (--net)
+          #
+          #   Internet access (python-pip, python-uv, go, ...):
+          #     Package managers download from the internet
+          #     during activation (pip install, go mod, ...).
+          #     → need: outbound connectivity (pasta)
+          #
+          #   DNS resolution (go, rust, ...):
+          #     Go's pure resolver reads /etc/resolv.conf and
+          #     dials the nameserver directly (127.0.0.53 for
+          #     systemd-resolved). This is dead in the
+          #     namespace. Go is compiled without cgo so
+          #     GODEBUG=netdns=cgo doesn't work.
+          #     → need: custom /etc/resolv.conf (bind-mount)
+          #
+          #   Non-root uid (postgresql, ...):
+          #     PostgreSQL's initdb checks geteuid() == 0 and
+          #     refuses to run as root.
+          #     → need: uid != 0 (inner unshare --user)
+          #
+          #   Writable /root (nix):
+          #     When mapped as root (uid 0), nix reads
+          #     /root/.nix-defexpr/channels which is
+          #     read-only on the builders.
+          #     → need: bind-mount writable dir over /root
+          #
+          #   Writable $HOME (flox, go, pip, ...):
+          #     uid 65534 (nobody) has home /var/empty which
+          #     is read-only. Tools write to $HOME.
+          #     → need: HOME + XDG vars pointing to tmpdir
+          #
           # Two tools, layered:
           #
           #   pasta (from passt project, https://passt.top)
