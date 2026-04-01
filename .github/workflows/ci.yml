@@ -1,292 +1,206 @@
 name: "CI"
 
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - "main"
-      - "preview"
+    branches: ["main"]
   pull_request:
-  schedule:
-    - cron: "0 0 * * *"
+  workflow_dispatch:
 
 env:
   FLOX_DISABLE_METRICS: "true"
-  CI: true
 
 jobs:
-
-  envs:
-    name: "Find environments"
+  wait-for-environments:
+    name: "Wait"
     runs-on: "ubuntu-latest"
-    timeout-minutes: 30
+    timeout-minutes: 120
 
     outputs:
-      envs_per_system: "${{ steps.envs.outputs.envs_per_system }}"
-      envs_only: "${{ steps.envs.outputs.envs_only }}"
-      envs_deploy: "${{ steps.envs.outputs.envs_deploy }}"
+      any_failed: "${{ steps.wait.outputs.any_failed }}"
+      failed_workflows: "${{ steps.wait.outputs.failed_workflows }}"
+      total_workflows: "${{ steps.wait.outputs.total_workflows }}"
+      pr_number: "${{ steps.wait.outputs.pr_number }}"
+      pr_author: "${{ steps.wait.outputs.pr_author }}"
 
     steps:
-      - name: "Checkout"
-        uses: "actions/checkout@v6"
+      - name: "Wait for all CI: * workflows"
+        id: "wait"
+        uses: "actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b" # v7
         with:
-          fetch-depth: 0
-          ref: ${{ github.head_ref }}
+          script: |
+            const isPR = context.eventName === 'pull_request';
+            // For PRs, context.sha is the merge commit — use head SHA instead
+            const sha = isPR
+              ? context.payload.pull_request.head.sha
+              : context.sha;
+            let prNumber = 0;
+            let prAuthor = '';
 
-      - name: "Find environments"
-        id: "envs"
-        env:
-          BASE_SHA: >-
-            ${{ github.event_name == 'pull_request'
-                && github.event.pull_request.base.sha
-                || 'HEAD~1' }}
-          UPDATE_ALL: >-
-            ${{ github.event_name == 'schedule'
-                && 'true' || '' }}
-        run: bash scripts/discover-envs.sh
+            if (isPR) {
+              prNumber = context.payload.pull_request.number;
+              prAuthor = context.payload.pull_request.user.login;
+            }
 
-  test:
-    name: "Test '${{ matrix.example }}' example on '${{ matrix.system }}'"
+            core.info(`SHA: ${sha} (${isPR ? 'PR head' : 'push'})`);
+            core.info(`Event: ${context.eventName}`);
+            core.info(`PR: #${prNumber} by ${prAuthor}`);
+
+            // Wait a bit for environment workflows to start
+            core.info('Waiting 30s for environment workflows to register...');
+            await new Promise(r => setTimeout(r, 30000));
+
+            // Poll until all CI: * workflows are complete
+            const maxAttempts = 1400;  // ~2 hours at 5s
+            const interval = 5000;
+
+            for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+              const runs = await github.rest.actions.listWorkflowRunsForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head_sha: sha,
+                per_page: 100,
+              });
+
+              // Filter for CI: * environment workflows (not this "CI" workflow)
+              const ciRuns = runs.data.workflow_runs.filter(
+                r => r.name.startsWith('CI: ')
+              );
+
+              if (ciRuns.length === 0) {
+                if (attempt <= 12) {
+                  // Still early — workflows may not have registered yet
+                  core.info(
+                    `Attempt ${attempt}: no CI workflows found yet, waiting...`
+                  );
+                  await new Promise(r => setTimeout(r, interval));
+                  continue;
+                }
+                // No workflows found after 1 minute — nothing to wait for
+                core.info('No environment workflows triggered for this SHA');
+                core.setOutput('any_failed', 'false');
+                core.setOutput('failed_workflows', '');
+                core.setOutput('total_workflows', '0');
+                core.setOutput('pr_number', prNumber.toString());
+                core.setOutput('pr_author', prAuthor);
+                return;
+              }
+
+              const pending = ciRuns.filter(
+                r => r.status !== 'completed'
+              );
+              const failed = ciRuns.filter(
+                r => r.status === 'completed'
+                  && r.conclusion !== 'success'
+                  && r.conclusion !== 'skipped'
+              );
+
+              if (attempt % 12 === 1) {
+                // Log status every ~60s
+                core.info(
+                  `[${Math.floor(attempt * 5 / 60)}m] ` +
+                  `${ciRuns.length} workflows: ` +
+                  `${ciRuns.length - pending.length} complete, ` +
+                  `${pending.length} pending, ` +
+                  `${failed.length} failed`
+                );
+                for (const run of ciRuns) {
+                  core.info(
+                    `  ${run.name}: ${run.status}` +
+                    (run.conclusion ? ` (${run.conclusion})` : '')
+                  );
+                }
+              }
+
+              if (pending.length === 0) {
+                core.info(
+                  `All ${ciRuns.length} environment workflows complete!`
+                );
+                const failedNames = failed.map(r => r.name).join(', ');
+                if (failed.length > 0) {
+                  core.info(`Failed: ${failedNames}`);
+                }
+                core.setOutput(
+                  'any_failed', (failed.length > 0).toString()
+                );
+                core.setOutput('failed_workflows', failedNames);
+                core.setOutput(
+                  'total_workflows', ciRuns.length.toString()
+                );
+                core.setOutput('pr_number', prNumber.toString());
+                core.setOutput('pr_author', prAuthor);
+                return;
+              }
+
+              await new Promise(r => setTimeout(r, interval));
+            }
+
+            core.setFailed('Timed out waiting for environment workflows');
+
+  result:
+    name: "Summary"
     runs-on: "ubuntu-latest"
-    timeout-minutes: 60
-    if: ${{ github.event_name == 'pull_request' }}
-
-    needs:
-      - "envs"
-
-    strategy:
-      fail-fast: false
-      max-parallel: ${{ github.ref == 'refs/head/main' && 4 || 8 }}
-      matrix:
-        include: ${{ fromJSON(needs.envs.outputs.envs_per_system ) }}
+    timeout-minutes: 5
+    needs: ["wait-for-environments"]
+    if: always()
 
     steps:
-      - name: "Checkout"
-        uses: "actions/checkout@v6"
-
-      - name: "Setup SSH"
-        uses: "webfactory/ssh-agent@v0.10.0"
-        with:
-          ssh-private-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
-
-      - name: "Setup Tailscale"
-        uses: "tailscale/github-action@v4"
-        with:
-          oauth-secret: "${{ secrets.MANAGED_TAILSCALE_AUTH_KEY }}"
-          tags: "tag:ci"
-          timeout: "30s"
-          use-cache: true
-
-      - name: "Find remote server to run tests on"
+      - name: "Check result"
         run: |
-          set -eo pipefail
-          echo "${{ vars.MANAGED_REMOTE_BUILDERS }}" > machines
-          export REMOTE_SERVER_ENTRY=$(cat machines | shuf | grep ${{ matrix.system }} | head -1 ; )
-          export REMOTE_SERVER_ADDRESS=$(echo "$REMOTE_SERVER_ENTRY" | cut -f1 -d' ' | cut -f3 -d'/' | sed 's/nixbld@//' ; )
-          export REMOTE_SERVER_USER_KNOWN_HOSTS_FILE=$(mktemp)
-          export REMOTE_SERVER_PUBLIC_HOST_KEY=$(echo "$REMOTE_SERVER_ENTRY" | tr -s ' ' | cut -f8 -d' ' | base64 -d ; )
-          printf "%s %s\n" "$REMOTE_SERVER_ADDRESS" "$REMOTE_SERVER_PUBLIC_HOST_KEY" > "$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE"
-          echo "REMOTE_SERVER_ADDRESS: $REMOTE_SERVER_ADDRESS"
-          echo "REMOTE_SERVER_USER_KNOWN_HOSTS_FILE: $REMOTE_SERVER_USER_KNOWN_HOSTS_FILE"
-          cat $REMOTE_SERVER_USER_KNOWN_HOSTS_FILE
-          echo "REMOTE_SERVER_ADDRESS=$REMOTE_SERVER_ADDRESS" >> $GITHUB_ENV
-          echo "REMOTE_SERVER_USER_KNOWN_HOSTS_FILE=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE" >> $GITHUB_ENV
-          if [ -n "$REMOTE_SERVER_ADDRESS" ]; then
-            tailscale ping "$REMOTE_SERVER_ADDRESS"
+          if [ "${{ needs.wait-for-environments.result }}" != "success" ]; then
+            echo "wait-for-environments failed"
+            exit 1
           fi
-
-      - name: "Test environment"
-        uses: nick-fields/retry@v4
-        with:
-          timeout_minutes: 15
-          max_attempts: 3
-          command: |
-            if [ ! -f "${{matrix.example}}/test.sh" ]; then
-                echo "WARN: No test.sh found in $env_path"
-                exit 0
-            fi
-            ssh github@$REMOTE_SERVER_ADDRESS \
-              -oUserKnownHostsFile=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE \
-              nix run \
-                  --accept-flake-config \
-                  --extra-experimental-features '"nix-command flakes"' \
-                  --option access-tokens "github.com=${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}" \
-                  github:flox/floxenvs/${{ github.sha }}#apps.${{ matrix.system }}.run-test -- ${{ matrix.example }}
-
-    outputs:
-      job: "${{ matrix.example }}"
-      system: "${{ matrix.system }}"
-
-  containarize:
-    name: "Containarize '${{ matrix.example }}'"
-    runs-on: "ubuntu-latest"
-    timeout-minutes: 30
-
-    if: (github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
-
-    needs:
-      - "envs"
-
-    env:
-      FLOX_BIN: "flox -vvv"
-
-
-    permissions:
-      contents:       "read"
-      packages:       "write"
-      attestations:   "write"
-      id-token:       "write"
-
-    strategy:
-      fail-fast: false
-      max-parallel: 8
-      matrix:
-        example: ${{ fromJSON(needs.envs.outputs.envs_deploy ) }}
-        exclude:
-          - example: "macos"
-          - example: "fooocus"
-
-    steps:
-      - name: "Checkout"
-        uses: "actions/checkout@v6"
-
-      - name: "Install flox"
-        uses: "flox/install-flox-action@main"
-
-      - name: "Login to Github Container Registry"
-        uses: "docker/login-action@v4"
-        with:
-          registry: "ghcr.io"
-          username: "${{ github.actor }}"
-          password: "${{ secrets.GITHUB_TOKEN }}"
-
-      - name: "Containarize"
-        run: |
-          export NIX_CONFIG='extra-experimental-features = nix-command flakes'
-          flox containerize -d ./${{ matrix.example }}
-
-      - name: "Tag & Push"
-        run: |
-          tag=$(echo -n "${{ matrix.example }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g')
-          docker tag "$tag:latest" "ghcr.io/flox/floxenvs:$tag-latest"
-          docker push "ghcr.io/flox/floxenvs:$tag-latest"
-
-
-  push:
-    name: "Sync '${{ matrix.example }}' manifest"
-    runs-on: "ubuntu-latest"
-    timeout-minutes: 30
-
-    if: (github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
-
-    needs:
-      - "envs"
-      - "containarize"
-
-    env:
-      FLOX_BIN:           "flox -vvv"
-      FLOX_REMOTE_OWNER:  "flox"
-      FLOX_AUTH0_URL:     "https://auth.flox.dev"
-
-    strategy:
-      fail-fast: false
-      max-parallel: 8
-      matrix:
-        example: ${{ fromJSON(needs.envs.outputs.envs_deploy ) }}
-        exclude:
-          - example: "macos"
-
-    steps:
-      - name: "Checkout"
-        uses: "actions/checkout@v6"
-
-      - name: "Install flox"
-        uses: "flox/install-flox-action@main"
-
-      - name: "Get FloxHub token"
-        run: |
-          echo "FLOX_FLOXHUB_TOKEN=${{secrets.FLOX_FLOXHUB_TOKEN}}" >> $GITHUB_ENV
-          echo skipping fetching new token until we have more tokens
-          exit 0
-          echo "FLOX_FLOXHUB_TOKEN=$(
-            curl --request POST \
-              --url $FLOX_AUTH0_URL/oauth/token \
-              --header 'content-type: application/x-www-form-urlencoded' \
-              --data "client_id=${{ secrets.MANAGED_FLOXENVS_AUTH0_CLIENT_ID }}" \
-              --data "audience=https://hub.flox.dev/api" \
-              --data "grant_type=client_credentials" \
-              --data "client_secret=${{ secrets.MANAGED_FLOXENVS_AUTH0_CLIENT_SECRET }}" \
-                | jq .access_token -r)" >> $GITHUB_ENV
-
-      - name: "Pull or Create remote environment"
-        run: |
-          pushd ./${{ matrix.example }}
-          if flox list --config -r "$FLOX_REMOTE_OWNER/${{ matrix.example }}" >/dev/null; then
-            $FLOX_BIN pull "$FLOX_REMOTE_OWNER/${{ matrix.example }}" --dir "remote"
-          else
-            echo "WARN: No environment $FLOX_REMOTE_OWNER/${{ matrix.example }} found on FloxHub"
-            echo "WARN: Creating a new environment ${{ matrix.example }}"
-            $FLOX_BIN init --name ${{ matrix.example }} --dir "remote"
-            $FLOX_BIN push --dir "remote"
+          if [ "${{ needs.wait-for-environments.outputs.any_failed }}" = "true" ]; then
+            echo "Failed workflows: ${{ needs.wait-for-environments.outputs.failed_workflows }}"
+            exit 1
           fi
-          popd
-
-      - name: "Sync to remote environment"
-        run: |
-          pushd ./${{ matrix.example }}
-          cp -rf .flox/env/* remote/.flox/env/
-          $FLOX_BIN edit --sync --dir "remote"
-          popd
-
-      - name: "Push to remote environment"
-        run: |
-          pushd ./${{ matrix.example }}
-          $FLOX_BIN push --dir "remote"
-          popd
+          echo "All ${{ needs.wait-for-environments.outputs.total_workflows }} environment workflows passed"
 
   auto-merge:
-    name: "Auto Merge PRs"
+    name: "Auto Merge"
     runs-on: "ubuntu-latest"
-    needs:
-      - "test"
+    timeout-minutes: 5
+    needs: ["wait-for-environments"]
+    if: >-
+      github.event_name == 'pull_request'
+      && needs.wait-for-environments.outputs.any_failed == 'false'
+      && needs.wait-for-environments.outputs.pr_author == 'floxbot'
+      && needs.wait-for-environments.outputs.total_workflows != '0'
 
-    if: ${{ success() && github.actor == 'floxbot' && github.event_name == 'pull_request'}} # Detect that the PR author is floxbot
     steps:
-      - name: "Enable auto-merge for Dependabot PRs"
-        run: |
-          echo "${{ github.actor }}"
-          echo "${{ github.event_name }}"
-          gh pr merge --auto --merge "$PR_URL"
+      - name: "Merge PR"
         env:
-          PR_URL: ${{github.event.pull_request.html_url}}
-          GITHUB_TOKEN: ${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}
-
+          PR_NUMBER: >-
+            ${{ needs.wait-for-environments.outputs.pr_number }}
+          GITHUB_TOKEN: >-
+            ${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}
+        run: |
+          gh pr merge --auto --merge "$PR_NUMBER" \
+            --repo "${{ github.repository }}"
 
   report-failure:
     name: "Report Failure"
     runs-on: "ubuntu-latest"
+    timeout-minutes: 5
+    needs: ["wait-for-environments"]
+    if: >-
+      needs.wait-for-environments.outputs.any_failed == 'true'
+      && github.ref_name == 'main'
 
-    if: ${{ failure() && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'schedule') }}
-
-    needs:
-      - "test"
-      - "push"
-      - "containarize"
-    
     steps:
-      - name: "Prepare message"
-        id: "envs"
-        run: |
-          message="$(echo '${{toJSON(needs)}}' | jq -r 'map(select(.result == "failure")) | .[] | "floxenvs: \(.outputs.job) on \(.outputs.system) had \(.result)"')"
-          echo "message='$message'" >> "$GITHUB_OUTPUT"
       - name: "Slack Notification"
-        uses: "rtCamp/action-slack-notify@v2"
+        uses: "rtCamp/action-slack-notify@e31e87e03dd19038e411e38ae27cbad084a90661" # v2
         env:
-          SLACK_CHANNEL:    "team-content"
-          SLACK_TITLE:      "${{ steps.envs.outputs.message }}"
-          SLACK_FOOTER:     "Thanks for looking at it."
-          SLACK_WEBHOOK:    "${{ secrets.MANAGED_SLACK_WEBHOOK }}"
-          SLACK_USERNAME:   "GitHub"
+          SLACK_CHANNEL: "team-content"
+          SLACK_TITLE: "floxenvs CI failed on main"
+          SLACK_FOOTER: "Thanks for looking at it."
+          SLACK_WEBHOOK: "${{ secrets.MANAGED_SLACK_WEBHOOK }}"
+          SLACK_USERNAME: "GitHub"
           SLACK_ICON_EMOJI: ":poop:"
-          SLACK_COLOR:      "#ff2800"  # ferrari red -> https://encycolorpedia.com/ff2800
+          SLACK_COLOR: "#ff2800"
           SLACK_LINK_NAMES: true
+          SLACK_MESSAGE: >-
+            Failed:
+            ${{ needs.wait-for-environments.outputs.failed_workflows }}
+            | Workflows:
+            ${{ needs.wait-for-environments.outputs.total_workflows }}

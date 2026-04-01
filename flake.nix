@@ -71,6 +71,21 @@
             cd /
             echo "👉 Stopping services..."
             flox services stop --dir "$envdir" 2>/dev/null || true
+
+            # On Darwin there's no namespace isolation, so
+            # processes spawned by flox activate can outlive the
+            # test if `flox services stop` fails or hangs. Find
+            # and kill any processes still referencing our temp
+            # directory (process-compose, service daemons, etc).
+            if [ "$(uname)" = "Darwin" ]; then
+              echo "👉 Killing orphaned processes..."
+              # Use pkill (built into macOS) — procps/pgrep is Linux-only
+              pkill -f "$TESTDIR" 2>/dev/null || true
+              sleep 1
+              # SIGKILL stragglers
+              pkill -9 -f "$TESTDIR" 2>/dev/null || true
+            fi
+
             echo "👉 Cleaning up $TESTDIR..."
             for i in $(seq 1 10); do
               chmod -R u+w "$TESTDIR" 2>/dev/null
@@ -132,15 +147,44 @@
 
           echo "👉 Running $name test..."
 
-          # On Linux, isolate in network+PID namespace so concurrent
-          # tests don't fight over ports and orphaned services get
-          # killed automatically on exit. Falls back to direct
-          # execution if unshare is unavailable or not permitted.
+          # On Linux, isolate in a user+network+PID namespace so
+          # concurrent tests don't fight over ports and orphaned
+          # services get killed automatically on exit.
+          #
+          # Namespace flags:
+          #   --user              unprivileged user namespace (no root needed)
+          #   --map-root-user     map caller to uid 0 inside the namespace,
+          #                       which grants CAP_NET_ADMIN to bring up lo
+          #   --mount             private mount table so we can bind-mount
+          #                       a writable dir over /root
+          #   --net               isolated network stack (own loopback)
+          #   --pid --fork        isolated PID namespace
+          #
+          # Inside the namespace uid=0 (root), but /root is read-only.
+          # Nix reads /root/.nix-defexpr/channels for uid 0, and flox
+          # reads /root/.config/flox — both fail without a writable
+          # /root. We fix this by bind-mounting NS_HOME over /root and
+          # seeding .nix-defexpr/channels so nix doesn't error out.
+          #
+          # XDG overrides ensure flox writes config/data/cache into
+          # the writable NS_HOME instead of /root.
+          #
+          # Falls back to direct execution if unshare is unavailable
+          # or not permitted.
           if [ "$(uname)" = "Linux" ] && command -v unshare >/dev/null 2>&1; then
             echo "👉 Isolating test in user+network+PID namespace..."
             NS_HOME=$(mktemp -d)
-            unshare --user --net --pid --fork /usr/bin/env HOME="$NS_HOME" ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
-              "export HOME=\"$NS_HOME\"; ip link set lo up 2>/dev/null || true; cd \"$envdir\"; eval \"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\"" \
+            mkdir -p "$NS_HOME/.nix-defexpr/channels"
+            unshare --user --map-root-user --mount --net --pid --fork ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
+              "mount --bind \"$NS_HOME\" /root 2>/dev/null || true; \
+               export HOME=\"$NS_HOME\"; \
+               export XDG_CONFIG_HOME=\"$NS_HOME/.config\"; \
+               export XDG_DATA_HOME=\"$NS_HOME/.local/share\"; \
+               export XDG_CACHE_HOME=\"$NS_HOME/.cache\"; \
+               export FLOX_DISABLE_METRICS=true; \
+               ip link set lo up 2>/dev/null || true; \
+               cd \"$envdir\"; \
+               eval \"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\"" \
               && exit 0 \
               || echo "👉 Namespace isolation failed, falling back to direct execution..."
           fi
