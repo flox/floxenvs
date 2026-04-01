@@ -1,0 +1,482 @@
+name: "Environment CI"
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+env:
+  FLOX_DISABLE_METRICS: "true"
+  CI: true
+
+jobs:
+
+  discover:
+    name: "Discover '${{ inputs.environment }}'"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 5
+
+    outputs:
+      matrix: "${{ steps.discover.outputs.matrix }}"
+      start_services: "${{ steps.discover.outputs.start_services }}"
+      has_demo: "${{ steps.discover.outputs.has_demo }}"
+      demo_matrix: "${{ steps.discover.outputs.demo_matrix }}"
+      demo_start_services: "${{ steps.discover.outputs.demo_start_services }}"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v6"
+
+      - name: "Discover environment"
+        id: "discover"
+        run: |
+          set -euo pipefail
+          ENV="${{ inputs.environment }}"
+          LOCK="$ENV/.flox/env/manifest.lock"
+
+          # Extract systems from lockfile, exclude x86_64-darwin
+          if [ -f "$LOCK" ]; then
+            SYSTEMS=$(python3 -c "
+          import json, sys
+          with open('$LOCK') as f:
+              data = json.load(f)
+          systems = sorted(set(
+              pkg['system'] for pkg in data.get('packages', [])
+              if 'system' in pkg and pkg['system'] != 'x86_64-darwin'
+          ))
+          print('\n'.join(systems))
+          ")
+          fi
+
+          # Default systems if empty
+          if [ -z "${SYSTEMS:-}" ]; then
+            SYSTEMS=$'aarch64-darwin\naarch64-linux\nx86_64-linux'
+          fi
+
+          # Build matrix JSON
+          MATRIX=$(echo "$SYSTEMS" | python3 -c "
+          import json, sys
+          systems = [s.strip() for s in sys.stdin if s.strip()]
+          print(json.dumps({'system': systems}))
+          ")
+          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+
+          # Detect services in manifest
+          if [ -f "$LOCK" ]; then
+            HAS_SERVICES=$(python3 -c "
+          import json
+          with open('$LOCK') as f:
+              data = json.load(f)
+          services = data.get('manifest', {}).get('services', {})
+          print('true' if services else 'false')
+          ")
+          else
+            HAS_SERVICES="false"
+          fi
+          echo "start_services=$HAS_SERVICES" >> "$GITHUB_OUTPUT"
+
+          # Check if demo directory exists
+          DEMO_DIR="$ENV-demo"
+          if [ -d "$DEMO_DIR" ]; then
+            echo "has_demo=true" >> "$GITHUB_OUTPUT"
+
+            # Demo systems
+            DEMO_LOCK="$DEMO_DIR/.flox/env/manifest.lock"
+            if [ -f "$DEMO_LOCK" ]; then
+              DEMO_SYSTEMS=$(python3 -c "
+          import json
+          with open('$DEMO_LOCK') as f:
+              data = json.load(f)
+          systems = sorted(set(
+              pkg['system'] for pkg in data.get('packages', [])
+              if 'system' in pkg and pkg['system'] != 'x86_64-darwin'
+          ))
+          print('\n'.join(systems))
+          ")
+            fi
+            if [ -z "${DEMO_SYSTEMS:-}" ]; then
+              DEMO_SYSTEMS=$'aarch64-darwin\naarch64-linux\nx86_64-linux'
+            fi
+            DEMO_MATRIX=$(echo "$DEMO_SYSTEMS" | python3 -c "
+          import json, sys
+          systems = [s.strip() for s in sys.stdin if s.strip()]
+          print(json.dumps({'system': systems}))
+          ")
+            echo "demo_matrix=$DEMO_MATRIX" >> "$GITHUB_OUTPUT"
+
+            # Demo services
+            if [ -f "$DEMO_LOCK" ]; then
+              DEMO_HAS_SERVICES=$(python3 -c "
+          import json
+          with open('$DEMO_LOCK') as f:
+              data = json.load(f)
+          services = data.get('manifest', {}).get('services', {})
+          print('true' if services else 'false')
+          ")
+            else
+              DEMO_HAS_SERVICES="false"
+            fi
+            echo "demo_start_services=$DEMO_HAS_SERVICES" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_demo=false" >> "$GITHUB_OUTPUT"
+            echo "demo_matrix={}" >> "$GITHUB_OUTPUT"
+            echo "demo_start_services=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  test:
+    name: "Test '${{ inputs.environment }}' on '${{ matrix.system }}'"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 60
+
+    needs:
+      - "discover"
+
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.discover.outputs.matrix) }}
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v6"
+
+      - name: "Setup SSH"
+        uses: "webfactory/ssh-agent@v0.10.0"
+        with:
+          ssh-private-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
+
+      - name: "Setup Tailscale"
+        uses: "tailscale/github-action@v4"
+        with:
+          oauth-secret: "${{ secrets.MANAGED_TAILSCALE_AUTH_KEY }}"
+          tags: "tag:ci"
+          timeout: "30s"
+          use-cache: true
+
+      - name: "Find remote server to run tests on"
+        run: |
+          set -eo pipefail
+          echo "${{ vars.MANAGED_REMOTE_BUILDERS }}" > machines
+          export REMOTE_SERVER_ENTRY=$(cat machines | shuf | grep ${{ matrix.system }} | head -1 ; )
+          export REMOTE_SERVER_ADDRESS=$(echo "$REMOTE_SERVER_ENTRY" | cut -f1 -d' ' | cut -f3 -d'/' | sed 's/nixbld@//' ; )
+          export REMOTE_SERVER_USER_KNOWN_HOSTS_FILE=$(mktemp)
+          export REMOTE_SERVER_PUBLIC_HOST_KEY=$(echo "$REMOTE_SERVER_ENTRY" | tr -s ' ' | cut -f8 -d' ' | base64 -d ; )
+          printf "%s %s\n" "$REMOTE_SERVER_ADDRESS" "$REMOTE_SERVER_PUBLIC_HOST_KEY" > "$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE"
+          echo "REMOTE_SERVER_ADDRESS: $REMOTE_SERVER_ADDRESS"
+          echo "REMOTE_SERVER_USER_KNOWN_HOSTS_FILE: $REMOTE_SERVER_USER_KNOWN_HOSTS_FILE"
+          cat $REMOTE_SERVER_USER_KNOWN_HOSTS_FILE
+          echo "REMOTE_SERVER_ADDRESS=$REMOTE_SERVER_ADDRESS" >> $GITHUB_ENV
+          echo "REMOTE_SERVER_USER_KNOWN_HOSTS_FILE=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE" >> $GITHUB_ENV
+          if [ -n "$REMOTE_SERVER_ADDRESS" ]; then
+            tailscale ping "$REMOTE_SERVER_ADDRESS"
+          fi
+
+      - name: "Test environment"
+        uses: nick-fields/retry@v4
+        with:
+          timeout_minutes: 15
+          max_attempts: 3
+          command: |
+            ssh github@$REMOTE_SERVER_ADDRESS \
+              -oUserKnownHostsFile=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE \
+              nix run \
+                  --accept-flake-config \
+                  --extra-experimental-features '"nix-command flakes"' \
+                  --option access-tokens "github.com=${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}" \
+                  github:flox/floxenvs/${{ github.sha }}#apps.${{ matrix.system }}.run-test -- ${{ inputs.environment }}
+
+  test-demo:
+    name: "Test '${{ inputs.environment }}-demo' on '${{ matrix.system }}'"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 60
+
+    needs:
+      - "discover"
+
+    if: needs.discover.outputs.has_demo == 'true'
+
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.discover.outputs.demo_matrix) }}
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v6"
+
+      - name: "Setup SSH"
+        uses: "webfactory/ssh-agent@v0.10.0"
+        with:
+          ssh-private-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
+
+      - name: "Setup Tailscale"
+        uses: "tailscale/github-action@v4"
+        with:
+          oauth-secret: "${{ secrets.MANAGED_TAILSCALE_AUTH_KEY }}"
+          tags: "tag:ci"
+          timeout: "30s"
+          use-cache: true
+
+      - name: "Find remote server to run tests on"
+        run: |
+          set -eo pipefail
+          echo "${{ vars.MANAGED_REMOTE_BUILDERS }}" > machines
+          export REMOTE_SERVER_ENTRY=$(cat machines | shuf | grep ${{ matrix.system }} | head -1 ; )
+          export REMOTE_SERVER_ADDRESS=$(echo "$REMOTE_SERVER_ENTRY" | cut -f1 -d' ' | cut -f3 -d'/' | sed 's/nixbld@//' ; )
+          export REMOTE_SERVER_USER_KNOWN_HOSTS_FILE=$(mktemp)
+          export REMOTE_SERVER_PUBLIC_HOST_KEY=$(echo "$REMOTE_SERVER_ENTRY" | tr -s ' ' | cut -f8 -d' ' | base64 -d ; )
+          printf "%s %s\n" "$REMOTE_SERVER_ADDRESS" "$REMOTE_SERVER_PUBLIC_HOST_KEY" > "$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE"
+          echo "REMOTE_SERVER_ADDRESS: $REMOTE_SERVER_ADDRESS"
+          echo "REMOTE_SERVER_USER_KNOWN_HOSTS_FILE: $REMOTE_SERVER_USER_KNOWN_HOSTS_FILE"
+          cat $REMOTE_SERVER_USER_KNOWN_HOSTS_FILE
+          echo "REMOTE_SERVER_ADDRESS=$REMOTE_SERVER_ADDRESS" >> $GITHUB_ENV
+          echo "REMOTE_SERVER_USER_KNOWN_HOSTS_FILE=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE" >> $GITHUB_ENV
+          if [ -n "$REMOTE_SERVER_ADDRESS" ]; then
+            tailscale ping "$REMOTE_SERVER_ADDRESS"
+          fi
+
+      - name: "Test environment"
+        uses: nick-fields/retry@v4
+        with:
+          timeout_minutes: 15
+          max_attempts: 3
+          command: |
+            ssh github@$REMOTE_SERVER_ADDRESS \
+              -oUserKnownHostsFile=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE \
+              nix run \
+                  --accept-flake-config \
+                  --extra-experimental-features '"nix-command flakes"' \
+                  --option access-tokens "github.com=${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}" \
+                  github:flox/floxenvs/${{ github.sha }}#apps.${{ matrix.system }}.run-test -- ${{ inputs.environment }}-demo
+
+  containerize:
+    name: "Containerize '${{ inputs.environment }}'"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+
+    needs:
+      - "test"
+
+    if: (github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v6"
+
+      - name: "Install flox"
+        uses: "flox/install-flox-action@main"
+
+      - name: "Login to Github Container Registry"
+        uses: "docker/login-action@v4"
+        with:
+          registry: "ghcr.io"
+          username: "${{ github.actor }}"
+          password: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: "Containerize"
+        run: |
+          export NIX_CONFIG='extra-experimental-features = nix-command flakes'
+          flox containerize -d ./${{ inputs.environment }}
+
+      - name: "Tag & Push"
+        run: |
+          tag=$(echo -n "${{ inputs.environment }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g')
+          docker tag "$tag:latest" "ghcr.io/flox/floxenvs:$tag-latest"
+          docker push "ghcr.io/flox/floxenvs:$tag-latest"
+
+  push:
+    name: "Push '${{ inputs.environment }}' to FloxHub"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+
+    needs:
+      - "test"
+
+    if: (github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'workflow_dispatch'
+
+    env:
+      FLOX_BIN: "flox -vvv"
+      FLOX_REMOTE_OWNER: "flox"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v6"
+
+      - name: "Install flox"
+        uses: "flox/install-flox-action@main"
+
+      - name: "Get FloxHub token"
+        run: |
+          echo "FLOX_FLOXHUB_TOKEN=${{ secrets.FLOX_FLOXHUB_TOKEN }}" >> $GITHUB_ENV
+
+      - name: "Pull or Create remote environment"
+        run: |
+          ENV="${{ inputs.environment }}"
+          pushd "./$ENV"
+          if flox list --config -r "$FLOX_REMOTE_OWNER/$ENV" >/dev/null; then
+            $FLOX_BIN pull "$FLOX_REMOTE_OWNER/$ENV" --dir "remote"
+          else
+            echo "WARN: No environment $FLOX_REMOTE_OWNER/$ENV found on FloxHub"
+            echo "WARN: Creating a new environment $ENV"
+            $FLOX_BIN init --name "$ENV" --dir "remote"
+            $FLOX_BIN push --dir "remote"
+          fi
+          popd
+
+      - name: "Sync to remote environment"
+        run: |
+          ENV="${{ inputs.environment }}"
+          pushd "./$ENV"
+          cp -rf .flox/env/* remote/.flox/env/
+          $FLOX_BIN edit --sync --dir "remote"
+          popd
+
+      - name: "Push to remote environment"
+        run: |
+          ENV="${{ inputs.environment }}"
+          pushd "./$ENV"
+          $FLOX_BIN push --dir "remote"
+          popd
+
+  containerize-demo:
+    name: "Containerize '${{ inputs.environment }}-demo'"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+
+    needs:
+      - "discover"
+      - "push"
+      - "test-demo"
+
+    if: >-
+      ((github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'workflow_dispatch')
+      && needs.discover.outputs.has_demo == 'true'
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v6"
+
+      - name: "Install flox"
+        uses: "flox/install-flox-action@main"
+
+      - name: "Get FloxHub token"
+        run: |
+          echo "FLOX_FLOXHUB_TOKEN=${{ secrets.FLOX_FLOXHUB_TOKEN }}" >> $GITHUB_ENV
+
+      - name: "Rewrite include to use remote environment"
+        run: |
+          ENV="${{ inputs.environment }}"
+          DEMO_DIR="$ENV-demo"
+          sed -i "s|{ dir = \"../$ENV\" }|{ remote = \"flox/$ENV\" }|g" "$DEMO_DIR/.flox/env/manifest.toml"
+          cat "$DEMO_DIR/.flox/env/manifest.toml"
+
+      - name: "Upgrade includes"
+        run: |
+          ENV="${{ inputs.environment }}"
+          DEMO_DIR="$ENV-demo"
+          pushd "$DEMO_DIR"
+          flox include upgrade
+          popd
+
+      - name: "Login to Github Container Registry"
+        uses: "docker/login-action@v4"
+        with:
+          registry: "ghcr.io"
+          username: "${{ github.actor }}"
+          password: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: "Containerize"
+        run: |
+          ENV="${{ inputs.environment }}"
+          DEMO_DIR="$ENV-demo"
+          export NIX_CONFIG='extra-experimental-features = nix-command flakes'
+          flox containerize -d "./$DEMO_DIR"
+
+      - name: "Tag & Push"
+        run: |
+          ENV="${{ inputs.environment }}"
+          tag=$(echo -n "$ENV-demo" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g')
+          docker tag "$tag:latest" "ghcr.io/flox/floxenvs:$tag-latest"
+          docker push "ghcr.io/flox/floxenvs:$tag-latest"
+
+  push-demo:
+    name: "Push '${{ inputs.environment }}-demo' to FloxHub"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+
+    needs:
+      - "discover"
+      - "push"
+      - "test-demo"
+
+    if: >-
+      ((github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'workflow_dispatch')
+      && needs.discover.outputs.has_demo == 'true'
+
+    env:
+      FLOX_BIN: "flox -vvv"
+      FLOX_REMOTE_OWNER: "flox"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v6"
+
+      - name: "Install flox"
+        uses: "flox/install-flox-action@main"
+
+      - name: "Get FloxHub token"
+        run: |
+          echo "FLOX_FLOXHUB_TOKEN=${{ secrets.FLOX_FLOXHUB_TOKEN }}" >> $GITHUB_ENV
+
+      - name: "Rewrite include to use remote environment"
+        run: |
+          ENV="${{ inputs.environment }}"
+          DEMO_DIR="$ENV-demo"
+          sed -i "s|{ dir = \"../$ENV\" }|{ remote = \"flox/$ENV\" }|g" "$DEMO_DIR/.flox/env/manifest.toml"
+          cat "$DEMO_DIR/.flox/env/manifest.toml"
+
+      - name: "Upgrade includes"
+        run: |
+          ENV="${{ inputs.environment }}"
+          DEMO_DIR="$ENV-demo"
+          pushd "$DEMO_DIR"
+          flox include upgrade
+          popd
+
+      - name: "Pull or Create remote environment"
+        run: |
+          ENV="${{ inputs.environment }}"
+          DEMO_DIR="$ENV-demo"
+          pushd "$DEMO_DIR"
+          if flox list --config -r "$FLOX_REMOTE_OWNER/$DEMO_DIR" >/dev/null; then
+            $FLOX_BIN pull "$FLOX_REMOTE_OWNER/$DEMO_DIR" --dir "remote"
+          else
+            echo "WARN: No environment $FLOX_REMOTE_OWNER/$DEMO_DIR found on FloxHub"
+            echo "WARN: Creating a new environment $DEMO_DIR"
+            $FLOX_BIN init --name "$DEMO_DIR" --dir "remote"
+            $FLOX_BIN push --dir "remote"
+          fi
+          popd
+
+      - name: "Sync to remote environment"
+        run: |
+          ENV="${{ inputs.environment }}"
+          DEMO_DIR="$ENV-demo"
+          pushd "$DEMO_DIR"
+          cp -rf .flox/env/* remote/.flox/env/
+          $FLOX_BIN edit --sync --dir "remote"
+          popd
+
+      - name: "Push to remote environment"
+        run: |
+          ENV="${{ inputs.environment }}"
+          DEMO_DIR="$ENV-demo"
+          pushd "$DEMO_DIR"
+          $FLOX_BIN push --dir "remote"
+          popd
