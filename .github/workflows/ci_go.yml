@@ -1,0 +1,36 @@
+name: "CI: go"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "go/**"
+      - "go-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_go.yml"
+  pull_request:
+    paths:
+      - "go/**"
+      - "go-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_go.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "go"
+    secrets: inherit
