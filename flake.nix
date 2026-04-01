@@ -172,30 +172,28 @@
           #         device or NAT needed
           #       • Localhost is isolated — 127.0.0.1 inside
           #         the namespace is separate from the host
-          #     pasta creates the namespace and runs the
-          #     command inside it — no unshare --net needed.
-          #     Flags:
-          #       -f            stay in foreground (without
-          #                     this, pasta daemonizes and
-          #                     the child loses connectivity)
-          #       -P FILE       write pasta's PID so we can
-          #                     kill it after the child exits
+          #     We start the namespace with unshare first,
+          #     then attach pasta to it by PID. This way
+          #     pasta configures networking and exits, while
+          #     the namespace process keeps running with
+          #     full connectivity. Flags:
           #       --config-net  configure the tap interface
           #       -t none       don't forward TCP ports from
           #                     host into namespace
           #       -u none       don't forward UDP ports either
           #
-          #   unshare --user (nested inside pasta)
-          #     Drops from uid 0 (root, as mapped by pasta's
-          #     user namespace) to uid 65534 (nobody). This is
-          #     needed because some services refuse to run as
-          #     root — notably PostgreSQL's initdb checks
-          #     geteuid() == 0 and exits with an error.
+          #   unshare --user --net --pid --fork
+          #     Creates the isolated namespace. The process
+          #     runs as uid 65534 (nobody) — important because
+          #     services like PostgreSQL's initdb refuse root.
           #
           # The result: uid=nobody, isolated network with
-          # internet + DNS, PID namespace for cleanup. No
-          # synchronization files, no bind-mounts, no
-          # resolv.conf hacks.
+          # internet + DNS, PID namespace for cleanup.
+          #
+          # Synchronization:
+          #   The namespace process signals readiness via a
+          #   temp file, then waits for pasta to configure
+          #   networking (signaled by a .done file).
           #
           # Home directory:
           #   uid 65534 (nobody) has home /var/empty which is
@@ -212,25 +210,35 @@
             NS_HOME=$(mktemp -d)
             mkdir -p "$NS_HOME/.nix-defexpr/channels"
             chmod 777 "$NS_HOME"
+            NS_READY=$(mktemp -u)
+            NS_DONE=$(mktemp -u)
 
-            PASTA_PIDFILE=$(mktemp -u)
-            pasta --config-net -t none -u none -f -P "$PASTA_PIDFILE" -- \
-              unshare --user ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
+            # Start the test in an isolated namespace, then
+            # attach pasta to it by PID for connectivity.
+            # The namespace process signals readiness, we
+            # start pasta, then signal it to proceed.
+            unshare --user --net --pid --fork ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
                "export HOME=\"$NS_HOME\"; \
                export XDG_CONFIG_HOME=\"$NS_HOME/.config\"; \
                export XDG_DATA_HOME=\"$NS_HOME/.local/share\"; \
                export XDG_CACHE_HOME=\"$NS_HOME/.cache\"; \
                export FLOX_DISABLE_METRICS=true; \
+               touch \"$NS_READY\"; \
+               while [ ! -f \"$NS_DONE\" ]; do sleep 0.1; done; \
                cd \"$envdir\"; \
-               eval \"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\""
-            NS_EXIT=$?
+               eval \"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\"" &
+            NS_PID=$!
 
-            # pasta -f stays running after the child exits;
-            # kill it so we don't leave orphan processes
-            if [ -f "$PASTA_PIDFILE" ]; then
-              kill "$(cat "$PASTA_PIDFILE")" 2>/dev/null || true
-              rm -f "$PASTA_PIDFILE"
-            fi
+            # Wait for namespace, then attach pasta for
+            # network connectivity (internet + DNS)
+            while [ ! -f "$NS_READY" ]; do sleep 0.1; done
+            pasta --config-net -t none -u none $NS_PID
+            touch "$NS_DONE"
+
+            # Wait for the test to finish
+            wait $NS_PID
+            NS_EXIT=$?
+            rm -f "$NS_READY" "$NS_DONE"
 
             if [ $NS_EXIT -eq 0 ]; then
               exit 0
