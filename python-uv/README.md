@@ -38,22 +38,22 @@ manifest:
 
    ```toml
    [install]
-   python3.pkg-path = "python3"
+   python.pkg-path = "python3"
    ```
 
 2. **Specific major.minor**:
 
    ```toml
    [install]
-   python3.pkg-path = "python312"
+   python.pkg-path = "python312"
    ```
 
 3. **Exact version pin**:
 
    ```toml
    [install]
-   python3.pkg-path = "python3"
-   python3.version = "3.12.2"
+   python.pkg-path = "python3"
+   python.version = "3.12.2"
    ```
 
 ## Automatic dependency installation
