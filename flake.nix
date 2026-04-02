@@ -216,12 +216,15 @@
           #         pasta exposes DNS via the gateway IP)
           #       • bind-mount a writable dir over /root so
           #         nix can read /root/.nix-defexpr/channels
-          #     Inner: --user
+          #     Inner: --user --mount --pid --fork
           #       Drops from uid 0 to uid 65534 (nobody).
           #       Services like PostgreSQL's initdb refuse to
           #       run as root — this makes them happy.
-          #       The mount namespace from the outer unshare
-          #       is inherited, so resolv.conf stays mounted.
+          #       --mount + remount /proc so processes see
+          #       their own PIDs (MongoDB's serverStatus reads
+          #       /proc/<pid>/stat which must match).
+          #       The resolv.conf bind-mount from the outer
+          #       namespace is inherited.
           #
           # The result: uid=nobody, isolated network with
           # internet + DNS, PID namespace for cleanup.
@@ -252,8 +255,9 @@
                mount --bind \"$NS_HOME\" /root; \
                touch \"$NS_READY\"; \
                while [ ! -f \"$NS_DONE\" ]; do sleep 0.1; done; \
-               unshare --user ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
-                 \"export HOME=\\\"$NS_HOME\\\"; \
+               unshare --user --mount --pid --fork ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
+                 \"mount -t proc proc /proc 2>/dev/null || true; \
+                 export HOME=\\\"$NS_HOME\\\"; \
                  export XDG_CONFIG_HOME=\\\"$NS_HOME/.config\\\"; \
                  export XDG_DATA_HOME=\\\"$NS_HOME/.local/share\\\"; \
                  export XDG_CACHE_HOME=\\\"$NS_HOME/.cache\\\"; \
