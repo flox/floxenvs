@@ -221,7 +221,13 @@
           #       Services like PostgreSQL's initdb refuse to
           #       run as root — this makes them happy.
           #       The mount namespace from the outer unshare
-          #       is inherited, so resolv.conf stays mounted.
+          #       is inherited, so resolv.conf and /proc
+          #       stay mounted.
+          #
+          #     /proc remount (in outer, as root):
+          #       The outer --pid namespace renumbers PIDs.
+          #       We remount /proc so it matches — MongoDB's
+          #       serverStatus reads /proc/<pid>/stat.
           #
           # The result: uid=nobody, isolated network with
           # internet + DNS, PID namespace for cleanup.
@@ -247,7 +253,8 @@
 
             # Outer namespace: root + mount for bind-mounts
             unshare --user --map-root-user --mount --net --pid --fork ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
-               "echo 'nameserver PASTA_DNS' > \"$NS_HOME/resolv.conf\"; \
+               "mount -t proc proc /proc; \
+               echo 'nameserver PASTA_DNS' > \"$NS_HOME/resolv.conf\"; \
                mount --bind \"$NS_HOME/resolv.conf\" /etc/resolv.conf; \
                mount --bind \"$NS_HOME\" /root; \
                touch \"$NS_READY\"; \

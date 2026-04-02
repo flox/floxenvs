@@ -1,0 +1,36 @@
+name: "CI: valkey"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "valkey/**"
+      - "valkey-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_valkey.yml"
+  pull_request:
+    paths:
+      - "valkey/**"
+      - "valkey-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_valkey.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "valkey"
+    secrets: inherit
