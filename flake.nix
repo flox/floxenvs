@@ -216,15 +216,18 @@
           #         pasta exposes DNS via the gateway IP)
           #       • bind-mount a writable dir over /root so
           #         nix can read /root/.nix-defexpr/channels
-          #     Inner: --user --mount --pid --fork
+          #     Inner: --user
           #       Drops from uid 0 to uid 65534 (nobody).
           #       Services like PostgreSQL's initdb refuse to
           #       run as root — this makes them happy.
-          #       --mount + remount /proc so processes see
-          #       their own PIDs (MongoDB's serverStatus reads
-          #       /proc/<pid>/stat which must match).
-          #       The resolv.conf bind-mount from the outer
-          #       namespace is inherited.
+          #       The mount namespace from the outer unshare
+          #       is inherited, so resolv.conf and /proc
+          #       stay mounted.
+          #
+          #     /proc remount (in outer, as root):
+          #       The outer --pid namespace renumbers PIDs.
+          #       We remount /proc so it matches — MongoDB's
+          #       serverStatus reads /proc/<pid>/stat.
           #
           # The result: uid=nobody, isolated network with
           # internet + DNS, PID namespace for cleanup.
@@ -250,14 +253,14 @@
 
             # Outer namespace: root + mount for bind-mounts
             unshare --user --map-root-user --mount --net --pid --fork ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
-               "echo 'nameserver PASTA_DNS' > \"$NS_HOME/resolv.conf\"; \
+               "mount -t proc proc /proc; \
+               echo 'nameserver PASTA_DNS' > \"$NS_HOME/resolv.conf\"; \
                mount --bind \"$NS_HOME/resolv.conf\" /etc/resolv.conf; \
                mount --bind \"$NS_HOME\" /root; \
                touch \"$NS_READY\"; \
                while [ ! -f \"$NS_DONE\" ]; do sleep 0.1; done; \
-               unshare --user --mount --pid --fork ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
-                 \"mount -t proc proc /proc 2>/dev/null || true; \
-                 export HOME=\\\"$NS_HOME\\\"; \
+               unshare --user ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
+                 \"export HOME=\\\"$NS_HOME\\\"; \
                  export XDG_CONFIG_HOME=\\\"$NS_HOME/.config\\\"; \
                  export XDG_DATA_HOME=\\\"$NS_HOME/.local/share\\\"; \
                  export XDG_CACHE_HOME=\\\"$NS_HOME/.cache\\\"; \
