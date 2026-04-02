@@ -39,9 +39,10 @@ flox services logs mongodb
 
 MONGO_STATUS=$(mongosh --host "$MONGO_HOST" \
   --port "$MONGO_PORT" \
-  --eval "db.serverStatus().ok" --quiet)
+  --eval "db.serverStatus().ok" --quiet 2>/dev/null \
+  | tail -1 | tr -d '[:space:]')
 if [ "$MONGO_STATUS" != "1" ]; then
-  echo "Error: MongoDB not responding correctly."
+  echo "Error: MongoDB not responding correctly (got: '$MONGO_STATUS')."
   exit 1
 fi
 echo ">>> MongoDB server status check ... OK"
