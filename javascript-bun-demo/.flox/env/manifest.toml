@@ -1,0 +1,25 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../javascript-bun" }
+]
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'Bun environment ready!' '' \
+    'Bun version:' \
+    "  $(bun --version)" '' \
+    'Commands:' \
+    '  bun install    Install packages' \
+    '  bun run        Run a script' \
+    '  bun <file>     Run a file'
+fi
+'''

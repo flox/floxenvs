@@ -1,0 +1,36 @@
+name: "CI: javascript-bun"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "javascript-bun/**"
+      - "javascript-bun-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_javascript-bun.yml"
+  pull_request:
+    paths:
+      - "javascript-bun/**"
+      - "javascript-bun-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_javascript-bun.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "javascript-bun"
+    secrets: inherit

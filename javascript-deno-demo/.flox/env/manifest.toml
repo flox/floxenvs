@@ -1,0 +1,25 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../javascript-deno" }
+]
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'Deno environment ready!' '' \
+    'Deno version:' \
+    "  $(deno --version | head -1)" '' \
+    'Commands:' \
+    '  deno install    Install packages' \
+    '  deno run        Run a script' \
+    '  deno task       Run a task'
+fi
+'''

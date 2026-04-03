@@ -1,0 +1,36 @@
+name: "CI: javascript-node"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "javascript-node/**"
+      - "javascript-node-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_javascript-node.yml"
+  pull_request:
+    paths:
+      - "javascript-node/**"
+      - "javascript-node-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_javascript-node.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "javascript-node"
+    secrets: inherit

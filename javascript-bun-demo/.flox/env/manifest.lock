@@ -1,0 +1,307 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "bun": {
+        "pkg-path": "bun",
+        "pkg-group": "javascript-bun"
+      },
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": "demo-tools"
+      }
+    },
+    "vars": {
+      "BUN_AUTO_INSTALL": "true",
+      "NODE_ENV": "development"
+    },
+    "hook": {
+      "on-activate": "export BUN_CACHE=\"$FLOX_ENV_CACHE/javascript-bun\"\nmkdir -p \"$BUN_CACHE\"\n\nBUN_LOCKFILE=\"\"\nif [ -f bun.lockb ]; then\n  BUN_LOCKFILE=\"bun.lockb\"\nelif [ -f bun.lock ]; then\n  BUN_LOCKFILE=\"bun.lock\"\nfi\n\nif [ \"$BUN_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f package.json ] \\\n    && [ -n \"$BUN_LOCKFILE\" ]; then\n  HASH=$(cat package.json \"$BUN_LOCKFILE\" \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$BUN_CACHE/packages-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    bun install --frozen-lockfile\n    echo \"$HASH\" > \"$BUN_CACHE/packages-hash\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Bun environment ready!' '' \\\n    'Bun version:' \\\n    \"  $(bun --version)\" '' \\\n    'Commands:' \\\n    '  bun install    Install packages' \\\n    '  bun run        Run a script' \\\n    '  bun <file>     Run a file'\nfi\n"
+    },
+    "options": {}
+  },
+  "packages": [
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/bmz60mbb36nlipdn9n6zmcm6kjls8gll-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:01:04.824827Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cdpxgzcjwidrmrzsq0zkyr9nxccvy3p6-gum-0.17.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/yhvp5prpjjl5hqk6fhr5svdzf1yfacgk-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:32:37.949153Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kqcb9j9k6wdvb7pjvjzn3p8dc82qmk9x-gum-0.17.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/cngbjjxmgsmcbgvihq7q9472rb5rhgdj-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:02:19.693599Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rznkbgxflsbrfy5c359vhhqrrxw4pfkj-gum-0.17.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/f5ahd90j9s46j49lz8k2yn3cmvyq6mbn-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:36:34.309717Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rf0zlw5q4j051xkjk9djfw5dpb8nwbgm-gum-0.17.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "bun",
+      "broken": false,
+      "derivation": "/nix/store/923bn84szvvcjhy05226q05vr2ds847s-bun-1.3.11.drv",
+      "description": "Incredibly fast JavaScript runtime, bundler, transpiler and package manager – all in one",
+      "install_id": "bun",
+      "license": "[ MIT, LGPL-2.1-only ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "bun-1.3.11",
+      "pname": "bun",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:01:03.400121Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.3.11",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cgzjp11cgzg8n349rqmbqz46izm2kl2k-bun-1.3.11"
+      },
+      "system": "aarch64-darwin",
+      "group": "javascript-bun",
+      "priority": 5
+    },
+    {
+      "attr_path": "bun",
+      "broken": false,
+      "derivation": "/nix/store/qjvwg5k4mn20j9v1lhbvzyc0dl7r8jv3-bun-1.3.11.drv",
+      "description": "Incredibly fast JavaScript runtime, bundler, transpiler and package manager – all in one",
+      "install_id": "bun",
+      "license": "[ MIT, LGPL-2.1-only ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "bun-1.3.11",
+      "pname": "bun",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:32:35.334726Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.3.11",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/n24wmwy3slpa1z9d5x6hyw9s2r41xjxm-bun-1.3.11"
+      },
+      "system": "aarch64-linux",
+      "group": "javascript-bun",
+      "priority": 5
+    },
+    {
+      "attr_path": "bun",
+      "broken": false,
+      "derivation": "/nix/store/84icbf3f96islpxqvil7pb9rafwwbfdx-bun-1.3.11.drv",
+      "description": "Incredibly fast JavaScript runtime, bundler, transpiler and package manager – all in one",
+      "install_id": "bun",
+      "license": "[ MIT, LGPL-2.1-only ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "bun-1.3.11",
+      "pname": "bun",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:02:18.270739Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.3.11",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/p03zpjl2i2f03pv7xd335cqv8w1qn6i8-bun-1.3.11"
+      },
+      "system": "x86_64-darwin",
+      "group": "javascript-bun",
+      "priority": 5
+    },
+    {
+      "attr_path": "bun",
+      "broken": false,
+      "derivation": "/nix/store/64i3nhw4vszdmfkc8mja1g8v0gsfbps5-bun-1.3.11.drv",
+      "description": "Incredibly fast JavaScript runtime, bundler, transpiler and package manager – all in one",
+      "install_id": "bun",
+      "license": "[ MIT, LGPL-2.1-only ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "bun-1.3.11",
+      "pname": "bun",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:36:31.443187Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.3.11",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/4b7jvqsqywnsb273svingfmpqschkszi-bun-1.3.11"
+      },
+      "system": "x86_64-linux",
+      "group": "javascript-bun",
+      "priority": 5
+    }
+  ],
+  "compose": {
+    "composer": {
+      "schema-version": "1.11.0",
+      "install": {
+        "gum": {
+          "pkg-path": "gum",
+          "pkg-group": "demo-tools"
+        }
+      },
+      "hook": {
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Bun environment ready!' '' \\\n    'Bun version:' \\\n    \"  $(bun --version)\" '' \\\n    'Commands:' \\\n    '  bun install    Install packages' \\\n    '  bun run        Run a script' \\\n    '  bun <file>     Run a file'\nfi\n"
+      },
+      "options": {},
+      "include": {
+        "environments": [
+          {
+            "dir": "../javascript-bun"
+          }
+        ]
+      }
+    },
+    "include": [
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "bun": {
+              "pkg-path": "bun",
+              "pkg-group": "javascript-bun"
+            }
+          },
+          "vars": {
+            "BUN_AUTO_INSTALL": "true",
+            "NODE_ENV": "development"
+          },
+          "hook": {
+            "on-activate": "export BUN_CACHE=\"$FLOX_ENV_CACHE/javascript-bun\"\nmkdir -p \"$BUN_CACHE\"\n\nBUN_LOCKFILE=\"\"\nif [ -f bun.lockb ]; then\n  BUN_LOCKFILE=\"bun.lockb\"\nelif [ -f bun.lock ]; then\n  BUN_LOCKFILE=\"bun.lock\"\nfi\n\nif [ \"$BUN_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f package.json ] \\\n    && [ -n \"$BUN_LOCKFILE\" ]; then\n  HASH=$(cat package.json \"$BUN_LOCKFILE\" \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$BUN_CACHE/packages-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    bun install --frozen-lockfile\n    echo \"$HASH\" > \"$BUN_CACHE/packages-hash\"\n  fi\nfi\n"
+          },
+          "options": {}
+        },
+        "name": "javascript-bun",
+        "descriptor": {
+          "dir": "../javascript-bun"
+        }
+      }
+    ],
+    "warnings": []
+  }
+}

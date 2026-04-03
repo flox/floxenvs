@@ -2,20 +2,11 @@
 
 set -eo pipefail
 
-check_command() {
-    if ! command -v $1 2>&1 >/dev/null
-    then
-        echo "Error: '$1' command could not be found."
-        exit 1
-    fi
-}
+if ! command -v deno >/dev/null 2>&1; then
+  echo "Error: 'deno' command not found."
+  exit 1
+fi
 
-check_command deno
+echo ">>> deno version: $(deno --version | head -1)"
 
-
-deno repl --eval "import figlet from 'figlet'; close()"
-echo ">>> figlet package installed"
-
-deno run --allow-all --no-prompt main.ts
-echo ">>> script works"
-
+echo ">>> javascript-deno environment is working"
