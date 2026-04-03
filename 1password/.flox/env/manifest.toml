@@ -1,34 +1,56 @@
-version = 1
+schema-version = "1.10.0"
+
+# 1Password CLI with automatic session caching.
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/1password"]
+#
+# Then fetch secrets in your own hook:
+#
+#   [hook]
+#   on-activate = '''
+#   export MY_API_KEY=$(op item get "MyService" \
+#     --field "credential")
+#   '''
 
 [install]
 op.pkg-path = "_1password"
+op.pkg-group = "1password"
 
 [hook]
 on-activate = '''
+# Cache 1Password session token so repeated
+# activations don't prompt for auth.
+export OP_CACHE="$FLOX_ENV_CACHE/1password"
+mkdir -p "$OP_CACHE"
 
-    # Start OP injection code
-    if ! op vault list >/dev/null 2>&1; then
-        CACHE="$HOME/.cache/op-session"
-        OP_TOKEN=$( [[ -f "$CACHE" ]] && cat "$CACHE" || op signin --raw 2>&1 )
-        if op whoami --session "${OP_TOKEN}" >/dev/null 2>&1; then
-            mkdir -p $(dirname "$CACHE") 2>/dev/null && echo "${OP_TOKEN}" > "$CACHE"
-            chmod 600 "$CACHE"
-        else
-            echo "op auth failed!" && return 1
-        fi
+if ! op vault list >/dev/null 2>&1; then
+  SESSION_FILE="$OP_CACHE/session"
+  OP_TOKEN=""
+  if [ -f "$SESSION_FILE" ]; then
+    OP_TOKEN=$(cat "$SESSION_FILE")
+  fi
+  if [ -z "$OP_TOKEN" ] \
+      || ! op whoami --session "$OP_TOKEN" \
+           >/dev/null 2>&1; then
+    OP_TOKEN=$(op signin --raw 2>&1) || true
+    if op whoami --session "$OP_TOKEN" \
+         >/dev/null 2>&1; then
+      echo "$OP_TOKEN" > "$SESSION_FILE"
+      chmod 600 "$SESSION_FILE"
     fi
-    export op_token=$( [[ "$OP_TOKEN" ]] && echo "--session $OP_TOKEN" )
-    # End OP injection code
-
-    export ANTHROPIC_API_KEY=$(op $op_token item get "Anthropic" --field "credential")
-    export TAILSCALE_TOKEN=$(op $op_token item get "Tailscale" --field "token")
+  fi
+  if [ -n "$OP_TOKEN" ]; then
+    export OP_SESSION_TOKEN="$OP_TOKEN"
+  fi
+fi
 '''
 
 [profile]
 common = '''
-    alias op="op $op_token"
+if [ -n "${OP_SESSION_TOKEN:-}" ]; then
+  alias op="op --session $OP_SESSION_TOKEN"
+fi
 '''
-
-[options]
-systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
-

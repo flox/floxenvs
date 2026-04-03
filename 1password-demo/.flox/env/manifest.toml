@@ -1,0 +1,29 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../1password" }
+]
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    '1Password CLI environment ready!' '' \
+    'op version:' \
+    "  $(op --version)" '' \
+    'Usage:' \
+    '  op vault list          List vaults' \
+    '  op item list           List items' \
+    '  op item get <name>     Get an item' \
+    '' \
+    'Fetch secrets in your hook:' \
+    '  export API_KEY=$(op item get "MyService" \' \
+    '    --field "credential")'
+fi
+'''

@@ -8,4 +8,4 @@ if ! command -v op >/dev/null 2>&1; then
 fi
 
 echo ">>> op version: $(op --version)"
-echo ">>> 1password environment is working"
+echo ">>> 1password-demo environment is working"

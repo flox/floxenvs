@@ -1,0 +1,305 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": "demo-tools"
+      },
+      "op": {
+        "pkg-path": "_1password",
+        "pkg-group": "1password"
+      }
+    },
+    "hook": {
+      "on-activate": "# Cache 1Password session token so repeated\n# activations don't prompt for auth.\nexport OP_CACHE=\"$FLOX_ENV_CACHE/1password\"\nmkdir -p \"$OP_CACHE\"\n\nif ! op vault list >/dev/null 2>&1; then\n  SESSION_FILE=\"$OP_CACHE/session\"\n  OP_TOKEN=\"\"\n  if [ -f \"$SESSION_FILE\" ]; then\n    OP_TOKEN=$(cat \"$SESSION_FILE\")\n  fi\n  if [ -z \"$OP_TOKEN\" ] \\\n      || ! op whoami --session \"$OP_TOKEN\" \\\n           >/dev/null 2>&1; then\n    OP_TOKEN=$(op signin --raw 2>&1) || true\n    if op whoami --session \"$OP_TOKEN\" \\\n         >/dev/null 2>&1; then\n      echo \"$OP_TOKEN\" > \"$SESSION_FILE\"\n      chmod 600 \"$SESSION_FILE\"\n    fi\n  fi\n  if [ -n \"$OP_TOKEN\" ]; then\n    export OP_SESSION_TOKEN=\"$OP_TOKEN\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    '1Password CLI environment ready!' '' \\\n    'op version:' \\\n    \"  $(op --version)\" '' \\\n    'Usage:' \\\n    '  op vault list          List vaults' \\\n    '  op item list           List items' \\\n    '  op item get <name>     Get an item' \\\n    '' \\\n    'Fetch secrets in your hook:' \\\n    '  export API_KEY=$(op item get \"MyService\" \\' \\\n    '    --field \"credential\")'\nfi\n"
+    },
+    "profile": {
+      "common": "if [ -n \"${OP_SESSION_TOKEN:-}\" ]; then\n  alias op=\"op --session $OP_SESSION_TOKEN\"\nfi\n"
+    },
+    "options": {}
+  },
+  "packages": [
+    {
+      "attr_path": "_1password",
+      "broken": false,
+      "derivation": "/nix/store/217xflkq1n69z2ial9r92cs62lj7niiv-1password-cli-2.32.0.drv",
+      "description": "1Password command-line tool",
+      "install_id": "op",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "name": "1password-cli-2.32.0",
+      "pname": "_1password",
+      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "rev_count": 883951,
+      "rev_date": "2025-10-25T06:24:58Z",
+      "scrape_date": "2025-10-27T02:08:14.515669Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "2.32.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/py72zb7vzh9l4prk9nd6bw3rc2zhxhn9-1password-cli-2.32.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "1password",
+      "priority": 5
+    },
+    {
+      "attr_path": "_1password",
+      "broken": false,
+      "derivation": "/nix/store/hhg515y4qdp4296w2g6dy8c12l7g3466-1password-cli-2.32.0.drv",
+      "description": "1Password command-line tool",
+      "install_id": "op",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "name": "1password-cli-2.32.0",
+      "pname": "_1password",
+      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "rev_count": 883951,
+      "rev_date": "2025-10-25T06:24:58Z",
+      "scrape_date": "2025-10-27T02:18:25.619001Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "2.32.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/p515b57pf3wg2jhc8md9hbcva6jarsjc-1password-cli-2.32.0"
+      },
+      "system": "aarch64-linux",
+      "group": "1password",
+      "priority": 5
+    },
+    {
+      "attr_path": "_1password",
+      "broken": false,
+      "derivation": "/nix/store/gnv9l43qzjaqbwkyiqpc0hwzlbmd4lzp-1password-cli-2.32.0.drv",
+      "description": "1Password command-line tool",
+      "install_id": "op",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "name": "1password-cli-2.32.0",
+      "pname": "_1password",
+      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "rev_count": 883951,
+      "rev_date": "2025-10-25T06:24:58Z",
+      "scrape_date": "2025-10-27T02:29:21.139103Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "2.32.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/gv6bgzp76viws8l647llyssrg09zzaq9-1password-cli-2.32.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "1password",
+      "priority": 5
+    },
+    {
+      "attr_path": "_1password",
+      "broken": false,
+      "derivation": "/nix/store/lq5vcqmcvpma2bfdnsvgmkz27lrw885c-1password-cli-2.32.0.drv",
+      "description": "1Password command-line tool",
+      "install_id": "op",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "name": "1password-cli-2.32.0",
+      "pname": "_1password",
+      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "rev_count": 883951,
+      "rev_date": "2025-10-25T06:24:58Z",
+      "scrape_date": "2025-10-27T03:00:53.739720Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "2.32.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cpd6j0shfjdcrdvnl93k003kq7flq1fj-1password-cli-2.32.0"
+      },
+      "system": "x86_64-linux",
+      "group": "1password",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/bmz60mbb36nlipdn9n6zmcm6kjls8gll-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:01:04.824827Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cdpxgzcjwidrmrzsq0zkyr9nxccvy3p6-gum-0.17.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/yhvp5prpjjl5hqk6fhr5svdzf1yfacgk-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:32:37.949153Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kqcb9j9k6wdvb7pjvjzn3p8dc82qmk9x-gum-0.17.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/cngbjjxmgsmcbgvihq7q9472rb5rhgdj-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:02:19.693599Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rznkbgxflsbrfy5c359vhhqrrxw4pfkj-gum-0.17.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/f5ahd90j9s46j49lz8k2yn3cmvyq6mbn-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:36:34.309717Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rf0zlw5q4j051xkjk9djfw5dpb8nwbgm-gum-0.17.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    }
+  ],
+  "compose": {
+    "composer": {
+      "schema-version": "1.11.0",
+      "install": {
+        "gum": {
+          "pkg-path": "gum",
+          "pkg-group": "demo-tools"
+        }
+      },
+      "hook": {
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    '1Password CLI environment ready!' '' \\\n    'op version:' \\\n    \"  $(op --version)\" '' \\\n    'Usage:' \\\n    '  op vault list          List vaults' \\\n    '  op item list           List items' \\\n    '  op item get <name>     Get an item' \\\n    '' \\\n    'Fetch secrets in your hook:' \\\n    '  export API_KEY=$(op item get \"MyService\" \\' \\\n    '    --field \"credential\")'\nfi\n"
+      },
+      "options": {},
+      "include": {
+        "environments": [
+          {
+            "dir": "../1password"
+          }
+        ]
+      }
+    },
+    "include": [
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "op": {
+              "pkg-path": "_1password",
+              "pkg-group": "1password"
+            }
+          },
+          "hook": {
+            "on-activate": "# Cache 1Password session token so repeated\n# activations don't prompt for auth.\nexport OP_CACHE=\"$FLOX_ENV_CACHE/1password\"\nmkdir -p \"$OP_CACHE\"\n\nif ! op vault list >/dev/null 2>&1; then\n  SESSION_FILE=\"$OP_CACHE/session\"\n  OP_TOKEN=\"\"\n  if [ -f \"$SESSION_FILE\" ]; then\n    OP_TOKEN=$(cat \"$SESSION_FILE\")\n  fi\n  if [ -z \"$OP_TOKEN\" ] \\\n      || ! op whoami --session \"$OP_TOKEN\" \\\n           >/dev/null 2>&1; then\n    OP_TOKEN=$(op signin --raw 2>&1) || true\n    if op whoami --session \"$OP_TOKEN\" \\\n         >/dev/null 2>&1; then\n      echo \"$OP_TOKEN\" > \"$SESSION_FILE\"\n      chmod 600 \"$SESSION_FILE\"\n    fi\n  fi\n  if [ -n \"$OP_TOKEN\" ]; then\n    export OP_SESSION_TOKEN=\"$OP_TOKEN\"\n  fi\nfi\n"
+          },
+          "profile": {
+            "common": "if [ -n \"${OP_SESSION_TOKEN:-}\" ]; then\n  alias op=\"op --session $OP_SESSION_TOKEN\"\nfi\n"
+          },
+          "options": {}
+        },
+        "name": "1password",
+        "descriptor": {
+          "dir": "../1password"
+        }
+      }
+    ],
+    "warnings": []
+  }
+}
