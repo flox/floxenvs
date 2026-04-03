@@ -43,6 +43,42 @@ To disable:
 RUBY_AUTO_INSTALL = "false"
 ```
 
+## Native extension packages
+
+The base `ruby` layer ships only the interpreter.
+If your gems need native extensions, add build
+tools in your manifest. Common packages:
+
+```toml
+[install]
+# C compiler for native extensions
+gcc-unwrapped.pkg-path = "gcc-unwrapped"
+gnumake.pkg-path = "gnumake"
+binutils.pkg-path = "binutils"
+pkg-config.pkg-path = "pkg-config"
+
+# XML parsing (nokogiri)
+libxml2.pkg-path = "libxml2"
+libxslt.pkg-path = "libxslt"
+
+# Crypto (net-ssh, jwt, etc.)
+openssl.pkg-path = "openssl"
+
+# YAML parsing
+libyaml.pkg-path = "libyaml"
+
+# Database clients
+postgresql.pkg-path = "postgresql"    # pg gem
+libmysqlclient.pkg-path = "libmysqlclient"  # mysql2
+
+# Image processing (mini_magick, rmagick)
+imagemagick.pkg-path = "imagemagick"
+
+# Linux only
+glibc.pkg-path = "glibc"
+glibc.systems = ["x86_64-linux", "aarch64-linux"]
+```
+
 ## Customization
 
 Fork this environment and edit
