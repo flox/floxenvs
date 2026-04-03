@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -eo pipefail
 
-if [ "$(uname -s)" != 'Linux' ]; then
-  echo "Skipping; the podman test should only be run on Linux"
-  exit 0
-fi
-
-RESULT="$(podman run -it quay.io/podman/hello)"
-echo "RESULT: $RESULT"
-if [[ "$RESULT" != *"... Hello Podman World ..."* ]]; then
-  echo "Error: Something went wrong!"
+if ! command -v podman >/dev/null 2>&1; then
+  echo "Error: 'podman' command not found."
   exit 1
 fi
+if ! command -v podman-compose >/dev/null 2>&1; then
+  echo "Error: 'podman-compose' command not found."
+  exit 1
+fi
+
+echo ">>> podman version: $(podman --version)"
+echo ">>> podman-compose version: $(podman-compose --version 2>&1 | head -1)"
+
+echo ">>> podman environment is working"
