@@ -1,0 +1,25 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../javascript-node" }
+]
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'Node.js environment ready!' '' \
+    'Node version:' \
+    "  $(node --version)" '' \
+    'Commands:' \
+    '  npm install    Install packages' \
+    '  npm start      Run your app' \
+    '  node <file>    Run a script'
+fi
+'''
