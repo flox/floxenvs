@@ -17,7 +17,7 @@
       "NODE_ENV": "development"
     },
     "hook": {
-      "on-activate": "export NODE_CACHE=\"$FLOX_ENV_CACHE/javascript-node\"\nmkdir -p \"$NODE_CACHE\"\n\nif [ \"$NODE_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f package.json ] \\\n    && [ -f package-lock.json ]; then\n  HASH=$(cat package.json package-lock.json \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$NODE_CACHE/packages-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    npm install\n    echo \"$HASH\" > \"$NODE_CACHE/packages-hash\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Node.js environment ready!' '' \\\n    'Node version:' \\\n    \"  $(node --version)\" '' \\\n    'Commands:' \\\n    '  npm install    Install packages' \\\n    '  npm start      Run your app' \\\n    '  node <file>    Run a script'\nfi\n"
+      "on-activate": "export NODE_CACHE=\"$FLOX_ENV_CACHE/javascript-node\"\nmkdir -p \"$NODE_CACHE\"\n\n# Ensure npm cache is writable (HOME may be /var/empty\n# inside namespace isolation)\nexport npm_config_cache=\"$NODE_CACHE/npm-cache\"\n\nif [ \"$NODE_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f package.json ] \\\n    && [ -f package-lock.json ]; then\n  HASH=$(cat package.json package-lock.json \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$NODE_CACHE/packages-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    npm install\n    echo \"$HASH\" > \"$NODE_CACHE/packages-hash\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Node.js environment ready!' '' \\\n    'Node version:' \\\n    \"  $(node --version)\" '' \\\n    'Commands:' \\\n    '  npm install    Install packages' \\\n    '  npm start      Run your app' \\\n    '  node <file>    Run a script'\nfi\n"
     },
     "options": {}
   },
@@ -296,7 +296,7 @@
             "NODE_ENV": "development"
           },
           "hook": {
-            "on-activate": "export NODE_CACHE=\"$FLOX_ENV_CACHE/javascript-node\"\nmkdir -p \"$NODE_CACHE\"\n\nif [ \"$NODE_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f package.json ] \\\n    && [ -f package-lock.json ]; then\n  HASH=$(cat package.json package-lock.json \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$NODE_CACHE/packages-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    npm install\n    echo \"$HASH\" > \"$NODE_CACHE/packages-hash\"\n  fi\nfi\n"
+            "on-activate": "export NODE_CACHE=\"$FLOX_ENV_CACHE/javascript-node\"\nmkdir -p \"$NODE_CACHE\"\n\n# Ensure npm cache is writable (HOME may be /var/empty\n# inside namespace isolation)\nexport npm_config_cache=\"$NODE_CACHE/npm-cache\"\n\nif [ \"$NODE_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f package.json ] \\\n    && [ -f package-lock.json ]; then\n  HASH=$(cat package.json package-lock.json \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$NODE_CACHE/packages-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    npm install\n    echo \"$HASH\" > \"$NODE_CACHE/packages-hash\"\n  fi\nfi\n"
           },
           "options": {}
         },

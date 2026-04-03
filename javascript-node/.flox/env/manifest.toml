@@ -25,6 +25,10 @@ on-activate = '''
 export NODE_CACHE="$FLOX_ENV_CACHE/javascript-node"
 mkdir -p "$NODE_CACHE"
 
+# Ensure npm cache is writable (HOME may be /var/empty
+# inside namespace isolation)
+export npm_config_cache="$NODE_CACHE/npm-cache"
+
 if [ "$NODE_AUTO_INSTALL" = "true" ] \
     && [ -f package.json ] \
     && [ -f package-lock.json ]; then
