@@ -2,20 +2,11 @@
 
 set -eo pipefail
 
-check_command() {
-    if ! command -v $1 2>&1 >/dev/null
-    then
-        echo "Error: '$1' command could not be found."
-        exit 1
-    fi
-}
+if ! command -v bun >/dev/null 2>&1; then
+  echo "Error: 'bun' command not found."
+  exit 1
+fi
 
-check_command bun
+echo ">>> bun version: $(bun --version)"
 
-
-bun repl --eval "import figlet from 'figlet'"
-echo ">>> figlet package installed"
-
-bun run index.ts
-echo ">>> script works"
-
+echo ">>> javascript-bun environment is working"

@@ -1,58 +1,34 @@
 schema-version = "1.10.0"
 
-# https://bun.sh/docs/quickstart
+# Minimal Bun environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/javascript-bun"]
 
 [install]
 bun.pkg-path = "bun"
-
-# helper tools
-gum.pkg-path = "gum"
-coreutils.pkg-path = "coreutils"
-coreutils.outputs = "all"
-
+bun.pkg-group = "javascript-bun"
 
 [vars]
-NODE_ENV="development"
-
+NODE_ENV = "development"
+BUN_AUTO_INSTALL = "true"
 
 [hook]
 on-activate = '''
+export BUN_CACHE="$FLOX_ENV_CACHE/javascript-bun"
+mkdir -p "$BUN_CACHE"
 
-export FLOX_JAVASCRIPT_BUN_CACHE_DIR="$FLOX_ENV_CACHE/javascript-bun"
-mkdir -p "$FLOX_JAVASCRIPT_BUN_CACHE_DIR"
-
-export FLOX_JAVASCRIPT_BUN_PACKAGES_HASH_FILE="$FLOX_JAVASCRIPT_BUN_CACHE_DIR/packages-hash"
-
-function with_spinner() {
-  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
-    bash -c "$1"
-  else
-    gum spin \
-      --show-error \
-      --spinner line \
-      --spinner.foreground="#cccccc" \
-      --title ">>> $2 ..." \
-      --title.foreground="#cccccc" \
-        -- bash -c "$1"
-  fi
-}
-
-function install_packages() { 
-  bun install --frozen-lockfile
-}
-export -f install_packages
-
-
-if [ -f "package.json" ] && [ -f "bun.lockb" ]; then
-  export FLOX_JAVASCRIPT_BUN_PACKAGES_HASH="false"
-  if [ -f "$FLOX_JAVASCRIPT_BUN_PACKAGES_HASH_FILE" ] ; then
-    export FLOX_JAVASCRIPT_BUN_PACKAGES_HASH=$(cat package.json bun.lockb | sha256sum | cut -d" " -f 1)
-  fi
-  if [ "$FLOX_JAVASCRIPT_BUN_PACKAGES_HASH" != "$(cat $FLOX_JAVASCRIPT_BUN_PACKAGES_HASH_FILE 2>/dev/null)" ]; then
-    with_spinner install_packages "Installing Javascript packages (with Bun)"
-    echo -e "{{ Foreground \"#ffffff\" \"✅ Javascript packages installed (with Bun).\" }}\n" \
-      | gum format -t template
-    echo "$FLOX_JAVASCRIPT_BUN_PACKAGES_HASH" > "$FLOX_JAVASCRIPT_BUN_PACKAGES_HASH_FILE"
+if [ "$BUN_AUTO_INSTALL" = "true" ] \
+    && [ -f package.json ] \
+    && [ -f bun.lockb ]; then
+  HASH=$(cat package.json bun.lockb \
+    | sha256sum | cut -d" " -f1)
+  LAST=$(cat "$BUN_CACHE/packages-hash" 2>/dev/null)
+  if [ "$HASH" != "$LAST" ]; then
+    bun install --frozen-lockfile
+    echo "$HASH" > "$BUN_CACHE/packages-hash"
   fi
 fi
 '''
