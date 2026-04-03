@@ -76,6 +76,8 @@ EOF
   mysql_install_db \
     --defaults-file="$MARIADB_CONFIG" \
     --auth-root-authentication-method=normal \
+    --user="$USER" \
+    --skip-test-db \
     >> "$INIT_LOG" 2>&1 \
     || init_fail
 
