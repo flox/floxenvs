@@ -1,0 +1,26 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../mkcert" }
+]
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'mkcert environment ready!' '' \
+    'Domains:' \
+    "  $MKCERT_DOMAINS" '' \
+    'Certificate files:' \
+    "  $CAROOT/domains.pem" \
+    "  $CAROOT/domains-key.pem" '' \
+    'Node.js CA:' \
+    "  NODE_EXTRA_CA_CERTS=$NODE_EXTRA_CA_CERTS"
+fi
+'''
