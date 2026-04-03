@@ -1,33 +1,80 @@
 # Ruby
 
-This is a ruby environment for developing using Ruby and Flox.
+Minimal Ruby environment providing the Ruby interpreter
+and Bundler, designed for use as an `[include]` base in
+other Flox environments.
 
-# The goal
+## What is included
 
-Get the top 15 or so rubygems that have Native Extensions building with Flox.
-See `Gemfile` for the list (the commented out ones are broken still)
+- `ruby` -- interpreter and standard library
+- `bundle` -- gem dependency manager (ships with Ruby)
 
-# Usage
+## Usage
 
-    flox activate
-    bundle
+Activate directly:
 
-# The test
+```bash
+flox activate -r flox/ruby
+```
 
-The `test.rb` file tries to load/require all the gem to ensure they at least
-can be `required`.
+Or include it in your own manifest:
 
-    bundle exec ./test.rb
+```toml
+[include]
+environments = ["flox/ruby"]
+```
 
-or
-    
-    ./test.sh since all environments on flox/floxenvs have a `test.sh` for validation
+## Package groups
 
+Ruby belongs to the `ruby` pkg-group. When pinning a
+version, set it on the same group:
 
-# Platforms
+```toml
+[install]
+ruby.pkg-path = "ruby"
+ruby.pkg-group = "ruby"
+ruby.version = "3.3.4"
+```
 
-Tested on Mac aarch64 and Linux x86_64 so far.
+## Environment variables
 
-# License
+| Variable | Description |
+| -------- | ------------------------------------ |
+| `RUBY_CACHE` | Set to `$FLOX_ENV_CACHE/ruby` |
+| `BUNDLE_PATH` | Gem install path inside cache |
+| `RUBY_AUTO_INSTALL` | Auto-install gems on activate |
 
-MIT
+## Automatic gem installation
+
+When `RUBY_AUTO_INSTALL` is `"true"` (the default) and
+both `Gemfile` and `Gemfile.lock` are present, the
+on-activate hook runs `bundle install` automatically.
+A SHA-256 hash of the two files is cached so subsequent
+activations skip the install when nothing has changed.
+
+To disable automatic installation:
+
+```toml
+[vars]
+RUBY_AUTO_INSTALL = "false"
+```
+
+## Native extension packages
+
+This base layer intentionally ships only Ruby itself.
+If your gems require native extensions (e.g. nokogiri,
+pg, mysql2, mini_magick), add the necessary build tools
+in your own manifest:
+
+```toml
+[install]
+gcc-unwrapped.pkg-path = "gcc-unwrapped"
+libxml2.pkg-path = "libxml2"
+openssl.pkg-path = "openssl"
+pkg-config.pkg-path = "pkg-config"
+```
+
+## See also
+
+For a full development environment with a sample app
+and bundled gems, see [ruby-demo](../ruby-demo/).
