@@ -32,6 +32,10 @@ export MARIADB_TMPDIR="$MARIADB_HOME/tmp"
 export MARIADB_SOCKET="$MARIADB_HOME/mariadb.sock"
 INIT_LOG="$MARIADB_HOME/init.log"
 
+if [ -z "$USER" ]; then
+  export USER="$(id -un)"
+fi
+
 if [ -z "$MARIADB_USER" ]; then
   export MARIADB_USER="$USER"
 fi
