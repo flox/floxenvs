@@ -1,32 +1,26 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "version": 1,
+    "schema-version": "1.10.0",
     "install": {
       "langchain-community": {
-        "pkg-path": "python312Packages.langchain-community"
+        "pkg-path": "python312Packages.langchain-community",
+        "pkg-group": "langchain"
       },
       "langchain-ollama": {
-        "pkg-path": "python312Packages.langchain-ollama"
+        "pkg-path": "python312Packages.langchain-ollama",
+        "pkg-group": "langchain"
       },
       "langgraph": {
-        "pkg-path": "python312Packages.langgraph"
+        "pkg-path": "python312Packages.langgraph",
+        "pkg-group": "langchain"
       },
       "ollama": {
-        "pkg-path": "ollama"
+        "pkg-path": "ollama",
+        "pkg-group": "langchain"
       }
     },
-    "profile": {
-      "common": "if ollama list >/dev/null 2>&1; then\n  echo \"🤖 Ollama service running\"\nelse\n  echo \"⛔️ Ollama service not available\"\nfi\n"
-    },
-    "options": {
-      "systems": [
-        "aarch64-darwin",
-        "aarch64-linux",
-        "x86_64-darwin",
-        "x86_64-linux"
-      ]
-    },
+    "options": {},
     "services": {
       "ollama": {
         "command": "ollama serve"
@@ -61,7 +55,7 @@
         "out": "/nix/store/q2vy38mrbag341w0vskp9lkrrdi1xzai-python3.12-langchain-community-0.4.1"
       },
       "system": "aarch64-darwin",
-      "group": "toplevel",
+      "group": "langchain",
       "priority": 5
     },
     {
@@ -91,7 +85,7 @@
         "out": "/nix/store/cdll4h6wjqipffnc90s5l7igi1vaxy34-python3.12-langchain-community-0.4.1"
       },
       "system": "aarch64-linux",
-      "group": "toplevel",
+      "group": "langchain",
       "priority": 5
     },
     {
@@ -121,7 +115,7 @@
         "out": "/nix/store/y4xl998hvy1ysaz2rgw9sp9wcq33yn0b-python3.12-langchain-community-0.4.1"
       },
       "system": "x86_64-darwin",
-      "group": "toplevel",
+      "group": "langchain",
       "priority": 5
     },
     {
@@ -151,7 +145,7 @@
         "out": "/nix/store/ldrjn8a1kk9pxcs4d6chf1fh0mzfzjaj-python3.12-langchain-community-0.4.1"
       },
       "system": "x86_64-linux",
-      "group": "toplevel",
+      "group": "langchain",
       "priority": 5
     },
     {
@@ -181,7 +175,7 @@
         "out": "/nix/store/5c0cdc861abr3j0jfxxq2jl6b03i1qwb-python3.12-langchain-ollama-1.0.0"
       },
       "system": "aarch64-darwin",
-      "group": "toplevel",
+      "group": "langchain",
       "priority": 5
     },
     {
@@ -211,7 +205,7 @@
         "out": "/nix/store/wkzfzd9wcpmlgf5x0cnzfik5gp6chz08-python3.12-langchain-ollama-1.0.0"
       },
       "system": "aarch64-linux",
-      "group": "toplevel",
+      "group": "langchain",
       "priority": 5
     },
     {
@@ -241,7 +235,7 @@
         "out": "/nix/store/chzk6d1f35h0h5gyy6rfcq3893zmslz3-python3.12-langchain-ollama-1.0.0"
       },
       "system": "x86_64-darwin",
-      "group": "toplevel",
+      "group": "langchain",
       "priority": 5
     },
     {
@@ -271,7 +265,7 @@
         "out": "/nix/store/6pkmpcfy3vqf6lrfjlydk5v2fc1fs44h-python3.12-langchain-ollama-1.0.0"
       },
       "system": "x86_64-linux",
-      "group": "toplevel",
+      "group": "langchain",
       "priority": 5
     },
     {
@@ -301,7 +295,7 @@
         "out": "/nix/store/ggd7ycy8bwrzza85l6pjhr3yc30c8jga-python3.12-langgraph-1.0.4"
       },
       "system": "aarch64-darwin",
-      "group": "toplevel",
+      "group": "langchain",
       "priority": 5
     },
     {
@@ -331,7 +325,7 @@
         "out": "/nix/store/37cbbapbhrnj10a8wb3hgynhikh6q1kj-python3.12-langgraph-1.0.4"
       },
       "system": "aarch64-linux",
-      "group": "toplevel",
+      "group": "langchain",
       "priority": 5
     },
     {
@@ -361,7 +355,7 @@
         "out": "/nix/store/shahsbcmdnly502dfyx5xyksgvin3438-python3.12-langgraph-1.0.4"
       },
       "system": "x86_64-darwin",
-      "group": "toplevel",
+      "group": "langchain",
       "priority": 5
     },
     {
@@ -391,7 +385,7 @@
         "out": "/nix/store/pnrra205pyfdkdg8hc8fyjmhrhkm7bmf-python3.12-langgraph-1.0.4"
       },
       "system": "x86_64-linux",
-      "group": "toplevel",
+      "group": "langchain",
       "priority": 5
     },
     {
@@ -420,7 +414,7 @@
         "out": "/nix/store/bkgcbgixlham8jq4prxi31izp7ph3rn8-ollama-0.13.2"
       },
       "system": "aarch64-darwin",
-      "group": "toplevel",
+      "group": "langchain",
       "priority": 5
     },
     {
@@ -449,7 +443,7 @@
         "out": "/nix/store/rz5f047z5r4944aksz69mbhhr6a47hxz-ollama-0.13.2"
       },
       "system": "aarch64-linux",
-      "group": "toplevel",
+      "group": "langchain",
       "priority": 5
     },
     {
@@ -478,7 +472,7 @@
         "out": "/nix/store/87ni487971f9cakvxg17687rw7l1bryg-ollama-0.13.2"
       },
       "system": "x86_64-darwin",
-      "group": "toplevel",
+      "group": "langchain",
       "priority": 5
     },
     {
@@ -507,7 +501,7 @@
         "out": "/nix/store/p9jwid9278wrxfmyn6cp323i34jccspm-ollama-0.13.2"
       },
       "system": "x86_64-linux",
-      "group": "toplevel",
+      "group": "langchain",
       "priority": 5
     }
   ]
