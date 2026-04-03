@@ -1,0 +1,36 @@
+name: "CI: cassandra"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "cassandra/**"
+      - "cassandra-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_cassandra.yml"
+  pull_request:
+    paths:
+      - "cassandra/**"
+      - "cassandra-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_cassandra.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "cassandra"
+    secrets: inherit
