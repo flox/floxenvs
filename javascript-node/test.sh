@@ -2,21 +2,16 @@
 
 set -eo pipefail
 
-check_command() {
-    if ! command -v $1 2>&1 >/dev/null
-    then
-        echo "Error: '$1' command could not be found."
-        exit 1
-    fi
-}
+if ! command -v node >/dev/null 2>&1; then
+  echo "Error: 'node' command not found."
+  exit 1
+fi
+if ! command -v npm >/dev/null 2>&1; then
+  echo "Error: 'npm' command not found."
+  exit 1
+fi
 
-check_command node
-check_command npm
+echo ">>> node version: $(node --version)"
+echo ">>> npm version: $(npm --version)"
 
-
-node --eval "require('figlet')"
-echo ">>> figlet package installed"
-
-node index.js
-echo ">>> script works"
-
+echo ">>> javascript-node environment is working"

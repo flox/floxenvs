@@ -1,64 +1,39 @@
 schema-version = "1.10.0"
 
+# Minimal Node.js environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/javascript-node"]
+#
+# Customize Node version in your manifest:
+#
+#   [install]
+#   nodejs.pkg-path = "nodejs_22"
+
 [install]
-nodejs.pkg-path = "nodejs"
-nodejs.version = "20"
-nodejs.outputs = "all"
-
-# helper tools
-gum.pkg-path = "gum"
-coreutils.pkg-path = "coreutils"
-coreutils.outputs = "all"
-
+nodejs.pkg-path = "nodejs_20"
+nodejs.pkg-group = "javascript-node"
 
 [vars]
-NODE_ENV="development"
-
+NODE_ENV = "development"
+NODE_AUTO_INSTALL = "true"
 
 [hook]
 on-activate = '''
+export NODE_CACHE="$FLOX_ENV_CACHE/javascript-node"
+mkdir -p "$NODE_CACHE"
 
-export FLOX_JAVASCRIPT_NODE_CACHE_DIR="$FLOX_ENV_CACHE/javascript-node"
-mkdir -p "$FLOX_JAVASCRIPT_NODE_CACHE_DIR"
-
-export FLOX_JAVASCRIPT_NODE_PACKAGES_HASH_FILE="$FLOX_JAVASCRIPT_NODE_CACHE_DIR/packages-hash"
-
-
-function with_spinner() {
-  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
-    bash -c "$1"
-  else
-    gum spin \
-      --show-error \
-      --spinner line \
-      --spinner.foreground="#cccccc" \
-      --title ">>> $2 ..." \
-      --title.foreground="#cccccc" \
-        -- bash -c "$1"
-  fi
-}
-
-function install_packages() { 
-  npm install
-}
-export -f install_packages
-
-
-
-if [ -f "package.json" ] && [ -f "package-lock.json" ]; then
-  export FLOX_JAVASCRIPT_NODE_PACKAGES_HASH="false"
-  if [ -f "$FLOX_JAVASCRIPT_NODE_PACKAGES_HASH_FILE" ] ; then
-    export FLOX_JAVASCRIPT_NODE_PACKAGES_HASH=$(cat package.json package-lock.json | sha256sum | cut -d" " -f 1)
-  fi
-  if [ "$FLOX_JAVASCRIPT_NODE_PACKAGES_HASH" != "$(cat $FLOX_JAVASCRIPT_NODE_PACKAGES_HASH_FILE 2>/dev/null)" ]; then
-    with_spinner install_packages "Installing Javascript packages (with NPM)"
-    echo -e "{{ Foreground \"#ffffff\" \"✅ Javascript packages installed (with NPM).\" }}\n" \
-      | gum format -t template
-    echo "$FLOX_JAVASCRIPT_NODE_PACKAGES_HASH" > "$FLOX_JAVASCRIPT_NODE_PACKAGES_HASH_FILE"
+if [ "$NODE_AUTO_INSTALL" = "true" ] \
+    && [ -f package.json ] \
+    && [ -f package-lock.json ]; then
+  HASH=$(cat package.json package-lock.json \
+    | sha256sum | cut -d" " -f1)
+  LAST=$(cat "$NODE_CACHE/packages-hash" 2>/dev/null)
+  if [ "$HASH" != "$LAST" ]; then
+    npm install
+    echo "$HASH" > "$NODE_CACHE/packages-hash"
   fi
 fi
 '''
-
-
-[options]
-systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
