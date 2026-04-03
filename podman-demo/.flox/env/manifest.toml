@@ -1,0 +1,42 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../podman" }
+]
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+undocker.pkg-path = "undocker"
+undocker.pkg-group = "demo-tools"
+podman-tui.pkg-path = "podman-tui"
+podman-tui.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'Podman environment ready!' '' \
+    'podman version:' \
+    "  $(podman --version)" '' \
+    'Commands:' \
+    '  podman run <image>     Run a container' \
+    '  podman-compose up      Start services' \
+    '  podman-tui             Terminal UI' \
+    '  undocker <image>       Extract image'
+fi
+'''
+
+[profile]
+common = '''
+if [ "$(uname -s)" = 'Darwin' ] \
+    && [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  trap 'gum confirm "Stop virtual machine?" \
+    && gum spin --spinner dot \
+         --title "Stopping machine..." \
+         -- podman machine stop \
+    ; echo "Podman machine stopped"' EXIT
+fi
+'''

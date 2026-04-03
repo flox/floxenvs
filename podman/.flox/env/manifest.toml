@@ -1,82 +1,37 @@
 schema-version = "1.10.0"
 
-[options]
-systems = ["x86_64-linux", "aarch64-linux", "x86_64-darwin", "aarch64-darwin"]
+# Minimal Podman environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/podman"]
+#
+# Podman provides rootless containers. On macOS it
+# uses a virtual machine (qemu) to run Linux
+# containers.
 
 [install]
-podman.pkg-path         = "podman"
+podman.pkg-path = "podman"
+podman.pkg-group = "podman"
 podman-compose.pkg-path = "podman-compose"
-podman-compose.outputs = "all"
-undocker.pkg-path       = "undocker"
-podman-tui.pkg-path     = "podman-tui"
-gum.pkg-path            = "gum"
+podman-compose.pkg-group = "podman"
 
-# for virtualization on darwin systems
 [install.qemu]
 pkg-path = "qemu"
-systems  = ["x86_64-darwin", "aarch64-darwin"]
-outputs = "all"
-
-
-[profile]
-common = """
-    if [ "$(uname -s)" = 'Darwin' ] && [ "$FLOX_ENVS_TESTING" != "1" ]; then
-        trap 'gum confirm "Stop virtual machine?" && gum spin --spinner dot --title "Stopping machine ...." -- podman machine stop ; echo; echo "✅ Podman virtual machine stopped"' EXIT
-    fi
-"""
+pkg-group = "podman"
+systems = ["x86_64-darwin", "aarch64-darwin"]
 
 [hook]
-on-activate = """
-    setup_podman() {
-        echo
-
-        # Confirm policy.json exits
-        if [ "$(uname -s)" = 'Linux' ] && [ ! -f ~/.config/containers/policy.json ]; then
-            if [ ! -t 0 ] || gum confirm "Create containers/policy.json file?" --default=true --affirmative "Yes" --negative "No"; then
-                mkdir -p ~/.config/containers/
-                printf '%s\n' '{"default": [{"type": "insecureAcceptAnything"}]}' > ~/.config/containers/policy.json
-                echo "✅ Podman policy created at ~/.config/containers/policy.json"
-            fi
-        fi
-
-        # Ensure podman can run
-        if [ "$(uname -s)" = 'Linux' ] || [ "$(podman machine ssh -- uname -s 2>/dev/null)" = "Linux" ]; then
-            echo "🍟 Podman is available."
-            return
-        fi
-
-        # We need a virtual machine
-        autostart="$HOME/.config/podman-env/autostart"
-        if [ "$FLOX_ENVS_TESTING" = "1" ]; then
-          mkdir -p "$HOME"/.config/podman-env
-          echo "1" > "$autostart"
-        fi
-        choice=
-        if [ ! -f "$autostart" ]; then
-            echo "Would you like to create and start the Podman virtual machine?"
-            choice=$(gum choose "Always - start now & on future activations" "Yes - start now only" "No - do not start")
-            if [ "${choice:0:1}" = "A" ]; then
-                mkdir -p "$HOME"/.config/podman-env
-                echo "1" > "$autostart"
-                echo
-                echo "Machine will start automatically on next activation. To disable this, run:"
-                echo "  rm $autostart"
-            fi
-        fi
-
-        if [ -f "$autostart" ] || [ "${choice:0:1}" = "A" ] || [ "${choice:0:1}" = "Y" ]; then
-            gum spin --spinner dot --title "Initializing machine..." -- podman machine init || true
-            gum spin --spinner dot --title "Starting machine..." -- podman machine start
-            if [ "$(podman machine ssh -- uname -s 2>/dev/null)" = "Linux" ]; then
-                echo "✅ Podman machine started"
-                echo "Stop it with 'podman machine stop' or by exiting this shell."
-                return
-            fi
-        fi
-
-        echo "🚨 Podman is not available."
-    }
-    setup_podman
-"""
-
-
+on-activate = '''
+# Ensure containers policy exists on Linux
+if [ "$(uname -s)" = "Linux" ]; then
+  POLICY="$HOME/.config/containers/policy.json"
+  if [ ! -f "$POLICY" ]; then
+    mkdir -p "$(dirname "$POLICY")"
+    printf '%s\n' \
+      '{"default": [{"type": "insecureAcceptAnything"}]}' \
+      > "$POLICY"
+  fi
+fi
+'''

@@ -1,0 +1,765 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": "demo-tools"
+      },
+      "podman": {
+        "pkg-path": "podman",
+        "pkg-group": "podman"
+      },
+      "podman-compose": {
+        "pkg-path": "podman-compose",
+        "pkg-group": "podman"
+      },
+      "podman-tui": {
+        "pkg-path": "podman-tui",
+        "pkg-group": "demo-tools"
+      },
+      "qemu": {
+        "pkg-path": "qemu",
+        "pkg-group": "podman",
+        "systems": [
+          "x86_64-darwin",
+          "aarch64-darwin"
+        ]
+      },
+      "undocker": {
+        "pkg-path": "undocker",
+        "pkg-group": "demo-tools"
+      }
+    },
+    "hook": {
+      "on-activate": "# Ensure containers policy exists on Linux\nif [ \"$(uname -s)\" = \"Linux\" ]; then\n  POLICY=\"$HOME/.config/containers/policy.json\"\n  if [ ! -f \"$POLICY\" ]; then\n    mkdir -p \"$(dirname \"$POLICY\")\"\n    printf '%s\\n' \\\n      '{\"default\": [{\"type\": \"insecureAcceptAnything\"}]}' \\\n      > \"$POLICY\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Podman environment ready!' '' \\\n    'podman version:' \\\n    \"  $(podman --version)\" '' \\\n    'Commands:' \\\n    '  podman run <image>     Run a container' \\\n    '  podman-compose up      Start services' \\\n    '  podman-tui             Terminal UI' \\\n    '  undocker <image>       Extract image'\nfi\n"
+    },
+    "profile": {
+      "common": "if [ \"$(uname -s)\" = 'Darwin' ] \\\n    && [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  trap 'gum confirm \"Stop virtual machine?\" \\\n    && gum spin --spinner dot \\\n         --title \"Stopping machine...\" \\\n         -- podman machine stop \\\n    ; echo \"Podman machine stopped\"' EXIT\nfi\n"
+    },
+    "options": {}
+  },
+  "packages": [
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/bmz60mbb36nlipdn9n6zmcm6kjls8gll-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:01:04.824827Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cdpxgzcjwidrmrzsq0zkyr9nxccvy3p6-gum-0.17.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/yhvp5prpjjl5hqk6fhr5svdzf1yfacgk-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:32:37.949153Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kqcb9j9k6wdvb7pjvjzn3p8dc82qmk9x-gum-0.17.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/cngbjjxmgsmcbgvihq7q9472rb5rhgdj-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:02:19.693599Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rznkbgxflsbrfy5c359vhhqrrxw4pfkj-gum-0.17.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/f5ahd90j9s46j49lz8k2yn3cmvyq6mbn-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:36:34.309717Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rf0zlw5q4j051xkjk9djfw5dpb8nwbgm-gum-0.17.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "podman-tui",
+      "broken": false,
+      "derivation": "/nix/store/5ql7s5338943qd7kir0l55kfkgz3032i-podman-tui-1.11.1.drv",
+      "description": "Podman Terminal UI",
+      "install_id": "podman-tui",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "podman-tui-1.11.1",
+      "pname": "podman-tui",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:01:40.955399Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.11.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/33m20lnak4c7py4a93j4g5vbv8362q0a-podman-tui-1.11.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "podman-tui",
+      "broken": false,
+      "derivation": "/nix/store/kk39cvi4640lv6jdawyqm3j5khn0rnvv-podman-tui-1.11.1.drv",
+      "description": "Podman Terminal UI",
+      "install_id": "podman-tui",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "podman-tui-1.11.1",
+      "pname": "podman-tui",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:33:30.512765Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.11.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/p6iajds6cklrh56wpvgh64iyk6m71y3s-podman-tui-1.11.1"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "podman-tui",
+      "broken": false,
+      "derivation": "/nix/store/ahy5xqrv2v8ydwr20ybprg9dr805xqgq-podman-tui-1.11.1.drv",
+      "description": "Podman Terminal UI",
+      "install_id": "podman-tui",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "podman-tui-1.11.1",
+      "pname": "podman-tui",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:02:55.441279Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.11.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/5ndmll0li757wjkxjn6vk6dmrf5wy1yb-podman-tui-1.11.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "podman-tui",
+      "broken": false,
+      "derivation": "/nix/store/64xk07fq0h3r69gxpcxdyr46v726y1rq-podman-tui-1.11.1.drv",
+      "description": "Podman Terminal UI",
+      "install_id": "podman-tui",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "podman-tui-1.11.1",
+      "pname": "podman-tui",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:37:31.695873Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.11.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/gymy2mn9pkds1kl7in19z6jyjrz80fx1-podman-tui-1.11.1"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "undocker",
+      "broken": false,
+      "derivation": "/nix/store/lwbzw796hqmmyms4fcnxbinbzxv3pd4r-undocker-1.2.3.drv",
+      "description": "CLI tool to convert a Docker image to a flattened rootfs tarball",
+      "install_id": "undocker",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "undocker-1.2.3",
+      "pname": "undocker",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:03:31.366081Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.2.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/y4vcyyra4g20js7x8frbdh25wm26lvjc-undocker-1.2.3"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "undocker",
+      "broken": false,
+      "derivation": "/nix/store/d34ji322a5md4g22swpsi0v05248b2v1-undocker-1.2.3.drv",
+      "description": "CLI tool to convert a Docker image to a flattened rootfs tarball",
+      "install_id": "undocker",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "undocker-1.2.3",
+      "pname": "undocker",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:35:45.974411Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.2.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/3pqwf4rhxhx5n94yqagjaj0drd3gfkfd-undocker-1.2.3"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "undocker",
+      "broken": false,
+      "derivation": "/nix/store/iy4rbwkvhdhgvk99f1frg6hn0skglaa1-undocker-1.2.3.drv",
+      "description": "CLI tool to convert a Docker image to a flattened rootfs tarball",
+      "install_id": "undocker",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "undocker-1.2.3",
+      "pname": "undocker",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:04:42.062180Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.2.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/q93gd270qxf2qyw252awd8bk9r3n5h6j-undocker-1.2.3"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "undocker",
+      "broken": false,
+      "derivation": "/nix/store/nrfvxgn5fzw71ndrk9c05gks1c0p3myq-undocker-1.2.3.drv",
+      "description": "CLI tool to convert a Docker image to a flattened rootfs tarball",
+      "install_id": "undocker",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "undocker-1.2.3",
+      "pname": "undocker",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:39:56.516242Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.2.3",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/0k1pw4wfwnf84ck192fzldh7bhkpy3ff-undocker-1.2.3"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "podman",
+      "broken": false,
+      "derivation": "/nix/store/7bs9wv5h82krpaf4k3r0r0l08awn74zi-podman-5.8.1.drv",
+      "description": "Program for managing pods, containers and container images",
+      "install_id": "podman",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "podman-5.8.1",
+      "pname": "podman",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:01:40.948163Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "5.8.1",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "man": "/nix/store/y5s91b5k6ipkp3d8pnd6419c1vf03ii6-podman-5.8.1-man",
+        "out": "/nix/store/1a9pny79n0na7m3vnskr3nqvba0ccb00-podman-5.8.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "podman",
+      "priority": 5
+    },
+    {
+      "attr_path": "podman",
+      "broken": false,
+      "derivation": "/nix/store/9v9wm8agm22n9q40b1i3ggqdk55p8882-podman-5.8.1.drv",
+      "description": "Program for managing pods, containers and container images",
+      "install_id": "podman",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "podman-5.8.1",
+      "pname": "podman",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:33:30.504424Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "5.8.1",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "man": "/nix/store/pn5wik4cb2la2llcw1lw0xjbiqvj7qn2-podman-5.8.1-man",
+        "out": "/nix/store/vjmr1a52mafl6g8ij5gbivhqp547iap5-podman-5.8.1"
+      },
+      "system": "aarch64-linux",
+      "group": "podman",
+      "priority": 5
+    },
+    {
+      "attr_path": "podman",
+      "broken": false,
+      "derivation": "/nix/store/h31i8ssqzkqrd09vd7xbzjqi46j2s6v0-podman-5.8.1.drv",
+      "description": "Program for managing pods, containers and container images",
+      "install_id": "podman",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "podman-5.8.1",
+      "pname": "podman",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:02:55.436071Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "5.8.1",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "man": "/nix/store/qjg4d8vgsmsz1xxaqy4c06rwm5fb5pmf-podman-5.8.1-man",
+        "out": "/nix/store/rlll5c2h6kv9vvf9kbl2p2ykwkzj4hfc-podman-5.8.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "podman",
+      "priority": 5
+    },
+    {
+      "attr_path": "podman",
+      "broken": false,
+      "derivation": "/nix/store/14vfvgc90cp752mzlqr8aamhi5wzvlky-podman-5.8.1.drv",
+      "description": "Program for managing pods, containers and container images",
+      "install_id": "podman",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "podman-5.8.1",
+      "pname": "podman",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:37:31.687060Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "5.8.1",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "man": "/nix/store/j8zjap52jfvziw7ygp8jqxy0222cnv0b-podman-5.8.1-man",
+        "out": "/nix/store/r8j6r32ym09g648svyqcaknp6vy01iww-podman-5.8.1"
+      },
+      "system": "x86_64-linux",
+      "group": "podman",
+      "priority": 5
+    },
+    {
+      "attr_path": "podman-compose",
+      "broken": false,
+      "derivation": "/nix/store/qs4kbj2mxjdbn3y3kcfcaqlgzs83yj69-podman-compose-1.5.0.drv",
+      "description": "Implementation of docker-compose with podman backend",
+      "install_id": "podman-compose",
+      "license": "GPL-2.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "podman-compose-1.5.0",
+      "pname": "podman-compose",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:01:40.951874Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.5.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/87fxzckjzl1q808clsdyr4wzc765n79j-podman-compose-1.5.0-dist",
+        "out": "/nix/store/9mif28m762mfi8i2gzrlrbgipsm28rj3-podman-compose-1.5.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "podman",
+      "priority": 5
+    },
+    {
+      "attr_path": "podman-compose",
+      "broken": false,
+      "derivation": "/nix/store/bi0a6gq88kh9rh3w26rhz9rwzr3qx9gp-podman-compose-1.5.0.drv",
+      "description": "Implementation of docker-compose with podman backend",
+      "install_id": "podman-compose",
+      "license": "GPL-2.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "podman-compose-1.5.0",
+      "pname": "podman-compose",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:33:30.508595Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.5.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/s7cp2vd3d6sba97czds6q6mamd73r3an-podman-compose-1.5.0-dist",
+        "out": "/nix/store/2805xjw56g3zwdbm025s6z1aazqd8yzn-podman-compose-1.5.0"
+      },
+      "system": "aarch64-linux",
+      "group": "podman",
+      "priority": 5
+    },
+    {
+      "attr_path": "podman-compose",
+      "broken": false,
+      "derivation": "/nix/store/lihh2s539jk59kdlx1l6g5wfqgzjlpvg-podman-compose-1.5.0.drv",
+      "description": "Implementation of docker-compose with podman backend",
+      "install_id": "podman-compose",
+      "license": "GPL-2.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "podman-compose-1.5.0",
+      "pname": "podman-compose",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:02:55.437826Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.5.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/pjfbdac6xzbyaj265jmjfmgkawp1s8l9-podman-compose-1.5.0-dist",
+        "out": "/nix/store/bf92c1r8lf6q068b6j3zdsllm05di4xg-podman-compose-1.5.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "podman",
+      "priority": 5
+    },
+    {
+      "attr_path": "podman-compose",
+      "broken": false,
+      "derivation": "/nix/store/4pvklp0fdgzxfj54m3jx0acdsvq3kx5j-podman-compose-1.5.0.drv",
+      "description": "Implementation of docker-compose with podman backend",
+      "install_id": "podman-compose",
+      "license": "GPL-2.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "podman-compose-1.5.0",
+      "pname": "podman-compose",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:37:31.691474Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.5.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/4yr9jf2v2d2mck2wgpycf2jkazwcnf5n-podman-compose-1.5.0-dist",
+        "out": "/nix/store/wgh57k9zz20sph74xa8z9ryivwyq233n-podman-compose-1.5.0"
+      },
+      "system": "x86_64-linux",
+      "group": "podman",
+      "priority": 5
+    },
+    {
+      "attr_path": "qemu",
+      "broken": false,
+      "derivation": "/nix/store/x7j44jggfnhcgka2cdhl7fzck8mp7lyh-qemu-10.2.2.drv",
+      "description": "Generic and open source machine emulator and virtualizer",
+      "install_id": "qemu",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "qemu-10.2.2",
+      "pname": "qemu",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:02:27.688482Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "10.2.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/1vx6xp4vqddwi4zl1jxkp66vlg9hmv8r-qemu-10.2.2-doc",
+        "out": "/nix/store/rsyb4k5vk29sdrmg39sf2ccvjikf9s52-qemu-10.2.2"
+      },
+      "system": "aarch64-darwin",
+      "group": "podman",
+      "priority": 5
+    },
+    {
+      "attr_path": "qemu",
+      "broken": false,
+      "derivation": "/nix/store/bq9647nky2hkq7s7s4zrl9livdbifa4g-qemu-10.2.2.drv",
+      "description": "Generic and open source machine emulator and virtualizer",
+      "install_id": "qemu",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "qemu-10.2.2",
+      "pname": "qemu",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:03:40.387290Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "10.2.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/xkfhvii0z2il1fdcpyy15s6m9xdgcndq-qemu-10.2.2-doc",
+        "out": "/nix/store/8v14rj76l8zsi24bf4wyvv4bn01bcrlq-qemu-10.2.2"
+      },
+      "system": "x86_64-darwin",
+      "group": "podman",
+      "priority": 5
+    }
+  ],
+  "compose": {
+    "composer": {
+      "schema-version": "1.11.0",
+      "install": {
+        "gum": {
+          "pkg-path": "gum",
+          "pkg-group": "demo-tools"
+        },
+        "podman-tui": {
+          "pkg-path": "podman-tui",
+          "pkg-group": "demo-tools"
+        },
+        "undocker": {
+          "pkg-path": "undocker",
+          "pkg-group": "demo-tools"
+        }
+      },
+      "hook": {
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Podman environment ready!' '' \\\n    'podman version:' \\\n    \"  $(podman --version)\" '' \\\n    'Commands:' \\\n    '  podman run <image>     Run a container' \\\n    '  podman-compose up      Start services' \\\n    '  podman-tui             Terminal UI' \\\n    '  undocker <image>       Extract image'\nfi\n"
+      },
+      "profile": {
+        "common": "if [ \"$(uname -s)\" = 'Darwin' ] \\\n    && [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  trap 'gum confirm \"Stop virtual machine?\" \\\n    && gum spin --spinner dot \\\n         --title \"Stopping machine...\" \\\n         -- podman machine stop \\\n    ; echo \"Podman machine stopped\"' EXIT\nfi\n"
+      },
+      "options": {},
+      "include": {
+        "environments": [
+          {
+            "dir": "../podman"
+          }
+        ]
+      }
+    },
+    "include": [
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "podman": {
+              "pkg-path": "podman",
+              "pkg-group": "podman"
+            },
+            "podman-compose": {
+              "pkg-path": "podman-compose",
+              "pkg-group": "podman"
+            },
+            "qemu": {
+              "pkg-path": "qemu",
+              "pkg-group": "podman",
+              "systems": [
+                "x86_64-darwin",
+                "aarch64-darwin"
+              ]
+            }
+          },
+          "hook": {
+            "on-activate": "# Ensure containers policy exists on Linux\nif [ \"$(uname -s)\" = \"Linux\" ]; then\n  POLICY=\"$HOME/.config/containers/policy.json\"\n  if [ ! -f \"$POLICY\" ]; then\n    mkdir -p \"$(dirname \"$POLICY\")\"\n    printf '%s\\n' \\\n      '{\"default\": [{\"type\": \"insecureAcceptAnything\"}]}' \\\n      > \"$POLICY\"\n  fi\nfi\n"
+          },
+          "options": {}
+        },
+        "name": "podman",
+        "descriptor": {
+          "dir": "../podman"
+        }
+      }
+    ],
+    "warnings": []
+  }
+}
