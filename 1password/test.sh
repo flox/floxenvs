@@ -2,12 +2,10 @@
 
 set -eo pipefail
 
-command_exists() {
-  if ! command -v $1 2>&1 >/dev/null; then
-    echo "Error: '$1' command could not be found."
-    return 1
-  fi
-  echo ">>> '$1' command exists"
-}
+if ! command -v op >/dev/null 2>&1; then
+  echo "Error: 'op' command not found."
+  exit 1
+fi
 
-command_exists op
+echo ">>> op version: $(op --version)"
+echo ">>> 1password environment is working"

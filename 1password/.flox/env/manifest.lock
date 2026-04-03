@@ -1,26 +1,20 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "version": 1,
+    "schema-version": "1.10.0",
     "install": {
       "op": {
-        "pkg-path": "_1password"
+        "pkg-path": "_1password",
+        "pkg-group": "1password"
       }
     },
     "hook": {
-      "on-activate": "\n    # Start OP injection code\n    if ! op vault list >/dev/null 2>&1; then\n        CACHE=\"$HOME/.cache/op-session\"\n        OP_TOKEN=$( [[ -f \"$CACHE\" ]] && cat \"$CACHE\" || op signin --raw 2>&1 )\n        if op whoami --session \"${OP_TOKEN}\" >/dev/null 2>&1; then\n            mkdir -p $(dirname \"$CACHE\") 2>/dev/null && echo \"${OP_TOKEN}\" > \"$CACHE\"\n            chmod 600 \"$CACHE\"\n        else\n            echo \"op auth failed!\" && return 1\n        fi\n    fi\n    export op_token=$( [[ \"$OP_TOKEN\" ]] && echo \"--session $OP_TOKEN\" )\n    # End OP injection code\n\n    export ANTHROPIC_API_KEY=$(op $op_token item get \"Anthropic\" --field \"credential\")\n    export TAILSCALE_TOKEN=$(op $op_token item get \"Tailscale\" --field \"token\")\n"
+      "on-activate": "# Cache 1Password session token so repeated\n# activations don't prompt for auth.\nexport OP_CACHE=\"$FLOX_ENV_CACHE/1password\"\nmkdir -p \"$OP_CACHE\"\n\nif ! op vault list >/dev/null 2>&1; then\n  SESSION_FILE=\"$OP_CACHE/session\"\n  OP_TOKEN=\"\"\n  if [ -f \"$SESSION_FILE\" ]; then\n    OP_TOKEN=$(cat \"$SESSION_FILE\")\n  fi\n  if [ -z \"$OP_TOKEN\" ] \\\n      || ! op whoami --session \"$OP_TOKEN\" \\\n           >/dev/null 2>&1; then\n    OP_TOKEN=$(op signin --raw 2>&1) || true\n    if op whoami --session \"$OP_TOKEN\" \\\n         >/dev/null 2>&1; then\n      echo \"$OP_TOKEN\" > \"$SESSION_FILE\"\n      chmod 600 \"$SESSION_FILE\"\n    fi\n  fi\n  if [ -n \"$OP_TOKEN\" ]; then\n    export OP_SESSION_TOKEN=\"$OP_TOKEN\"\n  fi\nfi\n"
     },
     "profile": {
-      "common": "    alias op=\"op $op_token\"\n"
+      "common": "if [ -n \"${OP_SESSION_TOKEN:-}\" ]; then\n  alias op=\"op --session $OP_SESSION_TOKEN\"\nfi\n"
     },
-    "options": {
-      "systems": [
-        "aarch64-darwin",
-        "aarch64-linux",
-        "x86_64-darwin",
-        "x86_64-linux"
-      ]
-    }
+    "options": {}
   },
   "packages": [
     {
@@ -30,15 +24,14 @@
       "description": "1Password command-line tool",
       "install_id": "op",
       "license": "Unfree",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=01f116e4df6a15f4ccdffb1bcd41096869fb385c",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
       "name": "1password-cli-2.32.0",
       "pname": "_1password",
-      "rev": "01f116e4df6a15f4ccdffb1bcd41096869fb385c",
-      "rev_count": 882227,
-      "rev_date": "2025-10-22T06:30:52Z",
-      "scrape_date": "2025-10-24T01:11:53.925908Z",
+      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "rev_count": 883951,
+      "rev_date": "2025-10-25T06:24:58Z",
+      "scrape_date": "2025-10-27T02:08:14.515669Z",
       "stabilities": [
-        "staging",
         "unstable"
       ],
       "unfree": true,
@@ -50,7 +43,7 @@
         "out": "/nix/store/py72zb7vzh9l4prk9nd6bw3rc2zhxhn9-1password-cli-2.32.0"
       },
       "system": "aarch64-darwin",
-      "group": "toplevel",
+      "group": "1password",
       "priority": 5
     },
     {
@@ -60,15 +53,14 @@
       "description": "1Password command-line tool",
       "install_id": "op",
       "license": "Unfree",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=01f116e4df6a15f4ccdffb1bcd41096869fb385c",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
       "name": "1password-cli-2.32.0",
       "pname": "_1password",
-      "rev": "01f116e4df6a15f4ccdffb1bcd41096869fb385c",
-      "rev_count": 882227,
-      "rev_date": "2025-10-22T06:30:52Z",
-      "scrape_date": "2025-10-24T01:48:36.762602Z",
+      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "rev_count": 883951,
+      "rev_date": "2025-10-25T06:24:58Z",
+      "scrape_date": "2025-10-27T02:18:25.619001Z",
       "stabilities": [
-        "staging",
         "unstable"
       ],
       "unfree": true,
@@ -80,7 +72,7 @@
         "out": "/nix/store/p515b57pf3wg2jhc8md9hbcva6jarsjc-1password-cli-2.32.0"
       },
       "system": "aarch64-linux",
-      "group": "toplevel",
+      "group": "1password",
       "priority": 5
     },
     {
@@ -90,15 +82,14 @@
       "description": "1Password command-line tool",
       "install_id": "op",
       "license": "Unfree",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=01f116e4df6a15f4ccdffb1bcd41096869fb385c",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
       "name": "1password-cli-2.32.0",
       "pname": "_1password",
-      "rev": "01f116e4df6a15f4ccdffb1bcd41096869fb385c",
-      "rev_count": 882227,
-      "rev_date": "2025-10-22T06:30:52Z",
-      "scrape_date": "2025-10-24T02:21:43.528277Z",
+      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "rev_count": 883951,
+      "rev_date": "2025-10-25T06:24:58Z",
+      "scrape_date": "2025-10-27T02:29:21.139103Z",
       "stabilities": [
-        "staging",
         "unstable"
       ],
       "unfree": true,
@@ -110,7 +101,7 @@
         "out": "/nix/store/gv6bgzp76viws8l647llyssrg09zzaq9-1password-cli-2.32.0"
       },
       "system": "x86_64-darwin",
-      "group": "toplevel",
+      "group": "1password",
       "priority": 5
     },
     {
@@ -120,15 +111,14 @@
       "description": "1Password command-line tool",
       "install_id": "op",
       "license": "Unfree",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=01f116e4df6a15f4ccdffb1bcd41096869fb385c",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
       "name": "1password-cli-2.32.0",
       "pname": "_1password",
-      "rev": "01f116e4df6a15f4ccdffb1bcd41096869fb385c",
-      "rev_count": 882227,
-      "rev_date": "2025-10-22T06:30:52Z",
-      "scrape_date": "2025-10-24T02:58:36.529903Z",
+      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
+      "rev_count": 883951,
+      "rev_date": "2025-10-25T06:24:58Z",
+      "scrape_date": "2025-10-27T03:00:53.739720Z",
       "stabilities": [
-        "staging",
         "unstable"
       ],
       "unfree": true,
@@ -140,7 +130,7 @@
         "out": "/nix/store/cpd6j0shfjdcrdvnl93k003kq7flq1fj-1password-cli-2.32.0"
       },
       "system": "x86_64-linux",
-      "group": "toplevel",
+      "group": "1password",
       "priority": 5
     }
   ]
