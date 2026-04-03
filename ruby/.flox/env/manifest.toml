@@ -1,106 +1,39 @@
 schema-version = "1.10.0"
 
+# Minimal Ruby environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/ruby"]
+#
+# Customize Ruby version in your manifest:
+#
+#   [install]
+#   ruby.version = "3.3.4"
+
 [install]
 ruby.pkg-path = "ruby"
-ruby.outputs = "all"
-# ruby version options
-#ruby.version = "3.3.4"
-#ruby.version = "3.1.6"
-#ruby.version = "2.7.8"
-
-# Useful for building native extensions
-gcc-unwrapped.pkg-path = "gcc-unwrapped"
-gcc-unwrapped.outputs = "all"
-libxml2.pkg-path = "libxml2"
-libxml2.outputs = "all"
-libxslt.pkg-path = "libxslt"
-libxslt.outputs = "all"
-gnumake.pkg-path = "gnumake"
-gnumake.outputs = "all"
-binutils.pkg-path = "binutils"
-binutils.outputs = "all"
-pkg-config.pkg-path = "pkg-config"
-pkg-config.outputs = "all"
-glibc.pkg-path = "glibc"  # glibc only needed on linux builds
-glibc.systems = ["x86_64-linux", "aarch64-linux"]
-glibc.outputs = "all"
-openssl.pkg-path = "openssl"
-openssl.outputs = "all"
-libyaml.pkg-path = "libyaml"
-libyaml.outputs = "all"
-imagemagick.pkg-path = "imagemagick"
-imagemagick.outputs = "all"
-postgresql.pkg-path = "postgresql"
-postgresql.outputs = "all"
-libmysqlclient.pkg-path = "libmysqlclient"
-libmysqlclient.outputs = "all"
-
-# Helpful for setup
-gum.pkg-path = "gum"
-which.pkg-path = "which"
+ruby.pkg-group = "ruby"
 
 [vars]
+RUBY_AUTO_INSTALL = "true"
 
 [hook]
 on-activate = '''
-unset CPATH
+export RUBY_CACHE="$FLOX_ENV_CACHE/ruby"
+export BUNDLE_PATH="$RUBY_CACHE/vendor"
+mkdir -p "$RUBY_CACHE"
 
-export RUBY_DIR="$FLOX_ENV_CACHE/ruby"
-export RUBY_VENDOR_DIR="$RUBY_DIR/vendor"
-
-set_vendor_path() {
-  bundle config set --local path "$RUBY_VENDOR_DIR"
-}
-
-bundle_install() {
-  bundle install
-}
-
-export -f set_vendor_path
-export -f bundle_install
-
-if [ -f "Gemfile" ]; then
-
-  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
-    set_vendor_path
-  else
-    gum spin \
-      --show-error \
-      --spinner dot \
-      --title "Configuring vendor path" \
-        -- bash -c set_vendor_path
+if [ "$RUBY_AUTO_INSTALL" = "true" ] \
+    && [ -f Gemfile ] \
+    && [ -f Gemfile.lock ]; then
+  HASH=$(cat Gemfile Gemfile.lock \
+    | sha256sum | cut -d" " -f1)
+  LAST=$(cat "$RUBY_CACHE/gems-hash" 2>/dev/null)
+  if [ "$HASH" != "$LAST" ]; then
+    bundle install
+    echo "$HASH" > "$RUBY_CACHE/gems-hash"
   fi
-  echo "✅ Vendor path set to:"
-  echo "   -> $RUBY_VENDOR_DIR"
-
-  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
-    bundle_install
-  else
-    gum spin \
-      --show-error \
-      --spinner monkey \
-      --title "Installing Ruby gems" \
-        -- bash -c bundle_install
-  fi
-  echo "✅ Ruby gems installed"
 fi
-
 '''
-
-[profile]
-common = '''
-echo ''
-echo '     ╔═════════════════════════════════════════════════════╗'
-echo '     ║                                                     ║'
-echo '     ║  Run `bundle` to finish the setup of your project   ║'
-echo '     ║  bundler is configured to install into              ║'
-echo '     ║       .flox/cache/ruby/vendor                       ║'
-echo '     ║                                                     ║'
-echo '     ║  Select a differnet Ruby version using `flox edit`  ║'
-echo '     ║                                                     ║'
-echo '     ╚═════════════════════════════════════════════════════╝'
-echo ''
-'''
-
-[options]
-systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]

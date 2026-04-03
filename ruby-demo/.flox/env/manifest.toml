@@ -1,0 +1,25 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../ruby" }
+]
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'Ruby environment ready!' '' \
+    'Ruby version:' \
+    "  $(ruby --version)" '' \
+    'Commands:' \
+    '  bundle install   Install gems' \
+    '  bundle exec      Run with bundler' \
+    '  ruby <file>      Run a script'
+fi
+'''
