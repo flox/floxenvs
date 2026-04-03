@@ -14,6 +14,12 @@ if ! command -v python3 >/dev/null 2>&1; then
 fi
 echo ">>> python3 ... OK"
 
+if ! command -v gum >/dev/null 2>&1; then
+  echo "Error: 'gum' command not found."
+  exit 1
+fi
+echo ">>> gum ... OK"
+
 echo ">>> Checking Python imports..."
 python3 -c "import langgraph" || { echo "Error: failed to import langgraph"; exit 1; }
 echo ">>>   langgraph ... OK"

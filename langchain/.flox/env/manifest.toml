@@ -1,28 +1,21 @@
-version = 1
+schema-version = "1.10.0"
+
+# Minimal LangChain environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/langchain"]
 
 [install]
 langgraph.pkg-path = "python312Packages.langgraph"
+langgraph.pkg-group = "langchain"
 langchain-ollama.pkg-path = "python312Packages.langchain-ollama"
+langchain-ollama.pkg-group = "langchain"
 langchain-community.pkg-path = "python312Packages.langchain-community"
+langchain-community.pkg-group = "langchain"
 ollama.pkg-path = "ollama"
-
-[profile]
-common = '''
-if ollama list >/dev/null 2>&1; then
-  echo "🤖 Ollama service running"
-else
-  echo "⛔️ Ollama service not available"
-fi
-'''
+ollama.pkg-group = "langchain"
 
 [services]
 ollama.command = "ollama serve"
-
-[options]
-systems = [
-  "aarch64-darwin",
-  "aarch64-linux",
-  "x86_64-darwin",
-  "x86_64-linux",
-]
-
