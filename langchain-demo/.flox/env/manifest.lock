@@ -1,0 +1,690 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": "demo-tools"
+      },
+      "langchain-community": {
+        "pkg-path": "python312Packages.langchain-community",
+        "pkg-group": "langchain"
+      },
+      "langchain-ollama": {
+        "pkg-path": "python312Packages.langchain-ollama",
+        "pkg-group": "langchain"
+      },
+      "langgraph": {
+        "pkg-path": "python312Packages.langgraph",
+        "pkg-group": "langchain"
+      },
+      "ollama": {
+        "pkg-path": "ollama",
+        "pkg-group": "langchain"
+      }
+    },
+    "hook": {
+      "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Ollama in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Python packages available:' \\\n    '  langgraph, langchain-ollama, langchain-community' '' \\\n    'Check Ollama status:' \\\n    '  ollama list'\nfi\n"
+    },
+    "options": {},
+    "services": {
+      "ollama": {
+        "command": "ollama serve"
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/bmz60mbb36nlipdn9n6zmcm6kjls8gll-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:01:04.824827Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cdpxgzcjwidrmrzsq0zkyr9nxccvy3p6-gum-0.17.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/yhvp5prpjjl5hqk6fhr5svdzf1yfacgk-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:32:37.949153Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kqcb9j9k6wdvb7pjvjzn3p8dc82qmk9x-gum-0.17.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/cngbjjxmgsmcbgvihq7q9472rb5rhgdj-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:02:19.693599Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rznkbgxflsbrfy5c359vhhqrrxw4pfkj-gum-0.17.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/f5ahd90j9s46j49lz8k2yn3cmvyq6mbn-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:36:34.309717Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rf0zlw5q4j051xkjk9djfw5dpb8nwbgm-gum-0.17.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "python312Packages.langchain-community",
+      "broken": false,
+      "derivation": "/nix/store/8c8mgcawq035r6dm0yhvpwpvs35q2yh1-python3.12-langchain-community-0.4.1.drv",
+      "description": "Community contributed LangChain integrations",
+      "install_id": "langchain-community",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "name": "python3.12-langchain-community-0.4.1",
+      "pname": "langchain-community",
+      "rev": "2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "rev_count": 910362,
+      "rev_date": "2025-12-11T16:57:14Z",
+      "scrape_date": "2025-12-14T03:02:21.117974Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/i350r0hh612ww2fnq167hdrp49fdqq6m-python3.12-langchain-community-0.4.1-dist",
+        "out": "/nix/store/q2vy38mrbag341w0vskp9lkrrdi1xzai-python3.12-langchain-community-0.4.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "langchain",
+      "priority": 5
+    },
+    {
+      "attr_path": "python312Packages.langchain-community",
+      "broken": false,
+      "derivation": "/nix/store/5pplizfc7r28fmdszp1jy8qz16swci1p-python3.12-langchain-community-0.4.1.drv",
+      "description": "Community contributed LangChain integrations",
+      "install_id": "langchain-community",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "name": "python3.12-langchain-community-0.4.1",
+      "pname": "langchain-community",
+      "rev": "2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "rev_count": 910362,
+      "rev_date": "2025-12-11T16:57:14Z",
+      "scrape_date": "2025-12-14T03:18:51.067121Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/jicsqj36wrvhidmyxglnd5i5xiz9n3qi-python3.12-langchain-community-0.4.1-dist",
+        "out": "/nix/store/cdll4h6wjqipffnc90s5l7igi1vaxy34-python3.12-langchain-community-0.4.1"
+      },
+      "system": "aarch64-linux",
+      "group": "langchain",
+      "priority": 5
+    },
+    {
+      "attr_path": "python312Packages.langchain-community",
+      "broken": false,
+      "derivation": "/nix/store/fa0yimd4yy619x8wgzz0kxfds18qhhd9-python3.12-langchain-community-0.4.1.drv",
+      "description": "Community contributed LangChain integrations",
+      "install_id": "langchain-community",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "name": "python3.12-langchain-community-0.4.1",
+      "pname": "langchain-community",
+      "rev": "2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "rev_count": 910362,
+      "rev_date": "2025-12-11T16:57:14Z",
+      "scrape_date": "2025-12-14T03:35:21.963310Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/iipa064jhc2f9k5pfdzrahphgr3yz3m8-python3.12-langchain-community-0.4.1-dist",
+        "out": "/nix/store/y4xl998hvy1ysaz2rgw9sp9wcq33yn0b-python3.12-langchain-community-0.4.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "langchain",
+      "priority": 5
+    },
+    {
+      "attr_path": "python312Packages.langchain-community",
+      "broken": false,
+      "derivation": "/nix/store/6dllrgb9jz02qlx2gq9lzjnl3z7fvl85-python3.12-langchain-community-0.4.1.drv",
+      "description": "Community contributed LangChain integrations",
+      "install_id": "langchain-community",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "name": "python3.12-langchain-community-0.4.1",
+      "pname": "langchain-community",
+      "rev": "2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "rev_count": 910362,
+      "rev_date": "2025-12-11T16:57:14Z",
+      "scrape_date": "2025-12-14T03:51:31.285880Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/ghajncdfsxhdvjxzpj20fjsdkw13hrpp-python3.12-langchain-community-0.4.1-dist",
+        "out": "/nix/store/ldrjn8a1kk9pxcs4d6chf1fh0mzfzjaj-python3.12-langchain-community-0.4.1"
+      },
+      "system": "x86_64-linux",
+      "group": "langchain",
+      "priority": 5
+    },
+    {
+      "attr_path": "python312Packages.langchain-ollama",
+      "broken": false,
+      "derivation": "/nix/store/02y8jvc37azvv5zlyir8bkw3zxmd9775-python3.12-langchain-ollama-1.0.0.drv",
+      "description": "Integration package connecting Ollama and LangChain",
+      "install_id": "langchain-ollama",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "name": "python3.12-langchain-ollama-1.0.0",
+      "pname": "langchain-ollama",
+      "rev": "2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "rev_count": 910362,
+      "rev_date": "2025-12-11T16:57:14Z",
+      "scrape_date": "2025-12-14T03:02:21.137166Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.0.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/9d6h96k9k6387b79lqd42qp26xr8gfgw-python3.12-langchain-ollama-1.0.0-dist",
+        "out": "/nix/store/5c0cdc861abr3j0jfxxq2jl6b03i1qwb-python3.12-langchain-ollama-1.0.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "langchain",
+      "priority": 5
+    },
+    {
+      "attr_path": "python312Packages.langchain-ollama",
+      "broken": false,
+      "derivation": "/nix/store/rx2yrmv1n1pzlpnqx4nz5z31ccqmnyjp-python3.12-langchain-ollama-1.0.0.drv",
+      "description": "Integration package connecting Ollama and LangChain",
+      "install_id": "langchain-ollama",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "name": "python3.12-langchain-ollama-1.0.0",
+      "pname": "langchain-ollama",
+      "rev": "2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "rev_count": 910362,
+      "rev_date": "2025-12-11T16:57:14Z",
+      "scrape_date": "2025-12-14T03:18:51.098920Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.0.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/j3xvvdz6i6ahw3bx6y5vdhbs1izjqmsk-python3.12-langchain-ollama-1.0.0-dist",
+        "out": "/nix/store/wkzfzd9wcpmlgf5x0cnzfik5gp6chz08-python3.12-langchain-ollama-1.0.0"
+      },
+      "system": "aarch64-linux",
+      "group": "langchain",
+      "priority": 5
+    },
+    {
+      "attr_path": "python312Packages.langchain-ollama",
+      "broken": false,
+      "derivation": "/nix/store/hysby04crbzn54080cml547mclh1rv7w-python3.12-langchain-ollama-1.0.0.drv",
+      "description": "Integration package connecting Ollama and LangChain",
+      "install_id": "langchain-ollama",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "name": "python3.12-langchain-ollama-1.0.0",
+      "pname": "langchain-ollama",
+      "rev": "2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "rev_count": 910362,
+      "rev_date": "2025-12-11T16:57:14Z",
+      "scrape_date": "2025-12-14T03:35:21.980061Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.0.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/8kpdckf419gkcgxnib5wisin98jlqs6w-python3.12-langchain-ollama-1.0.0-dist",
+        "out": "/nix/store/chzk6d1f35h0h5gyy6rfcq3893zmslz3-python3.12-langchain-ollama-1.0.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "langchain",
+      "priority": 5
+    },
+    {
+      "attr_path": "python312Packages.langchain-ollama",
+      "broken": false,
+      "derivation": "/nix/store/xf9x0vv88wvdazkvag04rfj4dcp8310w-python3.12-langchain-ollama-1.0.0.drv",
+      "description": "Integration package connecting Ollama and LangChain",
+      "install_id": "langchain-ollama",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "name": "python3.12-langchain-ollama-1.0.0",
+      "pname": "langchain-ollama",
+      "rev": "2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "rev_count": 910362,
+      "rev_date": "2025-12-11T16:57:14Z",
+      "scrape_date": "2025-12-14T03:51:31.308960Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.0.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/i3f8z8kx2v1m09r5mlrjabp2bgf6bimq-python3.12-langchain-ollama-1.0.0-dist",
+        "out": "/nix/store/6pkmpcfy3vqf6lrfjlydk5v2fc1fs44h-python3.12-langchain-ollama-1.0.0"
+      },
+      "system": "x86_64-linux",
+      "group": "langchain",
+      "priority": 5
+    },
+    {
+      "attr_path": "python312Packages.langgraph",
+      "broken": false,
+      "derivation": "/nix/store/ql016dhlc0dwz9jjxf6cqqxbaj17pd8x-python3.12-langgraph-1.0.4.drv",
+      "description": "Build resilient language agents as graphs",
+      "install_id": "langgraph",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "name": "python3.12-langgraph-1.0.4",
+      "pname": "langgraph",
+      "rev": "2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "rev_count": 910362,
+      "rev_date": "2025-12-11T16:57:14Z",
+      "scrape_date": "2025-12-14T03:02:21.155881Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.0.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/kpa1y5778f3flll9dc5zhwwvpml8p11p-python3.12-langgraph-1.0.4-dist",
+        "out": "/nix/store/ggd7ycy8bwrzza85l6pjhr3yc30c8jga-python3.12-langgraph-1.0.4"
+      },
+      "system": "aarch64-darwin",
+      "group": "langchain",
+      "priority": 5
+    },
+    {
+      "attr_path": "python312Packages.langgraph",
+      "broken": false,
+      "derivation": "/nix/store/94h1fsl67krvmaj5i8646wlq29qpczc6-python3.12-langgraph-1.0.4.drv",
+      "description": "Build resilient language agents as graphs",
+      "install_id": "langgraph",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "name": "python3.12-langgraph-1.0.4",
+      "pname": "langgraph",
+      "rev": "2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "rev_count": 910362,
+      "rev_date": "2025-12-11T16:57:14Z",
+      "scrape_date": "2025-12-14T03:18:51.129270Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.0.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/s450x9zx9qx2pwss4wnc87cljxax6v2q-python3.12-langgraph-1.0.4-dist",
+        "out": "/nix/store/37cbbapbhrnj10a8wb3hgynhikh6q1kj-python3.12-langgraph-1.0.4"
+      },
+      "system": "aarch64-linux",
+      "group": "langchain",
+      "priority": 5
+    },
+    {
+      "attr_path": "python312Packages.langgraph",
+      "broken": false,
+      "derivation": "/nix/store/c6h8rnxldd2zy9c05kfy7n9rnq2aakq4-python3.12-langgraph-1.0.4.drv",
+      "description": "Build resilient language agents as graphs",
+      "install_id": "langgraph",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "name": "python3.12-langgraph-1.0.4",
+      "pname": "langgraph",
+      "rev": "2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "rev_count": 910362,
+      "rev_date": "2025-12-11T16:57:14Z",
+      "scrape_date": "2025-12-14T03:35:21.996640Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.0.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/r406jpjxwkhj6hlhggbkd6li0c62i6ph-python3.12-langgraph-1.0.4-dist",
+        "out": "/nix/store/shahsbcmdnly502dfyx5xyksgvin3438-python3.12-langgraph-1.0.4"
+      },
+      "system": "x86_64-darwin",
+      "group": "langchain",
+      "priority": 5
+    },
+    {
+      "attr_path": "python312Packages.langgraph",
+      "broken": false,
+      "derivation": "/nix/store/3c9lqs67yn6yigk75h9y8sbkkpv8ia0r-python3.12-langgraph-1.0.4.drv",
+      "description": "Build resilient language agents as graphs",
+      "install_id": "langgraph",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "name": "python3.12-langgraph-1.0.4",
+      "pname": "langgraph",
+      "rev": "2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "rev_count": 910362,
+      "rev_date": "2025-12-11T16:57:14Z",
+      "scrape_date": "2025-12-14T03:51:31.329806Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.0.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/s7953qxw6h9b7qadpc70r0r5sna7jvzr-python3.12-langgraph-1.0.4-dist",
+        "out": "/nix/store/pnrra205pyfdkdg8hc8fyjmhrhkm7bmf-python3.12-langgraph-1.0.4"
+      },
+      "system": "x86_64-linux",
+      "group": "langchain",
+      "priority": 5
+    },
+    {
+      "attr_path": "ollama",
+      "broken": false,
+      "derivation": "/nix/store/rhs5adqfdwki9knqfl2q5hqqmy9q08v7-ollama-0.13.2.drv",
+      "description": "Get up and running with large language models locally",
+      "install_id": "ollama",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "name": "ollama-0.13.2",
+      "pname": "ollama",
+      "rev": "2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "rev_count": 910362,
+      "rev_date": "2025-12-11T16:57:14Z",
+      "scrape_date": "2025-12-14T03:01:59.260285Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.13.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/bkgcbgixlham8jq4prxi31izp7ph3rn8-ollama-0.13.2"
+      },
+      "system": "aarch64-darwin",
+      "group": "langchain",
+      "priority": 5
+    },
+    {
+      "attr_path": "ollama",
+      "broken": false,
+      "derivation": "/nix/store/f3x1w7nn19qp2ymkqyw724qysyagyxy4-ollama-0.13.2.drv",
+      "description": "Get up and running with large language models locally",
+      "install_id": "ollama",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "name": "ollama-0.13.2",
+      "pname": "ollama",
+      "rev": "2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "rev_count": 910362,
+      "rev_date": "2025-12-11T16:57:14Z",
+      "scrape_date": "2025-12-14T03:18:10.420821Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.13.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rz5f047z5r4944aksz69mbhhr6a47hxz-ollama-0.13.2"
+      },
+      "system": "aarch64-linux",
+      "group": "langchain",
+      "priority": 5
+    },
+    {
+      "attr_path": "ollama",
+      "broken": false,
+      "derivation": "/nix/store/jk50ydjrvkbcya45d5a2j4pa2akav6ci-ollama-0.13.2.drv",
+      "description": "Get up and running with large language models locally",
+      "install_id": "ollama",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "name": "ollama-0.13.2",
+      "pname": "ollama",
+      "rev": "2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "rev_count": 910362,
+      "rev_date": "2025-12-11T16:57:14Z",
+      "scrape_date": "2025-12-14T03:35:01.934641Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.13.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/87ni487971f9cakvxg17687rw7l1bryg-ollama-0.13.2"
+      },
+      "system": "x86_64-darwin",
+      "group": "langchain",
+      "priority": 5
+    },
+    {
+      "attr_path": "ollama",
+      "broken": false,
+      "derivation": "/nix/store/w11lfi69zy3hh3niwbbq5hw5v2x8f6yg-ollama-0.13.2.drv",
+      "description": "Get up and running with large language models locally",
+      "install_id": "ollama",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "name": "ollama-0.13.2",
+      "pname": "ollama",
+      "rev": "2fbfb1d73d239d2402a8fe03963e37aab15abe8b",
+      "rev_count": 910362,
+      "rev_date": "2025-12-11T16:57:14Z",
+      "scrape_date": "2025-12-14T03:51:03.721373Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.13.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/p9jwid9278wrxfmyn6cp323i34jccspm-ollama-0.13.2"
+      },
+      "system": "x86_64-linux",
+      "group": "langchain",
+      "priority": 5
+    }
+  ],
+  "compose": {
+    "composer": {
+      "schema-version": "1.11.0",
+      "install": {
+        "gum": {
+          "pkg-path": "gum",
+          "pkg-group": "demo-tools"
+        }
+      },
+      "hook": {
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Ollama in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Python packages available:' \\\n    '  langgraph, langchain-ollama, langchain-community' '' \\\n    'Check Ollama status:' \\\n    '  ollama list'\nfi\n"
+      },
+      "options": {},
+      "include": {
+        "environments": [
+          {
+            "dir": "../langchain"
+          }
+        ]
+      }
+    },
+    "include": [
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "langchain-community": {
+              "pkg-path": "python312Packages.langchain-community",
+              "pkg-group": "langchain"
+            },
+            "langchain-ollama": {
+              "pkg-path": "python312Packages.langchain-ollama",
+              "pkg-group": "langchain"
+            },
+            "langgraph": {
+              "pkg-path": "python312Packages.langgraph",
+              "pkg-group": "langchain"
+            },
+            "ollama": {
+              "pkg-path": "ollama",
+              "pkg-group": "langchain"
+            }
+          },
+          "options": {},
+          "services": {
+            "ollama": {
+              "command": "ollama serve"
+            }
+          }
+        },
+        "name": "langchain",
+        "descriptor": {
+          "dir": "../langchain"
+        }
+      }
+    ],
+    "warnings": []
+  }
+}
