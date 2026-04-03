@@ -1,0 +1,36 @@
+name: "CI: dotenv"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "dotenv/**"
+      - "dotenv-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_dotenv.yml"
+  pull_request:
+    paths:
+      - "dotenv/**"
+      - "dotenv-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_dotenv.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "dotenv"
+    secrets: inherit

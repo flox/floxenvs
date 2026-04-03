@@ -1,4 +1,16 @@
-version = 1
+schema-version = "1.10.0"
+
+# Load .env files automatically on activation.
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/dotenv"]
+#
+# Customize the file path:
+#
+#   [vars]
+#   DOTENV_FILE = ".env.local"
 
 [vars]
 DOTENV_FILE = ".env"
@@ -9,14 +21,5 @@ if [ -f "$DOTENV_FILE" ]; then
   set -o allexport
   source "$DOTENV_FILE"
   set +o allexport
-  echo "✅ Environment variables loaded from '$DOTENV_FILE' file"
 fi
 '''
-
-[options]
-systems = [
-  "aarch64-darwin",
-  "aarch64-linux",
-  "x86_64-darwin",
-  "x86_64-linux",
-]
