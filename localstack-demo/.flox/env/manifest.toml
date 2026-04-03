@@ -1,0 +1,25 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../localstack" }
+]
+
+# gum is a demo-only tool for styled terminal output.
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'Start LocalStack in the background:' \
+    '  flox services start' \
+    '  flox activate --start-services' '' \
+    'Once it starts, see available services with:' \
+    '  localstack status services'
+fi
+'''
