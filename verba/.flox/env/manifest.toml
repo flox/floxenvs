@@ -1,119 +1,67 @@
 schema-version = "1.10.0"
 
+# Verba RAG application with Weaviate + Ollama.
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/verba"]
+#
+# Provides Python, Weaviate vector database, Ollama
+# LLM backend, and the Verba RAG application.
+
 [install]
-
 python.pkg-path = "python311"
-
-# Install Weaviate as a vector database
+python.pkg-group = "verba"
 weaviate.pkg-path = "weaviate"
-#weaviate.version = "1.25.9"
-
-# Install Ollama as a backend
+weaviate.pkg-group = "verba"
 ollama.pkg-path = "ollama"
-#ollama.version = "0.3.5"
-
-# Nice UI for our hook and profile scripts :)
-gum.pkg-path = "gum"
-
-# Deps for our service scripts
+ollama.pkg-group = "verba"
 bash.pkg-path = "bash"
+bash.pkg-group = "verba"
 bash.priority = 0
-bash.outputs = "all"
 curl.pkg-path = "curl"
-curl.outputs = "all"
+curl.pkg-group = "verba-tools"
 git.pkg-path = "git"
-git.outputs = "all"
-
-# System/C deps
+git.pkg-group = "verba-tools"
 gcc-unwrapped.pkg-path = "gcc-unwrapped"
-gcc-unwrapped.outputs = "all"
+gcc-unwrapped.pkg-group = "verba-build"
 pkg-config.pkg-path = "pkg-config"
-pkg-config.outputs = "all"
-glibc.pkg-path = "glibc"  # glibc only needed on linux builds
+pkg-config.pkg-group = "verba-build"
+glibc.pkg-path = "glibc"
+glibc.pkg-group = "verba-build"
 glibc.systems = ["x86_64-linux", "aarch64-linux"]
-glibc.outputs = "all"
-
 
 [vars]
-
-# The name of the Verba package to install
 VERBA_INSTALL_PACKAGE = "goldenverba@git+https://github.com/weaviate/Verba"
-
-# This configures Weaviate, and configures Verba to use it
 WEAVIATE_URL_VERBA = "localhost"
-WEAVIATE_URL_VERBA_full = "http://localhost:8080" # needed for verba v2.1.0 Custom Deploy UI
-
-# Weaviate data path
+WEAVIATE_URL_VERBA_full = "http://localhost:8080"
 PERSISTENCE_DATA_PATH = "./verba-data"
-
-# Leave Weaviate wide open (for now!)
 AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED = "true"
-
-# Weaviate query default limit
 QUERY_DEFAULTS_LIMIT = "10"
-
-# This configures Verba to use the local Ollama instance
 OLLAMA_URL = "http://localhost:11434"
-
-# Our Ollama models
 OLLAMA_MODEL = "llama3"
 OLLAMA_EMBED_MODEL = "mxbai-embed-large"
+VIRTUAL_ENV_DISABLE_PROMPT = "1"
 
-# OpenAI configuration
-# OPENAI_API_KEY = ""
-# OPENAI_BASE_URL = "http://100.0.0.0:8000"
-
-# For other Verba variables that can be set here, see:
-# https://github.com/weaviate/Verba/blob/main/goldenverba/.env.example
-
-# Values that are *not* set here can be passed in at activation
-# time, like this:
-# 
-#     `OPENAI_API_KEY="xxx" flox activate -s`
-
-# IMO we don't need both Flox and venv to augment our prompt
-VIRTUAL_ENV_DISABLE_PROMPT="1"
-
-
-# Since Verba is not (yet) in the Flox catalog, we need to
-# install it from pypi using a venv
-
-# We can add a hook that makes sure that Verba is installed
-# before we try to start it (or use it!)
-#
 [hook]
 on-activate = '''
-# If we export this here, it can be used later in 'profiles.common'
 export PYTHON_DIR="$FLOX_ENV_CACHE/python"
 
-if tty -s; then
-  if [ ! -d "$PYTHON_DIR" ]; then
-    gum spin -s globe --title "Creating venv in $PYTHON_DIR..." -- python -m venv "$PYTHON_DIR"
-  fi
-
-  (
-    source "$PYTHON_DIR/bin/activate"
-    gum spin -s monkey --title "Installing/updating Verba..." -- pip install "$VERBA_INSTALL_PACKAGE"
-  )
-else
-  if [ ! -d "$PYTHON_DIR" ]; then
-    python -m venv "$PYTHON_DIR"
-  fi
-
-  (
-    source "$PYTHON_DIR/bin/activate"
-    pip install "$VERBA_INSTALL_PACKAGE"
-  )
+if [ ! -d "$PYTHON_DIR" ]; then
+  python -m venv "$PYTHON_DIR"
 fi
-'''
 
+(
+  source "$PYTHON_DIR/bin/activate"
+  pip install -q "$VERBA_INSTALL_PACKAGE"
+)
+'''
 
 [profile]
 common = '''
-  # Activate the Python venv
-  source "$PYTHON_DIR/bin/activate"
+source "$PYTHON_DIR/bin/activate"
 '''
-
 
 [services]
 weaviate.command = "weaviate --host 0.0.0.0 --port 8080 --scheme http"
@@ -131,15 +79,9 @@ fi
 """
 
 models.command = """
-# wait for ollama to be ready
 until ollama list; do
   sleep 0.1
 done
-
 ollama pull "$OLLAMA_MODEL"
 ollama pull "$OLLAMA_EMBED_MODEL"
 """
-
-
-[options]
-systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux", "x86_64-darwin"]

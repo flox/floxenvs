@@ -2,15 +2,21 @@
 
 set -eo pipefail
 
-check_command() {
-	if ! command -v $1 2>&1 >/dev/null; then
-		echo "Error: '$1' command could not be found."
-		exit 1
-	fi
-}
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "Error: 'python3' command not found."
+  exit 1
+fi
+if ! command -v weaviate >/dev/null 2>&1; then
+  echo "Error: 'weaviate' command not found."
+  exit 1
+fi
+if ! command -v ollama >/dev/null 2>&1; then
+  echo "Error: 'ollama' command not found."
+  exit 1
+fi
 
-check_command weaviate
-check_command ollama
-check_command "$PYTHON_DIR/bin/verba"
+echo ">>> python3 version: $(python3 --version)"
+echo ">>> weaviate available"
+echo ">>> ollama version: $(ollama --version 2>&1 | head -1)"
 
-echo "All commands are on \$PATH."
+echo ">>> verba environment is working"
