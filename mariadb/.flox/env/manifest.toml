@@ -73,12 +73,9 @@ skip-external-locking
 EOF
 
   echo "Initializing MariaDB database..." >> "$INIT_LOG"
-  mariadb-install-db \
+  mariadbd \
     --defaults-file="$MARIADB_CONFIG" \
-    --auth-root-authentication-method=normal \
-    --user="$USER" \
-    --skip-test-db \
-    --cross-bootstrap \
+    --initialize-insecure \
     >> "$INIT_LOG" 2>&1 \
     || init_fail
 
