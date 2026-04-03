@@ -1,0 +1,29 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../dotenv" }
+]
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  if [ -f "$DOTENV_FILE" ]; then
+    LOADED="$(grep -c '=' "$DOTENV_FILE" 2>/dev/null || echo 0)"
+    gum style --border double --margin '1 2' \
+      --padding '1 4' \
+      'dotenv environment ready!' '' \
+      "Loaded $LOADED variables from $DOTENV_FILE"
+  else
+    gum style --border double --margin '1 2' \
+      --padding '1 4' \
+      'dotenv environment ready!' '' \
+      "No $DOTENV_FILE file found." \
+      'Create one to auto-load variables.'
+  fi
+fi
+'''
