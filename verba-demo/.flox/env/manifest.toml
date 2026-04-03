@@ -1,0 +1,30 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../verba" }
+]
+
+# gum is a demo-only tool for styled terminal output.
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'Start Verba services in the background:' \
+    '  flox services start' \
+    '  flox activate --start-services' '' \
+    'Services:' \
+    '  weaviate  http://localhost:8080' \
+    '  ollama    http://localhost:11434' \
+    '  verba     http://localhost:8000' '' \
+    'Ollama models:' \
+    "  chat   = $OLLAMA_MODEL" \
+    "  embed  = $OLLAMA_EMBED_MODEL"
+fi
+'''

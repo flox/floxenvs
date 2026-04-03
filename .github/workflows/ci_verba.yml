@@ -1,0 +1,36 @@
+name: "CI: verba"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "verba/**"
+      - "verba-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_verba.yml"
+  pull_request:
+    paths:
+      - "verba/**"
+      - "verba-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_verba.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "verba"
+    secrets: inherit

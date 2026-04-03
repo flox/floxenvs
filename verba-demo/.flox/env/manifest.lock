@@ -28,6 +28,10 @@
           "aarch64-linux"
         ]
       },
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": "demo-tools"
+      },
       "ollama": {
         "pkg-path": "ollama",
         "pkg-group": "verba"
@@ -58,7 +62,7 @@
       "WEAVIATE_URL_VERBA_full": "http://localhost:8080"
     },
     "hook": {
-      "on-activate": "export PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nif [ ! -d \"$PYTHON_DIR\" ]; then\n  python -m venv \"$PYTHON_DIR\"\nfi\n\n(\n  source \"$PYTHON_DIR/bin/activate\"\n  pip install -q \"$VERBA_INSTALL_PACKAGE\"\n)\n"
+      "on-activate": "export PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nif [ ! -d \"$PYTHON_DIR\" ]; then\n  python -m venv \"$PYTHON_DIR\"\nfi\n\n(\n  source \"$PYTHON_DIR/bin/activate\"\n  pip install -q \"$VERBA_INSTALL_PACKAGE\"\n)\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Verba services in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Services:' \\\n    '  weaviate  http://localhost:8080' \\\n    '  ollama    http://localhost:11434' \\\n    '  verba     http://localhost:8000' '' \\\n    'Ollama models:' \\\n    \"  chat   = $OLLAMA_MODEL\" \\\n    \"  embed  = $OLLAMA_EMBED_MODEL\"\nfi\n"
     },
     "profile": {
       "common": "source \"$PYTHON_DIR/bin/activate\"\n"
@@ -80,6 +84,123 @@
     }
   },
   "packages": [
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/bmz60mbb36nlipdn9n6zmcm6kjls8gll-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:01:04.824827Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cdpxgzcjwidrmrzsq0zkyr9nxccvy3p6-gum-0.17.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/yhvp5prpjjl5hqk6fhr5svdzf1yfacgk-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:32:37.949153Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kqcb9j9k6wdvb7pjvjzn3p8dc82qmk9x-gum-0.17.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/cngbjjxmgsmcbgvihq7q9472rb5rhgdj-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:02:19.693599Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rznkbgxflsbrfy5c359vhhqrrxw4pfkj-gum-0.17.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/f5ahd90j9s46j49lz8k2yn3cmvyq6mbn-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:36:34.309717Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rf0zlw5q4j051xkjk9djfw5dpb8nwbgm-gum-0.17.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
     {
       "attr_path": "bash",
       "broken": false,
@@ -1177,5 +1298,115 @@
       "group": "verba-tools",
       "priority": 5
     }
-  ]
+  ],
+  "compose": {
+    "composer": {
+      "schema-version": "1.11.0",
+      "install": {
+        "gum": {
+          "pkg-path": "gum",
+          "pkg-group": "demo-tools"
+        }
+      },
+      "hook": {
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Verba services in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Services:' \\\n    '  weaviate  http://localhost:8080' \\\n    '  ollama    http://localhost:11434' \\\n    '  verba     http://localhost:8000' '' \\\n    'Ollama models:' \\\n    \"  chat   = $OLLAMA_MODEL\" \\\n    \"  embed  = $OLLAMA_EMBED_MODEL\"\nfi\n"
+      },
+      "options": {},
+      "include": {
+        "environments": [
+          {
+            "dir": "../verba"
+          }
+        ]
+      }
+    },
+    "include": [
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "bash": {
+              "pkg-path": "bash",
+              "pkg-group": "verba",
+              "priority": 0
+            },
+            "curl": {
+              "pkg-path": "curl",
+              "pkg-group": "verba-tools"
+            },
+            "gcc-unwrapped": {
+              "pkg-path": "gcc-unwrapped",
+              "pkg-group": "verba-build"
+            },
+            "git": {
+              "pkg-path": "git",
+              "pkg-group": "verba-tools"
+            },
+            "glibc": {
+              "pkg-path": "glibc",
+              "pkg-group": "verba-build",
+              "systems": [
+                "x86_64-linux",
+                "aarch64-linux"
+              ]
+            },
+            "ollama": {
+              "pkg-path": "ollama",
+              "pkg-group": "verba"
+            },
+            "pkg-config": {
+              "pkg-path": "pkg-config",
+              "pkg-group": "verba-build"
+            },
+            "python": {
+              "pkg-path": "python311",
+              "pkg-group": "verba"
+            },
+            "weaviate": {
+              "pkg-path": "weaviate",
+              "pkg-group": "verba"
+            }
+          },
+          "vars": {
+            "AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED": "true",
+            "OLLAMA_EMBED_MODEL": "mxbai-embed-large",
+            "OLLAMA_MODEL": "llama3",
+            "OLLAMA_URL": "http://localhost:11434",
+            "PERSISTENCE_DATA_PATH": "./verba-data",
+            "QUERY_DEFAULTS_LIMIT": "10",
+            "VERBA_INSTALL_PACKAGE": "goldenverba@git+https://github.com/weaviate/Verba",
+            "VIRTUAL_ENV_DISABLE_PROMPT": "1",
+            "WEAVIATE_URL_VERBA": "localhost",
+            "WEAVIATE_URL_VERBA_full": "http://localhost:8080"
+          },
+          "hook": {
+            "on-activate": "export PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nif [ ! -d \"$PYTHON_DIR\" ]; then\n  python -m venv \"$PYTHON_DIR\"\nfi\n\n(\n  source \"$PYTHON_DIR/bin/activate\"\n  pip install -q \"$VERBA_INSTALL_PACKAGE\"\n)\n"
+          },
+          "profile": {
+            "common": "source \"$PYTHON_DIR/bin/activate\"\n"
+          },
+          "options": {},
+          "services": {
+            "models": {
+              "command": "until ollama list; do\n  sleep 0.1\ndone\nollama pull \"$OLLAMA_MODEL\"\nollama pull \"$OLLAMA_EMBED_MODEL\"\n"
+            },
+            "ollama": {
+              "command": "ollama serve"
+            },
+            "verba": {
+              "command": "if [[ \"$WEAVIATE_URL_VERBA\" != \"\" ]]; then\n  until curl -s \"$WEAVIATE_URL_VERBA_full\"; do\n    echo \"waiting for weaviate ...\"\n    sleep 0.1\n  done\nfi\n\"$PYTHON_DIR/bin/verba\" start --port 8000 --host 0.0.0.0\n"
+            },
+            "weaviate": {
+              "command": "weaviate --host 0.0.0.0 --port 8080 --scheme http"
+            }
+          }
+        },
+        "name": "verba",
+        "descriptor": {
+          "dir": "../verba"
+        }
+      }
+    ],
+    "warnings": []
+  }
 }
