@@ -7,6 +7,10 @@
         "pkg-path": "awscli2",
         "pkg-group": "localstack"
       },
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": "demo-tools"
+      },
       "kubectl": {
         "pkg-path": "kubectl",
         "pkg-group": "localstack-tools"
@@ -21,7 +25,7 @@
       }
     },
     "hook": {
-      "on-activate": "export LOCALSTACK_CACHE=\"$FLOX_ENV_CACHE/localstack\"\nexport PYTHON_DIR=\"$LOCALSTACK_CACHE/venv\"\n\nif [ ! -d \"$PYTHON_DIR\" ]; then\n  python -m venv \"$PYTHON_DIR\" 2>/dev/null\nfi\n\n(\n  source \"$PYTHON_DIR/bin/activate\"\n  pip install -q awscli-local\n)\n"
+      "on-activate": "export LOCALSTACK_CACHE=\"$FLOX_ENV_CACHE/localstack\"\nexport PYTHON_DIR=\"$LOCALSTACK_CACHE/venv\"\n\nif [ ! -d \"$PYTHON_DIR\" ]; then\n  python -m venv \"$PYTHON_DIR\" 2>/dev/null\nfi\n\n(\n  source \"$PYTHON_DIR/bin/activate\"\n  pip install -q awscli-local\n)\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start LocalStack in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Once it starts, see available services with:' \\\n    '  localstack status services'\nfi\n"
     },
     "profile": {
       "bash": "source \"$PYTHON_DIR/bin/activate\"\n",
@@ -41,6 +45,123 @@
     }
   },
   "packages": [
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/bmz60mbb36nlipdn9n6zmcm6kjls8gll-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:01:04.824827Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cdpxgzcjwidrmrzsq0zkyr9nxccvy3p6-gum-0.17.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/yhvp5prpjjl5hqk6fhr5svdzf1yfacgk-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T18:32:37.949153Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kqcb9j9k6wdvb7pjvjzn3p8dc82qmk9x-gum-0.17.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/cngbjjxmgsmcbgvihq7q9472rb5rhgdj-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:02:19.693599Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rznkbgxflsbrfy5c359vhhqrrxw4pfkj-gum-0.17.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/f5ahd90j9s46j49lz8k2yn3cmvyq6mbn-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "6201e203d09599479a3b3450ed24fa81537ebc4e",
+      "rev_count": 972949,
+      "rev_date": "2026-04-01T09:47:46Z",
+      "scrape_date": "2026-04-02T19:36:34.309717Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rf0zlw5q4j051xkjk9djfw5dpb8nwbgm-gum-0.17.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
     {
       "attr_path": "awscli2",
       "broken": false,
@@ -564,5 +685,76 @@
       "group": "localstack-tools",
       "priority": 5
     }
-  ]
+  ],
+  "compose": {
+    "composer": {
+      "schema-version": "1.11.0",
+      "install": {
+        "gum": {
+          "pkg-path": "gum",
+          "pkg-group": "demo-tools"
+        }
+      },
+      "hook": {
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start LocalStack in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Once it starts, see available services with:' \\\n    '  localstack status services'\nfi\n"
+      },
+      "options": {},
+      "include": {
+        "environments": [
+          {
+            "dir": "../localstack"
+          }
+        ]
+      }
+    },
+    "include": [
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "awscli2": {
+              "pkg-path": "awscli2",
+              "pkg-group": "localstack"
+            },
+            "kubectl": {
+              "pkg-path": "kubectl",
+              "pkg-group": "localstack-tools"
+            },
+            "localstack": {
+              "pkg-path": "localstack",
+              "pkg-group": "localstack"
+            },
+            "python3": {
+              "pkg-path": "python3",
+              "pkg-group": "localstack"
+            }
+          },
+          "hook": {
+            "on-activate": "export LOCALSTACK_CACHE=\"$FLOX_ENV_CACHE/localstack\"\nexport PYTHON_DIR=\"$LOCALSTACK_CACHE/venv\"\n\nif [ ! -d \"$PYTHON_DIR\" ]; then\n  python -m venv \"$PYTHON_DIR\" 2>/dev/null\nfi\n\n(\n  source \"$PYTHON_DIR/bin/activate\"\n  pip install -q awscli-local\n)\n"
+          },
+          "profile": {
+            "bash": "source \"$PYTHON_DIR/bin/activate\"\n",
+            "zsh": "source \"$PYTHON_DIR/bin/activate\"\n",
+            "fish": "source \"$PYTHON_DIR/bin/activate.fish\"\n",
+            "tcsh": "source \"$PYTHON_DIR/bin/activate.csh\"\n"
+          },
+          "options": {},
+          "services": {
+            "localstack": {
+              "command": "localstack start -d",
+              "is-daemon": true,
+              "shutdown": {
+                "command": "localstack stop"
+              }
+            }
+          }
+        },
+        "name": "localstack",
+        "descriptor": {
+          "dir": "../localstack"
+        }
+      }
+    ],
+    "warnings": []
+  }
 }

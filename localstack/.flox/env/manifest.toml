@@ -1,58 +1,40 @@
-version = 1
+schema-version = "1.10.0"
+
+# Minimal LocalStack environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/localstack"]
 
 [install]
 localstack.pkg-path = "localstack"
-kubectl.pkg-path = "kubectl"
-gum.pkg-path = "gum"
+localstack.pkg-group = "localstack"
 python3.pkg-path = "python3"
+python3.pkg-group = "localstack"
 awscli2.pkg-path = "awscli2"
+awscli2.pkg-group = "localstack"
+kubectl.pkg-path = "kubectl"
+kubectl.pkg-group = "localstack-tools"
 
 [services]
 localstack.command = "localstack start -d"
 localstack.is-daemon = true
 localstack.shutdown.command = "localstack stop"
 
-[vars]
-AWSCLILOCAL_PACKAGE="awscli-local"
-
 [hook]
 on-activate = '''
-# Make a spinner we can skip this in CI
-function with_spinner() {
-  if [[ "$FLOX_ENVS_TESTING" == "1" ]]; then
-    bash -c "$2"
-  else
-    gum spin \
-      --show-error \
-      --spinner line \
-      --title "$1" \
-        -- bash -c "$2"
-  fi
-}
+export LOCALSTACK_CACHE="$FLOX_ENV_CACHE/localstack"
+export PYTHON_DIR="$LOCALSTACK_CACHE/venv"
 
-# Make a venv
-export PYTHON_DIR="$FLOX_ENV_CACHE/python"
 if [ ! -d "$PYTHON_DIR" ]; then
-  with_spinner "Creating venv in $PYTHON_DIR..." "python -m venv \"$PYTHON_DIR\""
-  echo "✅ Created venv"
+  python -m venv "$PYTHON_DIR" 2>/dev/null
 fi
 
 (
   source "$PYTHON_DIR/bin/activate"
-  with_spinner "Installing $AWSCLILOCAL_PACKAGE..." "pip install $AWSCLILOCAL_PACKAGE"
-  echo "✅ Installed $AWSCLILOCAL_PACKAGE"
+  pip install -q awscli-local
 )
-
-if [[ "$FLOX_ACTIVATE_START_SERVICES" == "true" ]]; then
-  gum style --border double --margin "1 2" --padding "1 4" \
-    'Localstack may take a few moments to start.' '' \
-    'Once it starts, see available services with:' \
-    '  localstack status services'
-else
-  gum style --border double --margin "1 2" --padding "1 4" \
-    'You may need to start localstack using:' \
-    '  flox services start'
-fi
 '''
 
 [profile]
@@ -68,7 +50,3 @@ source "$PYTHON_DIR/bin/activate.csh"
 zsh = '''
 source "$PYTHON_DIR/bin/activate"
 '''
-
-[options]
-systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
-
