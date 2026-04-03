@@ -1,0 +1,36 @@
+name: "CI: javascript-deno"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "javascript-deno/**"
+      - "javascript-deno-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_javascript-deno.yml"
+  pull_request:
+    paths:
+      - "javascript-deno/**"
+      - "javascript-deno-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_javascript-deno.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "javascript-deno"
+    secrets: inherit
