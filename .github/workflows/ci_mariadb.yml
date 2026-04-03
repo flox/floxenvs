@@ -1,0 +1,36 @@
+name: "CI: mariadb"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "mariadb/**"
+      - "mariadb-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_mariadb.yml"
+  pull_request:
+    paths:
+      - "mariadb/**"
+      - "mariadb-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_mariadb.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "mariadb"
+    secrets: inherit
