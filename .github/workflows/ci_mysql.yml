@@ -1,0 +1,36 @@
+name: "CI: mysql"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "mysql/**"
+      - "mysql-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_mysql.yml"
+  pull_request:
+    paths:
+      - "mysql/**"
+      - "mysql-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_mysql.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "mysql"
+    secrets: inherit
