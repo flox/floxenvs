@@ -13,7 +13,7 @@
       "NODE_ENV": "development"
     },
     "hook": {
-      "on-activate": "export BUN_CACHE=\"$FLOX_ENV_CACHE/javascript-bun\"\nmkdir -p \"$BUN_CACHE\"\n\nif [ \"$BUN_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f package.json ] \\\n    && [ -f bun.lockb ]; then\n  HASH=$(cat package.json bun.lockb \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$BUN_CACHE/packages-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    bun install --frozen-lockfile\n    echo \"$HASH\" > \"$BUN_CACHE/packages-hash\"\n  fi\nfi\n"
+      "on-activate": "export BUN_CACHE=\"$FLOX_ENV_CACHE/javascript-bun\"\nmkdir -p \"$BUN_CACHE\"\n\nBUN_LOCKFILE=\"\"\nif [ -f bun.lockb ]; then\n  BUN_LOCKFILE=\"bun.lockb\"\nelif [ -f bun.lock ]; then\n  BUN_LOCKFILE=\"bun.lock\"\nfi\n\nif [ \"$BUN_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f package.json ] \\\n    && [ -n \"$BUN_LOCKFILE\" ]; then\n  HASH=$(cat package.json \"$BUN_LOCKFILE\" \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$BUN_CACHE/packages-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    bun install --frozen-lockfile\n    echo \"$HASH\" > \"$BUN_CACHE/packages-hash\"\n  fi\nfi\n"
     },
     "options": {}
   },

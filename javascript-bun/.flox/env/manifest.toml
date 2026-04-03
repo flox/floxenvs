@@ -20,10 +20,17 @@ on-activate = '''
 export BUN_CACHE="$FLOX_ENV_CACHE/javascript-bun"
 mkdir -p "$BUN_CACHE"
 
+BUN_LOCKFILE=""
+if [ -f bun.lockb ]; then
+  BUN_LOCKFILE="bun.lockb"
+elif [ -f bun.lock ]; then
+  BUN_LOCKFILE="bun.lock"
+fi
+
 if [ "$BUN_AUTO_INSTALL" = "true" ] \
     && [ -f package.json ] \
-    && [ -f bun.lockb ]; then
-  HASH=$(cat package.json bun.lockb \
+    && [ -n "$BUN_LOCKFILE" ]; then
+  HASH=$(cat package.json "$BUN_LOCKFILE" \
     | sha256sum | cut -d" " -f1)
   LAST=$(cat "$BUN_CACHE/packages-hash" 2>/dev/null)
   if [ "$HASH" != "$LAST" ]; then

@@ -30,9 +30,9 @@ environments = ["flox/javascript-bun"]
 ## Automatic dependency installation
 
 When `BUN_AUTO_INSTALL` is `"true"` (the default) and both
-`package.json` and `bun.lockb` exist in the project
-directory, the hook runs `bun install --frozen-lockfile`
-automatically on activation.
+`package.json` and a lock file (`bun.lockb` or `bun.lock`)
+exist in the project directory, the hook runs
+`bun install --frozen-lockfile` automatically on activation.
 
 To skip automatic installation, set the variable in your
 manifest:
@@ -45,7 +45,7 @@ BUN_AUTO_INSTALL = "false"
 ## Dependency caching
 
 The hook computes a SHA-256 hash of `package.json` and
-`bun.lockb` combined, then stores the result in
+the lock file combined, then stores the result in
 `$FLOX_ENV_CACHE/javascript-bun/packages-hash`. On subsequent
 activations, packages are only reinstalled when the hash
 changes. This keeps activation fast when dependencies have not
