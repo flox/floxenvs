@@ -1,0 +1,36 @@
+name: "CI: colima"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "colima/**"
+      - "colima-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_colima.yml"
+  pull_request:
+    paths:
+      - "colima/**"
+      - "colima-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_colima.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "colima"
+    secrets: inherit
