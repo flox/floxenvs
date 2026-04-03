@@ -10,6 +10,10 @@ command_exists() {
   echo ">>> '$1' command exists"
 }
 
+echo ">>> DEBUG PATH: $PATH"
+echo ">>> DEBUG which docker: $(which docker 2>&1 || echo NOT_FOUND)"
+echo ">>> DEBUG docker sock: $(ls -la /var/run/docker.sock 2>&1 || echo NO_SOCK)"
+
 command_exists localstack
 command_exists aws
 command_exists kubectl
