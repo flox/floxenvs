@@ -73,11 +73,25 @@ skip-external-locking
 EOF
 
   echo "Initializing MariaDB database..." >> "$INIT_LOG"
-  mariadbd \
+
+  # mariadb-install-db calls chown which fails inside user
+  # namespaces (only uid 65534 is mapped). Create a no-op
+  # chown wrapper so the init script doesn't fail.
+  FAKE_BIN="$MARIADB_TMPDIR/fake-bin"
+  mkdir -p "$FAKE_BIN"
+  echo '#!/bin/sh' > "$FAKE_BIN/chown"
+  echo 'exit 0' >> "$FAKE_BIN/chown"
+  chmod +x "$FAKE_BIN/chown"
+
+  PATH="$FAKE_BIN:$PATH" mariadb-install-db \
     --defaults-file="$MARIADB_CONFIG" \
-    --initialize-insecure \
+    --auth-root-authentication-method=normal \
+    --user="$USER" \
+    --skip-test-db \
     >> "$INIT_LOG" 2>&1 \
     || init_fail
+
+  rm -rf "$FAKE_BIN"
 
   echo "Starting temporary MariaDB server..." >> "$INIT_LOG"
   mariadbd --defaults-file="$MARIADB_CONFIG" \
