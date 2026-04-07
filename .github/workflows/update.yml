@@ -2,6 +2,14 @@ name: "Update flox environments manifests"
 
 on:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: >
+          Environment to update. Leave empty to update
+          all environments.
+        required: false
+        default: ""
+        type: string
   schedule:
     - cron: "30 0 * * 1"
 
@@ -20,37 +28,33 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
 
-
-      - name: "Find environment"
+      - name: "Find environments"
         id: "envs"
+        env:
+          SINGLE_ENV: "${{ inputs.environment }}"
         run: |
-          set -x
-          envs="["
-          while IFS= read path; do
-            env_path=$(realpath -s $(dirname $path)/../..)
-            if [ -f "$env_path/test.sh" ]; then
-              name=$(basename $env_path)
-              num_of_services=$(yq -oy '.services | length' $path)
-              start_services="true"
-              if [ "$num_of_services" -eq 0 ]; then start_services="false"; fi
-
-              comma=""
-              if [ "$envs" != "[" ]; then comma=","; fi
-              envs="$envs$comma{\"example\":\"$name\"}"
+          if [ -n "$SINGLE_ENV" ]; then
+            # Single environment mode
+            has_demo="false"
+            if [ -d "${SINGLE_ENV}-demo/.flox/env" ]; then
+              has_demo="true"
             fi
-          done <<< "$(find ./ -maxdepth 4 -name manifest.toml)"
-          envs="$envs]"
+            envs="[{\"name\":\"$SINGLE_ENV\",\"has_demo\":$has_demo}]"
 
-          echo "-- ENVS --------------------"
-          echo "$envs " | jq
-          echo "----------------------------"
+            echo "-- single env --------------"
+            echo "$envs" | jq .
+            echo "----------------------------"
 
-          echo "envs=$envs" >> "$GITHUB_OUTPUT"
+            echo "envs=$envs" >> "$GITHUB_OUTPUT"
+          else
+            # All environments
+            bash scripts/discover-envs.sh --update
+          fi
 
   upgrade:
-    name: "Upgrade '${{ matrix.example }}' manifest"
+    name: "Upgrade '${{ matrix.name }}'"
     runs-on: "ubuntu-latest"
     timeout-minutes: 30
 
@@ -65,44 +69,53 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
         with:
-          ref: 'main'
+          ref: "main"
 
       - name: "Install flox"
-        uses: flox/install-flox-action@c94e7e1ab56ae14fe98bae4fd84384fd135f0c2a # main
+        uses: "flox/install-flox-action@c94e7e1ab56ae14fe98bae4fd84384fd135f0c2a" # main
 
-
-      - name: "Run upgrade"
+      - name: "Upgrade minimal environment"
         run: |
-          if [ ${{matrix.example}} == "macos" ]; then
-            echo "Skipping macos. TODO: use macos runner"
-            exit 0
-          fi
-          pushd ./${{ matrix.example }}
+          pushd ./${{ matrix.name }}
           flox -vvv upgrade
+          popd
+
+      - name: "Upgrade demo environment"
+        if: matrix.has_demo
+        run: |
+          pushd ./${{ matrix.name }}-demo
+          # Delete lock to force fresh resolution against
+          # the updated minimal env. flox include upgrade
+          # doesn't detect when the included env's lock
+          # changes (only manifest.toml triggers it).
+          rm -f .flox/env/manifest.lock
+          flox edit -f .flox/env/manifest.toml
           popd
 
       - name: "Create Pull Request"
         id: "create-pr"
-        uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8
-
+        uses: "peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0" # v8
         with:
           token: "${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}"
-          add-paths: "${{ matrix.example }}/.flox"
-          commit-message: "chore: Update lockfile of `${{ matrix.example }}` environment"
-          commiter: "FloxBot <bot@flox.dev>"
+          add-paths: |
+            ${{ matrix.name }}/.flox
+            ${{ matrix.name }}-demo/.flox
+          commit-message: "chore: update lockfiles for `${{ matrix.name }}`"
+          committer: "FloxBot <bot@flox.dev>"
           author: "FloxBot <bot@flox.dev>"
-          branch: "chore-update-${{ matrix.example }}-environment"
+          branch: "chore-update-${{ matrix.name }}-environment"
           delete-branch: true
-          title: "chore: Update lockfile of `${{ matrix.example }}` flox environment"
-          body: "This PR was automatically created by [Update workflow](https://github.com/flox/floxenvs/actions/workflows/update.yml)."
+          title: "chore: update lockfiles for `${{ matrix.name }}` environment"
+          body: |
+            Updates lockfiles for `${{ matrix.name }}` and `${{ matrix.name }}-demo`.
+
+            Created by [Update workflow](https://github.com/flox/floxenvs/actions/workflows/update.yml).
           labels: "team-developer-support"
 
       - name: "Sleep to slow down PRs"
-        if: ${{ steps.create-pr.outputs.pull-request-operation == 'created' }}
+        if: steps.create-pr.outputs.pull-request-operation == 'created'
         run: |
-          echo Sleeping to reduce the number of PRs created
-          echo This is because GitHub Actions does not support a proper job queue.
+          echo "Sleeping to reduce concurrent PRs"
           sleep "$((RANDOM % 60 + 120))"

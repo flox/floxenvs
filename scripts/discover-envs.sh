@@ -223,10 +223,51 @@ mode_discover() {
   fi
 }
 
+mode_update() {
+  # Output JSON array of minimal (non-demo) envs with
+  # a has_demo flag. Used by update.yml to upgrade env
+  # and its demo together.
+  local envs=()
+
+  while IFS= read -r lock; do
+    local env_path
+    env_path="$(lock_to_env "$lock")"
+    local name
+    name="$(basename "$env_path")"
+
+    # Skip demos — handled with their parent
+    if is_demo "$name"; then
+      continue
+    fi
+
+    local has_demo="false"
+    local demo_dir="$REPO_ROOT/${name}-demo"
+    if [ -d "$demo_dir/.flox/env" ]; then
+      has_demo="true"
+    fi
+
+    envs+=("{\"name\":\"$name\",\"has_demo\":$has_demo}")
+  done < <(find_locks)
+
+  local json
+  json="[$(IFS=,; echo "${envs[*]:-}")]"
+
+  echo "-- update envs -------------" >&2
+  echo "$json" | jq . >&2
+  echo "----------------------------" >&2
+
+  if [ -n "${GITHUB_OUTPUT:-}" ]; then
+    echo "envs=$json" >> "$GITHUB_OUTPUT"
+  else
+    echo "envs=$json"
+  fi
+}
+
 # ── Main ───────────────────────────────────────────────────
 
 case "${1:-}" in
   --validate) mode_validate ;;
   --list)     mode_list ;;
+  --update)   mode_update ;;
   *)          mode_discover ;;
 esac
