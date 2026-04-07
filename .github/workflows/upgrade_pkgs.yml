@@ -1,0 +1,105 @@
+name: "Upgrade Packages"
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: >
+          Package to upgrade. Leave empty to upgrade
+          all packages.
+        required: false
+        default: ""
+        type: string
+  schedule:
+    - cron: "0 1 * * *"
+
+env:
+  FLOX_DISABLE_METRICS: "true"
+
+jobs:
+
+  discover:
+    name: "Find packages"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 10
+
+    outputs:
+      packages: "${{ steps.discover.outputs.packages }}"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
+
+      - name: "Find packages"
+        id: "discover"
+        env:
+          SINGLE_PKG: "${{ inputs.package }}"
+        run: |
+          set -euo pipefail
+
+          if [ -n "$SINGLE_PKG" ]; then
+            echo "packages=[\"$SINGLE_PKG\"]" \
+              >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Find all packages with update.sh
+          pkgs="[]"
+          for dir in .flox/pkgs/*/; do
+            name="$(basename "$dir")"
+            if [ -x "$dir/update.sh" ]; then
+              pkgs=$(echo "$pkgs" | jq -c \
+                ". + [\"$name\"]")
+            fi
+          done
+
+          echo "packages=$pkgs" >> "$GITHUB_OUTPUT"
+          echo "Packages: $pkgs"
+
+  upgrade:
+    name: "Upgrade '${{ matrix.package }}'"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+    needs: ["discover"]
+    if: needs.discover.outputs.packages != '[]'
+
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        package: ${{ fromJSON(needs.discover.outputs.packages) }}
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
+        with:
+          ref: "main"
+
+      - name: "Install flox"
+        uses: "flox/install-flox-action@c94e7e1ab56ae14fe98bae4fd84384fd135f0c2a" # main
+
+      - name: "Run update script"
+        run: |
+          # Run inside flox activate so build tools
+          # (npm, nix-prefetch-url, etc.) are available
+          flox activate -- \
+            bash .flox/pkgs/${{ matrix.package }}/update.sh
+
+      - name: "Create Pull Request"
+        id: "create-pr"
+        uses: "peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0" # v8
+        with:
+          token: "${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}"
+          add-paths: |
+            .flox/pkgs/${{ matrix.package }}
+          commit-message: "chore(${{ matrix.package }}): upgrade to latest version"
+          committer: "FloxBot <bot@flox.dev>"
+          author: "FloxBot <bot@flox.dev>"
+          branch: "chore-upgrade-${{ matrix.package }}"
+          delete-branch: true
+          title: "chore(${{ matrix.package }}): upgrade to latest version"
+          body: |
+            Runs `update.sh` for `${{ matrix.package }}` and commits any changes.
+
+            Created by [Upgrade Packages workflow](https://github.com/flox/floxenvs/actions/workflows/upgrade_pkgs.yml).
+          labels: "team-developer-support"
