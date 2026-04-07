@@ -1,0 +1,142 @@
+name: "CI: packages"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".flox/pkgs/**"
+      - ".flox/env/manifest.toml"
+      - ".github/workflows/ci_pkgs.yml"
+  pull_request:
+    paths:
+      - ".flox/pkgs/**"
+      - ".flox/env/manifest.toml"
+      - ".github/workflows/ci_pkgs.yml"
+  workflow_dispatch:
+    inputs:
+      package:
+        description: >
+          Package to build. Leave empty to build all
+          changed packages.
+        required: false
+        default: ""
+        type: string
+
+env:
+  FLOX_DISABLE_METRICS: "true"
+
+jobs:
+
+  discover:
+    name: "Discover changed packages"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 10
+
+    outputs:
+      packages: "${{ steps.discover.outputs.packages }}"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
+        with:
+          fetch-depth: 0
+
+      - name: "Find changed packages"
+        id: "discover"
+        env:
+          SINGLE_PKG: "${{ inputs.package }}"
+          EVENT: "${{ github.event_name }}"
+          BASE_SHA: "${{ github.event.pull_request.base.sha }}"
+        run: |
+          set -euo pipefail
+
+          if [ -n "$SINGLE_PKG" ]; then
+            # Single package mode
+            echo "packages=[\"$SINGLE_PKG\"]" \
+              >> "$GITHUB_OUTPUT"
+            echo "Building: $SINGLE_PKG"
+            exit 0
+          fi
+
+          # Find changed packages
+          if [ "$EVENT" = "pull_request" ]; then
+            DIFF_BASE="$BASE_SHA"
+          else
+            DIFF_BASE="HEAD~1"
+          fi
+
+          pkgs="[]"
+          for dir in .flox/pkgs/*/; do
+            name="$(basename "$dir")"
+            if git diff --name-only "$DIFF_BASE" HEAD \
+                | grep -q "^.flox/pkgs/$name/"; then
+              pkgs=$(echo "$pkgs" | jq -c \
+                ". + [\"$name\"]")
+            fi
+          done
+
+          # On workflow_dispatch with no input, build all
+          if [ "$EVENT" = "workflow_dispatch" ] \
+              && [ "$pkgs" = "[]" ]; then
+            for dir in .flox/pkgs/*/; do
+              name="$(basename "$dir")"
+              pkgs=$(echo "$pkgs" | jq -c \
+                ". + [\"$name\"]")
+            done
+          fi
+
+          echo "packages=$pkgs" >> "$GITHUB_OUTPUT"
+          echo "Building: $pkgs"
+
+  build:
+    name: "Build '${{ matrix.package }}'"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+    needs: ["discover"]
+    if: needs.discover.outputs.packages != '[]'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJSON(needs.discover.outputs.packages) }}
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
+
+      - name: "Install flox"
+        uses: "flox/install-flox-action@c94e7e1ab56ae14fe98bae4fd84384fd135f0c2a" # main
+
+      - name: "Build package"
+        run: |
+          flox build "${{ matrix.package }}"
+
+  publish:
+    name: "Publish '${{ matrix.package }}'"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+    needs: ["discover", "build"]
+    if: >-
+      github.event_name == 'push'
+      && github.ref_name == 'main'
+      && needs.discover.outputs.packages != '[]'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJSON(needs.discover.outputs.packages) }}
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
+
+      - name: "Install flox"
+        uses: "flox/install-flox-action@c94e7e1ab56ae14fe98bae4fd84384fd135f0c2a" # main
+
+      - name: "Get FloxHub token"
+        run: |
+          echo "FLOX_FLOXHUB_TOKEN=${{ secrets.FLOX_FLOXHUB_TOKEN }}" >> $GITHUB_ENV
+
+      - name: "Publish package"
+        run: |
+          flox publish "${{ matrix.package }}"
