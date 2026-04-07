@@ -43,11 +43,11 @@ jobs:
             exit 0
           fi
 
-          # Find all packages with update.sh
+          # Find all packages with upgrade.sh
           pkgs="[]"
           for dir in .flox/pkgs/*/; do
             name="$(basename "$dir")"
-            if [ -x "$dir/update.sh" ]; then
+            if [ -x "$dir/upgrade.sh" ]; then
               pkgs=$(echo "$pkgs" | jq -c \
                 ". + [\"$name\"]")
             fi
@@ -83,7 +83,7 @@ jobs:
           # Run inside flox activate so build tools
           # (npm, nix-prefetch-url, etc.) are available
           flox activate -- \
-            bash .flox/pkgs/${{ matrix.package }}/update.sh
+            bash .flox/pkgs/${{ matrix.package }}/upgrade.sh
 
       - name: "Create Pull Request"
         id: "create-pr"
@@ -99,7 +99,7 @@ jobs:
           delete-branch: true
           title: "chore(${{ matrix.package }}): upgrade to latest version"
           body: |
-            Runs `update.sh` for `${{ matrix.package }}` and commits any changes.
+            Runs `upgrade.sh` for `${{ matrix.package }}` and commits any changes.
 
             Created by [Upgrade Packages workflow](https://github.com/flox/floxenvs/actions/workflows/upgrade_pkgs.yml).
           labels: "team-developer-support"
