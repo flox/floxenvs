@@ -144,4 +144,13 @@ jobs:
 
       - name: "Publish package"
         run: |
-          flox publish "${{ matrix.package }}"
+          # Read target org from publish.json (default: flox)
+          PKG="${{ matrix.package }}"
+          PUBLISH_JSON=".flox/pkgs/$PKG/publish.json"
+          if [ -f "$PUBLISH_JSON" ]; then
+            ORG=$(jq -r '.org' "$PUBLISH_JSON")
+          else
+            ORG="flox"
+          fi
+          echo "Publishing $PKG to $ORG"
+          flox publish -o "$ORG" "$PKG"
