@@ -254,41 +254,6 @@ jobs:
                   --option access-tokens "github.com=${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}" \
                   github:flox/floxenvs/${{ github.sha }}#apps.${{ matrix.system }}.run-test -- ${{ inputs.environment }}-demo
 
-  containerize:
-    name: "Containerize '${{ inputs.environment }}'"
-    runs-on: "ubuntu-latest"
-    timeout-minutes: 30
-
-    needs:
-      - "test"
-
-    if: (github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'workflow_dispatch'
-
-    steps:
-      - name: "Checkout"
-        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
-
-      - name: "Install flox"
-        uses: "flox/install-flox-action@c94e7e1ab56ae14fe98bae4fd84384fd135f0c2a" # main
-
-      - name: "Login to Github Container Registry"
-        uses: "docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121" # v4
-        with:
-          registry: "ghcr.io"
-          username: "${{ github.actor }}"
-          password: "${{ secrets.GITHUB_TOKEN }}"
-
-      - name: "Containerize"
-        run: |
-          export NIX_CONFIG='extra-experimental-features = nix-command flakes'
-          flox containerize -d ./${{ inputs.environment }}
-
-      - name: "Tag & Push"
-        run: |
-          tag=$(echo -n "${{ inputs.environment }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g')
-          docker tag "$tag:latest" "ghcr.io/flox/floxenvs:$tag-latest"
-          docker push "ghcr.io/flox/floxenvs:$tag-latest"
-
   push:
     name: "Push '${{ inputs.environment }}' to FloxHub"
     runs-on: "ubuntu-latest"
@@ -356,67 +321,6 @@ jobs:
           pushd "./$ENV"
           $FLOX_BIN push --dir "remote"
           popd
-
-  containerize-demo:
-    name: "Containerize '${{ inputs.environment }}-demo'"
-    runs-on: "ubuntu-latest"
-    timeout-minutes: 30
-
-    needs:
-      - "discover"
-      - "push"
-      - "test-demo"
-
-    if: >-
-      ((github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'workflow_dispatch')
-      && needs.discover.outputs.has_demo == 'true'
-
-    steps:
-      - name: "Checkout"
-        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
-
-      - name: "Install flox"
-        uses: "flox/install-flox-action@c94e7e1ab56ae14fe98bae4fd84384fd135f0c2a" # main
-
-      - name: "Get FloxHub token"
-        run: |
-          echo "FLOX_FLOXHUB_TOKEN=${{ secrets.FLOX_FLOXHUB_TOKEN }}" >> $GITHUB_ENV
-
-      - name: "Rewrite include to use remote environment"
-        run: |
-          ENV="${{ inputs.environment }}"
-          DEMO_DIR="$ENV-demo"
-          sed -i "s|{ dir = \"../$ENV\" }|{ remote = \"flox/$ENV\" }|g" "$DEMO_DIR/.flox/env/manifest.toml"
-          cat "$DEMO_DIR/.flox/env/manifest.toml"
-
-      - name: "Upgrade includes"
-        run: |
-          ENV="${{ inputs.environment }}"
-          DEMO_DIR="$ENV-demo"
-          pushd "$DEMO_DIR"
-          flox include upgrade
-          popd
-
-      - name: "Login to Github Container Registry"
-        uses: "docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121" # v4
-        with:
-          registry: "ghcr.io"
-          username: "${{ github.actor }}"
-          password: "${{ secrets.GITHUB_TOKEN }}"
-
-      - name: "Containerize"
-        run: |
-          ENV="${{ inputs.environment }}"
-          DEMO_DIR="$ENV-demo"
-          export NIX_CONFIG='extra-experimental-features = nix-command flakes'
-          flox containerize -d "./$DEMO_DIR"
-
-      - name: "Tag & Push"
-        run: |
-          ENV="${{ inputs.environment }}"
-          tag=$(echo -n "$ENV-demo" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g')
-          docker tag "$tag:latest" "ghcr.io/flox/floxenvs:$tag-latest"
-          docker push "ghcr.io/flox/floxenvs:$tag-latest"
 
   push-demo:
     name: "Push '${{ inputs.environment }}-demo' to FloxHub"
