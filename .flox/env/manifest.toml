@@ -1,0 +1,20 @@
+# Root flox environment for floxenvs.
+#
+# This environment defines custom packages that are
+# built and published via CI. Individual environments
+# in subdirectories can reference these packages.
+#
+# Build all packages:
+#   flox build
+#
+# Build a specific package:
+#   flox build claude-code
+
+schema-version = "1.11.0"
+
+[install]
+# Tools needed for package update scripts
+curl.pkg-path = "curl"
+jq.pkg-path = "jq"
+nodejs.pkg-path = "nodejs"
+prefetch-npm-deps.pkg-path = "prefetch-npm-deps"
