@@ -20,6 +20,7 @@ jobs:
       any_failed: "${{ steps.wait.outputs.any_failed }}"
       failed_workflows: "${{ steps.wait.outputs.failed_workflows }}"
       total_workflows: "${{ steps.wait.outputs.total_workflows }}"
+      successful_envs: "${{ steps.wait.outputs.successful_envs }}"
       pr_number: "${{ steps.wait.outputs.pr_number }}"
       pr_author: "${{ steps.wait.outputs.pr_author }}"
 
@@ -52,6 +53,7 @@ jobs:
               core.setOutput('any_failed', 'false');
               core.setOutput('failed_workflows', '');
               core.setOutput('total_workflows', '0');
+              core.setOutput('successful_envs', '[]');
               core.setOutput('pr_number', '0');
               core.setOutput('pr_author', '');
               return;
@@ -92,6 +94,7 @@ jobs:
                 core.setOutput('any_failed', 'false');
                 core.setOutput('failed_workflows', '');
                 core.setOutput('total_workflows', '0');
+                core.setOutput('successful_envs', '[]');
                 core.setOutput('pr_number', prNumber.toString());
                 core.setOutput('pr_author', prAuthor);
                 return;
@@ -138,6 +141,21 @@ jobs:
                 core.setOutput(
                   'total_workflows', ciRuns.length.toString()
                 );
+
+                // Extract env names from successful workflows
+                // "CI: redis" → "redis"
+                const successfulEnvs = ciRuns
+                  .filter(r => r.conclusion === 'success')
+                  .map(r => r.name.replace('CI: ', ''))
+                  .filter(n => n.length > 0);
+                core.setOutput(
+                  'successful_envs',
+                  JSON.stringify(successfulEnvs)
+                );
+                core.info(
+                  `Successful envs: ${successfulEnvs.join(', ')}`
+                );
+
                 core.setOutput('pr_number', prNumber.toString());
                 core.setOutput('pr_author', prAuthor);
                 return;
@@ -216,3 +234,64 @@ jobs:
             ${{ needs.wait-for-environments.outputs.failed_workflows }}
             | Workflows:
             ${{ needs.wait-for-environments.outputs.total_workflows }}
+
+  containerize:
+    name: "Containerize '${{ matrix.env }}'"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+    needs: ["wait-for-environments", "result"]
+    if: >-
+      github.event_name == 'push'
+      && github.ref_name == 'main'
+      && needs.result.result == 'success'
+      && needs.wait-for-environments.outputs.successful_envs != '[]'
+
+    permissions:
+      contents: "read"
+      packages: "write"
+      attestations: "write"
+      id-token: "write"
+
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        env: ${{ fromJSON(needs.wait-for-environments.outputs.successful_envs) }}
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
+
+      - name: "Install flox"
+        uses: "flox/install-flox-action@c94e7e1ab56ae14fe98bae4fd84384fd135f0c2a" # main
+
+      - name: "Login to GHCR"
+        uses: "docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121" # v4
+        with:
+          registry: "ghcr.io"
+          username: "${{ github.actor }}"
+          password: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: "Containerize environment"
+        run: |
+          ENV="${{ matrix.env }}"
+          export NIX_CONFIG='extra-experimental-features = nix-command flakes'
+          flox containerize -d "./$ENV"
+          tag=$(echo -n "$ENV" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g')
+          docker tag "$tag:latest" "ghcr.io/flox/floxenvs:$tag-latest"
+          docker push "ghcr.io/flox/floxenvs:$tag-latest"
+
+      - name: "Containerize demo"
+        if: hashFiles(format('{0}-demo/.flox/env/manifest.toml', matrix.env)) != ''
+        run: |
+          ENV="${{ matrix.env }}"
+          DEMO="$ENV-demo"
+          if [ ! -d "$DEMO/.flox/env" ]; then
+            echo "No demo for $ENV, skipping"
+            exit 0
+          fi
+          export NIX_CONFIG='extra-experimental-features = nix-command flakes'
+          flox containerize -d "./$DEMO"
+          tag=$(echo -n "$DEMO" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g')
+          docker tag "$tag:latest" "ghcr.io/flox/floxenvs:$tag-latest"
+          docker push "ghcr.io/flox/floxenvs:$tag-latest"
