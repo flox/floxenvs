@@ -1,16 +1,14 @@
-name: "CI: packages"
+name: "CI Packages"
 
 on:
   push:
     branches: ["main"]
     paths:
-      - ".flox/pkgs/**"
-      - ".flox/env/manifest.toml"
+      - ".flox/**"
       - ".github/workflows/ci_pkgs.yml"
   pull_request:
     paths:
-      - ".flox/pkgs/**"
-      - ".flox/env/manifest.toml"
+      - ".flox/**"
       - ".github/workflows/ci_pkgs.yml"
   workflow_dispatch:
     inputs:
