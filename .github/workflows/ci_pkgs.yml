@@ -115,7 +115,7 @@ jobs:
     timeout-minutes: 30
     needs: ["discover", "build"]
     if: >-
-      github.event_name == 'push'
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
       && github.ref_name == 'main'
       && needs.discover.outputs.packages != '[]'
 
