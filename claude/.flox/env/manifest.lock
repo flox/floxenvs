@@ -1,0 +1,261 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "claude-code": {
+        "pkg-path": "flox-ai/claude-code",
+        "pkg-group": "claude-code"
+      },
+      "claude-managed": {
+        "pkg-path": "flox-ai/claude-managed",
+        "pkg-group": "claude-managed"
+      }
+    },
+    "hook": {
+      "on-activate": "# Use local build if available (until plugin support is published)\nif [ -d \"$FLOX_ENV_PROJECT/../result-claude-managed/bin\" ]; then\n  export PATH=\"$FLOX_ENV_PROJECT/../result-claude-managed/bin:$PATH\"\nfi\neval \"$(claude-managed setup-hook)\"\n"
+    },
+    "profile": {
+      "common": "eval \"$(claude-managed setup-profile)\"\n"
+    },
+    "options": {}
+  },
+  "packages": [
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/r1mklnnia5glnsypq5ciwd396zwhha7l-claude-code-2.1.92.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/flox-ai?rev=ce2a7913bd08293664b0a3aabfa1a79c88d58e65",
+      "name": "claude-code-2.1.92",
+      "pname": "claude-code",
+      "rev": "ce2a7913bd08293664b0a3aabfa1a79c88d58e65",
+      "rev_count": 62,
+      "rev_date": "2026-04-06T14:03:27Z",
+      "scrape_date": "2026-04-15T18:55:00.768685Z",
+      "stabilities": [
+        "unstable",
+        "staging"
+      ],
+      "unfree": true,
+      "version": "2.1.92",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/jca9ifhsva603k3lnkf7r5imywqn59fx-claude-code-2.1.92"
+      },
+      "system": "aarch64-darwin",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/m1vkvx7dlfg3ljy5wki4jibpsd7kcam7-claude-code-2.1.92.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/flox-ai?rev=ce2a7913bd08293664b0a3aabfa1a79c88d58e65",
+      "name": "claude-code-2.1.92",
+      "pname": "claude-code",
+      "rev": "ce2a7913bd08293664b0a3aabfa1a79c88d58e65",
+      "rev_count": 62,
+      "rev_date": "2026-04-06T14:03:27Z",
+      "scrape_date": "2026-04-15T18:55:00.768689Z",
+      "stabilities": [
+        "unstable",
+        "staging"
+      ],
+      "unfree": true,
+      "version": "2.1.92",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/achlfmh05a0xbc22pvpbs25d3cfbbb07-claude-code-2.1.92"
+      },
+      "system": "aarch64-linux",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/700gaiam9a2nhpmggjy7y34632m97i7j-claude-code-2.1.92.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/flox-ai?rev=ce2a7913bd08293664b0a3aabfa1a79c88d58e65",
+      "name": "claude-code-2.1.92",
+      "pname": "claude-code",
+      "rev": "ce2a7913bd08293664b0a3aabfa1a79c88d58e65",
+      "rev_count": 62,
+      "rev_date": "2026-04-06T14:03:27Z",
+      "scrape_date": "2026-04-15T18:55:00.768690Z",
+      "stabilities": [
+        "unstable",
+        "staging"
+      ],
+      "unfree": true,
+      "version": "2.1.92",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/z8m58ppldxgscvn7kivvafzaaxai5sva-claude-code-2.1.92"
+      },
+      "system": "x86_64-darwin",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/vnbf0dylyj82knrlrxc6nfa4zd9qlbmj-claude-code-2.1.92.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/flox-ai?rev=ce2a7913bd08293664b0a3aabfa1a79c88d58e65",
+      "name": "claude-code-2.1.92",
+      "pname": "claude-code",
+      "rev": "ce2a7913bd08293664b0a3aabfa1a79c88d58e65",
+      "rev_count": 62,
+      "rev_date": "2026-04-06T14:03:27Z",
+      "scrape_date": "2026-04-15T18:55:00.768691Z",
+      "stabilities": [
+        "unstable",
+        "staging"
+      ],
+      "unfree": true,
+      "version": "2.1.92",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/j6mxpy1ahbhr8cpknylr04m2ca04kpx6-claude-code-2.1.92"
+      },
+      "system": "x86_64-linux",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/7mj4fgl4v04qzhccyxddivks0kx4d65n-claude-managed-0.1.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=5aa78a8767a290815c0bc223f0f79d95e8d6f55a",
+      "name": "claude-managed-0.1.0",
+      "pname": "claude-managed",
+      "rev": "5aa78a8767a290815c0bc223f0f79d95e8d6f55a",
+      "rev_count": 2611,
+      "rev_date": "2026-04-15T18:51:14Z",
+      "scrape_date": "2026-04-15T18:55:00.768699Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.1.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/dphb1822brpdrmkdrmxzzxqghs1052ni-claude-managed-0.1.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "claude-managed",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/n312kxfvp4lkr3x4frs0p7xcmz3i2fyq-claude-managed-0.1.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=5aa78a8767a290815c0bc223f0f79d95e8d6f55a",
+      "name": "claude-managed-0.1.0",
+      "pname": "claude-managed",
+      "rev": "5aa78a8767a290815c0bc223f0f79d95e8d6f55a",
+      "rev_count": 2611,
+      "rev_date": "2026-04-15T18:51:14Z",
+      "scrape_date": "2026-04-15T18:55:00.768702Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.1.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/c9i4hrsc4s1cbwaj05np56ggid3syd3k-claude-managed-0.1.0"
+      },
+      "system": "aarch64-linux",
+      "group": "claude-managed",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/i5ilkys0ych1nxmxi7qsjhw15hsn6kiv-claude-managed-0.1.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=5aa78a8767a290815c0bc223f0f79d95e8d6f55a",
+      "name": "claude-managed-0.1.0",
+      "pname": "claude-managed",
+      "rev": "5aa78a8767a290815c0bc223f0f79d95e8d6f55a",
+      "rev_count": 2611,
+      "rev_date": "2026-04-15T18:51:14Z",
+      "scrape_date": "2026-04-15T18:55:00.768703Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.1.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ngfkkdwccy85lg3zqlrn88l4gf4ji080-claude-managed-0.1.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "claude-managed",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/38zdpqqcia6gi3khjb8k3n3fihyf8c0z-claude-managed-0.1.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=5aa78a8767a290815c0bc223f0f79d95e8d6f55a",
+      "name": "claude-managed-0.1.0",
+      "pname": "claude-managed",
+      "rev": "5aa78a8767a290815c0bc223f0f79d95e8d6f55a",
+      "rev_count": 2611,
+      "rev_date": "2026-04-15T18:51:14Z",
+      "scrape_date": "2026-04-15T18:55:00.768704Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.1.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/m236m2m5lw68924ybdznj9zahimmjb16-claude-managed-0.1.0"
+      },
+      "system": "x86_64-linux",
+      "group": "claude-managed",
+      "priority": 5
+    }
+  ]
+}

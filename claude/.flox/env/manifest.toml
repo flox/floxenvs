@@ -1,0 +1,35 @@
+schema-version = "1.10.0"
+
+# Minimal Claude Code environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/claude"]
+#
+# To enable isolated mode:
+#
+#   [vars]
+#   CLAUDE_MANAGED_ISOLATED = "1"
+#
+# Then set ANTHROPIC_API_KEY in your environment.
+
+[install]
+claude-code.pkg-path = "flox-ai/claude-code"
+claude-code.pkg-group = "claude-code"
+claude-managed.pkg-path = "flox-ai/claude-managed"
+claude-managed.pkg-group = "claude-managed"
+
+[hook]
+on-activate = '''
+# Use local build if available (until plugin support is published)
+if [ -d "$FLOX_ENV_PROJECT/../result-claude-managed/bin" ]; then
+  export PATH="$FLOX_ENV_PROJECT/../result-claude-managed/bin:$PATH"
+fi
+eval "$(claude-managed setup-hook)"
+'''
+
+[profile]
+common = '''
+eval "$(claude-managed setup-profile)"
+'''

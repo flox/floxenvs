@@ -18,6 +18,79 @@
         lib = nixpkgs.lib;
         pkgs = nixpkgs.legacyPackages.${system};
 
+        claude-managed = pkgs.callPackage
+          ./.flox/pkgs/claude-managed/default.nix {};
+
+        batsWithLibs = pkgs.bats.withLibraries (p: [
+          p.bats-support
+          p.bats-assert
+        ]);
+
+        e2eTestDir = ./.flox/pkgs/claude-managed/e2e;
+
+        runTestCmNix =
+          pkgs.writeShellScriptBin
+            "run-test-claude-managed-with-nix"
+            ''
+              set -euo pipefail
+              export PATH="${lib.makeBinPath [
+                claude-managed
+                batsWithLibs
+                pkgs.coreutils
+              ]}:$PATH"
+              export BATS_SUPPORT_LIB="${pkgs.bats.libraries.bats-support}/share/bats/bats-support"
+              export BATS_ASSERT_LIB="${pkgs.bats.libraries.bats-assert}/share/bats/bats-assert"
+              if [ $# -gt 0 ]; then
+                bats "$@"
+              else
+                bats --jobs 1 ${e2eTestDir}/*.bats
+              fi
+            '';
+
+        runTestCmFlox =
+          pkgs.writeShellScriptBin
+            "run-test-claude-managed-with-flox"
+            ''
+              set -euo pipefail
+              export PATH="${lib.makeBinPath [
+                batsWithLibs
+                pkgs.coreutils
+              ]}:$PATH"
+              export BATS_SUPPORT_LIB="${pkgs.bats.libraries.bats-support}/share/bats/bats-support"
+              export BATS_ASSERT_LIB="${pkgs.bats.libraries.bats-assert}/share/bats/bats-assert"
+              export FLOX_DISABLE_METRICS=true
+
+              flox_bin="${lib.makeBinPath [
+                flox.packages."${system}".default
+              ]}"
+              export PATH="$flox_bin:$PATH"
+
+              tmpdir="$(mktemp -d)"
+              trap 'rm -rf "$tmpdir"' EXIT
+
+              binary_dir="$(nix build --no-link --print-out-paths \
+                '${inputs.self}#packages.${system}.claude-managed')"
+
+              cd "$tmpdir"
+              flox init
+
+              manifest_tpl=${pkgs.writeText "manifest-template.toml" ''
+                schema-version = "1.10.0"
+
+                [hook]
+                on-activate = """
+                export PATH="__BINARY_DIR__/bin:$PATH"
+                """
+              ''}
+              sed "s|__BINARY_DIR__|$binary_dir|g" "$manifest_tpl" > .flox/env/manifest.toml
+
+              if [ $# -gt 0 ]; then
+                flox activate -c "bats $*"
+              else
+                flox activate -c "bats --jobs 1 ${e2eTestDir}/*.bats"
+              fi
+            '';
+
         # Single entry point: nix run .#run-test -- <env-name>
         runTestScript = pkgs.writeShellScriptBin "run-test" ''
           set -euo pipefail
@@ -295,10 +368,23 @@
         '';
       in
       {
+        packages.claude-managed = claude-managed;
+
         apps.run-test = {
           type = "app";
           program = "${runTestScript}/bin/run-test";
         };
+
+        apps.run-test-claude-managed-with-nix = {
+          type = "app";
+          program = "${runTestCmNix}/bin/run-test-claude-managed-with-nix";
+        };
+
+        apps.run-test-claude-managed-with-flox = {
+          type = "app";
+          program = "${runTestCmFlox}/bin/run-test-claude-managed-with-flox";
+        };
+
         devShells.default = pkgs.mkShell {
           packages = [ pkgs.just ];
         };

@@ -1,0 +1,30 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../claude" }
+]
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+skill-coreutils.pkg-path = "flox-ai/skill-coreutils"
+skill-coreutils.pkg-group = "skill-coreutils"
+claude-plugin-typescript-lsp.pkg-path = "flox-ai/claude-plugin-typescript-lsp"
+claude-plugin-typescript-lsp.pkg-group = "claude-plugin-typescript-lsp"
+
+[hook]
+on-activate = '''
+if [ "${FLOX_ENVS_TESTING:-}" != "1" ]; then
+  gum style \
+    --foreground 212 --border-foreground 212 \
+    --border double --align center \
+    --width 50 --margin "1 2" --padding "1 2" \
+    "Claude Code" "with managed configuration"
+  echo ""
+  echo "  claude           — start Claude Code"
+  echo "  claude-managed status  — show config"
+  echo "  claude-managed doctor  — validate config"
+  echo ""
+fi
+'''
