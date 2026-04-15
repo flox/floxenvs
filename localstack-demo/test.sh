@@ -35,6 +35,17 @@ echo "  DEBUG:            ${DEBUG:-unset}"
 echo "  DOCKER_HOST:      ${DOCKER_HOST:-unset}"
 echo ""
 
+# ── Cleanup stale containers ──────────────────────────
+# On macOS (Colima), Docker containers persist across CI runs.
+# LocalStack refuses to start if "localstack-main" already exists.
+echo ">>> Checking for stale LocalStack containers:"
+docker ps -a --filter name=localstack 2>&1 || true
+if docker ps -a --format '{{.Names}}' 2>/dev/null | grep -q localstack; then
+  echo ">>> Removing stale LocalStack container(s)..."
+  docker rm -f $(docker ps -aq --filter name=localstack) 2>&1 || true
+fi
+echo ""
+
 # ── Debug: flox services ──────────────────────────────
 echo ">>> flox services status (before wait loop):"
 flox services status 2>&1 || echo "  flox services status FAILED"
