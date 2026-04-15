@@ -60,8 +60,8 @@ localstack status 2>&1 || echo "  localstack status FAILED"
 echo ""
 
 # ── Wait for LocalStack ──────────────────────────────
-echo ">>> Waiting for LocalStack to start (max 180s) .."
-MAX_ATTEMPTS=90
+echo ">>> Waiting for LocalStack to start (max 60s) .."
+MAX_ATTEMPTS=30
 ATTEMPT=0
 while [ "$MAX_ATTEMPTS" -gt 0 ]; do
   ATTEMPT=$((ATTEMPT + 1))
@@ -75,7 +75,7 @@ while [ "$MAX_ATTEMPTS" -gt 0 ]; do
   # Print status every 10 attempts for debugging
   if [ $((ATTEMPT % 10)) -eq 0 ]; then
     echo ""
-    echo ">>> Still waiting (attempt $ATTEMPT/90)..."
+    echo ">>> Still waiting (attempt $ATTEMPT/30)..."
     echo "  localstack status: $status_out"
     echo "  docker ps:"
     docker ps 2>&1 || true
@@ -90,7 +90,7 @@ done
 
 if [ "$MAX_ATTEMPTS" -eq 0 ]; then
   echo ""
-  echo ">>> FAILURE: LocalStack not ready after 180 seconds"
+  echo ">>> FAILURE: LocalStack not ready after 60 seconds"
   echo ""
   echo ">>> Final diagnostics:"
   echo "  localstack status:"
