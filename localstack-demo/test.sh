@@ -20,7 +20,7 @@ command_exists kubectl
 command_exists gum
 
 echo -n ">>> Waiting for LocalStack to start .."
-MAX_ATTEMPTS=30
+MAX_ATTEMPTS=60
 while [ "$MAX_ATTEMPTS" -gt 0 ]; do
   if localstack status | grep -q running 2>/dev/null; then
     echo -e "\n>>> LocalStack STARTED SUCCESSFULLY\n"
@@ -32,7 +32,7 @@ while [ "$MAX_ATTEMPTS" -gt 0 ]; do
 done
 
 if [ "$MAX_ATTEMPTS" -eq 0 ]; then
-  echo -e "\nError: LocalStack not ready after 60 seconds"
+  echo -e "\nError: LocalStack not ready after 120 seconds"
   exit 1
 fi
 
