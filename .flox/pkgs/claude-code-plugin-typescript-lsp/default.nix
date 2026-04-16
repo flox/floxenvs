@@ -2,7 +2,7 @@
 
 stdenv.mkDerivation {
   pname = "claude-code-plugin-typescript-lsp";
-  version = "0.2.0";
+  version = "0.2.1";
 
   src = builtins.path {
     path = ./.;
