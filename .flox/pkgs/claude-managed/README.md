@@ -37,6 +37,18 @@ claude-managed setup-hook      # env vars, keychain, symlinks
 claude-managed setup-profile   # cleanup function + EXIT trap
 claude-managed status          # config dir, auth, symlink status
 claude-managed doctor          # validate frontmatter and structure
+claude-managed rules add       # install a rule (symlink)
+claude-managed rules remove    # remove a rule by name
+claude-managed rules list      # show installed rules
+claude-managed rules clean     # remove stale managed rules
+claude-managed skills add      # install a skill (symlink)
+claude-managed skills remove   # remove a skill by name
+claude-managed skills list     # show installed skills
+claude-managed skills clean    # remove stale managed skills
+claude-managed agents add      # install an agent (symlink)
+claude-managed agents remove   # remove an agent by name
+claude-managed agents list     # show installed agents
+claude-managed agents clean    # remove stale managed agents
 claude-managed plugins add     # install plugin
 claude-managed plugins remove  # remove plugin by name
 claude-managed plugins list    # show installed plugins
@@ -95,6 +107,26 @@ rules, skills, and agents. Checks performed:
 - `effort` is one of: low, medium, high, max
 - `isolation` is `worktree` (only valid value)
 
+### rules/skills/agents add
+
+Installs a rule, skill, or agent by creating a
+relative symlink in `$CLAUDE_CONFIG_DIR/<type>/<name>`.
+
+### rules/skills/agents remove
+
+Removes the symlink by name.
+
+### rules/skills/agents list
+
+Shows entries in `$CLAUDE_CONFIG_DIR/<type>/` with
+symlink health status.
+
+### rules/skills/agents clean
+
+Removes symlinks whose targets point into
+`$FLOX_ENV/share/claude-code/<type>/`. User-created
+symlinks are preserved.
+
 ### plugins add
 
 Installs a plugin by creating a symlink in
@@ -119,6 +151,9 @@ Removes all plugin symlinks whose targets point
 into `$FLOX_ENV/share/claude-code/`. Regenerates JSON
 config files from remaining plugins. User-managed
 plugins are never touched.
+
+Rules, skills, and agents `clean` works identically
+but without JSON regeneration.
 
 ## How it works
 
@@ -276,6 +311,8 @@ internal/
                                      trap
   doctor/                   Fragment validation
                             (frontmatter, structure)
+  symlinks/                 Shared symlink operations
+                            (Add, Remove, List, Clean)
   plugins/                  JSON merge, add/remove/list/
                             clean
 e2e/                        Bats E2E test suite
