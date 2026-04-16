@@ -22,6 +22,7 @@ func HookCode(p *Params) string {
 	fmt.Fprintf(&sb, "export CLAUDE_CONFIG_DIR=%q\n", p.ConfigDir)
 	sb.WriteString("export CLAUDE_CODE_DISABLE_AUTO_MEMORY=1\n")
 	sb.WriteString("export CLAUDE_MANAGED=1\n")
+	sb.WriteString("mkdir -p \"$CLAUDE_CONFIG_DIR\"\n")
 
 	emitKeychainBridge(&sb)
 	emitFragments(&sb, p)
