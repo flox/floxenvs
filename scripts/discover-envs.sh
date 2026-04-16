@@ -52,6 +52,7 @@ get_systems() {
 
 find_locks() {
   find "$REPO_ROOT" -maxdepth 4 -path '*/.flox/env/manifest.lock' \
+    -not -path "$REPO_ROOT/.flox/*" \
     -not -path "$REPO_ROOT/_worktrees/*" \
     -not -path '*/remote/*' \
     -not -path '*/.git/*' \
