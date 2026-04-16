@@ -68,5 +68,5 @@ _get_hook_output() {
   local code
   code="$(_get_hook_output)"
   eval "$code"
-  [[ -f "$CLAUDE_CONFIG_DIR/rules/valid.md" ]]
+  [[ -e "$CLAUDE_CONFIG_DIR/rules/valid.md" ]]
 }

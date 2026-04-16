@@ -14,11 +14,6 @@ load test_helper/common
   assert_output --partial '_claude_managed_cleanup()'
 }
 
-@test "setup-profile contains clean_symlinks helper" {
-  run_cm setup-profile
-  assert_success
-  assert_output --partial '_claude_managed_clean_symlinks()'
-}
 
 @test "setup-profile does NOT export CLAUDE_CONFIG_DIR" {
   run_cm setup-profile

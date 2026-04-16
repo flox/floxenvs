@@ -86,17 +86,17 @@ func emitFragments(sb *strings.Builder, p *Params) {
 	}
 
 	for _, g := range groups {
-		fmt.Fprintf(sb, "\nclaude-managed %s clean\n", g.label)
+		fmt.Fprintf(sb, "\nclaude-managed --config-dir \"$CLAUDE_CONFIG_DIR\" %s clean\n", g.label)
 		for _, f := range g.items {
-			fmt.Fprintf(sb, "claude-managed %s add \"$FLOX_ENV/share/claude-code/%s/%s\"\n",
+			fmt.Fprintf(sb, "claude-managed --config-dir \"$CLAUDE_CONFIG_DIR\" %s add \"$FLOX_ENV/share/claude-code/%s/%s\"\n",
 				g.label, g.label, nameForFragment(g.label, f))
 		}
 	}
 
 	// plugins (always clean, even if none discovered)
-	sb.WriteString("\nclaude-managed plugins clean\n")
+	sb.WriteString("\nclaude-managed --config-dir \"$CLAUDE_CONFIG_DIR\" plugins clean\n")
 	for _, f := range p.Frags.Plugins {
-		fmt.Fprintf(sb, "claude-managed plugins add \"$FLOX_ENV/share/claude-code/plugins/%s\"\n", f.Name)
+		fmt.Fprintf(sb, "claude-managed --config-dir \"$CLAUDE_CONFIG_DIR\" plugins add \"$FLOX_ENV/share/claude-code/plugins/%s\"\n", f.Name)
 	}
 
 	if len(p.Frags.Plugins) > 0 {
@@ -134,10 +134,10 @@ func emitCleanupFunc(sb *strings.Builder) {
 	sb.WriteString(`
 # cleanup function (trap registered in profile, not here)
 _claude_managed_cleanup() {
-  claude-managed rules clean
-  claude-managed skills clean
-  claude-managed agents clean
-  claude-managed plugins clean
+  claude-managed --config-dir "$CLAUDE_CONFIG_DIR" rules clean
+  claude-managed --config-dir "$CLAUDE_CONFIG_DIR" skills clean
+  claude-managed --config-dir "$CLAUDE_CONFIG_DIR" agents clean
+  claude-managed --config-dir "$CLAUDE_CONFIG_DIR" plugins clean
   # remove bridged keychain entry (macOS only)
   if [ "$(uname -s)" = "Darwin" ]; then
     _cm_user="${USER:-claude-code-user}"

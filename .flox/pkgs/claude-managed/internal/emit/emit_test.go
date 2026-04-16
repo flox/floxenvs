@@ -28,14 +28,14 @@ func TestHookCode_Full(t *testing.T) {
 		"security add-generic-password",
 		`"$HOME/.claude.json"`,
 		"|| true",
-		"claude-managed rules clean",
-		`claude-managed rules add "$FLOX_ENV/share/claude-code/rules/style.md"`,
-		"claude-managed skills clean",
-		`claude-managed skills add "$FLOX_ENV/share/claude-code/skills/coreutils"`,
-		"claude-managed agents clean",
-		`claude-managed agents add "$FLOX_ENV/share/claude-code/agents/demo.md"`,
-		"claude-managed plugins clean",
-		`claude-managed plugins add "$FLOX_ENV/share/claude-code/plugins/typescript-lsp"`,
+		`claude-managed --config-dir "$CLAUDE_CONFIG_DIR" rules clean`,
+		`claude-managed --config-dir "$CLAUDE_CONFIG_DIR" rules add "$FLOX_ENV/share/claude-code/rules/style.md"`,
+		`claude-managed --config-dir "$CLAUDE_CONFIG_DIR" skills clean`,
+		`claude-managed --config-dir "$CLAUDE_CONFIG_DIR" skills add "$FLOX_ENV/share/claude-code/skills/coreutils"`,
+		`claude-managed --config-dir "$CLAUDE_CONFIG_DIR" agents clean`,
+		`claude-managed --config-dir "$CLAUDE_CONFIG_DIR" agents add "$FLOX_ENV/share/claude-code/agents/demo.md"`,
+		`claude-managed --config-dir "$CLAUDE_CONFIG_DIR" plugins clean`,
+		`claude-managed --config-dir "$CLAUDE_CONFIG_DIR" plugins add "$FLOX_ENV/share/claude-code/plugins/typescript-lsp"`,
 		"_claude_managed_cleanup()",
 		"security delete-generic-password",
 	}
@@ -73,7 +73,7 @@ func TestHookCode_NoFragments(t *testing.T) {
 		t.Errorf("missing CLAUDE_CONFIG_DIR")
 	}
 	for _, cmd := range []string{"rules clean", "skills clean", "agents clean", "plugins clean"} {
-		if !strings.Contains(result, "claude-managed "+cmd) {
+		if !strings.Contains(result, `claude-managed --config-dir "$CLAUDE_CONFIG_DIR" `+cmd) {
 			t.Errorf("missing %s", cmd)
 		}
 	}
@@ -95,10 +95,10 @@ func TestProfileCode(t *testing.T) {
 	if !strings.Contains(result, "trap _claude_managed_cleanup EXIT") {
 		t.Errorf("profile must contain trap registration")
 	}
-	if !strings.Contains(result, "claude-managed rules clean") {
+	if !strings.Contains(result, `claude-managed --config-dir "$CLAUDE_CONFIG_DIR" rules clean`) {
 		t.Errorf("cleanup should call rules clean")
 	}
-	if !strings.Contains(result, "claude-managed plugins clean") {
+	if !strings.Contains(result, `claude-managed --config-dir "$CLAUDE_CONFIG_DIR" plugins clean`) {
 		t.Errorf("cleanup should call plugins clean")
 	}
 }

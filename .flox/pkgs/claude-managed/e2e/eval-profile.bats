@@ -31,12 +31,6 @@ _get_profile_output() {
   declare -f _claude_managed_cleanup >/dev/null
 }
 
-@test "eval setup-profile defines clean_symlinks helper" {
-  local code
-  code="$(_get_profile_output)"
-  eval "$code"
-  declare -f _claude_managed_clean_symlinks >/dev/null
-}
 
 @test "cleanup removes managed symlinks" {
   local code

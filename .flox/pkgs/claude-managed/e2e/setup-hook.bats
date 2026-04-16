@@ -20,25 +20,33 @@ load test_helper/common
   assert_output --partial 'export CLAUDE_CODE_DISABLE_AUTO_MEMORY=1'
 }
 
-@test "setup-hook creates symlinks for valid rule" {
+@test "setup-hook emits rules add" {
   run_cm setup-hook
   assert_success
-  assert_output --partial 'ln -sfn'
+  assert_output --partial 'rules add'
   assert_output --partial 'rules/valid.md'
 }
 
-@test "setup-hook creates symlinks for valid skill" {
+@test "setup-hook emits skills add" {
   run_cm setup-hook
   assert_success
-  assert_output --partial 'ln -sfn'
+  assert_output --partial 'skills add'
   assert_output --partial 'skills/my-skill'
 }
 
-@test "setup-hook creates symlinks for valid agent" {
+@test "setup-hook emits agents add" {
   run_cm setup-hook
   assert_success
-  assert_output --partial 'ln -sfn'
+  assert_output --partial 'agents add'
   assert_output --partial 'agents/valid-agent.md'
+}
+
+@test "setup-hook emits clean before add" {
+  run_cm setup-hook
+  assert_success
+  assert_output --partial 'rules clean'
+  assert_output --partial 'skills clean'
+  assert_output --partial 'agents clean'
 }
 
 @test "setup-hook contains keychain bridge on Darwin" {
