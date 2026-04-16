@@ -78,8 +78,14 @@ func Clean(configDir, shareDir string) error {
 
 // patchInstallPaths sets installPath in each entry array
 // to the actual plugin location in the config dir.
+// Supports both v1 (flat) and v2 (wrapped in "plugins" key) formats.
 func patchInstallPaths(ip map[string]interface{}, pluginPath string) {
-	for _, v := range ip {
+	target := ip
+	// v2 format: entries are under "plugins" key
+	if plugins, ok := ip["plugins"].(map[string]interface{}); ok {
+		target = plugins
+	}
+	for _, v := range target {
 		arr, ok := v.([]interface{})
 		if !ok {
 			continue
