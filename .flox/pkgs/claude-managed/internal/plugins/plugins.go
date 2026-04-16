@@ -47,9 +47,6 @@ func Add(pluginDir, configDir string) ([]string, error) {
 		if err := MergeJSONFile(kmTarget, kmSource); err != nil {
 			return warnings, fmt.Errorf("merge known_marketplaces.json: %w", err)
 		}
-	} else {
-		warnings = append(warnings,
-			fmt.Sprintf("%s: missing known_marketplaces.json (marketplace won't be registered)", name))
 	}
 
 	return warnings, nil
