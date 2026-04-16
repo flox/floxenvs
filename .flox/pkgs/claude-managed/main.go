@@ -12,6 +12,7 @@ import (
 	"flox.dev/claude-managed/internal/doctor"
 	"flox.dev/claude-managed/internal/emit"
 	"flox.dev/claude-managed/internal/plugins"
+	"flox.dev/claude-managed/internal/symlinks"
 )
 
 const version = "0.1.0"
@@ -138,6 +139,12 @@ func main() {
 			printUsage()
 			os.Exit(1)
 		}
+	case "rules":
+		runFragmentSubcmd("rules", flag.Arg(1), flag.Arg(2), configDir, shareDir)
+	case "skills":
+		runFragmentSubcmd("skills", flag.Arg(1), flag.Arg(2), configDir, shareDir)
+	case "agents":
+		runFragmentSubcmd("agents", flag.Arg(1), flag.Arg(2), configDir, shareDir)
 	default:
 		printUsage()
 		os.Exit(1)
@@ -152,10 +159,10 @@ Commands:
   setup-profile    Emit shell code for profile (cleanup trap)
   status           Show config dir, auth, and symlink status
   doctor           Validate frontmatter and structure
-  plugins add      Install a plugin (symlink + merge config)
-  plugins remove   Remove a plugin by name
-  plugins list     Show installed plugins
-  plugins clean    Remove stale managed plugins
+  rules add|remove|list|clean    Manage rule symlinks
+  skills add|remove|list|clean   Manage skill symlinks
+  agents add|remove|list|clean   Manage agent symlinks
+  plugins add|remove|list|clean  Manage plugins (symlinks + JSON)
   version          Print version
 
 Flags:
@@ -324,6 +331,76 @@ func runDoctor(shareDir string) error {
 	return fmt.Errorf("%d issue(s) found", len(result.Issues))
 }
 
+func runSymlinkList(label, configDir, subdir string) error {
+	entries, err := symlinks.List(filepath.Join(configDir, subdir))
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(bold("Installed " + label))
+	fmt.Println()
+
+	if len(entries) == 0 {
+		fmt.Printf("  %s\n", dim("No "+label+" found."))
+		return nil
+	}
+
+	for _, e := range entries {
+		status := green("✓")
+		if e.Broken {
+			status = yellow("→ broken")
+		}
+		fmt.Printf("  %s %s\n", status, e.Name)
+		if e.Target != "" {
+			fmt.Printf("    %s\n", dim(e.Target))
+		}
+	}
+
+	return nil
+}
+
+func runFragmentSubcmd(typeName, subcmd, arg, configDir, shareDir string) {
+	subdir := typeName
+	switch subcmd {
+	case "add":
+		if arg == "" {
+			fmt.Fprintf(os.Stderr, red("ERROR:")+" usage: claude-managed %s add <path>\n", typeName)
+			os.Exit(1)
+		}
+		if err := symlinks.Add(arg, filepath.Join(configDir, subdir)); err != nil {
+			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
+			os.Exit(1)
+		}
+	case "remove":
+		if arg == "" {
+			fmt.Fprintf(os.Stderr, red("ERROR:")+" usage: claude-managed %s remove <name>\n", typeName)
+			os.Exit(1)
+		}
+		if err := symlinks.Remove(arg, filepath.Join(configDir, subdir)); err != nil {
+			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
+			os.Exit(1)
+		}
+	case "list":
+		if err := runSymlinkList(typeName, configDir, subdir); err != nil {
+			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
+			os.Exit(1)
+		}
+	case "clean":
+		if shareDir == "" {
+			fmt.Fprintln(os.Stderr, red("ERROR:")+" --dir is required or run inside Flox environment")
+			os.Exit(1)
+		}
+		if _, err := symlinks.Clean(filepath.Join(configDir, subdir), shareDir); err != nil {
+			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
+			os.Exit(1)
+		}
+	default:
+		fmt.Fprintf(os.Stderr, red("ERROR:")+" unknown %s command: %s\n", typeName, subcmd)
+		printUsage()
+		os.Exit(1)
+	}
+}
+
 func runPluginsList(configDir string) error {
 	entries, err := plugins.List(configDir)
 	if err != nil {
@@ -344,8 +421,8 @@ func runPluginsList(configDir string) error {
 			status = yellow("→ broken")
 		}
 		fmt.Printf("  %s %s\n", status, e.Name)
-		if e.Path != "" {
-			fmt.Printf("    %s\n", dim(e.Path))
+		if e.Target != "" {
+			fmt.Printf("    %s\n", dim(e.Target))
 		}
 	}
 
