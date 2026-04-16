@@ -1,7 +1,7 @@
 { stdenv, lib, typescript-language-server }:
 
 stdenv.mkDerivation {
-  pname = "claude-plugin-typescript-lsp";
+  pname = "claude-code-plugin-typescript-lsp";
   version = "0.1.0";
 
   src = builtins.path {
@@ -14,7 +14,7 @@ stdenv.mkDerivation {
     ln -s "${typescript-language-server}/bin/typescript-language-server" \
       "$out/bin/typescript-language-server"
 
-    PLUGINS_DIR="$out/share/claude/plugins/typescript-lsp"
+    PLUGINS_DIR="$out/share/claude-code/plugins/typescript-lsp"
     mkdir -p "$PLUGINS_DIR"
     cp -r "$src/typescript-lsp/." "$PLUGINS_DIR/"
   '';

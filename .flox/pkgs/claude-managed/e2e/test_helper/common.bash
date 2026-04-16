@@ -18,9 +18,9 @@ fi
 FIXTURES_DIR="$(cd "$(dirname "${BATS_TEST_FILENAME}")/fixtures" && pwd)"
 
 # Copy a fixture subtree into a fresh temp dir.
-# Usage: dir=$(setup_fixtures share/claude)
+# Usage: dir=$(setup_fixtures share/claude-code)
 setup_fixtures() {
-  local name="${1:-share/claude}"
+  local name="${1:-share/claude-code}"
   local dest="$BATS_TEST_TMPDIR/fixtures/$name"
   mkdir -p "$dest"
   cp -R "$FIXTURES_DIR/$name/." "$dest/"

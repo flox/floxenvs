@@ -20,7 +20,7 @@ environments = ["flox/claude"]
 On `flox activate`, `claude-managed setup` runs
 automatically and:
 
-- Scans `$FLOX_ENV/share/claude/` for config
+- Scans `$FLOX_ENV/share/claude-code/` for config
   fragments from other packages
 - Assembles settings, MCP servers, and instructions
 - Creates a `claude()` shell function with the

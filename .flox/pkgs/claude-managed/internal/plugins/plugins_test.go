@@ -107,7 +107,7 @@ func TestList(t *testing.T) {
 
 func TestClean(t *testing.T) {
 	pluginDir, configDir := setupTestPlugin(t)
-	shareDir := filepath.Dir(filepath.Dir(pluginDir)) // base/share/claude
+	shareDir := filepath.Dir(filepath.Dir(pluginDir)) // base/share/claude-code
 
 	Add(pluginDir, configDir)
 	err := Clean(configDir, shareDir)
@@ -127,7 +127,7 @@ func TestClean_PreservesUserPlugins(t *testing.T) {
 	userDir := t.TempDir()
 	os.Symlink(userDir, filepath.Join(pluginsDir, "user-plugin"))
 
-	Clean(configDir, "/nonexistent/share/claude")
+	Clean(configDir, "/nonexistent/share/claude-code")
 
 	link := filepath.Join(pluginsDir, "user-plugin")
 	if _, err := os.Lstat(link); err != nil {

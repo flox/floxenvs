@@ -12,7 +12,7 @@ import (
 
 func TestCheck_ValidFixtures(t *testing.T) {
 	frags := &discover.Result{
-		Rules: []discover.Fragment{{Name: "alpha", Path: filepath.Join("..", "testdata", "share", "claude", "rules", "alpha.md")}},
+		Rules: []discover.Fragment{{Name: "alpha", Path: filepath.Join("..", "testdata", "share", "claude-code", "rules", "alpha.md")}},
 	}
 	result := doctor.Check(frags)
 	if len(result.Issues) != 0 {

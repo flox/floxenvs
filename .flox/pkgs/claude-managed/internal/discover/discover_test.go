@@ -10,7 +10,7 @@ import (
 // testdataDir returns the path to the testdata directory relative to this file.
 func testdataDir() string {
 	_, filename, _, _ := runtime.Caller(0)
-	return filepath.Join(filepath.Dir(filename), "..", "testdata", "share", "claude")
+	return filepath.Join(filepath.Dir(filename), "..", "testdata", "share", "claude-code")
 }
 
 func TestDiscover(t *testing.T) {

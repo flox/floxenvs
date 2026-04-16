@@ -32,7 +32,7 @@ func main() {
 	}
 
 	var flagDir, flagConfigDir string
-	flag.StringVar(&flagDir, "dir", "", "fragment source directory (default: $FLOX_ENV/share/claude)")
+	flag.StringVar(&flagDir, "dir", "", "fragment source directory (default: $FLOX_ENV/share/claude-code)")
 	flag.StringVar(&flagConfigDir, "config-dir", "", "config directory (default: $FLOX_ENV_PROJECT/.claude-managed)")
 	flag.Usage = printUsage
 	flag.Parse()
@@ -48,7 +48,7 @@ func main() {
 
 	shareDir := flagDir
 	if shareDir == "" && floxEnv != "" {
-		shareDir = filepath.Join(floxEnv, "share", "claude")
+		shareDir = filepath.Join(floxEnv, "share", "claude-code")
 	}
 
 	if projectDir == "" {
@@ -159,7 +159,7 @@ Commands:
   version          Print version
 
 Flags:
-  --dir          Fragment source dir (default: $FLOX_ENV/share/claude)
+  --dir          Fragment source dir (default: $FLOX_ENV/share/claude-code)
   --config-dir   Config dir (default: $FLOX_ENV_PROJECT/.claude-managed)`)
 }
 

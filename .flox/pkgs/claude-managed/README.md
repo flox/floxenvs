@@ -116,14 +116,14 @@ symlink health status.
 ### plugins clean
 
 Removes all plugin symlinks whose targets point
-into `$FLOX_ENV/share/claude/`. Regenerates JSON
+into `$FLOX_ENV/share/claude-code/`. Regenerates JSON
 config files from remaining plugins. User-managed
 plugins are never touched.
 
 ## How it works
 
 Flox packages drop config fragments into
-`$FLOX_ENV/share/claude/`. On `flox activate`:
+`$FLOX_ENV/share/claude-code/`. On `flox activate`:
 
 The Go binary handles discovery and validation.
 Everything else (symlinks, keychain, cleanup) is emitted
@@ -145,7 +145,7 @@ session.
 ### Fragment types
 
 Packages install fragments under
-`$FLOX_ENV/share/claude/`:
+`$FLOX_ENV/share/claude-code/`:
 
 | Directory | Format | Delivery |
 | ------ | ------ | ------ |
@@ -231,7 +231,7 @@ in the isolated config dir.
 The `setup-profile` shell defines a
 `_claude_managed_clean_symlinks` helper that removes
 symlinks whose targets point into
-`$FLOX_ENV/share/claude/`. User-created entries are never
+`$FLOX_ENV/share/claude-code/`. User-created entries are never
 touched.
 
 **On activate:** `setup-hook` cleans stale symlinks, then
@@ -268,7 +268,7 @@ If `CLAUDE_MANAGED_DIR` is not set, defaults to
 main.go                     CLI entry point, env var
                             resolution, command dispatch
 internal/
-  discover/                 Scan $FLOX_ENV/share/claude/
+  discover/                 Scan $FLOX_ENV/share/claude-code/
   emit/                     Generate shell code
                             hook: env vars, keychain,
                                   symlinks, validation

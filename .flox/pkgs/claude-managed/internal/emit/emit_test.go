@@ -11,11 +11,11 @@ import (
 func TestHookCode_Full(t *testing.T) {
 	result := emit.HookCode(&emit.Params{
 		Frags: &discover.Result{
-			Skills:  []discover.Fragment{{Name: "coreutils", Path: "/share/claude/skills/coreutils/SKILL.md"}},
-			Rules:   []discover.Fragment{{Name: "style", Path: "/share/claude/rules/style.md"}},
-			Plugins: []discover.Fragment{{Name: "typescript-lsp", Path: "/share/claude/plugins/typescript-lsp"}},
+			Skills:  []discover.Fragment{{Name: "coreutils", Path: "/share/claude-code/skills/coreutils/SKILL.md"}},
+			Rules:   []discover.Fragment{{Name: "style", Path: "/share/claude-code/rules/style.md"}},
+			Plugins: []discover.Fragment{{Name: "typescript-lsp", Path: "/share/claude-code/plugins/typescript-lsp"}},
 		},
-		ShareDir:  "/share/claude",
+		ShareDir:  "/share/claude-code",
 		ConfigDir: "/project/.claude-managed",
 	})
 
@@ -28,12 +28,12 @@ func TestHookCode_Full(t *testing.T) {
 		"security add-generic-password",
 		`"$HOME/.claude.json"`,
 		"|| true",
-		`_cm_rellink "$FLOX_ENV/share/claude/skills/coreutils" "$CLAUDE_CONFIG_DIR/skills/coreutils"`,
-		`_cm_rellink "$FLOX_ENV/share/claude/rules/style.md" "$CLAUDE_CONFIG_DIR/rules/style.md"`,
+		`_cm_rellink "$FLOX_ENV/share/claude-code/skills/coreutils" "$CLAUDE_CONFIG_DIR/skills/coreutils"`,
+		`_cm_rellink "$FLOX_ENV/share/claude-code/rules/style.md" "$CLAUDE_CONFIG_DIR/rules/style.md"`,
 		"_claude_managed_cleanup()",
 		"security delete-generic-password",
 		"claude-managed plugins clean",
-		`claude-managed plugins add "$FLOX_ENV/share/claude/plugins/typescript-lsp"`,
+		`claude-managed plugins add "$FLOX_ENV/share/claude-code/plugins/typescript-lsp"`,
 	}
 	for _, want := range checks {
 		if !strings.Contains(result, want) {
@@ -49,7 +49,7 @@ func TestHookCode_Full(t *testing.T) {
 func TestHookCode_NoFragments(t *testing.T) {
 	result := emit.HookCode(&emit.Params{
 		Frags:     &discover.Result{},
-		ShareDir:  "/share/claude",
+		ShareDir:  "/share/claude-code",
 		ConfigDir: "/project/.claude-managed",
 	})
 
@@ -76,7 +76,7 @@ func TestHookCode_NoFragments(t *testing.T) {
 func TestProfileCode(t *testing.T) {
 	result := emit.ProfileCode(&emit.Params{
 		Frags:     &discover.Result{},
-		ShareDir:  "/share/claude",
+		ShareDir:  "/share/claude-code",
 		ConfigDir: "/project/.claude-managed",
 	})
 
@@ -88,11 +88,11 @@ func TestProfileCode(t *testing.T) {
 func TestHookCode_EnvVars(t *testing.T) {
 	result := emit.HookCode(&emit.Params{
 		Frags:     &discover.Result{},
-		ShareDir:  "/share/claude",
+		ShareDir:  "/share/claude-code",
 		ConfigDir: "/project/.claude-managed",
 	})
 
-	if !strings.Contains(result, `"$FLOX_ENV/share/claude"/*)`) {
+	if !strings.Contains(result, `"$FLOX_ENV/share/claude-code"/*)`) {
 		t.Errorf("helper should use $FLOX_ENV")
 	}
 	if !strings.Contains(result, `"$CLAUDE_CONFIG_DIR/$1"`) {

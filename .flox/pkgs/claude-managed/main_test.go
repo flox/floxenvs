@@ -11,7 +11,7 @@ import (
 func TestRunSetup_HookWarnsOnInvalidFrontmatter(t *testing.T) {
 	dir := t.TempDir()
 
-	// create share/claude/rules/ with a rule that has an unknown key
+	// create share/claude-code/rules/ with a rule that has an unknown key
 	rulesDir := filepath.Join(dir, "rules")
 	os.MkdirAll(rulesDir, 0755)
 	os.WriteFile(filepath.Join(rulesDir, "bad.md"), []byte("---\nfoo: bar\n---\n# Bad rule\n"), 0644)
@@ -33,7 +33,7 @@ func TestRunSetup_HookWarnsOnInvalidFrontmatter(t *testing.T) {
 func TestRunSetup_HookNoWarningsForValid(t *testing.T) {
 	dir := t.TempDir()
 
-	// create share/claude/rules/ with a valid rule
+	// create share/claude-code/rules/ with a valid rule
 	rulesDir := filepath.Join(dir, "rules")
 	os.MkdirAll(rulesDir, 0755)
 	os.WriteFile(filepath.Join(rulesDir, "good.md"), []byte("# Good rule\nDo things.\n"), 0644)
@@ -52,7 +52,7 @@ func TestRunSetup_HookNoWarningsForValid(t *testing.T) {
 func TestRunSetup_ProfileSkipsValidation(t *testing.T) {
 	dir := t.TempDir()
 
-	// create share/claude/rules/ with a bad rule
+	// create share/claude-code/rules/ with a bad rule
 	rulesDir := filepath.Join(dir, "rules")
 	os.MkdirAll(rulesDir, 0755)
 	os.WriteFile(filepath.Join(rulesDir, "bad.md"), []byte("---\nfoo: bar\n---\n# Bad\n"), 0644)

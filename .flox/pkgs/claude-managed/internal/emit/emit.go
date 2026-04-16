@@ -11,7 +11,7 @@ import (
 // Params holds everything needed to emit shell code.
 type Params struct {
 	Frags     *discover.Result
-	ShareDir  string // $FLOX_ENV/share/claude
+	ShareDir  string // $FLOX_ENV/share/claude-code
 	ConfigDir string // absolute path for CLAUDE_CONFIG_DIR
 }
 
@@ -63,7 +63,7 @@ _claude_managed_clean_symlinks() {
   for _link in "$_dir"/*; do
     [ -L "$_link" ] || continue
     _target="$(readlink "$_link")"
-    case "$_target" in "$FLOX_ENV/share/claude"/*)
+    case "$_target" in "$FLOX_ENV/share/claude-code"/*)
       rm -f "$_link" ;;
     esac
   done
@@ -126,7 +126,7 @@ func emitSymlinks(sb *strings.Builder, p *Params) {
 		sb.WriteString("\n# create skill symlinks\n")
 		sb.WriteString("mkdir -p \"$CLAUDE_CONFIG_DIR/skills\"\n")
 		for _, f := range p.Frags.Skills {
-			fmt.Fprintf(sb, "_cm_rellink \"$FLOX_ENV/share/claude/skills/%s\" \"$CLAUDE_CONFIG_DIR/skills/%s\"\n", f.Name, f.Name)
+			fmt.Fprintf(sb, "_cm_rellink \"$FLOX_ENV/share/claude-code/skills/%s\" \"$CLAUDE_CONFIG_DIR/skills/%s\"\n", f.Name, f.Name)
 		}
 	}
 
@@ -135,7 +135,7 @@ func emitSymlinks(sb *strings.Builder, p *Params) {
 		sb.WriteString("mkdir -p \"$CLAUDE_CONFIG_DIR/rules\"\n")
 		for _, f := range p.Frags.Rules {
 			base := filepath.Base(f.Path)
-			fmt.Fprintf(sb, "_cm_rellink \"$FLOX_ENV/share/claude/rules/%s\" \"$CLAUDE_CONFIG_DIR/rules/%s\"\n", base, base)
+			fmt.Fprintf(sb, "_cm_rellink \"$FLOX_ENV/share/claude-code/rules/%s\" \"$CLAUDE_CONFIG_DIR/rules/%s\"\n", base, base)
 		}
 	}
 
@@ -144,7 +144,7 @@ func emitSymlinks(sb *strings.Builder, p *Params) {
 		sb.WriteString("mkdir -p \"$CLAUDE_CONFIG_DIR/agents\"\n")
 		for _, f := range p.Frags.Agents {
 			base := filepath.Base(f.Path)
-			fmt.Fprintf(sb, "_cm_rellink \"$FLOX_ENV/share/claude/agents/%s\" \"$CLAUDE_CONFIG_DIR/agents/%s\"\n", base, base)
+			fmt.Fprintf(sb, "_cm_rellink \"$FLOX_ENV/share/claude-code/agents/%s\" \"$CLAUDE_CONFIG_DIR/agents/%s\"\n", base, base)
 		}
 	}
 
@@ -152,7 +152,7 @@ func emitSymlinks(sb *strings.Builder, p *Params) {
 		sb.WriteString("\n# install plugins\n")
 		sb.WriteString("claude-managed plugins clean\n")
 		for _, f := range p.Frags.Plugins {
-			fmt.Fprintf(sb, "claude-managed plugins add \"$FLOX_ENV/share/claude/plugins/%s\"\n", f.Name)
+			fmt.Fprintf(sb, "claude-managed plugins add \"$FLOX_ENV/share/claude-code/plugins/%s\"\n", f.Name)
 		}
 
 		// create claude wrapper script that injects --plugin-dir
