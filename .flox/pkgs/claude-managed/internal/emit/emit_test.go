@@ -13,6 +13,7 @@ func TestHookCode_Full(t *testing.T) {
 		Frags: &discover.Result{
 			Skills:  []discover.Fragment{{Name: "coreutils", Path: "/share/claude-code/skills/coreutils/SKILL.md"}},
 			Rules:   []discover.Fragment{{Name: "style", Path: "/share/claude-code/rules/style.md"}},
+			Agents:  []discover.Fragment{{Name: "demo", Path: "/share/claude-code/agents/demo.md"}},
 			Plugins: []discover.Fragment{{Name: "typescript-lsp", Path: "/share/claude-code/plugins/typescript-lsp"}},
 		},
 		ShareDir:  "/share/claude-code",
@@ -23,21 +24,36 @@ func TestHookCode_Full(t *testing.T) {
 		`CLAUDE_CONFIG_DIR="/project/.claude-managed"`,
 		"export CLAUDE_CODE_DISABLE_AUTO_MEMORY=1",
 		"export CLAUDE_MANAGED=1",
-		"_claude_managed_clean_symlinks()",
 		"shasum -a 256",
 		"security add-generic-password",
 		`"$HOME/.claude.json"`,
 		"|| true",
-		`_cm_rellink "$FLOX_ENV/share/claude-code/skills/coreutils" "$CLAUDE_CONFIG_DIR/skills/coreutils"`,
-		`_cm_rellink "$FLOX_ENV/share/claude-code/rules/style.md" "$CLAUDE_CONFIG_DIR/rules/style.md"`,
-		"_claude_managed_cleanup()",
-		"security delete-generic-password",
+		"claude-managed rules clean",
+		`claude-managed rules add "$FLOX_ENV/share/claude-code/rules/style.md"`,
+		"claude-managed skills clean",
+		`claude-managed skills add "$FLOX_ENV/share/claude-code/skills/coreutils"`,
+		"claude-managed agents clean",
+		`claude-managed agents add "$FLOX_ENV/share/claude-code/agents/demo.md"`,
 		"claude-managed plugins clean",
 		`claude-managed plugins add "$FLOX_ENV/share/claude-code/plugins/typescript-lsp"`,
+		"_claude_managed_cleanup()",
+		"security delete-generic-password",
 	}
 	for _, want := range checks {
 		if !strings.Contains(result, want) {
 			t.Errorf("hook output missing %q", want)
+		}
+	}
+
+	unwanted := []string{
+		"_cm_rellink",
+		"_claude_managed_clean_symlinks()",
+		"ln -sfn",
+		"realpath --relative-to",
+	}
+	for _, bad := range unwanted {
+		if strings.Contains(result, bad) {
+			t.Errorf("hook output should NOT contain %q", bad)
 		}
 	}
 
@@ -56,20 +72,16 @@ func TestHookCode_NoFragments(t *testing.T) {
 	if !strings.Contains(result, `CLAUDE_CONFIG_DIR="/project/.claude-managed"`) {
 		t.Errorf("missing CLAUDE_CONFIG_DIR")
 	}
-	if strings.Contains(result, "_cm_rellink \"$FLOX_ENV") {
-		t.Errorf("unexpected symlink creation")
+	for _, cmd := range []string{"rules clean", "skills clean", "agents clean", "plugins clean"} {
+		if !strings.Contains(result, "claude-managed "+cmd) {
+			t.Errorf("missing %s", cmd)
+		}
 	}
-	if !strings.Contains(result, "security add-generic-password") {
-		t.Errorf("missing keychain bridge")
+	if strings.Contains(result, " add ") {
+		t.Errorf("unexpected add command")
 	}
 	if !strings.Contains(result, "_claude_managed_cleanup()") {
 		t.Errorf("missing cleanup function")
-	}
-	if strings.Contains(result, "plugins add") {
-		t.Errorf("unexpected plugins add")
-	}
-	if !strings.Contains(result, "claude-managed plugins clean") {
-		t.Errorf("missing plugins clean in cleanup")
 	}
 }
 
@@ -81,21 +93,31 @@ func TestProfileCode(t *testing.T) {
 	})
 
 	if !strings.Contains(result, "trap _claude_managed_cleanup EXIT") {
-		t.Errorf("profile must contain trap registration, got: %s", result)
+		t.Errorf("profile must contain trap registration")
+	}
+	if !strings.Contains(result, "claude-managed rules clean") {
+		t.Errorf("cleanup should call rules clean")
+	}
+	if !strings.Contains(result, "claude-managed plugins clean") {
+		t.Errorf("cleanup should call plugins clean")
 	}
 }
 
-func TestHookCode_EnvVars(t *testing.T) {
+func TestHookCode_NoShellHelpers(t *testing.T) {
 	result := emit.HookCode(&emit.Params{
 		Frags:     &discover.Result{},
 		ShareDir:  "/share/claude-code",
 		ConfigDir: "/project/.claude-managed",
 	})
 
-	if !strings.Contains(result, `"$FLOX_ENV/share/claude-code"/*)`) {
-		t.Errorf("helper should use $FLOX_ENV")
+	unwanted := []string{
+		"_cm_rellink",
+		"_claude_managed_clean_symlinks()",
+		"realpath --relative-to",
 	}
-	if !strings.Contains(result, `"$CLAUDE_CONFIG_DIR/$1"`) {
-		t.Errorf("helper should use $CLAUDE_CONFIG_DIR")
+	for _, bad := range unwanted {
+		if strings.Contains(result, bad) {
+			t.Errorf("should NOT contain shell helper %q", bad)
+		}
 	}
 }
