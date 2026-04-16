@@ -4,16 +4,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
-)
 
-// PluginEntry represents an installed plugin in the config dir.
-type PluginEntry struct {
-	Name      string
-	Path      string // symlink target
-	IsSymlink bool
-	Broken    bool
-}
+	"flox.dev/claude-managed/internal/symlinks"
+)
 
 // Add symlinks a plugin into the config dir and merges
 // its JSON config files. Returns a list of warnings
@@ -25,17 +18,11 @@ func Add(pluginDir, configDir string) ([]string, error) {
 		return nil, err
 	}
 
-	// create or update symlink (relative path)
-	link := filepath.Join(pluginsDir, name)
-	relTarget, err := filepath.Rel(pluginsDir, pluginDir)
-	if err != nil {
-		relTarget = pluginDir // fallback to absolute
-	}
-	os.Remove(link)
-	if err := os.Symlink(relTarget, link); err != nil {
-		return nil, fmt.Errorf("symlink %s: %w", name, err)
+	if err := symlinks.Add(pluginDir, pluginsDir); err != nil {
+		return nil, err
 	}
 
+	link := filepath.Join(pluginsDir, name)
 	var warnings []string
 
 	// merge installed_plugins.json, patching installPath
@@ -71,92 +58,24 @@ func Add(pluginDir, configDir string) ([]string, error) {
 // Remove deletes a plugin symlink and regenerates JSON config files.
 func Remove(name, configDir string) error {
 	pluginsDir := filepath.Join(configDir, "plugins")
-	link := filepath.Join(pluginsDir, name)
-	if err := os.Remove(link); err != nil && !os.IsNotExist(err) {
-		return fmt.Errorf("remove %s: %w", name, err)
+	if err := symlinks.Remove(name, pluginsDir); err != nil {
+		return err
 	}
 	return regenerateJSON(pluginsDir)
 }
 
 // List returns all plugin entries in the config dir.
-func List(configDir string) ([]PluginEntry, error) {
-	pluginsDir := filepath.Join(configDir, "plugins")
-	if _, err := os.Stat(pluginsDir); os.IsNotExist(err) {
-		return nil, nil
-	}
-
-	entries, err := os.ReadDir(pluginsDir)
-	if err != nil {
-		return nil, err
-	}
-
-	var result []PluginEntry
-	for _, e := range entries {
-		path := filepath.Join(pluginsDir, e.Name())
-		info, err := os.Lstat(path)
-		if err != nil {
-			continue
-		}
-		if info.Mode()&os.ModeSymlink == 0 {
-			continue
-		}
-
-		entry := PluginEntry{
-			Name:      e.Name(),
-			IsSymlink: true,
-		}
-		target, err := os.Readlink(path)
-		if err == nil {
-			entry.Path = target
-			// resolve relative targets against the plugins dir
-			checkPath := target
-			if !filepath.IsAbs(target) {
-				checkPath = filepath.Join(pluginsDir, target)
-			}
-			if _, err := os.Stat(checkPath); err != nil {
-				entry.Broken = true
-			}
-		}
-		result = append(result, entry)
-	}
-
-	return result, nil
+func List(configDir string) ([]symlinks.Entry, error) {
+	return symlinks.List(filepath.Join(configDir, "plugins"))
 }
 
 // Clean removes all symlinks in plugins dir whose targets point
 // into the share dir, then regenerates JSON from remaining plugins.
 func Clean(configDir, shareDir string) error {
 	pluginsDir := filepath.Join(configDir, "plugins")
-	if _, err := os.Stat(pluginsDir); os.IsNotExist(err) {
-		return nil
-	}
-
-	entries, err := os.ReadDir(pluginsDir)
-	if err != nil {
+	if _, err := symlinks.Clean(pluginsDir, shareDir); err != nil {
 		return err
 	}
-
-	for _, e := range entries {
-		path := filepath.Join(pluginsDir, e.Name())
-		info, err := os.Lstat(path)
-		if err != nil || info.Mode()&os.ModeSymlink == 0 {
-			continue
-		}
-		target, err := os.Readlink(path)
-		if err != nil {
-			continue
-		}
-		// resolve relative symlinks to absolute for comparison
-		absTarget := target
-		if !filepath.IsAbs(target) {
-			absTarget = filepath.Join(pluginsDir, target)
-		}
-		absTarget = filepath.Clean(absTarget)
-		if strings.HasPrefix(absTarget, shareDir+"/") {
-			os.Remove(path)
-		}
-	}
-
 	return regenerateJSON(pluginsDir)
 }
 
