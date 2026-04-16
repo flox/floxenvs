@@ -72,8 +72,6 @@ jobs:
     steps:
       - name: "Checkout"
         uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
-        with:
-          ref: "main"
 
       - name: "Install flox"
         uses: "flox/install-flox-action@c94e7e1ab56ae14fe98bae4fd84384fd135f0c2a" # main
@@ -95,6 +93,7 @@ jobs:
           commit-message: "chore(${{ matrix.package }}): upgrade to latest version"
           committer: "FloxBot <bot@flox.dev>"
           author: "FloxBot <bot@flox.dev>"
+          base: "main"
           branch: "chore-upgrade-${{ matrix.package }}"
           delete-branch: true
           title: "chore(${{ matrix.package }}): upgrade to latest version"

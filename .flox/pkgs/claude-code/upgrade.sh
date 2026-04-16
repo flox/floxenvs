@@ -21,7 +21,8 @@ echo "Updating claude-code from $current_version to $latest_version"
 src_url="https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-${latest_version}.tgz"
 echo "Fetching source from $src_url ..."
 src_hash=$(nix-prefetch-url --unpack "$src_url" 2>/dev/null)
-src_sri="sha256-$(nix hash convert --hash-algo sha256 --to sri "$src_hash" \
+src_sri="sha256-$(nix --extra-experimental-features nix-command \
+  hash convert --hash-algo sha256 --to sri "$src_hash" \
   | sed 's/sha256-//')"
 echo "  srcHash: $src_sri"
 
