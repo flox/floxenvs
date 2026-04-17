@@ -4,6 +4,7 @@
   fetchurl,
   makeWrapper,
   unzip,
+  autoPatchelfHook,
   fzf,
   ripgrep,
   versionCheckHook,
@@ -51,6 +52,8 @@ stdenv.mkDerivation {
     makeWrapper
   ] ++ lib.optionals platformInfo.isZip [
     unzip
+  ] ++ lib.optionals stdenv.hostPlatform.isLinux [
+    autoPatchelfHook
   ];
 
   doInstallCheck = true;
