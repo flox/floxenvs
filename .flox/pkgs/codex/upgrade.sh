@@ -7,12 +7,12 @@ HASHES_FILE="$SCRIPT_DIR/hashes.json"
 
 current_version=$(jq -r '.version' "$HASHES_FILE")
 
-# Get latest rust-v* tag from GitHub
+# Get latest stable rust-v* tag from GitHub (skip prereleases and drafts)
 latest_version=$(
   curl -sfL \
     -H "Accept: application/vnd.github+json" \
     "https://api.github.com/repos/openai/codex/releases" \
-  | jq -r '[.[] | select(.tag_name | startswith("rust-v"))][0].tag_name' \
+  | jq -r '[.[] | select(.prerelease == false and .draft == false and (.tag_name | startswith("rust-v")))][0].tag_name' \
   | sed 's/^rust-v//'
 )
 
