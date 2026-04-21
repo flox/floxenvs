@@ -25,11 +25,12 @@ fi
 
 echo "Updating codex from $current_version to $latest_version"
 
-# Prefetch source from GitHub
-src_hash=$(nix-prefetch-fetchFromGitHub \
-  --owner openai \
-  --repo codex \
-  --tag "rust-v${latest_version}" 2>/dev/null)
+# Prefetch source from GitHub. Matches what `fetchFromGitHub` produces:
+# GitHub's archive tarball, unpacked and hashed.
+src_url="https://github.com/openai/codex/archive/refs/tags/rust-v${latest_version}.tar.gz"
+src_raw=$(nix-prefetch-url --unpack "$src_url" 2>/dev/null)
+src_hash=$(nix --extra-experimental-features nix-command \
+  hash convert --hash-algo sha256 --to sri "$src_raw")
 echo "  hash: $src_hash"
 
 # Prefetch cargo deps
