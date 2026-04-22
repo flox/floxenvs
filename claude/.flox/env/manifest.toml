@@ -26,6 +26,12 @@ eval "$(claude-managed setup-hook)"
 '''
 
 [profile]
-common = '''
-eval "$(claude-managed setup-profile)"
+bash = '''
+eval "$(claude-managed setup-profile-bash)"
+'''
+zsh = '''
+eval "$(claude-managed setup-profile-zsh)"
+'''
+fish = '''
+claude-managed setup-profile-fish | source
 '''

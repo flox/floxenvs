@@ -16,7 +16,9 @@
       "on-activate": "eval \"$(claude-managed setup-hook)\"\n"
     },
     "profile": {
-      "common": "eval \"$(claude-managed setup-profile)\"\n"
+      "bash": "eval \"$(claude-managed setup-profile-bash)\"\n",
+      "zsh": "eval \"$(claude-managed setup-profile-zsh)\"\n",
+      "fish": "claude-managed setup-profile-fish | source\n"
     },
     "options": {}
   },
