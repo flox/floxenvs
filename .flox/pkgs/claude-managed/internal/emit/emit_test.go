@@ -24,6 +24,8 @@ func TestHookCode_Full(t *testing.T) {
 		`CLAUDE_CONFIG_DIR="/project/.claude-managed"`,
 		"export CLAUDE_CODE_DISABLE_AUTO_MEMORY=1",
 		"export CLAUDE_MANAGED=1",
+		`mkdir -p "$CLAUDE_CONFIG_DIR/bin"`,
+		`export PATH="$CLAUDE_CONFIG_DIR/bin:$PATH"`,
 		"shasum -a 256",
 		"security add-generic-password",
 		`"$HOME/.claude.json"`,
@@ -71,6 +73,9 @@ func TestHookCode_NoFragments(t *testing.T) {
 
 	if !strings.Contains(result, `CLAUDE_CONFIG_DIR="/project/.claude-managed"`) {
 		t.Errorf("missing CLAUDE_CONFIG_DIR")
+	}
+	if !strings.Contains(result, `export PATH="$CLAUDE_CONFIG_DIR/bin:$PATH"`) {
+		t.Errorf("missing PATH export even without plugins")
 	}
 	for _, cmd := range []string{"rules clean", "skills clean", "agents clean", "plugins clean"} {
 		if !strings.Contains(result, `claude-managed --config-dir "$CLAUDE_CONFIG_DIR" `+cmd) {

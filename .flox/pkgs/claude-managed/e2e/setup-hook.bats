@@ -20,6 +20,13 @@ load test_helper/common
   assert_output --partial 'export CLAUDE_CODE_DISABLE_AUTO_MEMORY=1'
 }
 
+@test "setup-hook adds CLAUDE_CONFIG_DIR/bin to PATH" {
+  run_cm setup-hook
+  assert_success
+  assert_output --partial 'mkdir -p "$CLAUDE_CONFIG_DIR/bin"'
+  assert_output --partial 'export PATH="$CLAUDE_CONFIG_DIR/bin:$PATH"'
+}
+
 @test "setup-hook emits rules add" {
   run_cm setup-hook
   assert_success

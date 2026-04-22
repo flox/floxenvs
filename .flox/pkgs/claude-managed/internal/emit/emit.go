@@ -22,7 +22,8 @@ func HookCode(p *Params) string {
 	fmt.Fprintf(&sb, "export CLAUDE_CONFIG_DIR=%q\n", p.ConfigDir)
 	sb.WriteString("export CLAUDE_CODE_DISABLE_AUTO_MEMORY=1\n")
 	sb.WriteString("export CLAUDE_MANAGED=1\n")
-	sb.WriteString("mkdir -p \"$CLAUDE_CONFIG_DIR\"\n")
+	sb.WriteString("mkdir -p \"$CLAUDE_CONFIG_DIR/bin\"\n")
+	sb.WriteString("export PATH=\"$CLAUDE_CONFIG_DIR/bin:$PATH\"\n")
 
 	emitKeychainBridge(&sb)
 	emitFragments(&sb, p)
@@ -116,7 +117,6 @@ func nameForFragment(typeName string, f discover.Fragment) string {
 
 func emitPluginWrapper(sb *strings.Builder, p *Params) {
 	sb.WriteString("\n# create claude wrapper to load plugins\n")
-	sb.WriteString("mkdir -p \"$CLAUDE_CONFIG_DIR/bin\"\n")
 	sb.WriteString("_cm_real=\"$(command -v claude)\"\n")
 	sb.WriteString("{\n")
 	sb.WriteString("  echo '#!/usr/bin/env bash'\n")
@@ -127,7 +127,6 @@ func emitPluginWrapper(sb *strings.Builder, p *Params) {
 	sb.WriteString("  printf ' \"$@\"\\n'\n")
 	sb.WriteString("} > \"$CLAUDE_CONFIG_DIR/bin/claude\"\n")
 	sb.WriteString("chmod +x \"$CLAUDE_CONFIG_DIR/bin/claude\"\n")
-	sb.WriteString("export PATH=\"$CLAUDE_CONFIG_DIR/bin:$PATH\"\n")
 	sb.WriteString("unset _cm_real\n")
 }
 
