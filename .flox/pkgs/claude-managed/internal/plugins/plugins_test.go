@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 func setupTestPlugin(t *testing.T) (pluginDir, configDir string) {
@@ -53,8 +54,22 @@ func TestAdd(t *testing.T) {
 	if err != nil {
 		t.Fatalf("read installed_plugins.json: %v", err)
 	}
-	if _, ok := ip["test-plugin@flox"]; !ok {
-		t.Error("missing test-plugin@flox")
+	entries, ok := ip["test-plugin@flox"].([]interface{})
+	if !ok || len(entries) == 0 {
+		t.Fatal("missing test-plugin@flox")
+	}
+	entry := entries[0].(map[string]interface{})
+	if entry["installedAt"] == "2026-01-01T00:00:00Z" {
+		t.Error("installedAt should be patched to current time, got source placeholder")
+	}
+	if entry["lastUpdated"] == "2026-01-01T00:00:00Z" {
+		t.Error("lastUpdated should be patched to current time, got source placeholder")
+	}
+	if _, err := time.Parse(timestampFormat, entry["installedAt"].(string)); err != nil {
+		t.Errorf("installedAt not in expected format: %v", err)
+	}
+	if _, err := time.Parse(timestampFormat, entry["lastUpdated"].(string)); err != nil {
+		t.Errorf("lastUpdated not in expected format: %v", err)
 	}
 
 	kmPath := filepath.Join(configDir, "plugins", "known_marketplaces.json")
@@ -147,5 +162,36 @@ func TestAdd_Idempotent(t *testing.T) {
 	count := strings.Count(string(data), "test-plugin@flox")
 	if count != 1 {
 		t.Errorf("key should appear once, found %d times", count)
+	}
+}
+
+func TestAdd_PreservesInstalledAt(t *testing.T) {
+	pluginDir, configDir := setupTestPlugin(t)
+
+	origNow := now
+	t.Cleanup(func() { now = origNow })
+	now = func() string { return "2030-06-01T00:00:00.000Z" }
+
+	if _, err := Add(pluginDir, configDir); err != nil {
+		t.Fatalf("first Add failed: %v", err)
+	}
+
+	now = func() string { return "2030-06-02T00:00:00.000Z" }
+	if _, err := Add(pluginDir, configDir); err != nil {
+		t.Fatalf("second Add failed: %v", err)
+	}
+
+	ipPath := filepath.Join(configDir, "plugins", "installed_plugins.json")
+	ip, err := ReadJSONMap(ipPath)
+	if err != nil {
+		t.Fatalf("read: %v", err)
+	}
+	entries := ip["test-plugin@flox"].([]interface{})
+	entry := entries[0].(map[string]interface{})
+	if entry["installedAt"] != "2030-06-01T00:00:00.000Z" {
+		t.Errorf("installedAt should be preserved from first Add, got %v", entry["installedAt"])
+	}
+	if entry["lastUpdated"] != "2030-06-02T00:00:00.000Z" {
+		t.Errorf("lastUpdated should reflect second Add, got %v", entry["lastUpdated"])
 	}
 }

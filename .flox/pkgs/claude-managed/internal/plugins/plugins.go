@@ -4,9 +4,17 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"flox.dev/claude-managed/internal/symlinks"
 )
+
+// timestampFormat matches Claude Code's installed_plugins.json schema
+// (ISO 8601 with millisecond precision, UTC).
+const timestampFormat = "2006-01-02T15:04:05.000Z"
+
+// now is overridable in tests.
+var now = func() string { return time.Now().UTC().Format(timestampFormat) }
 
 // Add symlinks a plugin into the config dir and merges
 // its JSON config files. Returns a list of warnings
@@ -25,12 +33,13 @@ func Add(pluginDir, configDir string) ([]string, error) {
 	link := filepath.Join(pluginsDir, name)
 	var warnings []string
 
-	// merge installed_plugins.json, patching installPath
+	// merge installed_plugins.json, patching installPath and timestamps
 	ipPath := filepath.Join(pluginDir, "installed_plugins.json")
 	ipSource, _ := ReadJSONMap(ipPath)
 	if ipSource != nil {
-		patchInstallPaths(ipSource, link)
 		ipTarget := filepath.Join(pluginsDir, "installed_plugins.json")
+		existing, _ := ReadJSONMap(ipTarget)
+		patchEntries(ipSource, link, existing)
 		if err := MergeJSONFile(ipTarget, ipSource); err != nil {
 			return warnings, fmt.Errorf("merge installed_plugins.json: %w", err)
 		}
@@ -76,28 +85,65 @@ func Clean(configDir, shareDir string) error {
 	return regenerateJSON(pluginsDir)
 }
 
-// patchInstallPaths sets installPath in each entry array
-// to the actual plugin location in the config dir.
+// patchEntries sets installPath, installedAt, and lastUpdated
+// on each entry. installedAt is preserved from the existing
+// target file when present; otherwise set to current time.
+// lastUpdated is always refreshed.
 // Supports both v1 (flat) and v2 (wrapped in "plugins" key) formats.
-func patchInstallPaths(ip map[string]interface{}, pluginPath string) {
-	target := ip
-	// v2 format: entries are under "plugins" key
-	if plugins, ok := ip["plugins"].(map[string]interface{}); ok {
-		target = plugins
-	}
-	for _, v := range target {
+func patchEntries(ip map[string]interface{}, pluginPath string, existing map[string]interface{}) {
+	ts := now()
+	target := entriesMap(ip)
+	prev := entriesMap(existing)
+	for key, v := range target {
 		arr, ok := v.([]interface{})
 		if !ok {
 			continue
 		}
+		prevInstalledAt := lookupInstalledAt(prev, key)
 		for _, item := range arr {
 			m, ok := item.(map[string]interface{})
 			if !ok {
 				continue
 			}
 			m["installPath"] = pluginPath
+			if prevInstalledAt != "" {
+				m["installedAt"] = prevInstalledAt
+			} else {
+				m["installedAt"] = ts
+			}
+			m["lastUpdated"] = ts
 		}
 	}
+}
+
+// entriesMap returns the map containing plugin entries, unwrapping
+// the v2 "plugins" key if present. Returns nil for nil input.
+func entriesMap(m map[string]interface{}) map[string]interface{} {
+	if m == nil {
+		return nil
+	}
+	if plugins, ok := m["plugins"].(map[string]interface{}); ok {
+		return plugins
+	}
+	return m
+}
+
+// lookupInstalledAt returns the first entry's installedAt for key,
+// or "" if not present.
+func lookupInstalledAt(m map[string]interface{}, key string) string {
+	if m == nil {
+		return ""
+	}
+	arr, ok := m[key].([]interface{})
+	if !ok || len(arr) == 0 {
+		return ""
+	}
+	entry, ok := arr[0].(map[string]interface{})
+	if !ok {
+		return ""
+	}
+	s, _ := entry["installedAt"].(string)
+	return s
 }
 
 // regenerateJSON rebuilds installed_plugins.json and known_marketplaces.json
@@ -114,6 +160,9 @@ func regenerateJSON(pluginsDir string) error {
 	mergedIP := make(map[string]interface{})
 	mergedKM := make(map[string]interface{})
 
+	// Preserve installedAt timestamps from the existing merged file.
+	existingIP, _ := ReadJSONMap(filepath.Join(pluginsDir, "installed_plugins.json"))
+
 	for _, e := range entries {
 		path := filepath.Join(pluginsDir, e.Name())
 		info, err := os.Lstat(path)
@@ -127,7 +176,7 @@ func regenerateJSON(pluginsDir string) error {
 
 		ip, _ := ReadJSONMap(filepath.Join(target, "installed_plugins.json"))
 		if ip != nil {
-			patchInstallPaths(ip, path)
+			patchEntries(ip, path, existingIP)
 		}
 		for k, v := range ip {
 			mergedIP[k] = v

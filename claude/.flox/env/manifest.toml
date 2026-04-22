@@ -22,10 +22,6 @@ claude-managed.pkg-group = "claude-managed"
 
 [hook]
 on-activate = '''
-# Use local build if available (until plugin support is published)
-if [ -d "$FLOX_ENV_PROJECT/../result-claude-managed/bin" ]; then
-  export PATH="$FLOX_ENV_PROJECT/../result-claude-managed/bin:$PATH"
-fi
 eval "$(claude-managed setup-hook)"
 '''
 

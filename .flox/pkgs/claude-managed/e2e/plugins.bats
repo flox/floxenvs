@@ -24,6 +24,25 @@ load test_helper/common
   assert_success
 }
 
+@test "plugins add patches installedAt and lastUpdated" {
+  local dir config_dir ip
+  dir="$(setup_fixtures)"
+  config_dir="$(setup_config_dir)"
+  claude-managed --config-dir "$config_dir" \
+    plugins add "$dir/plugins/valid-plugin"
+  ip="$config_dir/plugins/installed_plugins.json"
+  # The fixture's placeholder (2026-01-01) must be overwritten.
+  run grep '"installedAt": "2026-01-01T00:00:00Z"' "$ip"
+  assert_failure
+  run grep '"lastUpdated": "2026-01-01T00:00:00Z"' "$ip"
+  assert_failure
+  # Expect ISO 8601 with millisecond precision on both fields.
+  run grep -E '"installedAt": "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}Z"' "$ip"
+  assert_success
+  run grep -E '"lastUpdated": "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}Z"' "$ip"
+  assert_success
+}
+
 @test "plugins add merges known_marketplaces.json" {
   local dir config_dir
   dir="$(setup_fixtures)"
