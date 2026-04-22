@@ -20,13 +20,15 @@ func TestHookCode_Full(t *testing.T) {
 		ConfigDir: "/project/.claude-managed",
 	})
 
-	// plugin wrapper must resolve the real claude explicitly, never via
-	// `command -v claude` (PATH already contains the wrapper dir -> loop)
-	if !strings.Contains(result, `_cm_real="$FLOX_ENV/bin/claude"`) {
-		t.Errorf("plugin wrapper must resolve claude via $FLOX_ENV/bin/claude")
+	// plugin wrapper must reference env vars, not baked-in absolute paths
+	if !strings.Contains(result, `exec "$FLOX_ENV/bin/claude"`) {
+		t.Errorf("wrapper body must reference $FLOX_ENV/bin/claude at runtime")
 	}
-	if strings.Contains(result, `_cm_real="$(command -v claude)"`) {
-		t.Errorf("plugin wrapper must NOT use bare `command -v claude`")
+	if !strings.Contains(result, `--plugin-dir "$CLAUDE_CONFIG_DIR/plugins/typescript-lsp"`) {
+		t.Errorf("wrapper body must reference $CLAUDE_CONFIG_DIR/plugins/... at runtime")
+	}
+	if strings.Contains(result, `_cm_real=`) {
+		t.Errorf("wrapper should not resolve claude eagerly; use $FLOX_ENV at runtime")
 	}
 
 	checks := []string{

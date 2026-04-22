@@ -143,21 +143,20 @@ func nameForFragment(typeName string, f discover.Fragment) string {
 
 func emitPluginWrapper(sb *strings.Builder, p *Params) {
 	sb.WriteString("\n# create claude wrapper to load plugins\n")
-	// use $FLOX_ENV/bin/claude explicitly; never `command -v claude` because
-	// $CLAUDE_CONFIG_DIR/bin is already prepended to PATH and would resolve
-	// back to this wrapper (infinite exec loop)
-	sb.WriteString("_cm_real=\"$FLOX_ENV/bin/claude\"\n")
-	sb.WriteString("if [ ! -x \"$_cm_real\" ]; then _cm_real=\"$(PATH=\"${PATH#\"$CLAUDE_CONFIG_DIR/bin:\"}\" command -v claude)\"; fi\n")
+	// reference env vars instead of baked-in absolute paths so the wrapper
+	// stays valid across nix store rebuilds and across machines that share
+	// the same $FLOX_ENV_PROJECT. $FLOX_ENV/bin/claude is used verbatim
+	// because `command -v claude` from inside the hook resolves back to
+	// this wrapper (PATH already has $CLAUDE_CONFIG_DIR/bin prepended)
 	sb.WriteString("{\n")
 	sb.WriteString("  echo '#!/usr/bin/env bash'\n")
-	sb.WriteString("  printf 'exec \"%s\"' \"$_cm_real\"\n")
+	sb.WriteString("  echo 'exec \"$FLOX_ENV/bin/claude\" \\'\n")
 	for _, f := range p.Frags.Plugins {
-		fmt.Fprintf(sb, "  printf ' --plugin-dir \"%%s\"' \"$CLAUDE_CONFIG_DIR/plugins/%s\"\n", f.Name)
+		fmt.Fprintf(sb, "  echo '  --plugin-dir \"$CLAUDE_CONFIG_DIR/plugins/%s\" \\'\n", f.Name)
 	}
-	sb.WriteString("  printf ' \"$@\"\\n'\n")
+	sb.WriteString("  echo '  \"$@\"'\n")
 	sb.WriteString("} > \"$CLAUDE_CONFIG_DIR/bin/claude\"\n")
 	sb.WriteString("chmod +x \"$CLAUDE_CONFIG_DIR/bin/claude\"\n")
-	sb.WriteString("unset _cm_real\n")
 }
 
 func emitCleanupFunc(sb *strings.Builder) {
