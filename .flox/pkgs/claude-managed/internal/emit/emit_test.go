@@ -20,6 +20,15 @@ func TestHookCode_Full(t *testing.T) {
 		ConfigDir: "/project/.claude-managed",
 	})
 
+	// plugin wrapper must resolve the real claude explicitly, never via
+	// `command -v claude` (PATH already contains the wrapper dir -> loop)
+	if !strings.Contains(result, `_cm_real="$FLOX_ENV/bin/claude"`) {
+		t.Errorf("plugin wrapper must resolve claude via $FLOX_ENV/bin/claude")
+	}
+	if strings.Contains(result, `_cm_real="$(command -v claude)"`) {
+		t.Errorf("plugin wrapper must NOT use bare `command -v claude`")
+	}
+
 	checks := []string{
 		`CLAUDE_CONFIG_DIR="/project/.claude-managed"`,
 		"export CLAUDE_CODE_DISABLE_AUTO_MEMORY=1",
