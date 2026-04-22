@@ -25,6 +25,14 @@ buildGo126Module rec {
 
   inherit vendorHash;
 
+  # Tests hardcode `/tmp/crush-test/` which can collide between sandboxed builds
+  # on the same macOS host (different uids, same path). Redirect to TMPDIR.
+  postPatch = ''
+    substituteInPlace internal/agent/common_test.go \
+      --replace-fail 'filepath.Join("/tmp/crush-test/", t.Name())' \
+                     'filepath.Join(os.TempDir(), "crush-test", t.Name())'
+  '';
+
   ldflags = [
     "-s"
     "-X=github.com/charmbracelet/crush/internal/version.Version=${version}"
