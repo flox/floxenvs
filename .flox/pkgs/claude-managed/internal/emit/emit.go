@@ -32,11 +32,37 @@ func HookCode(p *Params) string {
 	return sb.String()
 }
 
-// ProfileCode emits shell for profile: cleanup function + trap.
+// ProfileCode emits POSIX-compatible shell (bash/zsh) for [profile]:
+// re-exports PATH for interactive shells, defines cleanup, registers
+// EXIT trap.
 func ProfileCode(p *Params) string {
 	var sb strings.Builder
+	sb.WriteString("export PATH=\"$CLAUDE_CONFIG_DIR/bin:$PATH\"\n")
 	emitCleanupFunc(&sb)
 	sb.WriteString("trap _claude_managed_cleanup EXIT\n")
+	return sb.String()
+}
+
+// ProfileCodeFish emits fish-shell code for [profile.fish]: prepends
+// PATH, defines cleanup, registers fish_exit event handler.
+func ProfileCodeFish(p *Params) string {
+	var sb strings.Builder
+	sb.WriteString("set -gx PATH \"$CLAUDE_CONFIG_DIR/bin\" $PATH\n")
+	sb.WriteString(`
+function _claude_managed_cleanup --on-event fish_exit
+  claude-managed --config-dir "$CLAUDE_CONFIG_DIR" rules clean
+  claude-managed --config-dir "$CLAUDE_CONFIG_DIR" skills clean
+  claude-managed --config-dir "$CLAUDE_CONFIG_DIR" agents clean
+  claude-managed --config-dir "$CLAUDE_CONFIG_DIR" plugins clean
+  if test (uname -s) = Darwin
+    set _cm_user (test -n "$USER"; and echo $USER; or echo claude-code-user)
+    set _cm_hash (printf '%s' "$CLAUDE_CONFIG_DIR" | shasum -a 256 | cut -c1-8)
+    set _cm_dst_service "Claude Code-credentials-$_cm_hash"
+    security delete-generic-password -a "$_cm_user" -s "$_cm_dst_service" >/dev/null 2>&1; or true
+    rm -f "$CLAUDE_CONFIG_DIR/.claude.json"
+  end
+end
+`)
 	return sb.String()
 }
 

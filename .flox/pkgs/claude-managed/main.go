@@ -15,7 +15,7 @@ import (
 	"flox.dev/claude-managed/internal/symlinks"
 )
 
-const version = "0.2.5"
+const version = "0.2.6"
 
 // ANSI color helpers
 func ansi(code, s string) string { return "\033[" + code + "m" + s + "\033[0m" }
@@ -78,9 +78,15 @@ func main() {
 			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
 			os.Exit(1)
 		}
-	case "setup-profile":
+	case "setup-profile", "setup-profile-bash", "setup-profile-zsh":
 		requireShareDir()
 		if err := runSetup(shareDir, configDir, "profile", os.Stderr); err != nil {
+			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
+			os.Exit(1)
+		}
+	case "setup-profile-fish":
+		requireShareDir()
+		if err := runSetup(shareDir, configDir, "profile-fish", os.Stderr); err != nil {
 			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
 			os.Exit(1)
 		}
@@ -155,8 +161,11 @@ func printUsage() {
 	fmt.Fprintln(os.Stderr, `Usage: claude-managed [flags] <command>
 
 Commands:
-  setup-hook       Emit shell code for on-activate hook
-  setup-profile    Emit shell code for profile (cleanup trap)
+  setup-hook            Emit shell code for on-activate hook
+  setup-profile         Emit POSIX profile code (bash/zsh default)
+  setup-profile-bash    Emit profile code for [profile.bash]
+  setup-profile-zsh     Emit profile code for [profile.zsh]
+  setup-profile-fish    Emit profile code for [profile.fish]
   status           Show config dir, auth, and symlink status
   doctor           Validate frontmatter and structure
   rules add|remove|list|clean    Manage rule symlinks
@@ -195,6 +204,8 @@ func runSetup(shareDir, configDir, mode string, warn io.Writer) error {
 		fmt.Print(emit.HookCode(params))
 	case "profile":
 		fmt.Print(emit.ProfileCode(params))
+	case "profile-fish":
+		fmt.Print(emit.ProfileCodeFish(params))
 	}
 
 	return nil

@@ -97,6 +97,9 @@ func TestProfileCode(t *testing.T) {
 		ConfigDir: "/project/.claude-managed",
 	})
 
+	if !strings.Contains(result, `export PATH="$CLAUDE_CONFIG_DIR/bin:$PATH"`) {
+		t.Errorf("profile must re-export PATH for interactive shells")
+	}
 	if !strings.Contains(result, "trap _claude_managed_cleanup EXIT") {
 		t.Errorf("profile must contain trap registration")
 	}
@@ -105,6 +108,37 @@ func TestProfileCode(t *testing.T) {
 	}
 	if !strings.Contains(result, `claude-managed --config-dir "$CLAUDE_CONFIG_DIR" plugins clean`) {
 		t.Errorf("cleanup should call plugins clean")
+	}
+}
+
+func TestProfileCodeFish(t *testing.T) {
+	result := emit.ProfileCodeFish(&emit.Params{
+		Frags:     &discover.Result{},
+		ShareDir:  "/share/claude-code",
+		ConfigDir: "/project/.claude-managed",
+	})
+
+	checks := []string{
+		`set -gx PATH "$CLAUDE_CONFIG_DIR/bin" $PATH`,
+		"function _claude_managed_cleanup --on-event fish_exit",
+		`claude-managed --config-dir "$CLAUDE_CONFIG_DIR" rules clean`,
+		`claude-managed --config-dir "$CLAUDE_CONFIG_DIR" plugins clean`,
+		"end",
+	}
+	for _, want := range checks {
+		if !strings.Contains(result, want) {
+			t.Errorf("fish profile output missing %q", want)
+		}
+	}
+
+	unwanted := []string{
+		"trap ",
+		"_claude_managed_cleanup()",
+	}
+	for _, bad := range unwanted {
+		if strings.Contains(result, bad) {
+			t.Errorf("fish profile should NOT contain %q (POSIX syntax)", bad)
+		}
 	}
 }
 
