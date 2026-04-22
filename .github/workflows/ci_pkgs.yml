@@ -123,7 +123,7 @@ jobs:
   build-aarch64-darwin:
     name: "Build '${{ matrix.package }}' (aarch64-darwin)"
     runs-on: "ubuntu-latest"
-    timeout-minutes: 30
+    timeout-minutes: 60
     needs: ["discover"]
     if: needs.discover.outputs.aarch64-darwin != '[]'
 
@@ -156,7 +156,7 @@ jobs:
   build-aarch64-linux:
     name: "Build '${{ matrix.package }}' (aarch64-linux)"
     runs-on: "ubuntu-latest"
-    timeout-minutes: 30
+    timeout-minutes: 60
     needs: ["discover"]
     if: needs.discover.outputs.aarch64-linux != '[]'
 
@@ -189,7 +189,7 @@ jobs:
   build-x86_64-darwin:
     name: "Build '${{ matrix.package }}' (x86_64-darwin)"
     runs-on: "ubuntu-latest"
-    timeout-minutes: 30
+    timeout-minutes: 60
     needs: ["discover"]
     if: needs.discover.outputs.x86_64-darwin != '[]'
 
@@ -222,7 +222,7 @@ jobs:
   build-x86_64-linux:
     name: "Build '${{ matrix.package }}' (x86_64-linux)"
     runs-on: "ubuntu-latest"
-    timeout-minutes: 30
+    timeout-minutes: 60
     needs: ["discover"]
     if: needs.discover.outputs.x86_64-linux != '[]'
 
