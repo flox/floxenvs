@@ -32,7 +32,7 @@
     "options": {},
     "services": {
       "localstack": {
-        "command": "localstack start -d",
+        "command": "docker rm -f localstack-main 2>/dev/null; localstack start -d",
         "is-daemon": true,
         "shutdown": {
           "command": "localstack stop"

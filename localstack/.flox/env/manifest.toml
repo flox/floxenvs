@@ -18,7 +18,7 @@ kubectl.pkg-path = "kubectl"
 kubectl.pkg-group = "localstack-tools"
 
 [services]
-localstack.command = "localstack start -d"
+localstack.command = "docker rm -f localstack-main 2>/dev/null; localstack start -d"
 localstack.is-daemon = true
 localstack.shutdown.command = "localstack stop"
 

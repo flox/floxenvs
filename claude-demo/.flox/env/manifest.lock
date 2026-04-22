@@ -1,0 +1,665 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "claude-code": {
+        "pkg-path": "flox/claude-code",
+        "pkg-group": "claude-code"
+      },
+      "claude-code-plugin-typescript-lsp": {
+        "pkg-path": "flox/claude-code-plugin-typescript-lsp",
+        "pkg-group": "claude-code-plugin-typescript-lsp"
+      },
+      "claude-managed": {
+        "pkg-path": "flox/claude-managed",
+        "pkg-group": "claude-managed"
+      },
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": "demo-tools"
+      },
+      "skill-coreutils": {
+        "pkg-path": "flox/skill-coreutils",
+        "pkg-group": "skill-coreutils"
+      }
+    },
+    "hook": {
+      "on-activate": "eval \"$(claude-managed setup-hook)\"\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 50 --margin \"1 2\" --padding \"1 2\" \\\n    \"Claude Code\" \"with managed configuration\"\n  echo \"\"\n  echo \"  claude           — start Claude Code\"\n  echo \"  claude-managed status  — show config\"\n  echo \"  claude-managed doctor  — validate config\"\n  echo \"\"\nfi\n"
+    },
+    "profile": {
+      "bash": "eval \"$(claude-managed setup-profile-bash)\"\n",
+      "zsh": "eval \"$(claude-managed setup-profile-zsh)\"\n",
+      "fish": "claude-managed setup-profile-fish | source\n"
+    },
+    "options": {}
+  },
+  "packages": [
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/7ff8dr7l7fl47klnlpksjb9p3ww9igxh-claude-code-2.1.110.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=efe91449ea34d2df27bfe31c9581c101577764c7",
+      "name": "claude-code-2.1.110",
+      "pname": "claude-code",
+      "rev": "efe91449ea34d2df27bfe31c9581c101577764c7",
+      "rev_count": 2629,
+      "rev_date": "2026-04-16T19:39:45Z",
+      "scrape_date": "2026-04-22T16:24:05.343395Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "2.1.110",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ka2dqg6j4kx2gq91hv58k8xh84zm81k4-claude-code-2.1.110"
+      },
+      "system": "aarch64-darwin",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/micwl9ya497w95g9203gv8k9k2chx4kd-claude-code-2.1.110.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=efe91449ea34d2df27bfe31c9581c101577764c7",
+      "name": "claude-code-2.1.110",
+      "pname": "claude-code",
+      "rev": "efe91449ea34d2df27bfe31c9581c101577764c7",
+      "rev_count": 2629,
+      "rev_date": "2026-04-16T19:39:45Z",
+      "scrape_date": "2026-04-22T16:24:05.343398Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "2.1.110",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ya0qcllfv2ij0sf7xnylzlgzkiv4f3dj-claude-code-2.1.110"
+      },
+      "system": "aarch64-linux",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/m3g3hj1225cha37has3ybxd34vdhw0vk-claude-code-2.1.110.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=efe91449ea34d2df27bfe31c9581c101577764c7",
+      "name": "claude-code-2.1.110",
+      "pname": "claude-code",
+      "rev": "efe91449ea34d2df27bfe31c9581c101577764c7",
+      "rev_count": 2629,
+      "rev_date": "2026-04-16T19:39:45Z",
+      "scrape_date": "2026-04-22T16:24:05.343399Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "2.1.110",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/xpw7xdkh708xs0g6b22fs9vvrcqv7hxk-claude-code-2.1.110"
+      },
+      "system": "x86_64-darwin",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/sazinh41x9iwypjh2cw0y1m9h20nljkf-claude-code-2.1.110.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=efe91449ea34d2df27bfe31c9581c101577764c7",
+      "name": "claude-code-2.1.110",
+      "pname": "claude-code",
+      "rev": "efe91449ea34d2df27bfe31c9581c101577764c7",
+      "rev_count": 2629,
+      "rev_date": "2026-04-16T19:39:45Z",
+      "scrape_date": "2026-04-22T16:24:05.343400Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "2.1.110",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/7gijixymjj6hp21cglh3iwyhyvz8gg95-claude-code-2.1.110"
+      },
+      "system": "x86_64-linux",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code-plugin-typescript-lsp",
+      "broken": false,
+      "derivation": "/nix/store/kymlh6n8crwknfcdk6hz3hvz72c1ilwv-claude-code-plugin-typescript-lsp-0.2.4.drv",
+      "install_id": "claude-code-plugin-typescript-lsp",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=deb69b41c33438d3eab4e05232746dacc1bf7ece",
+      "name": "claude-code-plugin-typescript-lsp-0.2.4",
+      "pname": "claude-code-plugin-typescript-lsp",
+      "rev": "deb69b41c33438d3eab4e05232746dacc1bf7ece",
+      "rev_count": 2837,
+      "rev_date": "2026-04-22T12:21:56Z",
+      "scrape_date": "2026-04-22T16:04:00.961692Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.2.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/mn34sppbn6wib2l37pkxjjd12kjka7z8-claude-code-plugin-typescript-lsp-0.2.4"
+      },
+      "system": "aarch64-darwin",
+      "group": "claude-code-plugin-typescript-lsp",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code-plugin-typescript-lsp",
+      "broken": false,
+      "derivation": "/nix/store/z4qjfjj6hpdghrh6xviw6yd5y4y2419q-claude-code-plugin-typescript-lsp-0.2.4.drv",
+      "install_id": "claude-code-plugin-typescript-lsp",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=deb69b41c33438d3eab4e05232746dacc1bf7ece",
+      "name": "claude-code-plugin-typescript-lsp-0.2.4",
+      "pname": "claude-code-plugin-typescript-lsp",
+      "rev": "deb69b41c33438d3eab4e05232746dacc1bf7ece",
+      "rev_count": 2837,
+      "rev_date": "2026-04-22T12:21:56Z",
+      "scrape_date": "2026-04-22T16:04:00.961702Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.2.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/iqpwqjvqvpjl94flwcyv74fykxbcxyh9-claude-code-plugin-typescript-lsp-0.2.4"
+      },
+      "system": "aarch64-linux",
+      "group": "claude-code-plugin-typescript-lsp",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code-plugin-typescript-lsp",
+      "broken": false,
+      "derivation": "/nix/store/w5sp4j85cwc5zm6lhq5yscrzcfzd469h-claude-code-plugin-typescript-lsp-0.2.4.drv",
+      "install_id": "claude-code-plugin-typescript-lsp",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=deb69b41c33438d3eab4e05232746dacc1bf7ece",
+      "name": "claude-code-plugin-typescript-lsp-0.2.4",
+      "pname": "claude-code-plugin-typescript-lsp",
+      "rev": "deb69b41c33438d3eab4e05232746dacc1bf7ece",
+      "rev_count": 2837,
+      "rev_date": "2026-04-22T12:21:56Z",
+      "scrape_date": "2026-04-22T16:04:00.961703Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.2.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/6njvm3gcl5czv50ydigggzlz0yqm1vag-claude-code-plugin-typescript-lsp-0.2.4"
+      },
+      "system": "x86_64-darwin",
+      "group": "claude-code-plugin-typescript-lsp",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code-plugin-typescript-lsp",
+      "broken": false,
+      "derivation": "/nix/store/b0ln9bf7sws7b8yxdkf6qx49q0c9pqyv-claude-code-plugin-typescript-lsp-0.2.4.drv",
+      "install_id": "claude-code-plugin-typescript-lsp",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=deb69b41c33438d3eab4e05232746dacc1bf7ece",
+      "name": "claude-code-plugin-typescript-lsp-0.2.4",
+      "pname": "claude-code-plugin-typescript-lsp",
+      "rev": "deb69b41c33438d3eab4e05232746dacc1bf7ece",
+      "rev_count": 2837,
+      "rev_date": "2026-04-22T12:21:56Z",
+      "scrape_date": "2026-04-22T16:04:00.961704Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.2.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/jfxcc8n06p7r70dlw8iyw6y56sk9aly6-claude-code-plugin-typescript-lsp-0.2.4"
+      },
+      "system": "x86_64-linux",
+      "group": "claude-code-plugin-typescript-lsp",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/kkbinyqmj9m0crylzwqll64r119nqmg8-claude-managed-0.2.8.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=2aec140263aa1d6b7c615f169e5019d2b0025c59",
+      "name": "claude-managed-0.2.8",
+      "pname": "claude-managed",
+      "rev": "2aec140263aa1d6b7c615f169e5019d2b0025c59",
+      "rev_count": 2847,
+      "rev_date": "2026-04-22T16:02:42Z",
+      "scrape_date": "2026-04-22T16:04:00.961712Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.2.8",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/63vh9djrqk42p5mc4rzvzvr4fnwgwb24-claude-managed-0.2.8"
+      },
+      "system": "aarch64-darwin",
+      "group": "claude-managed",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/vggb7bf18ifpc0lrk8rnaq6grgicgsm4-claude-managed-0.2.8.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=2aec140263aa1d6b7c615f169e5019d2b0025c59",
+      "name": "claude-managed-0.2.8",
+      "pname": "claude-managed",
+      "rev": "2aec140263aa1d6b7c615f169e5019d2b0025c59",
+      "rev_count": 2847,
+      "rev_date": "2026-04-22T16:02:42Z",
+      "scrape_date": "2026-04-22T16:04:00.961715Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.2.8",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ybarjfx04djmyg6rrmn04agj21r78jis-claude-managed-0.2.8"
+      },
+      "system": "aarch64-linux",
+      "group": "claude-managed",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/fisr7avvqxhy7ys6a7lrnmwfxi94hcb2-claude-managed-0.2.8.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=2aec140263aa1d6b7c615f169e5019d2b0025c59",
+      "name": "claude-managed-0.2.8",
+      "pname": "claude-managed",
+      "rev": "2aec140263aa1d6b7c615f169e5019d2b0025c59",
+      "rev_count": 2847,
+      "rev_date": "2026-04-22T16:02:42Z",
+      "scrape_date": "2026-04-22T16:04:00.961716Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.2.8",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/vv1pl586bmmn60irfcinivdmf864cj0a-claude-managed-0.2.8"
+      },
+      "system": "x86_64-darwin",
+      "group": "claude-managed",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/yw9swwb0jlhibqryaagm28wryvyl4f4d-claude-managed-0.2.8.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=2aec140263aa1d6b7c615f169e5019d2b0025c59",
+      "name": "claude-managed-0.2.8",
+      "pname": "claude-managed",
+      "rev": "2aec140263aa1d6b7c615f169e5019d2b0025c59",
+      "rev_count": 2847,
+      "rev_date": "2026-04-22T16:02:42Z",
+      "scrape_date": "2026-04-22T16:04:00.961717Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.2.8",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/hh60f8agqvk7pzrjzrb4cvj28mfc36sz-claude-managed-0.2.8"
+      },
+      "system": "x86_64-linux",
+      "group": "claude-managed",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/bmz60mbb36nlipdn9n6zmcm6kjls8gll-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "rev_count": 982522,
+      "rev_date": "2026-04-18T21:33:21Z",
+      "scrape_date": "2026-04-21T06:03:21.334707Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cdpxgzcjwidrmrzsq0zkyr9nxccvy3p6-gum-0.17.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/yhvp5prpjjl5hqk6fhr5svdzf1yfacgk-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "rev_count": 982522,
+      "rev_date": "2026-04-18T21:33:21Z",
+      "scrape_date": "2026-04-21T06:36:39.889933Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kqcb9j9k6wdvb7pjvjzn3p8dc82qmk9x-gum-0.17.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/cngbjjxmgsmcbgvihq7q9472rb5rhgdj-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "rev_count": 982522,
+      "rev_date": "2026-04-18T21:33:21Z",
+      "scrape_date": "2026-04-21T07:08:13.206428Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rznkbgxflsbrfy5c359vhhqrrxw4pfkj-gum-0.17.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/f5ahd90j9s46j49lz8k2yn3cmvyq6mbn-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "rev_count": 982522,
+      "rev_date": "2026-04-18T21:33:21Z",
+      "scrape_date": "2026-04-21T07:44:42.442428Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rf0zlw5q4j051xkjk9djfw5dpb8nwbgm-gum-0.17.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "skill-coreutils",
+      "broken": false,
+      "derivation": "/nix/store/s3yqnc06nm35ckd1w8zg97a60l04i2cq-skill-coreutils-0.1.0.drv",
+      "install_id": "skill-coreutils",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=1b4dd2b68c3734719d26317ad18b63eb52a71d36",
+      "name": "skill-coreutils-0.1.0",
+      "pname": "skill-coreutils",
+      "rev": "1b4dd2b68c3734719d26317ad18b63eb52a71d36",
+      "rev_count": 2630,
+      "rev_date": "2026-04-16T20:12:24Z",
+      "scrape_date": "2026-04-22T16:04:00.961733Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.1.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/8b1jccqvzz8kgcz00cbfkwvf1a5n7w78-skill-coreutils-0.1.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "skill-coreutils",
+      "priority": 5
+    },
+    {
+      "attr_path": "skill-coreutils",
+      "broken": false,
+      "derivation": "/nix/store/6k5zabpp9np18w48sa0d7bxig8bq4f35-skill-coreutils-0.1.0.drv",
+      "install_id": "skill-coreutils",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=1b4dd2b68c3734719d26317ad18b63eb52a71d36",
+      "name": "skill-coreutils-0.1.0",
+      "pname": "skill-coreutils",
+      "rev": "1b4dd2b68c3734719d26317ad18b63eb52a71d36",
+      "rev_count": 2630,
+      "rev_date": "2026-04-16T20:12:24Z",
+      "scrape_date": "2026-04-22T16:04:00.961736Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.1.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/y2a2q8n9g2q2yfkqz0ls14pgjiyan390-skill-coreutils-0.1.0"
+      },
+      "system": "aarch64-linux",
+      "group": "skill-coreutils",
+      "priority": 5
+    },
+    {
+      "attr_path": "skill-coreutils",
+      "broken": false,
+      "derivation": "/nix/store/h3nv96i1mm0r0j0yk03glia4wfakis71-skill-coreutils-0.1.0.drv",
+      "install_id": "skill-coreutils",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=1b4dd2b68c3734719d26317ad18b63eb52a71d36",
+      "name": "skill-coreutils-0.1.0",
+      "pname": "skill-coreutils",
+      "rev": "1b4dd2b68c3734719d26317ad18b63eb52a71d36",
+      "rev_count": 2630,
+      "rev_date": "2026-04-16T20:12:24Z",
+      "scrape_date": "2026-04-22T16:04:00.961737Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.1.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/2qdzp45ggg120lmwknlciiadl6r5s7lj-skill-coreutils-0.1.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "skill-coreutils",
+      "priority": 5
+    },
+    {
+      "attr_path": "skill-coreutils",
+      "broken": false,
+      "derivation": "/nix/store/d0130d4snhrdl83wpbhjja7cbn9q2paz-skill-coreutils-0.1.0.drv",
+      "install_id": "skill-coreutils",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=1b4dd2b68c3734719d26317ad18b63eb52a71d36",
+      "name": "skill-coreutils-0.1.0",
+      "pname": "skill-coreutils",
+      "rev": "1b4dd2b68c3734719d26317ad18b63eb52a71d36",
+      "rev_count": 2630,
+      "rev_date": "2026-04-16T20:12:24Z",
+      "scrape_date": "2026-04-22T16:04:00.961738Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.1.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/3xkqhny7vhd770bx9jnrrcqk2zqah5a5-skill-coreutils-0.1.0"
+      },
+      "system": "x86_64-linux",
+      "group": "skill-coreutils",
+      "priority": 5
+    }
+  ],
+  "compose": {
+    "composer": {
+      "schema-version": "1.11.0",
+      "install": {
+        "claude-code-plugin-typescript-lsp": {
+          "pkg-path": "flox/claude-code-plugin-typescript-lsp",
+          "pkg-group": "claude-code-plugin-typescript-lsp"
+        },
+        "gum": {
+          "pkg-path": "gum",
+          "pkg-group": "demo-tools"
+        },
+        "skill-coreutils": {
+          "pkg-path": "flox/skill-coreutils",
+          "pkg-group": "skill-coreutils"
+        }
+      },
+      "hook": {
+        "on-activate": "if [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 50 --margin \"1 2\" --padding \"1 2\" \\\n    \"Claude Code\" \"with managed configuration\"\n  echo \"\"\n  echo \"  claude           — start Claude Code\"\n  echo \"  claude-managed status  — show config\"\n  echo \"  claude-managed doctor  — validate config\"\n  echo \"\"\nfi\n"
+      },
+      "options": {},
+      "include": {
+        "environments": [
+          {
+            "dir": "../claude"
+          }
+        ]
+      }
+    },
+    "include": [
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "claude-code": {
+              "pkg-path": "flox/claude-code",
+              "pkg-group": "claude-code"
+            },
+            "claude-managed": {
+              "pkg-path": "flox/claude-managed",
+              "pkg-group": "claude-managed"
+            }
+          },
+          "hook": {
+            "on-activate": "eval \"$(claude-managed setup-hook)\"\n"
+          },
+          "profile": {
+            "bash": "eval \"$(claude-managed setup-profile-bash)\"\n",
+            "zsh": "eval \"$(claude-managed setup-profile-zsh)\"\n",
+            "fish": "claude-managed setup-profile-fish | source\n"
+          },
+          "options": {}
+        },
+        "name": "claude",
+        "descriptor": {
+          "dir": "../claude"
+        }
+      }
+    ],
+    "warnings": []
+  }
+}

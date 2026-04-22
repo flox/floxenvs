@@ -1,0 +1,36 @@
+name: "CI: claude"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "claude/**"
+      - "claude-demo/**"
+      - ".flox/pkgs/claude-managed/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+  pull_request:
+    paths:
+      - "claude/**"
+      - "claude-demo/**"
+      - ".flox/pkgs/claude-managed/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "claude"
+    secrets: inherit

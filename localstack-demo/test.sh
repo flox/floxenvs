@@ -10,14 +10,20 @@ command_exists() {
   echo ">>> '$1' command exists"
 }
 
-echo ">>> DEBUG PATH: $PATH"
-echo ">>> DEBUG which docker: $(which docker 2>&1 || echo NOT_FOUND)"
-echo ">>> DEBUG docker sock: $(ls -la /var/run/docker.sock 2>&1 || echo NO_SOCK)"
-
 command_exists localstack
 command_exists aws
 command_exists kubectl
 command_exists gum
+
+# Remove stale LocalStack container if left over from a
+# previous CI run (macOS Colima keeps containers across
+# jobs). The service command also does this, but belt and
+# suspenders.
+if docker ps -a --format '{{.Names}}' 2>/dev/null \
+    | grep -q localstack; then
+  echo ">>> Removing stale LocalStack container..."
+  docker rm -f localstack-main 2>/dev/null || true
+fi
 
 echo -n ">>> Waiting for LocalStack to start .."
 MAX_ATTEMPTS=30
@@ -33,6 +39,12 @@ done
 
 if [ "$MAX_ATTEMPTS" -eq 0 ]; then
   echo -e "\nError: LocalStack not ready after 60 seconds"
+  echo ""
+  echo ">>> Diagnostics:"
+  localstack status 2>&1 || true
+  docker ps -a 2>&1 || true
+  flox services status 2>&1 || true
+  flox services logs localstack 2>&1 || true
   exit 1
 fi
 
