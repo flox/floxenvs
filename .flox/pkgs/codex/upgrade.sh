@@ -7,12 +7,12 @@ HASHES_FILE="$SCRIPT_DIR/hashes.json"
 
 current_version=$(jq -r '.version' "$HASHES_FILE")
 
-# Get latest rust-v* tag from GitHub
+# Get latest stable rust-v* tag from GitHub (skip prereleases and drafts)
 latest_version=$(
   curl -sfL \
     -H "Accept: application/vnd.github+json" \
     "https://api.github.com/repos/openai/codex/releases" \
-  | jq -r '[.[] | select(.tag_name | startswith("rust-v"))][0].tag_name' \
+  | jq -r '[.[] | select(.prerelease == false and .draft == false and (.tag_name | startswith("rust-v")))][0].tag_name' \
   | sed 's/^rust-v//'
 )
 
@@ -25,11 +25,12 @@ fi
 
 echo "Updating codex from $current_version to $latest_version"
 
-# Prefetch source from GitHub
-src_hash=$(nix-prefetch-fetchFromGitHub \
-  --owner openai \
-  --repo codex \
-  --tag "rust-v${latest_version}" 2>/dev/null)
+# Prefetch source from GitHub. Matches what `fetchFromGitHub` produces:
+# GitHub's archive tarball, unpacked and hashed.
+src_url="https://github.com/openai/codex/archive/refs/tags/rust-v${latest_version}.tar.gz"
+src_raw=$(nix-prefetch-url --unpack "$src_url" 2>/dev/null)
+src_hash=$(nix --extra-experimental-features nix-command \
+  hash convert --hash-algo sha256 --to sri "$src_raw")
 echo "  hash: $src_hash"
 
 # Prefetch cargo deps

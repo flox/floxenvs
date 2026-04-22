@@ -30,7 +30,8 @@ for platform in "${!ASSETS[@]}"; do
   url="https://github.com/anomalyco/opencode/releases/download/v${latest_version}/${asset}"
   echo "Fetching hash for $platform from $url ..."
   raw_hash=$(nix-prefetch-url --type sha256 "$url" 2>/dev/null)
-  sri_hash=$(nix hash convert --hash-algo sha256 --to sri "$raw_hash")
+  sri_hash=$(nix --extra-experimental-features nix-command \
+    hash convert --hash-algo sha256 --to sri "$raw_hash")
   echo "  $platform: $sri_hash"
   hashes_json=$(echo "$hashes_json" | jq --arg p "$platform" --arg h "$sri_hash" '.[$p] = $h')
 done
