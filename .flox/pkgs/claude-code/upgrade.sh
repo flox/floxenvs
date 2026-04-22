@@ -41,6 +41,7 @@ done
 jq -n \
   --arg v "$latest_version" \
   --argjson h "$hashes_json" \
-  '{version: $v, hashes: $h}' > "$HASHES_FILE"
+  '{version: $v, hashes: ($h | to_entries | sort_by(.key) | from_entries)}' \
+  > "$HASHES_FILE"
 
 echo "Updated to $latest_version"
