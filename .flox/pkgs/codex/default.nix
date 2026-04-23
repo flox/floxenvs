@@ -1,12 +1,20 @@
 {
   lib,
   stdenv,
+  stdenvNoCC,
+  cacert,
+  cargo,
   fetchFromGitHub,
   fetchurl,
   fetchzip,
+  gitMinimal,
   installShellFiles,
   makeWrapper,
+  nix-prefetch-git,
+  python3Packages,
+  runCommand,
   rustPlatform,
+  writers,
   pkg-config,
   openssl,
   bubblewrap,
@@ -18,6 +26,101 @@ let
   versionData =
     builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hash cargoHash;
+
+  # Upstream rustPlatform.fetchCargoVendor invokes a Python helper that hits
+  # crates.io with up to 5 parallel workers and only retries on 5xx. crates.io
+  # has started returning 403 on concurrent bursts from a single egress IP,
+  # which the upstream retry policy can't recover from — the build aborts on
+  # the first 403. See PR #1635 CI logs.
+  #
+  # Until nixpkgs ships a fix, use a locally-patched copy of the helper that:
+  #   * retries on 403 / 429 with a short linear backoff
+  #   * lowers concurrency from 5 → 2 to stop triggering the limit
+  #
+  # Everything else mirrors the upstream fetchCargoVendor plumbing exactly.
+  fetchCargoVendorUtil = writers.writePython3Bin "fetch-cargo-vendor-util" {
+    libraries =
+      with python3Packages;
+      [
+        requests
+        tomli-w
+      ]
+      ++ requests.optional-dependencies.socks;
+    flakeIgnore = [ "E501" ];
+  } (builtins.readFile ./fetch-cargo-vendor-util.py);
+
+  replaceWorkspaceValues = writers.writePython3Bin "replace-workspace-values" {
+    libraries = with python3Packages; [
+      tomli
+      tomli-w
+    ];
+    flakeIgnore = [
+      "E501"
+      "W503"
+    ];
+  } (builtins.readFile ./replace-workspace-values.py);
+
+  fetchCargoVendor =
+    {
+      name,
+      src,
+      sourceRoot ? "",
+      hash,
+      nativeBuildInputs ? [ ],
+      ...
+    }@args:
+    let
+      removedArgs = [
+        "name"
+        "pname"
+        "version"
+        "nativeBuildInputs"
+        "hash"
+      ];
+      vendorStaging = stdenvNoCC.mkDerivation (
+        {
+          name = "${name}-vendor-staging";
+          impureEnvVars = lib.fetchers.proxyImpureEnvVars;
+          nativeBuildInputs = [
+            fetchCargoVendorUtil
+            cacert
+            (nix-prefetch-git.override {
+              git = gitMinimal;
+              git-lfs = null;
+            })
+          ]
+          ++ nativeBuildInputs;
+          buildPhase = ''
+            runHook preBuild
+            if [ -n "''${cargoRoot-}" ]; then
+              cd "$cargoRoot"
+            fi
+            fetch-cargo-vendor-util create-vendor-staging ./Cargo.lock "$out"
+            runHook postBuild
+          '';
+          strictDeps = true;
+          dontConfigure = true;
+          dontInstall = true;
+          dontFixup = true;
+          outputHash = hash;
+          outputHashAlgo = if hash == "" then "sha256" else null;
+          outputHashMode = "recursive";
+        }
+        // removeAttrs args removedArgs
+      );
+    in
+    runCommand "${name}-vendor"
+      {
+        inherit vendorStaging;
+        nativeBuildInputs = [
+          fetchCargoVendorUtil
+          cargo
+          replaceWorkspaceValues
+        ];
+      }
+      ''
+        fetch-cargo-vendor-util create-vendor "$vendorStaging" "$out"
+      '';
 
   # The v8 crate downloads a prebuilt static library at build time.
   # Fetch it as a fixed-output derivation so the build stays sandboxed.
@@ -55,12 +158,17 @@ let
     tag = "rust-v${version}";
     inherit hash;
   };
+
+  cargoDeps = fetchCargoVendor {
+    name = "codex-${version}";
+    inherit src;
+    sourceRoot = "source/codex-rs";
+    hash = cargoHash;
+  };
 in
 rustPlatform.buildRustPackage {
   pname = "codex";
-  inherit version src;
-
-  inherit cargoHash;
+  inherit version src cargoDeps;
 
   sourceRoot = "source/codex-rs";
 
