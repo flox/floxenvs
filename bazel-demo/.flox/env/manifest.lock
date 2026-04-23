@@ -18,7 +18,7 @@
     "options": {},
     "build": {
       "hello": {
-        "command": "set -eo pipefail\n\n# Keep Bazel's output tree inside the flox cache so repeated\n# builds reuse the action cache instead of cluttering $HOME.\nexport BAZEL_CACHE_DIR=\"${BAZEL_CACHE_DIR:-$FLOX_ENV_CACHE/bazel}\"\nmkdir -p \"$BAZEL_CACHE_DIR\"\n\nbazel --output_user_root=\"$BAZEL_CACHE_DIR\" \\\n  build //:hello --repo_contents_cache=\n\nmkdir -p \"$out/bin\"\ncp -L bazel-bin/hello_/hello \"$out/bin/hello\"\nchmod +x \"$out/bin/hello\"\n",
+        "command": "set -eo pipefail\n\n# flox build's local mode doesn't export $FLOX_ENV_CACHE, so\n# park Bazel's output in a fresh tmpdir that is always\n# writable. --repo_contents_cache= keeps Bazel 9's new cache\n# from landing inside the worktree.\nbazel_cache=\"$(mktemp -d)\"\n# Bazel creates read-only action outputs; chmod before rm.\ntrap 'chmod -R u+w \"$bazel_cache\" 2>/dev/null; rm -rf \"$bazel_cache\"' EXIT\n\nbazel --output_user_root=\"$bazel_cache\" \\\n  build //:hello --repo_contents_cache=\n\nmkdir -p \"$out/bin\"\ncp -L bazel-bin/hello_/hello \"$out/bin/hello\"\nchmod +x \"$out/bin/hello\"\n",
         "version": "0.0.1",
         "description": "Sample Go binary built with Bazel + rules_go"
       }
@@ -274,7 +274,7 @@
       "options": {},
       "build": {
         "hello": {
-          "command": "set -eo pipefail\n\n# Keep Bazel's output tree inside the flox cache so repeated\n# builds reuse the action cache instead of cluttering $HOME.\nexport BAZEL_CACHE_DIR=\"${BAZEL_CACHE_DIR:-$FLOX_ENV_CACHE/bazel}\"\nmkdir -p \"$BAZEL_CACHE_DIR\"\n\nbazel --output_user_root=\"$BAZEL_CACHE_DIR\" \\\n  build //:hello --repo_contents_cache=\n\nmkdir -p \"$out/bin\"\ncp -L bazel-bin/hello_/hello \"$out/bin/hello\"\nchmod +x \"$out/bin/hello\"\n",
+          "command": "set -eo pipefail\n\n# flox build's local mode doesn't export $FLOX_ENV_CACHE, so\n# park Bazel's output in a fresh tmpdir that is always\n# writable. --repo_contents_cache= keeps Bazel 9's new cache\n# from landing inside the worktree.\nbazel_cache=\"$(mktemp -d)\"\n# Bazel creates read-only action outputs; chmod before rm.\ntrap 'chmod -R u+w \"$bazel_cache\" 2>/dev/null; rm -rf \"$bazel_cache\"' EXIT\n\nbazel --output_user_root=\"$bazel_cache\" \\\n  build //:hello --repo_contents_cache=\n\nmkdir -p \"$out/bin\"\ncp -L bazel-bin/hello_/hello \"$out/bin/hello\"\nchmod +x \"$out/bin/hello\"\n",
           "version": "0.0.1",
           "description": "Sample Go binary built with Bazel + rules_go"
         }
