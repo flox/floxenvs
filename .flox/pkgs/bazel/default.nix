@@ -104,27 +104,15 @@ stdenv.mkDerivation {
     unzip -q -o "$src" -d "$install_base"
     chmod -R u+w "$install_base"
 
-    # Shell wrapper instead of makeWrapper's --add-flags: bazel's
-    # top-level `--version` / `--help` / `-h` pseudo-commands reject
-    # startup options, so --install_base must only be injected for
-    # real commands. BAZEL_SH gives Bazel a concrete bash for shell
-    # actions so it never falls back to /bin/bash.
-    mkdir -p "$out/bin"
-    cat > "$out/bin/bazel" <<EOF
-    #!${bash}/bin/bash
-    set -e
-    export PATH="${lib.makeBinPath runtimeDeps}:\$PATH"
-    export BAZEL_SH="\''${BAZEL_SH:-${bash}/bin/bash}"
-    case "\''${1:-}" in
-      --version|--help|-h)
-        exec "$out/libexec/bazel/bazel-launcher" "\$@"
-        ;;
-    esac
-    exec "$out/libexec/bazel/bazel-launcher" "--install_base=$install_base" "\$@"
-    EOF
-    # Strip the leading four-space indent the here-doc preserves.
-    sed -i 's/^    //' "$out/bin/bazel"
-    chmod +x "$out/bin/bazel"
+    # See ./bazel-wrapper.sh for rationale. We clone the patched
+    # install tree into a per-user cache on first run because Bazel
+    # wants to create a lock file inside --install_base and $out is
+    # read-only.
+    install -Dm755 ${./bazel-wrapper.sh} "$out/bin/bazel"
+    substituteInPlace "$out/bin/bazel" \
+      --subst-var-by bash "${bash}/bin/bash" \
+      --subst-var-by out "$out" \
+      --subst-var-by runtimeDeps "${lib.makeBinPath runtimeDeps}"
 
     runHook postInstall
   '';
