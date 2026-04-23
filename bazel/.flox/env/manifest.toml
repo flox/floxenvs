@@ -17,6 +17,14 @@ schema-version = "1.10.0"
 bazel.pkg-path = "bazel_9"
 bazel.pkg-group = "bazel"
 
+# Bazel's rules_cc auto-configure looks up `gcc` or `$CC` on first
+# invocation, even for rule sets that don't emit C code (e.g.
+# rules_go depends on rules_cc). macOS picks up clang from Xcode;
+# Linux needs gcc in PATH.
+gcc.pkg-path = "gcc"
+gcc.pkg-group = "bazel-toolchain"
+gcc.systems = ["aarch64-linux", "x86_64-linux"]
+
 [hook]
 on-activate = '''
 export BAZEL_CACHE_DIR="$FLOX_ENV_CACHE/bazel"
