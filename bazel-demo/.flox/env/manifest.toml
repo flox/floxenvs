@@ -35,7 +35,8 @@ set -eo pipefail
 export BAZEL_CACHE_DIR="${BAZEL_CACHE_DIR:-$FLOX_ENV_CACHE/bazel}"
 mkdir -p "$BAZEL_CACHE_DIR"
 
-bazel --output_user_root="$BAZEL_CACHE_DIR" build //:hello
+bazel --output_user_root="$BAZEL_CACHE_DIR" \
+  build //:hello --repo_contents_cache=
 
 mkdir -p "$out/bin"
 cp -L bazel-bin/hello_/hello "$out/bin/hello"

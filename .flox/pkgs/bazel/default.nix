@@ -3,7 +3,6 @@
   stdenv,
   fetchurl,
   autoPatchelfHook,
-  buildFHSEnv,
   makeWrapper,
   bash,
   coreutils,
@@ -57,65 +56,45 @@ let
     which
     zip
   ];
-
-  # Raw binary with the ELF launcher patched (Linux) and a PATH
-  # prefix that exposes the tools Bazel shells out to.
-  bazelUnwrapped = stdenv.mkDerivation {
-    pname = "bazel-unwrapped";
-    inherit version;
-
-    inherit src;
-    dontUnpack = true;
-    dontBuild = true;
-
-    # Bazel's release binary has a zip trailer appended to an
-    # ELF/Mach-O launcher. `strip` and `patchShebangs` both
-    # corrupt that trailer.
-    dontStrip = true;
-    dontPatchShebangs = true;
-
-    nativeBuildInputs =
-      [ makeWrapper ]
-      ++ lib.optional stdenv.isLinux autoPatchelfHook;
-
-    buildInputs = lib.optionals stdenv.isLinux [
-      zlib
-      stdenv.cc.cc.lib
-    ];
-
-    installPhase = ''
-      runHook preInstall
-      install -Dm755 "$src" "$out/bin/.bazel-raw"
-      makeWrapper "$out/bin/.bazel-raw" "$out/bin/bazel" \
-        --prefix PATH : ${lib.makeBinPath runtimeDeps}
-      runHook postInstall
-    '';
-
-    meta = {
-      description = "Prebuilt Bazel ${version} from bazel.build (unwrapped)";
-      homepage = "https://bazel.build";
-      license = lib.licenses.asl20;
-      mainProgram = "bazel";
-    };
-  };
 in
-# Bazel's upstream Linux binary extracts an embedded JDK whose ELF
-# interpreter is hard-coded to /lib64/ld-linux-*. That path does not
-# exist on NixOS, so we launch Bazel inside a minimal FHS chroot where
-# it does. macOS binaries are code-signed by Google and run directly.
-if stdenv.isDarwin then
-  bazelUnwrapped
-else
-  buildFHSEnv {
-    pname = "bazel";
-    inherit version;
-    targetPkgs = pkgs: [ bazelUnwrapped ] ++ runtimeDeps;
-    runScript = "bazel";
-    meta = {
-      description = "Prebuilt Bazel ${version} from bazel.build";
-      homepage = "https://bazel.build";
-      license = lib.licenses.asl20;
-      mainProgram = "bazel";
-      platforms = lib.attrNames platformMap;
-    };
-  }
+# The upstream release binary is an ELF/Mach-O launcher with a zip
+# of Bazel's install tree (server jar + embedded JDK) appended.
+# autoPatchelfHook rewires the launcher's interpreter for Linux;
+# the JDK Bazel extracts on first run keeps its distro-pinned
+# /lib64/ld-linux-*.so.2 path, which is present on every non-NixOS
+# Linux and via the nix-ld shim on NixOS. `strip` and `patchShebangs`
+# both corrupt the zip trailer, so both are disabled.
+stdenv.mkDerivation {
+  pname = "bazel";
+  inherit version src;
+
+  dontUnpack = true;
+  dontBuild = true;
+  dontStrip = true;
+  dontPatchShebangs = true;
+
+  nativeBuildInputs =
+    [ makeWrapper ]
+    ++ lib.optional stdenv.isLinux autoPatchelfHook;
+
+  buildInputs = lib.optionals stdenv.isLinux [
+    zlib
+    stdenv.cc.cc.lib
+  ];
+
+  installPhase = ''
+    runHook preInstall
+    install -Dm755 "$src" "$out/bin/.bazel-raw"
+    makeWrapper "$out/bin/.bazel-raw" "$out/bin/bazel" \
+      --prefix PATH : ${lib.makeBinPath runtimeDeps}
+    runHook postInstall
+  '';
+
+  meta = {
+    description = "Prebuilt Bazel ${version} from bazel.build";
+    homepage = "https://bazel.build";
+    license = lib.licenses.asl20;
+    mainProgram = "bazel";
+    platforms = lib.attrNames platformMap;
+  };
+}
