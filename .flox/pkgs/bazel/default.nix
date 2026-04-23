@@ -6,10 +6,14 @@
   makeWrapper,
   bash,
   coreutils,
+  diffutils,
+  file,
   findutils,
   gawk,
   gnugrep,
+  gnupatch,
   gnused,
+  gnutar,
   gzip,
   python3,
   unzip,
@@ -42,14 +46,20 @@ let
     hash = srcHash;
   };
 
-  # Runtime tools Bazel shells out to while building user projects.
+  # Runtime tools Bazel shells out to during user builds. Mirrors
+  # `defaultShellUtils` from the nixpkgs bazel_9 source build:
+  # https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/ba/bazel_9/package.nix
   runtimeDeps = [
     bash
     coreutils
+    diffutils
+    file
     findutils
     gawk
     gnugrep
+    gnupatch
     gnused
+    gnutar
     gzip
     python3
     unzip
@@ -97,12 +107,14 @@ stdenv.mkDerivation {
     # Shell wrapper instead of makeWrapper's --add-flags: bazel's
     # top-level `--version` / `--help` / `-h` pseudo-commands reject
     # startup options, so --install_base must only be injected for
-    # real commands.
+    # real commands. BAZEL_SH gives Bazel a concrete bash for shell
+    # actions so it never falls back to /bin/bash.
     mkdir -p "$out/bin"
     cat > "$out/bin/bazel" <<EOF
     #!${bash}/bin/bash
     set -e
     export PATH="${lib.makeBinPath runtimeDeps}:\$PATH"
+    export BAZEL_SH="\''${BAZEL_SH:-${bash}/bin/bash}"
     case "\''${1:-}" in
       --version|--help|-h)
         exec "$out/libexec/bazel/bazel-launcher" "\$@"
@@ -121,6 +133,10 @@ stdenv.mkDerivation {
     description = "Prebuilt Bazel ${version} from bazel.build";
     homepage = "https://bazel.build";
     license = lib.licenses.asl20;
+    sourceProvenance = with lib.sourceTypes; [
+      binaryNativeCode
+      binaryBytecode
+    ];
     mainProgram = "bazel";
     platforms = lib.attrNames platformMap;
   };
