@@ -1,0 +1,419 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "bazel": {
+        "pkg-path": "flox/bazel",
+        "pkg-group": "bazel",
+        "systems": [
+          "aarch64-darwin",
+          "x86_64-darwin"
+        ]
+      },
+      "bazel_catalog": {
+        "pkg-path": "bazel_9",
+        "pkg-group": "bazel",
+        "systems": [
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
+      "gcc": {
+        "pkg-path": "gcc",
+        "pkg-group": "bazel-toolchain",
+        "systems": [
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": "demo-tools"
+      }
+    },
+    "hook": {
+      "on-activate": "export BAZEL_CACHE_DIR=\"$FLOX_ENV_CACHE/bazel\"\nmkdir -p \"$BAZEL_CACHE_DIR\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Bazel development environment' '' \\\n    'Try the sample build:' \\\n    '  flox build hello' \\\n    '  ./result-hello/bin/hello'\nfi\n"
+    },
+    "options": {},
+    "build": {
+      "hello": {
+        "command": "set -eo pipefail\n\n# flox build's local mode doesn't export $FLOX_ENV_CACHE, so\n# park Bazel's output in a fresh tmpdir that is always\n# writable. --repo_contents_cache= keeps Bazel 9's new cache\n# from landing inside the worktree.\nbazel_cache=\"$(mktemp -d)\"\n# Bazel creates read-only action outputs; chmod before rm.\ntrap 'chmod -R u+w \"$bazel_cache\" 2>/dev/null; rm -rf \"$bazel_cache\"' EXIT\n\nbazel --output_user_root=\"$bazel_cache\" \\\n  build //:hello --repo_contents_cache=\n\nmkdir -p \"$out/bin\"\ncp -L bazel-bin/hello_/hello \"$out/bin/hello\"\nchmod +x \"$out/bin/hello\"\n",
+        "version": "0.0.1",
+        "description": "Sample Go binary built with Bazel + rules_go"
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "bazel",
+      "broken": false,
+      "derivation": "/nix/store/l5d1xw882c87ky6wyqpgzgm9czzshba7-bazel-9.1.0.drv",
+      "description": "Prebuilt Bazel 9.1.0 from bazel.build",
+      "install_id": "bazel",
+      "license": "Apache-2.0",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=e2fb72952030dbbb577418f2bcb451f522584d66",
+      "name": "bazel-9.1.0",
+      "pname": "bazel",
+      "rev": "e2fb72952030dbbb577418f2bcb451f522584d66",
+      "rev_count": 2887,
+      "rev_date": "2026-04-23T16:28:20Z",
+      "scrape_date": "2026-04-23T17:19:56.746974Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.1.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/l15faskz9bsnx5v2wlqbshmdvbc12mkj-bazel-9.1.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "bazel",
+      "priority": 5
+    },
+    {
+      "attr_path": "bazel",
+      "broken": false,
+      "derivation": "/nix/store/wrhn9sq33mcmjpzlawh3bv7i18fnfkx0-bazel-9.1.0.drv",
+      "description": "Prebuilt Bazel 9.1.0 from bazel.build",
+      "install_id": "bazel",
+      "license": "Apache-2.0",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=e2fb72952030dbbb577418f2bcb451f522584d66",
+      "name": "bazel-9.1.0",
+      "pname": "bazel",
+      "rev": "e2fb72952030dbbb577418f2bcb451f522584d66",
+      "rev_count": 2887,
+      "rev_date": "2026-04-23T16:28:20Z",
+      "scrape_date": "2026-04-23T17:19:56.746978Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.1.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/6nrz74ck5lnz3f7bk51v9m16s8mgjpzd-bazel-9.1.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "bazel",
+      "priority": 5
+    },
+    {
+      "attr_path": "bazel_9",
+      "broken": false,
+      "derivation": "/nix/store/x9aq652dlm8vzw2b3jwv8fws3nn5m0j1-bazel-9.0.1.drv",
+      "description": "Build tool that builds code quickly and reliably",
+      "install_id": "bazel_catalog",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c1018dae018162ec878d42fec712642d214fdfa",
+      "name": "bazel-9.0.1",
+      "pname": "bazel_9",
+      "rev": "4c1018dae018162ec878d42fec712642d214fdfa",
+      "rev_count": 977467,
+      "rev_date": "2026-04-09T04:48:10Z",
+      "scrape_date": "2026-04-11T06:34:58.547159Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.0.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/prylvgpz81mclgdn0kb8rzzqbfnwg9az-bazel-9.0.1"
+      },
+      "system": "aarch64-linux",
+      "group": "bazel",
+      "priority": 5
+    },
+    {
+      "attr_path": "bazel_9",
+      "broken": false,
+      "derivation": "/nix/store/mz2mfvjqzaib4wshynfn2gl31284gf6b-bazel-9.0.1.drv",
+      "description": "Build tool that builds code quickly and reliably",
+      "install_id": "bazel_catalog",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c1018dae018162ec878d42fec712642d214fdfa",
+      "name": "bazel-9.0.1",
+      "pname": "bazel_9",
+      "rev": "4c1018dae018162ec878d42fec712642d214fdfa",
+      "rev_count": 977467,
+      "rev_date": "2026-04-09T04:48:10Z",
+      "scrape_date": "2026-04-11T07:39:12.621531Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.0.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/i6qdjrd5q3zv8nr0mph28d35xfmyhza5-bazel-9.0.1"
+      },
+      "system": "x86_64-linux",
+      "group": "bazel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gcc",
+      "broken": false,
+      "derivation": "/nix/store/97y2g0zkxi71g1v6c0gi1wfgnginv2r0-gcc-wrapper-15.2.0.drv",
+      "description": "GNU Compiler Collection, version 15.2.0 (wrapper script)",
+      "install_id": "gcc",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "name": "gcc-wrapper-15.2.0",
+      "pname": "gcc",
+      "rev": "b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "rev_count": 982522,
+      "rev_date": "2026-04-18T21:33:21Z",
+      "scrape_date": "2026-04-21T06:36:38.641645Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "15.2.0",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/zq0lwn9ai4q1jcfkrrc98cia15yp9zv2-gcc-wrapper-15.2.0-info",
+        "man": "/nix/store/3sbhv99id58xjminaqr8m6dq1h6zvfcp-gcc-wrapper-15.2.0-man",
+        "out": "/nix/store/waack2w5n0208w1qy7pxnwxbsq2n26vm-gcc-wrapper-15.2.0"
+      },
+      "system": "aarch64-linux",
+      "group": "bazel-toolchain",
+      "priority": 5
+    },
+    {
+      "attr_path": "gcc",
+      "broken": false,
+      "derivation": "/nix/store/lsh3l4h6f89bxqgmx0jglc14cagfin9z-gcc-wrapper-15.2.0.drv",
+      "description": "GNU Compiler Collection, version 15.2.0 (wrapper script)",
+      "install_id": "gcc",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "name": "gcc-wrapper-15.2.0",
+      "pname": "gcc",
+      "rev": "b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "rev_count": 982522,
+      "rev_date": "2026-04-18T21:33:21Z",
+      "scrape_date": "2026-04-21T07:44:41.134021Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "15.2.0",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/gzq6x9nsc2g1b4z0xlxnl3n8ahzcrgql-gcc-wrapper-15.2.0-info",
+        "man": "/nix/store/n58glhbv7fnb3bqvbdh6ib7pv456cm4n-gcc-wrapper-15.2.0-man",
+        "out": "/nix/store/hb2bs5fg5wkm04x565737qd5nh2hy5nk-gcc-wrapper-15.2.0"
+      },
+      "system": "x86_64-linux",
+      "group": "bazel-toolchain",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/bmz60mbb36nlipdn9n6zmcm6kjls8gll-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "rev_count": 982522,
+      "rev_date": "2026-04-18T21:33:21Z",
+      "scrape_date": "2026-04-21T06:03:21.334707Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cdpxgzcjwidrmrzsq0zkyr9nxccvy3p6-gum-0.17.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/yhvp5prpjjl5hqk6fhr5svdzf1yfacgk-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "rev_count": 982522,
+      "rev_date": "2026-04-18T21:33:21Z",
+      "scrape_date": "2026-04-21T06:36:39.889933Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kqcb9j9k6wdvb7pjvjzn3p8dc82qmk9x-gum-0.17.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/cngbjjxmgsmcbgvihq7q9472rb5rhgdj-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "rev_count": 982522,
+      "rev_date": "2026-04-18T21:33:21Z",
+      "scrape_date": "2026-04-21T07:08:13.206428Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rznkbgxflsbrfy5c359vhhqrrxw4pfkj-gum-0.17.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/f5ahd90j9s46j49lz8k2yn3cmvyq6mbn-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "rev_count": 982522,
+      "rev_date": "2026-04-18T21:33:21Z",
+      "scrape_date": "2026-04-21T07:44:42.442428Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rf0zlw5q4j051xkjk9djfw5dpb8nwbgm-gum-0.17.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    }
+  ],
+  "compose": {
+    "composer": {
+      "schema-version": "1.11.0",
+      "install": {
+        "gum": {
+          "pkg-path": "gum",
+          "pkg-group": "demo-tools"
+        }
+      },
+      "hook": {
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Bazel development environment' '' \\\n    'Try the sample build:' \\\n    '  flox build hello' \\\n    '  ./result-hello/bin/hello'\nfi\n"
+      },
+      "options": {},
+      "build": {
+        "hello": {
+          "command": "set -eo pipefail\n\n# flox build's local mode doesn't export $FLOX_ENV_CACHE, so\n# park Bazel's output in a fresh tmpdir that is always\n# writable. --repo_contents_cache= keeps Bazel 9's new cache\n# from landing inside the worktree.\nbazel_cache=\"$(mktemp -d)\"\n# Bazel creates read-only action outputs; chmod before rm.\ntrap 'chmod -R u+w \"$bazel_cache\" 2>/dev/null; rm -rf \"$bazel_cache\"' EXIT\n\nbazel --output_user_root=\"$bazel_cache\" \\\n  build //:hello --repo_contents_cache=\n\nmkdir -p \"$out/bin\"\ncp -L bazel-bin/hello_/hello \"$out/bin/hello\"\nchmod +x \"$out/bin/hello\"\n",
+          "version": "0.0.1",
+          "description": "Sample Go binary built with Bazel + rules_go"
+        }
+      },
+      "include": {
+        "environments": [
+          {
+            "dir": "../bazel"
+          }
+        ]
+      }
+    },
+    "include": [
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "bazel": {
+              "pkg-path": "flox/bazel",
+              "pkg-group": "bazel",
+              "systems": [
+                "aarch64-darwin",
+                "x86_64-darwin"
+              ]
+            },
+            "bazel_catalog": {
+              "pkg-path": "bazel_9",
+              "pkg-group": "bazel",
+              "systems": [
+                "aarch64-linux",
+                "x86_64-linux"
+              ]
+            },
+            "gcc": {
+              "pkg-path": "gcc",
+              "pkg-group": "bazel-toolchain",
+              "systems": [
+                "aarch64-linux",
+                "x86_64-linux"
+              ]
+            }
+          },
+          "hook": {
+            "on-activate": "export BAZEL_CACHE_DIR=\"$FLOX_ENV_CACHE/bazel\"\nmkdir -p \"$BAZEL_CACHE_DIR\"\n"
+          },
+          "options": {}
+        },
+        "name": "bazel",
+        "descriptor": {
+          "dir": "../bazel"
+        }
+      }
+    ],
+    "warnings": []
+  }
+}

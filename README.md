@@ -74,6 +74,8 @@ Most environments follow a dual-layer pattern:
 
 | Environment | Description | Links |
 | ----------- | ----------- | ----- |
+| bazel | Bazel build system | [floxhub](https://hub.flox.dev/flox/bazel) · [docs](bazel/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/bazel-latest) |
+| _└ bazel-demo_ | | [floxhub](https://hub.flox.dev/flox/bazel-demo) · [docs](bazel-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/bazel-demo-latest) |
 | colima | Docker via Colima | [floxhub](https://hub.flox.dev/flox/colima) · [docs](colima/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/colima-latest) |
 | _└ colima-demo_ | | [floxhub](https://hub.flox.dev/flox/colima-demo) · [docs](colima-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/colima-demo-latest) |
 | nginx | Nginx | [floxhub](https://hub.flox.dev/flox/nginx) · [docs](nginx/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/nginx-latest) |

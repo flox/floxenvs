@@ -1,0 +1,37 @@
+schema-version = "1.10.0"
+
+# Minimal Bazel environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/bazel"]
+
+[install]
+# macOS: `flox/bazel` is the upstream 9.1.0 prebuilt binary
+# packaged in `.flox/pkgs/bazel/`. Refreshed by upgrade_pkgs.yml
+# whenever a new Bazel release lands.
+bazel.pkg-path = "flox/bazel"
+bazel.pkg-group = "bazel"
+bazel.systems = ["aarch64-darwin", "x86_64-darwin"]
+
+# Linux: the catalog `bazel_9` is source-built against nixpkgs
+# (currently 9.0.1) so it works on NixOS-style builders where the
+# upstream prebuilt binary's JDK can't find /lib64/ld-linux-*.
+bazel_catalog.pkg-path = "bazel_9"
+bazel_catalog.pkg-group = "bazel"
+bazel_catalog.systems = ["aarch64-linux", "x86_64-linux"]
+
+# Bazel's rules_cc auto-configure looks up `gcc` or `$CC` on first
+# invocation, even for rule sets that don't emit C code (e.g.
+# rules_go depends on rules_cc). macOS picks up clang from Xcode;
+# Linux needs gcc in PATH.
+gcc.pkg-path = "gcc"
+gcc.pkg-group = "bazel-toolchain"
+gcc.systems = ["aarch64-linux", "x86_64-linux"]
+
+[hook]
+on-activate = '''
+export BAZEL_CACHE_DIR="$FLOX_ENV_CACHE/bazel"
+mkdir -p "$BAZEL_CACHE_DIR"
+'''

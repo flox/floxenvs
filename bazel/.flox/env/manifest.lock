@@ -1,0 +1,220 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "bazel": {
+        "pkg-path": "flox/bazel",
+        "pkg-group": "bazel",
+        "systems": [
+          "aarch64-darwin",
+          "x86_64-darwin"
+        ]
+      },
+      "bazel_catalog": {
+        "pkg-path": "bazel_9",
+        "pkg-group": "bazel",
+        "systems": [
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
+      "gcc": {
+        "pkg-path": "gcc",
+        "pkg-group": "bazel-toolchain",
+        "systems": [
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      }
+    },
+    "hook": {
+      "on-activate": "export BAZEL_CACHE_DIR=\"$FLOX_ENV_CACHE/bazel\"\nmkdir -p \"$BAZEL_CACHE_DIR\"\n"
+    },
+    "options": {}
+  },
+  "packages": [
+    {
+      "attr_path": "gcc",
+      "broken": false,
+      "derivation": "/nix/store/97y2g0zkxi71g1v6c0gi1wfgnginv2r0-gcc-wrapper-15.2.0.drv",
+      "description": "GNU Compiler Collection, version 15.2.0 (wrapper script)",
+      "install_id": "gcc",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "name": "gcc-wrapper-15.2.0",
+      "pname": "gcc",
+      "rev": "b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "rev_count": 982522,
+      "rev_date": "2026-04-18T21:33:21Z",
+      "scrape_date": "2026-04-21T06:36:38.641645Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "15.2.0",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/zq0lwn9ai4q1jcfkrrc98cia15yp9zv2-gcc-wrapper-15.2.0-info",
+        "man": "/nix/store/3sbhv99id58xjminaqr8m6dq1h6zvfcp-gcc-wrapper-15.2.0-man",
+        "out": "/nix/store/waack2w5n0208w1qy7pxnwxbsq2n26vm-gcc-wrapper-15.2.0"
+      },
+      "system": "aarch64-linux",
+      "group": "bazel-toolchain",
+      "priority": 5
+    },
+    {
+      "attr_path": "gcc",
+      "broken": false,
+      "derivation": "/nix/store/lsh3l4h6f89bxqgmx0jglc14cagfin9z-gcc-wrapper-15.2.0.drv",
+      "description": "GNU Compiler Collection, version 15.2.0 (wrapper script)",
+      "install_id": "gcc",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "name": "gcc-wrapper-15.2.0",
+      "pname": "gcc",
+      "rev": "b12141ef619e0a9c1c84dc8c684040326f27cdcc",
+      "rev_count": 982522,
+      "rev_date": "2026-04-18T21:33:21Z",
+      "scrape_date": "2026-04-21T07:44:41.134021Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "15.2.0",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/gzq6x9nsc2g1b4z0xlxnl3n8ahzcrgql-gcc-wrapper-15.2.0-info",
+        "man": "/nix/store/n58glhbv7fnb3bqvbdh6ib7pv456cm4n-gcc-wrapper-15.2.0-man",
+        "out": "/nix/store/hb2bs5fg5wkm04x565737qd5nh2hy5nk-gcc-wrapper-15.2.0"
+      },
+      "system": "x86_64-linux",
+      "group": "bazel-toolchain",
+      "priority": 5
+    },
+    {
+      "attr_path": "bazel",
+      "broken": false,
+      "derivation": "/nix/store/l5d1xw882c87ky6wyqpgzgm9czzshba7-bazel-9.1.0.drv",
+      "description": "Prebuilt Bazel 9.1.0 from bazel.build",
+      "install_id": "bazel",
+      "license": "Apache-2.0",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=e2fb72952030dbbb577418f2bcb451f522584d66",
+      "name": "bazel-9.1.0",
+      "pname": "bazel",
+      "rev": "e2fb72952030dbbb577418f2bcb451f522584d66",
+      "rev_count": 2887,
+      "rev_date": "2026-04-23T16:28:20Z",
+      "scrape_date": "2026-04-23T17:19:36.715367Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.1.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/l15faskz9bsnx5v2wlqbshmdvbc12mkj-bazel-9.1.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "bazel",
+      "priority": 5
+    },
+    {
+      "attr_path": "bazel",
+      "broken": false,
+      "derivation": "/nix/store/wrhn9sq33mcmjpzlawh3bv7i18fnfkx0-bazel-9.1.0.drv",
+      "description": "Prebuilt Bazel 9.1.0 from bazel.build",
+      "install_id": "bazel",
+      "license": "Apache-2.0",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=e2fb72952030dbbb577418f2bcb451f522584d66",
+      "name": "bazel-9.1.0",
+      "pname": "bazel",
+      "rev": "e2fb72952030dbbb577418f2bcb451f522584d66",
+      "rev_count": 2887,
+      "rev_date": "2026-04-23T16:28:20Z",
+      "scrape_date": "2026-04-23T17:19:36.715372Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.1.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/6nrz74ck5lnz3f7bk51v9m16s8mgjpzd-bazel-9.1.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "bazel",
+      "priority": 5
+    },
+    {
+      "attr_path": "bazel_9",
+      "broken": false,
+      "derivation": "/nix/store/x9aq652dlm8vzw2b3jwv8fws3nn5m0j1-bazel-9.0.1.drv",
+      "description": "Build tool that builds code quickly and reliably",
+      "install_id": "bazel_catalog",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c1018dae018162ec878d42fec712642d214fdfa",
+      "name": "bazel-9.0.1",
+      "pname": "bazel_9",
+      "rev": "4c1018dae018162ec878d42fec712642d214fdfa",
+      "rev_count": 977467,
+      "rev_date": "2026-04-09T04:48:10Z",
+      "scrape_date": "2026-04-11T06:34:58.547159Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.0.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/prylvgpz81mclgdn0kb8rzzqbfnwg9az-bazel-9.0.1"
+      },
+      "system": "aarch64-linux",
+      "group": "bazel",
+      "priority": 5
+    },
+    {
+      "attr_path": "bazel_9",
+      "broken": false,
+      "derivation": "/nix/store/mz2mfvjqzaib4wshynfn2gl31284gf6b-bazel-9.0.1.drv",
+      "description": "Build tool that builds code quickly and reliably",
+      "install_id": "bazel_catalog",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=4c1018dae018162ec878d42fec712642d214fdfa",
+      "name": "bazel-9.0.1",
+      "pname": "bazel_9",
+      "rev": "4c1018dae018162ec878d42fec712642d214fdfa",
+      "rev_count": 977467,
+      "rev_date": "2026-04-09T04:48:10Z",
+      "scrape_date": "2026-04-11T07:39:12.621531Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "9.0.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/i6qdjrd5q3zv8nr0mph28d35xfmyhza5-bazel-9.0.1"
+      },
+      "system": "x86_64-linux",
+      "group": "bazel",
+      "priority": 5
+    }
+  ]
+}
