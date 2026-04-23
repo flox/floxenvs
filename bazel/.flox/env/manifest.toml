@@ -1,0 +1,18 @@
+schema-version = "1.10.0"
+
+# Minimal Bazel environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/bazel"]
+
+[install]
+bazel.pkg-path = "flox/bazel"
+bazel.pkg-group = "bazel"
+
+[hook]
+on-activate = '''
+export BAZEL_CACHE_DIR="$FLOX_ENV_CACHE/bazel"
+mkdir -p "$BAZEL_CACHE_DIR"
+'''

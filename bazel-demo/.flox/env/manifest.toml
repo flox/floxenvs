@@ -1,0 +1,43 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../bazel" }
+]
+
+# Demo Bazel environment with a sample Go app built via
+# rules_go and exposed through a flox manifest build.
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'Bazel development environment' '' \
+    'Try the sample build:' \
+    '  flox build hello' \
+    '  ./result-hello/bin/hello'
+fi
+'''
+
+[build.hello]
+description = "Sample Go binary built with Bazel + rules_go"
+version = "0.0.1"
+command = '''
+set -eo pipefail
+
+# Keep Bazel's output tree inside the flox cache so repeated
+# builds reuse the action cache instead of cluttering $HOME.
+export BAZEL_CACHE_DIR="${BAZEL_CACHE_DIR:-$FLOX_ENV_CACHE/bazel}"
+mkdir -p "$BAZEL_CACHE_DIR"
+
+bazel --output_user_root="$BAZEL_CACHE_DIR" build //:hello
+
+mkdir -p "$out/bin"
+cp -L bazel-bin/hello_/hello "$out/bin/hello"
+chmod +x "$out/bin/hello"
+'''
