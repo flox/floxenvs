@@ -57,13 +57,15 @@ let
     zip
   ];
 in
-# The upstream release binary is an ELF/Mach-O launcher with a zip
-# of Bazel's install tree (server jar + embedded JDK) appended.
-# autoPatchelfHook rewires the launcher's interpreter for Linux;
-# the JDK Bazel extracts on first run keeps its distro-pinned
-# /lib64/ld-linux-*.so.2 path, which is present on every non-NixOS
-# Linux and via the nix-ld shim on NixOS. `strip` and `patchShebangs`
-# both corrupt the zip trailer, so both are disabled.
+# The upstream release binary is an ELF/Mach-O launcher with a zip of
+# Bazel's install tree (server jar + embedded JDK) appended. On first
+# run Bazel extracts that zip to $output_user_root/install/<hash>/.
+# The extracted JDK is pinned to /lib64/ld-linux-*, which is absent on
+# NixOS, so we unzip the install tree at build time and let
+# autoPatchelfHook rewrite every ELF interpreter. --install_base then
+# points Bazel at our patched tree so it skips the runtime extraction.
+# `strip` and `patchShebangs` both corrupt the zip trailer on the
+# launcher, so both are disabled.
 stdenv.mkDerivation {
   pname = "bazel";
   inherit version src;
@@ -74,7 +76,7 @@ stdenv.mkDerivation {
   dontPatchShebangs = true;
 
   nativeBuildInputs =
-    [ makeWrapper ]
+    [ makeWrapper unzip ]
     ++ lib.optional stdenv.isLinux autoPatchelfHook;
 
   buildInputs = lib.optionals stdenv.isLinux [
@@ -84,9 +86,34 @@ stdenv.mkDerivation {
 
   installPhase = ''
     runHook preInstall
-    install -Dm755 "$src" "$out/bin/.bazel-raw"
-    makeWrapper "$out/bin/.bazel-raw" "$out/bin/bazel" \
-      --prefix PATH : ${lib.makeBinPath runtimeDeps}
+
+    install -Dm755 "$src" "$out/libexec/bazel/bazel-launcher"
+
+    install_base="$out/share/bazel/install"
+    mkdir -p "$install_base"
+    unzip -q -o "$src" -d "$install_base"
+    chmod -R u+w "$install_base"
+
+    # Shell wrapper instead of makeWrapper's --add-flags: bazel's
+    # top-level `--version` / `--help` / `-h` pseudo-commands reject
+    # startup options, so --install_base must only be injected for
+    # real commands.
+    mkdir -p "$out/bin"
+    cat > "$out/bin/bazel" <<EOF
+    #!${bash}/bin/bash
+    set -e
+    export PATH="${lib.makeBinPath runtimeDeps}:\$PATH"
+    case "\''${1:-}" in
+      --version|--help|-h)
+        exec "$out/libexec/bazel/bazel-launcher" "\$@"
+        ;;
+    esac
+    exec "$out/libexec/bazel/bazel-launcher" "--install_base=$install_base" "\$@"
+    EOF
+    # Strip the leading four-space indent the here-doc preserves.
+    sed -i 's/^    //' "$out/bin/bazel"
+    chmod +x "$out/bin/bazel"
+
     runHook postInstall
   '';
 
