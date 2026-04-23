@@ -6,7 +6,9 @@ system for use as a layer in other environments.
 ## What is included
 
 - `bazel` -- Google's fast, correct, multi-language
-  build system (`bazel_9` from the Flox catalog)
+  build system
+- `gcc` (Linux only) -- required by `rules_cc` auto-
+  configure on first Bazel invocation
 
 ## Usage
 
@@ -36,39 +38,32 @@ state isolated per environment:
 bazel --output_user_root="$BAZEL_CACHE_DIR" build //...
 ```
 
-Or persist it by adding to `.bazelrc`:
-
-```text
-startup --output_user_root=${BAZEL_CACHE_DIR}
-```
-
 ## Versions
 
-| Source                                    | Version |
-| ----------------------------------------- | ------- |
-| Flox catalog (`nixpkgs`) -- `bazel_9`     | `9.0.1` (shipped by this env) |
-| Flox catalog (`nixpkgs`) -- `bazel`       | `7.6.0` (older major)         |
-| Flox org publish -- `flox/bazel`          | `9.1.0` (prebuilt upstream, `.flox/pkgs/bazel/`) |
-| Upstream stable on <https://bazel.build/> | `9.1.0` |
+The env ships different Bazel builds per system:
 
-This env ships `bazel_9` (9.0.1) because the
-nixpkgs-backed source build works on every system,
-including NixOS builders where `/lib64/ld-linux-*`
-is absent.
+| System       | Source                            | Version |
+| ------------ | --------------------------------- | ------- |
+| `*-darwin`   | `flox/bazel` (upstream prebuilt)  | `9.1.0` |
+| `*-linux`    | `bazel_9` from nixpkgs catalog    | `9.0.1` |
 
-`flox/bazel` (9.1.0) wraps the upstream prebuilt
-release binary from
-<https://github.com/bazelbuild/bazel/releases> and
-is refreshed by `upgrade_pkgs.yml` on every new
-Bazel release. It works out of the box on macOS and
-on Linux hosts where glibc ships at the standard
-`/lib64/ld-linux-*` path (Debian, Ubuntu, Fedora,
-etc.). To swap it in:
+On macOS the upstream release binary works out of the
+box, so the env picks `flox/bazel` (packaged from
+`.flox/pkgs/bazel/`) and tracks every new Bazel
+release via `upgrade_pkgs.yml`.
 
-```toml
-[install]
-bazel.pkg-path = "flox/bazel"
-```
+On Linux the upstream prebuilt binary's embedded JDK
+is pinned to `/lib64/ld-linux-*`, which is absent on
+NixOS-style hosts, so the env falls back to
+`nixpkgs`' source-built `bazel_9` (currently `9.0.1`)
+which is built against the nixpkgs glibc/JDK and
+works everywhere.
+
+Upstream stable on <https://bazel.build/> is `9.1.0`.
+
+| Alternative    | Version |
+| -------------- | ------- |
+| `bazel` from nixpkgs (older major) | `7.6.0` |
 
 ## Demo and sample project
 

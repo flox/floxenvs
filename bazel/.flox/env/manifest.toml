@@ -8,14 +8,19 @@ schema-version = "1.10.0"
 #   environments = ["flox/bazel"]
 
 [install]
-# Catalog bazel_9 (9.0.1) is used by default because it is
-# source-built against nixpkgs and works on NixOS-style builders
-# out of the box. `flox/bazel` (9.1.0, prebuilt upstream) is also
-# published from `.flox/pkgs/bazel/` for hosts where glibc is
-# available at the standard /lib64 path; swap the pkg-path below
-# to opt in.
-bazel.pkg-path = "bazel_9"
+# macOS: `flox/bazel` is the upstream 9.1.0 prebuilt binary
+# packaged in `.flox/pkgs/bazel/`. Refreshed by upgrade_pkgs.yml
+# whenever a new Bazel release lands.
+bazel.pkg-path = "flox/bazel"
 bazel.pkg-group = "bazel"
+bazel.systems = ["aarch64-darwin", "x86_64-darwin"]
+
+# Linux: the catalog `bazel_9` is source-built against nixpkgs
+# (currently 9.0.1) so it works on NixOS-style builders where the
+# upstream prebuilt binary's JDK can't find /lib64/ld-linux-*.
+bazel_catalog.pkg-path = "bazel_9"
+bazel_catalog.pkg-group = "bazel"
+bazel_catalog.systems = ["aarch64-linux", "x86_64-linux"]
 
 # Bazel's rules_cc auto-configure looks up `gcc` or `$CC` on first
 # invocation, even for rule sets that don't emit C code (e.g.
