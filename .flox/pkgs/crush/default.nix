@@ -4,7 +4,6 @@
   buildGo126Module,
   fetchFromGitHub,
   installShellFiles,
-  writableTmpDirAsHomeHook,
   versionCheckHook,
 }:
 
@@ -25,16 +24,11 @@ buildGo126Module rec {
 
   inherit vendorHash;
 
-  # Tests hardcode `/tmp/crush-test/` which can collide between sandboxed builds
-  # on the same macOS host (different uids, same path). Redirect to TMPDIR.
-  postPatch = ''
-    substituteInPlace internal/agent/common_test.go \
-      --replace-fail 'filepath.Join("/tmp/crush-test/", t.Name())' \
-                     'filepath.Join(os.TempDir(), "crush-test", t.Name())'
-  '';
+  subPackages = [ "." ];
 
   ldflags = [
     "-s"
+    "-w"
     "-X=github.com/charmbracelet/crush/internal/version.Version=${version}"
   ];
 
@@ -42,30 +36,19 @@ buildGo126Module rec {
     installShellFiles
   ];
 
-  checkFlags =
-    let
-      skippedTests = [
-        "TestCoderAgent"
-        "TestOpenAIClientStreamChoices"
-        "TestGrepWithIgnoreFiles"
-        "TestSearchImplementations"
-      ];
-    in
-    [ "-skip=^${builtins.concatStringsSep "$|^" skippedTests}$" ];
-
-  __darwinAllowLocalNetworking = true;
-
-  nativeCheckInputs = [ writableTmpDirAsHomeHook ];
-
   nativeInstallCheckInputs = [ versionCheckHook ];
   doInstallCheck = true;
 
-  postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
-    installShellCompletion --cmd crush \
-      --bash <($out/bin/crush completion bash) \
-      --fish <($out/bin/crush completion fish) \
-      --zsh <($out/bin/crush completion zsh)
-  '';
+  postInstall =
+    ''
+      install -Dm644 schema.json $out/share/crush/schema.json
+    ''
+    + lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
+      installShellCompletion --cmd crush \
+        --bash <($out/bin/crush completion bash) \
+        --fish <($out/bin/crush completion fish) \
+        --zsh <($out/bin/crush completion zsh)
+    '';
 
   meta = {
     description = "Glamourous AI coding agent for your favourite terminal";
