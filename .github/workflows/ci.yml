@@ -7,6 +7,9 @@ on:
   merge_group:
   workflow_dispatch:
 
+permissions:
+  pull-requests: write
+
 env:
   FLOX_DISABLE_METRICS: "true"
 
@@ -198,6 +201,17 @@ jobs:
       && needs.wait-for-environments.outputs.total_workflows != '0'
 
     steps:
+      - name: "Approve PR"
+        env:
+          PR_NUMBER: >-
+            ${{ needs.wait-for-environments.outputs.pr_number }}
+          GITHUB_TOKEN: >-
+            ${{ github.token }}
+        run: |
+          gh pr review "$PR_NUMBER" \
+            --repo "${{ github.repository }}" \
+            --approve
+
       - name: "Merge PR"
         env:
           PR_NUMBER: >-
