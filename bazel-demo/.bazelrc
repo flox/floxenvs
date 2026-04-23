@@ -3,3 +3,7 @@ common --enable_bzlmod
 build --noshow_progress
 build --color=no
 test --test_output=errors
+
+# Pure Go binary -- no cgo, no system libraries. Avoids a
+# macOS link error hunting for -lresolv inside the sandbox.
+build --@rules_go//go/config:pure
