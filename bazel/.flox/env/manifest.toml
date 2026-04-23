@@ -8,7 +8,13 @@ schema-version = "1.10.0"
 #   environments = ["flox/bazel"]
 
 [install]
-bazel.pkg-path = "flox/bazel"
+# Catalog bazel_9 (9.0.1) is used by default because it is
+# source-built against nixpkgs and works on NixOS-style builders
+# out of the box. `flox/bazel` (9.1.0, prebuilt upstream) is also
+# published from `.flox/pkgs/bazel/` for hosts where glibc is
+# available at the standard /lib64 path; swap the pkg-path below
+# to opt in.
+bazel.pkg-path = "bazel_9"
 bazel.pkg-group = "bazel"
 
 [hook]

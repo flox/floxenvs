@@ -6,8 +6,7 @@ system for use as a layer in other environments.
 ## What is included
 
 - `bazel` -- Google's fast, correct, multi-language
-  build system (`flox/bazel` -- a prebuilt of the
-  upstream release pinned via `.flox/pkgs/bazel/`)
+  build system (`bazel_9` from the Flox catalog)
 
 ## Usage
 
@@ -47,31 +46,29 @@ startup --output_user_root=${BAZEL_CACHE_DIR}
 
 | Source                                    | Version |
 | ----------------------------------------- | ------- |
-| `flox/bazel` (this env)                   | `9.1.0` |
-| Flox catalog (`nixpkgs`) -- `bazel_9`     | `9.0.1` |
-| Flox catalog (`nixpkgs`) -- `bazel`       | `7.6.0` |
+| Flox catalog (`nixpkgs`) -- `bazel_9`     | `9.0.1` (shipped by this env) |
+| Flox catalog (`nixpkgs`) -- `bazel`       | `7.6.0` (older major)         |
+| Flox org publish -- `flox/bazel`          | `9.1.0` (prebuilt upstream, `.flox/pkgs/bazel/`) |
 | Upstream stable on <https://bazel.build/> | `9.1.0` |
 
-The env ships `flox/bazel`, a prebuilt wrapper of
-the upstream GitHub release. It gets bumped by
-`upgrade_pkgs.yml` each time a new Bazel release
-lands, so the env always tracks upstream latest.
+This env ships `bazel_9` (9.0.1) because the
+nixpkgs-backed source build works on every system,
+including NixOS builders where `/lib64/ld-linux-*`
+is absent.
 
-If you prefer the nixpkgs-native build, swap the
-`[install]` entry:
+`flox/bazel` (9.1.0) wraps the upstream prebuilt
+release binary from
+<https://github.com/bazelbuild/bazel/releases> and
+is refreshed by `upgrade_pkgs.yml` on every new
+Bazel release. It works out of the box on macOS and
+on Linux hosts where glibc ships at the standard
+`/lib64/ld-linux-*` path (Debian, Ubuntu, Fedora,
+etc.). To swap it in:
 
 ```toml
 [install]
-bazel.pkg-path = "bazel_9"     # nixpkgs, 9.0.1
+bazel.pkg-path = "flox/bazel"
 ```
-
-## How `flox/bazel` works
-
-`.flox/pkgs/bazel/` in this repo wraps the prebuilt
-binary from `github.com/bazelbuild/bazel/releases`.
-On Linux it runs inside a minimal FHS chroot so
-Bazel's embedded JDK can find `/lib64/ld-linux-*`;
-on macOS the signed binary runs directly.
 
 ## Demo and sample project
 

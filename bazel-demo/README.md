@@ -23,36 +23,41 @@ Hello from Bazel + Go + Flox!
 
 ## What's in here
 
-| File            | Purpose                                    |
-| --------------- | ------------------------------------------ |
-| `MODULE.bazel`  | Bzlmod module with a `rules_go` dependency |
-| `BUILD.bazel`   | `go_binary` target named `hello`           |
-| `.bazelrc`      | Reproducible defaults (bzlmod on, quiet)   |
-| `.bazelversion` | Pins Bazel to the env-provided version     |
-| `main.go`       | The sample Go program                      |
+| File           | Purpose                                     |
+| -------------- | ------------------------------------------- |
+| `MODULE.bazel` | Bzlmod module with a `rules_go` dependency  |
+| `BUILD.bazel`  | `go_binary` target named `hello`            |
+| `.bazelrc`     | Reproducible defaults (bzlmod on, pure Go)  |
+| `main.go`      | The sample Go program                       |
 
 The manifest's `[build.hello]` table runs:
 
 ```bash
-bazel --output_user_root="$BAZEL_CACHE_DIR" build //:hello
+bazel_cache="$(mktemp -d)"
+bazel --output_user_root="$bazel_cache" \
+  build //:hello --repo_contents_cache=
 cp -L bazel-bin/hello_/hello "$out/bin/hello"
 ```
 
-`$BAZEL_CACHE_DIR` comes from the included `bazel`
-env and defaults to `$FLOX_ENV_CACHE/bazel` so
-repeated builds reuse Bazel's action cache.
+`--repo_contents_cache=` disables Bazel 9's new repo
+contents cache so it doesn't land inside the
+worktree. `mktemp -d` keeps the Bazel install tree
+outside `$FLOX_ENV_CACHE`, which isn't exported by
+`flox build`'s local mode.
 
 ## Versions
 
 | Source                                    | Version |
 | ----------------------------------------- | ------- |
-| `flox/bazel` (used by this env)           | `9.1.0` |
+| `bazel_9` from catalog (used by this env) | `9.0.1` |
 | Upstream on <https://bazel.build/>        | `9.1.0` |
-| `rules_go`                                | `0.50.1` (pinned in `MODULE.bazel`) |
+| `rules_go`                                | `0.60.0` (pinned in `MODULE.bazel`) |
+| Go SDK                                    | `1.24.0` (pinned via `go_sdk.download`) |
 
-`flox/bazel` tracks upstream latest and is rebuilt
-by `upgrade_pkgs.yml` whenever a new Bazel release
-lands.
+To try the upstream-latest 9.1.0 on macOS or a
+standard-glibc Linux, swap the minimal env to the
+custom `flox/bazel` package -- see
+[../bazel/README.md](../bazel/README.md).
 
 ## Customization
 
