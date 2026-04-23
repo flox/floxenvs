@@ -12,6 +12,14 @@ environments = [
 gum.pkg-path = "gum"
 gum.pkg-group = "demo-tools"
 
+# Bazel's rules_cc auto-configure looks up `gcc` or `$CC` even for
+# pure Go builds (rules_go transitively depends on rules_cc). On
+# Linux we need a C toolchain in PATH; macOS Bazel picks up clang
+# from Xcode.
+gcc.pkg-path = "gcc"
+gcc.pkg-group = "bazel-toolchain"
+gcc.systems = ["aarch64-linux", "x86_64-linux"]
+
 [hook]
 on-activate = '''
 if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
