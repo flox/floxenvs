@@ -44,22 +44,15 @@ repeated builds reuse Bazel's action cache.
 
 ## Versions
 
-| Source                     | Version |
-| -------------------------- | ------- |
-| Flox catalog -- `bazel_9`  | `9.0.1` (used by this env) |
-| Flox org -- `flox/bazel`   | `9.1.0` (upstream prebuilt) |
-| Upstream on <https://bazel.build/> | `9.1.0` |
-| `rules_go`                 | `0.50.1` (pinned in `MODULE.bazel`) |
+| Source                                    | Version |
+| ----------------------------------------- | ------- |
+| `flox/bazel` (used by this env)           | `9.1.0` |
+| Upstream on <https://bazel.build/>        | `9.1.0` |
+| `rules_go`                                | `0.50.1` (pinned in `MODULE.bazel`) |
 
-To try the upstream-latest 9.1.0 instead, swap the
-`[install]` table in `.flox/env/manifest.toml` (and
-in the included `../bazel/.flox/env/manifest.toml`)
-to use `flox/bazel`:
-
-```toml
-[install]
-bazel.pkg-path = "flox/bazel"
-```
+`flox/bazel` tracks upstream latest and is rebuilt
+by `upgrade_pkgs.yml` whenever a new Bazel release
+lands.
 
 ## Customization
 
