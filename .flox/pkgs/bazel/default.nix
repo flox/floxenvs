@@ -107,7 +107,8 @@ if stdenv.isDarwin then
   bazelUnwrapped
 else
   buildFHSEnv {
-    name = "bazel";
+    pname = "bazel";
+    inherit version;
     targetPkgs = pkgs: [ bazelUnwrapped ] ++ runtimeDeps;
     runScript = "bazel";
     meta = {
