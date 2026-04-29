@@ -29,16 +29,7 @@ version = "0.0.1"
 command = '''
 set -eo pipefail
 
-# flox build's local mode doesn't export $FLOX_ENV_CACHE, so
-# park Bazel's output in a fresh tmpdir that is always
-# writable. --repo_contents_cache= keeps Bazel 9's new cache
-# from landing inside the worktree.
-bazel_cache="$(mktemp -d)"
-# Bazel creates read-only action outputs; chmod before rm.
-trap 'chmod -R u+w "$bazel_cache" 2>/dev/null; rm -rf "$bazel_cache"' EXIT
-
-bazel --output_user_root="$bazel_cache" \
-  build //:hello --repo_contents_cache=
+bazel build //:hello
 
 mkdir -p "$out/bin"
 cp -L bazel-bin/hello_/hello "$out/bin/hello"
