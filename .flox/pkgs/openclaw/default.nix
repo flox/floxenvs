@@ -65,21 +65,24 @@ stdenv.mkDerivation (finalAttrs: {
     fi
     mkdir -p node_modules/.pnpm/node_modules
     ln -sfT ../../rolldown node_modules/.pnpm/node_modules/rolldown
-
-    # runtime-postbuild.mjs stages bundled plugin runtime deps by shelling
-    # out to `npm install`, which requires network access inside the Nix
-    # sandbox. Those deps are not needed for the main openclaw CLI build.
-    substituteInPlace scripts/runtime-postbuild.mjs \
-      --replace-fail \
-      'stageBundledPluginRuntimeDeps(params);' \
-      '/* stageBundledPluginRuntimeDeps(params); — disabled in Nix build */'
   '';
 
   buildPhase = ''
     runHook preBuild
 
+    # `pnpm build` and `pnpm ui:build` can run silently for over 30
+    # minutes on slower builders (e.g. x86_64-darwin via Rosetta on
+    # aarch64 hardware), tripping Nix's max-silent-time default of
+    # 1800s. Emit a heartbeat every 60s so the build stays alive.
+    ( while true; do echo "[heartbeat] still building..."; sleep 60; done ) &
+    heartbeat_pid=$!
+    trap "kill $heartbeat_pid 2>/dev/null || true" EXIT
+
     pnpm build
     pnpm ui:build
+
+    kill $heartbeat_pid 2>/dev/null || true
+    trap - EXIT
 
     runHook postBuild
   '';
