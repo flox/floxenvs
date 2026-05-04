@@ -63,9 +63,7 @@ jq -n \
 
 echo "Computing npmDepsHash..."
 prefetch_log=$(mktemp)
-nix build --impure --no-link \
-  --expr '((import <nixpkgs> {}).callPackage ./.flox/pkgs/pi {}).npmDeps' \
-  > "$prefetch_log" 2>&1 || true
+flox build pi > "$prefetch_log" 2>&1 || true
 
 npm_deps_hash=$(awk '/hash mismatch in fixed-output derivation/,0 {
   if (/got:/) { print $NF; exit }

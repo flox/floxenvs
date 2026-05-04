@@ -25,9 +25,9 @@ src_hash=$(nix-prefetch-url --unpack "$src_url" 2>/dev/null)
 src_sri=$(nix hash convert --hash-algo sha256 --to sri "$src_hash")
 echo "  srcHash: $src_sri"
 
-# Compute vendorHash by building just the goModules fixed-output derivation
-# with a fake hash. This isolates the hash mismatch — a full `flox build`
-# would also compile and test, masking real errors as "vendorHash failed".
+# Build with a dummy vendorHash to get the real one. The goModules
+# fixed-output derivation is built before compilation, so the hash
+# mismatch surfaces immediately.
 tmp_hashes=$(mktemp)
 cp "$HASHES_FILE" "$tmp_hashes"
 
@@ -37,11 +37,9 @@ jq -n \
   --arg vh "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" \
   '{version: $v, srcHash: $s, vendorHash: $vh}' > "$HASHES_FILE"
 
-echo "Fetching Go module dependencies to compute vendorHash..."
+echo "Building with dummy vendorHash to compute real one..."
 prefetch_log=$(mktemp)
-NIXPKGS_ALLOW_UNFREE=1 nix build --impure --no-link \
-  --expr '((import <nixpkgs> {}).callPackage ./.flox/pkgs/crush {}).goModules' \
-  > "$prefetch_log" 2>&1 || true
+flox build crush > "$prefetch_log" 2>&1 || true
 
 vendor_hash=$(awk '/hash mismatch in fixed-output derivation/,0 {
   if (/got:/) { print $NF; exit }
