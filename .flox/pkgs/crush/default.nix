@@ -24,6 +24,15 @@ buildGo126Module rec {
 
   inherit vendorHash;
 
+  # Crush bumps go.mod's go directive faster than flox/nixpkgs ships
+  # patch-level Go updates (e.g. requires 1.26.2 while we have 1.26.1).
+  # Patch versions are binary compatible per Go 1 stability, so rewrite
+  # the directive to whatever toolchain buildGo126Module provides.
+  postPatch = ''
+    go_ver=$(go env GOVERSION | sed 's/^go//')
+    sed -i "s/^go [0-9.]\+$/go $go_ver/" go.mod
+  '';
+
   subPackages = [ "." ];
 
   ldflags = [
