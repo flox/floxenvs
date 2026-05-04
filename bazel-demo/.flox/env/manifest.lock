@@ -28,8 +28,7 @@
         ]
       },
       "gum": {
-        "pkg-path": "gum",
-        "pkg-group": "demo-tools"
+        "pkg-path": "gum"
       }
     },
     "hook": {
@@ -38,7 +37,7 @@
     "options": {},
     "build": {
       "hello": {
-        "command": "set -eo pipefail\n\n# flox build's local mode doesn't export $FLOX_ENV_CACHE, so\n# park Bazel's output in a fresh tmpdir that is always\n# writable. --repo_contents_cache= keeps Bazel 9's new cache\n# from landing inside the worktree.\nbazel_cache=\"$(mktemp -d)\"\n# Bazel creates read-only action outputs; chmod before rm.\ntrap 'chmod -R u+w \"$bazel_cache\" 2>/dev/null; rm -rf \"$bazel_cache\"' EXIT\n\nbazel --output_user_root=\"$bazel_cache\" \\\n  build //:hello --repo_contents_cache=\n\nmkdir -p \"$out/bin\"\ncp -L bazel-bin/hello_/hello \"$out/bin/hello\"\nchmod +x \"$out/bin/hello\"\n",
+        "command": "set -eo pipefail\n\nbazel build //:hello\n\nmkdir -p \"$out/bin\"\ncp -L bazel-bin/hello_/hello \"$out/bin/hello\"\nchmod +x \"$out/bin/hello\"\n",
         "version": "0.0.1",
         "description": "Sample Go binary built with Bazel + rules_go"
       }
@@ -251,7 +250,7 @@
         "out": "/nix/store/ba53aq5kpjm2qb817qgxswy2hvnkxnyj-gum-0.17.0"
       },
       "system": "aarch64-darwin",
-      "group": "demo-tools",
+      "group": "toplevel",
       "priority": 5
     },
     {
@@ -280,7 +279,7 @@
         "out": "/nix/store/3hlyv3x7jjn5364f08jw0bic3zddqhxc-gum-0.17.0"
       },
       "system": "aarch64-linux",
-      "group": "demo-tools",
+      "group": "toplevel",
       "priority": 5
     },
     {
@@ -309,7 +308,7 @@
         "out": "/nix/store/qkwxvmldb9a8nmqq6aqqd47gj3pxwx42-gum-0.17.0"
       },
       "system": "x86_64-darwin",
-      "group": "demo-tools",
+      "group": "toplevel",
       "priority": 5
     },
     {
@@ -338,7 +337,7 @@
         "out": "/nix/store/c149nbx8xh8knvply95623gnwqds19xr-gum-0.17.0"
       },
       "system": "x86_64-linux",
-      "group": "demo-tools",
+      "group": "toplevel",
       "priority": 5
     }
   ],
@@ -347,8 +346,7 @@
       "schema-version": "1.11.0",
       "install": {
         "gum": {
-          "pkg-path": "gum",
-          "pkg-group": "demo-tools"
+          "pkg-path": "gum"
         }
       },
       "hook": {
@@ -357,7 +355,7 @@
       "options": {},
       "build": {
         "hello": {
-          "command": "set -eo pipefail\n\n# flox build's local mode doesn't export $FLOX_ENV_CACHE, so\n# park Bazel's output in a fresh tmpdir that is always\n# writable. --repo_contents_cache= keeps Bazel 9's new cache\n# from landing inside the worktree.\nbazel_cache=\"$(mktemp -d)\"\n# Bazel creates read-only action outputs; chmod before rm.\ntrap 'chmod -R u+w \"$bazel_cache\" 2>/dev/null; rm -rf \"$bazel_cache\"' EXIT\n\nbazel --output_user_root=\"$bazel_cache\" \\\n  build //:hello --repo_contents_cache=\n\nmkdir -p \"$out/bin\"\ncp -L bazel-bin/hello_/hello \"$out/bin/hello\"\nchmod +x \"$out/bin/hello\"\n",
+          "command": "set -eo pipefail\n\nbazel build //:hello\n\nmkdir -p \"$out/bin\"\ncp -L bazel-bin/hello_/hello \"$out/bin/hello\"\nchmod +x \"$out/bin/hello\"\n",
           "version": "0.0.1",
           "description": "Sample Go binary built with Bazel + rules_go"
         }
