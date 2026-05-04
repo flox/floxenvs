@@ -70,8 +70,19 @@ stdenv.mkDerivation (finalAttrs: {
   buildPhase = ''
     runHook preBuild
 
+    # `pnpm build` and `pnpm ui:build` can run silently for over 30
+    # minutes on slower builders (e.g. x86_64-darwin via Rosetta on
+    # aarch64 hardware), tripping Nix's max-silent-time default of
+    # 1800s. Emit a heartbeat every 60s so the build stays alive.
+    ( while true; do echo "[heartbeat] still building..."; sleep 60; done ) &
+    heartbeat_pid=$!
+    trap "kill $heartbeat_pid 2>/dev/null || true" EXIT
+
     pnpm build
     pnpm ui:build
+
+    kill $heartbeat_pid 2>/dev/null || true
+    trap - EXIT
 
     runHook postBuild
   '';
