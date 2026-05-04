@@ -105,6 +105,13 @@ stdenv.mkDerivation {
       wrapProgram "$f" --prefix PATH : "$runtimeBins:$out/bin"
     done
 
+    # Rewrite upstream-install path references in markdown files to
+    # the ''${CLAUDE_PLUGIN_ROOT}/... form that Claude Code uses for
+    # plugins. Driven by a basename index of the plugin tree, so new
+    # upstream files added in future versions are picked up without
+    # changing this derivation.
+    "$out/bin/python3" ${./fix_md_paths.py} "$PLUGIN_DIR"
+
     runHook postInstall
   '';
 
