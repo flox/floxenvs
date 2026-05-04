@@ -10,6 +10,11 @@
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version srcHash;
+
+  # Escape so the indented-string interpolation below produces the
+  # literal token `${CLAUDE_PLUGIN_ROOT}` in the resulting bash, with
+  # no further Nix or bash expansion.
+  pluginRootRef = "\${CLAUDE_PLUGIN_ROOT}";
 in
 stdenv.mkDerivation {
   pname = "claude-code-plugin-impeccable";
@@ -58,6 +63,22 @@ stdenv.mkDerivation {
         '#!/usr/bin/env node' "#!$out/bin/node"
       chmod +x "$f"
     done < <(find "$PLUGIN_DIR" -type f \( -name '*.mjs' -o -name '*.js' \))
+
+    # Rewrite hardcoded `.claude/skills/impeccable/scripts/<X>` references
+    # in markdown to `''${CLAUDE_PLUGIN_ROOT}/skills/impeccable/scripts/<X>`,
+    # the form Claude Code uses for plugins. Upstream's markdown is shared
+    # across harnesses so it embeds the user-install layout, which is wrong
+    # under a plugin install where the plugin root is `plugin/`.
+    rewritten=0
+    while IFS= read -r f; do
+      if grep -q '\.claude/skills/impeccable/scripts/' "$f"; then
+        substituteInPlace "$f" --replace-quiet \
+          '.claude/skills/impeccable/scripts/' \
+          '${pluginRootRef}/skills/impeccable/scripts/'
+        rewritten=$((rewritten + 1))
+      fi
+    done < <(find "$PLUGIN_DIR" -type f -name '*.md')
+    echo "fix_md_paths: rewrote refs in $rewritten markdown file(s)"
 
     runHook postInstall
   '';
