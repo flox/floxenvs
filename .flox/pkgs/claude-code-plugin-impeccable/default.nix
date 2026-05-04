@@ -1,4 +1,11 @@
-{ stdenv, lib, fetchFromGitHub }:
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  makeBinaryWrapper,
+  nodejs,
+  git,
+}:
 
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
@@ -15,7 +22,15 @@ stdenv.mkDerivation {
     hash = srcHash;
   };
 
+  # makeBinaryWrapper produces a compiled C wrapper for node so it
+  # is exec'd directly by the kernel via shebang on Darwin, where
+  # shebang chains through a shell-script wrapper are unreliable
+  # under stripped environments.
+  nativeBuildInputs = [ makeBinaryWrapper ];
+
   installPhase = ''
+    runHook preInstall
+
     PLUGIN_DIR="$out/share/claude-code/plugins/impeccable"
     mkdir -p "$PLUGIN_DIR"
 
@@ -24,11 +39,32 @@ stdenv.mkDerivation {
     # subdirectory — that's what marketplace.json points at.
     cp -r "$src/plugin/." "$PLUGIN_DIR/"
     chmod -R u+w "$PLUGIN_DIR"
+
+    # Wrap node so the one git invocation in scripts/is-generated.mjs
+    # (`git check-ignore`) and the npx-based external impeccable CLI
+    # referenced from markdown resolve from Nix without depending on
+    # the caller's PATH.
+    runtimeBins=${lib.makeBinPath [ git nodejs ]}
+    mkdir -p "$out/bin"
+    makeBinaryWrapper "${nodejs}/bin/node" "$out/bin/node" \
+      --prefix PATH : "$runtimeBins"
+
+    # Repoint every #!/usr/bin/env node shebang at the wrapped node.
+    # Marks files executable so the kernel honors the shebang when
+    # Claude Code invokes them.
+    while IFS= read -r f; do
+      head -1 "$f" | grep -q '/usr/bin/env node' || continue
+      substituteInPlace "$f" --replace-fail \
+        '#!/usr/bin/env node' "#!$out/bin/node"
+      chmod +x "$f"
+    done < <(find "$PLUGIN_DIR" -type f \( -name '*.mjs' -o -name '*.js' \))
+
+    runHook postInstall
   '';
 
   meta = {
     description =
-      "Impeccable design fluency plugin for Claude Code (1 skill, 23 commands)";
+      "Impeccable design fluency plugin for Claude Code (1 skill, 23 commands) with Node.js bundled";
     homepage = "https://github.com/pbakaus/impeccable";
     license = lib.licenses.asl20;
   };
