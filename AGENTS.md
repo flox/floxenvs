@@ -221,6 +221,10 @@ jobs:
     secrets: inherit
 ```
 
+No change to `ci.yml` or `scripts/wait-should-poll.sh` is
+required — the wait job derives env names from
+`ci_<name>.yml` filenames automatically.
+
 ### Step 4: Update README.md
 
 Add the environment to the root README.md table with
@@ -262,6 +266,23 @@ Tests run on remote builders via SSH over Tailscale.
 On Linux, tests are isolated in user + network + PID
 namespaces using `pasta` (from passt project) for
 network connectivity. See `flake.nix` for details.
+
+### Wait-job path filters
+
+The `wait-for-environments` and `wait-for-packages` jobs
+in `ci.yml` short-circuit when `git diff` shows no relevant
+paths changed. Their path patterns live in
+`scripts/wait-should-poll.sh` and **must stay in sync** with
+the `on.paths` triggers in `ci_pkgs.yml` and each
+`ci_<name>.yml`. When editing trigger paths, also update
+the helper.
+
+Env names are derived automatically from `ci_<name>.yml`
+filenames, so adding a new env workflow needs no change to
+`ci.yml` or the helper. Adding new shared paths to env
+workflow triggers (e.g. a new top-level directory like
+`scripts/`) requires updating
+`scripts/wait-should-poll.sh`.
 
 ### FloxHub target org
 
