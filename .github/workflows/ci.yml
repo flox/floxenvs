@@ -492,10 +492,11 @@ jobs:
     name: "Report Failure"
     runs-on: "ubuntu-latest"
     timeout-minutes: 5
-    needs: ["wait-for-environments"]
+    needs: ["wait-for-environments", "wait-for-packages"]
     if: >-
-      needs.wait-for-environments.outputs.any_failed == 'true'
-      && github.ref_name == 'main'
+      github.ref_name == 'main'
+      && (needs.wait-for-environments.outputs.any_failed == 'true'
+      || needs.wait-for-packages.outputs.any_failed == 'true')
 
     steps:
       - name: "Slack Notification"
@@ -510,10 +511,14 @@ jobs:
           SLACK_COLOR: "#ff2800"
           SLACK_LINK_NAMES: true
           SLACK_MESSAGE: >-
-            Failed:
+            Envs failed:
             ${{ needs.wait-for-environments.outputs.failed_workflows }}
-            | Workflows:
+            | Pkgs failed:
+            ${{ needs.wait-for-packages.outputs.failed_workflows }}
+            | Env total:
             ${{ needs.wait-for-environments.outputs.total_workflows }}
+            | Pkg total:
+            ${{ needs.wait-for-packages.outputs.total_workflows }}
 
   containerize:
     name: "Containerize '${{ matrix.env }}'"
