@@ -17,16 +17,87 @@ jobs:
     timeout-minutes: 120
 
     outputs:
-      any_failed: "${{ steps.wait.outputs.any_failed }}"
-      failed_workflows: "${{ steps.wait.outputs.failed_workflows }}"
-      total_workflows: "${{ steps.wait.outputs.total_workflows }}"
-      successful_envs: "${{ steps.wait.outputs.successful_envs }}"
-      pr_number: "${{ steps.wait.outputs.pr_number }}"
-      pr_author: "${{ steps.wait.outputs.pr_author }}"
+      any_failed: >-
+        ${{ steps.wait.outputs.any_failed
+            || steps.short_circuit.outputs.any_failed }}
+      failed_workflows: >-
+        ${{ steps.wait.outputs.failed_workflows
+            || steps.short_circuit.outputs.failed_workflows }}
+      total_workflows: >-
+        ${{ steps.wait.outputs.total_workflows
+            || steps.short_circuit.outputs.total_workflows }}
+      successful_envs: >-
+        ${{ steps.wait.outputs.successful_envs
+            || steps.short_circuit.outputs.successful_envs }}
+      pr_number: >-
+        ${{ steps.wait.outputs.pr_number
+            || steps.short_circuit.outputs.pr_number }}
+      pr_author: >-
+        ${{ steps.wait.outputs.pr_author
+            || steps.short_circuit.outputs.pr_author }}
 
     steps:
+      - name: "Checkout"
+        if: github.event_name == 'pull_request'
+              || github.event_name == 'push'
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
+        with:
+          fetch-depth: 0
+
+      - name: "Decide if polling is needed"
+        id: "decide"
+        if: github.event_name == 'pull_request'
+              || github.event_name == 'push'
+        env:
+          EVENT: "${{ github.event_name }}"
+          BASE_SHA: "${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA: "${{ github.event.pull_request.head.sha
+                       || github.sha }}"
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = "pull_request" ]; then
+            BASE="$BASE_SHA"
+            HEAD="$HEAD_SHA"
+          else
+            BASE="HEAD~1"
+            HEAD="HEAD"
+          fi
+          changed="$(git diff --name-only "$BASE" "$HEAD")"
+          should_poll="$(echo "$changed" \
+            | scripts/wait-should-poll.sh envs)"
+          echo "should_poll=$should_poll" >> "$GITHUB_OUTPUT"
+          echo "Changed files:"
+          echo "$changed" | sed 's/^/  /'
+          echo "should_poll=$should_poll"
+
+      - name: "Short-circuit (no env paths changed)"
+        id: "short_circuit"
+        if: >-
+          (github.event_name == 'pull_request'
+            || github.event_name == 'push')
+          && steps.decide.outputs.should_poll == 'false'
+        env:
+          PR_NUMBER: >-
+            ${{ github.event.pull_request.number || 0 }}
+          PR_AUTHOR: >-
+            ${{ github.event.pull_request.user.login || '' }}
+        run: |
+          {
+            echo "any_failed=false"
+            echo "failed_workflows="
+            echo "total_workflows=0"
+            echo "successful_envs=[]"
+            echo "pr_number=$PR_NUMBER"
+            echo "pr_author=$PR_AUTHOR"
+          } >> "$GITHUB_OUTPUT"
+          echo "No env paths changed — short-circuiting."
+
       - name: "Wait for all CI: * workflows"
         id: "wait"
+        if: >-
+          github.event_name == 'merge_group'
+          || github.event_name == 'workflow_dispatch'
+          || steps.decide.outputs.should_poll == 'true'
         uses: "actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3" # v9.0.0
         with:
           script: |
