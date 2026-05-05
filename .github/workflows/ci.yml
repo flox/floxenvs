@@ -64,7 +64,7 @@ jobs:
             BASE="HEAD~1"
             HEAD="HEAD"
           fi
-          changed="$(git diff --name-only "$BASE" "$HEAD")"
+          changed="$(git diff --name-only "$BASE...$HEAD")"
           should_poll="$(echo "$changed" \
             | scripts/wait-should-poll.sh envs)"
           echo "should_poll=$should_poll" >> "$GITHUB_OUTPUT"
@@ -283,7 +283,7 @@ jobs:
             BASE="HEAD~1"
             HEAD="HEAD"
           fi
-          changed="$(git diff --name-only "$BASE" "$HEAD")"
+          changed="$(git diff --name-only "$BASE...$HEAD")"
           should_poll="$(echo "$changed" \
             | scripts/wait-should-poll.sh packages)"
           echo "should_poll=$should_poll" >> "$GITHUB_OUTPUT"
