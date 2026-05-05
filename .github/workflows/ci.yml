@@ -460,7 +460,14 @@ jobs:
           if [ "$fail" -eq 1 ]; then
             exit 1
           fi
-          echo "Envs: ${ENVS_TOTAL} passed, Pkgs: ${PKGS_TOTAL} passed"
+          fmt() {
+            if [ "$2" = "0" ]; then
+              echo "$1: skipped (no relevant changes)"
+            else
+              echo "$1: $2 passed"
+            fi
+          }
+          echo "$(fmt Envs "$ENVS_TOTAL") | $(fmt Pkgs "$PKGS_TOTAL")"
 
   auto-merge:
     name: "Auto Merge"
