@@ -49,10 +49,19 @@ stdenv.mkDerivation {
     # (`git check-ignore`) and the npx-based external impeccable CLI
     # referenced from markdown resolve from Nix without depending on
     # the caller's PATH.
+    #
+    # Place node *inside* the plugin tree so users can call it via
+    # ''${CLAUDE_PLUGIN_ROOT}/bin/node — the consumer's flox env doesn't
+    # ship nodejs (and shouldn't have to, just because they want this
+    # plugin), so Claude's `Bash(node ...)` invocations would otherwise
+    # fail with `command not found: node`.
     runtimeBins=${lib.makeBinPath [ git nodejs ]}
-    mkdir -p "$out/bin"
-    makeBinaryWrapper "${nodejs}/bin/node" "$out/bin/node" \
+    mkdir -p "$PLUGIN_DIR/bin"
+    makeBinaryWrapper "${nodejs}/bin/node" "$PLUGIN_DIR/bin/node" \
       --prefix PATH : "$runtimeBins"
+    # npx is a JS script; it'll find the wrapped node via the wrapper
+    # itself prepending nodejs onto PATH at exec time.
+    ln -s "${nodejs}/bin/npx" "$PLUGIN_DIR/bin/npx"
 
     # Repoint every #!/usr/bin/env node shebang at the wrapped node.
     # Marks files executable so the kernel honors the shebang when
@@ -60,7 +69,7 @@ stdenv.mkDerivation {
     while IFS= read -r f; do
       head -1 "$f" | grep -q '/usr/bin/env node' || continue
       substituteInPlace "$f" --replace-fail \
-        '#!/usr/bin/env node' "#!$out/bin/node"
+        '#!/usr/bin/env node' "#!$PLUGIN_DIR/bin/node"
       chmod +x "$f"
     done < <(find "$PLUGIN_DIR" -type f \( -name '*.mjs' -o -name '*.js' \))
 
@@ -69,14 +78,32 @@ stdenv.mkDerivation {
     # the form Claude Code uses for plugins. Upstream's markdown is shared
     # across harnesses so it embeds the user-install layout, which is wrong
     # under a plugin install where the plugin root is `plugin/`.
+    #
+    # Then prefix bare `node ''${CLAUDE_PLUGIN_ROOT}/...` and
+    # `npx impeccable ...` invocations with our bundled binaries, so
+    # they don't depend on the consumer env having nodejs installed.
     rewritten=0
     while IFS= read -r f; do
+      changed=0
       if grep -q '\.claude/skills/impeccable/scripts/' "$f"; then
         substituteInPlace "$f" --replace-quiet \
           '.claude/skills/impeccable/scripts/' \
           '${pluginRootRef}/skills/impeccable/scripts/'
-        rewritten=$((rewritten + 1))
+        changed=1
       fi
+      if grep -qF 'node ${pluginRootRef}/' "$f"; then
+        substituteInPlace "$f" --replace-quiet \
+          'node ${pluginRootRef}/' \
+          '${pluginRootRef}/bin/node ${pluginRootRef}/'
+        changed=1
+      fi
+      if grep -q 'npx impeccable' "$f"; then
+        substituteInPlace "$f" --replace-quiet \
+          'npx impeccable' \
+          '${pluginRootRef}/bin/npx impeccable'
+        changed=1
+      fi
+      [ $changed -eq 1 ] && rewritten=$((rewritten + 1))
     done < <(find "$PLUGIN_DIR" -type f -name '*.md')
     echo "fix_md_paths: rewrote refs in $rewritten markdown file(s)"
 
