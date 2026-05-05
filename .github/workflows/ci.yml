@@ -466,12 +466,16 @@ jobs:
     name: "Auto Merge"
     runs-on: "ubuntu-latest"
     timeout-minutes: 5
-    needs: ["wait-for-environments"]
+    needs: ["wait-for-environments", "wait-for-packages"]
     if: >-
       github.event_name == 'pull_request'
+      && needs.wait-for-environments.result == 'success'
+      && needs.wait-for-packages.result == 'success'
       && needs.wait-for-environments.outputs.any_failed == 'false'
+      && needs.wait-for-packages.outputs.any_failed == 'false'
       && needs.wait-for-environments.outputs.pr_author == 'floxbot'
-      && needs.wait-for-environments.outputs.total_workflows != '0'
+      && (needs.wait-for-environments.outputs.total_workflows != '0'
+      || needs.wait-for-packages.outputs.total_workflows != '0')
 
     steps:
       - name: "Merge PR"
