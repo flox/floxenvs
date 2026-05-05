@@ -416,21 +416,50 @@ jobs:
     name: "Summary"
     runs-on: "ubuntu-latest"
     timeout-minutes: 5
-    needs: ["wait-for-environments"]
+    needs: ["wait-for-environments", "wait-for-packages"]
     if: always()
 
     steps:
       - name: "Check result"
+        env:
+          ENVS_RESULT: >-
+            ${{ needs.wait-for-environments.result }}
+          PKGS_RESULT: >-
+            ${{ needs.wait-for-packages.result }}
+          ENVS_FAILED: >-
+            ${{ needs.wait-for-environments.outputs.any_failed }}
+          PKGS_FAILED: >-
+            ${{ needs.wait-for-packages.outputs.any_failed }}
+          ENVS_FAILED_LIST: >-
+            ${{ needs.wait-for-environments.outputs.failed_workflows }}
+          PKGS_FAILED_LIST: >-
+            ${{ needs.wait-for-packages.outputs.failed_workflows }}
+          ENVS_TOTAL: >-
+            ${{ needs.wait-for-environments.outputs.total_workflows }}
+          PKGS_TOTAL: >-
+            ${{ needs.wait-for-packages.outputs.total_workflows }}
         run: |
-          if [ "${{ needs.wait-for-environments.result }}" != "success" ]; then
-            echo "wait-for-environments failed"
+          fail=0
+          if [ "$ENVS_RESULT" != "success" ]; then
+            echo "wait-for-environments did not succeed: $ENVS_RESULT"
+            fail=1
+          fi
+          if [ "$PKGS_RESULT" != "success" ]; then
+            echo "wait-for-packages did not succeed: $PKGS_RESULT"
+            fail=1
+          fi
+          if [ "$ENVS_FAILED" = "true" ]; then
+            echo "Failed env workflows: $ENVS_FAILED_LIST"
+            fail=1
+          fi
+          if [ "$PKGS_FAILED" = "true" ]; then
+            echo "Failed pkg workflows: $PKGS_FAILED_LIST"
+            fail=1
+          fi
+          if [ "$fail" -eq 1 ]; then
             exit 1
           fi
-          if [ "${{ needs.wait-for-environments.outputs.any_failed }}" = "true" ]; then
-            echo "Failed workflows: ${{ needs.wait-for-environments.outputs.failed_workflows }}"
-            exit 1
-          fi
-          echo "All ${{ needs.wait-for-environments.outputs.total_workflows }} environment workflows passed"
+          echo "Envs: ${ENVS_TOTAL} passed, Pkgs: ${PKGS_TOTAL} passed"
 
   auto-merge:
     name: "Auto Merge"
