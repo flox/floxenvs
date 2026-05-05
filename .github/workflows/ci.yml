@@ -38,16 +38,18 @@ jobs:
 
     steps:
       - name: "Checkout"
-        if: github.event_name == 'pull_request'
-              || github.event_name == 'push'
+        if: >-
+          github.event_name == 'pull_request'
+          || github.event_name == 'push'
         uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
         with:
           fetch-depth: 0
 
       - name: "Decide if polling is needed"
         id: "decide"
-        if: github.event_name == 'pull_request'
-              || github.event_name == 'push'
+        if: >-
+          github.event_name == 'pull_request'
+          || github.event_name == 'push'
         env:
           EVENT: "${{ github.event_name }}"
           BASE_SHA: "${{ github.event.pull_request.base.sha }}"
@@ -74,7 +76,7 @@ jobs:
         id: "short_circuit"
         if: >-
           (github.event_name == 'pull_request'
-            || github.event_name == 'push')
+          || github.event_name == 'push')
           && steps.decide.outputs.should_poll == 'false'
         env:
           PR_NUMBER: >-
