@@ -439,6 +439,7 @@ jobs:
           PKGS_TOTAL: >-
             ${{ needs.wait-for-packages.outputs.total_workflows }}
         run: |
+          set -euo pipefail
           fail=0
           if [ "$ENVS_RESULT" != "success" ]; then
             echo "wait-for-environments did not succeed: $ENVS_RESULT"
