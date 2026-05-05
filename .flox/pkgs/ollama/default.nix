@@ -102,6 +102,10 @@ buildGoModule (finalAttrs: {
         "TestPushHandler/unauthorized_push"
         # needs network access for npm install
         "TestPiRun_InstallAndWebSearchLifecycle"
+        # depend on a bundled plugin install path that
+        # isn't populated inside the build sandbox
+        "TestOpenclawRun_FirstLaunchOnboardUsesLaunchManagedHealthFlow"
+        "TestEnsureOpenclawInstalled_UsesBundledPluginInstallEnv"
       ];
     in
     [ "-skip=^${builtins.concatStringsSep "$|^" skippedTests}$" ];
