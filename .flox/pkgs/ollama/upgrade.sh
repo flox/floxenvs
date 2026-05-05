@@ -22,7 +22,8 @@ echo "Updating ollama from $current_version to $latest_version"
 src_url="https://github.com/ollama/ollama/archive/refs/tags/v${latest_version}.tar.gz"
 echo "Fetching source from $src_url ..."
 src_hash=$(nix-prefetch-url --unpack "$src_url" 2>/dev/null)
-src_sri=$(nix hash convert --hash-algo sha256 --to sri "$src_hash")
+src_sri=$(nix --extra-experimental-features nix-command \
+  hash convert --hash-algo sha256 --to sri "$src_hash")
 echo "  srcHash: $src_sri"
 
 # Compute vendorHash by building just the goModules fixed-output derivation
@@ -39,7 +40,9 @@ jq -n \
 
 echo "Fetching Go module dependencies to compute vendorHash..."
 prefetch_log=$(mktemp)
-NIXPKGS_ALLOW_UNFREE=1 nix build --impure --no-link \
+NIXPKGS_ALLOW_UNFREE=1 nix \
+  --extra-experimental-features 'nix-command flakes' \
+  build --impure --no-link \
   --expr '((import <nixpkgs> {}).callPackage ./.flox/pkgs/ollama {}).goModules' \
   > "$prefetch_log" 2>&1 || true
 
