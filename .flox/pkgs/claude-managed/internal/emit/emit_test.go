@@ -24,8 +24,15 @@ func TestHookCode_Full(t *testing.T) {
 	if !strings.Contains(result, `exec "$FLOX_ENV/bin/claude"`) {
 		t.Errorf("wrapper body must reference $FLOX_ENV/bin/claude at runtime")
 	}
-	if !strings.Contains(result, `--plugin-dir "$CLAUDE_CONFIG_DIR/plugins/typescript-lsp"`) {
-		t.Errorf("wrapper body must reference $CLAUDE_CONFIG_DIR/plugins/... at runtime")
+	// wrapper must discover plugins at exec time, not bake them in at hook time
+	if !strings.Contains(result, `for d in "$CLAUDE_CONFIG_DIR/plugins"/*/`) {
+		t.Errorf("wrapper must iterate $CLAUDE_CONFIG_DIR/plugins/*/ at runtime")
+	}
+	if !strings.Contains(result, `plugin_args+=(--plugin-dir`) {
+		t.Errorf("wrapper must build --plugin-dir args at runtime")
+	}
+	if strings.Contains(result, `--plugin-dir "$CLAUDE_CONFIG_DIR/plugins/typescript-lsp"`) {
+		t.Errorf("wrapper should NOT bake plugin names in at hook time")
 	}
 	if strings.Contains(result, `_cm_real=`) {
 		t.Errorf("wrapper should not resolve claude eagerly; use $FLOX_ENV at runtime")
@@ -98,6 +105,14 @@ func TestHookCode_NoFragments(t *testing.T) {
 	}
 	if !strings.Contains(result, "_claude_managed_cleanup()") {
 		t.Errorf("missing cleanup function")
+	}
+	// wrapper is emitted unconditionally so manually-added plugins
+	// (claude-managed plugins add <abspath>) work without re-activation
+	if !strings.Contains(result, `cat > "$CLAUDE_CONFIG_DIR/bin/claude"`) {
+		t.Errorf("wrapper must be emitted even when no plugins are discovered")
+	}
+	if !strings.Contains(result, `for d in "$CLAUDE_CONFIG_DIR/plugins"/*/`) {
+		t.Errorf("wrapper must iterate plugins at runtime even when none discovered")
 	}
 }
 

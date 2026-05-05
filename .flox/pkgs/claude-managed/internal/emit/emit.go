@@ -27,6 +27,7 @@ func HookCode(p *Params) string {
 
 	emitKeychainBridge(&sb)
 	emitFragments(&sb, p)
+	emitPluginWrapper(&sb)
 	emitCleanupFunc(&sb)
 
 	return sb.String()
@@ -126,10 +127,6 @@ func emitFragments(sb *strings.Builder, p *Params) {
 	for _, f := range p.Frags.Plugins {
 		fmt.Fprintf(sb, "claude-managed --config-dir \"$CLAUDE_CONFIG_DIR\" plugins add \"$FLOX_ENV/share/claude-code/plugins/%s\"\n", f.Name)
 	}
-
-	if len(p.Frags.Plugins) > 0 {
-		emitPluginWrapper(sb, p)
-	}
 }
 
 // nameForFragment returns the name to use in the add command path.
@@ -141,21 +138,33 @@ func nameForFragment(typeName string, f discover.Fragment) string {
 	return f.Name + ".md"
 }
 
-func emitPluginWrapper(sb *strings.Builder, p *Params) {
-	sb.WriteString("\n# create claude wrapper to load plugins\n")
-	// reference env vars instead of baked-in absolute paths so the wrapper
-	// stays valid across nix store rebuilds and across machines that share
-	// the same $FLOX_ENV_PROJECT. $FLOX_ENV/bin/claude is used verbatim
-	// because `command -v claude` from inside the hook resolves back to
-	// this wrapper (PATH already has $CLAUDE_CONFIG_DIR/bin prepended)
-	sb.WriteString("{\n")
-	sb.WriteString("  echo '#!/usr/bin/env bash'\n")
-	sb.WriteString("  echo 'exec \"$FLOX_ENV/bin/claude\" \\'\n")
-	for _, f := range p.Frags.Plugins {
-		fmt.Fprintf(sb, "  echo '  --plugin-dir \"$CLAUDE_CONFIG_DIR/plugins/%s\" \\'\n", f.Name)
-	}
-	sb.WriteString("  echo '  \"$@\"'\n")
-	sb.WriteString("} > \"$CLAUDE_CONFIG_DIR/bin/claude\"\n")
+// emitPluginWrapper writes a thin claude wrapper at
+// $CLAUDE_CONFIG_DIR/bin/claude that discovers plugins at exec time
+// from $CLAUDE_CONFIG_DIR/plugins/*/. This means plugins added later
+// (e.g. via `claude-managed plugins add <abspath>` for a locally-built
+// package not yet in the env's share dir) are picked up without
+// regenerating the wrapper.
+//
+// Always emitted: even if no plugins are present at activation time,
+// shipping the wrapper means the moment a user adds one it's already
+// on PATH and ready to load it. The runtime loop is a no-op when the
+// plugins dir is empty or absent.
+func emitPluginWrapper(sb *strings.Builder) {
+	sb.WriteString("\n# claude wrapper: discovers plugins at exec time from $CLAUDE_CONFIG_DIR/plugins/*/\n")
+	sb.WriteString("cat > \"$CLAUDE_CONFIG_DIR/bin/claude\" <<'WRAPPER'\n")
+	sb.WriteString("#!/usr/bin/env bash\n")
+	sb.WriteString("plugin_args=()\n")
+	sb.WriteString("if [ -d \"$CLAUDE_CONFIG_DIR/plugins\" ]; then\n")
+	sb.WriteString("  for d in \"$CLAUDE_CONFIG_DIR/plugins\"/*/; do\n")
+	sb.WriteString("    [ -d \"$d\" ] || continue\n")
+	sb.WriteString("    plugin_args+=(--plugin-dir \"${d%/}\")\n")
+	sb.WriteString("  done\n")
+	sb.WriteString("fi\n")
+	// $FLOX_ENV/bin/claude is used verbatim because `command -v claude`
+	// from inside this wrapper would resolve back to itself (PATH has
+	// $CLAUDE_CONFIG_DIR/bin prepended).
+	sb.WriteString("exec \"$FLOX_ENV/bin/claude\" \"${plugin_args[@]}\" \"$@\"\n")
+	sb.WriteString("WRAPPER\n")
 	sb.WriteString("chmod +x \"$CLAUDE_CONFIG_DIR/bin/claude\"\n")
 }
 
