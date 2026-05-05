@@ -12,21 +12,94 @@ env:
 
 jobs:
   wait-for-environments:
-    name: "Wait"
+    name: "Wait Envs"
     runs-on: "ubuntu-latest"
     timeout-minutes: 120
 
     outputs:
-      any_failed: "${{ steps.wait.outputs.any_failed }}"
-      failed_workflows: "${{ steps.wait.outputs.failed_workflows }}"
-      total_workflows: "${{ steps.wait.outputs.total_workflows }}"
-      successful_envs: "${{ steps.wait.outputs.successful_envs }}"
-      pr_number: "${{ steps.wait.outputs.pr_number }}"
-      pr_author: "${{ steps.wait.outputs.pr_author }}"
+      any_failed: >-
+        ${{ steps.wait.outputs.any_failed
+            || steps.short_circuit.outputs.any_failed }}
+      failed_workflows: >-
+        ${{ steps.wait.outputs.failed_workflows
+            || steps.short_circuit.outputs.failed_workflows }}
+      total_workflows: >-
+        ${{ steps.wait.outputs.total_workflows
+            || steps.short_circuit.outputs.total_workflows }}
+      successful_envs: >-
+        ${{ steps.wait.outputs.successful_envs
+            || steps.short_circuit.outputs.successful_envs }}
+      pr_number: >-
+        ${{ steps.wait.outputs.pr_number
+            || steps.short_circuit.outputs.pr_number }}
+      pr_author: >-
+        ${{ steps.wait.outputs.pr_author
+            || steps.short_circuit.outputs.pr_author }}
 
     steps:
+      - name: "Checkout"
+        if: >-
+          github.event_name == 'pull_request'
+          || github.event_name == 'push'
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
+        with:
+          fetch-depth: 0
+
+      - name: "Decide if polling is needed"
+        id: "decide"
+        if: >-
+          github.event_name == 'pull_request'
+          || github.event_name == 'push'
+        env:
+          EVENT: "${{ github.event_name }}"
+          BASE_SHA: "${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA: "${{ github.event.pull_request.head.sha
+                       || github.sha }}"
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = "pull_request" ]; then
+            BASE="$BASE_SHA"
+            HEAD="$HEAD_SHA"
+          else
+            BASE="HEAD~1"
+            HEAD="HEAD"
+          fi
+          changed="$(git diff --name-only "$BASE...$HEAD")"
+          should_poll="$(echo "$changed" \
+            | scripts/wait-should-poll.sh envs)"
+          echo "should_poll=$should_poll" >> "$GITHUB_OUTPUT"
+          echo "Changed files:"
+          echo "$changed" | sed 's/^/  /'
+          echo "should_poll=$should_poll"
+
+      - name: "Short-circuit (no env paths changed)"
+        id: "short_circuit"
+        if: >-
+          (github.event_name == 'pull_request'
+          || github.event_name == 'push')
+          && steps.decide.outputs.should_poll == 'false'
+        env:
+          PR_NUMBER: >-
+            ${{ github.event.pull_request.number || 0 }}
+          PR_AUTHOR: >-
+            ${{ github.event.pull_request.user.login || '' }}
+        run: |
+          {
+            echo "any_failed=false"
+            echo "failed_workflows="
+            echo "total_workflows=0"
+            echo "successful_envs=[]"
+            echo "pr_number=$PR_NUMBER"
+            echo "pr_author=$PR_AUTHOR"
+          } >> "$GITHUB_OUTPUT"
+          echo "No env paths changed — short-circuiting."
+
       - name: "Wait for all CI: * workflows"
         id: "wait"
+        if: >-
+          github.event_name == 'merge_group'
+          || github.event_name == 'workflow_dispatch'
+          || steps.decide.outputs.should_poll == 'true'
         uses: "actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3" # v9.0.0
         with:
           script: |
@@ -166,36 +239,250 @@ jobs:
 
             core.setFailed('Timed out waiting for environment workflows');
 
+  wait-for-packages:
+    name: "Wait Pkgs"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 120
+
+    outputs:
+      any_failed: >-
+        ${{ steps.wait.outputs.any_failed
+            || steps.short_circuit.outputs.any_failed }}
+      failed_workflows: >-
+        ${{ steps.wait.outputs.failed_workflows
+            || steps.short_circuit.outputs.failed_workflows }}
+      total_workflows: >-
+        ${{ steps.wait.outputs.total_workflows
+            || steps.short_circuit.outputs.total_workflows }}
+
+    steps:
+      - name: "Checkout"
+        if: >-
+          github.event_name == 'pull_request'
+          || github.event_name == 'push'
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
+        with:
+          fetch-depth: 0
+
+      - name: "Decide if polling is needed"
+        id: "decide"
+        if: >-
+          github.event_name == 'pull_request'
+          || github.event_name == 'push'
+        env:
+          EVENT: "${{ github.event_name }}"
+          BASE_SHA: "${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA: "${{ github.event.pull_request.head.sha
+                       || github.sha }}"
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = "pull_request" ]; then
+            BASE="$BASE_SHA"
+            HEAD="$HEAD_SHA"
+          else
+            BASE="HEAD~1"
+            HEAD="HEAD"
+          fi
+          changed="$(git diff --name-only "$BASE...$HEAD")"
+          should_poll="$(echo "$changed" \
+            | scripts/wait-should-poll.sh packages)"
+          echo "should_poll=$should_poll" >> "$GITHUB_OUTPUT"
+          echo "Changed files:"
+          echo "$changed" | sed 's/^/  /'
+          echo "should_poll=$should_poll"
+
+      - name: "Short-circuit (no pkg paths changed)"
+        id: "short_circuit"
+        if: >-
+          (github.event_name == 'pull_request'
+          || github.event_name == 'push')
+          && steps.decide.outputs.should_poll == 'false'
+        run: |
+          {
+            echo "any_failed=false"
+            echo "failed_workflows="
+            echo "total_workflows=0"
+          } >> "$GITHUB_OUTPUT"
+          echo "No package paths changed — short-circuiting."
+
+      - name: "Wait for CI Packages workflow"
+        id: "wait"
+        if: >-
+          github.event_name == 'merge_group'
+          || github.event_name == 'workflow_dispatch'
+          || steps.decide.outputs.should_poll == 'true'
+        uses: "actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3" # v9.0.0
+        with:
+          script: |
+            const isPR = context.eventName === 'pull_request';
+            const sha = isPR
+              ? context.payload.pull_request.head.sha
+              : context.sha;
+
+            core.info(`SHA: ${sha} (${isPR ? 'PR head' : 'push'})`);
+            core.info(`Event: ${context.eventName}`);
+
+            // Merge queue: no pkg workflow runs, pass immediately
+            if (context.eventName === 'merge_group') {
+              core.info('Merge queue — no pkg workflow to wait for');
+              core.setOutput('any_failed', 'false');
+              core.setOutput('failed_workflows', '');
+              core.setOutput('total_workflows', '0');
+              return;
+            }
+
+            core.info('Waiting 30s for CI Packages to register...');
+            await new Promise(r => setTimeout(r, 30000));
+
+            const maxAttempts = 1400;  // ~2 hours at 5s
+            const interval = 5000;
+
+            for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+              const runs = await github.rest.actions.listWorkflowRunsForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head_sha: sha,
+                per_page: 100,
+              });
+
+              const pkgRuns = runs.data.workflow_runs.filter(
+                r => r.name === 'CI Packages'
+              );
+
+              if (pkgRuns.length === 0) {
+                if (attempt <= 12) {
+                  core.info(
+                    `Attempt ${attempt}: CI Packages not found yet, waiting...`
+                  );
+                  await new Promise(r => setTimeout(r, interval));
+                  continue;
+                }
+                core.info('No CI Packages run triggered for this SHA');
+                core.setOutput('any_failed', 'false');
+                core.setOutput('failed_workflows', '');
+                core.setOutput('total_workflows', '0');
+                return;
+              }
+
+              const pending = pkgRuns.filter(
+                r => r.status !== 'completed'
+              );
+              const failed = pkgRuns.filter(
+                r => r.status === 'completed'
+                  && r.conclusion !== 'success'
+                  && r.conclusion !== 'skipped'
+              );
+
+              if (attempt % 12 === 1) {
+                core.info(
+                  `[${Math.floor(attempt * 5 / 60)}m] ` +
+                  `${pkgRuns.length} CI Packages: ` +
+                  `${pkgRuns.length - pending.length} complete, ` +
+                  `${pending.length} pending, ` +
+                  `${failed.length} failed`
+                );
+                for (const run of pkgRuns) {
+                  core.info(
+                    `  ${run.name}: ${run.status}` +
+                    (run.conclusion ? ` (${run.conclusion})` : '')
+                  );
+                }
+              }
+
+              if (pending.length === 0) {
+                core.info(
+                  `All ${pkgRuns.length} CI Packages runs complete!`
+                );
+                const failedNames = failed.map(r => r.name).join(', ');
+                if (failed.length > 0) {
+                  core.info(`Failed: ${failedNames}`);
+                }
+                core.setOutput(
+                  'any_failed', (failed.length > 0).toString()
+                );
+                core.setOutput('failed_workflows', failedNames);
+                core.setOutput(
+                  'total_workflows', pkgRuns.length.toString()
+                );
+                return;
+              }
+
+              await new Promise(r => setTimeout(r, interval));
+            }
+
+            core.setFailed('Timed out waiting for CI Packages');
+
   result:
     name: "Summary"
     runs-on: "ubuntu-latest"
     timeout-minutes: 5
-    needs: ["wait-for-environments"]
+    needs: ["wait-for-environments", "wait-for-packages"]
     if: always()
 
     steps:
       - name: "Check result"
+        env:
+          ENVS_RESULT: >-
+            ${{ needs.wait-for-environments.result }}
+          PKGS_RESULT: >-
+            ${{ needs.wait-for-packages.result }}
+          ENVS_FAILED: >-
+            ${{ needs.wait-for-environments.outputs.any_failed }}
+          PKGS_FAILED: >-
+            ${{ needs.wait-for-packages.outputs.any_failed }}
+          ENVS_FAILED_LIST: >-
+            ${{ needs.wait-for-environments.outputs.failed_workflows }}
+          PKGS_FAILED_LIST: >-
+            ${{ needs.wait-for-packages.outputs.failed_workflows }}
+          ENVS_TOTAL: >-
+            ${{ needs.wait-for-environments.outputs.total_workflows }}
+          PKGS_TOTAL: >-
+            ${{ needs.wait-for-packages.outputs.total_workflows }}
         run: |
-          if [ "${{ needs.wait-for-environments.result }}" != "success" ]; then
-            echo "wait-for-environments failed"
+          set -euo pipefail
+          fail=0
+          if [ "$ENVS_RESULT" != "success" ]; then
+            echo "wait-for-environments did not succeed: $ENVS_RESULT"
+            fail=1
+          fi
+          if [ "$PKGS_RESULT" != "success" ]; then
+            echo "wait-for-packages did not succeed: $PKGS_RESULT"
+            fail=1
+          fi
+          if [ "$ENVS_FAILED" = "true" ]; then
+            echo "Failed env workflows: $ENVS_FAILED_LIST"
+            fail=1
+          fi
+          if [ "$PKGS_FAILED" = "true" ]; then
+            echo "Failed pkg workflows: $PKGS_FAILED_LIST"
+            fail=1
+          fi
+          if [ "$fail" -eq 1 ]; then
             exit 1
           fi
-          if [ "${{ needs.wait-for-environments.outputs.any_failed }}" = "true" ]; then
-            echo "Failed workflows: ${{ needs.wait-for-environments.outputs.failed_workflows }}"
-            exit 1
-          fi
-          echo "All ${{ needs.wait-for-environments.outputs.total_workflows }} environment workflows passed"
+          fmt() {
+            if [ "$2" = "0" ]; then
+              echo "$1: skipped (no relevant changes)"
+            else
+              echo "$1: $2 passed"
+            fi
+          }
+          echo "$(fmt Envs "$ENVS_TOTAL") | $(fmt Pkgs "$PKGS_TOTAL")"
 
   auto-merge:
     name: "Auto Merge"
     runs-on: "ubuntu-latest"
     timeout-minutes: 5
-    needs: ["wait-for-environments"]
+    needs: ["wait-for-environments", "wait-for-packages"]
     if: >-
       github.event_name == 'pull_request'
+      && needs.wait-for-environments.result == 'success'
+      && needs.wait-for-packages.result == 'success'
       && needs.wait-for-environments.outputs.any_failed == 'false'
+      && needs.wait-for-packages.outputs.any_failed == 'false'
       && needs.wait-for-environments.outputs.pr_author == 'floxbot'
-      && needs.wait-for-environments.outputs.total_workflows != '0'
+      && (needs.wait-for-environments.outputs.total_workflows != '0'
+      || needs.wait-for-packages.outputs.total_workflows != '0')
 
     steps:
       - name: "Merge PR"
@@ -212,10 +499,11 @@ jobs:
     name: "Report Failure"
     runs-on: "ubuntu-latest"
     timeout-minutes: 5
-    needs: ["wait-for-environments"]
+    needs: ["wait-for-environments", "wait-for-packages"]
     if: >-
-      needs.wait-for-environments.outputs.any_failed == 'true'
-      && github.ref_name == 'main'
+      github.ref_name == 'main'
+      && (needs.wait-for-environments.outputs.any_failed == 'true'
+      || needs.wait-for-packages.outputs.any_failed == 'true')
 
     steps:
       - name: "Slack Notification"
@@ -230,10 +518,14 @@ jobs:
           SLACK_COLOR: "#ff2800"
           SLACK_LINK_NAMES: true
           SLACK_MESSAGE: >-
-            Failed:
+            Envs failed:
             ${{ needs.wait-for-environments.outputs.failed_workflows }}
-            | Workflows:
+            | Pkgs failed:
+            ${{ needs.wait-for-packages.outputs.failed_workflows }}
+            | Env total:
             ${{ needs.wait-for-environments.outputs.total_workflows }}
+            | Pkg total:
+            ${{ needs.wait-for-packages.outputs.total_workflows }}
 
   containerize:
     name: "Containerize '${{ matrix.env }}'"
