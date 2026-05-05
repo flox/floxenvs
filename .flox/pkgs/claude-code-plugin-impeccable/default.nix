@@ -9,7 +9,7 @@
 
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version srcHash;
+  inherit (versionData) version srcHash commitSha;
 
   # Escape so the indented-string interpolation below produces the
   # literal token `${CLAUDE_PLUGIN_ROOT}` in the resulting bash, with
@@ -93,7 +93,7 @@ stdenv.mkDerivation {
             "installPath": "",
             "scope": "project",
             "version": "${version}",
-            "gitCommitSha": "flox-managed"
+            "gitCommitSha": "${commitSha}"
           }
         ]
       },

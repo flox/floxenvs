@@ -29,9 +29,21 @@ src_sri=$(nix --extra-experimental-features nix-command \
   hash convert --hash-algo sha256 --to sri "$src_hash")
 echo "  srcHash: $src_sri"
 
+# Resolve the tag to its commit SHA — Claude Code's installed_plugins.json
+# records gitCommitSha per entry, and shipping the real SHA lets users
+# reproduce or audit exactly which upstream commit they have.
+commit_sha=$(git ls-remote https://github.com/pbakaus/impeccable.git \
+  "refs/tags/skill-v${latest_version}" | awk '{print $1}')
+if [ -z "$commit_sha" ]; then
+  echo "ERROR: could not resolve skill-v${latest_version} to a commit SHA"
+  exit 1
+fi
+echo "  commitSha: $commit_sha"
+
 jq -n \
   --arg v "$latest_version" \
   --arg s "$src_sri" \
-  '{version: $v, srcHash: $s}' > "$HASHES_FILE"
+  --arg c "$commit_sha" \
+  '{version: $v, srcHash: $s, commitSha: $c}' > "$HASHES_FILE"
 
 echo "Updated to $latest_version"
