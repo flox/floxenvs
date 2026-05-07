@@ -15,8 +15,8 @@ func TestCheck_ValidFixtures(t *testing.T) {
 		Rules: []discover.Fragment{{Name: "alpha", Path: filepath.Join("..", "testdata", "share", "claude-code", "rules", "alpha.md")}},
 	}
 	result := doctor.Check(frags)
-	if len(result.Issues) != 0 {
-		t.Errorf("expected no issues, got: %v", result.Issues)
+	if len(result.Errors()) != 0 {
+		t.Errorf("expected no errors, got: %v", result.Errors())
 	}
 	if len(result.Checked) != 1 {
 		t.Errorf("expected 1 checked fragment, got %d", len(result.Checked))
@@ -28,8 +28,8 @@ func TestCheck_MissingFile(t *testing.T) {
 		Rules: []discover.Fragment{{Name: "missing", Path: "/nonexistent/file.md"}},
 	}
 	result := doctor.Check(frags)
-	if len(result.Issues) == 0 {
-		t.Error("expected issue for missing file")
+	if len(result.Errors()) == 0 {
+		t.Error("expected error for missing file")
 	}
 	if len(result.Checked) != 1 || result.Checked[0].OK {
 		t.Error("expected checked fragment marked as not OK")
@@ -42,12 +42,37 @@ func TestCheck_MissingSkill(t *testing.T) {
 		Skills: []discover.Fragment{{Name: "broken", Path: filepath.Join(dir, "SKILL.md")}},
 	}
 	result := doctor.Check(frags)
-	if len(result.Issues) == 0 {
-		t.Error("expected issue for missing SKILL.md")
+	if len(result.Errors()) == 0 {
+		t.Error("expected error for missing SKILL.md")
 	}
 }
 
-func TestCheck_ValidSkill(t *testing.T) {
+func TestCheck_SkillRequiresNameAndDescription(t *testing.T) {
+	dir := t.TempDir()
+	skillFile := filepath.Join(dir, "SKILL.md")
+	// Frontmatter present but missing both name and description.
+	os.WriteFile(skillFile, []byte("---\nlicense: MIT\n---\n# Skill\n"), 0644)
+
+	frags := &discover.Result{
+		Skills: []discover.Fragment{{Name: "incomplete", Path: skillFile}},
+	}
+	result := doctor.Check(frags)
+	wantMissing := []string{`"name"`, `"description"`}
+	for _, want := range wantMissing {
+		found := false
+		for _, issue := range result.Errors() {
+			if strings.Contains(issue.Message, "missing required frontmatter key") &&
+				strings.Contains(issue.Message, want) {
+				found = true
+			}
+		}
+		if !found {
+			t.Errorf("expected error about missing required key %s, got: %v", want, result.Errors())
+		}
+	}
+}
+
+func TestCheck_SkillNoFrontmatterIsLenient(t *testing.T) {
 	dir := t.TempDir()
 	skillFile := filepath.Join(dir, "SKILL.md")
 	os.WriteFile(skillFile, []byte("# Skill\nDo things.\n"), 0644)
@@ -57,24 +82,73 @@ func TestCheck_ValidSkill(t *testing.T) {
 	}
 	result := doctor.Check(frags)
 	if len(result.Issues) != 0 {
-		t.Errorf("expected no issues, got: %v", result.Issues)
+		t.Errorf("expected no issues for skill without frontmatter, got: %v", result.Issues)
 	}
-	if len(result.Checked) != 1 || !result.Checked[0].OK {
+	if !result.Checked[0].OK {
 		t.Error("expected checked fragment marked as OK")
 	}
 }
 
-func TestCheck_SkillWithValidFrontmatter(t *testing.T) {
+func TestCheck_SkillSpecConformant(t *testing.T) {
 	dir := t.TempDir()
 	skillFile := filepath.Join(dir, "SKILL.md")
-	os.WriteFile(skillFile, []byte("---\nname: my-skill\ndescription: does things\n---\n# Skill\n"), 0644)
+	os.WriteFile(skillFile, []byte("---\nname: my-skill\ndescription: does things\nlicense: MIT\ncompatibility: claude-code opencode\nmetadata:\n  version: \"1.0\"\n---\n# Skill\n"), 0644)
 
 	frags := &discover.Result{
 		Skills: []discover.Fragment{{Name: "my-skill", Path: skillFile}},
 	}
 	result := doctor.Check(frags)
 	if len(result.Issues) != 0 {
-		t.Errorf("expected no issues, got: %v", result.Issues)
+		t.Errorf("expected no issues for spec-conformant skill, got: %v", result.Issues)
+	}
+}
+
+func TestCheck_SkillHumanizerStyle(t *testing.T) {
+	// Reproduces blader/humanizer's frontmatter: block-scalar description,
+	// top-level version (non-spec), license, compatibility, allowed-tools list.
+	skillBody := `---
+name: humanizer
+version: 2.5.1
+description: |
+  Remove signs of AI-generated writing from text. Use when editing or reviewing
+  text to make it sound more natural and human-written. Based on Wikipedia's
+  comprehensive "Signs of AI writing" guide. Detects and fixes patterns including:
+  inflated symbolism, promotional language, superficial -ing analyses, vague
+  attributions, em dash overuse, rule of three, AI vocabulary words, passive
+  voice, negative parallelisms, and filler phrases.
+license: MIT
+compatibility: claude-code opencode
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+---
+# Humanizer
+`
+	dir := t.TempDir()
+	skillFile := filepath.Join(dir, "SKILL.md")
+	os.WriteFile(skillFile, []byte(skillBody), 0644)
+
+	frags := &discover.Result{
+		Skills: []discover.Fragment{{Name: "humanizer", Path: skillFile}},
+	}
+	result := doctor.Check(frags)
+
+	if len(result.Errors()) != 0 {
+		t.Errorf("expected no errors for humanizer-style skill, got: %v", result.Errors())
+	}
+	if !result.Checked[0].OK {
+		t.Error("expected humanizer to be marked OK (warnings only)")
+	}
+
+	// Exactly one warning, about the non-spec top-level "version" key.
+	warnings := result.Warnings()
+	if len(warnings) != 1 {
+		t.Fatalf("expected exactly 1 warning, got %d: %v", len(warnings), warnings)
+	}
+	if !strings.Contains(warnings[0].Message, `"version"`) ||
+		!strings.Contains(warnings[0].Message, "metadata") {
+		t.Errorf("expected pedagogical warning about version+metadata, got: %q", warnings[0].Message)
 	}
 }
 
@@ -82,60 +156,90 @@ func TestCheck_SkillNameTooLong(t *testing.T) {
 	dir := t.TempDir()
 	skillFile := filepath.Join(dir, "SKILL.md")
 	longName := "a-very-long-skill-name-that-exceeds-the-sixty-four-character-limit-by-far"
-	os.WriteFile(skillFile, []byte("---\nname: "+longName+"\n---\n# Skill\n"), 0644)
+	os.WriteFile(skillFile, []byte("---\nname: "+longName+"\ndescription: x\n---\n# Skill\n"), 0644)
 
 	frags := &discover.Result{
 		Skills: []discover.Fragment{{Name: "long", Path: skillFile}},
 	}
 	result := doctor.Check(frags)
 	found := false
-	for _, issue := range result.Issues {
-		if issue.Message != "" && len(longName) > 64 {
+	for _, issue := range result.Errors() {
+		if strings.Contains(issue.Message, "exceeds 64") {
 			found = true
 		}
 	}
 	if !found {
-		t.Error("expected issue for skill name exceeding 64 chars")
+		t.Errorf("expected error for skill name exceeding 64 chars, got: %v", result.Issues)
 	}
 }
 
 func TestCheck_SkillNameNotKebab(t *testing.T) {
 	dir := t.TempDir()
 	skillFile := filepath.Join(dir, "SKILL.md")
-	os.WriteFile(skillFile, []byte("---\nname: MySkill\n---\n# Skill\n"), 0644)
+	os.WriteFile(skillFile, []byte("---\nname: MySkill\ndescription: x\n---\n# Skill\n"), 0644)
 
 	frags := &discover.Result{
 		Skills: []discover.Fragment{{Name: "bad-name", Path: skillFile}},
 	}
 	result := doctor.Check(frags)
 	found := false
-	for _, issue := range result.Issues {
-		if contains(issue.Message, "kebab-case") {
+	for _, issue := range result.Errors() {
+		if strings.Contains(issue.Message, "kebab-case") {
 			found = true
 		}
 	}
 	if !found {
-		t.Error("expected issue for non-kebab-case name")
+		t.Error("expected error for non-kebab-case name")
 	}
 }
 
-func TestCheck_SkillUnknownKey(t *testing.T) {
+func TestCheck_SkillUnknownKeyIsWarning(t *testing.T) {
 	dir := t.TempDir()
 	skillFile := filepath.Join(dir, "SKILL.md")
-	os.WriteFile(skillFile, []byte("---\nname: ok\nfoo: bar\n---\n# Skill\n"), 0644)
+	os.WriteFile(skillFile, []byte("---\nname: ok\ndescription: x\nfoo: bar\n---\n# Skill\n"), 0644)
 
 	frags := &discover.Result{
 		Skills: []discover.Fragment{{Name: "unknown-key", Path: skillFile}},
 	}
 	result := doctor.Check(frags)
+	if len(result.Errors()) != 0 {
+		t.Errorf("unknown skill key should not be an error, got: %v", result.Errors())
+	}
 	found := false
-	for _, issue := range result.Issues {
-		if contains(issue.Message, "unknown frontmatter key") {
+	for _, issue := range result.Warnings() {
+		if strings.Contains(issue.Message, "unknown frontmatter key") {
 			found = true
 		}
 	}
 	if !found {
-		t.Error("expected issue for unknown frontmatter key")
+		t.Error("expected warning for unknown frontmatter key")
+	}
+	if !result.Checked[0].OK {
+		t.Error("warnings alone should not flip OK to false")
+	}
+}
+
+func TestCheck_SkillDescriptionTooLong(t *testing.T) {
+	dir := t.TempDir()
+	skillFile := filepath.Join(dir, "SKILL.md")
+	longDesc := strings.Repeat("a", 1500)
+	os.WriteFile(skillFile, []byte("---\nname: ok\ndescription: "+longDesc+"\n---\n# Skill\n"), 0644)
+
+	frags := &discover.Result{
+		Skills: []discover.Fragment{{Name: "long-desc", Path: skillFile}},
+	}
+	result := doctor.Check(frags)
+	if len(result.Errors()) != 0 {
+		t.Errorf("description over 1024 chars should be a warning, not an error, got: %v", result.Errors())
+	}
+	found := false
+	for _, issue := range result.Warnings() {
+		if strings.Contains(issue.Message, "description") && strings.Contains(issue.Message, "1024") {
+			found = true
+		}
+	}
+	if !found {
+		t.Error("expected warning about description length")
 	}
 }
 
@@ -153,7 +257,7 @@ func TestCheck_RuleWithPaths(t *testing.T) {
 	}
 }
 
-func TestCheck_RuleUnknownKey(t *testing.T) {
+func TestCheck_RuleUnknownKeyIsWarning(t *testing.T) {
 	dir := t.TempDir()
 	ruleFile := filepath.Join(dir, "bad.md")
 	os.WriteFile(ruleFile, []byte("---\nfoo: bar\n---\n# Rules\n"), 0644)
@@ -162,14 +266,17 @@ func TestCheck_RuleUnknownKey(t *testing.T) {
 		Rules: []discover.Fragment{{Name: "bad", Path: ruleFile}},
 	}
 	result := doctor.Check(frags)
+	if len(result.Errors()) != 0 {
+		t.Errorf("unknown rule key should be a warning, got errors: %v", result.Errors())
+	}
 	found := false
-	for _, issue := range result.Issues {
-		if contains(issue.Message, "unknown frontmatter key") {
+	for _, issue := range result.Warnings() {
+		if strings.Contains(issue.Message, "unknown frontmatter key") {
 			found = true
 		}
 	}
 	if !found {
-		t.Error("expected issue for unknown frontmatter key in rule")
+		t.Error("expected warning for unknown frontmatter key in rule")
 	}
 }
 
@@ -183,13 +290,13 @@ func TestCheck_AgentForbiddenKey(t *testing.T) {
 	}
 	result := doctor.Check(frags)
 	found := false
-	for _, issue := range result.Issues {
-		if contains(issue.Message, "forbidden") {
+	for _, issue := range result.Errors() {
+		if strings.Contains(issue.Message, "forbidden") {
 			found = true
 		}
 	}
 	if !found {
-		t.Error("expected issue for forbidden agent key")
+		t.Error("expected error for forbidden agent key")
 	}
 }
 
@@ -217,13 +324,13 @@ func TestCheck_AgentInvalidEffort(t *testing.T) {
 	}
 	result := doctor.Check(frags)
 	found := false
-	for _, issue := range result.Issues {
-		if contains(issue.Message, "effort") {
+	for _, issue := range result.Errors() {
+		if strings.Contains(issue.Message, "effort") {
 			found = true
 		}
 	}
 	if !found {
-		t.Error("expected issue for invalid effort value")
+		t.Error("expected error for invalid effort value")
 	}
 }
 
@@ -237,13 +344,13 @@ func TestCheck_AgentInvalidIsolation(t *testing.T) {
 	}
 	result := doctor.Check(frags)
 	found := false
-	for _, issue := range result.Issues {
-		if contains(issue.Message, "isolation") {
+	for _, issue := range result.Errors() {
+		if strings.Contains(issue.Message, "isolation") {
 			found = true
 		}
 	}
 	if !found {
-		t.Error("expected issue for invalid isolation value")
+		t.Error("expected error for invalid isolation value")
 	}
 }
 
@@ -261,13 +368,35 @@ func TestCheck_NoFrontmatter(t *testing.T) {
 	}
 }
 
+func TestCheck_SkillInvalidYAML(t *testing.T) {
+	dir := t.TempDir()
+	skillFile := filepath.Join(dir, "SKILL.md")
+	// Tab in frontmatter is illegal YAML indentation.
+	os.WriteFile(skillFile, []byte("---\nname: foo\n\tbroken: indent\n---\n"), 0644)
+
+	frags := &discover.Result{
+		Skills: []discover.Fragment{{Name: "broken", Path: skillFile}},
+	}
+	result := doctor.Check(frags)
+	found := false
+	for _, issue := range result.Errors() {
+		if strings.Contains(issue.Message, "invalid YAML") {
+			found = true
+		}
+	}
+	if !found {
+		t.Errorf("expected error about invalid YAML, got: %v", result.Issues)
+	}
+}
+
 func TestParseFrontmatter(t *testing.T) {
 	tests := []struct {
-		name    string
-		input   string
-		wantNil bool
-		wantKey string
-		wantVal string
+		name      string
+		input     string
+		wantNil   bool
+		wantErr   bool
+		wantKeys  []string
+		notExpect []string // keys that must NOT appear (regression tests)
 	}{
 		{
 			name:    "no frontmatter",
@@ -275,27 +404,81 @@ func TestParseFrontmatter(t *testing.T) {
 			wantNil: true,
 		},
 		{
-			name:    "simple frontmatter",
-			input:   "---\nname: test\n---\n# Hello",
-			wantKey: "name",
-			wantVal: "test",
+			name:     "simple frontmatter",
+			input:    "---\nname: test\n---\n# Hello",
+			wantKeys: []string{"name"},
 		},
 		{
-			name:    "quoted value",
-			input:   "---\nname: \"my-skill\"\n---\n# Hello",
-			wantKey: "name",
-			wantVal: "my-skill",
+			name:     "quoted value with colon",
+			input:    "---\nname: \"foo: bar\"\n---\n# Hello",
+			wantKeys: []string{"name"},
 		},
 		{
 			name:    "unclosed frontmatter",
 			input:   "---\nname: test\n# Hello",
 			wantNil: true,
 		},
+		{
+			name: "block scalar description",
+			input: `---
+name: humanizer
+description: |
+  Multi-line text.
+  More text including: a colon mid-line.
+  Yet more text.
+---
+# Body`,
+			wantKeys:  []string{"name", "description"},
+			notExpect: []string{"More text including"},
+		},
+		{
+			name: "folded scalar",
+			input: `---
+description: >
+  Folded text spans
+  multiple lines.
+---`,
+			wantKeys: []string{"description"},
+		},
+		{
+			name: "list value",
+			input: `---
+allowed-tools:
+  - Read
+  - Write
+---`,
+			wantKeys:  []string{"allowed-tools"},
+			notExpect: []string{"Read", "Write"},
+		},
+		{
+			name: "nested mapping",
+			input: `---
+metadata:
+  version: "1.0"
+  author: someone
+---`,
+			wantKeys:  []string{"metadata"},
+			notExpect: []string{"version", "author"},
+		},
+		{
+			name:    "tab indent invalid",
+			input:   "---\nname: foo\n\tbroken: 1\n---",
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := doctor.ParseFrontmatterForTest(tt.input)
+			result, err := doctor.ParseFrontmatterForTest(tt.input)
+			if tt.wantErr {
+				if err == nil {
+					t.Errorf("expected error, got nil")
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
 			if tt.wantNil {
 				if result != nil {
 					t.Errorf("expected nil, got %v", result)
@@ -305,11 +488,26 @@ func TestParseFrontmatter(t *testing.T) {
 			if result == nil {
 				t.Fatal("expected non-nil result")
 			}
-			if result[tt.wantKey] != tt.wantVal {
-				t.Errorf("expected %s=%q, got %q", tt.wantKey, tt.wantVal, result[tt.wantKey])
+			for _, key := range tt.wantKeys {
+				if _, ok := result[key]; !ok {
+					t.Errorf("expected key %q, got keys %v", key, mapKeys(result))
+				}
+			}
+			for _, key := range tt.notExpect {
+				if _, ok := result[key]; ok {
+					t.Errorf("unexpected key %q (block scalar / list / nested leaked into top-level)", key)
+				}
 			}
 		})
 	}
+}
+
+func mapKeys(m map[string]any) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	return keys
 }
 
 func TestValidatePlugin_Valid(t *testing.T) {
@@ -421,17 +619,4 @@ func TestValidatePlugin_BadInstalledPluginsJSON(t *testing.T) {
 	if !found {
 		t.Error("expected invalid JSON issue for installed_plugins.json")
 	}
-}
-
-func contains(s, sub string) bool {
-	return len(s) >= len(sub) && (s == sub || len(s) > 0 && containsStr(s, sub))
-}
-
-func containsStr(s, sub string) bool {
-	for i := 0; i <= len(s)-len(sub); i++ {
-		if s[i:i+len(sub)] == sub {
-			return true
-		}
-	}
-	return false
 }
