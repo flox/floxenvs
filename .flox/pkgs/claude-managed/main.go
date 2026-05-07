@@ -15,7 +15,7 @@ import (
 	"flox.dev/claude-managed/internal/symlinks"
 )
 
-const version = "0.2.9"
+const version = "0.3.0"
 
 // ANSI color helpers
 func ansi(code, s string) string { return "\033[" + code + "m" + s + "\033[0m" }
@@ -189,7 +189,11 @@ func runSetup(shareDir, configDir, mode string, warn io.Writer) error {
 	if mode == "hook" {
 		result := doctor.Check(frags)
 		for _, issue := range result.Issues {
-			fmt.Fprintf(warn, yellow("WARN:")+" %s\n", issue)
+			label := yellow("WARN:")
+			if issue.IsError() {
+				label = red("ERROR:")
+			}
+			fmt.Fprintf(warn, "%s %s\n", label, issue)
 		}
 	}
 
@@ -271,14 +275,17 @@ func runStatus(shareDir, configDir, projectDir string, managed bool) error {
 				}
 			}
 			key := subdir + "/" + f.Name
-			if issues, ok := issuesByName[key]; ok {
+			issues := issuesByName[key]
+			if hasIssueError(issues) {
 				status = red("✗")
-				fmt.Printf("    %s %s\n", status, f.Name)
-				for _, issue := range issues {
+			}
+			fmt.Printf("    %s %s\n", status, f.Name)
+			for _, issue := range issues {
+				if issue.IsError() {
 					fmt.Printf("      %s\n", red(issue.Message))
+				} else {
+					fmt.Printf("      %s %s\n", yellow("⚠"), issue.Message)
 				}
-			} else {
-				fmt.Printf("    %s %s\n", status, f.Name)
 			}
 		}
 	}
@@ -316,13 +323,18 @@ func runDoctor(shareDir string) error {
 		}
 		for _, f := range items {
 			key := typeName + "/" + f.Name
-			if issues, ok := issuesByKey[key]; ok {
-				fmt.Printf("    %s %s\n", red("✗"), f.Name)
-				for _, issue := range issues {
+			issues := issuesByKey[key]
+			marker := green("✓")
+			if hasIssueError(issues) {
+				marker = red("✗")
+			}
+			fmt.Printf("    %s %s\n", marker, f.Name)
+			for _, issue := range issues {
+				if issue.IsError() {
 					fmt.Printf("      %s\n", red(issue.Message))
+				} else {
+					fmt.Printf("      %s %s\n", yellow("⚠"), issue.Message)
 				}
-			} else {
-				fmt.Printf("    %s %s\n", green("✓"), f.Name)
 			}
 		}
 	}
@@ -334,12 +346,28 @@ func runDoctor(shareDir string) error {
 
 	fmt.Println()
 
-	if len(result.Issues) == 0 {
+	errCount := len(result.Errors())
+	warnCount := len(result.Warnings())
+
+	switch {
+	case errCount == 0 && warnCount == 0:
 		fmt.Println(green("All valid."))
 		return nil
+	case errCount == 0:
+		fmt.Println(yellow(fmt.Sprintf("%d warning(s), no errors.", warnCount)))
+		return nil
+	default:
+		return fmt.Errorf("%d error(s), %d warning(s)", errCount, warnCount)
 	}
+}
 
-	return fmt.Errorf("%d issue(s) found", len(result.Issues))
+func hasIssueError(issues []doctor.Issue) bool {
+	for _, i := range issues {
+		if i.IsError() {
+			return true
+		}
+	}
+	return false
 }
 
 func runSymlinkList(label, configDir, subdir string) error {
