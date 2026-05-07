@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestRunSetup_HookWarnsOnInvalidFrontmatter(t *testing.T) {
+func TestRunSetup_HookWarnsOnUnknownRuleKey(t *testing.T) {
 	dir := t.TempDir()
 
 	// create share/claude-code/rules/ with a rule that has an unknown key
@@ -27,6 +27,26 @@ func TestRunSetup_HookWarnsOnInvalidFrontmatter(t *testing.T) {
 	}
 	if !strings.Contains(warn.String(), "unknown frontmatter key") {
 		t.Errorf("expected 'unknown frontmatter key' in warning, got: %q", warn.String())
+	}
+}
+
+func TestRunSetup_HookErrorsOnMissingSkillName(t *testing.T) {
+	dir := t.TempDir()
+
+	// skill with frontmatter but no name → error severity
+	skillDir := filepath.Join(dir, "skills", "broken")
+	os.MkdirAll(skillDir, 0755)
+	os.WriteFile(filepath.Join(skillDir, "SKILL.md"),
+		[]byte("---\ndescription: x\n---\n# Skill\n"), 0644)
+
+	var warn bytes.Buffer
+	err := runSetup(dir, "/tmp/config", "hook", &warn)
+	if err != nil {
+		t.Fatalf("runSetup failed: %v", err)
+	}
+
+	if !strings.Contains(warn.String(), "ERROR") {
+		t.Errorf("expected ERROR prefix for missing name, got: %q", warn.String())
 	}
 }
 

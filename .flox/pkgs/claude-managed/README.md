@@ -1,8 +1,8 @@
 # claude-managed
 
-A zero-dependency Go binary that assembles Claude Code
-configuration from Flox package fragments and emits
-eval-able shell code.
+A small Go binary that assembles Claude Code configuration
+from Flox package fragments and emits eval-able shell code.
+Depends only on `gopkg.in/yaml.v3` for frontmatter parsing.
 
 ## Usage
 
@@ -84,28 +84,38 @@ symlink health with validation results inline.
 ### doctor
 
 Validates frontmatter and structure of all discovered
-rules, skills, and agents. Checks performed:
+rules, skills, and agents. Issues are split into errors
+(skill is broken) and warnings (skill works but is
+unusual); `doctor` exits non-zero only on errors.
 
 **Rules** (`rules/*.md`):
 
-- File is readable
-- Frontmatter keys are recognized (only `paths` allowed)
+- File is readable (error if not)
+- Unknown frontmatter keys produce a warning
+  (only `paths` is recognized)
 
 **Skills** (`skills/*/SKILL.md`):
 
-- SKILL.md exists and is readable
-- Frontmatter keys are recognized
-- `name` is kebab-case, max 64 characters
-- `effort` is one of: low, medium, high, max
+- SKILL.md exists and is readable (error if not)
+- If frontmatter is present, `name` and `description`
+  are required (error if missing)
+- `name` is kebab-case, ≤64 characters (error)
+- `description` ≤1024 characters (warning if exceeded)
+- `compatibility` ≤500 characters (warning if exceeded)
+- `effort` is one of: low, medium, high, max (error)
+- Frontmatter keys are recognized as either
+  agentskills.io spec keys or Claude Code extensions
+  (warning otherwise; the `metadata:` mapping is the
+  spec-recommended home for non-standard fields)
 
 **Agents** (`agents/*.md`):
 
-- File is readable
-- Frontmatter keys are recognized
+- File is readable (error if not)
 - No forbidden keys (`hooks`, `mcpServers`,
-  `permissionMode` — security restriction)
-- `effort` is one of: low, medium, high, max
-- `isolation` is `worktree` (only valid value)
+  `permissionMode` — security restriction, error)
+- `effort` is one of: low, medium, high, max (error)
+- `isolation` is `worktree` (only valid value, error)
+- Unknown frontmatter keys produce a warning
 
 ### rules/skills/agents add
 
@@ -299,7 +309,7 @@ If `CLAUDE_MANAGED_DIR` is not set, defaults to
 
 ## Architecture
 
-```
+```text
 main.go                     CLI entry point, env var
                             resolution, command dispatch
 internal/
@@ -325,6 +335,21 @@ e2e/                        Bats E2E test suite
 ```bash
 flox build claude-managed
 ```
+
+### Updating dependencies
+
+Bumping or adding a Go dependency requires regenerating
+the `vendorHash` in `default.nix`:
+
+1. Edit `go.mod` (e.g. `go get example.com/pkg@vX.Y.Z`)
+2. Run `go mod tidy` to refresh `go.sum`
+3. Set `vendorHash` to a placeholder
+   (`sha256-AAAA...AAA=`) and run `nix-build`
+4. Copy the `got: sha256-...` line from the failure into
+   `vendorHash` and rebuild
+
+Tests cover the parser and validators. Re-run
+`go test ./...` after touching `internal/doctor/`.
 
 ## Testing
 
@@ -365,7 +390,7 @@ tests inside `flox activate`. Tests `FLOX_ENV` and
 
 ### Test structure
 
-```
+```text
 e2e/
   test_helper/
     common.bash          mode detection, fixture helpers
