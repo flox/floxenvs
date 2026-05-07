@@ -108,12 +108,14 @@ func scanPlugins(pluginsDir string) ([]Fragment, error) {
 
 	var fragments []Fragment
 	for _, entry := range entries {
-		if !entry.IsDir() {
+		fullPath := filepath.Join(pluginsDir, entry.Name())
+		info, err := os.Stat(fullPath)
+		if err != nil || !info.IsDir() {
 			continue
 		}
 		fragments = append(fragments, Fragment{
 			Name: entry.Name(),
-			Path: filepath.Join(pluginsDir, entry.Name()),
+			Path: fullPath,
 		})
 	}
 
@@ -137,10 +139,12 @@ func scanSkills(skillsDir string) ([]Fragment, error) {
 
 	var fragments []Fragment
 	for _, entry := range entries {
-		if !entry.IsDir() {
+		fullPath := filepath.Join(skillsDir, entry.Name())
+		info, err := os.Stat(fullPath)
+		if err != nil || !info.IsDir() {
 			continue
 		}
-		skillFile := filepath.Join(skillsDir, entry.Name(), "SKILL.md")
+		skillFile := filepath.Join(fullPath, "SKILL.md")
 		if _, err := os.Stat(skillFile); err == nil {
 			fragments = append(fragments, Fragment{
 				Name: entry.Name(),
