@@ -55,11 +55,8 @@ run_cm() {
   if [[ "$TEST_MODE" == "nix" ]]; then
     local config_dir="${CM_CONFIG_DIR:-$(setup_config_dir)}"
     case "$cmd" in
-      setup-hook|setup-profile|status)
+      setup-hook|setup-profile|doctor)
         run claude-managed --dir "$dir" --config-dir "$config_dir" "$cmd" "$@"
-        ;;
-      doctor)
-        run claude-managed --dir "$dir" "$cmd" "$@"
         ;;
       *)
         run claude-managed "$cmd" "$@"
@@ -67,10 +64,7 @@ run_cm() {
     esac
   else
     case "$cmd" in
-      setup-hook|setup-profile|status)
-        run claude-managed --dir "$dir" "$cmd" "$@"
-        ;;
-      doctor)
+      setup-hook|setup-profile|doctor)
         run claude-managed --dir "$dir" "$cmd" "$@"
         ;;
       *)
@@ -91,12 +85,8 @@ run_cm_split() {
   if [[ "$TEST_MODE" == "nix" ]]; then
     local config_dir="${CM_CONFIG_DIR:-$(setup_config_dir)}"
     case "$cmd" in
-      setup-hook|setup-profile|status)
+      setup-hook|setup-profile|doctor)
         claude-managed --dir "$dir" --config-dir "$config_dir" "$cmd" "$@" \
-          >"$tmpout" 2>"$tmperr" || CM_STATUS=$?
-        ;;
-      doctor)
-        claude-managed --dir "$dir" "$cmd" "$@" \
           >"$tmpout" 2>"$tmperr" || CM_STATUS=$?
         ;;
       *)
@@ -106,11 +96,7 @@ run_cm_split() {
     esac
   else
     case "$cmd" in
-      setup-hook|setup-profile|status)
-        claude-managed --dir "$dir" "$cmd" "$@" \
-          >"$tmpout" 2>"$tmperr" || CM_STATUS=$?
-        ;;
-      doctor)
+      setup-hook|setup-profile|doctor)
         claude-managed --dir "$dir" "$cmd" "$@" \
           >"$tmpout" 2>"$tmperr" || CM_STATUS=$?
         ;;

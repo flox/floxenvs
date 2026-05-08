@@ -25,7 +25,7 @@
       }
     },
     "hook": {
-      "on-activate": "eval \"$(claude-managed setup-hook)\"\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 50 --margin \"1 2\" --padding \"1 2\" \\\n    \"Claude Code\" \"with managed configuration\"\n  echo \"\"\n  echo \"  claude           — start Claude Code\"\n  echo \"  claude-managed status  — show config\"\n  echo \"  claude-managed doctor  — validate config\"\n  echo \"\"\nfi\n"
+      "on-activate": "eval \"$(claude-managed setup-hook)\"\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 50 --margin \"1 2\" --padding \"1 2\" \\\n    \"Claude Code\" \"with managed configuration\"\n  echo \"\"\n  echo \"  claude           — start Claude Code\"\n  echo \"  claude-managed doctor  — show config and validate\"\n  echo \"\"\nfi\n"
     },
     "profile": {
       "bash": "eval \"$(claude-managed setup-profile-bash)\"\n",
@@ -618,7 +618,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 50 --margin \"1 2\" --padding \"1 2\" \\\n    \"Claude Code\" \"with managed configuration\"\n  echo \"\"\n  echo \"  claude           — start Claude Code\"\n  echo \"  claude-managed status  — show config\"\n  echo \"  claude-managed doctor  — validate config\"\n  echo \"\"\nfi\n"
+        "on-activate": "if [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 50 --margin \"1 2\" --padding \"1 2\" \\\n    \"Claude Code\" \"with managed configuration\"\n  echo \"\"\n  echo \"  claude           — start Claude Code\"\n  echo \"  claude-managed doctor  — show config and validate\"\n  echo \"\"\nfi\n"
       },
       "options": {},
       "include": {

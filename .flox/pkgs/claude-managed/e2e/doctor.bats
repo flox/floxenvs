@@ -2,9 +2,23 @@
 
 load test_helper/common
 
-@test "doctor reports valid rule with checkmark" {
+@test "doctor shows config dir path" {
   run_cm doctor
-  assert_output --regexp '✓.*valid'
+  assert_output --partial 'config:'
+}
+
+@test "doctor shows not activated when CLAUDE_MANAGED unset" {
+  if [[ "$TEST_MODE" == "flox" ]]; then
+    skip "CLAUDE_MANAGED may be set in flox mode"
+  fi
+  run_cm doctor
+  assert_output --partial 'not activated'
+}
+
+@test "doctor reports valid rule" {
+  run_cm doctor
+  assert_output --partial 'valid'
+  refute_output --regexp '✗.*valid$'
 }
 
 @test "doctor reports bad frontmatter with X" {
@@ -45,7 +59,9 @@ load test_helper/common
 This rule is clean.
 EOF
   if [[ "$TEST_MODE" == "nix" ]]; then
-    run claude-managed --dir "$dir" doctor
+    local cdir="$BATS_TEST_TMPDIR/clean-config"
+    mkdir -p "$cdir"
+    run claude-managed --dir "$dir" --config-dir "$cdir" doctor
   else
     CM_DIR="$dir" run_cm doctor
   fi
@@ -57,7 +73,9 @@ EOF
   local dir="$BATS_TEST_TMPDIR/empty"
   mkdir -p "$dir"
   if [[ "$TEST_MODE" == "nix" ]]; then
-    run claude-managed --dir "$dir" doctor
+    local cdir="$BATS_TEST_TMPDIR/empty-config"
+    mkdir -p "$cdir"
+    run claude-managed --dir "$dir" --config-dir "$cdir" doctor
   else
     CM_DIR="$dir" run_cm doctor
   fi
@@ -67,9 +85,10 @@ EOF
   assert_output --partial 'No agents found'
 }
 
-@test "doctor shows sections: Rules, Skills, Agents" {
+@test "doctor shows sections: Rules, Skills, Agents, Plugins" {
   run_cm doctor
   assert_output --partial 'Rules'
   assert_output --partial 'Skills'
   assert_output --partial 'Agents'
+  assert_output --partial 'Plugins'
 }

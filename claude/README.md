@@ -41,8 +41,8 @@ Requires `ANTHROPIC_API_KEY` in the environment.
 
 - `claude-managed setup` -- assemble and print shell
   code
-- `claude-managed status` -- show assembled state
-- `claude-managed doctor` -- validate fragments
+- `claude-managed doctor` -- show assembled state and
+  validate fragments
 
 ## See also
 

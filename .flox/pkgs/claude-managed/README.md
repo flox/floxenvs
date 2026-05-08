@@ -35,8 +35,7 @@ hooks work:
 ```bash
 claude-managed setup-hook      # env vars, keychain, symlinks
 claude-managed setup-profile   # cleanup function + EXIT trap
-claude-managed status          # config dir, auth, symlink status
-claude-managed doctor          # validate frontmatter and structure
+claude-managed doctor          # config status, symlink health, validation
 claude-managed rules add       # install a rule (symlink)
 claude-managed rules remove    # remove a rule by name
 claude-managed rules list      # show installed rules
@@ -76,17 +75,20 @@ Emits shell code for the profile phase:
 2. Defines the `_claude_managed_cleanup` function
 3. Registers `trap _claude_managed_cleanup EXIT`
 
-### status
-
-Shows config dir, auth bridge status, and per-fragment
-symlink health with validation results inline.
-
 ### doctor
 
-Validates frontmatter and structure of all discovered
-rules, skills, and agents. Issues are split into errors
-(skill is broken) and warnings (skill works but is
-unusual); `doctor` exits non-zero only on errors.
+Single diagnostic view combining:
+
+- Config dir + activation marker
+- Auth bridge status
+- Per-fragment symlink health (`✓` installed, `→ broken`
+  if the link target is missing, `·` available but not
+  installed)
+- Frontmatter and structure validation, with errors
+  (broken) and warnings (unusual but works) reported
+  inline per fragment
+
+Exits non-zero only on errors.
 
 **Rules** (`rules/*.md`):
 
@@ -397,8 +399,7 @@ e2e/
   version.bats           version command
   setup-hook.bats        setup-hook output
   setup-profile.bats     setup-profile output
-  doctor.bats            validation reporting
-  status.bats            status display
+  doctor.bats            diagnostics: status + validation
   eval-hook.bats         eval shell output, side effects
   eval-profile.bats      eval profile, cleanup
   edge-cases.bats        robustness + security

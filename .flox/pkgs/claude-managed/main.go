@@ -15,7 +15,7 @@ import (
 	"flox.dev/claude-managed/internal/symlinks"
 )
 
-const version = "0.3.1"
+const version = "0.4.0"
 
 // ANSI color helpers
 func ansi(code, s string) string { return "\033[" + code + "m" + s + "\033[0m" }
@@ -90,15 +90,9 @@ func main() {
 			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
 			os.Exit(1)
 		}
-	case "status":
-		requireShareDir()
-		if err := runStatus(shareDir, configDir, projectDir, managed); err != nil {
-			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
-			os.Exit(1)
-		}
 	case "doctor":
 		requireShareDir()
-		if err := runDoctor(shareDir); err != nil {
+		if err := runDoctor(shareDir, configDir, projectDir, managed); err != nil {
 			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
 			os.Exit(1)
 		}
@@ -166,8 +160,7 @@ Commands:
   setup-profile-bash    Emit profile code for [profile.bash]
   setup-profile-zsh     Emit profile code for [profile.zsh]
   setup-profile-fish    Emit profile code for [profile.fish]
-  status           Show config dir, auth, and symlink status
-  doctor           Validate frontmatter and structure
+  doctor           Show config status, symlink health, and validation
   rules add|remove|list|clean    Manage rule symlinks
   skills add|remove|list|clean   Manage skill symlinks
   agents add|remove|list|clean   Manage agent symlinks
@@ -215,13 +208,12 @@ func runSetup(shareDir, configDir, mode string, warn io.Writer) error {
 	return nil
 }
 
-func runStatus(shareDir, configDir, projectDir string, managed bool) error {
+func runDoctor(shareDir, configDir, projectDir string, managed bool) error {
 	frags, err := discover.Scan(shareDir)
 	if err != nil {
 		return err
 	}
 
-	// relativize paths by stripping project dir prefix
 	rel := func(p string) string {
 		if r, err := filepath.Rel(projectDir, p); err == nil {
 			return r
@@ -229,92 +221,38 @@ func runStatus(shareDir, configDir, projectDir string, managed bool) error {
 		return p
 	}
 
-	fmt.Println(bold("Config dir, auth, and symlink status"))
+	fmt.Println(bold("Claude managed config diagnostics"))
 	fmt.Println()
 
-	// config dir + managed marker
 	if managed {
 		fmt.Printf("  %s %s %s\n", dim("config:"), rel(configDir), green("(active)"))
 	} else {
 		fmt.Printf("  %s %s %s\n", dim("config:"), rel(configDir), yellow("(not activated)"))
 	}
 
-	// auth status
 	if _, err := os.Stat(filepath.Join(configDir, ".claude.json")); err == nil {
 		fmt.Printf("  %s %s\n", dim("  auth:"), green("bridged"))
 	} else if managed {
 		fmt.Printf("  %s %s\n", dim("  auth:"), yellow("not bridged"))
 	}
-	fmt.Println()
-
-	// run validation
-	checkResult := doctor.Check(frags)
-	issuesByName := make(map[string][]doctor.Issue)
-	for _, issue := range checkResult.Issues {
-		key := issue.Type + "/" + issue.Name
-		issuesByName[key] = append(issuesByName[key], issue)
-	}
-
-	printSection := func(label string, items []discover.Fragment, subdir string) {
-		fmt.Printf("  %s\n", bold(label))
-		if len(items) == 0 {
-			fmt.Printf("    %s\n", dim("No "+strings.ToLower(label)+" found."))
-			return
-		}
-		for _, f := range items {
-			linkPath := filepath.Join(configDir, subdir, filepath.Base(f.Name))
-			if subdir == "rules" || subdir == "agents" {
-				linkPath = filepath.Join(configDir, subdir, filepath.Base(f.Path))
-			}
-			status := dim("·")
-			if target, err := os.Readlink(linkPath); err == nil {
-				if _, err := os.Stat(target); err == nil {
-					status = green("✓")
-				} else {
-					status = yellow("→ broken")
-				}
-			}
-			key := subdir + "/" + f.Name
-			issues := issuesByName[key]
-			if hasIssueError(issues) {
-				status = red("✗")
-			}
-			fmt.Printf("    %s %s\n", status, f.Name)
-			for _, issue := range issues {
-				if issue.IsError() {
-					fmt.Printf("      %s\n", red(issue.Message))
-				} else {
-					fmt.Printf("      %s %s\n", yellow("⚠"), issue.Message)
-				}
-			}
-		}
-	}
-
-	printSection("Rules", frags.Rules, "rules")
-	printSection("Skills", frags.Skills, "skills")
-	printSection("Agents", frags.Agents, "agents")
-	printSection("Plugins", frags.Plugins, "plugins")
-
-	return nil
-}
-
-func runDoctor(shareDir string) error {
-	frags, err := discover.Scan(shareDir)
-	if err != nil {
-		return err
-	}
 
 	result := doctor.Check(frags)
-
 	issuesByKey := make(map[string][]doctor.Issue)
 	for _, issue := range result.Issues {
 		key := issue.Type + "/" + issue.Name
 		issuesByKey[key] = append(issuesByKey[key], issue)
 	}
 
-	fmt.Println(bold("Validating frontmatter and structure"))
+	// installed-symlink lookup: subdir/<name> -> entry
+	installedByKey := make(map[string]symlinks.Entry)
+	for _, subdir := range []string{"rules", "skills", "agents", "plugins"} {
+		entries, _ := symlinks.List(filepath.Join(configDir, subdir))
+		for _, e := range entries {
+			installedByKey[subdir+"/"+e.Name] = e
+		}
+	}
 
-	printSection := func(label, typeName string, items []discover.Fragment) {
+	printSection := func(label, subdir string, items []discover.Fragment) {
 		fmt.Println()
 		fmt.Printf("  %s\n", bold(label))
 		if len(items) == 0 {
@@ -322,12 +260,24 @@ func runDoctor(shareDir string) error {
 			return
 		}
 		for _, f := range items {
-			key := typeName + "/" + f.Name
-			issues := issuesByKey[key]
-			marker := green("✓")
-			if hasIssueError(issues) {
-				marker = red("✗")
+			issues := issuesByKey[subdir+"/"+f.Name]
+
+			symlinkKey := subdir + "/" + f.Name
+			if subdir == "rules" || subdir == "agents" {
+				symlinkKey = subdir + "/" + filepath.Base(f.Path)
 			}
+			entry, hasSymlink := installedByKey[symlinkKey]
+
+			marker := dim("·")
+			switch {
+			case hasIssueError(issues):
+				marker = red("✗")
+			case hasSymlink && entry.Broken:
+				marker = yellow("→ broken")
+			case hasSymlink:
+				marker = green("✓")
+			}
+
 			fmt.Printf("    %s %s\n", marker, f.Name)
 			for _, issue := range issues {
 				if issue.IsError() {
