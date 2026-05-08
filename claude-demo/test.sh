@@ -49,8 +49,4 @@ echo ">>> config dir exists"
 echo ">>> claude-managed doctor"
 claude-managed doctor
 
-# ── Status ────────────────────────────────────────────
-echo ">>> claude-managed status"
-claude-managed status
-
 echo ">>> claude-demo environment is working"
