@@ -41,12 +41,20 @@ git clone --depth 1 --branch "rust-v${latest_version}" \
   https://github.com/openai/codex.git "$workdir/codex"
 
 cargo_hash=$(
-  nix run nixpkgs#nix-prefetch -- \
-    fetchCargoVendor \
-    --src "$workdir/codex" \
-    --source-root "source/codex-rs" 2>/dev/null \
-  || echo "MANUAL_UPDATE_NEEDED"
+  nix --extra-experimental-features "nix-command flakes" \
+    run nixpkgs#nix-prefetch -- \
+      fetchCargoVendor \
+      --src "$workdir/codex" \
+      --source-root "source/codex-rs" \
+      --option extra-experimental-features "nix-command flakes"
 )
+
+if [[ "$cargo_hash" != sha256-* ]]; then
+  echo "ERROR: cargoHash computation produced unexpected output:" >&2
+  echo "       '$cargo_hash'" >&2
+  echo "       refusing to write a broken hashes.json" >&2
+  exit 1
+fi
 echo "  cargoHash: $cargo_hash"
 
 # Read current v8 and livekit values (these change less often)
