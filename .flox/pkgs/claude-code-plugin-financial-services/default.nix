@@ -134,6 +134,16 @@ stdenv.mkDerivation {
       chmod +x "$f"
     done < <(find "$out/share/claude-code" -name '*.py' -type f)
 
+    # Wrap the bash entry points so curl/jq/python3 resolve
+    # from Nix when a user runs them.
+    for f in \
+        "$out/share/claude-code/financial-services/scripts/deploy-managed-agent.sh" \
+        "$out/share/claude-code/financial-services/scripts/test-cookbooks.sh"; do
+      [ -f "$f" ] || continue
+      chmod +x "$f"
+      wrapProgram "$f" --prefix PATH : "$runtimeBins:$out/bin"
+    done
+
     runHook postInstall
   '';
 
