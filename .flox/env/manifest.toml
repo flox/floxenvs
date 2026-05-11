@@ -7,3 +7,12 @@ curl.pkg-path = "curl"
 jq.pkg-path = "jq"
 nodejs.pkg-path = "nodejs"
 prefetch-npm-deps.pkg-path = "prefetch-npm-deps"
+
+# uv2nix nix libraries — consumed by .flox/pkgs/omlx/default.nix
+# via builtins.storePath from manifest.lock.
+pyproject-nix.pkg-path = "flox/pyproject-nix"
+pyproject-nix.pkg-group = "uv2nix-libs"
+uv2nix.pkg-path = "flox/uv2nix"
+uv2nix.pkg-group = "uv2nix-libs"
+pyproject-build-systems.pkg-path = "flox/pyproject-build-systems"
+pyproject-build-systems.pkg-group = "uv2nix-libs"
