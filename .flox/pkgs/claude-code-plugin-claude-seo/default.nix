@@ -87,11 +87,12 @@ stdenv.mkDerivation {
       chmod +x "$f"
     done < <(find "$PLUGIN_DIR" -name '*.py' -type f)
 
-    # hooks.json invokes 'python3 path/to/script' which would resolve
-    # python3 from the caller's PATH. Drop the explicit interpreter
+    # hooks.json invokes 'python path/to/script' which would resolve
+    # python from the caller's PATH. Drop the explicit interpreter
     # so the patched shebang on validate-schema.py is honored.
+    # (Upstream switched 'python3' → 'python' in v1.9.8.)
     substituteInPlace "$PLUGIN_DIR/hooks/hooks.json" --replace-fail \
-      'python3 \"''${CLAUDE_PLUGIN_ROOT}/hooks/validate-schema.py\"' \
+      'python \"''${CLAUDE_PLUGIN_ROOT}/hooks/validate-schema.py\"' \
       '\"''${CLAUDE_PLUGIN_ROOT}/hooks/validate-schema.py\"'
 
     # Wrap each extension install/uninstall script so 'node', 'npx',
