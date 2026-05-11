@@ -121,13 +121,16 @@ stdenv.mkDerivation {
     makeBinaryWrapper "${pythonEnv}/bin/python3" "$out/bin/python3" \
       --prefix PATH : "$runtimeBins"
 
-    # Repoint every #!/usr/bin/env python3 shebang at the wrapped
-    # python3 and mark executable so the kernel honors the
-    # shebang when Claude Code invokes them.
+    # Repoint every #!/usr/bin/env python3 shebang on line 1 at the
+    # wrapped python3 and mark executable so the kernel honors the
+    # shebang when Claude Code invokes the script. Only line 1 is
+    # rewritten — upstream skill-creator's init_skill.py embeds a
+    # second `#!/usr/bin/env python3` inside an EXAMPLE_SCRIPT
+    # template that gets written to user disk, which must remain
+    # portable (#!/usr/bin/env python3, not a /nix/store/... path).
     while IFS= read -r f; do
-      head -1 "$f" | grep -q '/usr/bin/env python3' || continue
-      substituteInPlace "$f" --replace-fail \
-        '#!/usr/bin/env python3' "#!$out/bin/python3"
+      head -1 "$f" | grep -q '^#!/usr/bin/env python3$' || continue
+      sed -i '1s|^#!/usr/bin/env python3$|#!'"$out"'/bin/python3|' "$f"
       chmod +x "$f"
     done < <(find "$out/share/claude-code" -name '*.py' -type f)
 
