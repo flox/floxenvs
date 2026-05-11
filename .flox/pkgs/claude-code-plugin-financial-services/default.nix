@@ -2,6 +2,7 @@
   lib,
   stdenvNoCC,
   fetchFromGitHub,
+  jq,
 }:
 
 let
@@ -21,6 +22,8 @@ stdenvNoCC.mkDerivation {
 
   dontConfigure = true;
   dontBuild = true;
+
+  nativeBuildInputs = [ jq ];
 
   installPhase = ''
     runHook preInstall
@@ -55,6 +58,35 @@ stdenvNoCC.mkDerivation {
        "$EXTRA_OUT/.claude-plugin/marketplace.json"
 
     chmod -R u+w "$out"
+
+    # Generate installed_plugins.json per plugin dir so
+    # claude-managed registers and Claude Code trusts each one.
+    UPSTREAM_REV="${data.rev}"
+    for plugin_dir in "$PLUGINS_OUT"/*/; do
+      name="$(basename "$plugin_dir")"
+      plugin_json="$plugin_dir/.claude-plugin/plugin.json"
+      if [ -f "$plugin_json" ]; then
+        plugin_version=$(jq -r '.version // "0.0.0"' \
+          "$plugin_json")
+      else
+        plugin_version="0.0.0"
+      fi
+      jq -n \
+        --arg name "$name@flox" \
+        --arg version "$plugin_version" \
+        --arg sha "$UPSTREAM_REV" \
+        '{
+          plugins: {
+            ($name): [{
+              installPath: "",
+              scope: "project",
+              version: $version,
+              gitCommitSha: $sha
+            }]
+          },
+          version: 2
+        }' > "$plugin_dir/installed_plugins.json"
+    done
 
     runHook postInstall
   '';
