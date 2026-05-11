@@ -22,8 +22,8 @@ environments = ["flox/claude"]
 financial-services.pkg-path = "claude-code-plugin-financial-services"
 ```
 
-On `flox activate`, `claude-managed setup` (provided by the
-included `flox/claude` env) discovers all 19 plugins under
+On `flox activate`, `claude-managed setup-hook` (provided by
+the included `flox/claude` env) discovers all 19 plugins under
 `$FLOX_ENV/share/claude-code/plugins/`, symlinks them into
 `$CLAUDE_CONFIG_DIR/plugins/<name>/`, and merges every
 `installed_plugins.json` so Claude Code trusts each one. The
@@ -89,7 +89,8 @@ Vertical plugins ship with `.mcp.json` files pre-wired to
 - Moody's — `https://api.moodys.com/genai-ready-data/m1/mcp`
 - MT Newswires — `https://vast-mcp.blueskyapi.com/mtnewswires`
 - Aiera — `https://mcp-pub.aiera.com`
-- LSEG — `https://api.analytics.lseg.com/lfa/mcp`
+- LSEG — `https://api.analytics.lseg.com/lfa/mcp` (the `lseg`
+  partner plugin uses `/lfa/mcp/server-cl` instead)
 - PitchBook — `https://premium.mcp.pitchbook.com/mcp`
 - Chronograph — `https://ai.chronograph.pe/mcp`
 - Egnyte — `https://mcp-server.egnyte.com/mcp`
