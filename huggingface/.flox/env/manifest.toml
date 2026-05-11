@@ -1,0 +1,28 @@
+schema-version = "1.11.0"
+
+# Minimal Hugging Face Hub environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/huggingface"]
+#
+# Provides the `hf` CLI (plus `huggingface-cli` and
+# `tiny-agents`) and redirects the Hugging Face cache to
+# `$FLOX_ENV_CACHE/huggingface` so models and datasets
+# persist across activations without polluting `~/.cache`.
+
+[install]
+huggingface-hub.pkg-path = "flox/huggingface-hub"
+huggingface-hub.pkg-group = "huggingface"
+
+[vars]
+# Anchor every HF path under a per-env cache root.
+HF_HOME = ""
+
+[hook]
+on-activate = '''
+HF_HOME="$FLOX_ENV_CACHE/huggingface"
+export HF_HOME
+mkdir -p "$HF_HOME"
+'''
