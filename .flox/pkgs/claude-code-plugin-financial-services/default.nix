@@ -121,6 +121,16 @@ stdenv.mkDerivation {
     makeBinaryWrapper "${pythonEnv}/bin/python3" "$out/bin/python3" \
       --prefix PATH : "$runtimeBins"
 
+    # Repoint every #!/usr/bin/env python3 shebang at the wrapped
+    # python3 and mark executable so the kernel honors the
+    # shebang when Claude Code invokes them.
+    while IFS= read -r f; do
+      head -1 "$f" | grep -q '/usr/bin/env python3' || continue
+      substituteInPlace "$f" --replace-fail \
+        '#!/usr/bin/env python3' "#!$out/bin/python3"
+      chmod +x "$f"
+    done < <(find "$out/share/claude-code" -name '*.py' -type f)
+
     runHook postInstall
   '';
 
