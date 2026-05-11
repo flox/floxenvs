@@ -1,0 +1,60 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "omlx": {
+        "pkg-path": "flox/omlx",
+        "pkg-group": "omlx"
+      }
+    },
+    "vars": {
+      "OMLX_HOST": "127.0.0.1",
+      "OMLX_PORT": "18000"
+    },
+    "hook": {
+      "on-activate": "export OMLX_DATA_DIR=\"$FLOX_ENV_CACHE/omlx\"\nexport OMLX_MODEL_DIR=\"${OMLX_MODEL_DIR:-$OMLX_DATA_DIR/models}\"\nmkdir -p \"$OMLX_MODEL_DIR\"\n"
+    },
+    "services": {
+      "omlx": {
+        "command": "omlx_data=\"${OMLX_DATA_DIR:-$FLOX_ENV_CACHE/omlx}\"\nomlx_models=\"${OMLX_MODEL_DIR:-$omlx_data/models}\"\nmkdir -p \"$omlx_models\"\nexec omlx serve \\\n  --model-dir \"$omlx_models\" \\\n  --host \"$OMLX_HOST\" \\\n  --port \"$OMLX_PORT\"\n"
+      }
+    },
+    "options": {
+      "systems": [
+        "aarch64-darwin"
+      ]
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "omlx",
+      "broken": false,
+      "derivation": "/nix/store/iyjn3yki8c5fh8sqk1f1h579b15gmann-omlx-env.drv",
+      "description": "Production-ready LLM inference server for Apple Silicon",
+      "install_id": "omlx",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=b094160",
+      "name": "omlx-0.3.8",
+      "pname": "omlx",
+      "rev": "b094160",
+      "rev_count": 1,
+      "rev_date": "2026-05-11T00:00:00Z",
+      "scrape_date": "2026-05-11T00:00:00Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.3.8",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/wi9vb1j2mzqsnxgnd7bsxvly370v74li-omlx-env"
+      },
+      "system": "aarch64-darwin",
+      "group": "omlx",
+      "priority": 5
+    }
+  ]
+}
