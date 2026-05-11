@@ -16,7 +16,7 @@
       "HF_HOME": ""
     },
     "hook": {
-      "on-activate": "HF_HOME=\"$FLOX_ENV_CACHE/huggingface\"\nexport HF_HOME\nmkdir -p \"$HF_HOME\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Hugging Face Hub CLI' '' \\\n    'Authenticate (optional):' \\\n    '  hf auth login' '' \\\n    'Download a file:' \\\n    '  hf download <repo_id> <filename>' '' \\\n    'Inspect the cache:' \\\n    \"  hf cache scan\" '' \\\n    \"Cache root: $HF_HOME\"\nfi\n"
+      "on-activate": "HF_HOME=\"$FLOX_ENV_CACHE/huggingface\"\nexport HF_HOME\nmkdir -p \"$HF_HOME\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  if [[ \"${HF_XET_HIGH_PERFORMANCE:-0}\" == \"1\" ]]; then\n    perf_line=\"High-perf mode: ON (HF_XET_HIGH_PERFORMANCE=1)\"\n  else\n    perf_line=\"Faster transfers: export HF_XET_HIGH_PERFORMANCE=1\"\n  fi\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Hugging Face Hub CLI' '' \\\n    'Authenticate (optional):' \\\n    '  hf auth login' \\\n    '  https://huggingface.co/settings/tokens' '' \\\n    'Download a file:' \\\n    '  hf download <repo_id> <filename>' '' \\\n    'Inspect the cache:' \\\n    '  hf cache scan' '' \\\n    \"Cache root: $HF_HOME\" \\\n    \"$perf_line\"\nfi\n"
     },
     "options": {}
   },
@@ -272,7 +272,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Hugging Face Hub CLI' '' \\\n    'Authenticate (optional):' \\\n    '  hf auth login' '' \\\n    'Download a file:' \\\n    '  hf download <repo_id> <filename>' '' \\\n    'Inspect the cache:' \\\n    \"  hf cache scan\" '' \\\n    \"Cache root: $HF_HOME\"\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  if [[ \"${HF_XET_HIGH_PERFORMANCE:-0}\" == \"1\" ]]; then\n    perf_line=\"High-perf mode: ON (HF_XET_HIGH_PERFORMANCE=1)\"\n  else\n    perf_line=\"Faster transfers: export HF_XET_HIGH_PERFORMANCE=1\"\n  fi\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Hugging Face Hub CLI' '' \\\n    'Authenticate (optional):' \\\n    '  hf auth login' \\\n    '  https://huggingface.co/settings/tokens' '' \\\n    'Download a file:' \\\n    '  hf download <repo_id> <filename>' '' \\\n    'Inspect the cache:' \\\n    '  hf cache scan' '' \\\n    \"Cache root: $HF_HOME\" \\\n    \"$perf_line\"\nfi\n"
       },
       "options": {},
       "include": {

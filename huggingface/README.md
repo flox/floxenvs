@@ -37,6 +37,23 @@ persist across activations without polluting
 `~/.cache/huggingface`. Override `HF_HOME` in your own
 manifest to point elsewhere.
 
+## High-performance transfers (opt-in)
+
+The bundled `hf-xet` binary already accelerates every
+download via chunk-based deduplication — no flag needed.
+For multi-GB models you can additionally saturate
+bandwidth and use all CPU cores by setting
+`HF_XET_HIGH_PERFORMANCE=1`:
+
+```toml
+[vars]
+HF_XET_HIGH_PERFORMANCE = "1"
+```
+
+Note: the legacy `HF_HUB_ENABLE_HF_TRANSFER=1` is
+deprecated in `huggingface_hub` v1.x — `hf-xet` replaced
+`hf_transfer` entirely.
+
 ## Common commands
 
 ```bash

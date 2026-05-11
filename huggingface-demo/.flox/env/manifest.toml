@@ -14,15 +14,22 @@ gum.pkg-group = "demo-tools"
 [hook]
 on-activate = '''
 if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  if [[ "${HF_XET_HIGH_PERFORMANCE:-0}" == "1" ]]; then
+    perf_line="High-perf mode: ON (HF_XET_HIGH_PERFORMANCE=1)"
+  else
+    perf_line="Faster transfers: export HF_XET_HIGH_PERFORMANCE=1"
+  fi
   gum style --border double --margin '1 2' \
     --padding '1 4' \
     'Hugging Face Hub CLI' '' \
     'Authenticate (optional):' \
-    '  hf auth login' '' \
+    '  hf auth login' \
+    '  https://huggingface.co/settings/tokens' '' \
     'Download a file:' \
     '  hf download <repo_id> <filename>' '' \
     'Inspect the cache:' \
-    "  hf cache scan" '' \
-    "Cache root: $HF_HOME"
+    '  hf cache scan' '' \
+    "Cache root: $HF_HOME" \
+    "$perf_line"
 fi
 '''

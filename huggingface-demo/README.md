@@ -47,6 +47,21 @@ hf cache scan
 hf upload <your-username>/<repo> ./path/to/file
 ```
 
+### 5. Crank up transfer speed (opt-in)
+
+`hf-xet` already accelerates every download by default.
+For multi-GB models, saturate bandwidth and CPU cores:
+
+```bash
+export HF_XET_HIGH_PERFORMANCE=1
+hf download meta-llama/Llama-3.2-1B-Instruct
+```
+
+The activation banner reflects whether high-perf mode
+is on. The legacy `HF_HUB_ENABLE_HF_TRANSFER` flag is
+deprecated and no longer functional in `huggingface_hub`
+v1.x — `hf-xet` replaced it.
+
 ## What is included
 
 | Package | Description |
