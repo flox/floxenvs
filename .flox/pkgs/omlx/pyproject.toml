@@ -1,0 +1,11 @@
+[project]
+name = "omlx-flox"
+version = "0.0.0"
+description = "Flox wrapper to lock omlx + extras"
+requires-python = ">=3.10"
+dependencies = [
+  "omlx[mcp,grammar,audio]",
+]
+
+[tool.uv.sources]
+omlx = { git = "https://github.com/jundot/omlx.git", tag = "v0.3.8" }
