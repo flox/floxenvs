@@ -7,5 +7,10 @@ dependencies = [
   "omlx[mcp,grammar,audio]",
 ]
 
+[tool.uv]
+override-dependencies = [
+  "mlx-lm @ git+https://github.com/ml-explore/mlx-lm@ed1fca4cef15a824c5f1702c80f70b4cffc8e4dd",
+]
+
 [tool.uv.sources]
 omlx = { git = "https://github.com/jundot/omlx.git", tag = "v0.3.8" }
