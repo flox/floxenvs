@@ -5,9 +5,14 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HASHES_FILE="$SCRIPT_DIR/hashes.json"
 
-current_rev=$(jq -r '.rev' "$HASHES_FILE")
+current_rev=$(jq -r '.rev // empty' "$HASHES_FILE")
 latest_rev=$(curl -sfL "https://api.github.com/repos/pyproject-nix/uv2nix/commits/HEAD" \
   | jq -r '.sha')
+
+if [ -z "$latest_rev" ] || [ "$latest_rev" = "null" ]; then
+  echo "ERROR: failed to fetch latest commit SHA (rate limited?)" >&2
+  exit 1
+fi
 
 echo "Current: $current_rev, Latest: $latest_rev"
 
