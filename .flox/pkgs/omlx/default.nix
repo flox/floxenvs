@@ -7,7 +7,7 @@
 
 let
   manifestLock = builtins.fromJSON
-    (builtins.readFile ../../.flox/env/manifest.lock);
+    (builtins.readFile ../../../.flox/env/manifest.lock);
 
   system = stdenv.hostPlatform.system;
 
@@ -52,6 +52,48 @@ let
     sourcePreference = "wheel";
   };
 
+  # Per-package overrides for sdist builds that uv2nix's
+  # default build-systems overlay doesn't fully resolve.
+  pyprojectOverrides = final: prev:
+    let
+      addSetuptools = pkg:
+        pkg.overrideAttrs (old: {
+          nativeBuildInputs = (old.nativeBuildInputs or [ ])
+            ++ final.resolveBuildSystem { setuptools = [ ]; };
+        });
+      sitePackages = "lib/python3.13/site-packages";
+    in
+    {
+      # Git-sourced packages: uv doesn't capture their declared
+      # build-system requirements in the lockfile, so uv2nix
+      # builds them without setuptools available.
+      dflash-mlx = addSetuptools prev.dflash-mlx;
+      mlx-audio = addSetuptools prev.mlx-audio;
+      mlx-embeddings = addSetuptools prev.mlx-embeddings;
+      mlx-lm = addSetuptools prev.mlx-lm;
+      mlx-vlm = addSetuptools prev.mlx-vlm;
+      omlx = addSetuptools prev.omlx;
+
+      # PyPI sdist packages that lack a build-system declaration.
+      docopt = addSetuptools prev.docopt;
+      webrtcvad = addSetuptools prev.webrtcvad;
+
+      # The mlx wheel has core.cpython-313-darwin.so with
+      # `@loader_path/lib/libmlx.dylib`, but libmlx ships in the
+      # separate mlx-metal package. uv2nix's mkVirtualEnv merges
+      # both via symlinks — but @loader_path resolves through the
+      # symlink to mlx's store path, where mlx/lib/ doesn't exist.
+      # Mirror mlx-metal's mlx/lib/ into mlx's store path so the
+      # dyld resolver finds it.
+      mlx = prev.mlx.overrideAttrs (old: {
+        postInstall = (old.postInstall or "") + ''
+          mkdir -p $out/${sitePackages}/mlx/lib
+          cp -r ${final.mlx-metal}/${sitePackages}/mlx/lib/. \
+                $out/${sitePackages}/mlx/lib/
+        '';
+      });
+    };
+
   pythonSet =
     (callPackage pyproject-nix-lib.build.packages {
       python = python313;
@@ -59,6 +101,7 @@ let
       (lib.composeManyExtensions [
         build-systems-overlays.default
         overlay
+        pyprojectOverrides
       ]);
 
   venv = pythonSet.mkVirtualEnv "omlx-env"
