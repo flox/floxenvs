@@ -1,7 +1,13 @@
 {
+  stdenv,
   lib,
-  stdenvNoCC,
   fetchFromGitHub,
+  makeBinaryWrapper,
+  makeWrapper,
+  python3,
+  curl,
+  gh,
+  git,
   jq,
 }:
 
@@ -14,8 +20,20 @@ let
     rev = data.rev;
     hash = data.srcHash;
   };
+
+  # Skill scripts + bundled marketplace scripts call into these.
+  # See spec section "Why these Python deps" for which dep maps
+  # to which consumer.
+  pythonEnv = python3.withPackages (ps: with ps; [
+    anthropic
+    jsonschema
+    openpyxl
+    python-pptx
+    pyyaml
+    requests
+  ]);
 in
-stdenvNoCC.mkDerivation {
+stdenv.mkDerivation {
   pname = "claude-code-plugin-financial-services";
   version = data.version;
   inherit src;
@@ -23,7 +41,7 @@ stdenvNoCC.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
-  nativeBuildInputs = [ jq ];
+  nativeBuildInputs = [ makeBinaryWrapper makeWrapper jq ];
 
   installPhase = ''
     runHook preInstall
@@ -94,6 +112,14 @@ stdenvNoCC.mkDerivation {
           version: 2
         }' > "$plugin_dir/installed_plugins.json"
     done
+
+    # Wrap python3 so plugin scripts find curl/gh/git/jq on PATH
+    # without depending on the consumer flox env. Same pattern as
+    # claude-code-plugin-claude-seo.
+    runtimeBins=${lib.makeBinPath [ curl gh git jq ]}
+    mkdir -p "$out/bin"
+    makeBinaryWrapper "${pythonEnv}/bin/python3" "$out/bin/python3" \
+      --prefix PATH : "$runtimeBins"
 
     runHook postInstall
   '';
