@@ -73,7 +73,7 @@ available in the next Claude Code session.
 - **lseg** — Price bonds, analyze yield curves, evaluate FX
   carry trades, value options, and build macro dashboards using
   LSEG financial data and analytics.
-- **sp-global** — S&P Global - Financial data and analytics
+- **spglobal** — S&P Global - Financial data and analytics
   skills including company tearsheets, earnings previews, and
   transaction summaries
 
