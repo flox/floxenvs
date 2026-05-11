@@ -59,6 +59,13 @@ stdenvNoCC.mkDerivation {
 
     chmod -R u+w "$out"
 
+    # Nothing to strip from per-plugin dirs — upstream packs
+    # them clean. We only sanity-check that no stray repo
+    # metadata leaked into the copies via cp -r.
+    for d in "$PLUGINS_OUT"/*/; do
+      rm -rf "$d/.github" "$d/.gitignore" 2>/dev/null || true
+    done
+
     # Generate installed_plugins.json per plugin dir so
     # claude-managed registers and Claude Code trusts each one.
     UPSTREAM_REV="${data.rev}"
