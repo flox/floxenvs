@@ -21,6 +21,9 @@
         claude-managed = pkgs.callPackage
           ./.flox/pkgs/claude-managed/default.nix {};
 
+        symphony = pkgs.callPackage
+          ./.flox/pkgs/symphony/default.nix {};
+
         batsWithLibs = pkgs.bats.withLibraries (p: [
           p.bats-support
           p.bats-assert
@@ -369,6 +372,7 @@
       in
       {
         packages.claude-managed = claude-managed;
+        packages.symphony = symphony;
 
         apps.run-test = {
           type = "app";

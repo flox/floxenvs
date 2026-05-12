@@ -173,19 +173,24 @@ func regenerateJSON(pluginsDir string) error {
 		if err != nil {
 			continue
 		}
+		// symlinks.Add stores the target as a path relative
+		// to the symlink's parent dir (pluginsDir), so resolve
+		// it back through pluginsDir before reading.
+		if !filepath.IsAbs(target) {
+			target = filepath.Join(pluginsDir, target)
+		}
 
 		ip, _ := ReadJSONMap(filepath.Join(target, "installed_plugins.json"))
 		if ip != nil {
 			patchEntries(ip, path, existingIP)
 		}
-		for k, v := range ip {
-			mergedIP[k] = v
-		}
+		// One-level-deep merge to combine the v2 schema's
+		// top-level "plugins" map across plugin files; the v1
+		// flat schema is unaffected (its values are arrays).
+		mergedIP = mergeOneLevel(mergedIP, ip)
 
 		km, _ := ReadJSONMap(filepath.Join(target, "known_marketplaces.json"))
-		for k, v := range km {
-			mergedKM[k] = v
-		}
+		mergedKM = mergeOneLevel(mergedKM, km)
 	}
 
 	ipPath := filepath.Join(pluginsDir, "installed_plugins.json")
