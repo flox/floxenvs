@@ -15,7 +15,7 @@ import (
 	"flox.dev/claude-managed/internal/symlinks"
 )
 
-const version = "0.4.0"
+const version = "0.4.1"
 
 // ANSI color helpers
 func ansi(code, s string) string { return "\033[" + code + "m" + s + "\033[0m" }
@@ -105,11 +105,7 @@ func main() {
 				fmt.Fprintln(os.Stderr, red("ERROR:")+" usage: claude-managed plugins add <path>")
 				os.Exit(1)
 			}
-			warnings, err := plugins.Add(pluginPath, configDir)
-			for _, w := range warnings {
-				fmt.Fprintf(os.Stderr, yellow("WARN:")+" %s\n", w)
-			}
-			if err != nil {
+			if err := plugins.Add(pluginPath, configDir); err != nil {
 				fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
 				os.Exit(1)
 			}

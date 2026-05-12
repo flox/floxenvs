@@ -17,21 +17,24 @@ const timestampFormat = "2006-01-02T15:04:05.000Z"
 var now = func() string { return time.Now().UTC().Format(timestampFormat) }
 
 // Add symlinks a plugin into the config dir and merges
-// its JSON config files. Returns a list of warnings
-// (e.g., missing JSON files) via the second return value.
-func Add(pluginDir, configDir string) ([]string, error) {
+// any optional JSON config files it ships. Plugins are
+// loaded by Claude Code via the wrapper's --plugin-dir
+// args (see emit.emitPluginWrapper), so missing JSON
+// files are fine — they're only merged when present so
+// upstream-provided registry/marketplace metadata is
+// preserved.
+func Add(pluginDir, configDir string) error {
 	name := filepath.Base(pluginDir)
 	pluginsDir := filepath.Join(configDir, "plugins")
 	if err := os.MkdirAll(pluginsDir, 0755); err != nil {
-		return nil, err
+		return err
 	}
 
 	if err := symlinks.Add(pluginDir, pluginsDir); err != nil {
-		return nil, err
+		return err
 	}
 
 	link := filepath.Join(pluginsDir, name)
-	var warnings []string
 
 	// merge installed_plugins.json, patching installPath and timestamps
 	ipPath := filepath.Join(pluginDir, "installed_plugins.json")
@@ -41,11 +44,8 @@ func Add(pluginDir, configDir string) ([]string, error) {
 		existing, _ := ReadJSONMap(ipTarget)
 		patchEntries(ipSource, link, existing)
 		if err := MergeJSONFile(ipTarget, ipSource); err != nil {
-			return warnings, fmt.Errorf("merge installed_plugins.json: %w", err)
+			return fmt.Errorf("merge installed_plugins.json: %w", err)
 		}
-	} else {
-		warnings = append(warnings,
-			fmt.Sprintf("%s: missing installed_plugins.json (plugin won't be trusted by Claude Code)", name))
 	}
 
 	// merge known_marketplaces.json
@@ -54,11 +54,11 @@ func Add(pluginDir, configDir string) ([]string, error) {
 	if kmSource != nil {
 		kmTarget := filepath.Join(pluginsDir, "known_marketplaces.json")
 		if err := MergeJSONFile(kmTarget, kmSource); err != nil {
-			return warnings, fmt.Errorf("merge known_marketplaces.json: %w", err)
+			return fmt.Errorf("merge known_marketplaces.json: %w", err)
 		}
 	}
 
-	return warnings, nil
+	return nil
 }
 
 // Remove deletes a plugin symlink and regenerates JSON config files.

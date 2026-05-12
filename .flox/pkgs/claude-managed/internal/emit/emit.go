@@ -140,24 +140,31 @@ func nameForFragment(typeName string, f discover.Fragment) string {
 
 // emitPluginWrapper writes a thin claude wrapper at
 // $CLAUDE_CONFIG_DIR/bin/claude that discovers plugins at exec time
-// from $CLAUDE_CONFIG_DIR/plugins/*/. This means plugins added later
-// (e.g. via `claude-managed plugins add <abspath>` for a locally-built
-// package not yet in the env's share dir) are picked up without
-// regenerating the wrapper.
+// from symlinks in $CLAUDE_CONFIG_DIR/plugins/. This means plugins
+// added later (e.g. via `claude-managed plugins add <abspath>` for a
+// locally-built package not yet in the env's share dir) are picked up
+// without regenerating the wrapper.
+//
+// Only symlinks are passed as --plugin-dir args. claude-managed
+// always installs plugins as symlinks (see symlinks.Add), so this
+// reliably excludes Claude Code's own runtime directories that get
+// created inside plugins/ at runtime — data/, cache/, marketplaces/.
+// Without this filter, Claude Code would treat its own state dirs as
+// plugins and create phantom entries like `data@inline` in /plugins.
 //
 // Always emitted: even if no plugins are present at activation time,
 // shipping the wrapper means the moment a user adds one it's already
 // on PATH and ready to load it. The runtime loop is a no-op when the
 // plugins dir is empty or absent.
 func emitPluginWrapper(sb *strings.Builder) {
-	sb.WriteString("\n# claude wrapper: discovers plugins at exec time from $CLAUDE_CONFIG_DIR/plugins/*/\n")
+	sb.WriteString("\n# claude wrapper: discovers plugin symlinks at exec time from $CLAUDE_CONFIG_DIR/plugins/\n")
 	sb.WriteString("cat > \"$CLAUDE_CONFIG_DIR/bin/claude\" <<'WRAPPER'\n")
 	sb.WriteString("#!/usr/bin/env bash\n")
 	sb.WriteString("plugin_args=()\n")
 	sb.WriteString("if [ -d \"$CLAUDE_CONFIG_DIR/plugins\" ]; then\n")
-	sb.WriteString("  for d in \"$CLAUDE_CONFIG_DIR/plugins\"/*/; do\n")
-	sb.WriteString("    [ -d \"$d\" ] || continue\n")
-	sb.WriteString("    plugin_args+=(--plugin-dir \"${d%/}\")\n")
+	sb.WriteString("  for d in \"$CLAUDE_CONFIG_DIR/plugins\"/*; do\n")
+	sb.WriteString("    [ -L \"$d\" ] && [ -d \"$d\" ] || continue\n")
+	sb.WriteString("    plugin_args+=(--plugin-dir \"$d\")\n")
 	sb.WriteString("  done\n")
 	sb.WriteString("fi\n")
 	// $FLOX_ENV/bin/claude is used verbatim because `command -v claude`
