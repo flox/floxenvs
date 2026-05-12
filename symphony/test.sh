@@ -15,11 +15,14 @@ if [[ ! -f "$SYMPHONY_DATA/WORKFLOW.md" ]]; then
 fi
 echo ">>> WORKFLOW.md ... OK"
 
-# `symphony` is an Elixir escript; calling it with no
-# args prints the guardrails warning and exits 0. That
-# both confirms the binary is wired correctly and avoids
-# accidentally booting the orchestrator from a test.
-symphony 2>&1 | grep -q 'guardrails' \
+# `symphony` is an Elixir escript; calling it without
+# the acknowledgement flag prints the guardrails warning
+# and exits non-zero. That confirms the binary is wired
+# correctly without booting the orchestrator. We capture
+# output through a subshell so the non-zero exit doesn't
+# trip `set -eo pipefail`.
+symphony_out=$(symphony 2>&1 || true)
+echo "$symphony_out" | grep -q 'guardrails' \
   || { echo "Error: symphony self-check did not print guardrails warning"; exit 1; }
 echo ">>> symphony self-check ... OK"
 echo ">>> codex version:    $(codex --version 2>&1 | head -1)"
