@@ -20,9 +20,11 @@ jobs:
 
     outputs:
       matrix: "${{ steps.discover.outputs.matrix }}"
+      runs_on: "${{ steps.discover.outputs.runs_on }}"
       start_services: "${{ steps.discover.outputs.start_services }}"
       has_demo: "${{ steps.discover.outputs.has_demo }}"
       demo_matrix: "${{ steps.discover.outputs.demo_matrix }}"
+      demo_runs_on: "${{ steps.discover.outputs.demo_runs_on }}"
       demo_start_services: "${{ steps.discover.outputs.demo_start_services }}"
 
     steps:
@@ -87,6 +89,17 @@ jobs:
           ' "$LOCK")
           MATRIX=$(echo "$SYSTEMS" | jq -c '{system: .}')
 
+          # Pick a runner whose system is in the lockfile. Prefer Linux
+          # (cheaper minutes), fall back to macOS for darwin-only envs.
+          RUNS_ON=$(echo "$SYSTEMS" | jq -r '
+            if   index("x86_64-linux")   then "ubuntu-latest"
+            elif index("aarch64-linux")  then "ubuntu-24.04-arm"
+            elif index("aarch64-darwin") then "macos-latest"
+            else error("no supported runner for systems: \(.)")
+            end
+          ')
+          echo "runs_on=$RUNS_ON" >> "$GITHUB_OUTPUT"
+
           # Detect services
           SVC=$(jq -r '
             .manifest.services // {} | length > 0
@@ -112,6 +125,15 @@ jobs:
             ' "$DEMO_LOCK")
             DEMO_MATRIX=$(echo "$DEMO_SYSTEMS" | jq -c '{system: .}')
 
+            DEMO_RUNS_ON=$(echo "$DEMO_SYSTEMS" | jq -r '
+              if   index("x86_64-linux")   then "ubuntu-latest"
+              elif index("aarch64-linux")  then "ubuntu-24.04-arm"
+              elif index("aarch64-darwin") then "macos-latest"
+              else error("no supported runner for systems: \(.)")
+              end
+            ')
+            echo "demo_runs_on=$DEMO_RUNS_ON" >> "$GITHUB_OUTPUT"
+
             DEMO_SVC=$(jq -r '
               .manifest.services // {} | length > 0
             ' "$DEMO_LOCK")
@@ -125,6 +147,7 @@ jobs:
             {
               echo "has_demo=false"
               echo "demo_matrix={\"system\":[]}"
+              echo "demo_runs_on=ubuntu-latest"
               echo "demo_start_services=false"
             } >> "$GITHUB_OUTPUT"
           fi
@@ -271,10 +294,11 @@ jobs:
 
   push:
     name: "Push '${{ inputs.environment }}' to FloxHub"
-    runs-on: "ubuntu-latest"
+    runs-on: "${{ needs.discover.outputs.runs_on }}"
     timeout-minutes: 30
 
     needs:
+      - "discover"
       - "test"
 
     if: (github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'workflow_dispatch'
@@ -339,7 +363,7 @@ jobs:
 
   push-demo:
     name: "Push '${{ inputs.environment }}-demo' to FloxHub"
-    runs-on: "ubuntu-latest"
+    runs-on: "${{ needs.discover.outputs.demo_runs_on }}"
     timeout-minutes: 30
 
     needs:
