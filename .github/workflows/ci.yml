@@ -482,24 +482,6 @@ jobs:
       || needs.wait-for-packages.outputs.total_workflows != '0')
 
     steps:
-      - name: "Mint approver App token"
-        id: "approver_token"
-        uses: "actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349" # v2.2.2
-        with:
-          app-id: "${{ secrets.MANAGED_FLOXENVS_APPROVER_APP_ID }}"
-          private-key: "${{ secrets.MANAGED_FLOXENVS_APPROVER_PRIVATE_KEY }}"
-
-      - name: "Approve PR"
-        env:
-          PR_NUMBER: >-
-            ${{ needs.wait-for-environments.outputs.pr_number }}
-          GITHUB_TOKEN: "${{ steps.approver_token.outputs.token }}"
-        run: |
-          gh pr review "$PR_NUMBER" \
-            --repo "${{ github.repository }}" \
-            --approve \
-            --body "Approved by automated approver: all required CI checks are green for floxbot PR."
-
       - name: "Merge PR"
         env:
           PR_NUMBER: >-
@@ -507,7 +489,7 @@ jobs:
           GITHUB_TOKEN: >-
             ${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}
         run: |
-          gh pr merge --auto --merge "$PR_NUMBER" \
+          gh pr merge --rebase "$PR_NUMBER" \
             --repo "${{ github.repository }}"
 
   report-failure:
