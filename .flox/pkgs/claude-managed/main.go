@@ -15,7 +15,7 @@ import (
 	"flox.dev/claude-managed/internal/symlinks"
 )
 
-const version = "0.4.0"
+const version = "0.4.1"
 
 // ANSI color helpers
 func ansi(code, s string) string { return "\033[" + code + "m" + s + "\033[0m" }
