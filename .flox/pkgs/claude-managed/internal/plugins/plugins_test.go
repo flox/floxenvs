@@ -28,8 +28,7 @@ func setupTestPlugin(t *testing.T) (pluginDir, configDir string) {
 
 func TestAdd(t *testing.T) {
 	pluginDir, configDir := setupTestPlugin(t)
-	_, err := Add(pluginDir, configDir)
-	if err != nil {
+	if err := Add(pluginDir, configDir); err != nil {
 		t.Fatalf("Add failed: %v", err)
 	}
 
@@ -153,8 +152,7 @@ func TestClean_PreservesUserPlugins(t *testing.T) {
 func TestAdd_Idempotent(t *testing.T) {
 	pluginDir, configDir := setupTestPlugin(t)
 	Add(pluginDir, configDir)
-	_, err := Add(pluginDir, configDir)
-	if err != nil {
+	if err := Add(pluginDir, configDir); err != nil {
 		t.Fatalf("second Add failed: %v", err)
 	}
 	ipPath := filepath.Join(configDir, "plugins", "installed_plugins.json")
@@ -201,10 +199,10 @@ func TestAdd_V2MergesUnderPluginsKey(t *testing.T) {
 	pluginA := setupV2Plugin(t, base, "alpha")
 	pluginB := setupV2Plugin(t, base, "beta")
 
-	if _, err := Add(pluginA, configDir); err != nil {
+	if err := Add(pluginA, configDir); err != nil {
 		t.Fatalf("Add alpha: %v", err)
 	}
-	if _, err := Add(pluginB, configDir); err != nil {
+	if err := Add(pluginB, configDir); err != nil {
 		t.Fatalf("Add beta: %v", err)
 	}
 
@@ -257,10 +255,10 @@ func TestRemove_V2KeepsOtherPluginsUnderPluginsKey(t *testing.T) {
 	pluginA := setupV2Plugin(t, base, "alpha")
 	pluginB := setupV2Plugin(t, base, "beta")
 
-	if _, err := Add(pluginA, configDir); err != nil {
+	if err := Add(pluginA, configDir); err != nil {
 		t.Fatalf("Add alpha: %v", err)
 	}
-	if _, err := Add(pluginB, configDir); err != nil {
+	if err := Add(pluginB, configDir); err != nil {
 		t.Fatalf("Add beta: %v", err)
 	}
 
@@ -292,12 +290,12 @@ func TestAdd_PreservesInstalledAt(t *testing.T) {
 	t.Cleanup(func() { now = origNow })
 	now = func() string { return "2030-06-01T00:00:00.000Z" }
 
-	if _, err := Add(pluginDir, configDir); err != nil {
+	if err := Add(pluginDir, configDir); err != nil {
 		t.Fatalf("first Add failed: %v", err)
 	}
 
 	now = func() string { return "2030-06-02T00:00:00.000Z" }
-	if _, err := Add(pluginDir, configDir); err != nil {
+	if err := Add(pluginDir, configDir); err != nil {
 		t.Fatalf("second Add failed: %v", err)
 	}
 

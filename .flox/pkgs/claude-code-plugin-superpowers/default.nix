@@ -7,7 +7,7 @@
 
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version srcHash commitSha;
+  inherit (versionData) version srcHash;
 in
 stdenv.mkDerivation {
   pname = "claude-code-plugin-superpowers";
@@ -93,27 +93,6 @@ stdenv.mkDerivation {
     # ENOEXEC.
     chmod +x "$PLUGIN_DIR/hooks/session-start" \
              "$PLUGIN_DIR/hooks/run-hook.cmd"
-
-    # Drop installed_plugins.json so claude-managed registers the plugin
-    # in $CLAUDE_CONFIG_DIR/plugins/installed_plugins.json at activation.
-    # installPath is patched to the real symlink target by
-    # `claude-managed plugins add`. v2 is the schema claude-managed
-    # >=0.2.8 reads.
-    cat > "$PLUGIN_DIR/installed_plugins.json" <<JSON
-    {
-      "plugins": {
-        "superpowers@flox": [
-          {
-            "installPath": "",
-            "scope": "project",
-            "version": "${version}",
-            "gitCommitSha": "${commitSha}"
-          }
-        ]
-      },
-      "version": 2
-    }
-    JSON
 
     runHook postInstall
   '';

@@ -9,7 +9,7 @@
 
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version srcHash commitSha;
+  inherit (versionData) version srcHash;
 
   # Escape so the indented-string interpolation below produces the
   # literal token `${CLAUDE_PLUGIN_ROOT}` in the resulting bash, with
@@ -106,27 +106,6 @@ stdenv.mkDerivation {
       [ $changed -eq 1 ] && rewritten=$((rewritten + 1))
     done < <(find "$PLUGIN_DIR" -type f -name '*.md')
     echo "fix_md_paths: rewrote refs in $rewritten markdown file(s)"
-
-    # Drop an installed_plugins.json next to the plugin so claude-managed
-    # registers it in $CLAUDE_CONFIG_DIR/plugins/installed_plugins.json
-    # — without that file Claude Code lists the plugin but won't trust it.
-    # Schema follows the v2 (`plugins` wrapper) format claude-managed uses;
-    # installPath is patched to the real symlink target by `plugins add`.
-    cat > "$PLUGIN_DIR/installed_plugins.json" <<JSON
-    {
-      "plugins": {
-        "impeccable@flox": [
-          {
-            "installPath": "",
-            "scope": "project",
-            "version": "${version}",
-            "gitCommitSha": "${commitSha}"
-          }
-        ]
-      },
-      "version": 2
-    }
-    JSON
 
     runHook postInstall
   '';

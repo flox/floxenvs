@@ -64,11 +64,20 @@ jobs:
               DIFF_BASE="HEAD~1"
             fi
 
+            # upgrade.sh isn't part of the build — a PR that touches
+            # only it produces a byte-identical package, so skip the
+            # matrix to avoid rebuilding (and re-hitting flaky cross
+            # builds like openclaw x86_64-darwin).
             pkgs="[]"
             for dir in .flox/pkgs/*/; do
               name="$(basename "$dir")"
-              if git diff --name-only "$DIFF_BASE" HEAD \
-                  | grep -q "^.flox/pkgs/$name/"; then
+              build_changes=$(git diff --name-only \
+                  "$DIFF_BASE" HEAD \
+                | grep -E "^\.flox/pkgs/$name/" \
+                | grep -vE \
+                  "^\.flox/pkgs/$name/upgrade\.sh$" \
+                || true)
+              if [ -n "$build_changes" ]; then
                 pkgs=$(echo "$pkgs" | jq -c \
                   ". + [\"$name\"]")
               fi
