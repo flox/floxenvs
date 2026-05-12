@@ -12,6 +12,10 @@
         "pkg-path": "flox/claude-code",
         "pkg-group": "claude-code"
       },
+      "claude-managed": {
+        "pkg-path": "flox/claude-managed",
+        "pkg-group": "claude-managed"
+      },
       "curl": {
         "pkg-path": "curl",
         "pkg-group": "graphify-tools"
@@ -43,6 +47,10 @@
       "python": {
         "pkg-path": "python311",
         "pkg-group": "graphify"
+      },
+      "skill-graphify": {
+        "pkg-path": "flox/skill-graphify",
+        "pkg-group": "skill-graphify"
       }
     },
     "vars": {
@@ -50,12 +58,12 @@
       "VIRTUAL_ENV_DISABLE_PROMPT": "1"
     },
     "hook": {
-      "on-activate": "export PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$PYTHON_DIR/.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$PYTHON_DIR\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  python3 -m venv --upgrade-deps \"$PYTHON_DIR\"\n  echo \"$CURRENT_INTERP\" > \"$PYTHON_DIR/.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$PYTHON_DIR/bin/activate\"\n\nHASH=$(echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5sum 2>/dev/null \\\n  || echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5 -q)\nHASH=$(echo \"$HASH\" | cut -d\" \" -f1)\nLAST=$(cat \"$PYTHON_DIR/.deps_hash\" 2>/dev/null)\nif [ \"$HASH\" != \"$LAST\" ]; then\n  pip install -q \"$GRAPHIFY_INSTALL_PACKAGE\"\n  echo \"$HASH\" > \"$PYTHON_DIR/.deps_hash\"\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'graphify — knowledge graphs for Claude Code' '' \\\n    'One-time skill install:' \\\n    '  graphify install' '' \\\n    'Build a graph from any folder:' \\\n    '  graphify .' \\\n    '  graphify ./raw --mode deep' \\\n    '  graphify ./raw --update' '' \\\n    'Query the graph:' \\\n    '  graphify query \"what connects X to Y?\"' \\\n    '  graphify path \"Module\" \"Database\"' \\\n    '  graphify explain \"Concept\"' '' \\\n    'Inside Claude Code (after install):' \\\n    '  /graphify .'\nfi\n"
+      "on-activate": "export PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$PYTHON_DIR/.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$PYTHON_DIR\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  python3 -m venv --upgrade-deps \"$PYTHON_DIR\"\n  echo \"$CURRENT_INTERP\" > \"$PYTHON_DIR/.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$PYTHON_DIR/bin/activate\"\n\nHASH=$(echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5sum 2>/dev/null \\\n  || echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5 -q)\nHASH=$(echo \"$HASH\" | cut -d\" \" -f1)\nLAST=$(cat \"$PYTHON_DIR/.deps_hash\" 2>/dev/null)\nif [ \"$HASH\" != \"$LAST\" ]; then\n  pip install -q \"$GRAPHIFY_INSTALL_PACKAGE\"\n  echo \"$HASH\" > \"$PYTHON_DIR/.deps_hash\"\nfi\n\neval \"$(claude-managed setup-hook)\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'graphify — knowledge graphs for Claude Code' '' \\\n    'The /graphify skill is pre-installed via' \\\n    'flox/skill-graphify and discovered by' \\\n    'claude-managed. Just open Claude Code:' \\\n    '  /graphify .' '' \\\n    'Or use the CLI directly:' \\\n    '  graphify .' \\\n    '  graphify ./raw --mode deep' \\\n    '  graphify ./raw --update' '' \\\n    'Query the graph:' \\\n    '  graphify query \"what connects X to Y?\"' \\\n    '  graphify path \"Module\" \"Database\"' \\\n    '  graphify explain \"Concept\"'\nfi\n"
     },
     "profile": {
-      "bash": "source \"$PYTHON_DIR/bin/activate\"\n",
-      "zsh": "source \"$PYTHON_DIR/bin/activate\"\n",
-      "fish": "source \"$PYTHON_DIR/bin/activate.fish\"\n",
+      "bash": "source \"$PYTHON_DIR/bin/activate\"\n\neval \"$(claude-managed setup-profile-bash)\"\n",
+      "zsh": "source \"$PYTHON_DIR/bin/activate\"\n\neval \"$(claude-managed setup-profile-zsh)\"\n",
+      "fish": "source \"$PYTHON_DIR/bin/activate.fish\"\n\nclaude-managed setup-profile-fish | source\n",
       "tcsh": "source \"$PYTHON_DIR/bin/activate.csh\"\n"
     },
     "options": {}
@@ -1203,6 +1211,238 @@
       "system": "x86_64-linux",
       "group": "graphify-tools",
       "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/w1klmic8k8a5iwgijlx0cm9yj48p8gih-claude-managed-0.4.1.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
+      "name": "claude-managed-0.4.1",
+      "pname": "claude-managed",
+      "rev": "4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
+      "rev_count": 3243,
+      "rev_date": "2026-05-12T18:55:19Z",
+      "scrape_date": "2026-05-12T23:00:58.688843Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ai6ahqbl18ai53h6qxs3jyfzx25xvlv2-claude-managed-0.4.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "claude-managed",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/hiz3gjm8xnaadxn8fcnn3cqv00ak7jmx-claude-managed-0.4.1.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
+      "name": "claude-managed-0.4.1",
+      "pname": "claude-managed",
+      "rev": "4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
+      "rev_count": 3243,
+      "rev_date": "2026-05-12T18:55:19Z",
+      "scrape_date": "2026-05-12T23:00:58.688847Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kxhnszh6kirs6a024s0bnjyx04dy0rkx-claude-managed-0.4.1"
+      },
+      "system": "aarch64-linux",
+      "group": "claude-managed",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/7cbjxv67m749n5mw2pb0lkh2i82s292k-claude-managed-0.4.1.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
+      "name": "claude-managed-0.4.1",
+      "pname": "claude-managed",
+      "rev": "4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
+      "rev_count": 3243,
+      "rev_date": "2026-05-12T18:55:19Z",
+      "scrape_date": "2026-05-12T23:00:58.688848Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/5amvlx9kqjc19v0r9s0pianxpj60qz4l-claude-managed-0.4.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "claude-managed",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/snshhqypg93w1yr27gxz9c239z3i9nax-claude-managed-0.4.1.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
+      "name": "claude-managed-0.4.1",
+      "pname": "claude-managed",
+      "rev": "4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
+      "rev_count": 3243,
+      "rev_date": "2026-05-12T18:55:19Z",
+      "scrape_date": "2026-05-12T23:00:58.688849Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/nr2v9wsw4c1zry0hzkg9psfs7kksvh4l-claude-managed-0.4.1"
+      },
+      "system": "x86_64-linux",
+      "group": "claude-managed",
+      "priority": 5
+    },
+    {
+      "attr_path": "skill-graphify",
+      "broken": false,
+      "derivation": "/nix/store/c0cbhdll30k80zs3pmhakk536h6vh6qf-skill-graphify-0+unstable-2026-05-12.5f9ea2b.drv",
+      "description": "graphify skill for Claude Code and OpenCode — turn any folder of files into a knowledge graph.",
+      "install_id": "skill-graphify",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=4055c5d6c4b403a8b80d5a21818007fbe5a4416b",
+      "name": "skill-graphify-0+unstable-2026-05-12.5f9ea2b",
+      "pname": "skill-graphify",
+      "rev": "4055c5d6c4b403a8b80d5a21818007fbe5a4416b",
+      "rev_count": 3240,
+      "rev_date": "2026-05-12T22:48:38Z",
+      "scrape_date": "2026-05-12T23:00:58.688858Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0+unstable-2026-05-12.5f9ea2b",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/v7hi8ml6dhhf2rvgcrrj8hci7d3h08wz-skill-graphify-0+unstable-2026-05-12.5f9ea2b"
+      },
+      "system": "aarch64-darwin",
+      "group": "skill-graphify",
+      "priority": 5
+    },
+    {
+      "attr_path": "skill-graphify",
+      "broken": false,
+      "derivation": "/nix/store/rr9rzxcfin9kgazzwrgssnfyks8a06k0-skill-graphify-0+unstable-2026-05-12.5f9ea2b.drv",
+      "description": "graphify skill for Claude Code and OpenCode — turn any folder of files into a knowledge graph.",
+      "install_id": "skill-graphify",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=4055c5d6c4b403a8b80d5a21818007fbe5a4416b",
+      "name": "skill-graphify-0+unstable-2026-05-12.5f9ea2b",
+      "pname": "skill-graphify",
+      "rev": "4055c5d6c4b403a8b80d5a21818007fbe5a4416b",
+      "rev_count": 3240,
+      "rev_date": "2026-05-12T22:48:38Z",
+      "scrape_date": "2026-05-12T23:00:58.688861Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0+unstable-2026-05-12.5f9ea2b",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/m7zqxxg1x714sh70jy766k8rvk3yw94s-skill-graphify-0+unstable-2026-05-12.5f9ea2b"
+      },
+      "system": "aarch64-linux",
+      "group": "skill-graphify",
+      "priority": 5
+    },
+    {
+      "attr_path": "skill-graphify",
+      "broken": false,
+      "derivation": "/nix/store/k1xml1vgls9hh9i2fl7kra71d1q930qr-skill-graphify-0+unstable-2026-05-12.5f9ea2b.drv",
+      "description": "graphify skill for Claude Code and OpenCode — turn any folder of files into a knowledge graph.",
+      "install_id": "skill-graphify",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=4055c5d6c4b403a8b80d5a21818007fbe5a4416b",
+      "name": "skill-graphify-0+unstable-2026-05-12.5f9ea2b",
+      "pname": "skill-graphify",
+      "rev": "4055c5d6c4b403a8b80d5a21818007fbe5a4416b",
+      "rev_count": 3240,
+      "rev_date": "2026-05-12T22:48:38Z",
+      "scrape_date": "2026-05-12T23:00:58.688863Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0+unstable-2026-05-12.5f9ea2b",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/48m1qpkf37b4dq2890mmyhxwdiqw27dd-skill-graphify-0+unstable-2026-05-12.5f9ea2b"
+      },
+      "system": "x86_64-darwin",
+      "group": "skill-graphify",
+      "priority": 5
+    },
+    {
+      "attr_path": "skill-graphify",
+      "broken": false,
+      "derivation": "/nix/store/5vanjiqbxy0h9j8g68nkm26b3mxnz96w-skill-graphify-0+unstable-2026-05-12.5f9ea2b.drv",
+      "description": "graphify skill for Claude Code and OpenCode — turn any folder of files into a knowledge graph.",
+      "install_id": "skill-graphify",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=4055c5d6c4b403a8b80d5a21818007fbe5a4416b",
+      "name": "skill-graphify-0+unstable-2026-05-12.5f9ea2b",
+      "pname": "skill-graphify",
+      "rev": "4055c5d6c4b403a8b80d5a21818007fbe5a4416b",
+      "rev_count": 3240,
+      "rev_date": "2026-05-12T22:48:38Z",
+      "scrape_date": "2026-05-12T23:00:58.688864Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0+unstable-2026-05-12.5f9ea2b",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/9zvlpgfa4h0swd83168cf0wyl7knqgsi-skill-graphify-0+unstable-2026-05-12.5f9ea2b"
+      },
+      "system": "x86_64-linux",
+      "group": "skill-graphify",
+      "priority": 5
     }
   ],
   "compose": {
@@ -1212,16 +1452,23 @@
         "gum": {
           "pkg-path": "gum",
           "pkg-group": "demo-tools"
+        },
+        "skill-graphify": {
+          "pkg-path": "flox/skill-graphify",
+          "pkg-group": "skill-graphify"
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'graphify — knowledge graphs for Claude Code' '' \\\n    'One-time skill install:' \\\n    '  graphify install' '' \\\n    'Build a graph from any folder:' \\\n    '  graphify .' \\\n    '  graphify ./raw --mode deep' \\\n    '  graphify ./raw --update' '' \\\n    'Query the graph:' \\\n    '  graphify query \"what connects X to Y?\"' \\\n    '  graphify path \"Module\" \"Database\"' \\\n    '  graphify explain \"Concept\"' '' \\\n    'Inside Claude Code (after install):' \\\n    '  /graphify .'\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'graphify — knowledge graphs for Claude Code' '' \\\n    'The /graphify skill is pre-installed via' \\\n    'flox/skill-graphify and discovered by' \\\n    'claude-managed. Just open Claude Code:' \\\n    '  /graphify .' '' \\\n    'Or use the CLI directly:' \\\n    '  graphify .' \\\n    '  graphify ./raw --mode deep' \\\n    '  graphify ./raw --update' '' \\\n    'Query the graph:' \\\n    '  graphify query \"what connects X to Y?\"' \\\n    '  graphify path \"Module\" \"Database\"' \\\n    '  graphify explain \"Concept\"'\nfi\n"
       },
       "options": {},
       "include": {
         "environments": [
           {
             "dir": "../graphify"
+          },
+          {
+            "dir": "../claude"
           }
         ]
       }
@@ -1288,8 +1535,46 @@
         "descriptor": {
           "dir": "../graphify"
         }
+      },
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "claude-code": {
+              "pkg-path": "flox/claude-code",
+              "pkg-group": "claude-code"
+            },
+            "claude-managed": {
+              "pkg-path": "flox/claude-managed",
+              "pkg-group": "claude-managed"
+            }
+          },
+          "hook": {
+            "on-activate": "eval \"$(claude-managed setup-hook)\"\n"
+          },
+          "profile": {
+            "bash": "eval \"$(claude-managed setup-profile-bash)\"\n",
+            "zsh": "eval \"$(claude-managed setup-profile-zsh)\"\n",
+            "fish": "claude-managed setup-profile-fish | source\n"
+          },
+          "options": {}
+        },
+        "name": "claude",
+        "descriptor": {
+          "dir": "../claude"
+        }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "install",
+            "claude-code"
+          ]
+        },
+        "higher_priority_name": "claude"
+      }
+    ]
   }
 }

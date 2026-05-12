@@ -14,17 +14,9 @@ project, see [graphify](../graphify/) or use
 flox activate -r flox/graphify-demo
 ```
 
-One-time setup — register the Claude Code skill:
-
-```bash
-graphify install
-```
-
-Then build a graph from any folder:
-
-```bash
-graphify .
-```
+The `/graphify` skill is pre-installed via
+`flox/skill-graphify` and auto-discovered by
+`claude-managed` — no `graphify install` step needed.
 
 Open Claude Code in any directory and type:
 
@@ -32,12 +24,22 @@ Open Claude Code in any directory and type:
 /graphify .
 ```
 
+Or use the CLI directly:
+
+```bash
+graphify .
+```
+
 ## What this demo includes
 
 - Everything from the `graphify` base environment
   (Python 3.11, `graphify` CLI, Claude Code)
+- The `flox/claude` env via `[include]` for
+  `claude-managed` (which auto-discovers skills under
+  `$FLOX_ENV/share/claude-code/skills/`)
+- `flox/skill-graphify` — ships the `/graphify` SKILL.md
+  so Claude Code finds it on activate
 - `gum` for the styled terminal banner
-- Banner with common commands and the in-Claude trigger
 
 ## Commands cheat sheet
 
