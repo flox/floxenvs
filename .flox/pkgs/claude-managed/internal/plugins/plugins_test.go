@@ -199,10 +199,10 @@ func TestAdd_V2MergesUnderPluginsKey(t *testing.T) {
 	pluginA := setupV2Plugin(t, base, "alpha")
 	pluginB := setupV2Plugin(t, base, "beta")
 
-	if _, err := Add(pluginA, configDir); err != nil {
+	if err := Add(pluginA, configDir); err != nil {
 		t.Fatalf("Add alpha: %v", err)
 	}
-	if _, err := Add(pluginB, configDir); err != nil {
+	if err := Add(pluginB, configDir); err != nil {
 		t.Fatalf("Add beta: %v", err)
 	}
 
@@ -255,10 +255,10 @@ func TestRemove_V2KeepsOtherPluginsUnderPluginsKey(t *testing.T) {
 	pluginA := setupV2Plugin(t, base, "alpha")
 	pluginB := setupV2Plugin(t, base, "beta")
 
-	if _, err := Add(pluginA, configDir); err != nil {
+	if err := Add(pluginA, configDir); err != nil {
 		t.Fatalf("Add alpha: %v", err)
 	}
-	if _, err := Add(pluginB, configDir); err != nil {
+	if err := Add(pluginB, configDir); err != nil {
 		t.Fatalf("Add beta: %v", err)
 	}
 
