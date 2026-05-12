@@ -1,0 +1,41 @@
+schema-version = "1.10.0"
+
+# Minimal oMLX environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/omlx"]
+#
+# oMLX is an LLM inference server optimized for Apple
+# Silicon. This environment requires aarch64-darwin
+# (Apple M1+) and macOS 15+.
+
+[install]
+omlx.pkg-path = "flox/omlx"
+omlx.pkg-group = "omlx"
+
+[vars]
+OMLX_HOST = "127.0.0.1"
+OMLX_PORT = "18000"
+
+[hook]
+on-activate = '''
+export OMLX_DATA_DIR="$FLOX_ENV_CACHE/omlx"
+export OMLX_MODEL_DIR="${OMLX_MODEL_DIR:-$OMLX_DATA_DIR/models}"
+mkdir -p "$OMLX_MODEL_DIR"
+'''
+
+[services]
+omlx.command = '''
+omlx_data="${OMLX_DATA_DIR:-$FLOX_ENV_CACHE/omlx}"
+omlx_models="${OMLX_MODEL_DIR:-$omlx_data/models}"
+mkdir -p "$omlx_models"
+exec omlx serve \
+  --model-dir "$omlx_models" \
+  --host "$OMLX_HOST" \
+  --port "$OMLX_PORT"
+'''
+
+[options]
+systems = ["aarch64-darwin"]
