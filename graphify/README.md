@@ -72,17 +72,42 @@ folder, including:
 | `graph.json` | Persistent graph |
 | `cache/` | SHA256 cache for incremental runs |
 
+## Services
+
+| Service | Description |
+| ------- | ----------- |
+| `graphify-watch` | Watches `$GRAPHIFY_PROJECT_ROOT` and rebuilds the graph on code changes |
+| `graphify-mcp` | MCP stdio server backed by `graphify-out/graph.json` (waits for the file to appear) |
+
+Start them:
+
+```bash
+flox services start
+# or activate with services already running:
+flox activate --start-services
+```
+
+`graphify-mcp` blocks until `graphify-watch` (or a
+manual `graphify <root>` run) produces `graph.json`,
+so the natural order is just `flox services start`.
+
 ## Environment variables
 
 | Variable | Description |
 | -------- | ----------- |
-| `GRAPHIFY_INSTALL_PACKAGE` | PyPI spec installed in the venv (default `graphifyy`) |
+| `GRAPHIFY_INSTALL_PACKAGE` | PyPI spec installed in the venv (default `graphifyy[mcp,watch]`) |
+| `GRAPHIFY_PROJECT_ROOT` | Folder graphify watches and serves (default: the dir containing `.flox/`, i.e. `$FLOX_ENV_PROJECT`) |
 
-Pin a version by setting:
+Pin a version or point at a different folder by
+overriding in your own manifest:
 
 ```toml
+[include]
+environments = ["flox/graphify"]
+
 [vars]
-GRAPHIFY_INSTALL_PACKAGE = "graphifyy==0.1.14"
+GRAPHIFY_INSTALL_PACKAGE = "graphifyy[mcp,watch]==0.1.14"
+GRAPHIFY_PROJECT_ROOT = "/abs/path/to/my/repo"
 ```
 
 ## Data directory

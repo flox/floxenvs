@@ -42,7 +42,8 @@
       }
     },
     "vars": {
-      "GRAPHIFY_INSTALL_PACKAGE": "graphifyy",
+      "GRAPHIFY_INSTALL_PACKAGE": "graphifyy[mcp,watch]",
+      "GRAPHIFY_PROJECT_ROOT": "",
       "VIRTUAL_ENV_DISABLE_PROMPT": "1"
     },
     "hook": {
@@ -54,7 +55,15 @@
       "fish": "source \"$PYTHON_DIR/bin/activate.fish\"\n",
       "tcsh": "source \"$PYTHON_DIR/bin/activate.csh\"\n"
     },
-    "options": {}
+    "options": {},
+    "services": {
+      "graphify-mcp": {
+        "command": "PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\nsource \"$PYTHON_DIR/bin/activate\"\nroot=\"${GRAPHIFY_PROJECT_ROOT:-$FLOX_ENV_PROJECT}\"\ngraph=\"$root/graphify-out/graph.json\"\nuntil [ -f \"$graph\" ]; do\n  echo \"waiting for $graph (run graphify-watch first) ...\"\n  sleep 2\ndone\nexec python -m graphify.serve \"$graph\"\n"
+      },
+      "graphify-watch": {
+        "command": "PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\nsource \"$PYTHON_DIR/bin/activate\"\nroot=\"${GRAPHIFY_PROJECT_ROOT:-$FLOX_ENV_PROJECT}\"\nexec graphify watch \"$root\"\n"
+      }
+    }
   },
   "packages": [
     {

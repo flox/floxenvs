@@ -32,8 +32,14 @@ glibc.pkg-group = "graphify-build"
 glibc.systems = ["x86_64-linux", "aarch64-linux"]
 
 [vars]
-# PyPI distribution name (CLI binary is `graphify`).
-GRAPHIFY_INSTALL_PACKAGE = "graphifyy"
+# PyPI distribution name (CLI binary is `graphify`). The
+# [mcp] extra pulls in `mcp` for the graphify-mcp service
+# and [watch] pulls in `watchdog` for the graphify-watch
+# service — both are required by the services below.
+GRAPHIFY_INSTALL_PACKAGE = "graphifyy[mcp,watch]"
+# Folder graphify operates on. Empty means "use the dir
+# that contains the .flox/ directory" — see services.
+GRAPHIFY_PROJECT_ROOT = ""
 VIRTUAL_ENV_DISABLE_PROMPT = "1"
 
 [hook]
@@ -76,3 +82,30 @@ source "$PYTHON_DIR/bin/activate.fish"
 tcsh = '''
 source "$PYTHON_DIR/bin/activate.csh"
 '''
+
+[services]
+# Watch GRAPHIFY_PROJECT_ROOT and rebuild the graph on
+# code changes. Defaults to the dir containing .flox/.
+graphify-watch.command = """
+PYTHON_DIR="$FLOX_ENV_CACHE/python"
+source "$PYTHON_DIR/bin/activate"
+root="${GRAPHIFY_PROJECT_ROOT:-$FLOX_ENV_PROJECT}"
+exec graphify watch "$root"
+"""
+
+# MCP stdio server. `graphify watch` builds the graph;
+# this serves it to MCP clients (Claude Code, Gemini,
+# Cursor, …). Runs as a separate service because watch
+# and serve are two different long-running processes —
+# the CLI has no combined flag.
+graphify-mcp.command = """
+PYTHON_DIR="$FLOX_ENV_CACHE/python"
+source "$PYTHON_DIR/bin/activate"
+root="${GRAPHIFY_PROJECT_ROOT:-$FLOX_ENV_PROJECT}"
+graph="$root/graphify-out/graph.json"
+until [ -f "$graph" ]; do
+  echo "waiting for $graph (run graphify-watch first) ..."
+  sleep 2
+done
+exec python -m graphify.serve "$graph"
+"""

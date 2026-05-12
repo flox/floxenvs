@@ -55,7 +55,8 @@
       }
     },
     "vars": {
-      "GRAPHIFY_INSTALL_PACKAGE": "graphifyy",
+      "GRAPHIFY_INSTALL_PACKAGE": "graphifyy[mcp,watch]",
+      "GRAPHIFY_PROJECT_ROOT": "",
       "VIRTUAL_ENV_DISABLE_PROMPT": "1"
     },
     "hook": {
@@ -67,7 +68,15 @@
       "fish": "source \"$PYTHON_DIR/bin/activate.fish\"\n\nclaude-managed setup-profile-fish | source\n",
       "tcsh": "source \"$PYTHON_DIR/bin/activate.csh\"\n"
     },
-    "options": {}
+    "options": {},
+    "services": {
+      "graphify-mcp": {
+        "command": "PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\nsource \"$PYTHON_DIR/bin/activate\"\nroot=\"${GRAPHIFY_PROJECT_ROOT:-$FLOX_ENV_PROJECT}\"\ngraph=\"$root/graphify-out/graph.json\"\nuntil [ -f \"$graph\" ]; do\n  echo \"waiting for $graph (run graphify-watch first) ...\"\n  sleep 2\ndone\nexec python -m graphify.serve \"$graph\"\n"
+      },
+      "graphify-watch": {
+        "command": "PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\nsource \"$PYTHON_DIR/bin/activate\"\nroot=\"${GRAPHIFY_PROJECT_ROOT:-$FLOX_ENV_PROJECT}\"\nexec graphify watch \"$root\"\n"
+      }
+    }
   },
   "packages": [
     {
@@ -184,6 +193,122 @@
       },
       "system": "x86_64-linux",
       "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/w1klmic8k8a5iwgijlx0cm9yj48p8gih-claude-managed-0.4.1.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
+      "name": "claude-managed-0.4.1",
+      "pname": "claude-managed",
+      "rev": "4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
+      "rev_count": 3243,
+      "rev_date": "2026-05-12T18:55:19Z",
+      "scrape_date": "2026-05-12T23:08:21.509533Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ai6ahqbl18ai53h6qxs3jyfzx25xvlv2-claude-managed-0.4.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "claude-managed",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/hiz3gjm8xnaadxn8fcnn3cqv00ak7jmx-claude-managed-0.4.1.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
+      "name": "claude-managed-0.4.1",
+      "pname": "claude-managed",
+      "rev": "4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
+      "rev_count": 3243,
+      "rev_date": "2026-05-12T18:55:19Z",
+      "scrape_date": "2026-05-12T23:08:21.509537Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kxhnszh6kirs6a024s0bnjyx04dy0rkx-claude-managed-0.4.1"
+      },
+      "system": "aarch64-linux",
+      "group": "claude-managed",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/7cbjxv67m749n5mw2pb0lkh2i82s292k-claude-managed-0.4.1.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
+      "name": "claude-managed-0.4.1",
+      "pname": "claude-managed",
+      "rev": "4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
+      "rev_count": 3243,
+      "rev_date": "2026-05-12T18:55:19Z",
+      "scrape_date": "2026-05-12T23:08:21.509539Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/5amvlx9kqjc19v0r9s0pianxpj60qz4l-claude-managed-0.4.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "claude-managed",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/snshhqypg93w1yr27gxz9c239z3i9nax-claude-managed-0.4.1.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
+      "name": "claude-managed-0.4.1",
+      "pname": "claude-managed",
+      "rev": "4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
+      "rev_count": 3243,
+      "rev_date": "2026-05-12T18:55:19Z",
+      "scrape_date": "2026-05-12T23:08:21.509540Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/nr2v9wsw4c1zry0hzkg9psfs7kksvh4l-claude-managed-0.4.1"
+      },
+      "system": "x86_64-linux",
+      "group": "claude-managed",
       "priority": 5
     },
     {
@@ -1328,122 +1453,6 @@
       "system": "x86_64-linux",
       "group": "skill-graphify",
       "priority": 5
-    },
-    {
-      "attr_path": "claude-managed",
-      "broken": false,
-      "derivation": "/nix/store/w1klmic8k8a5iwgijlx0cm9yj48p8gih-claude-managed-0.4.1.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "claude-managed",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
-      "name": "claude-managed-0.4.1",
-      "pname": "claude-managed",
-      "rev": "4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
-      "rev_count": 3243,
-      "rev_date": "2026-05-12T18:55:19Z",
-      "scrape_date": "2026-05-12T23:08:21.509533Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/ai6ahqbl18ai53h6qxs3jyfzx25xvlv2-claude-managed-0.4.1"
-      },
-      "system": "aarch64-darwin",
-      "group": "claude-managed",
-      "priority": 5
-    },
-    {
-      "attr_path": "claude-managed",
-      "broken": false,
-      "derivation": "/nix/store/hiz3gjm8xnaadxn8fcnn3cqv00ak7jmx-claude-managed-0.4.1.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "claude-managed",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
-      "name": "claude-managed-0.4.1",
-      "pname": "claude-managed",
-      "rev": "4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
-      "rev_count": 3243,
-      "rev_date": "2026-05-12T18:55:19Z",
-      "scrape_date": "2026-05-12T23:08:21.509537Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/kxhnszh6kirs6a024s0bnjyx04dy0rkx-claude-managed-0.4.1"
-      },
-      "system": "aarch64-linux",
-      "group": "claude-managed",
-      "priority": 5
-    },
-    {
-      "attr_path": "claude-managed",
-      "broken": false,
-      "derivation": "/nix/store/7cbjxv67m749n5mw2pb0lkh2i82s292k-claude-managed-0.4.1.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "claude-managed",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
-      "name": "claude-managed-0.4.1",
-      "pname": "claude-managed",
-      "rev": "4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
-      "rev_count": 3243,
-      "rev_date": "2026-05-12T18:55:19Z",
-      "scrape_date": "2026-05-12T23:08:21.509539Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/5amvlx9kqjc19v0r9s0pianxpj60qz4l-claude-managed-0.4.1"
-      },
-      "system": "x86_64-darwin",
-      "group": "claude-managed",
-      "priority": 5
-    },
-    {
-      "attr_path": "claude-managed",
-      "broken": false,
-      "derivation": "/nix/store/snshhqypg93w1yr27gxz9c239z3i9nax-claude-managed-0.4.1.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "claude-managed",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
-      "name": "claude-managed-0.4.1",
-      "pname": "claude-managed",
-      "rev": "4df4a706b3ef96b35bb2d2f6efacc42d11f271b2",
-      "rev_count": 3243,
-      "rev_date": "2026-05-12T18:55:19Z",
-      "scrape_date": "2026-05-12T23:08:21.509540Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/nr2v9wsw4c1zry0hzkg9psfs7kksvh4l-claude-managed-0.4.1"
-      },
-      "system": "x86_64-linux",
-      "group": "claude-managed",
-      "priority": 5
     }
   ],
   "compose": {
@@ -1518,7 +1527,8 @@
             }
           },
           "vars": {
-            "GRAPHIFY_INSTALL_PACKAGE": "graphifyy",
+            "GRAPHIFY_INSTALL_PACKAGE": "graphifyy[mcp,watch]",
+            "GRAPHIFY_PROJECT_ROOT": "",
             "VIRTUAL_ENV_DISABLE_PROMPT": "1"
           },
           "hook": {
@@ -1530,7 +1540,15 @@
             "fish": "source \"$PYTHON_DIR/bin/activate.fish\"\n",
             "tcsh": "source \"$PYTHON_DIR/bin/activate.csh\"\n"
           },
-          "options": {}
+          "options": {},
+          "services": {
+            "graphify-mcp": {
+              "command": "PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\nsource \"$PYTHON_DIR/bin/activate\"\nroot=\"${GRAPHIFY_PROJECT_ROOT:-$FLOX_ENV_PROJECT}\"\ngraph=\"$root/graphify-out/graph.json\"\nuntil [ -f \"$graph\" ]; do\n  echo \"waiting for $graph (run graphify-watch first) ...\"\n  sleep 2\ndone\nexec python -m graphify.serve \"$graph\"\n"
+            },
+            "graphify-watch": {
+              "command": "PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\nsource \"$PYTHON_DIR/bin/activate\"\nroot=\"${GRAPHIFY_PROJECT_ROOT:-$FLOX_ENV_PROJECT}\"\nexec graphify watch \"$root\"\n"
+            }
+          }
         },
         "name": "graphify",
         "descriptor": {
