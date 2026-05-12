@@ -15,32 +15,32 @@
     "hook": {
       "on-activate": "export OMLX_DATA_DIR=\"$FLOX_ENV_CACHE/omlx\"\nexport OMLX_MODEL_DIR=\"${OMLX_MODEL_DIR:-$OMLX_DATA_DIR/models}\"\nmkdir -p \"$OMLX_MODEL_DIR\"\n"
     },
-    "services": {
-      "omlx": {
-        "command": "omlx_data=\"${OMLX_DATA_DIR:-$FLOX_ENV_CACHE/omlx}\"\nomlx_models=\"${OMLX_MODEL_DIR:-$omlx_data/models}\"\nmkdir -p \"$omlx_models\"\nexec omlx serve \\\n  --model-dir \"$omlx_models\" \\\n  --host \"$OMLX_HOST\" \\\n  --port \"$OMLX_PORT\"\n"
-      }
-    },
     "options": {
       "systems": [
         "aarch64-darwin"
       ]
+    },
+    "services": {
+      "omlx": {
+        "command": "omlx_data=\"${OMLX_DATA_DIR:-$FLOX_ENV_CACHE/omlx}\"\nomlx_models=\"${OMLX_MODEL_DIR:-$omlx_data/models}\"\nmkdir -p \"$omlx_models\"\nexec omlx serve \\\n  --model-dir \"$omlx_models\" \\\n  --host \"$OMLX_HOST\" \\\n  --port \"$OMLX_PORT\"\n"
+      }
     }
   },
   "packages": [
     {
       "attr_path": "omlx",
       "broken": false,
-      "derivation": "/nix/store/iyjn3yki8c5fh8sqk1f1h579b15gmann-omlx-env.drv",
-      "description": "Production-ready LLM inference server for Apple Silicon",
+      "derivation": "/nix/store/d69kvylnd5nbyngvb60p0n9a7zjrjrkn-omlx-env.drv",
+      "description": "LLM inference server, optimized for your Mac",
       "install_id": "omlx",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=b094160",
-      "name": "omlx-0.3.8",
+      "license": "Apache-2.0",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=d5097f109efcbfcfa4595407abf0924c6ed78ba4",
+      "name": "omlx-env",
       "pname": "omlx",
-      "rev": "b094160",
-      "rev_count": 1,
-      "rev_date": "2026-05-11T00:00:00Z",
-      "scrape_date": "2026-05-11T00:00:00Z",
+      "rev": "d5097f109efcbfcfa4595407abf0924c6ed78ba4",
+      "rev_count": 3173,
+      "rev_date": "2026-05-11T13:25:23Z",
+      "scrape_date": "2026-05-12T07:47:13.422995Z",
       "stabilities": [
         "unstable"
       ],
@@ -50,7 +50,7 @@
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/wi9vb1j2mzqsnxgnd7bsxvly370v74li-omlx-env"
+        "out": "/nix/store/dpgqp7m2lavwndh962n7wdi8z005gq2p-omlx-env"
       },
       "system": "aarch64-darwin",
       "group": "omlx",
