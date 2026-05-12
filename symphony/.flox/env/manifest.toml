@@ -33,6 +33,9 @@ export SYMPHONY_LOGS_ROOT="$SYMPHONY_DATA/log"
 export CODEX_BIN="$(command -v codex)"
 mkdir -p "$SYMPHONY_WORKSPACE_ROOT" "$SYMPHONY_LOGS_ROOT"
 
+# Always regenerate WORKFLOW.md so the tracker stays in
+# sync with the current LINEAR_API_KEY state. Edits to
+# the cached file are intentionally discarded.
 if [[ -n "${LINEAR_API_KEY:-}" ]]; then
   cat > "$SYMPHONY_DATA/WORKFLOW.md" <<EOF
 ---

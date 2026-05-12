@@ -9,6 +9,12 @@ for c in symphony codex git bash; do
   echo ">>> $c ... OK"
 done
 
+if [[ ! -f "$SYMPHONY_DATA/WORKFLOW.md" ]]; then
+  echo "Error: WORKFLOW.md not generated at \$SYMPHONY_DATA"
+  exit 1
+fi
+echo ">>> WORKFLOW.md ... OK"
+
 echo ">>> symphony version: $(symphony version 2>&1 | head -1)"
 echo ">>> codex version:    $(codex --version 2>&1 | head -1)"
 
