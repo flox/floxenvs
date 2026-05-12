@@ -1,30 +1,18 @@
 {
   lib,
-  stdenv,
   python313,
   callPackage,
 }:
 
 let
-  manifestLock = builtins.fromJSON
-    (builtins.readFile ../../../.flox/env/manifest.lock);
-
-  system = stdenv.hostPlatform.system;
-
-  getStorePath = name:
-    let
-      pkg = lib.findFirst
-        (p: p.install_id == name && p.system == system) null
-        manifestLock.packages;
-    in
-    assert (pkg != null)
-      || (throw "package '${name}' not found in manifest.lock for ${system}");
-    builtins.storePath pkg.outputs.out;
-
-  pyproject-nix-pkg = getStorePath "pyproject-nix";
-  uv2nix-pkg = getStorePath "uv2nix";
+  # Build the three uv2nix Nix libraries directly from their
+  # sibling wrapper packages. Each wrapper is a pure-Nix
+  # derivation that fetches the upstream repo via
+  # fetchFromGitHub and exports the source under $out/<libname>/.
+  pyproject-nix-pkg = callPackage ../pyproject-nix { };
+  uv2nix-pkg = callPackage ../uv2nix { };
   pyproject-build-systems-pkg =
-    getStorePath "pyproject-build-systems";
+    callPackage ../pyproject-build-systems { };
 
   pyproject-nix-lib =
     import "${pyproject-nix-pkg}/pyproject-nix" {
