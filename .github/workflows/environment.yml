@@ -86,20 +86,21 @@ jobs:
               else . end
           ' "$LOCK")
           MATRIX=$(echo "$SYSTEMS" | jq -c '{system: .}')
-          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
 
           # Detect services
           SVC=$(jq -r '
             .manifest.services // {} | length > 0
           ' "$LOCK")
-          echo "start_services=$SVC" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "matrix=$MATRIX"
+            echo "start_services=$SVC"
+          } >> "$GITHUB_OUTPUT"
 
           # Check for demo
           DEMO_DIR="$ENV-demo"
           if [ -d "$DEMO_DIR" ] \
               && [ -f "$DEMO_DIR/.flox/env/manifest.lock" ]; then
-            echo "has_demo=true" >> "$GITHUB_OUTPUT"
-
             DEMO_LOCK="$DEMO_DIR/.flox/env/manifest.lock"
 
             DEMO_SYSTEMS=$(jq -r '
@@ -110,16 +111,22 @@ jobs:
                 else . end
             ' "$DEMO_LOCK")
             DEMO_MATRIX=$(echo "$DEMO_SYSTEMS" | jq -c '{system: .}')
-            echo "demo_matrix=$DEMO_MATRIX" >> "$GITHUB_OUTPUT"
 
             DEMO_SVC=$(jq -r '
               .manifest.services // {} | length > 0
             ' "$DEMO_LOCK")
-            echo "demo_start_services=$DEMO_SVC" >> "$GITHUB_OUTPUT"
+
+            {
+              echo "has_demo=true"
+              echo "demo_matrix=$DEMO_MATRIX"
+              echo "demo_start_services=$DEMO_SVC"
+            } >> "$GITHUB_OUTPUT"
           else
-            echo "has_demo=false" >> "$GITHUB_OUTPUT"
-            echo "demo_matrix={\"system\":[]}" >> "$GITHUB_OUTPUT"
-            echo "demo_start_services=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "has_demo=false"
+              echo "demo_matrix={\"system\":[]}"
+              echo "demo_start_services=false"
+            } >> "$GITHUB_OUTPUT"
           fi
 
   test:
@@ -155,16 +162,20 @@ jobs:
         run: |
           set -eo pipefail
           echo "${{ vars.MANAGED_REMOTE_BUILDERS }}" > machines
-          export REMOTE_SERVER_ENTRY=$(cat machines | shuf | grep ${{ matrix.system }} | head -1 ; )
-          export REMOTE_SERVER_ADDRESS=$(echo "$REMOTE_SERVER_ENTRY" | cut -f1 -d' ' | cut -f3 -d'/' | sed 's/nixbld@//' ; )
-          export REMOTE_SERVER_USER_KNOWN_HOSTS_FILE=$(mktemp)
-          export REMOTE_SERVER_PUBLIC_HOST_KEY=$(echo "$REMOTE_SERVER_ENTRY" | tr -s ' ' | cut -f8 -d' ' | base64 -d ; )
+          REMOTE_SERVER_ENTRY="$(shuf machines | grep "${{ matrix.system }}" | head -1)"
+          REMOTE_SERVER_ADDRESS="$(echo "$REMOTE_SERVER_ENTRY" | cut -f1 -d' ' | cut -f3 -d'/' | sed 's/nixbld@//')"
+          REMOTE_SERVER_USER_KNOWN_HOSTS_FILE="$(mktemp)"
+          REMOTE_SERVER_PUBLIC_HOST_KEY="$(echo "$REMOTE_SERVER_ENTRY" | tr -s ' ' | cut -f8 -d' ' | base64 -d)"
+          export REMOTE_SERVER_ENTRY REMOTE_SERVER_ADDRESS
+          export REMOTE_SERVER_USER_KNOWN_HOSTS_FILE REMOTE_SERVER_PUBLIC_HOST_KEY
           printf "%s %s\n" "$REMOTE_SERVER_ADDRESS" "$REMOTE_SERVER_PUBLIC_HOST_KEY" > "$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE"
           echo "REMOTE_SERVER_ADDRESS: $REMOTE_SERVER_ADDRESS"
           echo "REMOTE_SERVER_USER_KNOWN_HOSTS_FILE: $REMOTE_SERVER_USER_KNOWN_HOSTS_FILE"
-          cat $REMOTE_SERVER_USER_KNOWN_HOSTS_FILE
-          echo "REMOTE_SERVER_ADDRESS=$REMOTE_SERVER_ADDRESS" >> $GITHUB_ENV
-          echo "REMOTE_SERVER_USER_KNOWN_HOSTS_FILE=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE" >> $GITHUB_ENV
+          cat "$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE"
+          {
+            echo "REMOTE_SERVER_ADDRESS=$REMOTE_SERVER_ADDRESS"
+            echo "REMOTE_SERVER_USER_KNOWN_HOSTS_FILE=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE"
+          } >> "$GITHUB_ENV"
           if [ -n "$REMOTE_SERVER_ADDRESS" ]; then
             tailscale ping "$REMOTE_SERVER_ADDRESS"
           fi
@@ -222,16 +233,20 @@ jobs:
         run: |
           set -eo pipefail
           echo "${{ vars.MANAGED_REMOTE_BUILDERS }}" > machines
-          export REMOTE_SERVER_ENTRY=$(cat machines | shuf | grep ${{ matrix.system }} | head -1 ; )
-          export REMOTE_SERVER_ADDRESS=$(echo "$REMOTE_SERVER_ENTRY" | cut -f1 -d' ' | cut -f3 -d'/' | sed 's/nixbld@//' ; )
-          export REMOTE_SERVER_USER_KNOWN_HOSTS_FILE=$(mktemp)
-          export REMOTE_SERVER_PUBLIC_HOST_KEY=$(echo "$REMOTE_SERVER_ENTRY" | tr -s ' ' | cut -f8 -d' ' | base64 -d ; )
+          REMOTE_SERVER_ENTRY="$(shuf machines | grep "${{ matrix.system }}" | head -1)"
+          REMOTE_SERVER_ADDRESS="$(echo "$REMOTE_SERVER_ENTRY" | cut -f1 -d' ' | cut -f3 -d'/' | sed 's/nixbld@//')"
+          REMOTE_SERVER_USER_KNOWN_HOSTS_FILE="$(mktemp)"
+          REMOTE_SERVER_PUBLIC_HOST_KEY="$(echo "$REMOTE_SERVER_ENTRY" | tr -s ' ' | cut -f8 -d' ' | base64 -d)"
+          export REMOTE_SERVER_ENTRY REMOTE_SERVER_ADDRESS
+          export REMOTE_SERVER_USER_KNOWN_HOSTS_FILE REMOTE_SERVER_PUBLIC_HOST_KEY
           printf "%s %s\n" "$REMOTE_SERVER_ADDRESS" "$REMOTE_SERVER_PUBLIC_HOST_KEY" > "$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE"
           echo "REMOTE_SERVER_ADDRESS: $REMOTE_SERVER_ADDRESS"
           echo "REMOTE_SERVER_USER_KNOWN_HOSTS_FILE: $REMOTE_SERVER_USER_KNOWN_HOSTS_FILE"
-          cat $REMOTE_SERVER_USER_KNOWN_HOSTS_FILE
-          echo "REMOTE_SERVER_ADDRESS=$REMOTE_SERVER_ADDRESS" >> $GITHUB_ENV
-          echo "REMOTE_SERVER_USER_KNOWN_HOSTS_FILE=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE" >> $GITHUB_ENV
+          cat "$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE"
+          {
+            echo "REMOTE_SERVER_ADDRESS=$REMOTE_SERVER_ADDRESS"
+            echo "REMOTE_SERVER_USER_KNOWN_HOSTS_FILE=$REMOTE_SERVER_USER_KNOWN_HOSTS_FILE"
+          } >> "$GITHUB_ENV"
           if [ -n "$REMOTE_SERVER_ADDRESS" ]; then
             tailscale ping "$REMOTE_SERVER_ADDRESS"
           fi
@@ -276,7 +291,7 @@ jobs:
 
       - name: "Get FloxHub token"
         run: |
-          echo "FLOX_FLOXHUB_TOKEN=${{ secrets.FLOX_FLOXHUB_TOKEN }}" >> $GITHUB_ENV
+          echo "FLOX_FLOXHUB_TOKEN=${{ secrets.FLOX_FLOXHUB_TOKEN }}" >> "$GITHUB_ENV"
 
       - name: "Determine target org"
         id: "org"
@@ -348,7 +363,7 @@ jobs:
 
       - name: "Get FloxHub token"
         run: |
-          echo "FLOX_FLOXHUB_TOKEN=${{ secrets.FLOX_FLOXHUB_TOKEN }}" >> $GITHUB_ENV
+          echo "FLOX_FLOXHUB_TOKEN=${{ secrets.FLOX_FLOXHUB_TOKEN }}" >> "$GITHUB_ENV"
 
       - name: "Determine target org"
         id: "org"
