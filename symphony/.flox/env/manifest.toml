@@ -76,9 +76,15 @@ fi
 '''
 
 [services]
+# Upstream symphony's CLI requires the
+# `--i-understand-that-this-will-be-running-without-the-usual-guardrails`
+# acknowledgement before it will boot — Symphony spawns
+# Codex without sandbox isolation, and this flag is the
+# upstream-mandated way to confirm the user knows that.
 symphony.command = '''
 SYMPHONY_DATA="$FLOX_ENV_CACHE/symphony"
 exec symphony \
+  --i-understand-that-this-will-be-running-without-the-usual-guardrails \
   --port "$SYMPHONY_PORT" \
   --logs-root "$SYMPHONY_DATA/log" \
   "$SYMPHONY_DATA/WORKFLOW.md"

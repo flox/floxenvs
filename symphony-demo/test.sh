@@ -21,7 +21,11 @@ if ! grep -q '^tracker:' "$SYMPHONY_DATA/WORKFLOW.md"; then
 fi
 echo ">>> tracker line present"
 
-echo ">>> symphony version: $(symphony version 2>&1 | head -1)"
+# `symphony` is an Elixir escript; calling it with no
+# args prints the guardrails warning and exits 0.
+symphony 2>&1 | grep -q 'guardrails' \
+  || { echo "Error: symphony self-check did not print guardrails warning"; exit 1; }
+echo ">>> symphony self-check ... OK"
 echo ">>> codex version:    $(codex --version 2>&1 | head -1)"
 echo ">>> gum version:      $(gum --version)"
 
