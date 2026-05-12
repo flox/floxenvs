@@ -25,8 +25,11 @@ func TestHookCode_Full(t *testing.T) {
 		t.Errorf("wrapper body must reference $FLOX_ENV/bin/claude at runtime")
 	}
 	// wrapper must discover plugins at exec time, not bake them in at hook time
-	if !strings.Contains(result, `for d in "$CLAUDE_CONFIG_DIR/plugins"/*/`) {
-		t.Errorf("wrapper must iterate $CLAUDE_CONFIG_DIR/plugins/*/ at runtime")
+	if !strings.Contains(result, `for d in "$CLAUDE_CONFIG_DIR/plugins"/*`) {
+		t.Errorf("wrapper must iterate $CLAUDE_CONFIG_DIR/plugins/* at runtime")
+	}
+	if !strings.Contains(result, `[ -L "$d" ] && [ -d "$d" ] || continue`) {
+		t.Errorf("wrapper must only follow symlinks (skip data/, cache/, marketplaces/ dirs Claude Code creates)")
 	}
 	if !strings.Contains(result, `plugin_args+=(--plugin-dir`) {
 		t.Errorf("wrapper must build --plugin-dir args at runtime")
@@ -111,7 +114,7 @@ func TestHookCode_NoFragments(t *testing.T) {
 	if !strings.Contains(result, `cat > "$CLAUDE_CONFIG_DIR/bin/claude"`) {
 		t.Errorf("wrapper must be emitted even when no plugins are discovered")
 	}
-	if !strings.Contains(result, `for d in "$CLAUDE_CONFIG_DIR/plugins"/*/`) {
+	if !strings.Contains(result, `for d in "$CLAUDE_CONFIG_DIR/plugins"/*`) {
 		t.Errorf("wrapper must iterate plugins at runtime even when none discovered")
 	}
 }

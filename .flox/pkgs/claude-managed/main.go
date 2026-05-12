@@ -105,11 +105,7 @@ func main() {
 				fmt.Fprintln(os.Stderr, red("ERROR:")+" usage: claude-managed plugins add <path>")
 				os.Exit(1)
 			}
-			warnings, err := plugins.Add(pluginPath, configDir)
-			for _, w := range warnings {
-				fmt.Fprintf(os.Stderr, yellow("WARN:")+" %s\n", w)
-			}
-			if err != nil {
+			if err := plugins.Add(pluginPath, configDir); err != nil {
 				fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
 				os.Exit(1)
 			}
