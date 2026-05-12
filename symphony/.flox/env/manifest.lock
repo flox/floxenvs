@@ -1,0 +1,548 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "bash": {
+        "pkg-path": "bash",
+        "pkg-group": "symphony"
+      },
+      "codex": {
+        "pkg-path": "flox/codex",
+        "pkg-group": "symphony"
+      },
+      "git": {
+        "pkg-path": "git",
+        "pkg-group": "symphony-tools"
+      },
+      "symphony": {
+        "pkg-path": "flox/symphony",
+        "pkg-group": "symphony"
+      }
+    },
+    "vars": {
+      "SYMPHONY_PORT": "14000"
+    },
+    "hook": {
+      "on-activate": "export SYMPHONY_DATA=\"$FLOX_ENV_CACHE/symphony\"\nexport SYMPHONY_WORKSPACE_ROOT=\"$SYMPHONY_DATA/workspaces\"\nexport SYMPHONY_LOGS_ROOT=\"$SYMPHONY_DATA/log\"\nexport CODEX_BIN=\"$(command -v codex)\"\nmkdir -p \"$SYMPHONY_WORKSPACE_ROOT\" \"$SYMPHONY_LOGS_ROOT\"\n\nif [[ -n \"${LINEAR_API_KEY:-}\" ]]; then\n  cat > \"$SYMPHONY_DATA/WORKFLOW.md\" <<EOF\n---\ntracker:\n  kind: linear\n  active_states: [Todo, In Progress, Merging, Rework]\n  terminal_states: [Closed, Cancelled, Done]\npolling:\n  interval_ms: 5000\nworkspace:\n  root: $SYMPHONY_WORKSPACE_ROOT\nagent:\n  max_concurrent_agents: 4\n  max_turns: 20\ncodex:\n  bin: $CODEX_BIN\n---\n# Symphony — Linear workflow\nEOF\nelse\n  cat > \"$SYMPHONY_DATA/WORKFLOW.md\" <<EOF\n---\ntracker:\n  kind: memory\npolling:\n  interval_ms: 5000\nworkspace:\n  root: $SYMPHONY_WORKSPACE_ROOT\nagent:\n  max_concurrent_agents: 2\n  max_turns: 10\ncodex:\n  bin: $CODEX_BIN\n---\n# Symphony — in-memory dashboard demo\nEOF\nfi\n"
+    },
+    "options": {},
+    "services": {
+      "symphony": {
+        "command": "SYMPHONY_DATA=\"$FLOX_ENV_CACHE/symphony\"\nexec symphony \\\n  --port \"$SYMPHONY_PORT\" \\\n  --logs-root \"$SYMPHONY_DATA/log\" \\\n  \"$SYMPHONY_DATA/WORKFLOW.md\"\n"
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "bash",
+      "broken": false,
+      "derivation": "/nix/store/hhh1lks1hx9zh254wwdi2mynz9vrxc4h-bash-interactive-5.3p9.drv",
+      "description": "GNU Bourne-Again Shell, the de facto standard shell on Linux (for interactive use)",
+      "install_id": "bash",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "name": "bash-interactive-5.3p9",
+      "pname": "bash",
+      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "rev_count": 990025,
+      "rev_date": "2026-04-30T19:45:37Z",
+      "scrape_date": "2026-05-03T08:10:22.106148Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "5.3p9",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/6wxmagb455g12diam7bf305f5qs6j0pb-bash-interactive-5.3p9-dev",
+        "doc": "/nix/store/vmqw6a17fkxb0h7cdkwwayv4zcr7ilrh-bash-interactive-5.3p9-doc",
+        "info": "/nix/store/2y400c3b7xxqaw7z9javmgzivb7p79dx-bash-interactive-5.3p9-info",
+        "man": "/nix/store/1gjr5smhr73ya2bnvjr55ik4w8l9za9m-bash-interactive-5.3p9-man",
+        "out": "/nix/store/in4yc03diyvs2n2wgf3nva4hbvml8v1j-bash-interactive-5.3p9"
+      },
+      "system": "aarch64-darwin",
+      "group": "symphony",
+      "priority": 5
+    },
+    {
+      "attr_path": "bash",
+      "broken": false,
+      "derivation": "/nix/store/j1jz1vnc7ghkpp1b1214ixz5j8fq6sji-bash-interactive-5.3p9.drv",
+      "description": "GNU Bourne-Again Shell, the de facto standard shell on Linux (for interactive use)",
+      "install_id": "bash",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "name": "bash-interactive-5.3p9",
+      "pname": "bash",
+      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "rev_count": 990025,
+      "rev_date": "2026-04-30T19:45:37Z",
+      "scrape_date": "2026-05-03T08:44:33.553181Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "5.3p9",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/ds70877s3ssafag7acjv694m8sjg3rjj-bash-interactive-5.3p9-debug",
+        "dev": "/nix/store/af91fyhrr83yjmv0hvmg8qwllw3qk5mg-bash-interactive-5.3p9-dev",
+        "doc": "/nix/store/kna8sq16gxiw9qx5xnyd73l07pn7fymd-bash-interactive-5.3p9-doc",
+        "info": "/nix/store/8fx6ic9ajwmsyg5afrgyjpks2r2ibabp-bash-interactive-5.3p9-info",
+        "man": "/nix/store/pqjf0sh448pfbnznf358c5shnz8gj9a3-bash-interactive-5.3p9-man",
+        "out": "/nix/store/kqh7aw6sj1b0kzfkx2fxm8ij4lkc0735-bash-interactive-5.3p9"
+      },
+      "system": "aarch64-linux",
+      "group": "symphony",
+      "priority": 5
+    },
+    {
+      "attr_path": "bash",
+      "broken": false,
+      "derivation": "/nix/store/2y83zwwsap35s39n0nszbk7drpmjcj5b-bash-interactive-5.3p9.drv",
+      "description": "GNU Bourne-Again Shell, the de facto standard shell on Linux (for interactive use)",
+      "install_id": "bash",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "name": "bash-interactive-5.3p9",
+      "pname": "bash",
+      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "rev_count": 990025,
+      "rev_date": "2026-04-30T19:45:37Z",
+      "scrape_date": "2026-05-03T09:15:55.092999Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "5.3p9",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/a5jlanqwr330df9f7wj231zwls57b2w9-bash-interactive-5.3p9-dev",
+        "doc": "/nix/store/r32ymasfy6z5x0394hgifkfcqj175d4h-bash-interactive-5.3p9-doc",
+        "info": "/nix/store/syfrnwhbm2zlyilq14ks773h0yjrj5jc-bash-interactive-5.3p9-info",
+        "man": "/nix/store/k48vfj52w13xhqfs8rjkk25k5ian1xzs-bash-interactive-5.3p9-man",
+        "out": "/nix/store/7i5gfqa19rj4sydhl2rbb6spcisis1c9-bash-interactive-5.3p9"
+      },
+      "system": "x86_64-darwin",
+      "group": "symphony",
+      "priority": 5
+    },
+    {
+      "attr_path": "bash",
+      "broken": false,
+      "derivation": "/nix/store/5bdprl0q08gk4cynpik0ssmg0ky7lzbh-bash-interactive-5.3p9.drv",
+      "description": "GNU Bourne-Again Shell, the de facto standard shell on Linux (for interactive use)",
+      "install_id": "bash",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "name": "bash-interactive-5.3p9",
+      "pname": "bash",
+      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "rev_count": 990025,
+      "rev_date": "2026-04-30T19:45:37Z",
+      "scrape_date": "2026-05-03T09:52:10.760052Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "5.3p9",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out",
+        "out",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/5lz4ynx0dvpx4rlq3h7ab82hbbkmfhp8-bash-interactive-5.3p9-debug",
+        "dev": "/nix/store/5bs057cgp4nxqff22jg0k1svs121z6a8-bash-interactive-5.3p9-dev",
+        "doc": "/nix/store/ycaqnajbv2sb0hi0cm5hsg5ri8ywih7x-bash-interactive-5.3p9-doc",
+        "info": "/nix/store/cg59l95m74xywr3y3px4iir4jw09a3rp-bash-interactive-5.3p9-info",
+        "man": "/nix/store/arys3dnblxv60q8b575scyd6b97s0yzi-bash-interactive-5.3p9-man",
+        "out": "/nix/store/4bwbk4an4bx7cb8xwffghvjjyfyl7m2i-bash-interactive-5.3p9"
+      },
+      "system": "x86_64-linux",
+      "group": "symphony",
+      "priority": 5
+    },
+    {
+      "attr_path": "codex",
+      "broken": false,
+      "derivation": "/nix/store/10v79nkjfszdyh2qqzp2ppiczz6ai51n-codex-0.128.0.drv",
+      "description": "OpenAI Codex CLI - a coding agent that runs locally",
+      "install_id": "codex",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/floxenvs?rev=6d1577f32af10633ac0bf4b65205dcfa4d163676",
+      "name": "codex-0.128.0",
+      "pname": "codex",
+      "rev": "6d1577f32af10633ac0bf4b65205dcfa4d163676",
+      "rev_count": 3078,
+      "rev_date": "2026-05-08T21:21:32Z",
+      "scrape_date": "2026-05-12T12:02:07.768420Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.128.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/z1nw4q97qpka84sw429x0b2wh1cimihx-codex-0.128.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "symphony",
+      "priority": 5
+    },
+    {
+      "attr_path": "codex",
+      "broken": false,
+      "derivation": "/nix/store/li31rhfiywi27d96yqawlwpg3dbx166m-codex-0.128.0.drv",
+      "description": "OpenAI Codex CLI - a coding agent that runs locally",
+      "install_id": "codex",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/floxenvs?rev=6d1577f32af10633ac0bf4b65205dcfa4d163676",
+      "name": "codex-0.128.0",
+      "pname": "codex",
+      "rev": "6d1577f32af10633ac0bf4b65205dcfa4d163676",
+      "rev_count": 3078,
+      "rev_date": "2026-05-08T21:21:32Z",
+      "scrape_date": "2026-05-12T12:02:07.768422Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.128.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/qclfp8qj2br57l4yhr32ksjy4w43jc56-codex-0.128.0"
+      },
+      "system": "aarch64-linux",
+      "group": "symphony",
+      "priority": 5
+    },
+    {
+      "attr_path": "codex",
+      "broken": false,
+      "derivation": "/nix/store/dv8m4207dqlxzgvpqgvzhacxp7z4r4a5-codex-0.128.0.drv",
+      "description": "OpenAI Codex CLI - a coding agent that runs locally",
+      "install_id": "codex",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/floxenvs?rev=6d1577f32af10633ac0bf4b65205dcfa4d163676",
+      "name": "codex-0.128.0",
+      "pname": "codex",
+      "rev": "6d1577f32af10633ac0bf4b65205dcfa4d163676",
+      "rev_count": 3078,
+      "rev_date": "2026-05-08T21:21:32Z",
+      "scrape_date": "2026-05-12T12:02:07.768423Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.128.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/3887i3pjh15bm8v8c09sj402ym1j8zk2-codex-0.128.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "symphony",
+      "priority": 5
+    },
+    {
+      "attr_path": "codex",
+      "broken": false,
+      "derivation": "/nix/store/3yn83hlz4219bzy5bgiwrd6q1g0xyz8z-codex-0.128.0.drv",
+      "description": "OpenAI Codex CLI - a coding agent that runs locally",
+      "install_id": "codex",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/floxenvs?rev=6d1577f32af10633ac0bf4b65205dcfa4d163676",
+      "name": "codex-0.128.0",
+      "pname": "codex",
+      "rev": "6d1577f32af10633ac0bf4b65205dcfa4d163676",
+      "rev_count": 3078,
+      "rev_date": "2026-05-08T21:21:32Z",
+      "scrape_date": "2026-05-12T12:02:07.768424Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.128.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/x4lzjpggb93ql71ks4fdhqaczqb49qcx-codex-0.128.0"
+      },
+      "system": "x86_64-linux",
+      "group": "symphony",
+      "priority": 5
+    },
+    {
+      "attr_path": "symphony",
+      "broken": false,
+      "derivation": "/nix/store/s87xcfq8gsdxwnma9afqpg8pi6c26i95-symphony-58cf97d.drv",
+      "description": "OpenAI Symphony agent orchestrator",
+      "install_id": "symphony",
+      "license": "Apache-2.0",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=bacf28ad1328619a4d86cb88e1f11f5049af1aff",
+      "name": "symphony-58cf97d",
+      "pname": "symphony",
+      "rev": "bacf28ad1328619a4d86cb88e1f11f5049af1aff",
+      "rev_count": 3161,
+      "rev_date": "2026-05-11T11:34:24Z",
+      "scrape_date": "2026-05-12T12:02:07.768425Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "58cf97d",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/0akb81h4c87lxsjc8dxapwamd2mr9yml-symphony-58cf97d"
+      },
+      "system": "aarch64-darwin",
+      "group": "symphony",
+      "priority": 5
+    },
+    {
+      "attr_path": "symphony",
+      "broken": false,
+      "derivation": "/nix/store/1daw5smbq2i9r6a5ngfjhc9rcpnz9jin-symphony-58cf97d.drv",
+      "description": "OpenAI Symphony agent orchestrator",
+      "install_id": "symphony",
+      "license": "Apache-2.0",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=bacf28ad1328619a4d86cb88e1f11f5049af1aff",
+      "name": "symphony-58cf97d",
+      "pname": "symphony",
+      "rev": "bacf28ad1328619a4d86cb88e1f11f5049af1aff",
+      "rev_count": 3161,
+      "rev_date": "2026-05-11T11:34:24Z",
+      "scrape_date": "2026-05-12T12:02:07.768435Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "58cf97d",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/d3k6icdb22in2ck3a39h25dws53hg5s4-symphony-58cf97d"
+      },
+      "system": "aarch64-linux",
+      "group": "symphony",
+      "priority": 5
+    },
+    {
+      "attr_path": "symphony",
+      "broken": false,
+      "derivation": "/nix/store/va761kl0cpbxg64wvdka3s9k5ln8rp72-symphony-58cf97d.drv",
+      "description": "OpenAI Symphony agent orchestrator",
+      "install_id": "symphony",
+      "license": "Apache-2.0",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=bacf28ad1328619a4d86cb88e1f11f5049af1aff",
+      "name": "symphony-58cf97d",
+      "pname": "symphony",
+      "rev": "bacf28ad1328619a4d86cb88e1f11f5049af1aff",
+      "rev_count": 3161,
+      "rev_date": "2026-05-11T11:34:24Z",
+      "scrape_date": "2026-05-12T12:02:07.768436Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "58cf97d",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/8nrkv3zaxica8dlq14ln0jcfmf873rzs-symphony-58cf97d"
+      },
+      "system": "x86_64-darwin",
+      "group": "symphony",
+      "priority": 5
+    },
+    {
+      "attr_path": "symphony",
+      "broken": false,
+      "derivation": "/nix/store/pxkw01hb3ljzxnmqzq0ncjyy6vbxs3j8-symphony-58cf97d.drv",
+      "description": "OpenAI Symphony agent orchestrator",
+      "install_id": "symphony",
+      "license": "Apache-2.0",
+      "locked_url": "ssh://git@github.com/flox/floxenvs.git?rev=bacf28ad1328619a4d86cb88e1f11f5049af1aff",
+      "name": "symphony-58cf97d",
+      "pname": "symphony",
+      "rev": "bacf28ad1328619a4d86cb88e1f11f5049af1aff",
+      "rev_count": 3161,
+      "rev_date": "2026-05-11T11:34:24Z",
+      "scrape_date": "2026-05-12T12:02:07.768437Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "58cf97d",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/gds2xr4q73hlv2l8n83fh13c4zrk5mav-symphony-58cf97d"
+      },
+      "system": "x86_64-linux",
+      "group": "symphony",
+      "priority": 5
+    },
+    {
+      "attr_path": "git",
+      "broken": false,
+      "derivation": "/nix/store/9n758xnd7s67zz9naiivygz24pv7zpr4-git-2.53.0.drv",
+      "description": "Distributed version control system",
+      "install_id": "git",
+      "license": "GPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "git-2.53.0",
+      "pname": "git",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T08:07:16.514678Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.53.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/0kjpgj1grgba239ykdnv1cjc61xqk3aa-git-2.53.0-doc",
+        "out": "/nix/store/5y6cp247hspkqa7pp6cbc4540ygx0249-git-2.53.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "symphony-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "git",
+      "broken": false,
+      "derivation": "/nix/store/y0zdc38hb5flnbzx9a8sia7azv917jvc-git-2.53.0.drv",
+      "description": "Distributed version control system",
+      "install_id": "git",
+      "license": "GPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "git-2.53.0",
+      "pname": "git",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T08:43:45.985160Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.53.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/rc56a3l2wby94gk9gvirpwi9hv9v15gi-git-2.53.0-debug",
+        "doc": "/nix/store/q8j5mwix1g75xyq025d3hmringklm52z-git-2.53.0-doc",
+        "out": "/nix/store/gx9r7g2kyrjhh0zhgxz91f5nbczxh1ac-git-2.53.0"
+      },
+      "system": "aarch64-linux",
+      "group": "symphony-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "git",
+      "broken": false,
+      "derivation": "/nix/store/mpa3y57ch7a3rz55183a886hq2g4h9wm-git-2.53.0.drv",
+      "description": "Distributed version control system",
+      "install_id": "git",
+      "license": "GPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "git-2.53.0",
+      "pname": "git",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T09:16:10.426890Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.53.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/9jcm7zadfi5wsic3kizs4x71a8dqlj83-git-2.53.0-doc",
+        "out": "/nix/store/zar16r8w28c6qjdh3xqnkjcmvjjqwi77-git-2.53.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "symphony-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "git",
+      "broken": false,
+      "derivation": "/nix/store/gz2q1wq6ckyphg0q08nq9q93g1a6x561-git-2.53.0.drv",
+      "description": "Distributed version control system",
+      "install_id": "git",
+      "license": "GPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "git-2.53.0",
+      "pname": "git",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T09:52:24.820969Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.53.0",
+      "outputs_to_install": [
+        "out",
+        "out",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/qyqya20z59d164d6692hlyb9pkq10ykk-git-2.53.0-debug",
+        "doc": "/nix/store/vv1ap6qaxdzpa4jqg71myxh5wcvnlqv8-git-2.53.0-doc",
+        "out": "/nix/store/c0277k5giric1mn9dklllavbzvxl6hzb-git-2.53.0"
+      },
+      "system": "x86_64-linux",
+      "group": "symphony-tools",
+      "priority": 5
+    }
+  ]
+}

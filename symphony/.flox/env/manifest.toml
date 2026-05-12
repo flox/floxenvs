@@ -1,0 +1,82 @@
+schema-version = "1.10.0"
+
+# Minimal Symphony environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/symphony"]
+#
+# Provides the symphony orchestrator + codex agent.
+# Runs a dashboard-only in-memory tracker by default;
+# set LINEAR_API_KEY to switch to a Linear-driven
+# workflow.
+
+[install]
+symphony.pkg-path = "flox/symphony"
+symphony.pkg-group = "symphony"
+codex.pkg-path = "flox/codex"
+codex.pkg-group = "symphony"
+bash.pkg-path = "bash"
+bash.pkg-group = "symphony"
+git.pkg-path = "git"
+git.pkg-group = "symphony-tools"
+
+[vars]
+SYMPHONY_PORT = "14000"
+
+[hook]
+on-activate = '''
+export SYMPHONY_DATA="$FLOX_ENV_CACHE/symphony"
+export SYMPHONY_WORKSPACE_ROOT="$SYMPHONY_DATA/workspaces"
+export SYMPHONY_LOGS_ROOT="$SYMPHONY_DATA/log"
+export CODEX_BIN="$(command -v codex)"
+mkdir -p "$SYMPHONY_WORKSPACE_ROOT" "$SYMPHONY_LOGS_ROOT"
+
+if [[ -n "${LINEAR_API_KEY:-}" ]]; then
+  cat > "$SYMPHONY_DATA/WORKFLOW.md" <<EOF
+---
+tracker:
+  kind: linear
+  active_states: [Todo, In Progress, Merging, Rework]
+  terminal_states: [Closed, Cancelled, Done]
+polling:
+  interval_ms: 5000
+workspace:
+  root: $SYMPHONY_WORKSPACE_ROOT
+agent:
+  max_concurrent_agents: 4
+  max_turns: 20
+codex:
+  bin: $CODEX_BIN
+---
+# Symphony — Linear workflow
+EOF
+else
+  cat > "$SYMPHONY_DATA/WORKFLOW.md" <<EOF
+---
+tracker:
+  kind: memory
+polling:
+  interval_ms: 5000
+workspace:
+  root: $SYMPHONY_WORKSPACE_ROOT
+agent:
+  max_concurrent_agents: 2
+  max_turns: 10
+codex:
+  bin: $CODEX_BIN
+---
+# Symphony — in-memory dashboard demo
+EOF
+fi
+'''
+
+[services]
+symphony.command = '''
+SYMPHONY_DATA="$FLOX_ENV_CACHE/symphony"
+exec symphony \
+  --port "$SYMPHONY_PORT" \
+  --logs-root "$SYMPHONY_DATA/log" \
+  "$SYMPHONY_DATA/WORKFLOW.md"
+'''
