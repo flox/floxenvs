@@ -1,0 +1,37 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../symphony" }
+]
+
+# gum is a demo-only tool for styled terminal output.
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  if [[ -n "${LINEAR_API_KEY:-}" ]]; then
+    tracker="linear (LINEAR_API_KEY detected)"
+  else
+    tracker="memory (no LINEAR_API_KEY set)"
+  fi
+
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'Start Symphony in the background:' \
+    '  flox services start' \
+    '  flox activate --start-services' '' \
+    'Dashboard:' \
+    "  http://localhost:$SYMPHONY_PORT" '' \
+    'Tracker:' \
+    "  $tracker" '' \
+    'Codex binary:' \
+    "  $CODEX_BIN" '' \
+    'Workspace root:' \
+    "  $SYMPHONY_WORKSPACE_ROOT"
+fi
+'''

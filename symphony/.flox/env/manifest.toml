@@ -1,0 +1,91 @@
+schema-version = "1.10.0"
+
+# Minimal Symphony environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/symphony"]
+#
+# Provides the symphony orchestrator + codex agent.
+# Runs a dashboard-only in-memory tracker by default;
+# set LINEAR_API_KEY to switch to a Linear-driven
+# workflow.
+
+[install]
+symphony.pkg-path = "flox/symphony"
+symphony.pkg-group = "symphony"
+codex.pkg-path = "flox/codex"
+codex.pkg-group = "symphony"
+bash.pkg-path = "bash"
+bash.pkg-group = "symphony"
+git.pkg-path = "git"
+git.pkg-group = "symphony-tools"
+
+[vars]
+SYMPHONY_PORT = "14000"
+
+[hook]
+on-activate = '''
+export SYMPHONY_DATA="$FLOX_ENV_CACHE/symphony"
+export SYMPHONY_WORKSPACE_ROOT="$SYMPHONY_DATA/workspaces"
+export SYMPHONY_LOGS_ROOT="$SYMPHONY_DATA/log"
+export CODEX_BIN="$(command -v codex)"
+mkdir -p "$SYMPHONY_WORKSPACE_ROOT" "$SYMPHONY_LOGS_ROOT"
+
+# Always regenerate WORKFLOW.md so the tracker stays in
+# sync with the current LINEAR_API_KEY state. Edits to
+# the cached file are intentionally discarded.
+if [[ -n "${LINEAR_API_KEY:-}" ]]; then
+  cat > "$SYMPHONY_DATA/WORKFLOW.md" <<EOF
+---
+tracker:
+  kind: linear
+  active_states: [Todo, In Progress, Merging, Rework]
+  terminal_states: [Closed, Cancelled, Done]
+polling:
+  interval_ms: 5000
+workspace:
+  root: $SYMPHONY_WORKSPACE_ROOT
+agent:
+  max_concurrent_agents: 4
+  max_turns: 20
+codex:
+  bin: $CODEX_BIN
+---
+# Symphony — Linear workflow
+EOF
+else
+  cat > "$SYMPHONY_DATA/WORKFLOW.md" <<EOF
+---
+tracker:
+  kind: memory
+polling:
+  interval_ms: 5000
+workspace:
+  root: $SYMPHONY_WORKSPACE_ROOT
+agent:
+  max_concurrent_agents: 2
+  max_turns: 10
+codex:
+  bin: $CODEX_BIN
+---
+# Symphony — in-memory dashboard demo
+EOF
+fi
+'''
+
+[services]
+# Upstream symphony's CLI requires the
+# `--i-understand-that-this-will-be-running-without-the-usual-guardrails`
+# acknowledgement before it will boot — Symphony spawns
+# Codex without sandbox isolation, and this flag is the
+# upstream-mandated way to confirm the user knows that.
+symphony.command = '''
+SYMPHONY_DATA="$FLOX_ENV_CACHE/symphony"
+exec symphony \
+  --i-understand-that-this-will-be-running-without-the-usual-guardrails \
+  --port "$SYMPHONY_PORT" \
+  --logs-root "$SYMPHONY_DATA/log" \
+  "$SYMPHONY_DATA/WORKFLOW.md"
+'''
