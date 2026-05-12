@@ -1,163 +1,96 @@
 ---
 name: ls
-description: >-
-  List directory contents. Use when you need to view files in a directory,
-  check permissions, sizes, timestamps, or sort/filter file listings.
+description: "List directory contents — view files, check permissions, sizes, timestamps, or sort/filter listings. Use when exploring directories, verifying file attributes, or building file-listing commands."
 ---
 
-# ls - List Directory Contents
+# ls — List Directory Contents
 
-## Synopsis
+List information about files in a directory (current directory by default).
+Sorts entries alphabetically unless a sort option is specified.
 
-```
-ls [OPTION]... [FILE]...
-```
+## When to Use ls vs Alternatives
 
-List information about FILEs (current directory by default). Sorts entries
-alphabetically unless a sort option is specified.
+| Task | Use | Why |
+| ---- | --- | --- |
+| Quick human-readable listing | `ls -lah` | Concise, familiar output |
+| Scriptable file enumeration | `find . -maxdepth 1` | Handles special chars safely |
+| Detailed metadata for one file | `stat file` | Structured, parseable output |
+| Recursive search by criteria | `find . -name '*.log'` | Filters, actions built in |
+| Count files in directory | `find . -maxdepth 1 -type f \| wc -l` | Correct with special filenames |
 
-## Flags
-
-### Display Control
-
-| Flag | Long Form | Description |
-| ---- | --------- | ----------- |
-| -a | --all | Show all entries including those starting with . |
-| -A | --almost-all | Show all except . and .. |
-| -B | --ignore-backups | Ignore entries ending with ~ |
-| -d | --directory | List directories themselves, not contents |
-| -I | --ignore=PATTERN | Don't list entries matching PATTERN |
-| | --hide=PATTERN | Don't list entries matching PATTERN (overridden by -a/-A) |
-
-### Format
-
-| Flag | Long Form | Description |
-| ---- | --------- | ----------- |
-| -l | | Long listing format (permissions, owner, size, date) |
-| -1 | | One entry per line |
-| -C | | List entries by columns (default for terminal) |
-| -m | | Comma-separated list |
-| -x | | List entries by lines instead of columns |
-| | --format=WORD | across/horizontal (-x), commas (-m), long (-l), single-column (-1), verbose (-l), vertical (-C) |
-| -g | | Like -l but don't show owner |
-| -o | | Like -l but don't show group |
-| -G | --no-group | In long listing, don't print group names |
-| -n | --numeric-uid-gid | Like -l but show numeric UID/GID |
-
-### Size Display
-
-| Flag | Long Form | Description |
-| ---- | --------- | ----------- |
-| -h | --human-readable | Print sizes in human-readable format (1K, 234M, 2G) |
-| | --si | Like -h but use powers of 1000 not 1024 |
-| -s | --size | Print allocated size in blocks |
-| -k | --kibibytes | Default to 1024-byte blocks (with -s) |
-| | --block-size=SIZE | Scale sizes by SIZE (e.g., --block-size=M) |
-
-### Sorting
-
-| Flag | Long Form | Description |
-| ---- | --------- | ----------- |
-| -t | | Sort by modification time, newest first |
-| -S | | Sort by file size, largest first |
-| -v | | Natural sort of version numbers |
-| -X | | Sort alphabetically by extension |
-| -U | | Do not sort; list in directory order |
-| -r | --reverse | Reverse sort order |
-| -f | | Do not sort, enable -aU, disable -ls --color |
-| | --sort=WORD | Sort by WORD: none (-U), size (-S), time (-t), version (-v), extension (-X) |
-| | --group-directories-first | Group directories before files |
-
-### Time Display
-
-| Flag | Long Form | Description |
-| ---- | --------- | ----------- |
-| -c | | With -lt: sort by ctime; with -l: show ctime |
-| -u | | With -lt: sort by access time; with -l: show atime |
-| | --time=WORD | Select time: access/atime/use (-u), ctime/status (-c), birth/creation |
-| | --time-style=STYLE | Time display: full-iso, long-iso, iso, locale, +FORMAT |
-| | --full-time | Like -l --time-style=full-iso |
-
-### Indicators and Links
-
-| Flag | Long Form | Description |
-| ---- | --------- | ----------- |
-| -F | --classify | Append indicator (*/=>@\|) to entries |
-| -p | | Append / to directories |
-| | --file-type | Like -F but don't append * |
-| -L | --dereference | Show info for link target, not the link |
-| -H | --dereference-command-line | Follow symlinks on command line |
-| -i | --inode | Print inode number of each file |
-| | --hyperlink[=WHEN] | Hyperlink file names (always, auto, never) |
-
-### Escaping and Color
-
-| Flag | Long Form | Description |
-| ---- | --------- | ----------- |
-| -b | --escape | Print C-style escapes for nongraphic chars |
-| -q | --hide-control-chars | Print ? instead of nongraphic chars |
-| -N | --literal | Print entry names without quoting |
-| -Q | --quote-name | Enclose entry names in double quotes |
-| | --quoting-style=WORD | literal, locale, shell, shell-always, shell-escape, shell-escape-always, c, escape |
-| | --color[=WHEN] | Colorize output: always, auto, never |
-| -w | --width=COLS | Set output width |
-| -T | --tabsize=COLS | Set tab stop size |
-
-### Other
-
-| Flag | Long Form | Description |
-| ---- | --------- | ----------- |
-| -R | --recursive | List subdirectories recursively |
-| | --author | With -l, print author of each file |
-| -D | --dired | Generate output for Emacs dired mode |
-| | --help | Display help and exit |
-| | --version | Output version and exit |
-
-## Examples
+## Key Flag Combinations
 
 ```bash
-# List all files with details, human-readable sizes
+# Full details with human-readable sizes (most common)
 ls -lah
 
-# List only directories
+# Only directories
 ls -d */
 
-# Sort by modification time, newest first
+# Recently modified first
 ls -lt
 
-# Sort by size, largest first
+# Largest files first
 ls -lSh
 
-# Recursive listing
-ls -R
+# Hidden files only (exclude . and ..)
+ls -A -d .[^.]*
 
-# Show inode numbers
-ls -li
+# Machine-friendly: one entry per line, no color
+ls -1 --color=never
 
-# One file per line (useful for scripting)
-ls -1
+# Group directories first, then files
+ls -la --group-directories-first
 
-# List with full timestamps
-ls -l --full-time
+# Full ISO timestamps for precise comparison
+ls -l --time-style=full-iso
 
-# Ignore certain patterns
-ls --ignore='*.pyc' --ignore='__pycache__'
-
-# Show only hidden files
-ls -d .*
-
-# Natural version sort
-ls -v file1.txt file10.txt file2.txt
+# Skip compiled/generated files
+ls --ignore='*.pyc' --ignore='__pycache__' --ignore='node_modules'
 ```
 
-## Gotchas
+## Gotchas and Non-Obvious Behavior
 
-- **Do not parse ls output** in scripts. Filenames can contain spaces,
-  newlines, and special characters that break parsing. Use `find`, `stat`,
-  or shell globs instead.
-- `-a` shows `.` and `..`, `-A` does not. Use `-A` when you want hidden
-  files but not the directory entries.
-- `ls -l` shows symlink info; add `-L` to see the target's info instead.
-- Color output may interfere with piping. Use `--color=never` when piping
-  or `--color=always` to force color through pipes.
-- Default sort is locale-dependent. Set `LC_ALL=C` for byte-order sorting.
+### Never parse ls output in scripts
+
+Filenames can contain spaces, newlines, tabs, and special characters that
+break parsing. This is the single most common ls misuse:
+
+```bash
+# WRONG — breaks on filenames with spaces or special chars
+for f in $(ls); do echo "$f"; done
+ls -l | awk '{print $9}'
+
+# RIGHT — use globs, find, or stat
+for f in *; do echo "$f"; done
+find . -maxdepth 1 -type f -print0 | xargs -0 -I{} echo "{}"
+```
+
+### Hidden files: -a vs -A
+
+`-a` includes `.` and `..` directory entries, which inflates counts and
+can cause recursive issues. Use `-A` (almost-all) when you want hidden
+files without the directory self-references.
+
+### Symlink behavior
+
+`ls -l` shows info about the symlink itself. Add `-L` to dereference
+and show the target's attributes. When symlinks point to missing targets,
+`-L` will show an error while plain `ls -l` shows the dangling link.
+
+### Color and piping
+
+Color escape codes corrupt piped output. Use `--color=never` when piping
+to other commands, or `--color=always` to force color through a pager.
+
+### Locale-dependent sort order
+
+Default alphabetical sort follows the current locale's collation rules,
+which may interleave upper and lowercase. Set `LC_ALL=C` for strict
+byte-order sorting when deterministic output matters.
+
+### -f flag side effects
+
+`-f` disables sorting but also implicitly enables `-a` and `-U`, and
+disables `-l`, `-s`, and `--color`. It's faster on very large directories
+but the side effects are easy to forget.
