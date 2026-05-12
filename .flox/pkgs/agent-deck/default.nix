@@ -40,9 +40,7 @@ buildGoModule (finalAttrs: {
   ldflags = [
     "-s"
     "-w"
-    "-X=main.version=${finalAttrs.version}"
-    "-X=main.commit=v${finalAttrs.version}"
-    "-X=main.date=1970-01-01T00:00:00Z"
+    "-X=main.Version=${finalAttrs.version}"
   ];
 
   doInstallCheck = true;
