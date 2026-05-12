@@ -87,7 +87,9 @@ rustPlatform.buildRustPackage {
   };
 
   preBuild = ''
-    # Remove LTO to speed up builds
+    # Remove LTO to speed up builds. Keep codegen-units = 1 from upstream:
+    # raising it bloats the binary past the 128 MB ARM64 branch range and
+    # the macOS linker fails.
     substituteInPlace Cargo.toml \
       --replace-fail 'lto = "fat"' 'lto = false'
   '';
