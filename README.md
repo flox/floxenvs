@@ -103,6 +103,8 @@ Most environments follow a dual-layer pattern:
 | _└ verba-demo_ | | [floxhub](https://hub.flox.dev/flox/verba-demo) · [docs](verba-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/verba-demo-latest) |
 | symphony | OpenAI Symphony orchestrator | [floxhub](https://hub.flox.dev/flox/symphony) · [docs](symphony/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/symphony-latest) |
 | _└ symphony-demo_ | | [floxhub](https://hub.flox.dev/flox/symphony-demo) · [docs](symphony-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/symphony-demo-latest) |
+| omlx | oMLX LLM server (Apple Silicon) | [floxhub](https://hub.flox.dev/flox/omlx) · [docs](omlx/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/omlx-latest) |
+| _└ omlx-demo_ | | [floxhub](https://hub.flox.dev/flox/omlx-demo) · [docs](omlx-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/omlx-demo-latest) |
 
 ## Docker images
 
