@@ -87,9 +87,10 @@ rustPlatform.buildRustPackage {
   };
 
   preBuild = ''
-    # Remove LTO to speed up builds
+    # Speed up builds: drop fat LTO and single-unit codegen.
     substituteInPlace Cargo.toml \
-      --replace-fail 'lto = "fat"' 'lto = false'
+      --replace-fail 'lto = "fat"' 'lto = false' \
+      --replace-fail 'codegen-units = 1' 'codegen-units = 16'
   '';
 
   postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
