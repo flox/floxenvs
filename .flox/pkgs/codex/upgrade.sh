@@ -33,52 +33,66 @@ src_hash=$(nix --extra-experimental-features nix-command \
   hash convert --hash-algo sha256 --to sri "$src_raw")
 echo "  hash: $src_hash"
 
-# Prefetch cargo deps
-workdir=$(mktemp -d)
-trap 'rm -rf "$workdir"' EXIT
-
-git clone --depth 1 --branch "rust-v${latest_version}" \
-  https://github.com/openai/codex.git "$workdir/codex"
-
-cargo_hash=$(
-  nix --extra-experimental-features "nix-command flakes" \
-    run nixpkgs#nix-prefetch -- \
-      fetchCargoVendor \
-      --src "$workdir/codex" \
-      --source-root "source/codex-rs" \
-      --option extra-experimental-features "nix-command flakes"
-)
-
-if [[ "$cargo_hash" != sha256-* ]]; then
-  echo "ERROR: cargoHash computation produced unexpected output:" >&2
-  echo "       '$cargo_hash'" >&2
-  echo "       refusing to write a broken hashes.json" >&2
-  exit 1
-fi
-echo "  cargoHash: $cargo_hash"
-
-# Read current v8 and livekit values (these change less often)
+# Compute cargoHash by building the cargoDeps FOD with a fake hash
+# and reading the real one from the mismatch error. Mirrors the
+# crush/openclaw pattern; previously used `nix run nixpkgs#nix-prefetch`,
+# which broke in CI ("file 'nixpkgs' was not found in the Nix search
+# path") and silently emitted a placeholder before that.
+#
+# Read the v8 and livekit hashes (rarely change) so we can rewrite
+# the file with a fake cargoHash without losing them.
 v8_version=$(jq -r '.librusty_v8.version' "$HASHES_FILE")
 v8_hashes=$(jq '.librusty_v8.hashes' "$HASHES_FILE")
 lk_tag=$(jq -r '.livekit_webrtc.tag' "$HASHES_FILE")
 lk_hashes=$(jq '.livekit_webrtc.hashes' "$HASHES_FILE")
 
-# Write updated hashes (v8 and livekit hashes kept as-is)
-jq -n \
-  --arg v "$latest_version" \
-  --arg h "$src_hash" \
-  --arg c "$cargo_hash" \
-  --arg v8v "$v8_version" \
-  --argjson v8h "$v8_hashes" \
-  --arg lkt "$lk_tag" \
-  --argjson lkh "$lk_hashes" \
-  '{
-    version: $v,
-    hash: $h,
-    cargoHash: $c,
-    librusty_v8: { version: $v8v, hashes: $v8h },
-    livekit_webrtc: { tag: $lkt, hashes: $lkh }
-  }' > "$HASHES_FILE"
+tmp_hashes=$(mktemp)
+cp "$HASHES_FILE" "$tmp_hashes"
+trap 'cp "$tmp_hashes" "$HASHES_FILE"; rm -f "$tmp_hashes"' EXIT
+
+write_hashes() {
+  local cargo_hash="$1"
+  jq -n \
+    --arg v "$latest_version" \
+    --arg h "$src_hash" \
+    --arg c "$cargo_hash" \
+    --arg v8v "$v8_version" \
+    --argjson v8h "$v8_hashes" \
+    --arg lkt "$lk_tag" \
+    --argjson lkh "$lk_hashes" \
+    '{
+      version: $v,
+      hash: $h,
+      cargoHash: $c,
+      librusty_v8: { version: $v8v, hashes: $v8h },
+      livekit_webrtc: { tag: $lkt, hashes: $lkh }
+    }' > "$HASHES_FILE"
+}
+
+write_hashes "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+
+echo "Building with dummy cargoHash to compute real one..."
+prefetch_log=$(mktemp)
+flox build codex > "$prefetch_log" 2>&1 || true
+
+cargo_hash=$(awk '/hash mismatch in fixed-output derivation/,0 {
+  if (/got:/) { print $NF; exit }
+}' "$prefetch_log")
+
+if [[ "$cargo_hash" != sha256-* ]]; then
+  echo "ERROR: Could not extract cargoHash. Build output:" >&2
+  tail -30 "$prefetch_log" >&2
+  rm -f "$prefetch_log"
+  exit 1
+fi
+rm -f "$prefetch_log"
+echo "  cargoHash: $cargo_hash"
+
+write_hashes "$cargo_hash"
+
+# Hashes are good; clear the rollback trap.
+rm -f "$tmp_hashes"
+trap - EXIT
 
 echo "Updated to $latest_version"
 echo "NOTE: librusty_v8 and livekit_webrtc hashes were kept as-is."
