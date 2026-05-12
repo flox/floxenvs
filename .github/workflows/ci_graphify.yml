@@ -1,0 +1,36 @@
+name: "CI: graphify"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "graphify/**"
+      - "graphify-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_graphify.yml"
+  pull_request:
+    paths:
+      - "graphify/**"
+      - "graphify-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_graphify.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "graphify"
+    secrets: inherit

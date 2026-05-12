@@ -1,0 +1,1295 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "bash": {
+        "pkg-path": "bash",
+        "pkg-group": "graphify",
+        "priority": 0
+      },
+      "claude-code": {
+        "pkg-path": "flox/claude-code",
+        "pkg-group": "claude-code"
+      },
+      "curl": {
+        "pkg-path": "curl",
+        "pkg-group": "graphify-tools"
+      },
+      "gcc-unwrapped": {
+        "pkg-path": "gcc-unwrapped",
+        "pkg-group": "graphify-build"
+      },
+      "git": {
+        "pkg-path": "git",
+        "pkg-group": "graphify-tools"
+      },
+      "glibc": {
+        "pkg-path": "glibc",
+        "pkg-group": "graphify-build",
+        "systems": [
+          "x86_64-linux",
+          "aarch64-linux"
+        ]
+      },
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": "demo-tools"
+      },
+      "pkg-config": {
+        "pkg-path": "pkg-config",
+        "pkg-group": "graphify-build"
+      },
+      "python": {
+        "pkg-path": "python311",
+        "pkg-group": "graphify"
+      }
+    },
+    "vars": {
+      "GRAPHIFY_INSTALL_PACKAGE": "graphifyy",
+      "VIRTUAL_ENV_DISABLE_PROMPT": "1"
+    },
+    "hook": {
+      "on-activate": "export PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$PYTHON_DIR/.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$PYTHON_DIR\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  python3 -m venv --upgrade-deps \"$PYTHON_DIR\"\n  echo \"$CURRENT_INTERP\" > \"$PYTHON_DIR/.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$PYTHON_DIR/bin/activate\"\n\nHASH=$(echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5sum 2>/dev/null \\\n  || echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5 -q)\nHASH=$(echo \"$HASH\" | cut -d\" \" -f1)\nLAST=$(cat \"$PYTHON_DIR/.deps_hash\" 2>/dev/null)\nif [ \"$HASH\" != \"$LAST\" ]; then\n  pip install -q \"$GRAPHIFY_INSTALL_PACKAGE\"\n  echo \"$HASH\" > \"$PYTHON_DIR/.deps_hash\"\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'graphify — knowledge graphs for Claude Code' '' \\\n    'One-time skill install:' \\\n    '  graphify install' '' \\\n    'Build a graph from any folder:' \\\n    '  graphify .' \\\n    '  graphify ./raw --mode deep' \\\n    '  graphify ./raw --update' '' \\\n    'Query the graph:' \\\n    '  graphify query \"what connects X to Y?\"' \\\n    '  graphify path \"Module\" \"Database\"' \\\n    '  graphify explain \"Concept\"' '' \\\n    'Inside Claude Code (after install):' \\\n    '  /graphify .'\nfi\n"
+    },
+    "profile": {
+      "bash": "source \"$PYTHON_DIR/bin/activate\"\n",
+      "zsh": "source \"$PYTHON_DIR/bin/activate\"\n",
+      "fish": "source \"$PYTHON_DIR/bin/activate.fish\"\n",
+      "tcsh": "source \"$PYTHON_DIR/bin/activate.csh\"\n"
+    },
+    "options": {}
+  },
+  "packages": [
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/vnnw1yj4vcagw5nzsmq33l7xkz3hwfvp-claude-code-2.1.139.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=1819298531659832dc6d2920fce01bdcc1b25973",
+      "name": "claude-code-2.1.139",
+      "pname": "claude-code",
+      "rev": "1819298531659832dc6d2920fce01bdcc1b25973",
+      "rev_count": 3177,
+      "rev_date": "2026-05-12T13:58:19Z",
+      "scrape_date": "2026-05-12T20:12:06.081427Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "2.1.139",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/72szhzgdsfdnbdm8r1773vmhbwkradm7-claude-code-2.1.139"
+      },
+      "system": "aarch64-darwin",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/8yghng122n9labvqf084f88avp8g97bb-claude-code-2.1.139.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=1819298531659832dc6d2920fce01bdcc1b25973",
+      "name": "claude-code-2.1.139",
+      "pname": "claude-code",
+      "rev": "1819298531659832dc6d2920fce01bdcc1b25973",
+      "rev_count": 3177,
+      "rev_date": "2026-05-12T13:58:19Z",
+      "scrape_date": "2026-05-12T20:12:06.081430Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "2.1.139",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/382ls5wr3ciwr7ik6kc95silbang5hzs-claude-code-2.1.139"
+      },
+      "system": "aarch64-linux",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/fhjrz35bn0pqfhghp9kbqzkqix1zdk7b-claude-code-2.1.139.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=1819298531659832dc6d2920fce01bdcc1b25973",
+      "name": "claude-code-2.1.139",
+      "pname": "claude-code",
+      "rev": "1819298531659832dc6d2920fce01bdcc1b25973",
+      "rev_count": 3177,
+      "rev_date": "2026-05-12T13:58:19Z",
+      "scrape_date": "2026-05-12T20:12:06.081431Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "2.1.139",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/5nihj5s14byiqawy3mpkwmd9k8kj2p25-claude-code-2.1.139"
+      },
+      "system": "x86_64-darwin",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/dzhdynar60ghrbaa233npxjpa93lyw58-claude-code-2.1.139.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=1819298531659832dc6d2920fce01bdcc1b25973",
+      "name": "claude-code-2.1.139",
+      "pname": "claude-code",
+      "rev": "1819298531659832dc6d2920fce01bdcc1b25973",
+      "rev_count": 3177,
+      "rev_date": "2026-05-12T13:58:19Z",
+      "scrape_date": "2026-05-12T20:12:06.081432Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "2.1.139",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/405q2w5aflbb48rsarai7iqlx9q486nf-claude-code-2.1.139"
+      },
+      "system": "x86_64-linux",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/3if65h5mjjgjwgvd18srmm35cn3w6xs8-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T08:07:16.869646Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ba53aq5kpjm2qb817qgxswy2hvnkxnyj-gum-0.17.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/ka558hvp8n0vhw8lzwsw66zw3g3lavzd-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T08:43:47.052239Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/3hlyv3x7jjn5364f08jw0bic3zddqhxc-gum-0.17.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/z2rm91h36jx1ym7gpl3avxqqxc407pn2-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T09:16:10.806200Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/qkwxvmldb9a8nmqq6aqqd47gj3pxwx42-gum-0.17.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/835d9xq5q9w2hv6dzlsc3yjbh44kmpjn-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T09:52:25.957928Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/c149nbx8xh8knvply95623gnwqds19xr-gum-0.17.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "bash",
+      "broken": false,
+      "derivation": "/nix/store/hhh1lks1hx9zh254wwdi2mynz9vrxc4h-bash-interactive-5.3p9.drv",
+      "description": "GNU Bourne-Again Shell, the de facto standard shell on Linux (for interactive use)",
+      "install_id": "bash",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "bash-interactive-5.3p9",
+      "pname": "bash",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T08:07:15.355858Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "5.3p9",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/6wxmagb455g12diam7bf305f5qs6j0pb-bash-interactive-5.3p9-dev",
+        "doc": "/nix/store/vmqw6a17fkxb0h7cdkwwayv4zcr7ilrh-bash-interactive-5.3p9-doc",
+        "info": "/nix/store/2y400c3b7xxqaw7z9javmgzivb7p79dx-bash-interactive-5.3p9-info",
+        "man": "/nix/store/1gjr5smhr73ya2bnvjr55ik4w8l9za9m-bash-interactive-5.3p9-man",
+        "out": "/nix/store/in4yc03diyvs2n2wgf3nva4hbvml8v1j-bash-interactive-5.3p9"
+      },
+      "system": "aarch64-darwin",
+      "group": "graphify",
+      "priority": 0
+    },
+    {
+      "attr_path": "bash",
+      "broken": false,
+      "derivation": "/nix/store/j1jz1vnc7ghkpp1b1214ixz5j8fq6sji-bash-interactive-5.3p9.drv",
+      "description": "GNU Bourne-Again Shell, the de facto standard shell on Linux (for interactive use)",
+      "install_id": "bash",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "bash-interactive-5.3p9",
+      "pname": "bash",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T08:43:44.269629Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "5.3p9",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/ds70877s3ssafag7acjv694m8sjg3rjj-bash-interactive-5.3p9-debug",
+        "dev": "/nix/store/af91fyhrr83yjmv0hvmg8qwllw3qk5mg-bash-interactive-5.3p9-dev",
+        "doc": "/nix/store/kna8sq16gxiw9qx5xnyd73l07pn7fymd-bash-interactive-5.3p9-doc",
+        "info": "/nix/store/8fx6ic9ajwmsyg5afrgyjpks2r2ibabp-bash-interactive-5.3p9-info",
+        "man": "/nix/store/pqjf0sh448pfbnznf358c5shnz8gj9a3-bash-interactive-5.3p9-man",
+        "out": "/nix/store/kqh7aw6sj1b0kzfkx2fxm8ij4lkc0735-bash-interactive-5.3p9"
+      },
+      "system": "aarch64-linux",
+      "group": "graphify",
+      "priority": 0
+    },
+    {
+      "attr_path": "bash",
+      "broken": false,
+      "derivation": "/nix/store/2y83zwwsap35s39n0nszbk7drpmjcj5b-bash-interactive-5.3p9.drv",
+      "description": "GNU Bourne-Again Shell, the de facto standard shell on Linux (for interactive use)",
+      "install_id": "bash",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "bash-interactive-5.3p9",
+      "pname": "bash",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T09:16:09.302744Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "5.3p9",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/a5jlanqwr330df9f7wj231zwls57b2w9-bash-interactive-5.3p9-dev",
+        "doc": "/nix/store/r32ymasfy6z5x0394hgifkfcqj175d4h-bash-interactive-5.3p9-doc",
+        "info": "/nix/store/syfrnwhbm2zlyilq14ks773h0yjrj5jc-bash-interactive-5.3p9-info",
+        "man": "/nix/store/k48vfj52w13xhqfs8rjkk25k5ian1xzs-bash-interactive-5.3p9-man",
+        "out": "/nix/store/7i5gfqa19rj4sydhl2rbb6spcisis1c9-bash-interactive-5.3p9"
+      },
+      "system": "x86_64-darwin",
+      "group": "graphify",
+      "priority": 0
+    },
+    {
+      "attr_path": "bash",
+      "broken": false,
+      "derivation": "/nix/store/5bdprl0q08gk4cynpik0ssmg0ky7lzbh-bash-interactive-5.3p9.drv",
+      "description": "GNU Bourne-Again Shell, the de facto standard shell on Linux (for interactive use)",
+      "install_id": "bash",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "bash-interactive-5.3p9",
+      "pname": "bash",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T09:52:22.943110Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "5.3p9",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out",
+        "out",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/5lz4ynx0dvpx4rlq3h7ab82hbbkmfhp8-bash-interactive-5.3p9-debug",
+        "dev": "/nix/store/5bs057cgp4nxqff22jg0k1svs121z6a8-bash-interactive-5.3p9-dev",
+        "doc": "/nix/store/ycaqnajbv2sb0hi0cm5hsg5ri8ywih7x-bash-interactive-5.3p9-doc",
+        "info": "/nix/store/cg59l95m74xywr3y3px4iir4jw09a3rp-bash-interactive-5.3p9-info",
+        "man": "/nix/store/arys3dnblxv60q8b575scyd6b97s0yzi-bash-interactive-5.3p9-man",
+        "out": "/nix/store/4bwbk4an4bx7cb8xwffghvjjyfyl7m2i-bash-interactive-5.3p9"
+      },
+      "system": "x86_64-linux",
+      "group": "graphify",
+      "priority": 0
+    },
+    {
+      "attr_path": "python311",
+      "broken": false,
+      "derivation": "/nix/store/rjfhdl6hgpcxism51c7vvsgsmhlfkahz-python3-3.11.15.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "python3-3.11.15",
+      "pname": "python311",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T08:07:55.660905Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3-3.11.15",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/znfz14i3g4hh7pzlsa95wydykv13dcgp-python3-3.11.15"
+      },
+      "system": "aarch64-darwin",
+      "group": "graphify",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311",
+      "broken": false,
+      "derivation": "/nix/store/jr4dp4lpn8q5h47ryqjk9b9b6rq0jc42-python3-3.11.15.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "python3-3.11.15",
+      "pname": "python311",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T08:44:44.876880Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3-3.11.15",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/lsh489018507hwcymghcaw587fliryvx-python3-3.11.15-debug",
+        "out": "/nix/store/qcqvchsqdbvhdky18bgwjlm7jf3z26wd-python3-3.11.15"
+      },
+      "system": "aarch64-linux",
+      "group": "graphify",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311",
+      "broken": false,
+      "derivation": "/nix/store/wpzplivqrcynz2wxh7s00accry680zz2-python3-3.11.15.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "python3-3.11.15",
+      "pname": "python311",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T09:16:49.774825Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3-3.11.15",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/nvj6980554fnzs7dhdc50sc3af4mrjm7-python3-3.11.15"
+      },
+      "system": "x86_64-darwin",
+      "group": "graphify",
+      "priority": 5
+    },
+    {
+      "attr_path": "python311",
+      "broken": false,
+      "derivation": "/nix/store/wkd08c5qwgp0qbmb9z124z8p3i5dhzmr-python3-3.11.15.drv",
+      "description": "High-level dynamically-typed programming language",
+      "install_id": "python",
+      "license": "Python-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "python3-3.11.15",
+      "pname": "python311",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T09:53:24.536601Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "python3-3.11.15",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/2b0w3xbq6jzzq11dbr55q27zbcnpflpb-python3-3.11.15-debug",
+        "out": "/nix/store/bhwxi9xg4llb8giawi6hlr4ajbdvi02g-python3-3.11.15"
+      },
+      "system": "x86_64-linux",
+      "group": "graphify",
+      "priority": 5
+    },
+    {
+      "attr_path": "gcc-unwrapped",
+      "broken": false,
+      "derivation": "/nix/store/5zf4w4zgky1knz9gcq77vip1nlz32kzf-gcc-15.2.0.drv",
+      "description": "GNU Compiler Collection, version 15.2.0",
+      "install_id": "gcc-unwrapped",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "gcc-15.2.0",
+      "pname": "gcc-unwrapped",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T08:07:16.422971Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "15.2.0",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/havps1q8020ipprln02ybkkm6wykizxd-gcc-15.2.0-info",
+        "lib": "/nix/store/bv65z30cmflaybvgbvl1rlsp16j0pdjj-gcc-15.2.0-lib",
+        "man": "/nix/store/9krq23y9aq4xms2brckafpzvq1qnssrs-gcc-15.2.0-man",
+        "out": "/nix/store/gf7qyg4b8x6ighvjbw9fvyqm9379w34i-gcc-15.2.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "graphify-build",
+      "priority": 5
+    },
+    {
+      "attr_path": "gcc-unwrapped",
+      "broken": false,
+      "derivation": "/nix/store/y8x6w0bg7zkvam1asifr2fk9nwgh2x81-gcc-15.2.0.drv",
+      "description": "GNU Compiler Collection, version 15.2.0",
+      "install_id": "gcc-unwrapped",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "gcc-15.2.0",
+      "pname": "gcc-unwrapped",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T08:43:45.852914Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "15.2.0",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "checksum": "/nix/store/xa8wi7ch1xqf8siii7f4yb6nwaq9rpmh-gcc-15.2.0-checksum",
+        "info": "/nix/store/zdxjj2nhr9iki7r3flg3m50v4pallz0k-gcc-15.2.0-info",
+        "lib": "/nix/store/dcb4bsy8fcn51bw0qp3vwx8q0rzpghd5-gcc-15.2.0-lib",
+        "libgcc": "/nix/store/zf1nv5bf9nc9fbbiqq8z9sxjak1272l1-gcc-15.2.0-libgcc",
+        "man": "/nix/store/rz1xd2n9sw9sxccvx6pwaig8sx8cqggs-gcc-15.2.0-man",
+        "out": "/nix/store/r1y7h8ln5hdlrwzcyysih7vxqnwralj1-gcc-15.2.0"
+      },
+      "system": "aarch64-linux",
+      "group": "graphify-build",
+      "priority": 5
+    },
+    {
+      "attr_path": "gcc-unwrapped",
+      "broken": false,
+      "derivation": "/nix/store/mrmb7n6ifzjkxjacd38qdpgyhbknnhd6-gcc-15.2.0.drv",
+      "description": "GNU Compiler Collection, version 15.2.0",
+      "install_id": "gcc-unwrapped",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "gcc-15.2.0",
+      "pname": "gcc-unwrapped",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T09:16:10.338434Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "15.2.0",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/cij0x5lzi3iv6g5crjpcqw565d0gnrj3-gcc-15.2.0-info",
+        "lib": "/nix/store/5pn480mnhigbgklzf959q24c8347py5y-gcc-15.2.0-lib",
+        "man": "/nix/store/8w2c1iydm7q49c9vbq3k6rdjb9z7nfzh-gcc-15.2.0-man",
+        "out": "/nix/store/cmkmqlhyvkyajr31yacsbzp6h1gppx0l-gcc-15.2.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "graphify-build",
+      "priority": 5
+    },
+    {
+      "attr_path": "gcc-unwrapped",
+      "broken": false,
+      "derivation": "/nix/store/5lq941plvcnx8h4zpdrn3fqgsw8bg4l1-gcc-15.2.0.drv",
+      "description": "GNU Compiler Collection, version 15.2.0",
+      "install_id": "gcc-unwrapped",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "gcc-15.2.0",
+      "pname": "gcc-unwrapped",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T09:52:24.680286Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "15.2.0",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "checksum": "/nix/store/nabdhfjbfiraqiphlrmncnyi60hh0jm9-gcc-15.2.0-checksum",
+        "info": "/nix/store/40szayza7cn59akq967zkaxll8ff63dx-gcc-15.2.0-info",
+        "lib": "/nix/store/si4q3zks5mn5jhzzyri9hhd3cv789vlm-gcc-15.2.0-lib",
+        "libgcc": "/nix/store/wrxyd3k2f4bmh52pr5rpdjxxsm5r2qxm-gcc-15.2.0-libgcc",
+        "man": "/nix/store/i2vb046l4bgvbbsxc00wigdi47z4a2j2-gcc-15.2.0-man",
+        "out": "/nix/store/sanx9fg8mry8mq92zhlm5qvb83qlxrlx-gcc-15.2.0"
+      },
+      "system": "x86_64-linux",
+      "group": "graphify-build",
+      "priority": 5
+    },
+    {
+      "attr_path": "glibc",
+      "broken": false,
+      "derivation": "/nix/store/h13zggrv3nx9wajcf4q4x99pbg0jgj4y-glibc-2.42-61.drv",
+      "description": "GNU C Library",
+      "install_id": "glibc",
+      "license": "LGPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "glibc-2.42-61",
+      "pname": "glibc",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T08:43:46.087205Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.42-61",
+      "outputs_to_install": [
+        "bin",
+        "bin"
+      ],
+      "outputs": {
+        "bin": "/nix/store/yiidqakcb5f0s16lr25ba3xgics4zxqq-glibc-2.42-61-bin",
+        "debug": "/nix/store/acsk7n6v9cq9xzxpmlgjh39c7jpch3m0-glibc-2.42-61-debug",
+        "dev": "/nix/store/qkmcrkn6shfg8jn7d6ifsl9piybr4ffk-glibc-2.42-61-dev",
+        "getent": "/nix/store/m404vdyh7dy7c1fsb8c37klic5lpky4q-glibc-2.42-61-getent",
+        "out": "/nix/store/m8ckqvgrqjipr958qckyvgcgjvfvjz94-glibc-2.42-61",
+        "static": "/nix/store/p5wadn7izc52nh6bphmgawxddbmrgaq7-glibc-2.42-61-static"
+      },
+      "system": "aarch64-linux",
+      "group": "graphify-build",
+      "priority": 5
+    },
+    {
+      "attr_path": "glibc",
+      "broken": false,
+      "derivation": "/nix/store/yvq2ahrzng0qv8wpw5lr669jpb43s3m7-glibc-2.42-61.drv",
+      "description": "GNU C Library",
+      "install_id": "glibc",
+      "license": "LGPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "glibc-2.42-61",
+      "pname": "glibc",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T09:52:24.926963Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.42-61",
+      "outputs_to_install": [
+        "bin",
+        "bin",
+        "bin",
+        "bin"
+      ],
+      "outputs": {
+        "bin": "/nix/store/pf30k3mg7n6bibc1k6609gyq7glk00k2-glibc-2.42-61-bin",
+        "debug": "/nix/store/nlbjhlh6z68ryydyj4262pkchii034gn-glibc-2.42-61-debug",
+        "dev": "/nix/store/fbbw928argckfii0j322346ihmllg7a7-glibc-2.42-61-dev",
+        "getent": "/nix/store/s7k8v487pif6h7qzz4fvlibinpdsc8w6-glibc-2.42-61-getent",
+        "out": "/nix/store/fjkx1l5cnskzrqacf08z7i8z17256w0j-glibc-2.42-61",
+        "static": "/nix/store/1m76xra6g13zl6hh2z9rzb8cf59b7p7n-glibc-2.42-61-static"
+      },
+      "system": "x86_64-linux",
+      "group": "graphify-build",
+      "priority": 5
+    },
+    {
+      "attr_path": "pkg-config",
+      "broken": false,
+      "derivation": "/nix/store/awa1zar3xcb7m0d0s2bm6yjp51mf6rgd-pkg-config-wrapper-0.29.2.drv",
+      "description": "Tool that allows packages to find out information about other packages (wrapper script)",
+      "install_id": "pkg-config",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "pkg-config-wrapper-0.29.2",
+      "pname": "pkg-config",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T08:07:53.455878Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.29.2",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/3ra1a1p9jhxky99x5mbnyvzrm3f6g6kj-pkg-config-wrapper-0.29.2-doc",
+        "man": "/nix/store/hl4fhxp8w3lv1nfrj5ss6dlwlr7cnk3l-pkg-config-wrapper-0.29.2-man",
+        "out": "/nix/store/7693fhfqg2hddwl3kbbpinrdqdp71nq2-pkg-config-wrapper-0.29.2"
+      },
+      "system": "aarch64-darwin",
+      "group": "graphify-build",
+      "priority": 5
+    },
+    {
+      "attr_path": "pkg-config",
+      "broken": false,
+      "derivation": "/nix/store/l8wczzfk1ggc1ng1k82579m1j274llc8-pkg-config-wrapper-0.29.2.drv",
+      "description": "Tool that allows packages to find out information about other packages (wrapper script)",
+      "install_id": "pkg-config",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "pkg-config-wrapper-0.29.2",
+      "pname": "pkg-config",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T08:44:41.505822Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.29.2",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/a614wyav8j0q5a1kh2gzhy41g4y1lv2j-pkg-config-wrapper-0.29.2-doc",
+        "man": "/nix/store/knhjp3ik00llr0xvlknw3bi0whbd69c9-pkg-config-wrapper-0.29.2-man",
+        "out": "/nix/store/kgz9d6ywgjb2wswd1bw5in3ffzs3mdqw-pkg-config-wrapper-0.29.2"
+      },
+      "system": "aarch64-linux",
+      "group": "graphify-build",
+      "priority": 5
+    },
+    {
+      "attr_path": "pkg-config",
+      "broken": false,
+      "derivation": "/nix/store/p0sm511w8y8yisw1139bx6xhv0s2iyj9-pkg-config-wrapper-0.29.2.drv",
+      "description": "Tool that allows packages to find out information about other packages (wrapper script)",
+      "install_id": "pkg-config",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "pkg-config-wrapper-0.29.2",
+      "pname": "pkg-config",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T09:16:47.516062Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.29.2",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/4nabmxn3icdkc5xh2pd3x8hf6armf1v1-pkg-config-wrapper-0.29.2-doc",
+        "man": "/nix/store/c3xapphpjndny9q73q2z9zcdpxnjvgaw-pkg-config-wrapper-0.29.2-man",
+        "out": "/nix/store/pc7g2z1vjmqg68ic2xq1jgd4ml255ci8-pkg-config-wrapper-0.29.2"
+      },
+      "system": "x86_64-darwin",
+      "group": "graphify-build",
+      "priority": 5
+    },
+    {
+      "attr_path": "pkg-config",
+      "broken": false,
+      "derivation": "/nix/store/033f00lp1fj6h3m9abzbxn3i2m76dhsg-pkg-config-wrapper-0.29.2.drv",
+      "description": "Tool that allows packages to find out information about other packages (wrapper script)",
+      "install_id": "pkg-config",
+      "license": "GPL-2.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "pkg-config-wrapper-0.29.2",
+      "pname": "pkg-config",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T09:53:21.144433Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.29.2",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/18hx89ypx3y5jiyvpma5cv9q05avmhiv-pkg-config-wrapper-0.29.2-doc",
+        "man": "/nix/store/kb3cgnjs38aj2kjslwvyg40jy7b5zgyw-pkg-config-wrapper-0.29.2-man",
+        "out": "/nix/store/v7mjkia7ki79s5i24ldbzq1khalhgzk0-pkg-config-wrapper-0.29.2"
+      },
+      "system": "x86_64-linux",
+      "group": "graphify-build",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/fr5h7hv5af8sbhh37npxkarhdvmgkga8-curl-8.19.0.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "curl-8.19.0",
+      "pname": "curl",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T08:07:15.792177Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.19.0",
+      "outputs_to_install": [
+        "bin",
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/j1q7xbajv38k3wgmwf4cbym460mh0i38-curl-8.19.0-bin",
+        "dev": "/nix/store/drdsd796645bwphipiq7vdjw4qd3spgm-curl-8.19.0-dev",
+        "devdoc": "/nix/store/qp9cjijminqlbl3dwc35i9zmcfbdphyg-curl-8.19.0-devdoc",
+        "man": "/nix/store/fyafi0f11l82zdkwgpg1sahkwlrbvk6b-curl-8.19.0-man",
+        "out": "/nix/store/12mp5fb651ivly10ka3xiz0098fzfp4c-curl-8.19.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "graphify-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/az1wkd2h0z51pkfjjvlngxgy3c23vacj-curl-8.19.0.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "curl-8.19.0",
+      "pname": "curl",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T08:43:44.893974Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.19.0",
+      "outputs_to_install": [
+        "bin",
+        "bin",
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/zgb4nz7nfh5ilxs51kck1cj94rmgx4dh-curl-8.19.0-bin",
+        "debug": "/nix/store/b94zxjr3vy1k8mnnfdnjfw62d04mwk6k-curl-8.19.0-debug",
+        "dev": "/nix/store/y8ny10jabky92wll2qia0z4z2y81nll5-curl-8.19.0-dev",
+        "devdoc": "/nix/store/j9b42ralm5hssyv8029fnwi4zp1i5c74-curl-8.19.0-devdoc",
+        "man": "/nix/store/3285jwci6763zax4wl6pzqin1swk9v00-curl-8.19.0-man",
+        "out": "/nix/store/dllixhxh0nlqaw1mb0dhw3cd38bprcfx-curl-8.19.0"
+      },
+      "system": "aarch64-linux",
+      "group": "graphify-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/1fbajizmzjz626khnkvxljrl2775d1ci-curl-8.19.0.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "curl-8.19.0",
+      "pname": "curl",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T09:16:09.717222Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.19.0",
+      "outputs_to_install": [
+        "bin",
+        "bin",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/a8hawq0pswlwcz0fmyc9qr3aprzzq3ps-curl-8.19.0-bin",
+        "dev": "/nix/store/074rz5g82fh6m5lw283nrpq5d2mphliq-curl-8.19.0-dev",
+        "devdoc": "/nix/store/nb1b303q9f828bzl9k6aglk5s1q6ldka-curl-8.19.0-devdoc",
+        "man": "/nix/store/gyzpm3pcny7y61lzh1qbqgz6bmb0wz2r-curl-8.19.0-man",
+        "out": "/nix/store/ilvxgsha4q03lgx85nqig6a0hkxf59ml-curl-8.19.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "graphify-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "curl",
+      "broken": false,
+      "derivation": "/nix/store/qyc63by7jdcnqwzk9gj2x3z2nh6r1r3a-curl-8.19.0.drv",
+      "description": "Command line tool for transferring files with URL syntax",
+      "install_id": "curl",
+      "license": "curl",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "curl-8.19.0",
+      "pname": "curl",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T09:52:23.632004Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.19.0",
+      "outputs_to_install": [
+        "bin",
+        "bin",
+        "bin",
+        "bin",
+        "bin",
+        "man",
+        "man",
+        "man"
+      ],
+      "outputs": {
+        "bin": "/nix/store/sm2nq18jjqp4x0sxpl6lrvwl9rx6mvj2-curl-8.19.0-bin",
+        "debug": "/nix/store/jk4szs9lvdmwwh9p372im3rpnl7sdb63-curl-8.19.0-debug",
+        "dev": "/nix/store/7xvb5060qcf36ncp47wz62rl3fsccv1g-curl-8.19.0-dev",
+        "devdoc": "/nix/store/7kpxw181nfry6ax0hsawdy1n91sxl8w9-curl-8.19.0-devdoc",
+        "man": "/nix/store/8qlb8vwqn254fwc4rvvkgq26ypdx8sdx-curl-8.19.0-man",
+        "out": "/nix/store/pz6b64891m180yb4hadj1jjg3wm3ybng-curl-8.19.0"
+      },
+      "system": "x86_64-linux",
+      "group": "graphify-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "git",
+      "broken": false,
+      "derivation": "/nix/store/9n758xnd7s67zz9naiivygz24pv7zpr4-git-2.53.0.drv",
+      "description": "Distributed version control system",
+      "install_id": "git",
+      "license": "GPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "git-2.53.0",
+      "pname": "git",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T08:07:16.514678Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.53.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/0kjpgj1grgba239ykdnv1cjc61xqk3aa-git-2.53.0-doc",
+        "out": "/nix/store/5y6cp247hspkqa7pp6cbc4540ygx0249-git-2.53.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "graphify-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "git",
+      "broken": false,
+      "derivation": "/nix/store/y0zdc38hb5flnbzx9a8sia7azv917jvc-git-2.53.0.drv",
+      "description": "Distributed version control system",
+      "install_id": "git",
+      "license": "GPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "git-2.53.0",
+      "pname": "git",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T08:43:45.985160Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.53.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/rc56a3l2wby94gk9gvirpwi9hv9v15gi-git-2.53.0-debug",
+        "doc": "/nix/store/q8j5mwix1g75xyq025d3hmringklm52z-git-2.53.0-doc",
+        "out": "/nix/store/gx9r7g2kyrjhh0zhgxz91f5nbczxh1ac-git-2.53.0"
+      },
+      "system": "aarch64-linux",
+      "group": "graphify-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "git",
+      "broken": false,
+      "derivation": "/nix/store/mpa3y57ch7a3rz55183a886hq2g4h9wm-git-2.53.0.drv",
+      "description": "Distributed version control system",
+      "install_id": "git",
+      "license": "GPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "git-2.53.0",
+      "pname": "git",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T09:16:10.426890Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.53.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "doc": "/nix/store/9jcm7zadfi5wsic3kizs4x71a8dqlj83-git-2.53.0-doc",
+        "out": "/nix/store/zar16r8w28c6qjdh3xqnkjcmvjjqwi77-git-2.53.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "graphify-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "git",
+      "broken": false,
+      "derivation": "/nix/store/gz2q1wq6ckyphg0q08nq9q93g1a6x561-git-2.53.0.drv",
+      "description": "Distributed version control system",
+      "install_id": "git",
+      "license": "GPL-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "name": "git-2.53.0",
+      "pname": "git",
+      "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+      "rev_count": 992384,
+      "rev_date": "2026-05-05T04:14:16Z",
+      "scrape_date": "2026-05-06T09:52:24.820969Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.53.0",
+      "outputs_to_install": [
+        "out",
+        "out",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/qyqya20z59d164d6692hlyb9pkq10ykk-git-2.53.0-debug",
+        "doc": "/nix/store/vv1ap6qaxdzpa4jqg71myxh5wcvnlqv8-git-2.53.0-doc",
+        "out": "/nix/store/c0277k5giric1mn9dklllavbzvxl6hzb-git-2.53.0"
+      },
+      "system": "x86_64-linux",
+      "group": "graphify-tools",
+      "priority": 5
+    }
+  ],
+  "compose": {
+    "composer": {
+      "schema-version": "1.10.0",
+      "install": {
+        "gum": {
+          "pkg-path": "gum",
+          "pkg-group": "demo-tools"
+        }
+      },
+      "hook": {
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'graphify — knowledge graphs for Claude Code' '' \\\n    'One-time skill install:' \\\n    '  graphify install' '' \\\n    'Build a graph from any folder:' \\\n    '  graphify .' \\\n    '  graphify ./raw --mode deep' \\\n    '  graphify ./raw --update' '' \\\n    'Query the graph:' \\\n    '  graphify query \"what connects X to Y?\"' \\\n    '  graphify path \"Module\" \"Database\"' \\\n    '  graphify explain \"Concept\"' '' \\\n    'Inside Claude Code (after install):' \\\n    '  /graphify .'\nfi\n"
+      },
+      "options": {},
+      "include": {
+        "environments": [
+          {
+            "dir": "../graphify"
+          }
+        ]
+      }
+    },
+    "include": [
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "bash": {
+              "pkg-path": "bash",
+              "pkg-group": "graphify",
+              "priority": 0
+            },
+            "claude-code": {
+              "pkg-path": "flox/claude-code",
+              "pkg-group": "claude-code"
+            },
+            "curl": {
+              "pkg-path": "curl",
+              "pkg-group": "graphify-tools"
+            },
+            "gcc-unwrapped": {
+              "pkg-path": "gcc-unwrapped",
+              "pkg-group": "graphify-build"
+            },
+            "git": {
+              "pkg-path": "git",
+              "pkg-group": "graphify-tools"
+            },
+            "glibc": {
+              "pkg-path": "glibc",
+              "pkg-group": "graphify-build",
+              "systems": [
+                "x86_64-linux",
+                "aarch64-linux"
+              ]
+            },
+            "pkg-config": {
+              "pkg-path": "pkg-config",
+              "pkg-group": "graphify-build"
+            },
+            "python": {
+              "pkg-path": "python311",
+              "pkg-group": "graphify"
+            }
+          },
+          "vars": {
+            "GRAPHIFY_INSTALL_PACKAGE": "graphifyy",
+            "VIRTUAL_ENV_DISABLE_PROMPT": "1"
+          },
+          "hook": {
+            "on-activate": "export PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$PYTHON_DIR/.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$PYTHON_DIR\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  python3 -m venv --upgrade-deps \"$PYTHON_DIR\"\n  echo \"$CURRENT_INTERP\" > \"$PYTHON_DIR/.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$PYTHON_DIR/bin/activate\"\n\nHASH=$(echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5sum 2>/dev/null \\\n  || echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5 -q)\nHASH=$(echo \"$HASH\" | cut -d\" \" -f1)\nLAST=$(cat \"$PYTHON_DIR/.deps_hash\" 2>/dev/null)\nif [ \"$HASH\" != \"$LAST\" ]; then\n  pip install -q \"$GRAPHIFY_INSTALL_PACKAGE\"\n  echo \"$HASH\" > \"$PYTHON_DIR/.deps_hash\"\nfi\n"
+          },
+          "profile": {
+            "bash": "source \"$PYTHON_DIR/bin/activate\"\n",
+            "zsh": "source \"$PYTHON_DIR/bin/activate\"\n",
+            "fish": "source \"$PYTHON_DIR/bin/activate.fish\"\n",
+            "tcsh": "source \"$PYTHON_DIR/bin/activate.csh\"\n"
+          },
+          "options": {}
+        },
+        "name": "graphify",
+        "descriptor": {
+          "dir": "../graphify"
+        }
+      }
+    ],
+    "warnings": []
+  }
+}

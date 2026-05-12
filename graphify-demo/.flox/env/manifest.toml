@@ -1,0 +1,33 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../graphify" }
+]
+
+# gum is a demo-only tool for styled terminal output.
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'graphify — knowledge graphs for Claude Code' '' \
+    'One-time skill install:' \
+    '  graphify install' '' \
+    'Build a graph from any folder:' \
+    '  graphify .' \
+    '  graphify ./raw --mode deep' \
+    '  graphify ./raw --update' '' \
+    'Query the graph:' \
+    '  graphify query "what connects X to Y?"' \
+    '  graphify path "Module" "Database"' \
+    '  graphify explain "Concept"' '' \
+    'Inside Claude Code (after install):' \
+    '  /graphify .'
+fi
+'''
