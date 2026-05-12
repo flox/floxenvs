@@ -2,7 +2,6 @@
   lib,
   beam28Packages,
   fetchFromGitHub,
-  makeWrapper,
 }:
 
 let
@@ -26,26 +25,23 @@ beamPkgs.mixRelease {
   inherit version;
   src = "${srcRoot}/elixir";
 
+  # upstream's mix.exs declares
+  #   escript: [main_module: SymphonyElixir.CLI,
+  #             name: "symphony", path: "bin/symphony"]
+  # so the CLI users want is built by `mix escript.build`,
+  # not by `mix release`. mixRelease handles escripts when
+  # `escriptBinName` is set: it runs `mix escript.build`
+  # instead of `mix release` and copies the named file to
+  # $out/bin/, with erlang automatically added as a
+  # runtime input.
+  escriptBinName = "bin/symphony";
+
   mixFodDeps = beamPkgs.fetchMixDeps {
     pname = "mix-deps-symphony";
     inherit version;
     src = "${srcRoot}/elixir";
     hash = mixFodHash;
   };
-
-  nativeBuildInputs = [ makeWrapper ];
-
-  # The mix release script is named after the OTP app
-  # (`symphony_elixir`). Expose it as `symphony` for the
-  # CLI experience promised in upstream docs.
-  postInstall = ''
-    if [ -e $out/bin/symphony_elixir ] \
-        && [ ! -e $out/bin/symphony ]; then
-      makeWrapper $out/bin/symphony_elixir \
-        $out/bin/symphony \
-        --set RELEASE_COOKIE symphony
-    fi
-  '';
 
   meta = {
     description = "OpenAI Symphony agent orchestrator";
