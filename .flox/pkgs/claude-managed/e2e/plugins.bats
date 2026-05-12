@@ -136,6 +136,28 @@ load test_helper/common
   [[ "$count" -eq 1 ]]
 }
 
+@test "plugins add merges multiple v2-format installed_plugins.json" {
+  # Regression test for the shallow-merge bug: when each plugin's
+  # installed_plugins.json wraps its entries under a single
+  # top-level "plugins" key (the v2 schema), two `plugins add`
+  # calls must leave BOTH plugins registered in the merged file.
+  # Before the fix, the second call clobbered the inner "plugins"
+  # map and only the last-added plugin survived.
+  local dir config_dir ip
+  dir="$(setup_fixtures)"
+  config_dir="$(setup_config_dir)"
+  claude-managed --config-dir "$config_dir" \
+    plugins add "$dir/plugins/v2-plugin-a"
+  claude-managed --config-dir "$config_dir" \
+    plugins add "$dir/plugins/v2-plugin-b"
+  ip="$config_dir/plugins/installed_plugins.json"
+  [[ -f "$ip" ]]
+  run grep '"v2-plugin-a@flox"' "$ip"
+  assert_success
+  run grep '"v2-plugin-b@flox"' "$ip"
+  assert_success
+}
+
 @test "doctor validates plugins" {
   run_cm doctor
   assert_output --partial 'Plugins'
