@@ -34,8 +34,8 @@ graphify .
 
 - Everything from the `graphify` base environment
   (Python 3.11, `graphify` CLI, Claude Code)
-- The `flox/claude` env via `[include]` for
-  `claude-managed` (which auto-discovers skills under
+- `flox/claude` via `[include]` for `claude-managed`
+  (which auto-discovers skills under
   `$FLOX_ENV/share/claude-code/skills/`)
 - `flox/skill-graphify` — ships the `/graphify` SKILL.md
   so Claude Code finds it on activate
