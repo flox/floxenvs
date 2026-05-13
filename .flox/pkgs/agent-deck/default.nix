@@ -30,7 +30,19 @@ buildGoModule (finalAttrs: {
   # in a subprocess and waits for it to write debug.log. The TUI bails
   # in the sandbox (no tmux/terminal), so debug.log never appears. The
   # test guards the subprocess arm with testing.Short(), so honour that.
-  checkFlags = [ "-short" ];
+  #
+  # TestValidatePluginFlags_* relies on a process-wide config cache keyed
+  # on file mtime. On fast Linux filesystems (tmpfs in the Nix sandbox)
+  # mtimes collide between tests, so the catalog from an earlier test
+  # leaks into a later one and the assertion flips. Upstream's
+  # clearSessionUserConfigCache is a no-op (see plugin_cli_test.go:35).
+  # Darwin's coarser mtime resolution hides this. Skip the group until
+  # upstream wires real cache invalidation.
+  checkFlags = [
+    "-short"
+    "-skip"
+    "^TestValidatePluginFlags_"
+  ];
 
   preCheck = ''
     export HOME=$(mktemp -d)
