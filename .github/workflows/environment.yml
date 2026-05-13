@@ -54,18 +54,48 @@ jobs:
             popd
           fi
 
-          # Check for uncommitted lock changes
-          if ! git diff --quiet -- "*/manifest.lock"; then
+          # Check for uncommitted lock changes — but ignore
+          # two known-noisy per-fetch fields:
+          #
+          # * `scrape_date` — timestamp the catalog records
+          #   when it last verified an artifact. Recently
+          #   published packages get re-scraped every couple
+          #   of minutes, racing CI on PRs that publish and
+          #   consume in the same branch.
+          #
+          # * `schema-version` — recorded inside each
+          #   included env's manifest snapshot in the lock.
+          #   A `{ remote = "flox/X" }` include re-fetches
+          #   the published env from FloxHub, whose recorded
+          #   schema may differ from the same env's checked-
+          #   out source if FloxHub processed the publish
+          #   with a different flox version. The source-of-
+          #   truth schema lives in the manifest.toml that
+          #   is itself committed.
+          #
+          # Both fields are derived metadata, not part of
+          # the artifact identity (`rev`/`rev_count`/
+          # `narHash`).
+          diff="$(git diff --unified=0 \
+            -- "*/manifest.lock" \
+            | grep -E '^[-+][^-+]' \
+            | grep -vE '^[-+][[:space:]]*"scrape_date":' \
+            | grep -vE '^[-+][[:space:]]*"schema-version":' \
+            || true)"
+          if [ -n "$diff" ]; then
             echo "Error: lockfiles are out of date!"
             echo ""
             git diff --stat -- "*/manifest.lock"
+            echo ""
+            echo "Non-trivial drift detected:"
+            echo "$diff" | head -40
             echo ""
             echo "Run 'flox edit -f' on the env and"
             echo "'flox include upgrade' on the demo,"
             echo "then commit the updated lockfiles."
             exit 1
           fi
-          echo "Lockfiles are up to date."
+          echo "Lockfiles are up to date (scrape_date / schema-version drift ignored)."
 
       - name: "Discover environment"
         id: "discover"

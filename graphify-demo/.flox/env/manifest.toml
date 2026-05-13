@@ -1,0 +1,40 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../graphify" },
+  { remote = "flox/claude" }
+]
+
+# gum is a demo-only tool for styled terminal output.
+# skills-graphify ships the /graphify SKILL.md into
+# $FLOX_ENV/share/claude-code/skills/graphify/ where
+# claude-managed (pulled in via flox/claude) auto-discovers
+# it on activate — no `graphify install` step needed.
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+skills-graphify.pkg-path = "flox/skills-graphify"
+skills-graphify.pkg-group = "skills-graphify"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'graphify — knowledge graphs for Claude Code' '' \
+    'The /graphify skill is pre-installed via' \
+    'flox/skill-graphify and discovered by' \
+    'claude-managed. Just open Claude Code:' \
+    '  /graphify .' '' \
+    'Or use the CLI directly:' \
+    '  graphify .' \
+    '  graphify ./raw --mode deep' \
+    '  graphify ./raw --update' '' \
+    'Query the graph:' \
+    '  graphify query "what connects X to Y?"' \
+    '  graphify path "Module" "Database"' \
+    '  graphify explain "Concept"'
+fi
+'''

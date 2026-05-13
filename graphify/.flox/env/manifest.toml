@@ -1,0 +1,111 @@
+schema-version = "1.10.0"
+
+# graphify — Claude Code skill that turns any folder of code,
+# docs, papers, or images into a queryable knowledge graph.
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/graphify"]
+#
+# Provides Python 3.11 with the graphify CLI installed in a
+# venv, plus the claude-code CLI used by the skill.
+
+[install]
+python.pkg-path = "python311"
+python.pkg-group = "graphify"
+claude-code.pkg-path = "flox/claude-code"
+claude-code.pkg-group = "claude-code"
+bash.pkg-path = "bash"
+bash.pkg-group = "graphify"
+bash.priority = 0
+git.pkg-path = "git"
+git.pkg-group = "graphify-tools"
+curl.pkg-path = "curl"
+curl.pkg-group = "graphify-tools"
+gcc-unwrapped.pkg-path = "gcc-unwrapped"
+gcc-unwrapped.pkg-group = "graphify-build"
+pkg-config.pkg-path = "pkg-config"
+pkg-config.pkg-group = "graphify-build"
+glibc.pkg-path = "glibc"
+glibc.pkg-group = "graphify-build"
+glibc.systems = ["x86_64-linux", "aarch64-linux"]
+
+[vars]
+# PyPI distribution name (CLI binary is `graphify`). The
+# [mcp] extra pulls in `mcp` for the graphify-mcp service
+# and [watch] pulls in `watchdog` for the graphify-watch
+# service — both are required by the services below.
+GRAPHIFY_INSTALL_PACKAGE = "graphifyy[mcp,watch]"
+# Folder graphify operates on. Empty means "use the dir
+# that contains the .flox/ directory" — see services.
+GRAPHIFY_PROJECT_ROOT = ""
+VIRTUAL_ENV_DISABLE_PROMPT = "1"
+
+[hook]
+on-activate = '''
+export PYTHON_DIR="$FLOX_ENV_CACHE/python"
+
+CURRENT_INTERP="$(realpath "$(which python3)")"
+CACHED_INTERP="$(cat "$PYTHON_DIR/.interpreter" \
+  2>/dev/null || echo none)"
+
+if [ ! -d "$PYTHON_DIR" ] \
+    || [ "$CURRENT_INTERP" != "$CACHED_INTERP" ]; then
+  python3 -m venv --upgrade-deps "$PYTHON_DIR"
+  echo "$CURRENT_INTERP" > "$PYTHON_DIR/.interpreter"
+fi
+
+unset VIRTUAL_ENV
+source "$PYTHON_DIR/bin/activate"
+
+HASH=$(echo "$GRAPHIFY_INSTALL_PACKAGE" | md5sum 2>/dev/null \
+  || echo "$GRAPHIFY_INSTALL_PACKAGE" | md5 -q)
+HASH=$(echo "$HASH" | cut -d" " -f1)
+LAST=$(cat "$PYTHON_DIR/.deps_hash" 2>/dev/null)
+if [ "$HASH" != "$LAST" ]; then
+  pip install -q "$GRAPHIFY_INSTALL_PACKAGE"
+  echo "$HASH" > "$PYTHON_DIR/.deps_hash"
+fi
+'''
+
+[profile]
+bash = '''
+source "$PYTHON_DIR/bin/activate"
+'''
+zsh = '''
+source "$PYTHON_DIR/bin/activate"
+'''
+fish = '''
+source "$PYTHON_DIR/bin/activate.fish"
+'''
+tcsh = '''
+source "$PYTHON_DIR/bin/activate.csh"
+'''
+
+[services]
+# Watch GRAPHIFY_PROJECT_ROOT and rebuild the graph on
+# code changes. Defaults to the dir containing .flox/.
+graphify-watch.command = """
+PYTHON_DIR="$FLOX_ENV_CACHE/python"
+source "$PYTHON_DIR/bin/activate"
+root="${GRAPHIFY_PROJECT_ROOT:-$FLOX_ENV_PROJECT}"
+exec graphify watch "$root"
+"""
+
+# MCP stdio server. `graphify watch` builds the graph;
+# this serves it to MCP clients (Claude Code, Gemini,
+# Cursor, …). Runs as a separate service because watch
+# and serve are two different long-running processes —
+# the CLI has no combined flag.
+graphify-mcp.command = """
+PYTHON_DIR="$FLOX_ENV_CACHE/python"
+source "$PYTHON_DIR/bin/activate"
+root="${GRAPHIFY_PROJECT_ROOT:-$FLOX_ENV_PROJECT}"
+graph="$root/graphify-out/graph.json"
+until [ -f "$graph" ]; do
+  echo "waiting for $graph (run graphify-watch first) ..."
+  sleep 2
+done
+exec python -m graphify.serve "$graph"
+"""
