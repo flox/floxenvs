@@ -28,11 +28,27 @@ stdenvNoCC.mkDerivation {
     # Upstream bundles the skill at graphify/skill.md inside the
     # Python package. Install it as a discoverable Claude Code /
     # OpenCode skill under share/<host>/skills/graphify/SKILL.md.
+    #
+    # Upstream's frontmatter has a top-level `trigger:` key, which
+    # isn't in the agentskills.io spec — claude-managed warns on
+    # every activate. Nest it under `metadata:` as the spec (and
+    # the warning text) recommends. The slash command itself is
+    # derived from the skill directory name, so this is purely a
+    # frontmatter-compliance fix.
     for dest in \
       "$out/share/claude-code/skills/graphify" \
       "$out/share/opencode/skills/graphify"; do
       mkdir -p "$dest"
-      cp "$src/graphify/skill.md" "$dest/SKILL.md"
+      awk '
+        /^trigger:[[:space:]]/ && !done {
+          sub(/^trigger:[[:space:]]+/, "")
+          print "metadata:"
+          print "  trigger: " $0
+          done = 1
+          next
+        }
+        { print }
+      ' "$src/graphify/skill.md" > "$dest/SKILL.md"
     done
 
     runHook postInstall
