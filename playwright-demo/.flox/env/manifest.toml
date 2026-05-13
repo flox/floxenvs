@@ -1,0 +1,30 @@
+schema-version = "1.11.0"
+
+[include]
+environments = [
+  { dir = "../playwright" }
+]
+
+# gum is a demo-only tool for styled terminal output.
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'Playwright demo — browser automation in a Flox env' '' \
+    'Install the chromium binary (first time only):' \
+    '  playwright install chromium' '' \
+    'Run the sample test against demo.playwright.dev:' \
+    '  playwright test' '' \
+    'Or expose Playwright as an MCP service:' \
+    '  flox services start playwright-mcp' '' \
+    "MCP endpoint: http://${PLAYWRIGHT_MCP_HOST}:${PLAYWRIGHT_MCP_PORT}/" '' \
+    'Or drive a browser directly from the CLI:' \
+    '  playwright-cli open https://playwright.dev'
+fi
+'''
