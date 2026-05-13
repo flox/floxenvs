@@ -29,9 +29,10 @@ stdenvNoCC.mkDerivation {
   installPhase = ''
     runHook preInstall
 
-    # Sdist root is graphifyy-<version>/; the skill ships
-    # at graphify/skill.md as setuptools package-data.
-    skill_src="graphifyy-${data.version}/graphify/skill.md"
+    # unpackPhase strips the single graphifyy-<version>/
+    # wrapper dir, so we land inside it. The skill ships at
+    # graphify/skill.md as setuptools package-data.
+    skill_src="graphify/skill.md"
     if [ ! -f "$skill_src" ]; then
       echo "error: $skill_src not found in PyPI sdist" >&2
       exit 1
