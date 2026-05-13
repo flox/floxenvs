@@ -1,0 +1,307 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": "demo-tools"
+      },
+      "vibe-kanban": {
+        "pkg-path": "flox/vibe-kanban",
+        "pkg-group": "vibe-kanban"
+      }
+    },
+    "vars": {
+      "BACKEND_PORT": "13456",
+      "PREVIEW_PROXY_PORT": "13457"
+    },
+    "hook": {
+      "on-activate": "export VIBE_KANBAN_CACHE=\"$FLOX_ENV_CACHE/vibe-kanban\"\nmkdir -p \"$VIBE_KANBAN_CACHE\"\n\n# vibe-kanban stores its sqlite database and config under\n# $XDG_DATA_HOME/vibe-kanban. Scope it to the env cache so the\n# env is self-contained and doesn't touch the user's home.\nexport XDG_DATA_HOME=\"$VIBE_KANBAN_CACHE/data\"\nmkdir -p \"$XDG_DATA_HOME\"\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 50 --margin \"1 2\" --padding \"1 2\" \\\n    \"Vibe Kanban\" \"kanban for coding agents\"\n  echo \"\"\n  echo \"  vibe-kanban         — start the web UI\"\n  echo \"  vibe-kanban-mcp     — MCP server for agents\"\n  echo \"  vibe-kanban-review  — review diffs\"\n  echo \"\"\n  echo \"  Web UI port: $BACKEND_PORT\"\n  echo \"  Data dir:    $XDG_DATA_HOME\"\n  echo \"\"\nfi\n"
+    },
+    "options": {}
+  },
+  "packages": [
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/3if65h5mjjgjwgvd18srmm35cn3w6xs8-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=da5ad661ba4e5ef59ba743f0d112cbc30e474f32",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "da5ad661ba4e5ef59ba743f0d112cbc30e474f32",
+      "rev_count": 995699,
+      "rev_date": "2026-05-10T19:57:52Z",
+      "scrape_date": "2026-05-13T08:52:41.504876Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ba53aq5kpjm2qb817qgxswy2hvnkxnyj-gum-0.17.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/ka558hvp8n0vhw8lzwsw66zw3g3lavzd-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=da5ad661ba4e5ef59ba743f0d112cbc30e474f32",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "da5ad661ba4e5ef59ba743f0d112cbc30e474f32",
+      "rev_count": 995699,
+      "rev_date": "2026-05-10T19:57:52Z",
+      "scrape_date": "2026-05-13T09:22:16.243739Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/3hlyv3x7jjn5364f08jw0bic3zddqhxc-gum-0.17.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/z2rm91h36jx1ym7gpl3avxqqxc407pn2-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=da5ad661ba4e5ef59ba743f0d112cbc30e474f32",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "da5ad661ba4e5ef59ba743f0d112cbc30e474f32",
+      "rev_count": 995699,
+      "rev_date": "2026-05-10T19:57:52Z",
+      "scrape_date": "2026-05-13T09:55:23.113121Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/qkwxvmldb9a8nmqq6aqqd47gj3pxwx42-gum-0.17.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/835d9xq5q9w2hv6dzlsc3yjbh44kmpjn-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=da5ad661ba4e5ef59ba743f0d112cbc30e474f32",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "da5ad661ba4e5ef59ba743f0d112cbc30e474f32",
+      "rev_count": 995699,
+      "rev_date": "2026-05-10T19:57:52Z",
+      "scrape_date": "2026-05-13T10:36:04.862400Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/c149nbx8xh8knvply95623gnwqds19xr-gum-0.17.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "vibe-kanban",
+      "broken": false,
+      "derivation": "/nix/store/8wvlh6py19bibp8y9y4llm2c6ckdn2y3-vibe-kanban-0.1.44.drv",
+      "description": "Kanban-style task manager for coding agents",
+      "install_id": "vibe-kanban",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=dcc75abe4d9eb8b39fcc8feb3c56e65695045056",
+      "name": "vibe-kanban-0.1.44",
+      "pname": "vibe-kanban",
+      "rev": "dcc75abe4d9eb8b39fcc8feb3c56e65695045056",
+      "rev_count": 3256,
+      "rev_date": "2026-05-13T15:19:42Z",
+      "scrape_date": "2026-05-13T15:33:56.156037Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "0.1.44",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/dgdhkkvsmp07hf6r6518ns9ikpayzsak-vibe-kanban-0.1.44"
+      },
+      "system": "aarch64-darwin",
+      "group": "vibe-kanban",
+      "priority": 5
+    },
+    {
+      "attr_path": "vibe-kanban",
+      "broken": false,
+      "derivation": "/nix/store/s7dnfal1w5m0lshaxw090paycr41h16w-vibe-kanban-0.1.44.drv",
+      "description": "Kanban-style task manager for coding agents",
+      "install_id": "vibe-kanban",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=dcc75abe4d9eb8b39fcc8feb3c56e65695045056",
+      "name": "vibe-kanban-0.1.44",
+      "pname": "vibe-kanban",
+      "rev": "dcc75abe4d9eb8b39fcc8feb3c56e65695045056",
+      "rev_count": 3256,
+      "rev_date": "2026-05-13T15:19:42Z",
+      "scrape_date": "2026-05-13T15:33:56.156038Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "0.1.44",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/gfrpp87agrsiaa5z5dfvfh85ppdalgm1-vibe-kanban-0.1.44"
+      },
+      "system": "aarch64-linux",
+      "group": "vibe-kanban",
+      "priority": 5
+    },
+    {
+      "attr_path": "vibe-kanban",
+      "broken": false,
+      "derivation": "/nix/store/wmv4hi75l749h3sf96q4js6piqbgcmch-vibe-kanban-0.1.44.drv",
+      "description": "Kanban-style task manager for coding agents",
+      "install_id": "vibe-kanban",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=dcc75abe4d9eb8b39fcc8feb3c56e65695045056",
+      "name": "vibe-kanban-0.1.44",
+      "pname": "vibe-kanban",
+      "rev": "dcc75abe4d9eb8b39fcc8feb3c56e65695045056",
+      "rev_count": 3256,
+      "rev_date": "2026-05-13T15:19:42Z",
+      "scrape_date": "2026-05-13T15:33:56.156038Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "0.1.44",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/508vckj4ypr37rg6pwzwimv2cnqflf07-vibe-kanban-0.1.44"
+      },
+      "system": "x86_64-darwin",
+      "group": "vibe-kanban",
+      "priority": 5
+    },
+    {
+      "attr_path": "vibe-kanban",
+      "broken": false,
+      "derivation": "/nix/store/l2968jf8v9q1f7lfx5cg06js2arwd84m-vibe-kanban-0.1.44.drv",
+      "description": "Kanban-style task manager for coding agents",
+      "install_id": "vibe-kanban",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=dcc75abe4d9eb8b39fcc8feb3c56e65695045056",
+      "name": "vibe-kanban-0.1.44",
+      "pname": "vibe-kanban",
+      "rev": "dcc75abe4d9eb8b39fcc8feb3c56e65695045056",
+      "rev_count": 3256,
+      "rev_date": "2026-05-13T15:19:42Z",
+      "scrape_date": "2026-05-13T15:33:56.156038Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "0.1.44",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/04cnq6kaqj2mhkwg6z3zvk0lgqhwnfyl-vibe-kanban-0.1.44"
+      },
+      "system": "x86_64-linux",
+      "group": "vibe-kanban",
+      "priority": 5
+    }
+  ],
+  "compose": {
+    "composer": {
+      "schema-version": "1.11.0",
+      "install": {
+        "gum": {
+          "pkg-path": "gum",
+          "pkg-group": "demo-tools"
+        }
+      },
+      "hook": {
+        "on-activate": "if [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 50 --margin \"1 2\" --padding \"1 2\" \\\n    \"Vibe Kanban\" \"kanban for coding agents\"\n  echo \"\"\n  echo \"  vibe-kanban         — start the web UI\"\n  echo \"  vibe-kanban-mcp     — MCP server for agents\"\n  echo \"  vibe-kanban-review  — review diffs\"\n  echo \"\"\n  echo \"  Web UI port: $BACKEND_PORT\"\n  echo \"  Data dir:    $XDG_DATA_HOME\"\n  echo \"\"\nfi\n"
+      },
+      "options": {},
+      "include": {
+        "environments": [
+          {
+            "dir": "../vibe-kanban"
+          }
+        ]
+      }
+    },
+    "include": [
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "vibe-kanban": {
+              "pkg-path": "flox/vibe-kanban",
+              "pkg-group": "vibe-kanban"
+            }
+          },
+          "vars": {
+            "BACKEND_PORT": "13456",
+            "PREVIEW_PROXY_PORT": "13457"
+          },
+          "hook": {
+            "on-activate": "export VIBE_KANBAN_CACHE=\"$FLOX_ENV_CACHE/vibe-kanban\"\nmkdir -p \"$VIBE_KANBAN_CACHE\"\n\n# vibe-kanban stores its sqlite database and config under\n# $XDG_DATA_HOME/vibe-kanban. Scope it to the env cache so the\n# env is self-contained and doesn't touch the user's home.\nexport XDG_DATA_HOME=\"$VIBE_KANBAN_CACHE/data\"\nmkdir -p \"$XDG_DATA_HOME\"\n"
+          },
+          "options": {}
+        },
+        "name": "vibe-kanban",
+        "descriptor": {
+          "dir": "../vibe-kanban"
+        }
+      }
+    ],
+    "warnings": []
+  }
+}

@@ -1,0 +1,38 @@
+name: "CI: vibe-kanban"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "vibe-kanban/**"
+      - "vibe-kanban-demo/**"
+      - ".flox/pkgs/vibe-kanban/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_vibe-kanban.yml"
+  pull_request:
+    paths:
+      - "vibe-kanban/**"
+      - "vibe-kanban-demo/**"
+      - ".flox/pkgs/vibe-kanban/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_vibe-kanban.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "vibe-kanban"
+    secrets: inherit
