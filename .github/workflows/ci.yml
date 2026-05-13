@@ -551,10 +551,46 @@ jobs:
       - name: "Checkout"
         uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
 
+      - name: "Check Linux support"
+        id: "linux_support"
+        run: |
+          set -euo pipefail
+          ENV="${{ matrix.env }}"
+          LOCK="$ENV/.flox/env/manifest.lock"
+
+          # Containers are built on ubuntu-latest (x86_64-linux). If the
+          # env doesn't support x86_64-linux, skip the containerize job.
+          # Empty `systems` in the manifest means "all systems" (default).
+          ENV_LINUX=$(jq -r '
+            .manifest.options.systems // []
+            | if length == 0 then "true"
+              else (index("x86_64-linux") | if . != null then "true" else "false" end)
+              end
+          ' "$LOCK")
+          echo "env_linux=$ENV_LINUX" >> "$GITHUB_OUTPUT"
+
+          DEMO_LOCK="$ENV-demo/.flox/env/manifest.lock"
+          if [ -f "$DEMO_LOCK" ]; then
+            DEMO_LINUX=$(jq -r '
+              .manifest.options.systems // []
+              | if length == 0 then "true"
+                else (index("x86_64-linux") | if . != null then "true" else "false" end)
+                end
+            ' "$DEMO_LOCK")
+          else
+            DEMO_LINUX="false"
+          fi
+          echo "demo_linux=$DEMO_LINUX" >> "$GITHUB_OUTPUT"
+
+          echo "env x86_64-linux supported: $ENV_LINUX"
+          echo "demo x86_64-linux supported: $DEMO_LINUX"
+
       - name: "Install flox"
+        if: steps.linux_support.outputs.env_linux == 'true' || steps.linux_support.outputs.demo_linux == 'true'
         uses: "flox/install-flox-action@c94e7e1ab56ae14fe98bae4fd84384fd135f0c2a" # main
 
       - name: "Login to GHCR"
+        if: steps.linux_support.outputs.env_linux == 'true' || steps.linux_support.outputs.demo_linux == 'true'
         uses: "docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121" # v4
         with:
           registry: "ghcr.io"
@@ -562,6 +598,7 @@ jobs:
           password: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: "Containerize environment"
+        if: steps.linux_support.outputs.env_linux == 'true'
         run: |
           ENV="${{ matrix.env }}"
           export NIX_CONFIG='extra-experimental-features = nix-command flakes'
@@ -571,7 +608,9 @@ jobs:
           docker push "ghcr.io/flox/floxenvs:$tag-latest"
 
       - name: "Containerize demo"
-        if: hashFiles(format('{0}-demo/.flox/env/manifest.toml', matrix.env)) != ''
+        if: >-
+          steps.linux_support.outputs.demo_linux == 'true'
+          && hashFiles(format('{0}-demo/.flox/env/manifest.toml', matrix.env)) != ''
         run: |
           ENV="${{ matrix.env }}"
           DEMO="$ENV-demo"
