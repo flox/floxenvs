@@ -406,7 +406,11 @@ jobs:
         run: |
           ENV="${{ inputs.environment }}"
           DEMO_DIR="$ENV-demo"
-          sed -i "s|{ dir = \"../$ENV\" }|{ remote = \"$FLOX_REMOTE_OWNER/$ENV\" }|g" "$DEMO_DIR/.flox/env/manifest.toml"
+          # sed -i is non-portable between GNU (Linux) and BSD (macOS) sed;
+          # write through a temp file so the same step works on both runners.
+          MANIFEST="$DEMO_DIR/.flox/env/manifest.toml"
+          sed "s|{ dir = \"../$ENV\" }|{ remote = \"$FLOX_REMOTE_OWNER/$ENV\" }|g" "$MANIFEST" > "$MANIFEST.new"
+          mv "$MANIFEST.new" "$MANIFEST"
           cat "$DEMO_DIR/.flox/env/manifest.toml"
 
       - name: "Upgrade includes"
