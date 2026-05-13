@@ -17,11 +17,18 @@ Activate directly:
 flox activate -r flox/graphify
 ```
 
-Then register the Claude Code skill (one-time setup):
+The `/graphify` SKILL.md ships with the env (via
+`flox/skills-graphify`) under
+`$FLOX_ENV/share/claude-code/skills/graphify/`. To have
+Claude Code auto-discover it, compose this env with
+`flox/claude` (which provides `claude-managed`):
 
-```bash
-graphify install
+```toml
+[include]
+environments = ["flox/graphify", "flox/claude"]
 ```
+
+Otherwise run `graphify install` manually.
 
 Open Claude Code in any directory and type:
 
@@ -45,6 +52,7 @@ defaults.
 
 - Python 3.11 with `graphifyy` installed in a venv
 - Claude Code CLI (the skill host)
+- `flox/skills-graphify` — bundled `/graphify` SKILL.md
 - Git, curl, and build tools for tree-sitter native deps
 
 ## Usage

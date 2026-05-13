@@ -7,16 +7,14 @@ environments = [
 ]
 
 # gum is a demo-only tool for styled terminal output.
-# skills-graphify ships the /graphify SKILL.md into
-# $FLOX_ENV/share/claude-code/skills/graphify/ where
-# claude-managed (pulled in via flox/claude) auto-discovers
-# it on activate — no `graphify install` step needed.
+# The /graphify SKILL.md comes in via `../graphify`'s
+# flox/skills-graphify install, and claude-managed
+# (pulled in via `../claude`) auto-discovers it on
+# activate — no `graphify install` step needed.
 
 [install]
 gum.pkg-path = "gum"
 gum.pkg-group = "demo-tools"
-skills-graphify.pkg-path = "flox/skills-graphify"
-skills-graphify.pkg-group = "skills-graphify"
 
 [hook]
 on-activate = '''
