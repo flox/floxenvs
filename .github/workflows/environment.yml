@@ -54,18 +54,35 @@ jobs:
             popd
           fi
 
-          # Check for uncommitted lock changes
-          if ! git diff --quiet -- "*/manifest.lock"; then
+          # Check for uncommitted lock changes — but ignore
+          # `scrape_date` drift. That field is a per-fetch
+          # timestamp the catalog records when it last
+          # verified the artifact; it has no bearing on
+          # reproducibility (the `rev`/`rev_count`/`narHash`
+          # are the actual identity). Recently-published
+          # packages get re-scraped every couple of minutes,
+          # which races with CI and produces spurious
+          # "out of date" failures on PRs that publish and
+          # consume a package in the same branch.
+          diff="$(git diff --unified=0 \
+            -- "*/manifest.lock" \
+            | grep -E '^[-+][^-+]' \
+            | grep -vE '^[-+][[:space:]]*"scrape_date":' \
+            || true)"
+          if [ -n "$diff" ]; then
             echo "Error: lockfiles are out of date!"
             echo ""
             git diff --stat -- "*/manifest.lock"
+            echo ""
+            echo "Non-scrape_date drift detected:"
+            echo "$diff" | head -40
             echo ""
             echo "Run 'flox edit -f' on the env and"
             echo "'flox include upgrade' on the demo,"
             echo "then commit the updated lockfiles."
             exit 1
           fi
-          echo "Lockfiles are up to date."
+          echo "Lockfiles are up to date (scrape_date drift ignored)."
 
       - name: "Discover environment"
         id: "discover"
