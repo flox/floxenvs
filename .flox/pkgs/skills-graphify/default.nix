@@ -7,17 +7,19 @@
 let
   data = builtins.fromJSON (builtins.readFile ./hashes.json);
 
-  # Use fetchurl (byte-level hash of the .tar.gz) instead of
-  # fetchFromGitHub (which hashes the unpacked tree and can
-  # produce platform-divergent hashes for the same source).
-  # mkDerivation auto-unpacks the tarball in unpackPhase.
+  # Pull the sdist directly from PyPI — the same artifact
+  # the `graphify` env's `pip install graphifyy` resolves
+  # to. Versions are immutable and the hash is stable
+  # across platforms, so this avoids both the GitHub
+  # default-branch drift and the fetchFromGitHub
+  # unpack-divergence we hit when sourcing from the repo.
   src = fetchurl {
-    url = "https://github.com/safishamsi/graphify/archive/${data.rev}.tar.gz";
+    url = data.url;
     hash = data.srcHash;
   };
 in
 stdenvNoCC.mkDerivation {
-  pname = "skill-graphify";
+  pname = "skills-graphify";
   version = data.version;
   inherit src;
 
@@ -27,16 +29,20 @@ stdenvNoCC.mkDerivation {
   installPhase = ''
     runHook preInstall
 
-    # Upstream bundles the skill at graphify/skill.md inside the
-    # Python package. Install it as a discoverable Claude Code /
-    # OpenCode skill under share/<host>/skills/graphify/SKILL.md.
-    #
-    # Upstream's frontmatter has a top-level `trigger:` key, which
-    # isn't in the agentskills.io spec — claude-managed warns on
-    # every activate. Nest it under `metadata:` as the spec (and
-    # the warning text) recommends. The slash command itself is
-    # derived from the skill directory name, so this is purely a
-    # frontmatter-compliance fix.
+    # Sdist root is graphifyy-<version>/; the skill ships
+    # at graphify/skill.md as setuptools package-data.
+    skill_src="graphifyy-${data.version}/graphify/skill.md"
+    if [ ! -f "$skill_src" ]; then
+      echo "error: $skill_src not found in PyPI sdist" >&2
+      exit 1
+    fi
+
+    # Upstream frontmatter has a top-level `trigger:` key
+    # which isn't in the agentskills.io spec — claude-managed
+    # warns on every activate. Nest it under `metadata:` as
+    # the spec (and the warning text) recommends. The slash
+    # command itself is derived from the skill directory
+    # name, so this is purely a frontmatter-compliance fix.
     for dest in \
       "$out/share/claude-code/skills/graphify" \
       "$out/share/opencode/skills/graphify"; do
@@ -50,7 +56,7 @@ stdenvNoCC.mkDerivation {
           next
         }
         { print }
-      ' graphify/skill.md > "$dest/SKILL.md"
+      ' "$skill_src" > "$dest/SKILL.md"
     done
 
     runHook postInstall
