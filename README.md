@@ -90,6 +90,8 @@ Most environments follow a dual-layer pattern:
 | _└ dotenv-demo_ | | [floxhub](https://hub.flox.dev/flox/dotenv-demo) · [docs](dotenv-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/dotenv-demo-latest) |
 | mkcert | Local TLS certs | [floxhub](https://hub.flox.dev/flox/mkcert) · [docs](mkcert/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/mkcert-latest) |
 | _└ mkcert-demo_ | | [floxhub](https://hub.flox.dev/flox/mkcert-demo) · [docs](mkcert-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/mkcert-demo-latest) |
+| playwright | Browser automation + MCP | [floxhub](https://hub.flox.dev/flox/playwright) · [docs](playwright/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/playwright-latest) |
+| _└ playwright-demo_ | | [floxhub](https://hub.flox.dev/flox/playwright-demo) · [docs](playwright-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/playwright-demo-latest) |
 
 ## AI & ML
 
