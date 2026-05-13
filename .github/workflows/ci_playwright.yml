@@ -1,0 +1,36 @@
+name: "CI: playwright"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "playwright/**"
+      - "playwright-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_playwright.yml"
+  pull_request:
+    paths:
+      - "playwright/**"
+      - "playwright-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_playwright.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "playwright"
+    secrets: inherit
