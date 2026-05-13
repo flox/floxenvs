@@ -1,0 +1,31 @@
+schema-version = "1.10.0"
+
+# Minimal Vibe Kanban environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/vibe-kanban"]
+#
+# Override BACKEND_PORT or PREVIEW_PROXY_PORT in your own
+# manifest to change the bound ports.
+
+[install]
+vibe-kanban.pkg-path = "flox/vibe-kanban"
+vibe-kanban.pkg-group = "vibe-kanban"
+
+[vars]
+BACKEND_PORT = "13456"
+PREVIEW_PROXY_PORT = "13457"
+
+[hook]
+on-activate = '''
+export VIBE_KANBAN_CACHE="$FLOX_ENV_CACHE/vibe-kanban"
+mkdir -p "$VIBE_KANBAN_CACHE"
+
+# vibe-kanban stores its sqlite database and config under
+# $XDG_DATA_HOME/vibe-kanban. Scope it to the env cache so the
+# env is self-contained and doesn't touch the user's home.
+export XDG_DATA_HOME="$VIBE_KANBAN_CACHE/data"
+mkdir -p "$XDG_DATA_HOME"
+'''

@@ -105,6 +105,8 @@ Most environments follow a dual-layer pattern:
 | _└ symphony-demo_ | | [floxhub](https://hub.flox.dev/flox/symphony-demo) · [docs](symphony-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/symphony-demo-latest) |
 | omlx | oMLX LLM server (Apple Silicon) | [floxhub](https://hub.flox.dev/flox/omlx) · [docs](omlx/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/omlx-latest) |
 | _└ omlx-demo_ | | [floxhub](https://hub.flox.dev/flox/omlx-demo) · [docs](omlx-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/omlx-demo-latest) |
+| vibe-kanban | Kanban for coding agents | [floxhub](https://hub.flox.dev/flox/vibe-kanban) · [docs](vibe-kanban/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/vibe-kanban-latest) |
+| _└ vibe-kanban-demo_ | | [floxhub](https://hub.flox.dev/flox/vibe-kanban-demo) · [docs](vibe-kanban-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/vibe-kanban-demo-latest) |
 
 ## Docker images
 

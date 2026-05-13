@@ -1,0 +1,29 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../vibe-kanban" }
+]
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [ "${FLOX_ENVS_TESTING:-}" != "1" ]; then
+  gum style \
+    --foreground 212 --border-foreground 212 \
+    --border double --align center \
+    --width 50 --margin "1 2" --padding "1 2" \
+    "Vibe Kanban" "kanban for coding agents"
+  echo ""
+  echo "  vibe-kanban         — start the web UI"
+  echo "  vibe-kanban-mcp     — MCP server for agents"
+  echo "  vibe-kanban-review  — review diffs"
+  echo ""
+  echo "  Web UI port: $BACKEND_PORT"
+  echo "  Data dir:    $XDG_DATA_HOME"
+  echo ""
+fi
+'''
