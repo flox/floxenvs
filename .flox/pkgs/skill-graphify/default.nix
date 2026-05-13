@@ -1,16 +1,18 @@
 {
   lib,
   stdenvNoCC,
-  fetchFromGitHub,
+  fetchurl,
 }:
 
 let
   data = builtins.fromJSON (builtins.readFile ./hashes.json);
 
-  src = fetchFromGitHub {
-    owner = "safishamsi";
-    repo = "graphify";
-    rev = data.rev;
+  # Use fetchurl (byte-level hash of the .tar.gz) instead of
+  # fetchFromGitHub (which hashes the unpacked tree and can
+  # produce platform-divergent hashes for the same source).
+  # mkDerivation auto-unpacks the tarball in unpackPhase.
+  src = fetchurl {
+    url = "https://github.com/safishamsi/graphify/archive/${data.rev}.tar.gz";
     hash = data.srcHash;
   };
 in
@@ -48,7 +50,7 @@ stdenvNoCC.mkDerivation {
           next
         }
         { print }
-      ' "$src/graphify/skill.md" > "$dest/SKILL.md"
+      ' graphify/skill.md > "$dest/SKILL.md"
     done
 
     runHook postInstall

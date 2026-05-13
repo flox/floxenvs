@@ -57,8 +57,12 @@ fi
 
 echo "Updating skill-graphify to $new_version"
 
-# Prefetch the source tarball and compute SRI hash.
-sha256_base32=$(nix-prefetch-url --unpack \
+# Prefetch the .tar.gz and compute SRI hash of the raw
+# tarball bytes (no --unpack). fetchurl in default.nix
+# verifies the same hash, which is stable across platforms
+# — unlike fetchFromGitHub's unpacked-tree hash, which can
+# diverge between linux x86_64 and other systems.
+sha256_base32=$(nix-prefetch-url \
   "https://github.com/$OWNER/$REPO/archive/$rev.tar.gz")
 sri_hash=$(nix --extra-experimental-features nix-command \
   hash convert --hash-algo sha256 --to sri "$sha256_base32")
