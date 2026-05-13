@@ -1,0 +1,52 @@
+schema-version = "1.10.0"
+
+# Minimal Playwright environment for use with
+# [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/playwright"]
+#
+# Provides the Playwright library, test runner,
+# browser drivers, Microsoft's playwright-cli, the
+# Playwright MCP server, and a Claude Code / OpenCode
+# skill bundle for driving playwright-cli.
+
+[install]
+playwright.pkg-path = "playwright"
+playwright.pkg-group = "playwright"
+playwright-test.pkg-path = "playwright-test"
+playwright-test.pkg-group = "playwright"
+playwright-driver.pkg-path = "playwright-driver"
+playwright-driver.pkg-group = "playwright"
+playwright-mcp.pkg-path = "playwright-mcp"
+playwright-mcp.pkg-group = "playwright"
+playwright-cli.pkg-path = "flox/playwright-cli"
+playwright-cli.pkg-group = "playwright"
+skills-playwright-cli.pkg-path = "flox/skills-playwright-cli"
+skills-playwright-cli.pkg-group = "playwright"
+
+[vars]
+PLAYWRIGHT_MCP_HOST = "127.0.0.1"
+PLAYWRIGHT_MCP_PORT = "18931"
+PLAYWRIGHT_HEADLESS = "true"
+
+[hook]
+on-activate = '''
+dir="$FLOX_ENV_CACHE/playwright"
+export PLAYWRIGHT_DATA_DIR="$dir"
+export PLAYWRIGHT_BROWSERS_PATH="${PLAYWRIGHT_BROWSERS_PATH:-$dir/browsers}"
+mkdir -p "$PLAYWRIGHT_BROWSERS_PATH"
+'''
+
+[services]
+playwright-mcp.command = '''
+dir="${PLAYWRIGHT_DATA_DIR:-$FLOX_ENV_CACHE/playwright}"
+export PLAYWRIGHT_BROWSERS_PATH="${PLAYWRIGHT_BROWSERS_PATH:-$dir/browsers}"
+mkdir -p "$PLAYWRIGHT_BROWSERS_PATH"
+exec playwright-mcp \
+  --host "$PLAYWRIGHT_MCP_HOST" \
+  --port "$PLAYWRIGHT_MCP_PORT" \
+  --browser chromium
+'''

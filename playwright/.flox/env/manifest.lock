@@ -1,0 +1,752 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "playwright": {
+        "pkg-path": "playwright",
+        "pkg-group": "playwright"
+      },
+      "playwright-cli": {
+        "pkg-path": "flox/playwright-cli",
+        "pkg-group": "playwright"
+      },
+      "playwright-driver": {
+        "pkg-path": "playwright-driver",
+        "pkg-group": "playwright"
+      },
+      "playwright-mcp": {
+        "pkg-path": "playwright-mcp",
+        "pkg-group": "playwright"
+      },
+      "playwright-test": {
+        "pkg-path": "playwright-test",
+        "pkg-group": "playwright"
+      },
+      "skills-playwright-cli": {
+        "pkg-path": "flox/skills-playwright-cli",
+        "pkg-group": "playwright"
+      }
+    },
+    "vars": {
+      "PLAYWRIGHT_HEADLESS": "true",
+      "PLAYWRIGHT_MCP_HOST": "127.0.0.1",
+      "PLAYWRIGHT_MCP_PORT": "18931"
+    },
+    "hook": {
+      "on-activate": "dir=\"$FLOX_ENV_CACHE/playwright\"\nexport PLAYWRIGHT_DATA_DIR=\"$dir\"\nexport PLAYWRIGHT_BROWSERS_PATH=\"${PLAYWRIGHT_BROWSERS_PATH:-$dir/browsers}\"\nmkdir -p \"$PLAYWRIGHT_BROWSERS_PATH\"\n"
+    },
+    "options": {},
+    "services": {
+      "playwright-mcp": {
+        "command": "dir=\"${PLAYWRIGHT_DATA_DIR:-$FLOX_ENV_CACHE/playwright}\"\nexport PLAYWRIGHT_BROWSERS_PATH=\"${PLAYWRIGHT_BROWSERS_PATH:-$dir/browsers}\"\nmkdir -p \"$PLAYWRIGHT_BROWSERS_PATH\"\nexec playwright-mcp \\\n  --host \"$PLAYWRIGHT_MCP_HOST\" \\\n  --port \"$PLAYWRIGHT_MCP_PORT\" \\\n  --browser chromium\n"
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "playwright",
+      "broken": false,
+      "derivation": "/nix/store/bi4a0pnsnv0v9cn3saqmygv67x8mxjmf-playwright-core-1.59.1.drv",
+      "description": "Framework for Web Testing and Automation",
+      "install_id": "playwright",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "name": "playwright-core-1.59.1",
+      "pname": "playwright",
+      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "rev_count": 990025,
+      "rev_date": "2026-04-30T19:45:37Z",
+      "scrape_date": "2026-05-03T08:11:01.435963Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.59.1",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ryrbklwx4fm57djibvxz9skvc8nm1r1d-playwright-core-1.59.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "playwright",
+      "broken": false,
+      "derivation": "/nix/store/n9v1pd7sfcv907xk6gd4d3i4vymw6qbw-playwright-core-1.59.1.drv",
+      "description": "Framework for Web Testing and Automation",
+      "install_id": "playwright",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "name": "playwright-core-1.59.1",
+      "pname": "playwright",
+      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "rev_count": 990025,
+      "rev_date": "2026-04-30T19:45:37Z",
+      "scrape_date": "2026-05-03T08:45:31.331503Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.59.1",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kzhra5kizi6rsmlnlk0m0ayynlw7cixm-playwright-core-1.59.1"
+      },
+      "system": "aarch64-linux",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "playwright",
+      "broken": false,
+      "derivation": "/nix/store/vfn8ci1i1iwmqgfhjpsvlj48813p37ia-playwright-core-1.59.1.drv",
+      "description": "Framework for Web Testing and Automation",
+      "install_id": "playwright",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "name": "playwright-core-1.59.1",
+      "pname": "playwright",
+      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "rev_count": 990025,
+      "rev_date": "2026-04-30T19:45:37Z",
+      "scrape_date": "2026-05-03T09:16:34.168853Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.59.1",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/25k0vryiwd4l94pwf7ryzq14z31063s3-playwright-core-1.59.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "playwright",
+      "broken": false,
+      "derivation": "/nix/store/ybvcy5sgkf2ljp66qhw96lqwccnp3d2k-playwright-core-1.59.1.drv",
+      "description": "Framework for Web Testing and Automation",
+      "install_id": "playwright",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "name": "playwright-core-1.59.1",
+      "pname": "playwright",
+      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "rev_count": 990025,
+      "rev_date": "2026-04-30T19:45:37Z",
+      "scrape_date": "2026-05-03T09:53:12.000466Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.59.1",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/jzdig02pgpjxqh2ghpvf4ba2zki9vfka-playwright-core-1.59.1"
+      },
+      "system": "x86_64-linux",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "playwright-cli",
+      "broken": false,
+      "derivation": "/nix/store/j86cl19qivypg141gnf8z990318vsrf9-playwright-cli-0.1.13.drv",
+      "description": "Microsoft Playwright CLI — record and generate Playwright code, inspect selectors, drive a browser from the shell.",
+      "install_id": "playwright-cli",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=b351d45aaa083aea9973ed8490f1d9898faf004e",
+      "name": "playwright-cli-0.1.13",
+      "pname": "playwright-cli",
+      "rev": "b351d45aaa083aea9973ed8490f1d9898faf004e",
+      "rev_count": 3240,
+      "rev_date": "2026-05-13T15:34:48Z",
+      "scrape_date": "2026-05-13T15:48:42.980150Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.1.13",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/lsdw7jc1yx39d5c7da1x5rc1gxxdns49-playwright-cli-0.1.13"
+      },
+      "system": "aarch64-darwin",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "playwright-cli",
+      "broken": false,
+      "derivation": "/nix/store/x7wmmk232qkaq55bn2rq2gwyajd9yi38-playwright-cli-0.1.13.drv",
+      "description": "Microsoft Playwright CLI — record and generate Playwright code, inspect selectors, drive a browser from the shell.",
+      "install_id": "playwright-cli",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=b351d45aaa083aea9973ed8490f1d9898faf004e",
+      "name": "playwright-cli-0.1.13",
+      "pname": "playwright-cli",
+      "rev": "b351d45aaa083aea9973ed8490f1d9898faf004e",
+      "rev_count": 3240,
+      "rev_date": "2026-05-13T15:34:48Z",
+      "scrape_date": "2026-05-13T15:48:42.980158Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.1.13",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/3147vvdsksp3z1mbn38ynl3hjjwd9sc6-playwright-cli-0.1.13"
+      },
+      "system": "aarch64-linux",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "playwright-cli",
+      "broken": false,
+      "derivation": "/nix/store/0a2jq84f69j28siy1vwbl99w1w8x6c1p-playwright-cli-0.1.13.drv",
+      "description": "Microsoft Playwright CLI — record and generate Playwright code, inspect selectors, drive a browser from the shell.",
+      "install_id": "playwright-cli",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=b351d45aaa083aea9973ed8490f1d9898faf004e",
+      "name": "playwright-cli-0.1.13",
+      "pname": "playwright-cli",
+      "rev": "b351d45aaa083aea9973ed8490f1d9898faf004e",
+      "rev_count": 3240,
+      "rev_date": "2026-05-13T15:34:48Z",
+      "scrape_date": "2026-05-13T15:48:42.980160Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.1.13",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/j7vp538a42sghm5bvdr9fk7h9x091w7i-playwright-cli-0.1.13"
+      },
+      "system": "x86_64-darwin",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "playwright-cli",
+      "broken": false,
+      "derivation": "/nix/store/ynhs1zka7cw1ir77m47irqmc6lpinhg1-playwright-cli-0.1.13.drv",
+      "description": "Microsoft Playwright CLI — record and generate Playwright code, inspect selectors, drive a browser from the shell.",
+      "install_id": "playwright-cli",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=b351d45aaa083aea9973ed8490f1d9898faf004e",
+      "name": "playwright-cli-0.1.13",
+      "pname": "playwright-cli",
+      "rev": "b351d45aaa083aea9973ed8490f1d9898faf004e",
+      "rev_count": 3240,
+      "rev_date": "2026-05-13T15:34:48Z",
+      "scrape_date": "2026-05-13T15:48:42.980161Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.1.13",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/h4gsi85fi9mqwgydq68ll5k30pzvjl5v-playwright-cli-0.1.13"
+      },
+      "system": "x86_64-linux",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "playwright-driver",
+      "broken": false,
+      "derivation": "/nix/store/bi4a0pnsnv0v9cn3saqmygv67x8mxjmf-playwright-core-1.59.1.drv",
+      "description": "Framework for Web Testing and Automation",
+      "install_id": "playwright-driver",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "name": "playwright-core-1.59.1",
+      "pname": "playwright-driver",
+      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "rev_count": 990025,
+      "rev_date": "2026-04-30T19:45:37Z",
+      "scrape_date": "2026-05-03T08:11:01.437724Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.59.1",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ryrbklwx4fm57djibvxz9skvc8nm1r1d-playwright-core-1.59.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "playwright-driver",
+      "broken": false,
+      "derivation": "/nix/store/n9v1pd7sfcv907xk6gd4d3i4vymw6qbw-playwright-core-1.59.1.drv",
+      "description": "Framework for Web Testing and Automation",
+      "install_id": "playwright-driver",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "name": "playwright-core-1.59.1",
+      "pname": "playwright-driver",
+      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "rev_count": 990025,
+      "rev_date": "2026-04-30T19:45:37Z",
+      "scrape_date": "2026-05-03T08:45:31.333646Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.59.1",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kzhra5kizi6rsmlnlk0m0ayynlw7cixm-playwright-core-1.59.1"
+      },
+      "system": "aarch64-linux",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "playwright-driver",
+      "broken": false,
+      "derivation": "/nix/store/vfn8ci1i1iwmqgfhjpsvlj48813p37ia-playwright-core-1.59.1.drv",
+      "description": "Framework for Web Testing and Automation",
+      "install_id": "playwright-driver",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "name": "playwright-core-1.59.1",
+      "pname": "playwright-driver",
+      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "rev_count": 990025,
+      "rev_date": "2026-04-30T19:45:37Z",
+      "scrape_date": "2026-05-03T09:16:34.170584Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.59.1",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/25k0vryiwd4l94pwf7ryzq14z31063s3-playwright-core-1.59.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "playwright-driver",
+      "broken": false,
+      "derivation": "/nix/store/ybvcy5sgkf2ljp66qhw96lqwccnp3d2k-playwright-core-1.59.1.drv",
+      "description": "Framework for Web Testing and Automation",
+      "install_id": "playwright-driver",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "name": "playwright-core-1.59.1",
+      "pname": "playwright-driver",
+      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "rev_count": 990025,
+      "rev_date": "2026-04-30T19:45:37Z",
+      "scrape_date": "2026-05-03T09:53:12.003338Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.59.1",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/jzdig02pgpjxqh2ghpvf4ba2zki9vfka-playwright-core-1.59.1"
+      },
+      "system": "x86_64-linux",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "playwright-mcp",
+      "broken": false,
+      "derivation": "/nix/store/1qn68p9cy8ik83s9fl89bvjfqsybwrfw-playwright-mcp-0.0.69.drv",
+      "description": "Playwright MCP server",
+      "install_id": "playwright-mcp",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "name": "playwright-mcp-0.0.69",
+      "pname": "playwright-mcp",
+      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "rev_count": 990025,
+      "rev_date": "2026-04-30T19:45:37Z",
+      "scrape_date": "2026-05-03T08:11:01.439546Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.0.69",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/1qkx4ks9nd2vf8xvqnwnri60f2lw2f0z-playwright-mcp-0.0.69"
+      },
+      "system": "aarch64-darwin",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "playwright-mcp",
+      "broken": false,
+      "derivation": "/nix/store/j9n1lzw47crxp7hdf776s1sl7ly6685f-playwright-mcp-0.0.69.drv",
+      "description": "Playwright MCP server",
+      "install_id": "playwright-mcp",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "name": "playwright-mcp-0.0.69",
+      "pname": "playwright-mcp",
+      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "rev_count": 990025,
+      "rev_date": "2026-04-30T19:45:37Z",
+      "scrape_date": "2026-05-03T08:45:31.335893Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.0.69",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/2g4gxsyvy687h0nzpvilqqw3agdh56zh-playwright-mcp-0.0.69"
+      },
+      "system": "aarch64-linux",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "playwright-mcp",
+      "broken": false,
+      "derivation": "/nix/store/jp4zsgwcsfb7bjqkjhshd6yl8ijxm02y-playwright-mcp-0.0.69.drv",
+      "description": "Playwright MCP server",
+      "install_id": "playwright-mcp",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "name": "playwright-mcp-0.0.69",
+      "pname": "playwright-mcp",
+      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "rev_count": 990025,
+      "rev_date": "2026-04-30T19:45:37Z",
+      "scrape_date": "2026-05-03T09:16:34.172324Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.0.69",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/zbn2k535f93grcrx0bjbay2sj5swvvc4-playwright-mcp-0.0.69"
+      },
+      "system": "x86_64-darwin",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "playwright-mcp",
+      "broken": false,
+      "derivation": "/nix/store/sj4vazjr4g06j67qmc2n5zl6161bk479-playwright-mcp-0.0.69.drv",
+      "description": "Playwright MCP server",
+      "install_id": "playwright-mcp",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "name": "playwright-mcp-0.0.69",
+      "pname": "playwright-mcp",
+      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "rev_count": 990025,
+      "rev_date": "2026-04-30T19:45:37Z",
+      "scrape_date": "2026-05-03T09:53:12.006288Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.0.69",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/knmsj84wandkr60imyjf3fnc6jn5gbf0-playwright-mcp-0.0.69"
+      },
+      "system": "x86_64-linux",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "playwright-test",
+      "broken": false,
+      "derivation": "/nix/store/9jyh4v7lln627q3cdanddk6ig7ijymrd-playwright-test-1.59.1.drv",
+      "description": "Framework for Web Testing and Automation",
+      "install_id": "playwright-test",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "name": "playwright-test-1.59.1",
+      "pname": "playwright-test",
+      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "rev_count": 990025,
+      "rev_date": "2026-04-30T19:45:37Z",
+      "scrape_date": "2026-05-03T08:11:01.441322Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.59.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ln7cfs541j5rb9bwlr9m4x67lzhbmi9h-playwright-test-1.59.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "playwright-test",
+      "broken": false,
+      "derivation": "/nix/store/xlbrz0wfpk2i839hg38fzhvsysx5xy2i-playwright-test-1.59.1.drv",
+      "description": "Framework for Web Testing and Automation",
+      "install_id": "playwright-test",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "name": "playwright-test-1.59.1",
+      "pname": "playwright-test",
+      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "rev_count": 990025,
+      "rev_date": "2026-04-30T19:45:37Z",
+      "scrape_date": "2026-05-03T08:45:31.338104Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.59.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/n19mvp3bvhmr1jin9ryzzmwrqpf2fl7w-playwright-test-1.59.1"
+      },
+      "system": "aarch64-linux",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "playwright-test",
+      "broken": false,
+      "derivation": "/nix/store/kjlwiiv2qni207wkh1yj23s8h1dz43av-playwright-test-1.59.1.drv",
+      "description": "Framework for Web Testing and Automation",
+      "install_id": "playwright-test",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "name": "playwright-test-1.59.1",
+      "pname": "playwright-test",
+      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "rev_count": 990025,
+      "rev_date": "2026-04-30T19:45:37Z",
+      "scrape_date": "2026-05-03T09:16:34.174048Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.59.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/abs7g243084dmyvycslzj6b39ydw1rzp-playwright-test-1.59.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "playwright-test",
+      "broken": false,
+      "derivation": "/nix/store/cvzjhray4hqnn33hhi2bpcj1nd2n9lwd-playwright-test-1.59.1.drv",
+      "description": "Framework for Web Testing and Automation",
+      "install_id": "playwright-test",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "name": "playwright-test-1.59.1",
+      "pname": "playwright-test",
+      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
+      "rev_count": 990025,
+      "rev_date": "2026-04-30T19:45:37Z",
+      "scrape_date": "2026-05-03T09:53:12.009093Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.59.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/5f7zzgcwdy8qlnanc8c47d9ndj4g1dql-playwright-test-1.59.1"
+      },
+      "system": "x86_64-linux",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "skills-playwright-cli",
+      "broken": false,
+      "derivation": "/nix/store/7gysffv7ahj0irjrvmkf27cq75wm139z-skills-playwright-cli-0+unstable-2026-05-07.3a1bafc.drv",
+      "description": "Playwright CLI skill bundle for Claude Code and OpenCode — drives playwright-cli from an agent via a token-efficient command set.",
+      "install_id": "skills-playwright-cli",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=b351d45aaa083aea9973ed8490f1d9898faf004e",
+      "name": "skills-playwright-cli-0+unstable-2026-05-07.3a1bafc",
+      "pname": "skills-playwright-cli",
+      "rev": "b351d45aaa083aea9973ed8490f1d9898faf004e",
+      "rev_count": 3240,
+      "rev_date": "2026-05-13T15:34:48Z",
+      "scrape_date": "2026-05-13T15:48:42.980185Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0+unstable-2026-05-07.3a1bafc",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/yq8pm9f6vp149zazv4f2wxzrnxlh9bfg-skills-playwright-cli-0+unstable-2026-05-07.3a1bafc"
+      },
+      "system": "aarch64-darwin",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "skills-playwright-cli",
+      "broken": false,
+      "derivation": "/nix/store/shfvf3bi6d5v6y1ak6lb9qva74fnriq8-skills-playwright-cli-0+unstable-2026-05-07.3a1bafc.drv",
+      "description": "Playwright CLI skill bundle for Claude Code and OpenCode — drives playwright-cli from an agent via a token-efficient command set.",
+      "install_id": "skills-playwright-cli",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=b351d45aaa083aea9973ed8490f1d9898faf004e",
+      "name": "skills-playwright-cli-0+unstable-2026-05-07.3a1bafc",
+      "pname": "skills-playwright-cli",
+      "rev": "b351d45aaa083aea9973ed8490f1d9898faf004e",
+      "rev_count": 3240,
+      "rev_date": "2026-05-13T15:34:48Z",
+      "scrape_date": "2026-05-13T15:48:42.980186Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0+unstable-2026-05-07.3a1bafc",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/dzkkgimy0z03ll5ch7mfzqwgy5jk4h7l-skills-playwright-cli-0+unstable-2026-05-07.3a1bafc"
+      },
+      "system": "aarch64-linux",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "skills-playwright-cli",
+      "broken": false,
+      "derivation": "/nix/store/y3hd7zs6937031q69mc6j8g4aaw28v0j-skills-playwright-cli-0+unstable-2026-05-07.3a1bafc.drv",
+      "description": "Playwright CLI skill bundle for Claude Code and OpenCode — drives playwright-cli from an agent via a token-efficient command set.",
+      "install_id": "skills-playwright-cli",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=b351d45aaa083aea9973ed8490f1d9898faf004e",
+      "name": "skills-playwright-cli-0+unstable-2026-05-07.3a1bafc",
+      "pname": "skills-playwright-cli",
+      "rev": "b351d45aaa083aea9973ed8490f1d9898faf004e",
+      "rev_count": 3240,
+      "rev_date": "2026-05-13T15:34:48Z",
+      "scrape_date": "2026-05-13T15:48:42.980187Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0+unstable-2026-05-07.3a1bafc",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/7jvb79hvjmzv5z6xvfq0alv78gr3wy8d-skills-playwright-cli-0+unstable-2026-05-07.3a1bafc"
+      },
+      "system": "x86_64-darwin",
+      "group": "playwright",
+      "priority": 5
+    },
+    {
+      "attr_path": "skills-playwright-cli",
+      "broken": false,
+      "derivation": "/nix/store/rqh5nsxws5ydfiq71aqwr7kmszmf4iic-skills-playwright-cli-0+unstable-2026-05-07.3a1bafc.drv",
+      "description": "Playwright CLI skill bundle for Claude Code and OpenCode — drives playwright-cli from an agent via a token-efficient command set.",
+      "install_id": "skills-playwright-cli",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=b351d45aaa083aea9973ed8490f1d9898faf004e",
+      "name": "skills-playwright-cli-0+unstable-2026-05-07.3a1bafc",
+      "pname": "skills-playwright-cli",
+      "rev": "b351d45aaa083aea9973ed8490f1d9898faf004e",
+      "rev_count": 3240,
+      "rev_date": "2026-05-13T15:34:48Z",
+      "scrape_date": "2026-05-13T15:48:42.980191Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0+unstable-2026-05-07.3a1bafc",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/jndvzia4a5rk7nn03bdxd1q3js0zb6kx-skills-playwright-cli-0+unstable-2026-05-07.3a1bafc"
+      },
+      "system": "x86_64-linux",
+      "group": "playwright",
+      "priority": 5
+    }
+  ]
+}
