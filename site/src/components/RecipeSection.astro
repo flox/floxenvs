@@ -1,0 +1,44 @@
+---
+interface Recipe {
+  name: string;
+  title?: string;
+  features: string[];
+}
+interface Props {
+  recipes: Recipe[];
+  readme: string;
+  manifestToml: string;
+}
+const { recipes, readme, manifestToml } = Astro.props as Props;
+---
+{recipes.length === 0 ? null : (
+  <section class="mt-12">
+    <h2 class="text-xl font-semibold">Recipes</h2>
+    {recipes.map((r) => (
+      <div class="mt-6 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
+        <div class="flex items-baseline gap-3 mb-3">
+          <h3 class="font-semibold">{r.title ?? r.name}</h3>
+          <code class="text-xs text-slate-500">{r.name}</code>
+        </div>
+        {r.features.length > 0 && (
+          <ul class="list-disc list-inside text-sm text-slate-600 dark:text-slate-300 mb-4">
+            {r.features.map((f) => <li>{f}</li>)}
+          </ul>
+        )}
+        {manifestToml && (
+          <details class="mb-4">
+            <summary class="cursor-pointer text-sm font-mono text-slate-500">
+              composed manifest.toml
+            </summary>
+            <pre class="text-sm font-mono mt-2 p-3 rounded bg-slate-50 dark:bg-slate-900 overflow-x-auto"><code>{manifestToml}</code></pre>
+          </details>
+        )}
+        {readme && (
+          <div class="prose prose-sm dark:prose-invert max-w-none mt-4 whitespace-pre-wrap">
+            {readme}
+          </div>
+        )}
+      </div>
+    ))}
+  </section>
+)}
