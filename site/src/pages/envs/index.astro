@@ -1,0 +1,29 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import ItemCard from "../../components/ItemCard.astro";
+
+const base = import.meta.env.BASE_URL;
+const envs = (await getCollection("envs")).sort((a, b) =>
+  a.data.name.localeCompare(b.data.name),
+);
+---
+<Layout title="Environments · flox/envs" description="All Flox environments.">
+  <h1 class="text-2xl font-bold">Environments</h1>
+  <p class="mt-1 text-sm text-slate-500">
+    {envs.length} environments
+  </p>
+  <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    {envs.map((e) => (
+      <ItemCard
+        kind="env"
+        name={e.data.name}
+        title={e.data.title}
+        tagline={e.data.tagline}
+        href={`${base}envs/${e.data.name}/`}
+        ai_role={e.data.ai_role}
+        category={e.data.category}
+      />
+    ))}
+  </div>
+</Layout>
