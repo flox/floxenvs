@@ -1,0 +1,42 @@
+kind: env
+name: symphony
+title: Symphony
+publisher: flox
+tagline: >
+  Symphony orchestrator with a Codex agent backend and a
+  ready-to-run Phoenix LiveView dashboard.
+summary:
+  - "One-line include — symphony orchestrator and codex agent ready"
+  - "Phoenix LiveView dashboard on a configurable port"
+  - "In-memory tracker by default; set LINEAR_API_KEY for Linear integration"
+  - "Manages concurrent Codex agents with configurable turn limits"
+category: ai
+ai_role: orchestrator
+tags: [orchestrator, codex, agents, linear, dashboard]
+stack: [elixir, phoenix]
+featured: true
+combines_well_with:
+  - env:claude
+  - env:langchain
+status: stable
+license: MIT
+upstream:
+  name: Symphony
+  url: https://github.com/openai/symphony
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = ["flox/symphony"]
+  activate: |
+    flox activate -r flox/symphony --start-services
+recipes:
+  - name: symphony-demo
+    start_services: true
+    features:
+      - "Styled banner showing dashboard URL, tracker mode, and workspace root"
+      - "Detects LINEAR_API_KEY and shows active tracker in the welcome screen"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/symphony
+  floxhub: https://hub.flox.dev/flox/symphony

@@ -1,0 +1,42 @@
+kind: env
+name: vibe-kanban
+title: Vibe Kanban
+publisher: flox
+tagline: >
+  Kanban-style task manager that lets you plan work as issues
+  and execute it with coding agents such as Claude Code or Codex.
+summary:
+  - "One-line include — vibe-kanban web UI and MCP server ready"
+  - "Plan tasks as kanban issues and delegate execution to coding agents"
+  - "MCP server for agent integration and diff review CLI included"
+  - "git and nodejs bundled so agents can shell out without extra setup"
+category: ai
+ai_role: ide
+tags: [kanban, agents, task-management, mcp, claude-code]
+stack: [nodejs]
+featured: true
+combines_well_with:
+  - env:claude
+  - pkg:claude-code
+status: stable
+license: MIT
+upstream:
+  name: Vibe Kanban
+  url: https://github.com/BloopAI/vibe-kanban
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = ["flox/vibe-kanban"]
+  activate: |
+    flox activate -r flox/vibe-kanban
+recipes:
+  - name: vibe-kanban-demo
+    start_services: false
+    features:
+      - "Styled banner with web UI port and data directory"
+      - "Shows all three binaries: vibe-kanban, vibe-kanban-mcp, vibe-kanban-review"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/vibe-kanban
+  floxhub: https://hub.flox.dev/flox/vibe-kanban

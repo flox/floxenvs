@@ -1,0 +1,43 @@
+kind: env
+name: graphify
+title: Graphify
+publisher: flox
+tagline: >
+  Claude Code skill that turns any folder of code, docs, papers,
+  or images into a queryable knowledge graph.
+summary:
+  - "One-line include — graphify CLI and Claude Code ready in any env"
+  - "Builds interactive knowledge graphs with vis.js and Obsidian export"
+  - "MCP server exposes the graph to Claude Code and other agents"
+  - "Background watch service rebuilds the graph on file changes"
+  - "Supports incremental updates, URL ingestion, and shortest-path queries"
+category: ai
+ai_role: tooling
+tags: [knowledge-graph, mcp, claude-code, python, graph-rag]
+stack: [python, claude-code]
+featured: true
+combines_well_with:
+  - env:claude
+  - pkg:claude-code
+status: stable
+license: MIT
+upstream:
+  name: graphify
+  url: https://github.com/safishamsi/graphify
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = ["flox/graphify"]
+  activate: |
+    flox activate -r flox/graphify --start-services
+recipes:
+  - name: graphify-demo
+    start_services: false
+    features:
+      - "Pre-installed /graphify Claude Code skill via flox/skills-graphify"
+      - "Styled banner with quick-start commands for CLI and slash-command use"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/graphify
+  floxhub: https://hub.flox.dev/flox/graphify

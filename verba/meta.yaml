@@ -1,0 +1,43 @@
+kind: env
+name: verba
+title: Verba
+publisher: flox
+tagline: >
+  Verba RAG environment with Weaviate vector database, Ollama LLM
+  backend, and the Verba web UI — all as background services.
+summary:
+  - "One-line include — Verba RAG stack ready with Weaviate and Ollama"
+  - "Four coordinated services: weaviate, ollama, verba, and model puller"
+  - "Configurable chat and embedding models via OLLAMA_MODEL vars"
+  - "Python venv cached in FLOX_ENV_CACHE for fast re-activations"
+category: ai
+ai_role: rag
+tags: [rag, weaviate, ollama, vector-db, python]
+stack: [python, weaviate, ollama]
+featured: true
+combines_well_with:
+  - env:omlx
+  - env:postgresql
+  - env:langchain
+status: stable
+license: MIT
+upstream:
+  name: Verba
+  url: https://github.com/weaviate/Verba
+  license: BSD-3-Clause
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = ["flox/verba"]
+  activate: |
+    flox activate -r flox/verba --start-services
+recipes:
+  - name: verba-demo
+    start_services: true
+    features:
+      - "Styled banner with service URLs for Weaviate, Ollama, and Verba"
+      - "Displays active chat and embedding model names at startup"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/verba
+  floxhub: https://hub.flox.dev/flox/verba
