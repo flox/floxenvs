@@ -91,7 +91,7 @@ async function loadEnvs() {
   const out: unknown[] = [];
   for (const e of entries) {
     if (!e.isDirectory()) continue;
-    if (e.name.startsWith(".") || e.name === "site") continue;
+    if (e.name.startsWith(".")) continue;
     if (e.name === "scripts") continue;
     if (e.name.endsWith("-demo")) continue;
 
