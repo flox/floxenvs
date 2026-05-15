@@ -1,0 +1,21 @@
+---
+import Layout from "../layouts/Layout.astro";
+const base = import.meta.env.BASE_URL;
+---
+<Layout title="Search · flox/envs">
+  <h1 class="text-2xl font-bold">Search</h1>
+  <p class="mt-1 text-sm text-slate-500">
+    Across environments and packages.
+  </p>
+  <link rel="stylesheet" href={`${base}pagefind/pagefind-ui.css`} />
+  <div id="search" class="mt-6"></div>
+  <script type="module" define:vars={{ base }}>
+    const mod = await import(`${base}pagefind/pagefind-ui.js`);
+    new mod.PagefindUI({
+      element: "#search",
+      bundlePath: `${base}pagefind/`,
+      showImages: false,
+      showSubResults: true,
+    });
+  </script>
+</Layout>
