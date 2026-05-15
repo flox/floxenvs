@@ -1,0 +1,51 @@
+---
+import KindBadge from "./KindBadge.astro";
+import type { Kind, SubKind } from "../lib/kindNames";
+
+interface Props {
+  kind: Kind;
+  subkind?: SubKind;
+  name: string;
+  title: string;
+  tagline: string;
+  href: string;
+  category?: string;
+  ai_role?: string;
+}
+const { kind, subkind, name, title, tagline, href, category, ai_role } =
+  Astro.props as Props;
+const stripeTone: Record<string, string> = {
+  env: "bg-kind-env",
+  pkg: "bg-kind-pkg",
+  plain: "bg-kind-pkg",
+  plugin: "bg-kind-plugin",
+  skill: "bg-kind-skill",
+};
+const stripe = stripeTone[subkind ?? kind];
+const badgeKind = (subkind && subkind !== "plain") ? subkind : kind;
+---
+<a
+  href={href}
+  class="group flex border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden hover:border-slate-400 transition"
+>
+  <div class:list={["w-1.5 shrink-0", stripe]} aria-hidden="true"></div>
+  <div class="p-4 flex-1">
+    <div class="flex items-center gap-2 mb-1">
+      <KindBadge kind={badgeKind} />
+      {ai_role && (
+        <span class="text-xs text-slate-500 font-mono">
+          ai · {ai_role}
+        </span>
+      )}
+    </div>
+    <h3 class="font-semibold leading-tight group-hover:underline">
+      {title}
+    </h3>
+    <p class="mt-1 text-sm text-slate-600 dark:text-slate-300 line-clamp-2">
+      {tagline}
+    </p>
+    <div class="mt-3 text-xs text-slate-400 font-mono">
+      {href}
+    </div>
+  </div>
+</a>
