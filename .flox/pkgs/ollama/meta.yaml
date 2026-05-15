@@ -1,0 +1,35 @@
+kind: pkg
+subkind: plain
+name: ollama
+title: Ollama
+publisher: flox
+tagline: >
+  Local LLM runtime for Llama, Mistral, and friends.
+summary:
+  - "Get up and running with large language models locally"
+  - "Built from source with GPU-accelerated Metal support on macOS"
+  - "Serves a compatible OpenAI API on localhost"
+category: ai
+ai_role: llm-runtime
+tags: [llm, local, llama, mistral, openai-compatible, go]
+stack: [go, cmake]
+featured: true
+combines_well_with:
+  - env:langchain
+  - env:verba
+status: stable
+license: MIT
+upstream:
+  name: Ollama
+  url: https://github.com/ollama/ollama
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    ollama.pkg-path = "flox/ollama"
+    ollama.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/ollama
+  floxhub: https://hub.flox.dev/flox/ollama

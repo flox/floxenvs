@@ -1,0 +1,36 @@
+kind: pkg
+subkind: plain
+name: playwright-cli
+title: Playwright CLI
+publisher: flox
+tagline: >
+  Microsoft Playwright CLI for recording, inspecting, and
+  driving browsers from the shell.
+summary:
+  - "Record browser sessions and generate Playwright test code"
+  - "Inspect CSS selectors and debug web pages interactively"
+  - "Works with browsers provided by env:playwright at the env layer"
+category: ai
+ai_role: tooling
+tags: [playwright, browser, testing, automation, nodejs, microsoft]
+stack: [nodejs, typescript]
+featured: false
+combines_well_with:
+  - env:playwright
+  - pkg:claude-code
+status: stable
+license: Apache-2.0
+upstream:
+  name: playwright-cli
+  url: https://github.com/microsoft/playwright-cli
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    playwright-cli.pkg-path = "flox/playwright-cli"
+    playwright-cli.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/playwright-cli
+  floxhub: https://hub.flox.dev/flox/playwright-cli

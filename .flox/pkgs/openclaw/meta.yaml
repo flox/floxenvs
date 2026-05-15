@@ -1,0 +1,34 @@
+kind: pkg
+subkind: plain
+name: openclaw
+title: Openclaw
+publisher: flox
+tagline: >
+  Self-hosted, open-source AI assistant and agent CLI.
+summary:
+  - "Self-hosted alternative to hosted AI agents with full data control"
+  - "Ships three binaries: openclaw, moltbot, and clawdbot"
+  - "Shell completion for bash, fish, and zsh included"
+category: ai
+ai_role: agent
+tags: [agent, self-hosted, cli, nodejs, open-source]
+stack: [nodejs, typescript]
+featured: false
+combines_well_with:
+  - env:claude
+status: stable
+license: MIT
+upstream:
+  name: Openclaw
+  url: https://github.com/openclaw/openclaw
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    openclaw.pkg-path = "flox/openclaw"
+    openclaw.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/openclaw
+  floxhub: https://hub.flox.dev/flox/openclaw

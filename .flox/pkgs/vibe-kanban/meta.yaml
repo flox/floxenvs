@@ -1,0 +1,35 @@
+kind: pkg
+subkind: plain
+name: vibe-kanban
+title: Vibe Kanban
+publisher: flox
+tagline: >
+  Kanban-style task manager for coding agents.
+summary:
+  - "Visualise and manage tasks across multiple coding agent sessions"
+  - "Ships vibe-kanban, vibe-kanban-mcp, and vibe-kanban-review binaries"
+  - "Works with Claude, Codex, Gemini, and other coding agents"
+category: ai
+ai_role: ide
+tags: [kanban, agents, task-management, mcp, ide]
+stack: [nodejs]
+featured: false
+combines_well_with:
+  - env:vibe-kanban
+  - env:claude
+status: stable
+license: Unfree
+upstream:
+  name: Vibe Kanban
+  url: https://github.com/BloopAI/vibe-kanban
+  license: Unfree
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    vibe-kanban.pkg-path = "flox/vibe-kanban"
+    vibe-kanban.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/vibe-kanban
+  floxhub: https://hub.flox.dev/flox/vibe-kanban

@@ -1,0 +1,34 @@
+kind: pkg
+subkind: plain
+name: claude-code
+title: Claude Code
+publisher: flox
+tagline: >
+  Anthropic's Claude Code agent CLI.
+summary:
+  - "Agentic coding tool that understands your entire codebase"
+  - "Pre-packaged binary with auto-updater disabled for Nix stability"
+  - "Supports bubblewrap sandbox on Linux for safe code execution"
+category: ai
+ai_role: agent
+tags: [agent, cli, anthropic, mcp, coding]
+stack: [nodejs, typescript]
+featured: true
+combines_well_with:
+  - env:claude
+status: stable
+license: Unfree
+upstream:
+  name: Claude Code
+  url: https://github.com/anthropics/claude-code
+  license: Unfree
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    claude-code.pkg-path = "flox/claude-code"
+    claude-code.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/claude-code
+  floxhub: https://hub.flox.dev/flox/claude-code

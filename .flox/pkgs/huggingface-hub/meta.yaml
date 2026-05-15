@@ -1,0 +1,36 @@
+kind: pkg
+subkind: plain
+name: huggingface-hub
+title: Hugging Face Hub CLI
+publisher: flox
+tagline: >
+  CLI client for the Hugging Face Hub — download models,
+  datasets, and spaces.
+summary:
+  - "Download and upload models and datasets from the Hub"
+  - "Manage cached files and repository metadata from the terminal"
+  - "Python-based CLI kept at the latest upstream release"
+category: ai
+ai_role: tooling
+tags: [huggingface, models, datasets, python, cli]
+stack: [python]
+featured: false
+combines_well_with:
+  - env:huggingface
+  - env:langchain
+status: stable
+license: Apache-2.0
+upstream:
+  name: huggingface_hub
+  url: https://github.com/huggingface/huggingface_hub
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    huggingface-hub.pkg-path = "flox/huggingface-hub"
+    huggingface-hub.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/huggingface-hub
+  floxhub: https://hub.flox.dev/flox/huggingface-hub

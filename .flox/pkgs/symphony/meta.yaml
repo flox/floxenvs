@@ -1,0 +1,35 @@
+kind: pkg
+subkind: plain
+name: symphony
+title: Symphony
+publisher: flox
+tagline: >
+  OpenAI Symphony agent orchestrator CLI.
+summary:
+  - "Orchestrates concurrent coding agents via an Elixir escript CLI"
+  - "Tracks agent tasks in memory or integrates with Linear"
+  - "Part of the openai/symphony repo alongside a Phoenix LiveView UI"
+category: ai
+ai_role: orchestrator
+tags: [orchestrator, openai, elixir, agents, linear]
+stack: [elixir]
+featured: false
+combines_well_with:
+  - env:symphony
+  - env:langchain
+status: stable
+license: Apache-2.0
+upstream:
+  name: Symphony
+  url: https://github.com/openai/symphony
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    symphony.pkg-path = "flox/symphony"
+    symphony.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/symphony
+  floxhub: https://hub.flox.dev/flox/symphony

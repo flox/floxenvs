@@ -1,0 +1,34 @@
+kind: pkg
+subkind: plain
+name: codex
+title: Codex
+publisher: flox
+tagline: >
+  OpenAI Codex CLI agent.
+summary:
+  - "Lightweight coding agent that runs locally in your terminal"
+  - "Built in Rust with V8 for fast, sandboxed execution"
+  - "Shell completion and bubblewrap sandbox support on Linux"
+category: ai
+ai_role: agent
+tags: [agent, cli, openai, coding, rust]
+stack: [rust]
+featured: true
+combines_well_with:
+  - env:claude
+status: stable
+license: Apache-2.0
+upstream:
+  name: Codex
+  url: https://github.com/openai/codex
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    codex.pkg-path = "flox/codex"
+    codex.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/codex
+  floxhub: https://hub.flox.dev/flox/codex
