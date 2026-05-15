@@ -12,17 +12,15 @@ on:
         default: "manual"
 
 concurrency:
-  group: "pages"
+  group: "website-deploy"
   cancel-in-progress: false
 
 permissions:
-  contents: "read"
-  pages: "write"
-  id-token: "write"
+  contents: "write"
 
 jobs:
-  build:
-    name: "Build"
+  build-and-deploy:
+    name: "Build and deploy"
     runs-on: "ubuntu-latest"
     steps:
       - uses: actions/checkout@v4
@@ -42,17 +40,15 @@ jobs:
           SITE_URL: "https://flox.github.io"
           BASE_PATH: "/floxenvs"
         run: "npm run build"
-      - uses: actions/upload-pages-artifact@v3
+      - name: "Publish to gh-pages branch"
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: ".website/dist"
-
-  deploy:
-    name: "Deploy"
-    needs: build
-    runs-on: "ubuntu-latest"
-    environment:
-      name: "github-pages"
-      url: ${{ steps.deploy.outputs.page_url }}
-    steps:
-      - id: deploy
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ".website/dist"
+          publish_branch: "gh-pages"
+          enable_jekyll: false
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
+          commit_message: >-
+            deploy: ${{ inputs.sha || github.sha }}
+            (from ${{ inputs.triggered_by || github.event_name }})

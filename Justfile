@@ -34,3 +34,12 @@ website-test:
 # Website: run astro check (TypeScript + Astro diagnostics)
 website-check:
     cd .website && npm run check
+
+# Website: build and push .website/dist to the gh-pages branch
+website-push:
+    cd .website && npm run build
+    cd .website && npx gh-pages \
+        --dist dist \
+        --branch gh-pages \
+        --nojekyll \
+        --message "deploy: $(git rev-parse --short HEAD) (from $(git rev-parse --abbrev-ref HEAD))"
