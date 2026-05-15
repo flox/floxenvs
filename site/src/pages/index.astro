@@ -1,9 +1,168 @@
 ---
+import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
+import ItemCard from "../components/ItemCard.astro";
+import AiRoleFilter from "../components/AiRoleFilter.tsx";
+import AffinityGraph from "../components/AffinityGraph.tsx";
+import { computeAffinityEdges } from "../lib/affinityEdges";
+import { deriveBundling } from "../lib/derive";
+
+const base = import.meta.env.BASE_URL;
+const envs = await getCollection("envs");
+const pkgs = await getCollection("packages");
+
+const { envs: dEnvs, pkgs: dPkgs } = deriveBundling(
+  envs.map((e) => ({
+    name: e.data.name,
+    bundles_pkgs: e.data.bundles_pkgs,
+    manifest_install: e.data.manifest_install,
+  })),
+  pkgs.map((p) => ({ name: p.data.name })),
+);
+
+const aiEnvs = envs.filter((e) => e.data.category === "ai");
+const aiPkgs = pkgs.filter((p) => p.data.category === "ai");
+
+const featured = [
+  ...aiEnvs
+    .filter((e) => e.data.featured)
+    .map((e) => ({
+      kind: "env" as const,
+      data: e.data,
+      href: `${base}envs/${e.data.name}/`,
+    })),
+  ...aiPkgs
+    .filter((p) => p.data.featured)
+    .map((p) => ({
+      kind: "pkg" as const,
+      data: p.data,
+      href: `${base}packages/${p.data.name}/`,
+    })),
+];
+
+const graphNodes = [
+  ...aiEnvs.map((e) => ({
+    kind: "env" as const,
+    name: e.data.name,
+    title: e.data.title,
+    href: `${base}envs/${e.data.name}/`,
+  })),
+  ...aiPkgs.map((p) => ({
+    kind: "pkg" as const,
+    name: p.data.name,
+    title: p.data.title,
+    href: `${base}packages/${p.data.name}/`,
+  })),
+];
+
+const graphInputs = [
+  ...aiEnvs.map((e) => {
+    const d = dEnvs.find((x) => x.name === e.data.name)!;
+    return {
+      kind: "env" as const,
+      name: e.data.name,
+      combines_well_with: e.data.combines_well_with,
+      bundles_pkgs: d.bundles_pkgs,
+    };
+  }),
+  ...aiPkgs.map((p) => ({
+    kind: "pkg" as const,
+    name: p.data.name,
+    combines_well_with: p.data.combines_well_with,
+  })),
+];
+const edges = computeAffinityEdges(graphInputs);
+
+const featuredRecipes = aiEnvs.filter((e) => e.data.recipes.length > 0).slice(0, 6);
 ---
-<Layout title="flox / envs">
-  <h1 class="text-3xl font-bold">flox / envs</h1>
-  <p class="mt-2 text-slate-600 dark:text-slate-300">
-    Showcase site under construction.
-  </p>
+<Layout
+  title="flox / envs — AI environments and packages"
+  description="Ready-to-use Flox environments and packages, AI first."
+>
+  <section class="text-center max-w-2xl mx-auto py-10">
+    <p class="text-sm font-mono uppercase tracking-wide text-slate-500">flox / envs</p>
+    <h1 class="text-4xl font-bold mt-3 leading-tight">
+      Ready-to-use Flox envs and packages
+    </h1>
+    <p class="mt-4 text-slate-600 dark:text-slate-300">
+      One include line. AI agents, runtimes, plugins, skills — and the
+      glue to make them work together.
+    </p>
+    <pre class="mt-6 text-sm font-mono p-4 rounded-lg bg-slate-50 dark:bg-slate-900 text-left overflow-x-auto"><code>{`[include]
+environments = ["flox/<name>"]`}</code></pre>
+    <div class="mt-6 flex gap-3 justify-center">
+      <a href="#ai" class="px-4 py-2 rounded-lg bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900">Browse AI items</a>
+      <a href={`${base}search/`} class="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700">Search everything</a>
+    </div>
+  </section>
+
+  <section id="ai" class="mt-12">
+    <h2 class="text-2xl font-bold">AI environments and packages</h2>
+    <p class="mt-1 text-sm text-slate-500">
+      Filter by role; envs and packages are listed together.
+    </p>
+    <div class="mt-5">
+      <AiRoleFilter client:load />
+    </div>
+    <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {featured.map((f) => (
+        <div data-ai-role={f.data.ai_role ?? ""}>
+          <ItemCard
+            kind={f.kind}
+            subkind={f.kind === "pkg" ? (f.data as any).subkind : undefined}
+            name={f.data.name}
+            title={f.data.title}
+            tagline={f.data.tagline}
+            href={f.href}
+            ai_role={f.data.ai_role}
+            category={f.data.category}
+          />
+        </div>
+      ))}
+    </div>
+  </section>
+
+  {graphNodes.length > 1 && (
+    <section class="mt-16">
+      <h2 class="text-2xl font-bold">How they compose</h2>
+      <p class="mt-1 text-sm text-slate-500">
+        Edges show <span class="font-mono">combines_well_with</span> and
+        bundling relationships.
+      </p>
+      <div class="mt-6 rounded-lg border border-slate-200 dark:border-slate-800 p-4">
+        <AffinityGraph client:load edges={edges} nodes={graphNodes} />
+      </div>
+    </section>
+  )}
+
+  {featuredRecipes.length > 0 && (
+    <section class="mt-16">
+      <h2 class="text-2xl font-bold">Featured recipes</h2>
+      <p class="mt-1 text-sm text-slate-500">
+        Each recipe is the <code class="text-xs">-demo</code> variant of an env.
+      </p>
+      <div class="mt-6 flex gap-3 overflow-x-auto pb-2 -mx-6 px-6">
+        {featuredRecipes.map((e) => (
+          <a
+            href={`${base}envs/${e.data.name}/#recipes`}
+            class="shrink-0 w-72 p-4 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-slate-400"
+          >
+            <p class="text-xs font-mono text-slate-500">{e.data.name}-demo</p>
+            <h3 class="mt-1 font-semibold">{e.data.title}</h3>
+            <p class="mt-1 text-sm text-slate-600 dark:text-slate-300 line-clamp-3">
+              {e.data.tagline}
+            </p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="mt-20 py-10 border-t border-slate-200 dark:border-slate-800 text-center">
+    <h2 class="text-lg font-semibold">Looking for everything else?</h2>
+    <div class="mt-3 flex gap-4 justify-center text-sm">
+      <a href={`${base}envs/`} class="underline">All environments →</a>
+      <a href={`${base}packages/`} class="underline">All packages →</a>
+    </div>
+  </section>
 </Layout>
