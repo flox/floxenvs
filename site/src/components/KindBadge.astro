@@ -1,0 +1,28 @@
+---
+import { KIND_LABEL } from "../lib/kindNames";
+import type { Kind, SubKind } from "../lib/kindNames";
+
+interface Props {
+  kind: Kind | SubKind;
+  className?: string;
+}
+const { kind, className = "" } = Astro.props as Props;
+const label = KIND_LABEL[kind];
+const tones: Record<string, string> = {
+  env: "bg-kind-env/15 text-kind-env ring-kind-env/30",
+  pkg: "bg-kind-pkg/15 text-kind-pkg ring-kind-pkg/30",
+  plain: "bg-kind-pkg/15 text-kind-pkg ring-kind-pkg/30",
+  plugin: "bg-kind-plugin/15 text-kind-plugin ring-kind-plugin/30",
+  skill: "bg-kind-skill/15 text-kind-skill ring-kind-skill/30",
+};
+---
+<span
+  class:list={[
+    "inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono uppercase tracking-wide ring-1",
+    tones[kind],
+    className,
+  ]}
+  data-kind={kind}
+>
+  {label}
+</span>
