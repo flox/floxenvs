@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+  /* Kind-disambiguation colors — used across cards, badges,
+     and search results to make env vs pkg obvious. */
+  --color-kind-env: oklch(0.65 0.16 165);
+  --color-kind-pkg: oklch(0.55 0.04 240);
+  --color-kind-plugin: oklch(0.62 0.18 280);
+  --color-kind-skill: oklch(0.78 0.16 70);
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+html { color-scheme: light dark; }
+
+@media (prefers-color-scheme: dark) {
+  :root { background: oklch(0.18 0.01 240); color: oklch(0.95 0 0); }
+}
