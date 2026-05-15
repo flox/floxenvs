@@ -1,0 +1,42 @@
+kind: env
+name: langchain
+title: LangChain (+ Ollama)
+publisher: flox
+tagline: >
+  LangChain and LangGraph wired up to a local Ollama runtime.
+summary:
+  - "LangGraph orchestration framework"
+  - "LangChain-Ollama and LangChain-Community integrations"
+  - "Ollama runs as a background Flox service"
+  - "Connection info on activation"
+category: ai
+ai_role: orchestrator
+tags: [langchain, orchestrator, local-llm, python]
+stack: [python]
+featured: true
+combines_well_with:
+  - pkg:ollama
+  - env:verba
+  - env:postgresql
+status: stable
+license: MIT
+upstream:
+  name: LangChain
+  url: https://github.com/langchain-ai/langchain
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = ["flox/langchain"]
+  activate: |
+    flox activate -r flox/langchain --start-services
+recipes:
+  - name: langchain-demo
+    start_services: true
+    features:
+      - "Ollama service started automatically"
+      - "Pull a model and invoke it from Python"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/langchain
+  floxhub: https://hub.flox.dev/flox/langchain
