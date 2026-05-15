@@ -1,0 +1,27 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../../layouts/Layout.astro";
+import ItemCard from "../../../components/ItemCard.astro";
+
+const base = import.meta.env.BASE_URL;
+const pkgs = (await getCollection("packages"))
+  .filter((p) => p.data.subkind === "skill")
+  .sort((a, b) => a.data.name.localeCompare(b.data.name));
+---
+<Layout title="Skills · flox/envs">
+  <h1 class="text-2xl font-bold">Skills</h1>
+  <p class="mt-1 text-sm text-slate-500">{pkgs.length} skills</p>
+  <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    {pkgs.map((p) => (
+      <ItemCard
+        kind="pkg"
+        subkind="skill"
+        name={p.data.name}
+        title={p.data.title}
+        tagline={p.data.tagline}
+        href={`${base}packages/${p.data.name}/`}
+        ai_role={p.data.ai_role}
+      />
+    ))}
+  </div>
+</Layout>
