@@ -1,5 +1,11 @@
 # Floxenvs local development recipes.
-# Requires: just (added to devShell in flake.nix)
+# Requires: just (installed via .flox/env/manifest.toml)
+#
+# Run `just` with no arguments to see this listing.
+
+# Show available recipes with their descriptions and arguments
+_default:
+    @just --list --unsorted --list-heading $'Available recipes:\n  Run with: just <recipe> [args...]\n\n'
 
 # Discover environments and output CI matrix JSON
 discover-envs:
@@ -13,15 +19,18 @@ list-envs:
 validate:
     bash scripts/discover-envs.sh --validate
 
-# Website (Astro)
+# Website: start the Astro dev server with hot reload
 website-dev:
     cd .website && npm run dev
 
+# Website: produce the static build in .website/dist
 website-build:
     cd .website && npm run build
 
+# Website: run vitest unit tests for content libs
 website-test:
     cd .website && npm run test
 
+# Website: run astro check (TypeScript + Astro diagnostics)
 website-check:
     cd .website && npm run check
