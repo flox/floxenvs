@@ -1,0 +1,38 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import ItemCard from "../../components/ItemCard.astro";
+
+export async function getStaticPaths() {
+  const envs = await getCollection("envs");
+  const pkgs = await getCollection("packages");
+  const tags = new Set<string>();
+  for (const e of envs) for (const t of e.data.tags) tags.add(t);
+  for (const p of pkgs) for (const t of p.data.tags) tags.add(t);
+  return [...tags].map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const base = import.meta.env.BASE_URL;
+const envs = (await getCollection("envs")).filter((e) => e.data.tags.includes(slug!));
+const pkgs = (await getCollection("packages")).filter((p) => p.data.tags.includes(slug!));
+---
+<Layout title={`#${slug} · flox/envs`}>
+  <h1 class="text-2xl font-bold">#{slug}</h1>
+  <p class="mt-1 text-sm text-slate-500">
+    {envs.length + pkgs.length} items
+  </p>
+  <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    {envs.map((e) => (
+      <ItemCard kind="env" name={e.data.name} title={e.data.title}
+        tagline={e.data.tagline} href={`${base}envs/${e.data.name}/`}
+        ai_role={e.data.ai_role} category={e.data.category} />
+    ))}
+    {pkgs.map((p) => (
+      <ItemCard kind="pkg" subkind={p.data.subkind} name={p.data.name}
+        title={p.data.title} tagline={p.data.tagline}
+        href={`${base}packages/${p.data.name}/`}
+        ai_role={p.data.ai_role} category={p.data.category} />
+    ))}
+  </div>
+</Layout>
