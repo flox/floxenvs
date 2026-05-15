@@ -623,3 +623,16 @@ jobs:
           tag=$(echo -n "$DEMO" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g')
           docker tag "$tag:latest" "ghcr.io/flox/floxenvs:$tag-latest"
           docker push "ghcr.io/flox/floxenvs:$tag-latest"
+
+  trigger-website:
+    name: "Website"
+    needs: ["result", "containerize"]
+    if: |
+      github.ref == 'refs/heads/main'
+      && github.event_name == 'push'
+      && needs.result.result == 'success'
+    uses: "./.github/workflows/website.yml"
+    with:
+      sha: ${{ github.sha }}
+      triggered_by: "ci"
+    secrets: inherit
