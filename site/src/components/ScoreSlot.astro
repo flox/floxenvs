@@ -1,0 +1,11 @@
+---
+interface Props {
+  kind: "env" | "pkg";
+  name: string;
+}
+const { kind, name } = Astro.props as Props;
+// In Plan A we render nothing — the audit pipeline that
+// generates metrics.json is in Plan B. We keep the slot so
+// page layouts already account for it.
+---
+<div data-score-slot={`${kind}:${name}`} aria-hidden="true"></div>
