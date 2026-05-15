@@ -1,0 +1,154 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import KindBadge from "../../components/KindBadge.astro";
+import ScoreSlot from "../../components/ScoreSlot.astro";
+import InstallTabs from "../../components/InstallTabs.astro";
+import RecipeSection from "../../components/RecipeSection.astro";
+import SidebarEntry from "../../components/SidebarEntry.astro";
+import { deriveBundling } from "../../lib/derive";
+
+export async function getStaticPaths() {
+  const envs = await getCollection("envs");
+  return envs.map((e) => ({ params: { name: e.data.name }, props: { env: e } }));
+}
+
+const { env } = Astro.props as { env: { data: any } };
+const base = import.meta.env.BASE_URL;
+const pkgs = await getCollection("packages");
+
+const { envs: dEnvs, pkgs: dPkgs } = deriveBundling(
+  [{
+    name: env.data.name,
+    bundles_pkgs: env.data.bundles_pkgs,
+    manifest_install: env.data.manifest_install,
+  }],
+  pkgs.map((p) => ({ name: p.data.name })),
+);
+const bundles = dEnvs[0].bundles_pkgs;
+
+const tabs = [
+  env.data.install?.include && { label: "Include", code: env.data.install.include },
+  env.data.install?.activate && { label: "Activate", code: env.data.install.activate },
+  env.data.install?.docker && { label: "Docker", code: env.data.install.docker },
+].filter(Boolean) as { label: string; code: string }[];
+
+const recommendedPkgs = pkgs.filter((p) => {
+  if (bundles.includes(p.data.name)) return false;
+  if (env.data.combines_well_with.includes(`pkg:${p.data.name}`)) return true;
+  if (p.data.combines_well_with.includes(`env:${env.data.name}`)) return true;
+  return false;
+});
+---
+<Layout title={`${env.data.title} · flox/envs`} description={env.data.tagline}>
+  <nav class="text-sm text-slate-500 mb-4">
+    <a href={`${base}envs/`} class="underline">Environments</a> / {env.data.name}
+  </nav>
+  <div class="flex items-center gap-3 mb-2">
+    <KindBadge kind="env" />
+    <span class="text-xs font-mono text-slate-500">{env.data.status}</span>
+  </div>
+  <h1 class="text-3xl font-bold">{env.data.title}</h1>
+  <p class="mt-2 text-slate-600 dark:text-slate-300">{env.data.tagline}</p>
+
+  {env.data.summary.length > 0 && (
+    <ul class="mt-4 list-disc list-inside text-sm">
+      {env.data.summary.map((s: string) => <li>{s}</li>)}
+    </ul>
+  )}
+
+  <div class="grid lg:grid-cols-[1fr_280px] gap-10 mt-10">
+    <div>
+      <ScoreSlot kind="env" name={env.data.name} />
+
+      {tabs.length > 0 && (
+        <section class="mt-8">
+          <h2 class="text-xl font-semibold mb-3">Install</h2>
+          <InstallTabs tabs={tabs} />
+        </section>
+      )}
+
+      <RecipeSection
+        recipes={env.data.recipes}
+        readme={env.data.recipe_readme}
+        manifestToml={env.data.recipe_manifest}
+      />
+
+      {recommendedPkgs.length > 0 && (
+        <section class="mt-12">
+          <h2 class="text-xl font-semibold">Recommended packages</h2>
+          <p class="text-sm text-slate-500 mt-1">
+            Packages that pair well with this env.
+          </p>
+          <div class="mt-4 grid sm:grid-cols-2 gap-3">
+            {recommendedPkgs.map((p) => (
+              <a
+                href={`${base}packages/${p.data.name}/`}
+                class="block p-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-slate-400"
+              >
+                <div class="flex items-center gap-2">
+                  <KindBadge kind={p.data.subkind ?? "pkg"} />
+                  <span class="font-semibold">{p.data.title}</span>
+                </div>
+                <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                  {p.data.tagline}
+                </p>
+                {p.data.install?.pkg && (
+                  <pre class="mt-2 text-xs font-mono p-2 rounded bg-slate-50 dark:bg-slate-900 overflow-x-auto"><code>{p.data.install.pkg}</code></pre>
+                )}
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {env.data.readme && (
+        <section class="mt-12">
+          <h2 class="text-xl font-semibold">Documentation</h2>
+          <div class="prose prose-sm dark:prose-invert max-w-none mt-3 whitespace-pre-wrap">
+            {env.data.readme}
+          </div>
+        </section>
+      )}
+    </div>
+
+    <aside class="space-y-1">
+      <SidebarEntry label="Status">{env.data.status}</SidebarEntry>
+      <SidebarEntry label="Publisher">{env.data.publisher}</SidebarEntry>
+      {env.data.license && <SidebarEntry label="License">{env.data.license}</SidebarEntry>}
+      {env.data.upstream && (
+        <SidebarEntry label="Upstream">
+          <a href={env.data.upstream.url} class="underline">
+            {env.data.upstream.name}
+          </a>
+          {env.data.upstream.license && (
+            <span class="text-slate-500"> · {env.data.upstream.license}</span>
+          )}
+        </SidebarEntry>
+      )}
+      {env.data.maintainer && (
+        <SidebarEntry label="Maintainer">{env.data.maintainer}</SidebarEntry>
+      )}
+      {bundles.length > 0 && (
+        <SidebarEntry label="Bundles packages">
+          {bundles.map((b: string, i: number) => (
+            <>
+              <a href={`${base}packages/${b}/`} class="underline">{b}</a>
+              {i < bundles.length - 1 ? ", " : ""}
+            </>
+          ))}
+        </SidebarEntry>
+      )}
+      {env.data.links?.floxhub && (
+        <SidebarEntry label="FloxHub">
+          <a href={env.data.links.floxhub} class="underline">link</a>
+        </SidebarEntry>
+      )}
+      {env.data.links?.source && (
+        <SidebarEntry label="Source">
+          <a href={env.data.links.source} class="underline">repo</a>
+        </SidebarEntry>
+      )}
+    </aside>
+  </div>
+</Layout>
