@@ -25,3 +25,10 @@ iloom-cli.pkg-group = "iloom"
 iloom-cli.version = "^0.13.8"
 gh.pkg-path = "gh"
 gh.pkg-group = "iloom"
+
+# x86_64-darwin is omitted: there is no Intel Mac remote builder, so
+# building iloom-cli for that system requires Rosetta on an Apple
+# Silicon Mac. iloom-cli works there, but neither this env nor the CI
+# attempts to lock/test it.
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]

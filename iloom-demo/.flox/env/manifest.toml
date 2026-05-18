@@ -11,6 +11,10 @@ environments = [
 gum.pkg-path = "gum"
 gum.pkg-group = "demo-tools"
 
+# Inherit the 3-system constraint from the included iloom env.
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]
+
 [hook]
 on-activate = '''
 if [ "${FLOX_ENVS_TESTING:-}" != "1" ]; then
