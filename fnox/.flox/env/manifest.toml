@@ -1,0 +1,39 @@
+schema-version = "1.10.0"
+
+# Minimal fnox environment for use with [include].
+#
+# fnox ("Fort Knox") manages secrets via encryption (age,
+# AWS/Azure/GCP KMS) or cloud providers (1Password, Bitwarden,
+# Vault, AWS Secrets Manager, ...). See https://fnox.jdx.dev/.
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/fnox"]
+#
+# Then load secrets in your own hook:
+#
+#   [hook]
+#   on-activate = '''
+#   eval "$(fnox export --shell bash)"
+#   '''
+#
+# Or wrap a command with secrets in env:
+#
+#   fnox exec -- <command>
+
+[install]
+fnox.pkg-path = "flox/fnox"
+fnox.pkg-group = "fnox"
+
+[vars]
+# Quiet by default; set FNOX_LOG=info/debug/trace to see more.
+FNOX_LOG = "warn"
+
+[hook]
+on-activate = '''
+# Per-environment data path; used by fnox to cache lease state,
+# session tokens, and resolved secrets.
+export FNOX_DATA_DIR="$FLOX_ENV_CACHE/fnox"
+mkdir -p "$FNOX_DATA_DIR"
+'''

@@ -1,0 +1,38 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [{ dir = "../fnox" }]
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+age.pkg-path = "age"
+age.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+# Use the demo identity that's checked into the repo. This is a
+# *demo-only* key — never reuse it for real secrets.
+export FNOX_AGE_KEY="$(grep '^AGE-SECRET-KEY-' \
+  "$FLOX_ENV_PROJECT/.fnox-demo-key.txt")"
+
+# Per-cwd config (fnox auto-discovers fnox.toml).
+export FNOX_CONFIG_DIR="$FLOX_ENV_PROJECT"
+
+if [ "${FLOX_ENVS_TESTING:-}" != "1" ]; then
+  gum style \
+    --foreground 212 --border-foreground 212 \
+    --border double --align center \
+    --width 60 --margin "1 2" --padding "1 2" \
+    "fnox demo" "Fort Knox for your secrets"
+  echo ""
+  echo "  Try one of these (cwd: $FLOX_ENV_PROJECT):"
+  echo ""
+  echo "    fnox list                  — view configured secrets"
+  echo "    fnox get DATABASE_URL      — decrypt one secret"
+  echo "    fnox exec -- env | grep ^DEMO_"
+  echo "    fnox lease create greeting — run command lease"
+  echo "    fnox tui                   — interactive dashboard"
+  echo ""
+fi
+'''

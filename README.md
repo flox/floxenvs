@@ -88,6 +88,8 @@ Most environments follow a dual-layer pattern:
 | _└ 1password-demo_ | | [floxhub](https://hub.flox.dev/flox/1password-demo) · [docs](1password-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/1password-demo-latest) |
 | dotenv | Load `.env` vars | [floxhub](https://hub.flox.dev/flox/dotenv) · [docs](dotenv/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/dotenv-latest) |
 | _└ dotenv-demo_ | | [floxhub](https://hub.flox.dev/flox/dotenv-demo) · [docs](dotenv-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/dotenv-demo-latest) |
+| fnox | Secrets manager (age / KMS / Vault / 1Password / ...) | [floxhub](https://hub.flox.dev/flox/fnox) · [docs](fnox/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/fnox-latest) |
+| _└ fnox-demo_ | | [floxhub](https://hub.flox.dev/flox/fnox-demo) · [docs](fnox-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/fnox-demo-latest) |
 | mkcert | Local TLS certs | [floxhub](https://hub.flox.dev/flox/mkcert) · [docs](mkcert/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/mkcert-latest) |
 | _└ mkcert-demo_ | | [floxhub](https://hub.flox.dev/flox/mkcert-demo) · [docs](mkcert-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/mkcert-demo-latest) |
 | playwright | Browser automation + MCP | [floxhub](https://hub.flox.dev/flox/playwright) · [docs](playwright/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/playwright-latest) |
