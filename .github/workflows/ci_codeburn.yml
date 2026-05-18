@@ -1,0 +1,38 @@
+name: "CI: codeburn"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "codeburn/**"
+      - "codeburn-demo/**"
+      - ".flox/pkgs/codeburn/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_codeburn.yml"
+  pull_request:
+    paths:
+      - "codeburn/**"
+      - "codeburn-demo/**"
+      - ".flox/pkgs/codeburn/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_codeburn.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "codeburn"
+    secrets: inherit
