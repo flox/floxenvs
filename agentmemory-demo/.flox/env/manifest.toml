@@ -1,0 +1,32 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../agentmemory" }
+]
+
+# gum is a demo-only tool for styled terminal output.
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'agentmemory — persistent memory for Claude Code' '' \
+    'Start the backend in the background:' \
+    '  flox services start' \
+    '  flox activate --start-services' '' \
+    'REST + MCP:' \
+    "  $AGENTMEMORY_URL" '' \
+    'Pinned server version:' \
+    "  $AGENTMEMORY_VERSION" '' \
+    'Plugin:' \
+    '  $FLOX_ENV/share/claude-code/plugins/agentmemory' '' \
+    'Try it:' \
+    '  claude   # then /recall, /remember, /handoff'
+fi
+'''

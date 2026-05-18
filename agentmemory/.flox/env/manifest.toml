@@ -1,0 +1,75 @@
+schema-version = "1.10.0"
+
+# Minimal agentmemory environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/agentmemory"]
+#
+# Provides Claude Code with the agentmemory plugin
+# wired up via claude-managed, plus a background
+# `agentmemory` service running the REST/MCP backend
+# on port 3111 (configurable via AGENTMEMORY_URL).
+#
+# Pin the runtime server version via AGENTMEMORY_VERSION;
+# the bundled plugin is the matching tag of upstream.
+
+[install]
+claude-code.pkg-path = "flox/claude-code"
+claude-code.pkg-group = "claude-code"
+claude-managed.pkg-path = "flox/claude-managed"
+claude-managed.pkg-group = "claude-managed"
+claude-managed.version = "^0.4.1"
+claude-code-plugin-agentmemory.pkg-path = "flox/claude-code-plugin-agentmemory"
+claude-code-plugin-agentmemory.pkg-group = "claude-code-plugin-agentmemory"
+nodejs.pkg-path = "nodejs_20"
+nodejs.pkg-group = "agentmemory"
+
+[vars]
+# REST endpoint the plugin hooks talk to. Override to point
+# the plugin at a remote server instead of the local one.
+AGENTMEMORY_URL = "http://localhost:3111"
+# When "true", the SessionStart hook injects accumulated
+# context into every new Claude Code session. Set to
+# anything else (e.g. "false") to disable the injection
+# while still capturing observations.
+AGENTMEMORY_INJECT_CONTEXT = "true"
+# Pinned upstream server version. The bundled Claude Code
+# plugin is fetched from the matching git tag, so keep the
+# two in sync when bumping.
+AGENTMEMORY_VERSION = "0.9.20"
+
+[hook]
+on-activate = '''
+export AGENTMEMORY_CACHE="$FLOX_ENV_CACHE/agentmemory"
+export npm_config_cache="$AGENTMEMORY_CACHE/npm"
+mkdir -p "$npm_config_cache"
+eval "$(claude-managed setup-hook)"
+'''
+
+[profile]
+bash = '''
+eval "$(claude-managed setup-profile-bash)"
+'''
+zsh = '''
+eval "$(claude-managed setup-profile-zsh)"
+'''
+fish = '''
+claude-managed setup-profile-fish | source
+'''
+
+[services]
+# Run the agentmemory REST/MCP backend via npx so flox
+# services manages its lifecycle. The first activation
+# downloads @agentmemory/agentmemory@$AGENTMEMORY_VERSION
+# into the per-env npm cache; subsequent starts are
+# cache-fast. The server uses SQLite under
+# $XDG_DATA_HOME (scoped via AGENTMEMORY_CACHE below).
+agentmemory.command = '''
+export AGENTMEMORY_CACHE="$FLOX_ENV_CACHE/agentmemory"
+export npm_config_cache="$AGENTMEMORY_CACHE/npm"
+export XDG_DATA_HOME="$AGENTMEMORY_CACHE/data"
+mkdir -p "$npm_config_cache" "$XDG_DATA_HOME"
+exec npx -y "@agentmemory/agentmemory@$AGENTMEMORY_VERSION"
+'''
