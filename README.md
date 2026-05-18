@@ -101,6 +101,8 @@ Most environments follow a dual-layer pattern:
 | _└ huggingface-demo_ | | [floxhub](https://hub.flox.dev/flox/huggingface-demo) · [docs](huggingface-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/huggingface-demo-latest) |
 | graphify | Knowledge-graph skill for Claude Code | [floxhub](https://hub.flox.dev/flox/graphify) · [docs](graphify/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/graphify-latest) |
 | _└ graphify-demo_ | | [floxhub](https://hub.flox.dev/flox/graphify-demo) · [docs](graphify-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/graphify-demo-latest) |
+| remotion | Remotion video skill for Claude Code | [floxhub](https://hub.flox.dev/flox/remotion) · [docs](remotion/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/remotion-latest) |
+| _└ remotion-demo_ | | [floxhub](https://hub.flox.dev/flox/remotion-demo) · [docs](remotion-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/remotion-demo-latest) |
 | langchain | LangChain + Ollama | [floxhub](https://hub.flox.dev/flox/langchain) · [docs](langchain/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/langchain-latest) |
 | _└ langchain-demo_ | | [floxhub](https://hub.flox.dev/flox/langchain-demo) · [docs](langchain-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/langchain-demo-latest) |
 | verba | Verba RAG app | [floxhub](https://hub.flox.dev/flox/verba) · [docs](verba/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/verba-latest) |
