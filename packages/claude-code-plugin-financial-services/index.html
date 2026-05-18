@@ -1,0 +1,142 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>claude-code-plugin-financial-services (Claude Code plugin) · flox/envs</title><meta name="description" content="Financial-services compliance and document tooling for Claude Code.
+"><link rel="icon" href="/floxenvs/favicon.svg"><link rel="stylesheet" href="/floxenvs/_astro/_slug_.BwxxlVGX.css"></head> <body class="font-sans antialiased min-h-dvh bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100"> <header class="border-b border-slate-200 dark:border-slate-800"> <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center gap-6"> <a href="/floxenvs/" class="font-bold tracking-tight">flox / envs</a> <a href="/floxenvs/envs/" class="text-sm text-slate-600 dark:text-slate-300">Envs</a> <a href="/floxenvs/packages/" class="text-sm text-slate-600 dark:text-slate-300">Packages</a> <a href="/floxenvs/search/" class="text-sm text-slate-600 dark:text-slate-300 ml-auto">Search</a> <a href="https://github.com/flox/floxenvs" class="text-sm text-slate-600 dark:text-slate-300">GitHub</a> </nav> </header> <main class="max-w-6xl mx-auto px-6 py-10">  <nav class="text-sm text-slate-500 mb-4"> <a href="/floxenvs/packages/" class="underline">Packages</a>  / <a href="/floxenvs/packages/plugins/" class="underline">Plugins</a>   / claude-code-plugin-financial-services </nav> <div class="flex items-center gap-3 mb-2"> <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono uppercase tracking-wide ring-1 bg-kind-plugin/15 text-kind-plugin ring-kind-plugin/30" data-kind="plugin"> PLUGIN </span> <span class="text-xs font-mono text-slate-500">stable</span> </div> <h1 class="text-3xl font-bold">claude-code-plugin-financial-services (Claude Code plugin)</h1> <p class="mt-2 text-slate-600 dark:text-slate-300">Financial-services compliance and document tooling for Claude Code.
+</p> <div class="grid lg:grid-cols-[1fr_280px] gap-10 mt-10"> <div> <div data-score-slot="pkg:claude-code-plugin-financial-services" aria-hidden="true"></div> <section class="mt-8"> <h2 class="text-xl font-semibold mb-3">Install</h2> <div class="rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden"> <div role="tablist" class="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"> <button role="tab" aria-selected="true" aria-controls="ihrr77zmynn-panel-0" data-tab-target="ihrr77zmynn-panel-0" class="px-4 py-2 text-sm font-mono data-[active=true]:bg-white dark:data-[active=true]:bg-slate-950 data-[active=true]:font-semibold" data-active="true"> Manifest </button> </div> <pre id="ihrr77zmynn-panel-0" role="tabpanel" data-tab-panel class="text-sm font-mono p-4 m-0 overflow-x-auto"><code>[install]
+claude-code.pkg-path = &quot;flox/claude-code&quot;
+claude-code.publisher = &quot;flox&quot;
+claude-code-plugin-financial-services.pkg-path = &quot;flox/claude-code-plugin-financial-services&quot;
+claude-code-plugin-financial-services.publisher = &quot;flox&quot;
+</code></pre> </div> <script type="module">for(const a of document.querySelectorAll('[role="tablist"]')){const r=a.querySelectorAll('[role="tab"]');r.forEach(e=>{e.addEventListener("click",()=>{const c=e.getAttribute("data-tab-target");a.parentElement.querySelectorAll("[data-tab-panel]").forEach(t=>t.toggleAttribute("hidden",t.id!==c)),r.forEach(t=>{const l=t===e;t.setAttribute("aria-selected",String(l)),t.setAttribute("data-active",String(l))})})})}</script> </section>   <section class="mt-12"> <h2 class="text-xl font-semibold">Documentation</h2> <div class="prose prose-sm dark:prose-invert max-w-none mt-3 whitespace-pre-wrap"> # claude-code-plugin-financial-services
+
+Flox-packaged build of [anthropics/financial-services][upstream]
+— the Claude for Financial Services marketplace, packaged as a
+single FloxHub package that ships **19 Claude Code plugins**
+(7 vertical bundles + 10 named agent plugins + 2 partner-built
+plugins) plus the helper scripts, managed-agent cookbooks, and a
+wrapped `python3` carrying every Python dependency the skills
+and scripts need.
+
+## Install
+
+Add to a `flox/claude`-based environment:
+
+```toml
+schema-version = &quot;1.10.0&quot;
+
+[include]
+environments = [&quot;flox/claude&quot;]
+
+[install]
+financial-services.pkg-path = &quot;claude-code-plugin-financial-services&quot;
+```
+
+On `flox activate`, `claude-managed setup-hook` (provided by
+the included `flox/claude` env) discovers all 19 plugins under
+`$FLOX_ENV/share/claude-code/plugins/`, symlinks them into
+`$CLAUDE_CONFIG_DIR/plugins/&lt;name&gt;/`, and merges every
+`installed_plugins.json` so Claude Code trusts each one. The
+plugins, their slash commands, hooks, and MCP wiring are
+available in the next Claude Code session.
+
+## Plugins (19)
+
+- **financial-analysis** — Core financial modeling and analysis
+  tools: DCF, comps, LBO, 3-statement models, competitive
+  analysis, and deck QC
+- **investment-banking** — Investment banking productivity
+  tools - client and market insights, deck creation, financial
+  analysis, and transaction management
+- **equity-research** — Equity research tools: earnings
+  analysis, initiating coverage reports, and research workflows
+- **private-equity** — Private equity deal sourcing and
+  workflow tools: company discovery, CRM integration, and
+  founder outreach
+- **wealth-management** — Wealth management and financial
+  advisory tools: client reviews, financial planning, portfolio
+  analysis, and client reporting
+- **fund-admin** — Fund administration and finance ops: GL
+  reconciliation, break tracing, accruals, roll-forwards,
+  variance commentary, NAV tie-out
+- **operations** — Operational workflows: KYC document parsing
+  and rules-grid evaluation
+- **pitch-agent** — Comps, precedents, LBO to a branded pitch
+  deck, end to end
+- **market-researcher** — Sector or theme to industry overview,
+  competitive landscape, peer comps, and ideas shortlist
+- **earnings-reviewer** — Earnings call and filings to model
+  update to note draft
+- **meeting-prep-agent** — Briefing pack before every client
+  meeting
+- **model-builder** — DCF, LBO, 3-statement, comps - live in Excel
+- **gl-reconciler** — Finds breaks, traces root cause, routes
+  for sign-off
+- **kyc-screener** — Parses onboarding docs, runs the rules
+  engine, flags gaps
+- **valuation-reviewer** — Ingests GP packages, runs valuation
+  template, stages LP reporting
+- **month-end-closer** — Accruals, roll-forwards, variance
+  commentary
+- **statement-auditor** — Audits pre-generated LP statements
+  before distribution
+- **lseg** — Price bonds, analyze yield curves, evaluate FX
+  carry trades, value options, and build macro dashboards using
+  LSEG financial data and analytics.
+- **spglobal** — S&amp;P Global - Financial data and analytics
+  skills including company tearsheets, earnings previews, and
+  transaction summaries
+
+## MCP servers — bring your own auth
+
+Vertical plugins ship with `.mcp.json` files pre-wired to
+**11 third-party HTTP MCP servers**:
+
+- Daloopa — `https://mcp.daloopa.com/server/mcp`
+- Morningstar — `https://mcp.morningstar.com/mcp`
+- S&amp;P Global Kensho — `https://kfinance.kensho.com/integrations/mcp`
+- FactSet — `https://mcp.factset.com/mcp`
+- Moody&#39;s — `https://api.moodys.com/genai-ready-data/m1/mcp`
+- MT Newswires — `https://vast-mcp.blueskyapi.com/mtnewswires`
+- Aiera — `https://mcp-pub.aiera.com`
+- LSEG — `https://api.analytics.lseg.com/lfa/mcp` (the `lseg`
+  partner plugin uses `/lfa/mcp/server-cl` instead)
+- PitchBook — `https://premium.mcp.pitchbook.com/mcp`
+- Chronograph — `https://ai.chronograph.pe/mcp`
+- Egnyte — `https://mcp-server.egnyte.com/mcp`
+
+Each requires a separate vendor account / authentication.
+Unreachable or unauthenticated servers fail silently in
+Claude Code and are skipped from `/mcp`.
+
+## Helper scripts
+
+Bundled at `$FLOX_ENV/share/claude-code/financial-services/scripts/`:
+
+- `deploy-managed-agent.sh &lt;slug&gt;` — POST a cookbook to
+  Anthropic&#39;s `/v1/agents` (Managed Agents API). Requires
+  `ANTHROPIC_API_KEY`.
+- `test-cookbooks.sh` — smoke-test all cookbooks in dry-run mode.
+- `validate.py`, `check.py`, `orchestrate.py`,
+  `sync-agent-skills.py` — skill-tooling helpers.
+
+`python3`, `curl`, and `jq` are bundled and on PATH within the
+wrapped scripts.
+
+## Closure size
+
+This package ships a wrapped Python with `anthropic`, `openpyxl`,
+`python-pptx`, `pyyaml`, `jsonschema`, and `requests` — the
+closure is ~1.7 GiB, dominated by `anthropic` SDK transitives
+(`httpx`, `pydantic`) and `python-pptx`&#39;s `lxml` + `pillow`
+dependencies. This is consistent with sibling
+`claude-code-plugin-claude-seo` and is the cost of &quot;skills just
+work&quot; without separate dep provisioning.
+
+## Upstream
+
+- Repo: &lt;https://github.com/anthropics/financial-services&gt;
+- License: MIT
+- Pinned commit: see `hashes.json`
+
+[upstream]: https://github.com/anthropics/financial-services
+ </div> </section> </div> <aside class="space-y-1"> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Status</span> <span class="flex-1 break-words">stable</span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Publisher</span> <span class="flex-1 break-words">flox</span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">License</span> <span class="flex-1 break-words">MIT</span> </div>   <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Plugin for</span> <span class="flex-1 break-words"> <a href="/floxenvs/packages/claude-code/" class="underline"> claude-code </a> </span> </div>   <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">FloxHub</span> <span class="flex-1 break-words"> <a href="https://hub.flox.dev/flox/claude-code-plugin-financial-services" class="underline">link</a> </span> </div> </aside> </div>  </main> <footer class="border-t border-slate-200 dark:border-slate-800 mt-20"> <div class="max-w-6xl mx-auto px-6 py-6 text-sm text-slate-500">
+Built from <a class="underline" href="https://github.com/flox/floxenvs">flox/floxenvs</a>.
+</div> </footer> </body></html>

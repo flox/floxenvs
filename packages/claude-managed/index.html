@@ -1,0 +1,421 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Claude Managed · flox/envs</title><meta name="description" content="Flox-native config management helper for Claude Code CLI.
+"><link rel="icon" href="/floxenvs/favicon.svg"><link rel="stylesheet" href="/floxenvs/_astro/_slug_.BwxxlVGX.css"></head> <body class="font-sans antialiased min-h-dvh bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100"> <header class="border-b border-slate-200 dark:border-slate-800"> <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center gap-6"> <a href="/floxenvs/" class="font-bold tracking-tight">flox / envs</a> <a href="/floxenvs/envs/" class="text-sm text-slate-600 dark:text-slate-300">Envs</a> <a href="/floxenvs/packages/" class="text-sm text-slate-600 dark:text-slate-300">Packages</a> <a href="/floxenvs/search/" class="text-sm text-slate-600 dark:text-slate-300 ml-auto">Search</a> <a href="https://github.com/flox/floxenvs" class="text-sm text-slate-600 dark:text-slate-300">GitHub</a> </nav> </header> <main class="max-w-6xl mx-auto px-6 py-10">  <nav class="text-sm text-slate-500 mb-4"> <a href="/floxenvs/packages/" class="underline">Packages</a>    / claude-managed </nav> <div class="flex items-center gap-3 mb-2"> <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono uppercase tracking-wide ring-1 bg-kind-pkg/15 text-kind-pkg ring-kind-pkg/30" data-kind="plain"> PKG </span> <span class="text-xs font-mono text-slate-500">stable</span> </div> <h1 class="text-3xl font-bold">Claude Managed</h1> <p class="mt-2 text-slate-600 dark:text-slate-300">Flox-native config management helper for Claude Code CLI.
+</p> <ul class="mt-4 list-disc list-inside text-sm"> <li>Assembles Claude Code config from per-package fragments on activate</li><li>Manages rules, skills, agents, and plugins via isolated CLAUDE_CONFIG_DIR</li><li>Bridges macOS Keychain credentials so isolated sessions authenticate</li> </ul><div class="grid lg:grid-cols-[1fr_280px] gap-10 mt-10"> <div> <div data-score-slot="pkg:claude-managed" aria-hidden="true"></div> <section class="mt-8"> <h2 class="text-xl font-semibold mb-3">Install</h2> <div class="rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden"> <div role="tablist" class="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"> <button role="tab" aria-selected="true" aria-controls="iu0tp4xk8d-panel-0" data-tab-target="iu0tp4xk8d-panel-0" class="px-4 py-2 text-sm font-mono data-[active=true]:bg-white dark:data-[active=true]:bg-slate-950 data-[active=true]:font-semibold" data-active="true"> Manifest </button> </div> <pre id="iu0tp4xk8d-panel-0" role="tabpanel" data-tab-panel class="text-sm font-mono p-4 m-0 overflow-x-auto"><code>[install]
+claude-managed.pkg-path = &quot;flox/claude-managed&quot;
+claude-managed.publisher = &quot;flox&quot;
+</code></pre> </div> <script type="module">for(const a of document.querySelectorAll('[role="tablist"]')){const r=a.querySelectorAll('[role="tab"]');r.forEach(e=>{e.addEventListener("click",()=>{const c=e.getAttribute("data-tab-target");a.parentElement.querySelectorAll("[data-tab-panel]").forEach(t=>t.toggleAttribute("hidden",t.id!==c)),r.forEach(t=>{const l=t===e;t.setAttribute("aria-selected",String(l)),t.setAttribute("data-active",String(l))})})})}</script> </section> <section class="mt-12"> <h2 class="text-xl font-semibold">Use with these environments</h2> <div class="mt-4 grid sm:grid-cols-2 gap-3"> <a href="/floxenvs/envs/claude/" class="block p-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-slate-400"> <div class="flex items-center gap-2"> <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono uppercase tracking-wide ring-1 bg-kind-env/15 text-kind-env ring-kind-env/30" data-kind="env"> ENV </span> <span class="font-semibold">Claude Code</span> </div> <p class="mt-1 text-sm text-slate-600 dark:text-slate-300"> Claude Code CLI with managed config assembly and MCP fragments.
+ </p> </a> </div> </section> <section class="mt-12"> <h2 class="text-xl font-semibold">Combines with these packages</h2> <div class="mt-4 grid sm:grid-cols-2 gap-3"> <a href="/floxenvs/packages/claude-code/" class="block p-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-slate-400"> <div class="flex items-center gap-2"> <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono uppercase tracking-wide ring-1 bg-kind-pkg/15 text-kind-pkg ring-kind-pkg/30" data-kind="plain"> PKG </span> <span class="font-semibold">Claude Code</span> </div> <p class="mt-1 text-sm text-slate-600 dark:text-slate-300"> Anthropic&#39;s Claude Code agent CLI.
+ </p> </a> </div> </section> <section class="mt-12"> <h2 class="text-xl font-semibold">Documentation</h2> <div class="prose prose-sm dark:prose-invert max-w-none mt-3 whitespace-pre-wrap"> # claude-managed
+
+A small Go binary that assembles Claude Code configuration
+from Flox package fragments and emits eval-able shell code.
+Depends only on `gopkg.in/yaml.v3` for frontmatter parsing.
+
+## Usage
+
+```toml
+# manifest.toml
+[hook]
+on-activate = &#39;&#39;&#39;
+eval &quot;$(claude-managed setup-hook)&quot;
+&#39;&#39;&#39;
+
+[profile]
+common = &#39;&#39;&#39;
+eval &quot;$(claude-managed setup-profile)&quot;
+&#39;&#39;&#39;
+```
+
+The setup is split into two phases because of how flox
+hooks work:
+
+- **`on-activate`** runs in a context where only env vars
+  persist to the user&#39;s shell. Filesystem side effects
+  (mkdir, cp, symlinks) persist, but function definitions
+  and traps do not.
+- **`[profile]`** runs in the user&#39;s actual shell, so
+  function definitions and EXIT traps survive for the
+  lifetime of the session.
+
+## Commands
+
+```bash
+claude-managed setup-hook      # env vars, keychain, symlinks
+claude-managed setup-profile   # cleanup function + EXIT trap
+claude-managed doctor          # config status, symlink health, validation
+claude-managed rules add       # install a rule (symlink)
+claude-managed rules remove    # remove a rule by name
+claude-managed rules list      # show installed rules
+claude-managed rules clean     # remove stale managed rules
+claude-managed skills add      # install a skill (symlink)
+claude-managed skills remove   # remove a skill by name
+claude-managed skills list     # show installed skills
+claude-managed skills clean    # remove stale managed skills
+claude-managed agents add      # install an agent (symlink)
+claude-managed agents remove   # remove an agent by name
+claude-managed agents list     # show installed agents
+claude-managed agents clean    # remove stale managed agents
+claude-managed plugins add     # install plugin
+claude-managed plugins remove  # remove plugin by name
+claude-managed plugins list    # show installed plugins
+claude-managed plugins clean   # remove stale plugins
+claude-managed version         # print version
+```
+
+### setup-hook
+
+Emits shell code for the on-activate hook phase:
+
+1. Exports env vars (`CLAUDE_CONFIG_DIR`, etc.)
+2. Validates fragments and prints warnings to stderr
+3. Bridges macOS Keychain credentials for the isolated
+   config dir
+4. Copies `~/.claude.json` for OAuth account metadata
+5. Cleans stale symlinks and creates fresh ones in
+   `$CLAUDE_CONFIG_DIR/{rules,skills,agents}/`
+
+### setup-profile
+
+Emits shell code for the profile phase:
+
+1. Defines the `_claude_managed_clean_symlinks` helper
+2. Defines the `_claude_managed_cleanup` function
+3. Registers `trap _claude_managed_cleanup EXIT`
+
+### doctor
+
+Single diagnostic view combining:
+
+- Config dir + activation marker
+- Auth bridge status
+- Per-fragment symlink health (`✓` installed, `→ broken`
+  if the link target is missing, `·` available but not
+  installed)
+- Frontmatter and structure validation, with errors
+  (broken) and warnings (unusual but works) reported
+  inline per fragment
+
+Exits non-zero only on errors.
+
+**Rules** (`rules/*.md`):
+
+- File is readable (error if not)
+- Unknown frontmatter keys produce a warning
+  (only `paths` is recognized)
+
+**Skills** (`skills/*/SKILL.md`):
+
+- SKILL.md exists and is readable (error if not)
+- If frontmatter is present, `name` and `description`
+  are required (error if missing)
+- `name` is kebab-case, ≤64 characters (error)
+- `description` ≤1024 characters (warning if exceeded)
+- `compatibility` ≤500 characters (warning if exceeded)
+- `effort` is one of: low, medium, high, max (error)
+- Frontmatter keys are recognized as either
+  agentskills.io spec keys or Claude Code extensions
+  (warning otherwise; the `metadata:` mapping is the
+  spec-recommended home for non-standard fields)
+
+**Agents** (`agents/*.md`):
+
+- File is readable (error if not)
+- No forbidden keys (`hooks`, `mcpServers`,
+  `permissionMode` — security restriction, error)
+- `effort` is one of: low, medium, high, max (error)
+- `isolation` is `worktree` (only valid value, error)
+- Unknown frontmatter keys produce a warning
+
+### rules/skills/agents add
+
+Installs a rule, skill, or agent by creating a
+relative symlink in `$CLAUDE_CONFIG_DIR/&lt;type&gt;/&lt;name&gt;`.
+
+### rules/skills/agents remove
+
+Removes the symlink by name.
+
+### rules/skills/agents list
+
+Shows entries in `$CLAUDE_CONFIG_DIR/&lt;type&gt;/` with
+symlink health status.
+
+### rules/skills/agents clean
+
+Removes symlinks whose targets point into
+`$FLOX_ENV/share/claude-code/&lt;type&gt;/`. User-created
+symlinks are preserved.
+
+### plugins add
+
+Installs a plugin by creating a symlink in
+`$CLAUDE_CONFIG_DIR/plugins/` and merging the
+plugin&#39;s `installed_plugins.json` and
+`known_marketplaces.json` into the config dir&#39;s
+accumulated files.
+
+### plugins remove
+
+Removes a plugin symlink by name and regenerates
+the JSON config files from remaining plugins.
+
+### plugins list
+
+Shows all installed plugins in the config dir with
+symlink health status.
+
+### plugins clean
+
+Removes all plugin symlinks whose targets point
+into `$FLOX_ENV/share/claude-code/`. Regenerates JSON
+config files from remaining plugins. User-managed
+plugins are never touched.
+
+Rules, skills, and agents `clean` works identically
+but without JSON regeneration.
+
+## How it works
+
+Flox packages drop config fragments into
+`$FLOX_ENV/share/claude-code/`. On `flox activate`:
+
+The Go binary handles discovery and validation.
+Everything else (symlinks, keychain, cleanup) is emitted
+as shell code — visible and debuggable.
+
+### Why two phases?
+
+Flox `on-activate` hooks run in a subshell-like context.
+Env var exports and filesystem side effects persist, but
+shell function definitions and `trap` registrations do not
+survive to the user&#39;s interactive shell. An EXIT trap
+registered in `on-activate` fires immediately when the
+hook context exits — deleting files that were just created.
+
+The `[profile]` section runs in the user&#39;s actual shell,
+so functions and traps defined there persist for the
+session.
+
+### Fragment types
+
+Packages install fragments under
+`$FLOX_ENV/share/claude-code/`:
+
+| Directory | Format | Delivery |
+| ------ | ------ | ------ |
+| `rules/*.md` | Rule files | Symlink |
+| `skills/*/SKILL.md` | Skill directories | Symlink |
+| `agents/*.md` | Agent files | Symlink |
+| `plugins/*/` | Plugin directories | Symlink + JSON |
+| | | merge |
+
+All fragment types are delivered via symlinks into
+`$CLAUDE_CONFIG_DIR/`.
+
+### Isolation via CLAUDE_CONFIG_DIR
+
+`CLAUDE_CONFIG_DIR` is set to
+`$FLOX_ENV_PROJECT/.claude-managed`, a directory next to
+the project&#39;s `.claude/`. This isolates the Claude session:
+
+- No user settings from `~/.claude/` leaking in
+- No user `CLAUDE.md` leaking in
+- No user memory files leaking in
+- Session transcripts stay in the managed dir
+- Auto-memory disabled via
+  `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`
+
+## Authentication
+
+Claude Code stores OAuth credentials in the macOS Keychain
+(or platform equivalent). The service name is derived from
+`CLAUDE_CONFIG_DIR`:
+
+- Default (no env var): `Claude Code-credentials`
+- With custom dir: `Claude Code-credentials-&lt;sha256[:8]&gt;`
+
+Since we set `CLAUDE_CONFIG_DIR` for isolation, Claude
+looks for credentials under a hashed service name that
+doesn&#39;t exist yet. The emitted shell code bridges this gap
+automatically.
+
+### How the keychain bridge works
+
+At activate time, the `setup-hook` shell code:
+
+1. Computes the SHA-256 hash of `$CLAUDE_CONFIG_DIR`
+   (first 8 hex chars) to derive the isolated service name
+2. Checks if the isolated keychain entry already exists
+   (idempotent — skips if present)
+3. Reads the default entry (`Claude Code-credentials`) via
+   `security find-generic-password -w` (returns plaintext)
+4. Re-encodes the plaintext with `xxd -p` (hex) and writes
+   it under the isolated service name using
+   `security add-generic-password -X`
+5. Copies `~/.claude.json` into `$CLAUDE_CONFIG_DIR/` for
+   `oauthAccount` metadata
+
+All `security` commands use `|| true` to guard against
+`set -e` in flox hooks.
+
+### Token refresh
+
+OAuth tokens expire after ~1 hour with a ~5-minute refresh
+buffer. When Claude refreshes a token, it writes back to
+the same service name it read from — the isolated one.
+This is self-consistent: the bridge is only needed once at
+activate time.
+
+### Cleanup
+
+The EXIT trap (registered in `setup-profile`) removes the
+bridged keychain entry and the copied `.claude.json` when
+the shell exits. Each new `flox activate` creates a fresh
+bridge.
+
+### Linux
+
+On Linux, Claude Code uses a file-based credential store
+at `$CLAUDE_CONFIG_DIR/.credentials.json`. No bridging is
+needed since Claude creates and manages this file directly
+in the isolated config dir.
+
+### Symlink lifecycle
+
+The `setup-profile` shell defines a
+`_claude_managed_clean_symlinks` helper that removes
+symlinks whose targets point into
+`$FLOX_ENV/share/claude-code/`. User-created entries are never
+touched.
+
+**On activate:** `setup-hook` cleans stale symlinks, then
+`ln -sfn` creates fresh ones.
+
+**On exit (trap):** cleanup function runs the helper
+again, removing all managed symlinks.
+
+## Environment variables
+
+### Read by claude-managed
+
+| Variable | Purpose |
+| ------ | ------ |
+| `FLOX_ENV` | Flox environment path (fragment source) |
+| `FLOX_ENV_PROJECT` | Project root (for relative paths) |
+| `CLAUDE_MANAGED_DIR` | Override config dir location |
+| `CLAUDE_MANAGED` | Check if managed mode is active |
+
+If `CLAUDE_MANAGED_DIR` is not set, defaults to
+`$FLOX_ENV_PROJECT/.claude-managed`.
+
+### Set by emitted shell code
+
+| Variable | Purpose |
+| ------ | ------ |
+| `CLAUDE_CONFIG_DIR` | `$FLOX_ENV_PROJECT/.claude-managed` |
+| `CLAUDE_CODE_DISABLE_AUTO_MEMORY` | Disables memory |
+| `CLAUDE_MANAGED` | Marker that managed mode is active |
+
+## Architecture
+
+```text
+main.go                     CLI entry point, env var
+                            resolution, command dispatch
+internal/
+  discover/                 Scan $FLOX_ENV/share/claude-code/
+  emit/                     Generate shell code
+                            hook: env vars, keychain,
+                                  symlinks, validation
+                            profile: cleanup function,
+                                     trap
+  doctor/                   Fragment validation
+                            (frontmatter, structure)
+  symlinks/                 Shared symlink operations
+                            (Add, Remove, List, Clean)
+  plugins/                  JSON merge, add/remove/list/
+                            clean
+e2e/                        Bats E2E test suite
+  test_helper/common.bash   Shared helpers, mode detection
+  fixtures/                 Static test fragments
+```
+
+## Building
+
+```bash
+flox build claude-managed
+```
+
+### Updating dependencies
+
+Bumping or adding a Go dependency requires regenerating
+the `vendorHash` in `default.nix`:
+
+1. Edit `go.mod` (e.g. `go get example.com/pkg@vX.Y.Z`)
+2. Run `go mod tidy` to refresh `go.sum`
+3. Set `vendorHash` to a placeholder
+   (`sha256-AAAA...AAA=`) and run `nix-build`
+4. Copy the `got: sha256-...` line from the failure into
+   `vendorHash` and rebuild
+
+Tests cover the parser and validators. Re-run
+`go test ./...` after touching `internal/doctor/`.
+
+## Testing
+
+### Unit tests (Go)
+
+```bash
+cd .flox/pkgs/claude-managed
+go test ./...
+```
+
+### E2E tests
+
+70 bats tests covering command output, shell eval,
+validation, security edge cases, and cleanup safety.
+Two runners are available from the repo root:
+
+**Hermetic (no flox required):**
+
+```bash
+nix run .#run-test-claude-managed-with-nix
+```
+
+Builds the binary via Nix, sets `claude-managed` on
+PATH, runs bats against temp fixture trees using
+`--dir` and `--config-dir` flags. No `FLOX_*`
+variables are set.
+
+**With flox (real lifecycle):**
+
+```bash
+nix run .#run-test-claude-managed-with-flox
+```
+
+Creates a throwaway flox environment, installs the
+built binary via `on-activate`, and runs the same bats
+tests inside `flox activate`. Tests `FLOX_ENV` and
+`FLOX_ENV_PROJECT` integration.
+
+### Test structure
+
+```text
+e2e/
+  test_helper/
+    common.bash          mode detection, fixture helpers
+  version.bats           version command
+  setup-hook.bats        setup-hook output
+  setup-profile.bats     setup-profile output
+  doctor.bats            diagnostics: status + validation
+  eval-hook.bats         eval shell output, side effects
+  eval-profile.bats      eval profile, cleanup
+  edge-cases.bats        robustness + security
+  fixtures/              static test fragments
+```
+
+`common.bash` detects the execution mode via `FLOX_ENV`
+and adapts flag usage. Both runners execute the same
+bats files.
+ </div> </section> </div> <aside class="space-y-1"> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Status</span> <span class="flex-1 break-words">stable</span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Publisher</span> <span class="flex-1 break-words">flox</span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">License</span> <span class="flex-1 break-words">MIT</span> </div>  <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Maintainer</span> <span class="flex-1 break-words">@rok</span> </div>   <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Bundled by envs</span> <span class="flex-1 break-words"> <a href="/floxenvs/envs/claude/" class="underline">claude</a> </span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">FloxHub</span> <span class="flex-1 break-words"> <a href="https://hub.flox.dev/flox/claude-managed" class="underline">link</a> </span> </div> </aside> </div>  </main> <footer class="border-t border-slate-200 dark:border-slate-800 mt-20"> <div class="max-w-6xl mx-auto px-6 py-6 text-sm text-slate-500">
+Built from <a class="underline" href="https://github.com/flox/floxenvs">flox/floxenvs</a>.
+</div> </footer> </body></html>
