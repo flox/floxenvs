@@ -8,7 +8,7 @@ several ways to pull secrets into your shell.
 ```text
 fnox-demo/
 ├── fnox.toml                 # config: providers + secrets + leases
-├── .fnox-demo-key.txt        # demo age private key (NOT a real secret)
+├── fnox-demo-key.txt         # demo age private key (NOT a real secret)
 └── scripts/
     └── mint-greeting.sh      # command-lease script
 ```
@@ -42,7 +42,7 @@ fnox lease create greeting
 
 `DEMO_DATABASE_URL` is age-encrypted ciphertext stored inline
 in `fnox.toml`. The recipient is a public key; the matching
-private key (`FNOX_AGE_KEY`) lives in `.fnox-demo-key.txt`.
+private key (`FNOX_AGE_KEY`) lives in `fnox-demo-key.txt`.
 
 For real use cases generate your own keypair:
 

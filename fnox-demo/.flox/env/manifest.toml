@@ -14,7 +14,7 @@ on-activate = '''
 # Use the demo identity that's checked into the repo. This is a
 # *demo-only* key — never reuse it for real secrets.
 export FNOX_AGE_KEY="$(grep '^AGE-SECRET-KEY-' \
-  "$FLOX_ENV_PROJECT/.fnox-demo-key.txt")"
+  "$FLOX_ENV_PROJECT/fnox-demo-key.txt")"
 
 # Per-cwd config (fnox auto-discovers fnox.toml).
 export FNOX_CONFIG_DIR="$FLOX_ENV_PROJECT"

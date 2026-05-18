@@ -20,7 +20,7 @@
       "FNOX_LOG": "warn"
     },
     "hook": {
-      "on-activate": "# Per-environment data path; used by fnox to cache lease state,\n# session tokens, and resolved secrets.\nexport FNOX_DATA_DIR=\"$FLOX_ENV_CACHE/fnox\"\nmkdir -p \"$FNOX_DATA_DIR\"\n\n# Use the demo identity that's checked into the repo. This is a\n# *demo-only* key — never reuse it for real secrets.\nexport FNOX_AGE_KEY=\"$(grep '^AGE-SECRET-KEY-' \\\n  \"$FLOX_ENV_PROJECT/.fnox-demo-key.txt\")\"\n\n# Per-cwd config (fnox auto-discovers fnox.toml).\nexport FNOX_CONFIG_DIR=\"$FLOX_ENV_PROJECT\"\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 60 --margin \"1 2\" --padding \"1 2\" \\\n    \"fnox demo\" \"Fort Knox for your secrets\"\n  echo \"\"\n  echo \"  Try one of these (cwd: $FLOX_ENV_PROJECT):\"\n  echo \"\"\n  echo \"    fnox list                  — view configured secrets\"\n  echo \"    fnox get DATABASE_URL      — decrypt one secret\"\n  echo \"    fnox exec -- env | grep ^DEMO_\"\n  echo \"    fnox lease create greeting — run command lease\"\n  echo \"    fnox tui                   — interactive dashboard\"\n  echo \"\"\nfi\n"
+      "on-activate": "# Per-environment data path; used by fnox to cache lease state,\n# session tokens, and resolved secrets.\nexport FNOX_DATA_DIR=\"$FLOX_ENV_CACHE/fnox\"\nmkdir -p \"$FNOX_DATA_DIR\"\n\n# Use the demo identity that's checked into the repo. This is a\n# *demo-only* key — never reuse it for real secrets.\nexport FNOX_AGE_KEY=\"$(grep '^AGE-SECRET-KEY-' \\\n  \"$FLOX_ENV_PROJECT/fnox-demo-key.txt\")\"\n\n# Per-cwd config (fnox auto-discovers fnox.toml).\nexport FNOX_CONFIG_DIR=\"$FLOX_ENV_PROJECT\"\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 60 --margin \"1 2\" --padding \"1 2\" \\\n    \"fnox demo\" \"Fort Knox for your secrets\"\n  echo \"\"\n  echo \"  Try one of these (cwd: $FLOX_ENV_PROJECT):\"\n  echo \"\"\n  echo \"    fnox list                  — view configured secrets\"\n  echo \"    fnox get DATABASE_URL      — decrypt one secret\"\n  echo \"    fnox exec -- env | grep ^DEMO_\"\n  echo \"    fnox lease create greeting — run command lease\"\n  echo \"    fnox tui                   — interactive dashboard\"\n  echo \"\"\nfi\n"
     },
     "options": {}
   },
@@ -271,7 +271,7 @@
       "rev": "240148da74917773c707bd673cea571ecbeeb56d",
       "rev_count": 3405,
       "rev_date": "2026-05-18T22:02:41Z",
-      "scrape_date": "2026-05-18T23:09:14.270488Z",
+      "scrape_date": "2026-05-18T23:45:31.946624Z",
       "stabilities": [
         "unstable"
       ],
@@ -300,7 +300,7 @@
       "rev": "240148da74917773c707bd673cea571ecbeeb56d",
       "rev_count": 3405,
       "rev_date": "2026-05-18T22:02:41Z",
-      "scrape_date": "2026-05-18T23:09:14.270489Z",
+      "scrape_date": "2026-05-18T23:45:31.946625Z",
       "stabilities": [
         "unstable"
       ],
@@ -329,7 +329,7 @@
       "rev": "240148da74917773c707bd673cea571ecbeeb56d",
       "rev_count": 3405,
       "rev_date": "2026-05-18T22:02:41Z",
-      "scrape_date": "2026-05-18T23:09:14.270489Z",
+      "scrape_date": "2026-05-18T23:45:31.946625Z",
       "stabilities": [
         "unstable"
       ],
@@ -358,7 +358,7 @@
       "rev": "240148da74917773c707bd673cea571ecbeeb56d",
       "rev_count": 3405,
       "rev_date": "2026-05-18T22:02:41Z",
-      "scrape_date": "2026-05-18T23:09:14.270489Z",
+      "scrape_date": "2026-05-18T23:45:31.946626Z",
       "stabilities": [
         "unstable"
       ],
@@ -389,7 +389,7 @@
         }
       },
       "hook": {
-        "on-activate": "# Use the demo identity that's checked into the repo. This is a\n# *demo-only* key — never reuse it for real secrets.\nexport FNOX_AGE_KEY=\"$(grep '^AGE-SECRET-KEY-' \\\n  \"$FLOX_ENV_PROJECT/.fnox-demo-key.txt\")\"\n\n# Per-cwd config (fnox auto-discovers fnox.toml).\nexport FNOX_CONFIG_DIR=\"$FLOX_ENV_PROJECT\"\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 60 --margin \"1 2\" --padding \"1 2\" \\\n    \"fnox demo\" \"Fort Knox for your secrets\"\n  echo \"\"\n  echo \"  Try one of these (cwd: $FLOX_ENV_PROJECT):\"\n  echo \"\"\n  echo \"    fnox list                  — view configured secrets\"\n  echo \"    fnox get DATABASE_URL      — decrypt one secret\"\n  echo \"    fnox exec -- env | grep ^DEMO_\"\n  echo \"    fnox lease create greeting — run command lease\"\n  echo \"    fnox tui                   — interactive dashboard\"\n  echo \"\"\nfi\n"
+        "on-activate": "# Use the demo identity that's checked into the repo. This is a\n# *demo-only* key — never reuse it for real secrets.\nexport FNOX_AGE_KEY=\"$(grep '^AGE-SECRET-KEY-' \\\n  \"$FLOX_ENV_PROJECT/fnox-demo-key.txt\")\"\n\n# Per-cwd config (fnox auto-discovers fnox.toml).\nexport FNOX_CONFIG_DIR=\"$FLOX_ENV_PROJECT\"\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 60 --margin \"1 2\" --padding \"1 2\" \\\n    \"fnox demo\" \"Fort Knox for your secrets\"\n  echo \"\"\n  echo \"  Try one of these (cwd: $FLOX_ENV_PROJECT):\"\n  echo \"\"\n  echo \"    fnox list                  — view configured secrets\"\n  echo \"    fnox get DATABASE_URL      — decrypt one secret\"\n  echo \"    fnox exec -- env | grep ^DEMO_\"\n  echo \"    fnox lease create greeting — run command lease\"\n  echo \"    fnox tui                   — interactive dashboard\"\n  echo \"\"\nfi\n"
       },
       "options": {},
       "include": {
