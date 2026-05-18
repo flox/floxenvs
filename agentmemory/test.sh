@@ -44,16 +44,23 @@ echo ">>> plugin layout looks complete"
 
 # Hook scripts must have been repointed at the bundled node
 # (not /usr/bin/env node) so they don't depend on the
-# consumer env's PATH having node on it.
+# consumer env's PATH having node on it. The substituted path is
+# the build-time $PLUGIN_DIR (a /nix/store path) rather than the
+# env's runtime mount of it, so just confirm /usr/bin/env is gone
+# and the shebang resolves to an executable.
 shebang="$(head -1 "$plugin_dir/scripts/session-start.mjs")"
 case "$shebang" in
-  "#!$plugin_dir/bin/node") ;;
-  *)
-    echo "Error: session-start.mjs shebang not rewritten: $shebang"
+  *'/usr/bin/env'*)
+    echo "Error: session-start.mjs still uses /usr/bin/env: $shebang"
     exit 1
     ;;
 esac
-echo ">>> hook script shebangs repointed at bundled node"
+shebang_bin="${shebang#\#!}"
+if [ ! -x "$shebang_bin" ]; then
+  echo "Error: session-start.mjs shebang target not executable: $shebang_bin"
+  exit 1
+fi
+echo ">>> hook script shebang resolves to $shebang_bin"
 
 # hooks.json must invoke the bundled node via the
 # ${CLAUDE_PLUGIN_ROOT}-anchored path so Claude Code can
