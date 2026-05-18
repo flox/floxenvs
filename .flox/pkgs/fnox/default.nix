@@ -7,20 +7,21 @@
 }:
 
 let
-  versionData =
-    builtins.fromJSON (builtins.readFile ./hashes.json);
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version binaries;
 
+  # Linux: musl (static) — gnu builds error on NixOS because the
+  # release binaries hard-code /lib64/ld-linux-x86-64.so.2 etc., which
+  # is not present in the build sandbox or on most NixOS hosts.
   platformMap = {
-    x86_64-linux = "x86_64-unknown-linux-gnu";
-    aarch64-linux = "aarch64-unknown-linux-gnu";
+    x86_64-linux = "x86_64-unknown-linux-musl";
+    aarch64-linux = "aarch64-unknown-linux-musl";
     x86_64-darwin = "x86_64-apple-darwin";
     aarch64-darwin = "aarch64-apple-darwin";
   };
 
   platform = stdenv.hostPlatform.system;
-  target = platformMap.${platform}
-    or (throw "Unsupported system: ${platform}");
+  target = platformMap.${platform} or (throw "Unsupported system: ${platform}");
 
   src = fetchurl {
     url = "https://github.com/jdx/fnox/releases/download/v${version}/fnox-${target}.tar.gz";
