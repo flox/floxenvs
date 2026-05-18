@@ -1,0 +1,30 @@
+schema-version = "1.11.0"
+
+[include]
+environments = [
+  { dir = "../caveman" }
+]
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [ "${FLOX_ENVS_TESTING:-}" != "1" ]; then
+  gum style \
+    --foreground 212 --border-foreground 212 \
+    --border double --align center \
+    --width 50 --margin "1 2" --padding "1 2" \
+    "Caveman Mode" "Talk like caveman. Save ~75% tokens."
+  echo ""
+  echo "  claude           — start Claude Code"
+  echo "  /caveman         — toggle caveman mode (default: full)"
+  echo "  /caveman lite    — drop filler only, keep grammar"
+  echo "  /caveman ultra   — extreme abbreviation"
+  echo "  /caveman wenyan-full — classical-Chinese style"
+  echo "  /caveman-help    — full reference card"
+  echo "  /caveman-stats   — show real session token usage"
+  echo ""
+fi
+'''
