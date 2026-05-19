@@ -11,6 +11,18 @@ export default defineConfig({
   base: BASE,
   output: "static",
   trailingSlash: "always",
-  integrations: [preact(), sitemap()],
+  integrations: [
+    preact(),
+    sitemap({
+      // Mark each URL with the build timestamp. The build is
+      // deterministic per push, so this is effectively the
+      // "last touched on main" date for the whole catalog.
+      // Per-page git-commit times would be sharper but require
+      // a build-time git lookup; deferring that.
+      serialize(item) {
+        return { ...item, lastmod: new Date().toISOString() };
+      },
+    }),
+  ],
   vite: { plugins: [tailwindcss()] },
 });

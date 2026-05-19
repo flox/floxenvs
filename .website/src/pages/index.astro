@@ -75,10 +75,42 @@ const graphInputs = [
 const edges = computeAffinityEdges(graphInputs);
 
 const featuredRecipes = aiEnvs.filter((e) => e.data.recipes.length > 0).slice(0, 6);
+
+const origin = (Astro.site?.toString() ?? "").replace(/\/$/, "");
+const homeUrl = `${origin}${base}`;
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "flox / envs",
+    url: homeUrl,
+    description: "Ready-to-use Flox environments and packages, AI first.",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${homeUrl}search/?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Flox",
+    url: "https://flox.dev",
+    logo: `${origin}${base}favicon.svg`,
+    sameAs: [
+      "https://github.com/flox",
+      "https://hub.flox.dev",
+    ],
+  },
+];
 ---
 <Layout
   title="flox / envs — AI environments and packages"
   description="Ready-to-use Flox environments and packages, AI first."
+  jsonLd={jsonLd}
 >
   <section class="pt-8 pb-16 lg:pt-12 lg:pb-24">
     <div class="grid lg:grid-cols-[1.1fr_1fr] gap-10 items-center">

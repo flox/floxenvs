@@ -37,11 +37,78 @@ const tabs = pkg.data.install?.pkg
 const ogImage = pkg.data.featured
   ? `${base}og/pkg/${pkg.data.name}.png`
   : undefined;
+
+const origin = (Astro.site?.toString() ?? "").replace(/\/$/, "");
+const pageUrl = `${origin}${base}packages/${pkg.data.name}/`;
+const subkindLabel = pkg.data.subkind === "plugin"
+  ? "Plugins"
+  : pkg.data.subkind === "skill"
+  ? "Skills"
+  : null;
+const subkindHref = pkg.data.subkind === "plugin"
+  ? `${origin}${base}packages/plugins/`
+  : pkg.data.subkind === "skill"
+  ? `${origin}${base}packages/skills/`
+  : null;
+const breadcrumbItems = [
+  {
+    "@type": "ListItem",
+    position: 1,
+    name: "Packages",
+    item: `${origin}${base}packages/`,
+  },
+];
+if (subkindLabel && subkindHref) {
+  breadcrumbItems.push({
+    "@type": "ListItem",
+    position: 2,
+    name: subkindLabel,
+    item: subkindHref,
+  });
+}
+breadcrumbItems.push({
+  "@type": "ListItem",
+  position: breadcrumbItems.length + 1,
+  name: pkg.data.title,
+  item: pageUrl,
+});
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: pkg.data.title,
+    description: pkg.data.tagline,
+    applicationCategory: "DeveloperApplication",
+    operatingSystem: pkg.data.systems?.length
+      ? Array.from(new Set(pkg.data.systems.map((s: string) =>
+          s.endsWith("-linux") ? "Linux"
+          : s.endsWith("-darwin") ? "macOS"
+          : s)))
+      : undefined,
+    license: pkg.data.license
+      ? `https://spdx.org/licenses/${pkg.data.license}.html`
+      : undefined,
+    url: pageUrl,
+    codeRepository: pkg.data.links?.source,
+    isBasedOn: pkg.data.upstream?.url,
+    publisher: {
+      "@type": "Organization",
+      name: "Flox",
+      url: "https://flox.dev",
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: breadcrumbItems,
+  },
+];
 ---
 <Layout
   title={`${pkg.data.title} · flox/envs`}
   description={pkg.data.tagline}
   ogImage={ogImage}
+  jsonLd={jsonLd}
 >
   <nav class="text-sm text-slate-500 mb-4">
     <a href={`${base}packages/`} class="underline">Packages</a>

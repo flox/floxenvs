@@ -4,30 +4,46 @@ const {
   title,
   description,
   ogImage,
+  jsonLd,
 } = Astro.props as {
   title: string;
   description?: string;
   ogImage?: string;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 };
 const base = import.meta.env.BASE_URL;
-const site = Astro.site?.toString() ?? "";
-const defaultOg = `${site}${base}og/default.png`;
-const og = ogImage ?? defaultOg;
+// Normalize trailing slash on the origin so concatenations never produce //.
+const origin = (Astro.site?.toString() ?? "").replace(/\/$/, "");
+const canonical = `${origin}${Astro.url.pathname}`;
+function absUrl(u: string): string {
+  if (/^https?:\/\//.test(u)) return u;
+  const path = u.startsWith("/") ? u : `/${u}`;
+  return `${origin}${path}`;
+}
+const ogAbs = absUrl(ogImage ?? `${base}og/default.png`);
+const ldArray = jsonLd
+  ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd])
+  : [];
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={canonical} />
     <link rel="icon" href={`${base}favicon.svg`} />
     <meta property="og:title" content={title} />
     {description && <meta property="og:description" content={description} />}
-    <meta property="og:image" content={og} />
+    <meta property="og:image" content={ogAbs} />
+    <meta property="og:url" content={canonical} />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content={og} />
+    <meta name="twitter:image" content={ogAbs} />
+    {ldArray.map((ld) => (
+      <script type="application/ld+json" set:html={JSON.stringify(ld)} />
+    ))}
     <script is:inline>
       // Apply theme before paint to avoid FOUC. Honors the
       // stored choice, otherwise falls back to system pref.
