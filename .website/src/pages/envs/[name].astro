@@ -5,6 +5,7 @@ import KindBadge from "../../components/KindBadge.astro";
 import ScoreSlot from "../../components/ScoreSlot.astro";
 import InstallTabs from "../../components/InstallTabs.astro";
 import RecipeSection from "../../components/RecipeSection.astro";
+import Markdown from "../../components/Markdown.astro";
 import SidebarEntry from "../../components/SidebarEntry.astro";
 import { deriveBundling } from "../../lib/derive";
 
@@ -109,9 +110,7 @@ const recommendedPkgs = pkgs.filter((p) => {
       {env.data.readme && (
         <section class="mt-12">
           <h2 class="text-xl font-semibold">Documentation</h2>
-          <div class="prose prose-sm dark:prose-invert max-w-none mt-3 whitespace-pre-wrap">
-            {env.data.readme}
-          </div>
+          <Markdown source={env.data.readme} className="mt-3" />
         </section>
       )}
     </div>

@@ -5,6 +5,7 @@ import KindBadge from "../../components/KindBadge.astro";
 import ScoreSlot from "../../components/ScoreSlot.astro";
 import InstallTabs from "../../components/InstallTabs.astro";
 import SidebarEntry from "../../components/SidebarEntry.astro";
+import Markdown from "../../components/Markdown.astro";
 
 export async function getStaticPaths() {
   const pkgs = await getCollection("packages");
@@ -120,9 +121,7 @@ const tabs = pkg.data.install?.pkg
       {pkg.data.readme && (
         <section class="mt-12">
           <h2 class="text-xl font-semibold">Documentation</h2>
-          <div class="prose prose-sm dark:prose-invert max-w-none mt-3 whitespace-pre-wrap">
-            {pkg.data.readme}
-          </div>
+          <Markdown source={pkg.data.readme} className="mt-3" />
         </section>
       )}
     </div>
