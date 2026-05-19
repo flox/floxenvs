@@ -103,6 +103,8 @@ Most environments follow a dual-layer pattern:
 | _└ huggingface-demo_ | | [floxhub](https://hub.flox.dev/flox/huggingface-demo) · [docs](huggingface-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/huggingface-demo-latest) |
 | graphify | Knowledge-graph skill for Claude Code | [floxhub](https://hub.flox.dev/flox/graphify) · [docs](graphify/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/graphify-latest) |
 | _└ graphify-demo_ | | [floxhub](https://hub.flox.dev/flox/graphify-demo) · [docs](graphify-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/graphify-demo-latest) |
+| agentmemory | Persistent memory plugin for Claude Code | [floxhub](https://hub.flox.dev/flox/agentmemory) · [docs](agentmemory/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/agentmemory-latest) |
+| _└ agentmemory-demo_ | | [floxhub](https://hub.flox.dev/flox/agentmemory-demo) · [docs](agentmemory-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/agentmemory-demo-latest) |
 | gstack | Garry Tan's Claude Code stack | [floxhub](https://hub.flox.dev/flox/gstack) · [docs](gstack/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/gstack-latest) |
 | _└ gstack-demo_ | | [floxhub](https://hub.flox.dev/flox/gstack-demo) · [docs](gstack-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/gstack-demo-latest) |
 | remotion | Remotion video skill for Claude Code | [floxhub](https://hub.flox.dev/flox/remotion) · [docs](remotion/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/remotion-latest) |
