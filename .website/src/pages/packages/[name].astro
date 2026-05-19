@@ -60,7 +60,11 @@ const tabs = pkg.data.install?.pkg
 
   <div class="grid lg:grid-cols-[1fr_280px] gap-10 mt-10">
     <div>
-      <ScoreSlot kind="pkg" name={pkg.data.name} />
+      <ScoreSlot
+        kind="pkg"
+        name={pkg.data.name}
+        metrics={pkg.data.metrics}
+      />
 
       {tabs.length > 0 && (
         <section class="mt-8">

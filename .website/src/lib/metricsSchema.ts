@@ -37,8 +37,9 @@ const Scanner = z.object({
 const Finding = z.object({
   tool: z.string(),
   level: z.enum(["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"]),
-  count: z.number(),
+  count: z.number().optional(),
   status: z.string(),
+  note: z.string().optional(),
 });
 
 const Security = z.object({

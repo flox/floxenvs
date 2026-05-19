@@ -59,7 +59,11 @@ const recommendedPkgs = pkgs.filter((p) => {
 
   <div class="grid lg:grid-cols-[1fr_280px] gap-10 mt-10">
     <div>
-      <ScoreSlot kind="env" name={env.data.name} />
+      <ScoreSlot
+        kind="env"
+        name={env.data.name}
+        metrics={env.data.metrics}
+      />
 
       {tabs.length > 0 && (
         <section class="mt-8">
