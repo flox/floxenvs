@@ -1,0 +1,28 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [{ dir = "../lmstudio" }]
+
+# gum is a demo-only tool for styled terminal output.
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' --padding '1 4' \
+    'LM Studio — local LLMs + OpenAI-compatible API' '' \
+    'Start the API server:' \
+    '  flox services start' '' \
+    "API: http://${LMS_HOST}:${LMS_PORT}/v1" \
+    'Health check:  lmstudio-health' '' \
+    'Download + run a model:' \
+    '  lms get qwen2.5-7b-instruct' \
+    '  lms load qwen2.5-7b-instruct' '' \
+    'Launch an agentic CLI against the local model:' \
+    '  lms-launch claude --model qwen2.5-7b-instruct' \
+    '  lms-launch codex  --model qwen2.5-7b-instruct'
+fi
+'''
