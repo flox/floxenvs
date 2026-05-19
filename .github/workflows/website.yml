@@ -111,6 +111,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true' || inputs.force_rescan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           REPO_ROOT: ${{ github.workspace }}
         run: |
           set -euo pipefail
