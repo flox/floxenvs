@@ -1,0 +1,47 @@
+---
+interface Props {
+  tool: string;
+  status: string;     // "Passed" | "Failed" | "Warnings" | "Pending (v2)"
+  level: string;      // "CRITICAL" | "HIGH" | "MEDIUM" | "LOW" | "INFO"
+}
+const { tool, status, level } = Astro.props as Props;
+
+const isPending = status.startsWith("Pending");
+const isPassed  = status === "Passed";
+const isFailed  = status === "Failed";
+const isWarns   = status === "Warnings";
+
+const dotTones: Record<string, string> = {
+  passed:  "bg-score-green",
+  failed:  "bg-score-red",
+  warn:    "bg-score-amber",
+  pending: "bg-slate-300 dark:bg-slate-700",
+};
+const dotKey =
+  isPassed ? "passed"
+  : isFailed ? "failed"
+  : isWarns ? "warn"
+  : "pending";
+---
+<div class="flex items-center gap-3 text-sm py-1">
+  <span class:list={[
+    "inline-block w-2 h-2 rounded-full shrink-0",
+    dotTones[dotKey],
+  ]} aria-hidden="true"></span>
+  <span class="font-mono text-slate-600 dark:text-slate-300 w-32 shrink-0">
+    by {tool}
+  </span>
+  <span class:list={[
+    "text-xs uppercase tracking-wide font-mono",
+    isFailed  ? "text-score-red"
+              : isWarns ? "text-score-amber"
+              : "text-slate-500",
+  ]}>
+    {status}
+  </span>
+  {!isPending && level !== "INFO" && (
+    <span class="text-xs font-mono text-slate-400 ml-auto">
+      {level}
+    </span>
+  )}
+</div>
