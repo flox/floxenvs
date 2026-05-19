@@ -18,7 +18,7 @@ Add to your `manifest.toml`:
 
 ```toml
 [include]
-environments = ["flox/langchain"]
+environments = [{ remote = "flox/langchain" }]
 ```
 
 ## What is included

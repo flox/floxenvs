@@ -93,7 +93,7 @@ minimal environment in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/mysql"]
+environments = [{ remote = "flox/mysql" }]
 ```
 
 This gives you MySQL with sane defaults. Override vars

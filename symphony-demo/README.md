@@ -17,7 +17,7 @@ flox activate -r flox/symphony-demo --start-services
 
 Then open the dashboard:
 
-```
+```text
 http://localhost:14000
 ```
 
@@ -65,7 +65,7 @@ minimal environment in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/symphony"]
+environments = [{ remote = "flox/symphony" }]
 ```
 
 This gives you Symphony with sane defaults. Override

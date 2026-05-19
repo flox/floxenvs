@@ -17,7 +17,7 @@ flox activate -r flox/symphony --start-services
 
 Open the dashboard:
 
-```
+```text
 http://localhost:14000
 ```
 
@@ -27,7 +27,7 @@ Add to your `manifest.toml`:
 
 ```toml
 [include]
-environments = ["flox/symphony"]
+environments = [{ remote = "flox/symphony" }]
 ```
 
 ## What is included
@@ -35,9 +35,9 @@ environments = ["flox/symphony"]
 | Package | Description |
 | ------- | ----------- |
 | `flox/symphony` | OpenAI Symphony orchestrator |
-| `flox/codex`    | Codex coding agent backend |
-| `git`           | Git CLI for workspace ops |
-| `bash`          | Bash for hook + service scripts |
+| `flox/codex` | Codex coding agent backend |
+| `git` | Git CLI for workspace ops |
+| `bash` | Bash for hook + service scripts |
 
 ## Configuration
 

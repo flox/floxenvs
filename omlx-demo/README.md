@@ -93,7 +93,7 @@ minimal environment in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/omlx"]
+environments = [{ remote = "flox/omlx" }]
 ```
 
 oMLX upstream: <https://github.com/jundot/omlx>

@@ -16,7 +16,7 @@ Include in your manifest:
 
 ```toml
 [include]
-environments = ["flox/vibe-kanban"]
+environments = [{ remote = "flox/vibe-kanban" }]
 ```
 
 Or activate directly:

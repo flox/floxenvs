@@ -21,7 +21,7 @@ Or include it in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/ruby"]
+environments = [{ remote = "flox/ruby" }]
 ```
 
 ## Package groups

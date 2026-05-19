@@ -47,12 +47,12 @@ outside `$FLOX_ENV_CACHE`, which isn't exported by
 
 ## Versions
 
-| Source                                    | Version |
-| ----------------------------------------- | ------- |
-| `bazel_9` from catalog (used by this env) | `9.0.1` |
-| Upstream on <https://bazel.build/>        | `9.1.0` |
-| `rules_go`                                | `0.60.0` (pinned in `MODULE.bazel`) |
-| Go SDK                                    | `1.24.0` (pinned via `go_sdk.download`) |
+| Source                              | Version                      |
+| ----------------------------------- | ---------------------------- |
+| `bazel_9` from catalog (this env)   | `9.0.1`                      |
+| Upstream on <https://bazel.build/>  | `9.1.0`                      |
+| `rules_go` (pinned in MODULE.bazel) | `0.60.0`                     |
+| Go SDK (pinned via go_sdk.download) | `1.24.0`                     |
 
 To try the upstream-latest 9.1.0 on macOS or a
 standard-glibc Linux, swap the minimal env to the
@@ -74,5 +74,5 @@ it in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/bazel"]
+environments = [{ remote = "flox/bazel" }]
 ```

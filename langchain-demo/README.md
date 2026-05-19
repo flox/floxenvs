@@ -57,7 +57,7 @@ minimal environment in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/langchain"]
+environments = [{ remote = "flox/langchain" }]
 ```
 
 This gives you LangChain with Ollama and sane

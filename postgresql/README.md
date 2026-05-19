@@ -18,7 +18,7 @@ Add to your `manifest.toml`:
 
 ```toml
 [include]
-environments = ["flox/postgresql"]
+environments = [{ remote = "flox/postgresql" }]
 ```
 
 Then customize in your own manifest as needed -- override

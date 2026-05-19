@@ -13,7 +13,7 @@ Include this environment in your own Flox manifest:
 
 ```toml
 [include]
-environments = ["flox/mkcert"]
+environments = [{ remote = "flox/mkcert" }]
 ```
 
 Or for local development with a relative path:
@@ -39,7 +39,7 @@ MKCERT_DOMAINS = "myapp.local localhost 127.0.0.1 ::1"
 
 Default value:
 
-```
+```text
 example.com localhost 127.0.0.1 ::1
 ```
 

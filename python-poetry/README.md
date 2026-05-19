@@ -26,7 +26,7 @@ Or from FloxHub:
 
 ```toml
 [include]
-environments = ["flox/python-poetry"]
+environments = [{ remote = "flox/python-poetry" }]
 ```
 
 ## Python version

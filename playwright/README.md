@@ -23,7 +23,7 @@ Add to your `manifest.toml`:
 
 ```toml
 [include]
-environments = ["flox/playwright"]
+environments = [{ remote = "flox/playwright" }]
 ```
 
 ## What is included

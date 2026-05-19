@@ -72,7 +72,7 @@ minimal environment in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/graphify"]
+environments = [{ remote = "flox/graphify" }]
 ```
 
 This gives you Python, `graphify`, and Claude Code with

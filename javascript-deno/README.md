@@ -24,7 +24,7 @@ Or from FloxHub:
 
 ```toml
 [include]
-environments = ["flox/javascript-deno"]
+environments = [{ remote = "flox/javascript-deno" }]
 ```
 
 ## Automatic dependency installation

@@ -9,7 +9,7 @@ Include this environment in your project manifest:
 
 ```toml
 [include]
-environments = ["flox/localstack"]
+environments = [{ remote = "flox/localstack" }]
 ```
 
 Activate and start the service:

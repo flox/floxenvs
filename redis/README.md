@@ -18,7 +18,7 @@ Add to your `manifest.toml`:
 
 ```toml
 [include]
-environments = ["flox/redis"]
+environments = [{ remote = "flox/redis" }]
 ```
 
 Then customize vars in your own manifest to override
@@ -57,7 +57,7 @@ After activation, these are available in your shell:
 
 Most Redis clients accept a URL in this form:
 
-```
+```text
 redis://$REDIS_HOST:$REDIS_PORT
 ```
 

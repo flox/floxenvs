@@ -35,7 +35,7 @@ minimal environment in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/localstack"]
+environments = [{ remote = "flox/localstack" }]
 ```
 
 This gives you LocalStack with sane defaults. Override

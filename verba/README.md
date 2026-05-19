@@ -18,7 +18,7 @@ Add to your `manifest.toml`:
 
 ```toml
 [include]
-environments = ["flox/verba"]
+environments = [{ remote = "flox/verba" }]
 ```
 
 Then customize vars in your own manifest to override

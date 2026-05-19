@@ -25,7 +25,7 @@ Or from FloxHub:
 
 ```toml
 [include]
-environments = ["flox/javascript-node"]
+environments = [{ remote = "flox/javascript-node" }]
 ```
 
 ## Node version
