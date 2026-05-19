@@ -1,0 +1,40 @@
+schema-version = "1.10.0"
+
+# Minimal Serena environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/serena"]
+#
+# Provides the `serena` CLI and the `serena-mcp` service,
+# which exposes Serena's MCP server over SSE on
+# 127.0.0.1:19121 (override via SERENA_MCP_HOST/PORT).
+
+[install]
+serena.pkg-path  = "flox/serena"
+serena.pkg-group = "serena"
+nodejs.pkg-path  = "nodejs_20"
+nodejs.pkg-group = "serena"
+
+[vars]
+SERENA_MCP_HOST  = "127.0.0.1"
+SERENA_MCP_PORT  = "19121"
+SERENA_TRANSPORT = "sse"
+
+[hook]
+on-activate = '''
+dir="$FLOX_ENV_CACHE/serena"
+export SERENA_DATA_DIR="$dir"
+mkdir -p "$dir"
+'''
+
+[services]
+serena-mcp.command = '''
+dir="${SERENA_DATA_DIR:-$FLOX_ENV_CACHE/serena}"
+mkdir -p "$dir"
+exec serena start-mcp-server \
+  --transport "$SERENA_TRANSPORT" \
+  --host "$SERENA_MCP_HOST" \
+  --port "$SERENA_MCP_PORT"
+'''

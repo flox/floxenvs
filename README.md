@@ -119,6 +119,8 @@ Most environments follow a dual-layer pattern:
 | _└ omlx-demo_ | | [floxhub](https://hub.flox.dev/flox/omlx-demo) · [docs](omlx-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/omlx-demo-latest) |
 | vibe-kanban | Kanban for coding agents | [floxhub](https://hub.flox.dev/flox/vibe-kanban) · [docs](vibe-kanban/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/vibe-kanban-latest) |
 | _└ vibe-kanban-demo_ | | [floxhub](https://hub.flox.dev/flox/vibe-kanban-demo) · [docs](vibe-kanban-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/vibe-kanban-demo-latest) |
+| serena | MCP toolkit for coding agents | [floxhub](https://hub.flox.dev/flox/serena) · [docs](serena/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/serena-latest) |
+| _└ serena-demo_ | | [floxhub](https://hub.flox.dev/flox/serena-demo) · [docs](serena-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/serena-demo-latest) |
 | codeburn | AI coding token observability TUI | [floxhub](https://hub.flox.dev/flox/codeburn) · [docs](codeburn/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/codeburn-latest) |
 | _└ codeburn-demo_ | | [floxhub](https://hub.flox.dev/flox/codeburn-demo) · [docs](codeburn-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/codeburn-demo-latest) |
 | iloom | AI-assisted dev in isolated worktrees | [floxhub](https://hub.flox.dev/flox/iloom) · [docs](iloom/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/iloom-latest) |
