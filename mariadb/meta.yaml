@@ -1,0 +1,55 @@
+kind: env
+name: mariadb
+title: MariaDB
+publisher: flox
+tagline: >
+  MariaDB ready to include — auto-init, sane data dirs,
+  services that come up clean on port 13307.
+summary:
+  - "Latest stable MariaDB server via Flox, no system install"
+  - "Database and user created automatically on first boot"
+  - "Connects on TCP port 13307 (override via `MARIADB_PORT`)"
+  - "Unix-socket also available for fastest local connections"
+  - "Boots as a Flox service with `--start-services`"
+category: database
+tags: [mariadb, sql, database, service]
+stack: [c]
+featured: false
+combines_well_with:
+  - env:python-pip
+  - env:python-poetry
+  - env:python-uv
+  - env:ruby
+  - env:rust
+  - env:go
+  - env:javascript-node
+status: stable
+license: GPL-2.0-or-later
+upstream:
+  name: MariaDB
+  url: https://mariadb.org/
+  license: GPL-2.0-or-later
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = ["flox/mariadb"]
+  activate: |
+    flox activate -r flox/mariadb --start-services
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/mariadb-latest
+recipes:
+  - name: mariadb-demo
+    title: Quick start
+    start_services: true
+    features:
+      - "Launches MariaDB as a Flox service on port 13307"
+      - "Connects via Unix socket or TCP with no extra flags"
+      - "Sample schema bootstraps with `mariadb -e 'SHOW DATABASES;'`"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/mariadb
+  floxhub: https://hub.flox.dev/flox/mariadb
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/mariadb-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Amariadb

@@ -1,0 +1,53 @@
+kind: env
+name: mongodb
+title: MongoDB
+publisher: flox
+tagline: >
+  MongoDB ready to include — auto-init, sane data dirs,
+  services that come up clean on port 27017.
+summary:
+  - "Latest stable MongoDB Community Edition via Flox"
+  - "Data directory created automatically on first activate"
+  - "Connects on port 27017 (override via `MONGO_PORT`)"
+  - "Use `mongosh` from the demo env to explore your data"
+  - "Boots as a Flox service with `--start-services`"
+category: database
+tags: [mongodb, nosql, database, service]
+stack: [cpp]
+featured: false
+combines_well_with:
+  - env:python-pip
+  - env:python-poetry
+  - env:python-uv
+  - env:go
+  - env:javascript-node
+status: stable
+license: SSPL-1.0
+upstream:
+  name: MongoDB
+  url: https://www.mongodb.com/
+  license: SSPL-1.0
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = ["flox/mongodb"]
+  activate: |
+    flox activate -r flox/mongodb --start-services
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/mongodb-latest
+recipes:
+  - name: mongodb-demo
+    title: Quick start
+    start_services: true
+    features:
+      - "Launches MongoDB as a Flox service on port 27017"
+      - "Connects via `mongosh --host $MONGO_HOST --port $MONGO_PORT`"
+      - "Sample collection bootstraps with `mongosh` on first run"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/mongodb
+  floxhub: https://hub.flox.dev/flox/mongodb
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/mongodb-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Amongodb

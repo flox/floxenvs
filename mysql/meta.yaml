@@ -1,0 +1,55 @@
+kind: env
+name: mysql
+title: MySQL
+publisher: flox
+tagline: >
+  MySQL 8.4 ready to include — auto-init, sane data dirs,
+  services that come up clean on port 13306.
+summary:
+  - "MySQL 8.4 server via Flox, no system install needed"
+  - "Database and user created automatically on first boot"
+  - "Connects on TCP port 13306 (override via `MYSQL_PORT`)"
+  - "Client env-vars set so `mysql` connects without flags"
+  - "Boots as a Flox service with `--start-services`"
+category: database
+tags: [mysql, sql, database, service]
+stack: [c]
+featured: false
+combines_well_with:
+  - env:python-pip
+  - env:python-poetry
+  - env:python-uv
+  - env:ruby
+  - env:rust
+  - env:go
+  - env:javascript-node
+status: stable
+license: GPL-2.0-or-later
+upstream:
+  name: MySQL
+  url: https://www.mysql.com/
+  license: GPL-2.0-or-later
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = ["flox/mysql"]
+  activate: |
+    flox activate -r flox/mysql --start-services
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/mysql-latest
+recipes:
+  - name: mysql-demo
+    title: Quick start
+    start_services: true
+    features:
+      - "Launches MySQL as a Flox service on port 13306"
+      - "Connects via `mysql` with no extra flags"
+      - "Sample schema bootstraps with `mysql -e 'SHOW DATABASES;'`"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/mysql
+  floxhub: https://hub.flox.dev/flox/mysql
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/mysql-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Amysql
