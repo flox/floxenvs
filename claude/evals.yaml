@@ -1,0 +1,27 @@
+# evals for the claude env. Each case runs in an ephemeral
+# `flox activate -- bash -c <cmd>` shell. Assertions are
+# deterministic.
+
+cases:
+  - id: claude-help-works
+    cmd: "claude --help"
+    assert:
+      exit_code: 0
+      stdout_matches: "Usage:.*claude"
+      max_duration_s: 5
+
+  - id: claude-version-sane
+    cmd: "claude --version"
+    assert:
+      exit_code: 0
+      stdout_matches: "^[0-9]+\\.[0-9]+\\.[0-9]+"
+      max_duration_s: 5
+
+  - id: claude-managed-doctor
+    cmd: "claude-managed doctor"
+    assert:
+      exit_code: 0
+      stdout_contains:
+        - "fragments:"
+        - "settings:"
+      max_duration_s: 10
