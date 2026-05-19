@@ -48,9 +48,21 @@ let
           nativeBuildInputs = (old.nativeBuildInputs or [ ])
             ++ final.resolveBuildSystem { setuptools = [ ]; };
         });
+      addHatchling = pkg:
+        pkg.overrideAttrs (old: {
+          nativeBuildInputs = (old.nativeBuildInputs or [ ])
+            ++ final.resolveBuildSystem { hatchling = [ ]; };
+        });
     in
     {
-      # Filled in during Task 3 if the build needs them.
+      # Sdist deps that don't declare a build-system in their
+      # pyproject — uv2nix builds them without setuptools.
+      proxy-tools = addSetuptools prev.proxy-tools;
+
+      # Git-sourced: uv doesn't capture the package's declared
+      # build-system requirements in the lockfile, so uv2nix
+      # builds it without hatchling available.
+      serena-agent = addHatchling prev.serena-agent;
     };
 
   pythonSet =
