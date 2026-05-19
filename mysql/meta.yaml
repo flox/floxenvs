@@ -33,7 +33,7 @@ maintainer: "@rok"
 install:
   include: |
     [include]
-    environments = ["flox/mysql"]
+    environments = [{ remote = "flox/mysql" }]
   activate: |
     flox activate -r flox/mysql --start-services
   docker: |

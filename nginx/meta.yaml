@@ -25,7 +25,7 @@ maintainer: "@rok"
 install:
   include: |
     [include]
-    environments = ["flox/nginx"]
+    environments = [{ remote = "flox/nginx" }]
   activate: |
     flox activate -r flox/nginx --start-services
   docker: |

@@ -33,7 +33,7 @@ maintainer: "@rok"
 install:
   include: |
     [include]
-    environments = ["flox/redis"]
+    environments = [{ remote = "flox/redis" }]
   activate: |
     flox activate -r flox/redis --start-services
   docker: |

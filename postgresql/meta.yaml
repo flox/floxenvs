@@ -33,7 +33,7 @@ maintainer: "@rok"
 install:
   include: |
     [include]
-    environments = ["flox/postgresql"]
+    environments = [{ remote = "flox/postgresql" }]
   activate: |
     flox activate -r flox/postgresql --start-services
   docker: |

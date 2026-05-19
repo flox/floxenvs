@@ -31,7 +31,7 @@ maintainer: "@rok"
 install:
   include: |
     [include]
-    environments = ["flox/temporal"]
+    environments = [{ remote = "flox/temporal" }]
   activate: |
     flox activate -r flox/temporal --start-services
   docker: |

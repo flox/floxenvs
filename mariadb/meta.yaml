@@ -33,7 +33,7 @@ maintainer: "@rok"
 install:
   include: |
     [include]
-    environments = ["flox/mariadb"]
+    environments = [{ remote = "flox/mariadb" }]
   activate: |
     flox activate -r flox/mariadb --start-services
   docker: |

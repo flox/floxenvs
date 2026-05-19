@@ -31,7 +31,7 @@ maintainer: "@rok"
 install:
   include: |
     [include]
-    environments = ["flox/mongodb"]
+    environments = [{ remote = "flox/mongodb" }]
   activate: |
     flox activate -r flox/mongodb --start-services
   docker: |

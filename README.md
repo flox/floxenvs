@@ -9,7 +9,7 @@ Include any environment in your manifest:
 
 ```toml
 [include]
-environments = ["flox/<name>"]
+environments = [{ remote = "flox/<name>" }]
 ```
 
 Or run as a Docker container:

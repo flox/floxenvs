@@ -34,7 +34,7 @@ maintainer: "@rok"
 install:
   include: |
     [include]
-    environments = ["flox/valkey"]
+    environments = [{ remote = "flox/valkey" }]
   activate: |
     flox activate -r flox/valkey --start-services
   docker: |

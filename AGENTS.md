@@ -10,7 +10,7 @@ and published via GitHub Actions CI.
 
 ## Repository structure
 
-```
+```text
 floxenvs/
 ├── .flox/                  # Root flox env (build tools + custom packages)
 │   ├── env/manifest.toml
@@ -56,7 +56,7 @@ this in their own manifest:
 
 ```toml
 [include]
-environments = ["flox/<name>"]
+environments = [{ remote = "flox/<name>" }]
 ```
 
 Rules for minimal environments:
@@ -121,7 +121,7 @@ schema-version = "1.10.0"
 # Include it in your own manifest:
 #
 #   [include]
-#   environments = ["flox/<name>"]
+#   environments = [{ remote = "flox/<name>" }]
 
 [install]
 <pkg>.pkg-path = "<pkg>"
@@ -235,7 +235,7 @@ demo.
 
 ### Three layers
 
-```
+```text
 ci_<name>.yml          Thin trigger (path filters)
     │
     └──▶ environment.yml    Reusable workflow

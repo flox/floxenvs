@@ -24,7 +24,7 @@ maintainer: "@rok"
 install:
   include: |
     [include]
-    environments = ["flox/colima"]
+    environments = [{ remote = "flox/colima" }]
   activate: |
     flox activate -r flox/colima --start-services
   docker: |

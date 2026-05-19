@@ -32,7 +32,7 @@ maintainer: "@rok"
 install:
   include: |
     [include]
-    environments = ["flox/cassandra"]
+    environments = [{ remote = "flox/cassandra" }]
   activate: |
     flox activate -r flox/cassandra --start-services
   docker: |
