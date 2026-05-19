@@ -1,0 +1,26 @@
+schema-version = "1.11.0"
+
+[include]
+environments = [{ dir = "../codeburn" }]
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [ "${FLOX_ENVS_TESTING:-}" != "1" ]; then
+  gum style \
+    --foreground 212 --border-foreground 212 \
+    --border double --align center \
+    --width 50 --margin "1 2" --padding "1 2" \
+    "CodeBurn" "AI coding token observability"
+  echo ""
+  echo "  codeburn          — interactive dashboard"
+  echo "  codeburn today    — today's usage"
+  echo "  codeburn month    — this month's usage"
+  echo "  codeburn optimize — find waste, get fixes"
+  echo "  codeburn compare  — side-by-side models"
+  echo ""
+fi
+'''

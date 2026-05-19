@@ -1,0 +1,23 @@
+schema-version = "1.10.0"
+
+# Minimal gstack environment for use with [include].
+#
+# Layers Garry Tan's gstack (45 skills covering planning,
+# design, QA, code review, security, and shipping) onto
+# the flox/claude managed Claude Code config.
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/gstack"]
+#
+# Upstream gstack: https://github.com/garrytan/gstack
+
+[include]
+environments = [
+  { remote = "flox/claude" }
+]
+
+[install]
+claude-code-plugin-gstack.pkg-path = "flox/claude-code-plugin-gstack"
+claude-code-plugin-gstack.pkg-group = "claude-code-plugin-gstack"
