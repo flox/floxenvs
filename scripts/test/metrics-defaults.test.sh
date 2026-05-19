@@ -51,5 +51,63 @@ assert_eq "item_dir env"  "claude" "$(sh_item_dir env claude)"
 assert_eq "item_dir pkg"  ".flox/pkgs/ollama" \
   "$(sh_item_dir pkg ollama)"
 
+
+# ── metrics-defaults env path ────────────────────────────
+TMP=$(mktemp -d)
+trap 'rm -rf "$TMP"' EXIT
+mkdir -p "$TMP/sample/.flox/env"
+cat > "$TMP/sample/README.md" <<'EOF'
+sample readme
+EOF
+cat > "$TMP/sample/test.sh" <<'EOF'
+#!/usr/bin/env bash
+echo ok
+EOF
+cat > "$TMP/sample/.flox/env/manifest.toml" <<'EOF'
+schema-version = "1.10.0"
+
+# Example minimal env.
+#
+#   [include]
+#   environments = ["flox/sample"]
+
+[install]
+foo.pkg-path = "foo"
+foo.pkg-group = "sample"
+
+[hook]
+on-activate = '''
+mkdir -p "$FLOX_ENV_CACHE/sample"
+'''
+EOF
+cat > "$TMP/sample/meta.yaml" <<'EOF'
+kind: env
+name: sample
+title: Sample
+publisher: flox
+tagline: A sample env.
+category: ai
+ai_role: tooling
+tags: [sample]
+status: stable
+license: MIT
+links:
+  source: https://example
+EOF
+mkdir -p "$TMP/sample-demo"
+touch "$TMP/sample-demo/README.md"
+
+# shellcheck disable=SC1091
+. "$ROOT/lib/metrics-defaults.sh"
+out=$(default_env_checks "sample" "$TMP/sample")
+score=$(echo "$out" | jq -r '.score')
+echo "$out" | jq -e '.checks | length >= 9' >/dev/null
+assert_eq "env defaults score >= 80" "true" \
+  "$(awk -v s="$score" 'BEGIN { print (s >= 80) ? "true" : "false" }')"
+echo "$out" | jq -e '
+  ([.checks[] | select(.pass == false)] | length == 0)
+' >/dev/null
+assert_eq "env defaults all pass" "true" "true"
+
 echo "--- $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]
