@@ -6,6 +6,7 @@ import AiRoleFilter from "../components/AiRoleFilter.tsx";
 import AffinityGraph from "../components/AffinityGraph.tsx";
 import { computeAffinityEdges } from "../lib/affinityEdges";
 import { deriveBundling } from "../lib/derive";
+import CategoryStrip from "../components/CategoryStrip.astro";
 
 const base = import.meta.env.BASE_URL;
 const envs = await getCollection("envs");
@@ -157,6 +158,8 @@ environments = ["flox/<name>"]`}</code></pre>
       </div>
     </section>
   )}
+
+  <CategoryStrip />
 
   <section class="mt-20 py-10 border-t border-slate-200 dark:border-slate-800 text-center">
     <h2 class="text-lg font-semibold">Looking for everything else?</h2>
