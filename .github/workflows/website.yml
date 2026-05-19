@@ -220,8 +220,8 @@ jobs:
       - name: "Build"
         working-directory: ".website"
         env:
-          SITE_URL: "https://flox.github.io"
-          BASE_PATH: "/floxenvs"
+          SITE_URL: ${{ vars.SITE_URL || 'https://envs.flox.dev' }}
+          BASE_PATH: ${{ vars.BASE_PATH || '/' }}
         run: "npm run build"
       - name: "Upload dist artifact for the deploy job"
         uses: actions/upload-artifact@v4
