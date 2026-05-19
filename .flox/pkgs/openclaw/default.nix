@@ -31,16 +31,25 @@ stdenv.mkDerivation (finalAttrs: {
     inherit hash;
   };
 
-  # nixpkgs <26.11's fetchPnpmDeps fixupPhase only cleans v3 and v10
-  # pnpm store dirs. pnpm 11 uses v11, so transient `tmp/`/`projects/`
-  # state and a non-normalized `index.db` leak into the tarball and
-  # produce different pnpmDepsHash on each builder. Mirror the v11
-  # cleanup landed upstream in nixpkgs commit 83ace87 + 7cb14ad.
+  # nixpkgs <26.11's fetchPnpmDeps does not handle pnpm 11 cleanly:
+  #   (a) `pnpm config set side-effects-cache false` silently no-ops
+  #       on pnpm 11, leaving platform-specific binaries cached into
+  #       the store — each builder ends up with different content;
+  #   (b) the fixupPhase only cleans v3/v10 store dirs, while pnpm 11
+  #       uses v11, so transient tmp/projects state and a
+  #       non-normalized SQLite index.db leak into the tarball.
+  # Both reproduce as a different pnpmDepsHash on every builder.
+  # Mirror the upstream fix landed in nixpkgs commits 83ace87 and
+  # 7cb14ad until flox's catalog picks them up.
   pnpmDeps = (fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
     pnpm = pnpm_11;
     fetcherVersion = 3;
     hash = pnpmDepsHash;
+    prePnpmInstall = ''
+      export pnpm_config_side_effects_cache=false
+      export pnpm_config_update_notifier=false
+    '';
   }).overrideAttrs (old: {
     nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [
       pnpm-fixup-state-db
