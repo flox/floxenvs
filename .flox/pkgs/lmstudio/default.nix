@@ -9,15 +9,15 @@ let
   version = "${upstreamVersion}+flox";
 
   meta = {
-    description = "LM Studio - Desktop app for experimenting with local and open-source LLMs";
+    description = "Desktop app for experimenting with local and open-source LLMs";
     homepage = "https://lmstudio.ai/";
     license = lib.licenses.unfree;
     mainProgram = "lm-studio";
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     platforms = [
-      "x86_64-linux"
-      "aarch64-linux"
       "aarch64-darwin"
+      "aarch64-linux"
+      "x86_64-linux"
     ];
   };
 
