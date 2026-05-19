@@ -5,6 +5,19 @@ title: Ollama
 publisher: flox
 tagline: >
   Local LLM runtime for Llama, Mistral, and friends.
+intro: >
+  Ollama is the canonical way to run open-weight large
+  language models locally. The flox/ollama package builds it
+  from source with GPU-accelerated Metal support on Apple
+  Silicon and CUDA where available, then exposes an
+  OpenAI-compatible HTTP API on 127.0.0.1:11434. Pull a model
+  once with `ollama pull llama3.1`, and any OpenAI SDK can
+  point its base URL at the local endpoint and run prompts
+  offline. Used as the LLM runtime for flox/langchain,
+  flox/verba, and any agent or RAG pipeline that needs
+  inference without a cloud round-trip. Free and MIT
+  licensed; the model weights themselves carry separate
+  licenses.
 summary:
   - "Get up and running with large language models locally"
   - "Built from source with GPU-accelerated Metal support on macOS"

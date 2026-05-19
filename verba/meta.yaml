@@ -5,6 +5,21 @@ publisher: flox
 tagline: >
   Verba RAG environment with Weaviate vector database, Ollama LLM
   backend, and the Verba web UI — all as background services.
+intro: >
+  flox/verba is a one-include RAG (Retrieval-Augmented
+  Generation) stack: Weaviate as the vector database, Ollama
+  as the local LLM, the Verba web UI, and a model-puller
+  service that warms the cache on first activation. All four
+  pieces run as managed Flox services, so a single
+  `flox activate -r flox/verba --start-services` brings the
+  whole stack up coordinated. The chat and embedding models
+  are configurable via OLLAMA_MODEL environment variables;
+  defaults are llama3.1 for chat and nomic-embed-text for
+  embeddings. The Python runtime is cached in
+  `$FLOX_ENV_CACHE` for fast re-activations. Pairs with
+  flox/postgresql when Weaviate is not the right vector
+  store, and with flox/langchain for downstream Python
+  orchestration.
 summary:
   - "One-line include — Verba RAG stack ready with Weaviate and Ollama"
   - "Four coordinated services: weaviate, ollama, verba, and model puller"

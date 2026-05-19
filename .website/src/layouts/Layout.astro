@@ -34,6 +34,13 @@ const ldArray = jsonLd
     {description && <meta name="description" content={description} />}
     <link rel="canonical" href={canonical} />
     <link rel="icon" href={`${base}favicon.svg`} />
+    {/* Static-host partial security mitigation. GitHub Pages
+        does not let us set HTTP response headers; meta http-equiv
+        works for CSP / Referrer-Policy / Permissions-Policy but
+        not for X-Frame-Options or HSTS (those must be HTTP). */}
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), interest-cohort=()" />
     <meta property="og:title" content={title} />
     {description && <meta property="og:description" content={description} />}
     <meta property="og:image" content={ogAbs} />

@@ -7,8 +7,22 @@ const base = import.meta.env.BASE_URL;
 const envs = (await getCollection("envs")).sort((a, b) =>
   a.data.name.localeCompare(b.data.name),
 );
+const origin = (Astro.site?.toString() ?? "").replace(/\/$/, "");
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Flox environments",
+  url: `${origin}${base}envs/`,
+  numberOfItems: envs.length,
+  itemListElement: envs.map((e, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: e.data.title,
+    url: `${origin}${base}envs/${e.data.name}/`,
+  })),
+};
 ---
-<Layout title="Environments · flox/envs" description="All Flox environments.">
+<Layout title="Environments · flox/envs" description="All Flox environments." jsonLd={jsonLd}>
   <h1 class="text-2xl font-bold">Environments</h1>
   <p class="mt-1 text-sm text-slate-500">
     {envs.length} environments

@@ -4,6 +4,21 @@ title: LangChain (+ Ollama)
 publisher: flox
 tagline: >
   LangChain and LangGraph wired up to a local Ollama runtime.
+intro: >
+  flox/langchain is a complete local-LLM development
+  environment: LangChain plus LangGraph for orchestration,
+  the langchain-ollama and langchain-community integrations,
+  and Ollama running as a managed Flox service in the
+  background. One `flox activate --start-services` and the
+  Python runtime is ready, the model server is up on
+  127.0.0.1:11434, and the connection info is printed on
+  activation. Pull a model with `ollama pull llama3.1`, then
+  invoke it from Python via `ChatOllama(model="llama3.1")`.
+  Useful for offline RAG pipelines, agent prototyping, and
+  any LangChain workflow where you do not want to pay
+  per-token to a cloud provider during iteration. Pairs with
+  flox/verba for a turnkey RAG stack and flox/postgresql for
+  a vector store.
 summary:
   - "LangGraph orchestration framework"
   - "LangChain-Ollama and LangChain-Community integrations"

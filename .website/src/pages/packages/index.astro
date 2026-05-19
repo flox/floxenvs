@@ -7,8 +7,22 @@ const base = import.meta.env.BASE_URL;
 const pkgs = (await getCollection("packages")).sort((a, b) =>
   a.data.name.localeCompare(b.data.name),
 );
+const origin = (Astro.site?.toString() ?? "").replace(/\/$/, "");
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Flox packages",
+  url: `${origin}${base}packages/`,
+  numberOfItems: pkgs.length,
+  itemListElement: pkgs.map((p, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: p.data.title,
+    url: `${origin}${base}packages/${p.data.name}/`,
+  })),
+};
 ---
-<Layout title="Packages · flox/envs" description="All Flox packages.">
+<Layout title="Packages · flox/envs" description="All Flox packages." jsonLd={jsonLd}>
   <h1 class="text-2xl font-bold">Packages</h1>
   <p class="mt-1 text-sm text-slate-500">
     {pkgs.length} packages
