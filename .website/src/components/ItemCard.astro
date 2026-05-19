@@ -1,5 +1,6 @@
 ---
 import KindBadge from "./KindBadge.astro";
+import KindIcon from "./KindIcon.astro";
 import type { Kind, SubKind } from "../lib/kindNames";
 
 interface Props {
@@ -31,6 +32,12 @@ const badgeKind = (subkind && subkind !== "plain") ? subkind : kind;
   <div class:list={["w-1.5 shrink-0", stripe]} aria-hidden="true"></div>
   <div class="p-4 flex-1">
     <div class="flex items-center gap-2 mb-1">
+      <KindIcon kind={badgeKind} className={`text-${
+        badgeKind === "env" ? "kind-env"
+        : badgeKind === "plugin" ? "kind-plugin"
+        : badgeKind === "skill"  ? "kind-skill"
+        : "kind-pkg"
+      }`} />
       <KindBadge kind={badgeKind} />
       {ai_role && (
         <span class="text-xs text-slate-500 font-mono">
