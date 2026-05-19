@@ -1,0 +1,54 @@
+kind: env
+name: cassandra
+title: Apache Cassandra
+publisher: flox
+tagline: >
+  Cassandra 4.x ready to include — distributed NoSQL database,
+  auto-configured and running as a Flox service on port 19042.
+summary:
+  - "Apache Cassandra 4.x via Flox, no system install required"
+  - "Config generated automatically on first activation"
+  - "Native transport on port 19042 (override via `CASSANDRA_PORT`)"
+  - "Data, commitlog, and caches under `$FLOX_ENV_CACHE/cassandra`"
+  - "Boots as a Flox service with `--start-services`"
+category: database
+tags: [cassandra, nosql, distributed, database, service]
+stack: [java]
+featured: false
+combines_well_with:
+  - env:python-pip
+  - env:python-poetry
+  - env:python-uv
+  - env:rust
+  - env:go
+  - env:javascript-node
+status: stable
+license: Apache-2.0
+upstream:
+  name: Apache Cassandra
+  url: https://cassandra.apache.org/
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = ["flox/cassandra"]
+  activate: |
+    flox activate -r flox/cassandra --start-services
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/cassandra-latest
+recipes:
+  - name: cassandra-demo
+    title: Quick start
+    start_services: true
+    features:
+      - "Launches Cassandra as a Flox service on port 19042"
+      - "Connects via `cqlsh` with no extra configuration"
+      - "CQL walkthrough with keyspace and table creation"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/cassandra
+  floxhub: https://hub.flox.dev/flox/cassandra
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/cassandra-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Acassandra
