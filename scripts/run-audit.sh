@@ -128,33 +128,49 @@ else
            note:"shellcheck not installed"}]')
 fi
 
+# ── v2 scanners: semgrep, trivy, snyk ────────────────────
+semgrep_findings=$(REPO_ROOT="$ROOT" \
+  "$SCRIPT_DIR/run-semgrep.sh" "$KIND" "$NAME" "$abs_dir")
+trivy_findings=$(REPO_ROOT="$ROOT" \
+  "$SCRIPT_DIR/run-trivy.sh" "$KIND" "$NAME")
+snyk_findings=$(REPO_ROOT="$ROOT" \
+  "$SCRIPT_DIR/run-snyk.sh" "$KIND" "$NAME" "$abs_dir")
+
+# Merge v2 findings into sec_findings accumulator.
+sec_findings=$(jq -n \
+  --argjson base     "$sec_findings" \
+  --argjson semgrep  "$semgrep_findings" \
+  --argjson trivy    "$trivy_findings" \
+  --argjson snyk     "$snyk_findings" \
+  '
+  # Tag each finding with its tool name so the row
+  # builder below can filter by tool.
+  ($semgrep | map(. + {tool:"semgrep"})) as $sg
+  | ($trivy  | map(. + {tool:"trivy"}))  as $tv
+  | ($snyk   | map(. + {tool:"snyk"}))   as $sk
+  | $base + $sg + $tv + $sk
+  ')
+
 # Always-on row: gitleaks reported "Passed" when no
-# findings; mirror that for shellcheck.
+# findings; mirror that for all scanners.
 sec_rows=$(jq -n \
   --argjson findings "$sec_findings" \
   '
+  def row($t):
+    ($findings | map(select(.tool == $t))) as $hits
+    | if ($hits | length) == 0 then
+        {tool: $t, level: "INFO", status: "Passed"}
+      else
+        {tool: $t,
+         level:  ($hits[0].level  // "INFO"),
+         status: ($hits[0].status // "Passed")}
+      end;
   [
-    {tool:"gitleaks",
-     level: ($findings | map(select(.tool=="gitleaks"))
-             | (first.level // "INFO")),
-     status: ($findings | any(.tool == "gitleaks")
-              | if . then
-                  ([$findings[] | select(.tool=="gitleaks")
-                    | .status] | first // "Passed")
-                else "Passed"
-                end)},
-    {tool:"shellcheck",
-     level: ($findings | map(select(.tool=="shellcheck"))
-             | (first.level // "INFO")),
-     status: ($findings | any(.tool == "shellcheck")
-              | if . then
-                  ([$findings[] | select(.tool=="shellcheck")
-                    | .status] | first // "Passed")
-                else "Passed"
-                end)},
-    {tool:"floxenv-scan", level:"INFO",  status:"Pending (v2)"},
-    {tool:"trivy",        level:"INFO",  status:"Pending (v2)"},
-    {tool:"snyk",         level:"INFO",  status:"Pending (v2)"}
+    row("gitleaks"),
+    row("shellcheck"),
+    row("semgrep"),
+    row("trivy"),
+    row("snyk")
   ]
   ')
 
