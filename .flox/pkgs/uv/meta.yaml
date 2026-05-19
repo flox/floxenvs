@@ -1,0 +1,34 @@
+kind: pkg
+subkind: plain
+name: uv
+title: uv
+publisher: flox
+tagline: >
+  uv — an extremely fast Python package manager.
+summary:
+  - "Install and manage Python packages at Rust speed"
+  - "Drop-in replacement for pip, pip-tools, and virtualenv"
+  - "Resolves dependencies and generates reproducible lock files"
+category: language
+tags: [uv, python, package-manager, resolver]
+stack: [rust]
+featured: false
+combines_well_with:
+  - env:python-uv
+  - env:python-pip
+status: stable
+license: "MIT OR Apache-2.0"
+upstream:
+  name: uv
+  url: https://github.com/astral-sh/uv
+  license: "MIT OR Apache-2.0"
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    uv.pkg-path = "flox/uv"
+    uv.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/uv
+  floxhub: https://hub.flox.dev/flox/uv

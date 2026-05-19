@@ -1,0 +1,31 @@
+kind: pkg
+subkind: plain
+name: pi
+title: pi
+publisher: flox
+tagline: >
+  Tiny shell helper used by Flox Python pkgs in upgrade flows.
+summary:
+  - "Terminal-based coding agent with multi-model support"
+  - "Bundled with fd and ripgrep for fast file traversal"
+  - "Telemetry disabled and version checks skipped out of the box"
+category: tool
+tags: [shell, python, internal]
+stack: [shell]
+featured: false
+status: stable
+license: MIT
+upstream:
+  name: pi
+  url: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/pi
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    pi.pkg-path = "flox/pi"
+    pi.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/pi
+  floxhub: https://hub.flox.dev/flox/pi

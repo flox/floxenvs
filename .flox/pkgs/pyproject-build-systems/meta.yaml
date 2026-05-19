@@ -1,0 +1,34 @@
+kind: pkg
+subkind: plain
+name: pyproject-build-systems
+title: pyproject-build-systems
+publisher: flox
+tagline: >
+  Pre-built Nix overlays for common Python build-system packages.
+summary:
+  - "Supplies build-system packages (setuptools, flit, hatch, etc.) as Nix overlays"
+  - "Used by uv2nix environments to satisfy PEP 517 build backends"
+  - "Works alongside pyproject-nix for complete Python build coverage"
+category: language
+tags: [pyproject, python, nix, build, build-systems]
+stack: [nix]
+featured: false
+combines_well_with:
+  - pkg:pyproject-nix
+  - pkg:uv2nix
+status: stable
+license: MIT
+upstream:
+  name: build-system-pkgs
+  url: https://github.com/pyproject-nix/build-system-pkgs
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    pyproject-build-systems.pkg-path = "flox/pyproject-build-systems"
+    pyproject-build-systems.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/pyproject-build-systems
+  floxhub: https://hub.flox.dev/flox/pyproject-build-systems
