@@ -1,0 +1,36 @@
+name: "CI: lmstudio"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "lmstudio/**"
+      - "lmstudio-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_lmstudio.yml"
+  pull_request:
+    paths:
+      - "lmstudio/**"
+      - "lmstudio-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_lmstudio.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "lmstudio"
+    secrets: inherit

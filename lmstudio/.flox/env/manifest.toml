@@ -1,0 +1,42 @@
+schema-version = "1.10.0"
+
+# Minimal LM Studio environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/lmstudio"]
+#
+# LM Studio requires a Metal-capable GPU (macOS) or
+# CUDA / Vulkan-capable discrete GPU (Linux). On
+# headless CI / VMs without a GPU, set
+# LMS_SKIP_GPU_CHECK=1.
+
+[install]
+lmstudio.pkg-path = "flox/lmstudio"
+lmstudio.pkg-group = "lmstudio"
+curl.pkg-path = "curl"
+curl.pkg-group = "lmstudio"
+jq.pkg-path = "jq"
+jq.pkg-group = "lmstudio"
+
+[vars]
+LMS_HOST = "127.0.0.1"
+LMS_PORT = "11234"
+LMS_CONTEXT_LENGTH = "131072"
+
+[hook]
+on-activate = '''
+export LMS_LOG_DIR="$FLOX_ENV_CACHE/lmstudio/logs"
+mkdir -p "$LMS_LOG_DIR"
+'''
+
+[services]
+lmstudio.command = '''
+export LMS_LOG_DIR="${LMS_LOG_DIR:-$FLOX_ENV_CACHE/lmstudio/logs}"
+mkdir -p "$LMS_LOG_DIR"
+exec lms-service
+'''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]
