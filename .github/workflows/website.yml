@@ -228,3 +228,41 @@ jobs:
           name: "website-dist"
           path: ".website/dist"
           retention-days: 1
+
+  deploy:
+    name: "Deploy"
+    needs: ["build-site"]
+    runs-on: "ubuntu-latest"
+    permissions:
+      contents: "write"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: "Download built site"
+        uses: actions/download-artifact@v4
+        with:
+          name: "website-dist"
+          path: ".website/dist"
+      - name: "Publish to gh-pages branch"
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ".website/dist"
+          publish_branch: "gh-pages"
+          enable_jekyll: false
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
+          commit_message: >-
+            deploy: ${{ inputs.sha || github.sha }}
+            (from ${{ inputs.triggered_by || github.event_name }})
+      - name: "Mark deployed SHA"
+        if: success() && inputs.triggered_by == 'ci'
+        env:
+          DEPLOY_SHA: ${{ inputs.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          git config user.email "ci@flox.dev"
+          git config user.name  "flox-ci"
+          git tag -f site-last-deployed "$DEPLOY_SHA"
+          git push -f origin site-last-deployed
