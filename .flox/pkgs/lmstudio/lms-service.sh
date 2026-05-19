@@ -60,8 +60,20 @@ attempts=0
 max_attempts=30
 while [ "$attempts" -lt "$max_attempts" ]; do
   attempts=$((attempts + 1))
-  if @lms@ server start 2>&1 | tee -a "$log_file"; then
-    log "API server started on port ${LMS_PORT:-1234}"
+  # Pass --port and --bind explicitly: lms's stateful "last used"
+  # port default and its LMS_SERVER_HOST-only host hook would
+  # otherwise diverge from this env's LMS_HOST/LMS_PORT contract.
+  # --cors is opt-in via LMS_CORS (set to anything except "0").
+  cors_flag=()
+  if [ -n "${LMS_CORS:-}" ] && [ "${LMS_CORS}" != "0" ]; then
+    cors_flag=("--cors")
+  fi
+  if @lms@ server start \
+        --port "${LMS_PORT:-1234}" \
+        --bind "${LMS_HOST:-127.0.0.1}" \
+        "${cors_flag[@]}" \
+        2>&1 | tee -a "$log_file"; then
+    log "API server started on ${LMS_HOST:-127.0.0.1}:${LMS_PORT:-1234}"
     break
   fi
   log "Waiting for API server... (attempt $attempts/$max_attempts)"

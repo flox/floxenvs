@@ -54,6 +54,7 @@ environments = ["flox/lmstudio"]
 | `LMS_PORT` | `11234` | API listen port. |
 | `LMS_CONTEXT_LENGTH` | `131072` | Context window for `lms load`. |
 | `LMS_LOG_DIR` | `$FLOX_ENV_CACHE/lmstudio/logs` | Log directory. |
+| `LMS_CORS` | unset | `1` enables `--cors` for browser clients. |
 | `LMS_SKIP_GPU_CHECK` | unset | Bypass GPU-presence check. |
 
 Override any of these in your own manifest before

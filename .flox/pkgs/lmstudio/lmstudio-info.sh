@@ -8,7 +8,11 @@ echo "  Host: ${LMS_HOST:-127.0.0.1}"
 echo "  Port: ${LMS_PORT:-1234}"
 echo "  API:  http://${LMS_HOST:-127.0.0.1}:${LMS_PORT:-1234}"
 echo "  GUI:  ${LMS_GUI:-false}"
-echo "  CORS: ${LMS_CORS_ORIGIN:-*}"
+if [ -n "${LMS_CORS:-}" ] && [ "${LMS_CORS}" != "0" ]; then
+    echo "  CORS: enabled (LMS_CORS=${LMS_CORS})"
+else
+    echo "  CORS: disabled (set LMS_CORS=1 to enable)"
+fi
 echo ""
 if [ "${_FLOX_ENV_CUDA_DETECTION:-0}" = "1" ]; then
     echo "GPU: Available (CUDA detected, --gpu max default)"
