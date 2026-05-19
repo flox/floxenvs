@@ -1,0 +1,36 @@
+name: "CI: fnox"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "fnox/**"
+      - "fnox-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_fnox.yml"
+  pull_request:
+    paths:
+      - "fnox/**"
+      - "fnox-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_fnox.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "fnox"
+    secrets: inherit
