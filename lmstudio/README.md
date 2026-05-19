@@ -11,8 +11,9 @@ hard-exits at startup on systems without one. Set
 CI / install-only flows; the API server itself still
 needs a GPU to serve models).
 
-**macOS: Apple Silicon only.** LM Studio does not ship
-an `x86_64-darwin` build.
+**Platforms:** aarch64-darwin (Apple Silicon),
+aarch64-linux, x86_64-linux. LM Studio does not ship
+an Intel-Mac build.
 
 ## Quick start
 
