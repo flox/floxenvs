@@ -11,13 +11,19 @@ intro: >
   from source with GPU-accelerated Metal support on Apple
   Silicon and CUDA where available, then exposes an
   OpenAI-compatible HTTP API on 127.0.0.1:11434. Pull a model
-  once with `ollama pull llama3.1`, and any OpenAI SDK can
+  once with `ollama pull llama3.1` (or `mistral`, `gemma3`,
+  `qwen2.5-coder`, `deepseek-r1`, `phi4` — see the Ollama
+  model catalog for the full list), and any OpenAI SDK can
   point its base URL at the local endpoint and run prompts
   offline. Used as the LLM runtime for flox/langchain,
   flox/verba, and any agent or RAG pipeline that needs
-  inference without a cloud round-trip. Free and MIT
-  licensed; the model weights themselves carry separate
-  licenses.
+  inference without a cloud round-trip — useful for laptop
+  development, on-premise compliance workflows, and avoiding
+  per-token costs during iteration. Free and MIT licensed
+  yourself; the model weights themselves carry separate
+  licenses (Llama is Llama-Community, Mistral is Apache-2.0,
+  and so on). Add `ollama.pkg-path = "flox/ollama"` to any
+  `[install]` block and you're done.
 summary:
   - "Get up and running with large language models locally"
   - "Built from source with GPU-accelerated Metal support on macOS"

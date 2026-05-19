@@ -3,6 +3,7 @@ import preact from "@astrojs/preact";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { execFileSync } from "node:child_process";
+import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -32,12 +33,46 @@ function gitLastCommitISO(absDir) {
 
 const BUILD_TIME = new Date().toISOString();
 
-// Cache repeated lookups (one per directory) so the serialize
-// callback stays cheap when called N times for the same dir.
+// Cache per-directory git lookups so the serialize callback
+// stays cheap when called N times for the same dir.
 const lastModCache = new Map();
+function dirLastMod(dir) {
+  if (lastModCache.has(dir)) return lastModCache.get(dir);
+  const t = gitLastCommitISO(dir) || BUILD_TIME;
+  lastModCache.set(dir, t);
+  return t;
+}
+
+// Newest of a list of ISO timestamps (greatest lex order).
+function newest(values) {
+  let best = "";
+  for (const v of values) if (v && v > best) best = v;
+  return best;
+}
+
+// Cached newest-of-collection-members lookup. Used for index
+// and taxonomy pages so /envs/ reflects the newest env
+// directory and /packages/plugins/ reflects the newest plugin.
+const collNewestCache = new Map();
+function newestUnder(root, filter) {
+  const key = `${root}::${filter?.toString() ?? ""}`;
+  if (collNewestCache.has(key)) return collNewestCache.get(key);
+  const entries = (() => {
+    try {
+      return fs.readdirSync(root, { withFileTypes: true })
+        .filter((e) => e.isDirectory())
+        .filter((e) => !filter || filter(e.name));
+    } catch {
+      return [];
+    }
+  })();
+  const stamps = entries.map((e) => dirLastMod(path.join(root, e.name)));
+  const t = newest(stamps) || BUILD_TIME;
+  collNewestCache.set(key, t);
+  return t;
+}
+
 function lastModFor(urlPath) {
-  // Strip the base path so we can map cleanly back to a repo dir.
-  // urlPath is the full https URL emitted by the sitemap integration.
   let p;
   try {
     p = new URL(urlPath).pathname;
@@ -45,28 +80,61 @@ function lastModFor(urlPath) {
     p = urlPath;
   }
   if (BASE && p.startsWith(BASE)) p = p.slice(BASE.length);
-  // Normalise: strip leading + trailing slash
   p = p.replace(/^\/+/, "").replace(/\/+$/, "");
 
   const segments = p.split("/").filter(Boolean);
-  let dir = null;
+  // Landing page
   if (segments.length === 0) {
-    // Landing page — use build time
-    return BUILD_TIME;
+    return newest([
+      newestUnder(REPO_ROOT, (n) =>
+        !n.startsWith(".") && n !== "site" && n !== ".website" &&
+        n !== "scripts" && n !== "node_modules" && !n.endsWith("-demo")),
+      newestUnder(path.join(REPO_ROOT, ".flox", "pkgs"), null),
+    ]);
   }
+  // Env detail
   if (segments[0] === "envs" && segments[1] && segments.length === 2) {
-    dir = path.join(REPO_ROOT, segments[1]);
-  } else if (
+    return dirLastMod(path.join(REPO_ROOT, segments[1]));
+  }
+  // Pkg detail
+  if (
     segments[0] === "packages" && segments[1] && segments.length === 2 &&
     segments[1] !== "plugins" && segments[1] !== "skills"
   ) {
-    dir = path.join(REPO_ROOT, ".flox", "pkgs", segments[1]);
+    return dirLastMod(path.join(REPO_ROOT, ".flox", "pkgs", segments[1]));
   }
-  if (!dir) return BUILD_TIME;
-  if (lastModCache.has(dir)) return lastModCache.get(dir);
-  const t = gitLastCommitISO(dir) || BUILD_TIME;
-  lastModCache.set(dir, t);
-  return t;
+  // Envs index — newest env dir
+  if (segments[0] === "envs" && segments.length === 1) {
+    return newestUnder(REPO_ROOT, (n) =>
+      !n.startsWith(".") && n !== "site" && n !== ".website" &&
+      n !== "scripts" && n !== "node_modules" && !n.endsWith("-demo"));
+  }
+  // Packages index — newest pkg dir
+  if (segments[0] === "packages" && segments.length === 1) {
+    return newestUnder(path.join(REPO_ROOT, ".flox", "pkgs"), null);
+  }
+  // Plugins / skills filtered indexes
+  if (
+    segments[0] === "packages" && segments.length === 2 &&
+    (segments[1] === "plugins" || segments[1] === "skills")
+  ) {
+    const prefix = segments[1] === "plugins"
+      ? "claude-code-plugin-"
+      : null;
+    return newestUnder(path.join(REPO_ROOT, ".flox", "pkgs"), (n) =>
+      prefix ? n.startsWith(prefix) : (n === "skill-coreutils" || n.startsWith("skills-")));
+  }
+  // Category / tag pages — fall back to all-content newest
+  if (segments[0] === "categories" || segments[0] === "tags") {
+    return newest([
+      newestUnder(REPO_ROOT, (n) =>
+        !n.startsWith(".") && n !== "site" && n !== ".website" &&
+        n !== "scripts" && n !== "node_modules" && !n.endsWith("-demo")),
+      newestUnder(path.join(REPO_ROOT, ".flox", "pkgs"), null),
+    ]);
+  }
+  // Anything else (search, compare, og endpoints) — build time
+  return BUILD_TIME;
 }
 
 export default defineConfig({

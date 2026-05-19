@@ -4,11 +4,13 @@ const {
   title,
   description,
   ogImage,
+  ogType,
   jsonLd,
 } = Astro.props as {
   title: string;
   description?: string;
   ogImage?: string;
+  ogType?: string;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 };
 const base = import.meta.env.BASE_URL;
@@ -45,7 +47,7 @@ const ldArray = jsonLd
     {description && <meta property="og:description" content={description} />}
     <meta property="og:image" content={ogAbs} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType ?? "website"} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content={ogAbs} />
     {ldArray.map((ld) => (
@@ -134,6 +136,7 @@ const ldArray = jsonLd
           <p class="font-semibold text-slate-700 dark:text-slate-300">Project</p>
           <ul class="mt-1 space-y-1 text-slate-500">
             <li><a class="hover:underline" href="https://github.com/flox/floxenvs">Source on GitHub</a></li>
+            <li><a class="hover:underline" href="https://github.com/flox/floxenvs/discussions">Discussions</a></li>
             <li><a class="hover:underline" href="https://github.com/flox/floxenvs/issues">Issues</a></li>
             <li><a class="hover:underline" href="https://github.com/flox/floxenvs/blob/main/LICENSE">MIT license</a></li>
           </ul>

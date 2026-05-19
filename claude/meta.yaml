@@ -5,8 +5,8 @@ publisher: flox
 tagline: >
   Claude Code CLI with managed config assembly and MCP fragments.
 intro: >
-  Claude Code is Anthropic's terminal-based AI coding agent.
-  The flox/claude environment ships the CLI pre-wired with a
+  Claude Code is Anthropic's terminal-based AI coding agent,
+  and the flox/claude environment ships it pre-wired with a
   managed configuration layer that assembles `~/.claude/`
   settings, MCP server definitions, and CLAUDE.md instructions
   from drop-in fragments at activation time. Add it to any
@@ -14,10 +14,14 @@ intro: >
   to run — API key or interactive browser auth, your choice.
   The bundled isolated mode points Claude at a per-project
   `$FLOX_ENV_CACHE` so untrusted codebases never touch your
-  global Claude state. Pairs naturally with the
-  claude-code-plugin-* packages for SEO, financial services,
-  TypeScript LSP, and design tooling, and with graphify for
-  knowledge-graph context.
+  global Claude state, which makes it safe to run against
+  pull requests from contributors you don't yet trust. The
+  environment composes cleanly with the claude-code-plugin-*
+  packages (SEO, financial services, TypeScript LSP, UI/UX
+  Pro Max, and Superpowers) and with graphify for
+  knowledge-graph context. Use it as the default agent in a
+  multi-tool setup with codex, crush, or opencode, or run it
+  alone — every choice is one manifest line away.
 summary:
   - "One-line include — claude CLI ready in any Flox env"
   - "Auto-assembles settings, MCP servers, and instructions"

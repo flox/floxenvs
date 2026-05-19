@@ -13,12 +13,17 @@ intro: >
   Python runtime is ready, the model server is up on
   127.0.0.1:11434, and the connection info is printed on
   activation. Pull a model with `ollama pull llama3.1`, then
-  invoke it from Python via `ChatOllama(model="llama3.1")`.
-  Useful for offline RAG pipelines, agent prototyping, and
-  any LangChain workflow where you do not want to pay
-  per-token to a cloud provider during iteration. Pairs with
-  flox/verba for a turnkey RAG stack and flox/postgresql for
-  a vector store.
+  invoke it from Python via `ChatOllama(model="llama3.1")`
+  with no further wiring required. Useful for offline RAG
+  pipelines, agent prototyping, and any LangChain workflow
+  where you do not want to pay per-token to a cloud provider
+  during iteration — or where the data simply can't leave the
+  developer's machine. The Python virtualenv lives in
+  `$FLOX_ENV_CACHE` so reactivations are fast. Pairs with
+  flox/verba for a turnkey RAG stack with Weaviate as the
+  vector store, with flox/postgresql when you need a SQL
+  vector backend via pgvector, and with flox/omlx on Apple
+  Silicon when you want MLX inference instead of Ollama.
 summary:
   - "LangGraph orchestration framework"
   - "LangChain-Ollama and LangChain-Community integrations"

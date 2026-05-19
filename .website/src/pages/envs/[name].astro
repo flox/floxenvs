@@ -47,6 +47,14 @@ const recommendedPkgs = pkgs.filter((p) => {
 
 const origin = (Astro.site?.toString() ?? "").replace(/\/$/, "");
 const pageUrl = `${origin}${base}envs/${env.data.name}/`;
+// Derive OS from `systems` if present; default to the four canonical Flox
+// targets if absent (every Flox env in this repo ships for all four).
+const osList = env.data.systems?.length
+  ? Array.from(new Set(env.data.systems.map((s: string) =>
+      s.endsWith("-linux") ? "Linux"
+      : s.endsWith("-darwin") ? "macOS"
+      : s)))
+  : ["Linux", "macOS"];
 const jsonLd = [
   {
     "@context": "https://schema.org",
@@ -54,21 +62,23 @@ const jsonLd = [
     name: env.data.title,
     description: env.data.tagline,
     applicationCategory: "DeveloperApplication",
-    operatingSystem: env.data.systems?.length
-      ? Array.from(new Set(env.data.systems.map((s: string) =>
-          s.endsWith("-linux") ? "Linux"
-          : s.endsWith("-darwin") ? "macOS"
-          : s)))
-      : undefined,
+    operatingSystem: osList,
     license: env.data.license
       ? `https://spdx.org/licenses/${env.data.license}.html`
       : undefined,
     url: pageUrl,
     codeRepository: env.data.links?.source,
     isBasedOn: env.data.upstream?.url,
-    softwareVersion: env.data.upstream?.name,
+    dateModified: env.data.last_updated || undefined,
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+      availability: "https://schema.org/InStock",
+    },
     publisher: {
       "@type": "Organization",
+      "@id": "https://flox.dev/#organization",
       name: "Flox",
       url: "https://flox.dev",
     },
@@ -80,12 +90,18 @@ const jsonLd = [
       {
         "@type": "ListItem",
         position: 1,
+        name: "flox / envs",
+        item: `${origin}${base}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
         name: "Environments",
         item: `${origin}${base}envs/`,
       },
       {
         "@type": "ListItem",
-        position: 2,
+        position: 3,
         name: env.data.title,
         item: pageUrl,
       },
@@ -97,6 +113,7 @@ const jsonLd = [
   title={`${env.data.title} · flox/envs`}
   description={env.data.tagline}
   ogImage={ogImage}
+  ogType="product"
   jsonLd={jsonLd}
 >
   <nav class="text-sm text-slate-500 mb-4">
