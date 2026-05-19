@@ -1,0 +1,30 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../worktrunk" }
+]
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [ "${FLOX_ENVS_TESTING:-}" != "1" ]; then
+  gum style \
+    --foreground 212 --border-foreground 212 \
+    --border double --align center \
+    --width 60 --margin "1 2" --padding "1 2" \
+    "Worktrunk" "git worktrees, made easy"
+  echo ""
+  echo "  wt switch <branch>        — switch / create worktree"
+  echo "  wt switch -c -x claude X  — create + start coding agent"
+  echo "  wt list                   — list worktrees with status"
+  echo "  wt merge                  — merge + clean up"
+  echo "  wt remove                 — remove worktree + branch"
+  echo ""
+  echo "  Docs: https://worktrunk.dev"
+  echo ""
+fi
+'''

@@ -1,0 +1,26 @@
+schema-version = "1.10.0"
+
+# Minimal Worktrunk environment for use with [include].
+#
+# Worktrunk is a CLI for git worktree management designed
+# for running AI coding agents in parallel.
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/worktrunk"]
+
+[install]
+worktrunk.pkg-path = "flox/worktrunk"
+worktrunk.pkg-group = "worktrunk"
+# worktrunk shells out to `git` for every worktree
+# operation. Keep it explicit here so the env stays
+# self-contained.
+git.pkg-path = "git"
+git.pkg-group = "worktrunk"
+
+[hook]
+on-activate = '''
+export WORKTRUNK_CACHE="$FLOX_ENV_CACHE/worktrunk"
+mkdir -p "$WORKTRUNK_CACHE"
+'''

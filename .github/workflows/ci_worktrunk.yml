@@ -1,0 +1,38 @@
+name: "CI: worktrunk"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "worktrunk/**"
+      - "worktrunk-demo/**"
+      - ".flox/pkgs/worktrunk/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_worktrunk.yml"
+  pull_request:
+    paths:
+      - "worktrunk/**"
+      - "worktrunk-demo/**"
+      - ".flox/pkgs/worktrunk/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_worktrunk.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "worktrunk"
+    secrets: inherit
