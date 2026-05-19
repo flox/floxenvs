@@ -1,0 +1,97 @@
+# .semgrep/flox.yaml
+# Flox-specific Semgrep rules used by run-semgrep.sh.
+# Severity strings map to the risk levels in the spec:
+#   ERROR   -> CRITICAL
+#   WARNING -> HIGH
+#   INFO    -> MEDIUM / LOW
+# The mapping is performed by scripts/lib/semgrep-to-findings.sh.
+rules:
+  - id: flox-curl-pipe-shell
+    languages: [bash]
+    severity: ERROR
+    message: |
+      `curl | sh`-style remote execution found. Pin and verify
+      releases instead of piping into a shell.
+    patterns:
+      - pattern-either:
+          - pattern: curl ... | sh
+          - pattern: curl ... | bash
+          - pattern: wget ... | sh
+          - pattern: wget ... | bash
+
+  - id: flox-rm-rf-root
+    languages: [bash]
+    severity: ERROR
+    message: |
+      Destructive `rm -rf` against an absolute path that can
+      escape the env's cache directory.
+    patterns:
+      - pattern-either:
+          - pattern: rm -rf /
+          - pattern: rm -rf /*
+          - pattern: rm -rf "$HOME"
+          - pattern: rm -rf $HOME
+
+  - id: flox-eval-untrusted
+    languages: [bash]
+    severity: WARNING
+    message: |
+      `eval` on a non-literal string is fragile and can run
+      arbitrary code. Use functions or arrays instead.
+    pattern: eval "${...}"
+
+  - id: flox-bind-0-0-0-0
+    languages: [generic]
+    paths:
+      include:
+        - "*.toml"
+    severity: WARNING
+    message: |
+      Service bound to 0.0.0.0 makes it reachable from any
+      network interface. Prefer 127.0.0.1 for dev defaults.
+    pattern-regex: '^\s*(host|bind|listen|address)\s*=\s*"0\.0\.0\.0"'
+
+  - id: flox-allow-unfree
+    languages: [generic]
+    paths:
+      include:
+        - "*.toml"
+    severity: INFO
+    message: |
+      `allow-unfree = true` opts the env in to non-free
+      packages. Document why this is needed.
+    pattern-regex: '^\s*allow-unfree\s*=\s*true'
+
+  - id: flox-allow-insecure
+    languages: [generic]
+    paths:
+      include:
+        - "*.toml"
+    severity: WARNING
+    message: |
+      `allow-insecure = true` opts the env in to known-vulnerable
+      packages. Pin a specific exception list instead.
+    pattern-regex: '^\s*allow-insecure\s*=\s*true'
+
+  - id: flox-noisy-hook
+    languages: [bash]
+    severity: INFO
+    message: |
+      `echo`/`printf` in an `on-activate` hook breaks the
+      "silent hooks" rule for minimal envs. Move user-facing
+      output to the demo hook.
+    pattern-either:
+      - pattern: echo "..."
+      - pattern: printf "..."
+
+  - id: flox-base64-exfil
+    languages: [bash]
+    severity: ERROR
+    message: |
+      base64-encoded payload piped to a network command —
+      classic exfiltration pattern.
+    patterns:
+      - pattern-either:
+          - pattern: base64 ... | curl ...
+          - pattern: base64 ... | wget ...
+          - pattern: base64 ... | nc ...
