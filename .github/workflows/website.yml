@@ -179,3 +179,52 @@ jobs:
         with:
           name: "site-metrics-staged"
           path: ".website/src/content/metrics"
+
+  build-site:
+    name: "Build site"
+    needs: ["collect-metrics"]
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: ".website/package-lock.json"
+      - name: "Download staged metrics"
+        uses: actions/download-artifact@v4
+        with:
+          name: "site-metrics-staged"
+          path: ".website/src/content/metrics"
+      - name: "Surface metrics.json into dist for next deploy"
+        run: |
+          set -euo pipefail
+          # Copy each metrics.json into .website/public so the
+          # build embeds it at the same URL the next run
+          # of collect-metrics will fetch from.
+          while IFS= read -r f; do
+            rel="${f#.website/src/content/metrics/}"
+            kind="${rel%%/*}"
+            name="$(basename "${rel#"$kind"/}" .json)"
+            case "$kind" in
+              env) dest=".website/public/envs/$name/metrics.json" ;;
+              pkg) dest=".website/public/packages/$name/metrics.json" ;;
+            esac
+            mkdir -p "$(dirname "$dest")"
+            cp "$f" "$dest"
+          done < <(find .website/src/content/metrics -name '*.json')
+      - name: "Install"
+        working-directory: ".website"
+        run: "npm ci"
+      - name: "Build"
+        working-directory: ".website"
+        env:
+          SITE_URL: "https://flox.github.io"
+          BASE_PATH: "/floxenvs"
+        run: "npm run build"
+      - name: "Upload dist artifact for the deploy job"
+        uses: actions/upload-artifact@v4
+        with:
+          name: "website-dist"
+          path: ".website/dist"
+          retention-days: 1
