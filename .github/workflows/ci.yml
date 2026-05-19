@@ -635,6 +635,8 @@ jobs:
       && needs.result.result == 'success'
     permissions:
       contents: "write"
+      pages: "write"
+      id-token: "write"
     uses: "./.github/workflows/website.yml"
     with:
       sha: ${{ github.sha }}
