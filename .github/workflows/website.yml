@@ -122,3 +122,60 @@ jobs:
           name: "metrics-${{ matrix.kind }}-${{ matrix.name }}"
           path: "audit/${{ matrix.kind }}/${{ matrix.name }}/metrics.json"
           if-no-files-found: "error"
+
+  collect-metrics:
+    name: "Collect metrics"
+    needs: ["detect-changed", "audit-item"]
+    if: always() && needs.detect-changed.result == 'success'
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v4
+      - name: "Install jq"
+        run: sudo apt-get install -y -qq jq
+      - name: "Stage directory"
+        run: mkdir -p .website/src/content/metrics/env \
+                       .website/src/content/metrics/pkg
+      - name: "Download changed-item artifacts"
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "metrics-*"
+          path: "_metrics_in"
+          merge-multiple: false
+      - name: "Stage changed-item metrics"
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          for d in _metrics_in/metrics-*; do
+            base=$(basename "$d")
+            # name = metrics-<kind>-<name>
+            kind=$(echo "$base" | cut -d- -f2)
+            name=$(echo "$base" | cut -d- -f3-)
+            cp "$d/metrics.json" \
+               ".website/src/content/metrics/$kind/$name.json"
+          done
+      - name: "Fetch prior metrics for unchanged items"
+        env:
+          DEPLOY_URL: "https://flox.github.io/floxenvs"
+        run: |
+          set -euo pipefail
+          export REPO_ROOT="$PWD"
+          mapfile -t items < <(bash scripts/list-items.sh)
+          for item in "${items[@]}"; do
+            kind="${item%%:*}"; name="${item##*:}"
+            target=".website/src/content/metrics/$kind/$name.json"
+            [ -f "$target" ] && continue
+            case "$kind" in
+              env) url="$DEPLOY_URL/envs/$name/metrics.json" ;;
+              pkg) url="$DEPLOY_URL/packages/$name/metrics.json" ;;
+            esac
+            if curl -sfL --max-time 10 -o "$target" "$url"; then
+              echo "fetched prior metrics for $item"
+            else
+              echo "no prior metrics for $item; leaving default"
+            fi
+          done
+      - name: "Upload staged metrics"
+        uses: actions/upload-artifact@v4
+        with:
+          name: "site-metrics-staged"
+          path: ".website/src/content/metrics"
