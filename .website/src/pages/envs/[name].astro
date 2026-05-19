@@ -114,16 +114,7 @@ const jsonLd = [
   <p class="mt-4 text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-3xl">
     {env.data.intro ? env.data.intro : (
       <Fragment>
-        The <strong>flox/{env.data.name}</strong> environment packages{" "}
-        {env.data.upstream?.name ?? env.data.title}
-        {" "}for one-line inclusion in any Flox manifest. Add it via{" "}
-        <code class="font-mono text-sm">{`{ remote = "flox/${env.data.name}" }`}</code>
-        {" "}and the toolchain is pinned, services are wired, and the demo recipe
-        starts cleanly. Published by Flox under {env.data.license ?? "an open-source"} license
-        {env.data.upstream?.url && (
-          <Fragment>, upstream {" "}<a href={env.data.upstream.url} class="underline">{env.data.upstream.name}</a></Fragment>
-        )}
-        {env.data.maintainer && <Fragment>, maintained by {env.data.maintainer}</Fragment>}.
+        The <strong>flox/{env.data.name}</strong> environment packages {env.data.upstream?.name ?? env.data.title} for one-line inclusion in any Flox manifest. Add it via <code class="font-mono text-sm">{`{ remote = "flox/${env.data.name}" }`}</code> and the toolchain is pinned, services are wired, and the demo recipe starts cleanly. Published by Flox under {env.data.license ?? "an open-source"} license{env.data.upstream?.url ? <Fragment>, upstream <a href={env.data.upstream.url} class="underline">{env.data.upstream.name}</a></Fragment> : null}{env.data.maintainer ? `, maintained by ${env.data.maintainer}` : null}.
       </Fragment>
     )}
   </p>
