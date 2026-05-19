@@ -13,7 +13,10 @@ KIND=${1:?kind (env|pkg) required}
 NAME=${2:?name required}
 DIR=${3:?absolute item directory required}
 
-ROOT=$(git -C "$DIR" rev-parse --show-toplevel)
+ROOT=$(git -C "$DIR" rev-parse --show-toplevel 2>/dev/null) || {
+  echo "[]" # no-op: not a git repo
+  exit 0
+}
 RULES="${ROOT}/.semgrep/flox.yaml"
 
 if ! command -v semgrep >/dev/null 2>&1; then

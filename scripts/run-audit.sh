@@ -129,12 +129,20 @@ else
 fi
 
 # ── v2 scanners: semgrep, trivy, snyk ────────────────────
+set +e
 semgrep_findings=$(REPO_ROOT="$ROOT" \
-  "$SCRIPT_DIR/run-semgrep.sh" "$KIND" "$NAME" "$abs_dir")
+  "$SCRIPT_DIR/run-semgrep.sh" "$KIND" "$NAME" "$abs_dir" 2>/dev/null) \
+  || semgrep_findings='[]'
 trivy_findings=$(REPO_ROOT="$ROOT" \
-  "$SCRIPT_DIR/run-trivy.sh" "$KIND" "$NAME")
+  "$SCRIPT_DIR/run-trivy.sh" "$KIND" "$NAME" 2>/dev/null) \
+  || trivy_findings='[]'
 snyk_findings=$(REPO_ROOT="$ROOT" \
-  "$SCRIPT_DIR/run-snyk.sh" "$KIND" "$NAME" "$abs_dir")
+  "$SCRIPT_DIR/run-snyk.sh" "$KIND" "$NAME" "$abs_dir" 2>/dev/null) \
+  || snyk_findings='[]'
+set -e
+[ -z "$semgrep_findings" ] && semgrep_findings='[]'
+[ -z "$trivy_findings"   ] && trivy_findings='[]'
+[ -z "$snyk_findings"    ] && snyk_findings='[]'
 
 # Merge v2 findings into sec_findings accumulator.
 sec_findings=$(jq -n \

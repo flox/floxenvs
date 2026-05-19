@@ -20,7 +20,10 @@ if ! command -v trivy >/dev/null 2>&1; then
   exit 0
 fi
 
-ROOT=$(git rev-parse --show-toplevel)
+ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || {
+  echo "[]" # no-op: not a git repo
+  exit 0
+}
 IMAGE="ghcr.io/flox/floxenvs/${NAME}-latest"
 
 # `trivy image` may fail when the image isn't pushed yet

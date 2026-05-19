@@ -22,7 +22,10 @@ if ! command -v snyk >/dev/null 2>&1; then
   exit 0
 fi
 
-ROOT=$(git -C "$DIR" rev-parse --show-toplevel)
+ROOT=$(git -C "$DIR" rev-parse --show-toplevel 2>/dev/null) || {
+  echo "[]" # no-op: not a git repo
+  exit 0
+}
 
 # snyk test reads SNYK_TOKEN from env. It exits
 # non-zero on findings, which is fine — we just want the
