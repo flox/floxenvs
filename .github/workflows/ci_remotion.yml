@@ -1,0 +1,36 @@
+name: "CI: remotion"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "remotion/**"
+      - "remotion-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_remotion.yml"
+  pull_request:
+    paths:
+      - "remotion/**"
+      - "remotion-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_remotion.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "remotion"
+    secrets: inherit
