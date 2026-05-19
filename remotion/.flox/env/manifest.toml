@@ -1,0 +1,44 @@
+schema-version = "1.10.0"
+
+# Minimal Remotion environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/remotion"]
+#
+# Ships Claude Code with the Remotion best-practices skill
+# pre-registered as a plugin, plus Node.js so
+# `npx create-video@latest`, `npx remotion studio`, and
+# `npx remotion render` work out of the box. ffmpeg/ffprobe
+# are intentionally not installed — Remotion bundles its own
+# via `npx remotion ffmpeg` (per skills/remotion/rules/ffmpeg.md),
+# and nixpkgs' Darwin ffmpeg build trips macOS' invalid-signature
+# check (SIGKILL on launch).
+
+[install]
+claude-code.pkg-path = "flox/claude-code"
+claude-code.pkg-group = "claude-code"
+claude-managed.pkg-path = "flox/claude-managed"
+claude-managed.pkg-group = "claude-managed"
+claude-managed.version = "^0.4.1"
+claude-code-plugin-remotion.pkg-path = "flox/claude-code-plugin-remotion"
+claude-code-plugin-remotion.pkg-group = "claude-code-plugin-remotion"
+nodejs.pkg-path = "nodejs_22"
+nodejs.pkg-group = "remotion"
+
+[hook]
+on-activate = '''
+eval "$(claude-managed setup-hook)"
+'''
+
+[profile]
+bash = '''
+eval "$(claude-managed setup-profile-bash)"
+'''
+zsh = '''
+eval "$(claude-managed setup-profile-zsh)"
+'''
+fish = '''
+claude-managed setup-profile-fish | source
+'''

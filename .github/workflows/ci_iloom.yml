@@ -1,0 +1,38 @@
+name: "CI: iloom"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "iloom/**"
+      - "iloom-demo/**"
+      - ".flox/pkgs/iloom-cli/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_iloom.yml"
+  pull_request:
+    paths:
+      - "iloom/**"
+      - "iloom-demo/**"
+      - ".flox/pkgs/iloom-cli/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_iloom.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "iloom"
+    secrets: inherit

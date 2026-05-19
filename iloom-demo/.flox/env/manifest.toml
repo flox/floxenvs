@@ -1,0 +1,36 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../iloom" }
+]
+
+# gum is a demo-only tool for styled terminal output.
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+# Inherit the 3-system constraint from the included iloom env.
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]
+
+[hook]
+on-activate = '''
+if [ "${FLOX_ENVS_TESTING:-}" != "1" ]; then
+  gum style \
+    --foreground 212 --border-foreground 212 \
+    --border double --align center \
+    --width 60 --margin "1 2" --padding "1 2" \
+    "iloom" "AI-assisted dev in isolated worktrees"
+  echo ""
+  echo "  il start <issue>   — start a loom for an issue"
+  echo "  il finish          — validate, merge, clean up"
+  echo "  il plan <issue>    — decompose an epic"
+  echo "  il telemetry off   — disable anonymous usage data"
+  echo ""
+  echo "  iloom uses gh for issue tracker auth:"
+  echo "    gh auth login"
+  echo ""
+fi
+'''

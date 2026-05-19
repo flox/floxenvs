@@ -1,0 +1,34 @@
+schema-version = "1.10.0"
+
+# Minimal iloom environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/iloom"]
+#
+# Provides the `iloom` (and `il` alias) CLI plus the GitHub
+# CLI (`gh`) it uses for issue-tracker authentication.
+#
+# iloom drives a coding agent (Claude Code by default). Pull
+# in the agent of your choice alongside this env:
+#
+#   [include]
+#   environments = [
+#     "flox/iloom",
+#     "flox/claude",
+#   ]
+
+[install]
+iloom-cli.pkg-path = "flox/iloom-cli"
+iloom-cli.pkg-group = "iloom"
+iloom-cli.version = "^0.13.8"
+gh.pkg-path = "gh"
+gh.pkg-group = "iloom"
+
+# x86_64-darwin is omitted: there is no Intel Mac remote builder, so
+# building iloom-cli for that system requires Rosetta on an Apple
+# Silicon Mac. iloom-cli works there, but neither this env nor the CI
+# attempts to lock/test it.
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]

@@ -1,0 +1,23 @@
+schema-version = "1.10.0"
+
+# Claude Code environment with the caveman plugin
+# pre-installed. Ultra-compressed communication
+# mode that cuts ~75% of tokens while keeping full
+# technical accuracy.
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/caveman"]
+#
+# Then activate the mode by typing /caveman in
+# Claude Code, or saying "talk like caveman".
+
+[include]
+environments = [
+  { dir = "../claude" }
+]
+
+[install]
+claude-code-plugin-caveman.pkg-path = "flox/claude-code-plugin-caveman"
+claude-code-plugin-caveman.pkg-group = "claude-code-plugin-caveman"

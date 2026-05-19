@@ -1,0 +1,40 @@
+name: "CI: agentmemory"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "agentmemory/**"
+      - "agentmemory-demo/**"
+      - ".flox/pkgs/claude-code-plugin-agentmemory/**"
+      - ".flox/pkgs/claude-managed/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_agentmemory.yml"
+  pull_request:
+    paths:
+      - "agentmemory/**"
+      - "agentmemory-demo/**"
+      - ".flox/pkgs/claude-code-plugin-agentmemory/**"
+      - ".flox/pkgs/claude-managed/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_agentmemory.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "agentmemory"
+    secrets: inherit
