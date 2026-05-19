@@ -66,3 +66,59 @@ jobs:
           count=$(echo "$matrix" | jq '.include | length')
           echo "count=$count" >> "$GITHUB_OUTPUT"
           echo "$matrix" | jq .
+
+  audit-item:
+    name: "Audit ${{ matrix.kind }}:${{ matrix.name }}"
+    needs: detect-changed
+    if: needs.detect-changed.outputs.count != '0'
+    runs-on: "ubuntu-latest"
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.detect-changed.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: "Install tools"
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq jq yq shellcheck
+          curl -sSL -o /tmp/gitleaks.tgz \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz
+          sudo tar -xzf /tmp/gitleaks.tgz -C /usr/local/bin gitleaks
+      - name: "Resolve item directory"
+        id: dir
+        run: |
+          case "${{ matrix.kind }}" in
+            env) echo "dir=${{ matrix.name }}" >> "$GITHUB_OUTPUT" ;;
+            pkg) echo "dir=.flox/pkgs/${{ matrix.name }}" >> "$GITHUB_OUTPUT" ;;
+          esac
+      - name: "Content hash"
+        id: hash
+        run: |
+          MAIN_H=$(git rev-parse "HEAD:${{ steps.dir.outputs.dir }}" 2>/dev/null || echo none)
+          DEMO_H=$(git rev-parse "HEAD:${{ matrix.name }}-demo" 2>/dev/null || echo none)
+          CONF_H=$(git rev-parse "HEAD:.gitleaks.toml" 2>/dev/null || echo none)
+          KEY="audit-v1-${{ matrix.kind }}-${{ matrix.name }}-${MAIN_H}-${DEMO_H}-${CONF_H}"
+          echo "key=$KEY" >> "$GITHUB_OUTPUT"
+      - name: "Restore cache"
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: "audit/${{ matrix.kind }}/${{ matrix.name }}/metrics.json"
+          key: ${{ steps.hash.outputs.key }}
+      - name: "Run audit"
+        if: steps.cache.outputs.cache-hit != 'true' || inputs.force_rescan
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO_ROOT: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          bash scripts/run-audit.sh \
+            "${{ matrix.kind }}" "${{ matrix.name }}"
+      - name: "Upload metrics.json artifact"
+        uses: actions/upload-artifact@v4
+        with:
+          name: "metrics-${{ matrix.kind }}-${{ matrix.name }}"
+          path: "audit/${{ matrix.kind }}/${{ matrix.name }}/metrics.json"
+          if-no-files-found: "error"
