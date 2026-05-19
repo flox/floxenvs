@@ -1,0 +1,46 @@
+kind: env
+name: colima
+title: Colima
+publisher: flox
+tagline: >
+  Colima container runtime ready to include — Docker-
+  compatible containers on macOS and Linux via Lima.
+summary:
+  - "Colima + Docker CLI via Flox, no Docker Desktop required"
+  - "Runs as a Flox service with `--start-services`"
+  - "Works on macOS (QEMU/Virtualization.framework) and Linux"
+  - "Include from any manifest with one line"
+category: tool
+tags: [docker, colima, macos, container]
+stack: [go]
+featured: false
+status: stable
+license: MIT
+upstream:
+  name: Colima
+  url: https://github.com/abiosoft/colima
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = ["flox/colima"]
+  activate: |
+    flox activate -r flox/colima --start-services
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/colima-latest
+recipes:
+  - name: colima-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Launches Colima with `flox services start`"
+      - "Adds docker-compose, lazydocker, oxker, ctop, dive"
+      - "Styled welcome with connection and usage hints"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/colima
+  floxhub: https://hub.flox.dev/flox/colima
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/colima-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Acolima

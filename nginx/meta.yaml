@@ -1,0 +1,47 @@
+kind: env
+name: nginx
+title: Nginx
+publisher: flox
+tagline: >
+  Nginx ready to include — web server and reverse proxy
+  with sane defaults, runs as a Flox service on port 18181.
+summary:
+  - "Latest stable Nginx via Flox, no system install"
+  - "Config auto-generated under `$FLOX_ENV_CACHE/nginx`"
+  - "Serves on port 18181 by default (override via vars)"
+  - "Sample `index.html` created on first boot"
+  - "Boots as a Flox service with `--start-services`"
+category: service
+tags: [nginx, web, proxy, http, service]
+stack: [c]
+featured: false
+status: stable
+license: BSD-2-Clause
+upstream:
+  name: Nginx
+  url: https://nginx.org/
+  license: BSD-2-Clause
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = ["flox/nginx"]
+  activate: |
+    flox activate -r flox/nginx --start-services
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/nginx-latest
+recipes:
+  - name: nginx-demo
+    title: Quick start
+    start_services: true
+    features:
+      - "Launches Nginx as a Flox service on port 18181"
+      - "Adds curl for instant `curl http://localhost:18181`"
+      - "Styled welcome with port, document root, and log paths"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/nginx
+  floxhub: https://hub.flox.dev/flox/nginx
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/nginx-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Anginx

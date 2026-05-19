@@ -1,0 +1,48 @@
+kind: env
+name: bazel
+title: Bazel
+publisher: flox
+tagline: >
+  Bazel build system ready to include — fast, correct,
+  multi-language, works on macOS and Linux.
+summary:
+  - "Bazel 9.x via Flox — upstream prebuilt on macOS, nixpkgs on Linux"
+  - "GCC toolchain included on Linux for `rules_cc` auto-configure"
+  - "Build cache isolated under `$FLOX_ENV_CACHE/bazel`"
+  - "Include from any manifest with one line"
+category: tool
+tags: [bazel, build, monorepo, jvm]
+stack: [java]
+featured: false
+combines_well_with:
+  - pkg:bazel
+  - env:go
+  - env:javascript-node
+status: stable
+license: Apache-2.0
+upstream:
+  name: Bazel
+  url: https://bazel.build/
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = ["flox/bazel"]
+  activate: |
+    flox activate -r flox/bazel
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/bazel-latest
+recipes:
+  - name: bazel-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Sample Go binary built with Bazel + `rules_go`"
+      - "`flox build hello` produces a runnable `./result-hello/bin/hello`"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/bazel
+  floxhub: https://hub.flox.dev/flox/bazel
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/bazel-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Abazel
