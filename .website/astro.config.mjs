@@ -1,5 +1,6 @@
 import { defineConfig } from "astro/config";
 import preact from "@astrojs/preact";
+import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 
 const SITE = process.env.SITE_URL ?? "https://flox.github.io";
@@ -10,6 +11,6 @@ export default defineConfig({
   base: BASE,
   output: "static",
   trailingSlash: "always",
-  integrations: [preact()],
+  integrations: [preact(), sitemap()],
   vite: { plugins: [tailwindcss()] },
 });
