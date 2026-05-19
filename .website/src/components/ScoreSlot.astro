@@ -1,11 +1,18 @@
 ---
+import ScorePanel from "./ScorePanel.astro";
+import { defaultMetrics, MetricsSchema } from "../lib/metricsSchema";
+import type { Metrics } from "../lib/metricsSchema";
+
 interface Props {
   kind: "env" | "pkg";
   name: string;
+  // Pages already have the metrics on the entry — they
+  // can pass it in directly to avoid an extra parse.
+  metrics?: Metrics;
 }
-const { kind, name } = Astro.props as Props;
-// In Plan A we render nothing — the audit pipeline that
-// generates metrics.json is in Plan B. We keep the slot so
-// page layouts already account for it.
+const { kind, name, metrics } = Astro.props as Props;
+const m = metrics
+  ? MetricsSchema.parse(metrics)
+  : defaultMetrics({ kind, name });
 ---
-<div data-score-slot={`${kind}:${name}`} aria-hidden="true"></div>
+<ScorePanel metrics={m} />
