@@ -7,7 +7,7 @@
   cmake,
   git,
   pnpmConfigHook,
-  pnpm_10,
+  pnpm_11,
   nodejs_22,
   makeWrapper,
   versionCheckHook,
@@ -32,7 +32,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
-    pnpm = pnpm_10;
+    pnpm = pnpm_11;
     fetcherVersion = 3;
     hash = pnpmDepsHash;
   };
@@ -41,7 +41,7 @@ stdenv.mkDerivation (finalAttrs: {
     cmake
     git
     pnpmConfigHook
-    pnpm_10
+    pnpm_11
     nodejs_22
     makeWrapper
     installShellFiles
