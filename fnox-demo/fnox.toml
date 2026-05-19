@@ -1,0 +1,100 @@
+# fnox demo configuration — showcases multiple ways to retrieve
+# secrets. The `DEMO_*` keys all resolve out of the box; the
+# commented-out blocks below show how to wire up real providers
+# (1Password, Vault, AWS, keychain, custom scripts, ...).
+#
+# To pull every demo secret into your shell:
+#   eval "$(fnox export --shell bash)"
+# Or wrap a command:
+#   fnox exec -- env | grep ^DEMO_
+
+# ─── PROVIDERS ──────────────────────────────────────────────────
+
+# 1. age — encryption keys, ciphertext lives in this file.
+#    Anyone can read the encrypted value; only the holder of the
+#    private key can decrypt. Safe to commit.
+[providers.demo-age]
+type = "age"
+recipients = ["age1dstzhpm8gqpjrqxnr00djx4wswayaev9sdp7zp9yt0mqq78ec9ysjfdd6u"]
+
+# 2. Examples — uncomment one (and configure it) to add a real
+#    provider. fnox will then store the encrypted value or the
+#    reference in this file.
+#
+# [providers.work-1p]
+# type = "1password"
+# # Then: fnox set GITHUB_TOKEN "op://Personal/GitHub/token" \
+# #         --provider work-1p
+#
+# [providers.staging-vault]
+# type = "vault"
+# address = "https://vault.example.com:8200"
+# # Then: fnox set DB_PASSWORD "secret/data/staging/db#password" \
+# #         --provider staging-vault
+#
+# [providers.mac-keychain]
+# type = "keychain"
+# # Then: fnox set GHCR_PAT "<value>" --provider mac-keychain
+#
+# [providers.local-pass]
+# type = "password-store"
+# # Reads from `pass show <key>` — uses your existing
+# # GPG-encrypted ~/.password-store/.
+
+# ─── SECRETS ────────────────────────────────────────────────────
+
+# 1. Encrypted in git via age. fnox set wrote this; only holders
+#    of the age private key (FNOX_AGE_KEY) can decrypt.
+[secrets.DEMO_DATABASE_URL]
+provider = "demo-age"
+value = """\
+YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBWRlpqWWVydHVtVTZSNG5\
+ENlNjUkhrV24wMHg4c2RJSFhPVWMvRW4wRkhvCm9DWEdVZVdQZzRiYjJNbTZJdn\
+JNQ2s5UzVhQU5YMjEwZ3pFSXhzbCtFNzAKLT4gIUItZ3JlYXNlIGlwUWc0bSB4J\
+jowIDIuIEY1eSFaNDhPCkxKWHZ0QkovN0dCbVhYRC9LQ21PMmFsNUJjenJod3o1\
+SzAwQ3psc3F4Qm1uOUtqdStqSGhmajVIL0N1SEVZdzYKaUJnZHRxV2k1VFBPNmw\
+0Ci0tLSBnZ295YVdobjNKUTN5bDU4SUM1cDNjTGNobjFKc3dVQVpmRldYUFhQRm\
+M0CkvYMFmsmd+RBeFoF+uBTJs9jtD9QXuWKGGyaXe7XbKVozOVO/SGqjoGREorm\
+3vGRemd6STox5SK4JpjEGaE9kFu3ZcFQMhu5mzGSvTdOw==\
+"""
+
+# 2. Plain default — non-secret config that lives alongside.
+[secrets.DEMO_APP_PORT]
+default = "3000"
+
+[secrets.DEMO_NODE_ENV]
+default = "development"
+
+# ─── LEASES ────────────────────────────────────────────────────
+#
+# Leases are short-lived credentials minted on demand. The
+# `command` backend runs a script and parses JSON back from it —
+# useful for any system fnox doesn't natively integrate with.
+
+# Demo: emits a fresh "credential" every time you run
+#   fnox lease create greeting
+# It just shells out to a script that prints JSON. Replace with
+# your own script that hits an internal API, runs `op item get`,
+# calls `gh auth token`, signs a JWT, etc.
+[leases.greeting]
+type = "command"
+create_command = "$FLOX_ENV_PROJECT/scripts/mint-greeting.sh"
+duration = "5m"
+
+# Real-world examples — uncomment and adapt:
+#
+# [leases.aws-readonly]
+# type = "aws-sts"
+# role_arn = "arn:aws:iam::1234567890:role/readonly"
+# duration = "1h"
+#
+# [leases.gh-app]
+# type = "github-app"
+# app_id = "123456"
+# installation_id = "78901234"
+# private_key_path = "~/.config/fnox/github-app.pem"
+# duration = "1h"
+#
+# [leases.vault-db]
+# type = "vault"
+# path = "database/creds/readonly"

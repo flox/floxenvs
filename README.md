@@ -88,6 +88,8 @@ Most environments follow a dual-layer pattern:
 | _└ 1password-demo_ | | [floxhub](https://hub.flox.dev/flox/1password-demo) · [docs](1password-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/1password-demo-latest) |
 | dotenv | Load `.env` vars | [floxhub](https://hub.flox.dev/flox/dotenv) · [docs](dotenv/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/dotenv-latest) |
 | _└ dotenv-demo_ | | [floxhub](https://hub.flox.dev/flox/dotenv-demo) · [docs](dotenv-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/dotenv-demo-latest) |
+| fnox | Secrets manager (age / KMS / Vault / 1Password / ...) | [floxhub](https://hub.flox.dev/flox/fnox) · [docs](fnox/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/fnox-latest) |
+| _└ fnox-demo_ | | [floxhub](https://hub.flox.dev/flox/fnox-demo) · [docs](fnox-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/fnox-demo-latest) |
 | mkcert | Local TLS certs | [floxhub](https://hub.flox.dev/flox/mkcert) · [docs](mkcert/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/mkcert-latest) |
 | _└ mkcert-demo_ | | [floxhub](https://hub.flox.dev/flox/mkcert-demo) · [docs](mkcert-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/mkcert-demo-latest) |
 | playwright | Browser automation + MCP | [floxhub](https://hub.flox.dev/flox/playwright) · [docs](playwright/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/playwright-latest) |
@@ -103,6 +105,10 @@ Most environments follow a dual-layer pattern:
 | _└ graphify-demo_ | | [floxhub](https://hub.flox.dev/flox/graphify-demo) · [docs](graphify-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/graphify-demo-latest) |
 | agentmemory | Persistent memory plugin for Claude Code | [floxhub](https://hub.flox.dev/flox/agentmemory) · [docs](agentmemory/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/agentmemory-latest) |
 | _└ agentmemory-demo_ | | [floxhub](https://hub.flox.dev/flox/agentmemory-demo) · [docs](agentmemory-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/agentmemory-demo-latest) |
+| gstack | Garry Tan's Claude Code stack | [floxhub](https://hub.flox.dev/flox/gstack) · [docs](gstack/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/gstack-latest) |
+| _└ gstack-demo_ | | [floxhub](https://hub.flox.dev/flox/gstack-demo) · [docs](gstack-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/gstack-demo-latest) |
+| remotion | Remotion video skill for Claude Code | [floxhub](https://hub.flox.dev/flox/remotion) · [docs](remotion/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/remotion-latest) |
+| _└ remotion-demo_ | | [floxhub](https://hub.flox.dev/flox/remotion-demo) · [docs](remotion-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/remotion-demo-latest) |
 | langchain | LangChain + Ollama | [floxhub](https://hub.flox.dev/flox/langchain) · [docs](langchain/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/langchain-latest) |
 | _└ langchain-demo_ | | [floxhub](https://hub.flox.dev/flox/langchain-demo) · [docs](langchain-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/langchain-demo-latest) |
 | verba | Verba RAG app | [floxhub](https://hub.flox.dev/flox/verba) · [docs](verba/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/verba-latest) |
@@ -113,6 +119,8 @@ Most environments follow a dual-layer pattern:
 | _└ omlx-demo_ | | [floxhub](https://hub.flox.dev/flox/omlx-demo) · [docs](omlx-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/omlx-demo-latest) |
 | vibe-kanban | Kanban for coding agents | [floxhub](https://hub.flox.dev/flox/vibe-kanban) · [docs](vibe-kanban/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/vibe-kanban-latest) |
 | _└ vibe-kanban-demo_ | | [floxhub](https://hub.flox.dev/flox/vibe-kanban-demo) · [docs](vibe-kanban-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/vibe-kanban-demo-latest) |
+| iloom | AI-assisted dev in isolated worktrees | [floxhub](https://hub.flox.dev/flox/iloom) · [docs](iloom/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/iloom-latest) |
+| _└ iloom-demo_ | | [floxhub](https://hub.flox.dev/flox/iloom-demo) · [docs](iloom-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/iloom-demo-latest) |
 
 ## Docker images
 

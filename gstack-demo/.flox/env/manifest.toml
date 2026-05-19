@@ -1,0 +1,32 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../gstack" }
+]
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [ "${FLOX_ENVS_TESTING:-}" != "1" ]; then
+  gum style \
+    --foreground 212 --border-foreground 212 \
+    --border double --align center \
+    --width 60 --margin "1 2" --padding "1 2" \
+    "gstack" "Garry Tan's Claude Code stack"
+  echo ""
+  echo "  claude                 — start Claude Code"
+  echo "  claude-managed doctor  — show config and validate"
+  echo ""
+  echo "  Try one of:"
+  echo "    /office-hours    Pitch an idea, get a CEO grill"
+  echo "    /plan-ceo-review Strategic challenge of a plan"
+  echo "    /review          Pre-landing review of a branch"
+  echo "    /qa              Browser-driven QA on a URL"
+  echo "    /ship            Open a PR with the gstack flow"
+  echo ""
+fi
+'''
