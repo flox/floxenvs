@@ -1,0 +1,47 @@
+kind: env
+name: dotenv
+title: dotenv
+publisher: flox
+tagline: >
+  Auto-load `.env` files on Flox activation — zero
+  config, override the path with one variable.
+summary:
+  - "Sources .env on every `flox activate`, no extra tools"
+  - "All variables exported automatically via allexport"
+  - "Override the file path with `DOTENV_FILE` in [vars]"
+  - "Silently skipped if the file does not exist"
+  - "Include from any manifest with one line"
+category: tool
+tags: [dotenv, env-vars, configuration]
+stack: [shell]
+featured: false
+status: stable
+license: MIT
+upstream:
+  name: dotenv
+  url: https://github.com/motdotla/dotenv
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = ["flox/dotenv"]
+  activate: |
+    flox activate -r flox/dotenv
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/dotenv-latest
+recipes:
+  - name: dotenv-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Creates a sample .env and activates with it loaded"
+      - "Shows which variables were loaded on activation"
+      - "Override path: `DOTENV_FILE=.env.local` in [vars]"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/dotenv
+  floxhub: https://hub.flox.dev/flox/dotenv
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/dotenv-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Adotenv

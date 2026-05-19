@@ -1,0 +1,47 @@
+kind: env
+name: localstack
+title: LocalStack
+publisher: flox
+tagline: >
+  LocalStack ready to include — AWS cloud services
+  emulated locally, no AWS account required.
+summary:
+  - "LocalStack + AWS CLI v2 + awscli-local via Flox"
+  - "Python venv auto-created in FLOX_ENV_CACHE"
+  - "kubectl included for local Kubernetes workflows"
+  - "Runs as a Flox service with `flox services start`"
+  - "Include from any manifest with one line"
+category: service
+tags: [aws, localstack, cloud, mocks, service]
+stack: [python]
+featured: false
+status: stable
+license: Apache-2.0
+upstream:
+  name: LocalStack
+  url: https://www.localstack.cloud/
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = ["flox/localstack"]
+  activate: |
+    flox activate -r flox/localstack --start-services
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/localstack-latest
+recipes:
+  - name: localstack-demo
+    title: Quick start
+    start_services: true
+    features:
+      - "Boots LocalStack as a Flox background service"
+      - "AWS CLI pre-configured to hit the local endpoint"
+      - "`localstack status services` shows all running AWS APIs"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/localstack
+  floxhub: https://hub.flox.dev/flox/localstack
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/localstack-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Alocalstack

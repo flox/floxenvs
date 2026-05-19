@@ -1,0 +1,51 @@
+kind: env
+name: playwright
+title: Playwright
+publisher: flox
+tagline: >
+  Playwright ready to include — browser automation,
+  E2E tests, MCP server, and Claude Code skill in one env.
+summary:
+  - "Playwright + test runner + browser drivers via Flox"
+  - "Microsoft playwright-cli for record/replay workflows"
+  - "Playwright MCP server runs as an opt-in Flox service"
+  - "Claude Code / OpenCode skill auto-discovered on activation"
+  - "Include from any manifest with one line"
+category: tool
+tags: [playwright, browser, e2e, mcp, automation]
+stack: [nodejs, typescript]
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:playwright-cli
+  - env:javascript-node
+status: stable
+license: Apache-2.0
+upstream:
+  name: Playwright
+  url: https://playwright.dev/
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = ["flox/playwright"]
+  activate: |
+    flox activate -r flox/playwright
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/playwright-latest
+recipes:
+  - name: playwright-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Runs a sample E2E test against demo.playwright.dev"
+      - "Starts the Playwright MCP server for agent-driven testing"
+      - "`playwright-cli open <url>` for interactive record/replay"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/playwright
+  floxhub: https://hub.flox.dev/flox/playwright
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/playwright-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Aplaywright
