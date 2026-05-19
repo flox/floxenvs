@@ -2,53 +2,67 @@ name: "Website"
 
 on:
   workflow_dispatch:
+    inputs:
+      items:
+        description: >
+          Comma-separated <kind>:<name> entries
+          (e.g. `env:claude,pkg:ollama`), or `changed`, or `all`.
+        type: string
+        default: "changed"
+      force_rescan:
+        description: "Ignore audit cache and re-run all scanners."
+        type: boolean
+        default: false
   workflow_call:
     inputs:
       sha:
         type: string
-        required: false
+        required: true
       triggered_by:
         type: string
-        default: "manual"
+        default: "ci"
+      items:
+        type: string
+        default: "changed"
+      force_rescan:
+        type: boolean
+        default: false
 
 concurrency:
-  group: "website-deploy"
+  group: "pages"
   cancel-in-progress: false
 
 permissions:
-  contents: "write"
+  contents: "read"
+  pages: "write"
+  id-token: "write"
 
 jobs:
-  build-and-deploy:
-    name: "Build and deploy"
+  detect-changed:
+    name: "Detect changed items"
     runs-on: "ubuntu-latest"
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      count: ${{ steps.matrix.outputs.count }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "npm"
-          cache-dependency-path: ".website/package-lock.json"
-      - name: "Install"
-        working-directory: ".website"
-        run: "npm ci"
-      - name: "Build"
-        working-directory: ".website"
+      - name: "Install yq, jq, gh"
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq jq yq
+      - name: "Compute matrix"
+        id: matrix
         env:
-          SITE_URL: "https://flox.github.io"
-          BASE_PATH: "/floxenvs"
-        run: "npm run build"
-      - name: "Publish to gh-pages branch"
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ".website/dist"
-          publish_branch: "gh-pages"
-          enable_jekyll: false
-          user_name: "github-actions[bot]"
-          user_email: "github-actions[bot]@users.noreply.github.com"
-          commit_message: >-
-            deploy: ${{ inputs.sha || github.sha }}
-            (from ${{ inputs.triggered_by || github.event_name }})
+          TRIGGER: ${{ github.event_name }}
+          SHA: ${{ inputs.sha || github.sha }}
+          INPUT_ITEMS: ${{ inputs.items || 'changed' }}
+        run: |
+          set -euo pipefail
+          export REPO_ROOT="$PWD"
+          matrix=$(bash scripts/changed-items.sh)
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          count=$(echo "$matrix" | jq '.include | length')
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          echo "$matrix" | jq .
