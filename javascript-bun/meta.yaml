@@ -1,0 +1,49 @@
+kind: env
+name: javascript-bun
+title: Bun
+publisher: flox
+tagline: >
+  Bun runtime and package manager with automatic install.
+summary:
+  - "Bun runtime, bundler, and package manager via Flox"
+  - "`bun install` runs automatically on activation"
+  - "Hash-based caching skips reinstall when deps unchanged"
+  - "Include from any manifest with one line"
+category: language
+tags: [bun, javascript, typescript, package-manager]
+stack: [zig]
+featured: false
+combines_well_with:
+  - env:postgresql
+  - env:redis
+  - env:playwright
+status: stable
+license: MIT
+upstream:
+  name: Bun
+  url: https://bun.sh/
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = ["flox/javascript-bun"]
+  activate: |
+    flox activate -r flox/javascript-bun
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/javascript-bun-latest
+recipes:
+  - name: javascript-bun-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "`bun install` against a sample `package.json`"
+      - "Runs a `.ts` file directly with `bun`"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/javascript-bun
+  floxhub: https://hub.flox.dev/flox/javascript-bun
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/javascript-bun-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Ajavascript-bun
