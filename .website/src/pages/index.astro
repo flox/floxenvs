@@ -80,20 +80,46 @@ const featuredRecipes = aiEnvs.filter((e) => e.data.recipes.length > 0).slice(0,
   title="flox / envs — AI environments and packages"
   description="Ready-to-use Flox environments and packages, AI first."
 >
-  <section class="text-center max-w-2xl mx-auto py-10">
-    <p class="text-sm font-mono uppercase tracking-wide text-slate-500">flox / envs</p>
-    <h1 class="text-4xl font-bold mt-3 leading-tight">
-      Ready-to-use Flox envs and packages
-    </h1>
-    <p class="mt-4 text-slate-600 dark:text-slate-300">
-      One include line. AI agents, runtimes, plugins, skills — and the
-      glue to make them work together.
-    </p>
-    <pre class="mt-6 text-sm font-mono p-4 rounded-lg bg-slate-50 dark:bg-slate-900 text-left overflow-x-auto"><code>{`[include]
-environments = ["flox/<name>"]`}</code></pre>
-    <div class="mt-6 flex gap-3 justify-center">
-      <a href="#ai" class="px-4 py-2 rounded-lg bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900">Browse AI items</a>
-      <a href={`${base}search/`} class="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700">Search everything</a>
+  <section class="pt-8 pb-16 lg:pt-12 lg:pb-24">
+    <div class="grid lg:grid-cols-[1.1fr_1fr] gap-10 items-center">
+      <div>
+        <p class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.18em] text-kind-env">
+          <span class="inline-block w-1.5 h-1.5 rounded-full bg-kind-env"></span>
+          flox / envs
+        </p>
+        <h1 class="mt-4 text-4xl sm:text-5xl font-bold leading-[1.05] tracking-tight text-slate-900 dark:text-slate-50">
+          Ready-to-use<br />
+          <span class="text-kind-env">Flox</span> envs and packages.
+        </h1>
+        <p class="mt-5 text-lg leading-relaxed text-slate-600 dark:text-slate-300 max-w-xl">
+          One include line. AI agents, runtimes, plugins, skills,
+          and the glue to make them work together.
+        </p>
+        <div class="mt-7 flex flex-wrap gap-3">
+          <a href="#ai" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white transition">
+            Browse AI items
+            <span aria-hidden="true">→</span>
+          </a>
+          <a href={`${base}search/`} class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 text-sm font-medium hover:border-slate-500 dark:hover:border-slate-500 transition">
+            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" /></svg>
+            Search everything
+          </a>
+        </div>
+      </div>
+      <div class="relative">
+        <div class="absolute -inset-4 bg-gradient-to-br from-kind-env/10 via-transparent to-kind-plugin/10 rounded-2xl blur-2xl" aria-hidden="true"></div>
+        <pre class="relative font-mono text-sm sm:text-[15px] leading-relaxed p-6 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 overflow-x-auto"><code><span class="text-slate-400"># my-project/.flox/env/manifest.toml</span>
+<span class="text-slate-500">[include]</span>
+environments = [
+  <span class="text-kind-env">"flox/claude"</span>,
+  <span class="text-kind-env">"flox/postgresql"</span>,
+  <span class="text-kind-env">"flox/langchain"</span>,
+]
+
+<span class="text-slate-500">[install]</span>
+ollama.pkg-path     = <span class="text-kind-plugin">"flox/ollama"</span>
+ollama.publisher    = <span class="text-kind-plugin">"flox"</span></code></pre>
+      </div>
     </div>
   </section>
 

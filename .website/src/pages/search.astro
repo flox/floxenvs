@@ -3,14 +3,27 @@ import Layout from "../layouts/Layout.astro";
 const base = import.meta.env.BASE_URL;
 ---
 <Layout title="Search · flox/envs">
-  <h1 class="text-2xl font-bold">Search</h1>
-  <p class="mt-1 text-sm text-slate-500">
-    Across environments and packages.
+  <h1 class="text-3xl font-bold tracking-tight">Search</h1>
+  <p class="mt-2 text-slate-600 dark:text-slate-400">
+    Across every environment and package.
   </p>
   <link rel="stylesheet" href={`${base}pagefind/pagefind-ui.css`} />
-  <div id="search" class="mt-6"></div>
+  <div class="mt-8">
+    <div id="search" class="pagefind-mount">
+      <div class="rounded-lg border border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center gap-2 text-slate-400 dark:text-slate-500">
+        <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" /></svg>
+        <span class="text-sm">Loading search…</span>
+      </div>
+    </div>
+  </div>
+  <p class="mt-6 text-xs text-slate-400 dark:text-slate-500">
+    Try: <code class="font-mono">claude</code>, <code class="font-mono">ollama</code>,
+    <code class="font-mono">rag</code>, or any tag.
+  </p>
   <script type="module" define:vars={{ base }}>
     const mod = await import(`${base}pagefind/pagefind-ui.js`);
+    const mount = document.getElementById("search");
+    if (mount) mount.innerHTML = "";
     new mod.PagefindUI({
       element: "#search",
       bundlePath: `${base}pagefind/`,

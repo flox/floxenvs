@@ -142,12 +142,11 @@ const recommendedPkgs = pkgs.filter((p) => {
       )}
       {bundles.length > 0 && (
         <SidebarEntry label="Bundles packages">
-          {bundles.map((b: string, i: number) => (
-            <>
-              <a href={`${base}packages/${b}/`} class="underline">{b}</a>
-              {i < bundles.length - 1 ? ", " : ""}
-            </>
-          ))}
+          <span class="inline-flex flex-wrap gap-x-1.5 gap-y-1">
+            {bundles.map((b: string) => (
+              <a href={`${base}packages/${b}/`} class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300">{b}</a>
+            ))}
+          </span>
         </SidebarEntry>
       )}
       {env.data.links?.floxhub && (

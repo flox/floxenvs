@@ -164,12 +164,11 @@ const ogImage = pkg.data.featured
       )}
       {useWithEnvs.length > 0 && (
         <SidebarEntry label="Bundled by envs">
-          {useWithEnvs.map((e, i: number) => (
-            <>
-              <a href={`${base}envs/${e.data.name}/`} class="underline">{e.data.name}</a>
-              {i < useWithEnvs.length - 1 ? ", " : ""}
-            </>
-          ))}
+          <span class="inline-flex flex-wrap gap-x-1.5 gap-y-1">
+            {useWithEnvs.map((e) => (
+              <a href={`${base}envs/${e.data.name}/`} class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300">{e.data.name}</a>
+            ))}
+          </span>
         </SidebarEntry>
       )}
       {pkg.data.links?.floxhub && (
