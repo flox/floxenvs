@@ -8,6 +8,8 @@
   nodejs_24,
   ripgrep,
   bash,
+  glib,
+  libsecret,
   versionCheckHook,
 }:
 
@@ -29,9 +31,31 @@ stdenv.mkDerivation (finalAttrs: {
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ];
 
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
+    # keytar.node — credential storage via libsecret
+    libsecret
+    glib
+  ];
+
   # Bundled mxc-bin/{x64,arm64}/lxc-exec dlopen libgcc_s.so.1 at runtime.
   runtimeDependencies = lib.optionals stdenv.hostPlatform.isLinux [
     stdenv.cc.cc.lib
+  ];
+
+  # prebuilds/linux-*/computer.node is a screen-capture / desktop-automation
+  # native module (X11, libXtst, libpipewire, libei, libjpeg, libpng). The
+  # CLI loads it lazily — only when the agent uses screen tools — so we let
+  # autoPatchelfHook skip those deps and keep the closure small. Affected
+  # features will fail at runtime, not at build.
+  autoPatchelfIgnoreMissingDeps = lib.optionals stdenv.hostPlatform.isLinux [
+    "libX11.so.6"
+    "libXtst.so.6"
+    "libjpeg.so.8"
+    "libpng16.so.16"
+    "libgio-2.0.so.0"
+    "libgobject-2.0.so.0"
+    "libpipewire-0.3.so.0"
+    "libei.so.1"
   ];
 
   dontBuild = true;
