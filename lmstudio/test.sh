@@ -14,11 +14,21 @@ for cmd in lms lm-studio lms-service \
   echo ">>> $cmd present"
 done
 
-if ! lms --version >/dev/null 2>&1; then
-  echo "Error: 'lms --version' failed."
-  exit 1
+# On Linux, the lms Bun binary segfaults at startup without a
+# supported GPU even when LMS_SKIP_GPU_CHECK=1 bypasses the
+# wrapper's pre-flight check. CI builders are GPU-less, so we can
+# only invoke the binary on macOS. Linux verifies binary presence
+# (above) and lmstudio-info (below); the real `lms` functionality
+# is exercised at user activation.
+if [[ "$(uname)" == "Darwin" ]]; then
+  if ! lms --version >/dev/null 2>&1; then
+    echo "Error: 'lms --version' failed."
+    exit 1
+  fi
+  echo ">>> lms --version OK"
+else
+  echo ">>> lms --version skipped on $(uname) (binary needs a GPU)"
 fi
-echo ">>> lms --version OK"
 
 if ! lmstudio-info >/dev/null 2>&1; then
   echo "Error: 'lmstudio-info' failed."
