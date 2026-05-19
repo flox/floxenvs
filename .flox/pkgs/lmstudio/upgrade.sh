@@ -32,21 +32,35 @@ probe_exists() {
 # Walk forward from the current version, checking
 #   <maj>.<min>.<pat+N>-1  for N in 1..20
 #   <maj>.<min+M>.0-1      for M in 1..5, with sub-probes for patches
-# Pick the highest reachable.
+# Pick the highest reachable. We only probe build-id "-1"; LM Studio
+# has not shipped any "-2" rebuild to date. If that ever changes,
+# bump the parsed cur_bld and re-run manually.
+# Break on the first miss within each series: LM Studio ships
+# patches consecutively, so a 404 means we've passed the frontier.
 latest_version=""
 # Same minor, higher patch.
 for ((p = cur_pat + 1; p <= cur_pat + 20; p++)); do
   v="${cur_maj}.${cur_min}.${p}-1"
   if probe_exists "$v"; then
     latest_version="$v"
+  else
+    break
   fi
 done
-# Next minor versions.
+# Next minor versions. If <maj>.<m>.0-1 doesn't exist, that minor
+# series hasn't shipped yet — skip the whole series.
 for ((m = cur_min + 1; m <= cur_min + 5; m++)); do
-  for ((p = 0; p <= 20; p++)); do
+  v="${cur_maj}.${m}.0-1"
+  if ! probe_exists "$v"; then
+    break
+  fi
+  latest_version="$v"
+  for ((p = 1; p <= 20; p++)); do
     v="${cur_maj}.${m}.${p}-1"
     if probe_exists "$v"; then
       latest_version="$v"
+    else
+      break
     fi
   done
 done
