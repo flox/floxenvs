@@ -1,0 +1,30 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../remotion" }
+]
+
+# gum is a demo-only tool for styled terminal output.
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'Remotion + Claude Code' '' \
+    'Scaffold a new video project:' \
+    '  npx create-video@latest --yes --blank --no-tailwind my-video' '' \
+    'Inside a Remotion project:' \
+    '  npx remotion studio       Open the visual editor' \
+    '  npx remotion render       Render to MP4' \
+    '  npx remotion ffmpeg ...   Bundled ffmpeg' '' \
+    'Ask Claude (skill auto-loads on Remotion code):' \
+    '  claude' '' \
+    "Node: $(node --version)"
+fi
+'''
