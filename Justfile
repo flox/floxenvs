@@ -43,3 +43,24 @@ website-push:
         --branch gh-pages \
         --nojekyll \
         --message "deploy: $(git rev-parse --short HEAD) (from $(git rev-parse --abbrev-ref HEAD))"
+
+# ── Audit pipeline (Plan B) ─────────────────────────────
+
+# List every <kind>:<name>.
+audit-list:
+    bash scripts/list-items.sh
+
+# Lint meta.yaml for a single item.
+audit-meta-lint kind name:
+    REPO_ROOT="$(pwd)" bash scripts/lint-meta.sh {{ kind }} {{ name }}
+
+# Run the full audit pipeline for a single item.
+audit-item kind name:
+    REPO_ROOT="$(pwd)" bash scripts/run-audit.sh {{ kind }} {{ name }}
+
+# Run all unit tests for the audit shell scripts.
+audit-test:
+    @set -e; \
+    for t in scripts/test/*.test.sh; do \
+      echo "── $$t"; bash "$$t"; \
+    done
