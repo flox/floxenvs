@@ -5,15 +5,14 @@ gum-styled onboarding banner. Shows the activation
 flow, model download, and how to point an agentic CLI
 at the local API.
 
-**Requires the same GPU as
-[lmstudio](../lmstudio/).** Platforms:
-aarch64-darwin (Apple Silicon),
+Requires the same GPU as [lmstudio](../lmstudio/).
+Platforms: aarch64-darwin (Apple Silicon),
 aarch64-linux, x86_64-linux.
 
 ## Quick start
 
 ```bash
-flox activate -r flox/lmstudio-demo
+flox activate -r flox/lmstudio-demo --start-services
 ```
 
 You should see a styled banner with the next steps:
