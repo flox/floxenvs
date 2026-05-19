@@ -1,0 +1,51 @@
+kind: env
+name: python-uv
+title: Python + uv
+publisher: flox
+tagline: >
+  Python 3 + uv with auto-venv and hash-cached uv.lock
+  syncs.
+summary:
+  - "Python 3 interpreter via Flox"
+  - "uv package manager included"
+  - "Venv stored under `$FLOX_ENV_CACHE/python-uv`"
+  - "Hash-cached `uv.lock` — syncs only when lock changes"
+  - "Venv recreated automatically if interpreter path changes"
+  - "Include from any manifest with one line"
+category: language
+tags: [python, uv, language, venv]
+stack: [python]
+featured: false
+combines_well_with:
+  - env:postgresql
+  - env:redis
+  - env:playwright
+status: stable
+license: PSF-2.0
+upstream:
+  name: CPython
+  url: https://www.python.org/
+  license: PSF-2.0
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = ["flox/python-uv"]
+  activate: |
+    flox activate -r flox/python-uv
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/python-uv-latest
+recipes:
+  - name: python-uv-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "`uv lock` and `uv sync` from a sample `pyproject.toml`"
+      - "Imports `httpx` to confirm install succeeded"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/python-uv
+  floxhub: https://hub.flox.dev/flox/python-uv
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/python-uv-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Apython-uv
