@@ -42,11 +42,16 @@ stdenv.mkDerivation (finalAttrs: {
     stdenv.cc.cc.lib
   ];
 
-  # prebuilds/linux-*/computer.node is a screen-capture / desktop-automation
-  # native module (X11, libXtst, libpipewire, libei, libjpeg, libpng). The
-  # CLI loads it lazily — only when the agent uses screen tools — so we let
-  # autoPatchelfHook skip those deps and keep the closure small. Affected
-  # features will fail at runtime, not at build.
+  # Skip dependencies that come from two upstream-bundled file groups we
+  # don't expect to use on a Nix glibc system:
+  #   - prebuilds/linux-*/computer.node is a screen-capture / desktop-
+  #     automation native module (X11, libXtst, libpipewire, libei,
+  #     libjpeg, libpng). The CLI loads it lazily so let the build pass
+  #     and let those features fail at runtime, not at build.
+  #   - prebuilds/linuxmusl-*/keytar.node and runtime.node are Alpine-style
+  #     musl variants; they're not loaded on glibc, but autoPatchelfHook
+  #     still processes any file matching the target arch and aborts on
+  #     libc.musl. Ignoring the symbol is simpler than deleting the files.
   autoPatchelfIgnoreMissingDeps = lib.optionals stdenv.hostPlatform.isLinux [
     "libX11.so.6"
     "libXtst.so.6"
@@ -56,6 +61,8 @@ stdenv.mkDerivation (finalAttrs: {
     "libgobject-2.0.so.0"
     "libpipewire-0.3.so.0"
     "libei.so.1"
+    "libc.musl-x86_64.so.1"
+    "libc.musl-aarch64.so.1"
   ];
 
   dontBuild = true;
