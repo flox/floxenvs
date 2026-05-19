@@ -1,0 +1,367 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+
+const base = import.meta.env.BASE_URL;
+const allPkgs = await getCollection("packages");
+
+const AGENT_NAMES = [
+  "claude-code",
+  "codex",
+  "crush",
+  "opencode",
+  "openclaw",
+  "agent-deck",
+];
+
+const pkgMap = Object.fromEntries(
+  allPkgs
+    .filter((p) => AGENT_NAMES.includes(p.data.name))
+    .map((p) => [p.data.name, p]),
+);
+
+// Static truth table columns that cannot be inferred from meta.yaml
+const agentMeta: Record<
+  string,
+  {
+    multiModel: boolean;
+    offline: boolean;
+    surface: string;
+    tagline: string;
+    strength: string;
+    weakness: string;
+    provider: string;
+  }
+> = {
+  "claude-code": {
+    multiModel: false,
+    offline: false,
+    surface: "Terminal",
+    tagline: "Anthropic's official agentic coding CLI",
+    strength: "Deepest Claude integration, MCP tool support, bubblewrap sandbox",
+    weakness: "Anthropic-only; requires paid API or Claude subscription",
+    provider: "Anthropic",
+  },
+  codex: {
+    multiModel: false,
+    offline: false,
+    surface: "Terminal",
+    tagline: "OpenAI's lightweight Rust-based coding agent",
+    strength: "Fast sandboxed execution, built in Rust, zero JS runtime",
+    weakness: "OpenAI-only; limited plugin ecosystem",
+    provider: "OpenAI",
+  },
+  crush: {
+    multiModel: true,
+    offline: false,
+    surface: "Terminal (TUI)",
+    tagline: "Charmbracelet's beautiful terminal AI coding agent",
+    strength: "Gorgeous Charm TUI, any OpenAI-compatible endpoint",
+    weakness: "FSL-1.1-MIT license restricts commercial redistribution",
+    provider: "Any OpenAI-compatible",
+  },
+  opencode: {
+    multiModel: true,
+    offline: true,
+    surface: "Terminal",
+    tagline: "Terminal-native AI coding agent with fuzzy search",
+    strength: "Works locally with Ollama, ripgrep + fzf integration",
+    weakness: "Newer project; smaller community than Claude Code or Codex",
+    provider: "Multi-provider (incl. Ollama)",
+  },
+  openclaw: {
+    multiModel: true,
+    offline: true,
+    surface: "Terminal",
+    tagline: "Self-hosted open-source AI assistant and agent CLI",
+    strength: "Full data sovereignty, MIT license, three bundled binaries",
+    weakness: "Self-hosting overhead; less turnkey than hosted agents",
+    provider: "Self-hosted / any",
+  },
+  "agent-deck": {
+    multiModel: true,
+    offline: false,
+    surface: "Terminal (TUI)",
+    tagline: "Terminal command center for orchestrating multiple AI agents",
+    strength: "Single TUI to manage all agents at once, plugin architecture",
+    weakness: "Orchestrator layer, not a standalone coding agent",
+    provider: "Delegates to other agents",
+  },
+};
+
+const agents = AGENT_NAMES.map((name) => ({
+  name,
+  pkg: pkgMap[name],
+  meta: agentMeta[name],
+})).filter((a) => a.pkg !== undefined);
+
+const origin = (Astro.site?.toString() ?? "").replace(/\/$/, "");
+const pageUrl = `${origin}${base}compare/ai-coding-agents/`;
+
+const faqItems = [
+  {
+    question: "Which is the best AI coding agent for Claude users?",
+    answer:
+      "Claude Code is the canonical choice for Claude users. It is Anthropic's official CLI, ships with MCP tool support and a bubblewrap sandbox on Linux, and is pre-packaged by Flox so the auto-updater is disabled for reproducible Nix builds. Install it in one line: flox install flox/claude-code.",
+  },
+  {
+    question: "Which AI coding agent works offline with local models?",
+    answer:
+      "Opencode and Openclaw both support local inference. Opencode integrates with Ollama out of the box, and Openclaw is fully self-hosted so all requests stay on your machine. Both are packaged for Flox with a single pkg-path install.",
+  },
+  {
+    question: "Which AI coding agents are free and open source?",
+    answer:
+      "Codex (Apache-2.0), Opencode (MIT), and Openclaw (MIT) are fully open-source. Agent Deck is also MIT. Crush is FSL-1.1-MIT, which is source-available but restricts commercial redistribution for two years. Claude Code is proprietary (Unfree license).",
+  },
+  {
+    question: "Which AI coding agent supports multi-agent orchestration?",
+    answer:
+      "Agent Deck is purpose-built as an orchestration layer: it provides a single TUI for launching, monitoring, and managing sessions across Claude Code, Codex, Crush, Opencode, and Openclaw simultaneously. It uses a plugin architecture for extensible workflows.",
+  },
+  {
+    question: "Which AI coding agents integrate with my IDE?",
+    answer:
+      "All six agents are terminal-first and work alongside any IDE via a side-by-side terminal. Claude Code additionally supports VS Code and JetBrains extensions. If you need deep IDE embedding, pair Claude Code with your editor plugin; for everything else a split-terminal workflow works well.",
+  },
+  {
+    question: "Which AI coding agent has the best terminal UX?",
+    answer:
+      "Crush (by Charmbracelet) and Agent Deck both offer rich TUI interfaces with color, layout, and keyboard navigation. Opencode adds fzf-powered fuzzy search and ripgrep integration. Claude Code and Codex are more minimal but highly efficient for scripting and automation.",
+  },
+];
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqItems.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "AI coding agents available on Flox",
+    url: pageUrl,
+    numberOfItems: agents.length,
+    itemListElement: agents.map((a, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: a.pkg.data.title,
+      url: `${origin}${base}packages/${a.name}/`,
+    })),
+  },
+];
+---
+<Layout
+  title="AI coding agents on Flox compared — Claude Code, Codex, Crush, and more"
+  description="Side-by-side comparison of every AI coding agent packaged for Flox in 2026 — license, models supported, MCP, terminal vs IDE, plus install snippets."
+  jsonLd={jsonLd}
+>
+  {/* Breadcrumb */}
+  <nav class="text-sm text-slate-500 mb-6">
+    <a href={base} class="underline">Home</a>
+    {" / "}
+    <span>Compare AI coding agents</span>
+  </nav>
+
+  {/* Hero */}
+  <section class="pb-10 border-b border-slate-200 dark:border-slate-800">
+    <p class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.18em] text-kind-env">
+      <span class="inline-block w-1.5 h-1.5 rounded-full bg-kind-env" aria-hidden="true"></span>
+      flox / compare
+    </p>
+    <h1 class="mt-3 text-3xl sm:text-4xl font-bold leading-tight tracking-tight">
+      AI coding agents on Flox — compared
+    </h1>
+    <p class="mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-300 max-w-3xl">
+      This is the canonical side-by-side comparison for picking an AI coding
+      agent from the Flox catalog in 2026. Every agent listed below ships as a
+      reproducible Flox package — one line to install, zero version drift,
+      works on macOS and Linux.
+    </p>
+  </section>
+
+  {/* At-a-glance comparison table */}
+  <section class="mt-10">
+    <h2 class="text-2xl font-bold">At a glance</h2>
+    <p class="mt-1 text-sm text-slate-500">
+      All agents are available via{" "}
+      <code class="font-mono text-xs">flox install</code> with a single
+      pkg-path line.
+    </p>
+    <div class="mt-5 overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800">
+      <table class="w-full text-sm border-collapse">
+        <thead>
+          <tr class="bg-slate-50 dark:bg-slate-900 text-left">
+            <th class="px-4 py-3 font-semibold border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">Agent</th>
+            <th class="px-4 py-3 font-semibold border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">License</th>
+            <th class="px-4 py-3 font-semibold border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">Provider</th>
+            <th class="px-4 py-3 font-semibold border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">Multi-model</th>
+            <th class="px-4 py-3 font-semibold border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">Offline / local</th>
+            <th class="px-4 py-3 font-semibold border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">Surface</th>
+            <th class="px-4 py-3 font-semibold border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">Last updated</th>
+          </tr>
+        </thead>
+        <tbody>
+          {agents.map((a, i) => (
+            <tr class:list={[
+              "border-b border-slate-100 dark:border-slate-800 last:border-0",
+              i % 2 === 1 ? "bg-slate-50/50 dark:bg-slate-900/30" : "",
+            ]}>
+              <td class="px-4 py-3 font-semibold whitespace-nowrap">
+                <a
+                  href={`${base}packages/${a.name}/`}
+                  class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300"
+                >
+                  {a.pkg.data.title}
+                </a>
+              </td>
+              <td class="px-4 py-3 font-mono text-xs whitespace-nowrap text-slate-600 dark:text-slate-300">
+                {a.pkg.data.license ?? "—"}
+              </td>
+              <td class="px-4 py-3 whitespace-nowrap text-slate-600 dark:text-slate-300">
+                {a.meta.provider}
+              </td>
+              <td class="px-4 py-3 text-center">
+                {a.meta.multiModel
+                  ? <span class="text-emerald-600 dark:text-emerald-400 font-bold" title="Yes">✓</span>
+                  : <span class="text-slate-400" title="No">—</span>}
+              </td>
+              <td class="px-4 py-3 text-center">
+                {a.meta.offline
+                  ? <span class="text-emerald-600 dark:text-emerald-400 font-bold" title="Yes">✓</span>
+                  : <span class="text-slate-400" title="No">—</span>}
+              </td>
+              <td class="px-4 py-3 whitespace-nowrap text-slate-600 dark:text-slate-300">
+                {a.meta.surface}
+              </td>
+              <td class="px-4 py-3 whitespace-nowrap text-slate-500 font-mono text-xs">
+                {a.pkg.data.last_updated
+                  ? <time datetime={a.pkg.data.last_updated}>{a.pkg.data.last_updated.slice(0, 10)}</time>
+                  : "—"}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  {/* Per-agent capsule cards */}
+  <section class="mt-14">
+    <h2 class="text-2xl font-bold">Agent capsules</h2>
+    <p class="mt-1 text-sm text-slate-500">
+      Quick profile for each agent — strength, weakness, and detail link.
+    </p>
+    <div class="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {agents.map((a) => (
+        <div class="rounded-lg border border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-2 hover:border-slate-400 dark:hover:border-slate-600 transition">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <h3 class="font-bold text-base">{a.pkg.data.title}</h3>
+              <p class="text-xs font-mono text-slate-500 mt-0.5">{a.name}</p>
+            </div>
+            <span class="shrink-0 text-xs font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+              {a.pkg.data.license ?? "—"}
+            </span>
+          </div>
+          <p class="text-sm text-slate-600 dark:text-slate-300 leading-snug">
+            {a.meta.tagline}
+          </p>
+          <dl class="text-xs space-y-1 mt-1">
+            <div class="flex gap-1.5">
+              <dt class="font-semibold text-emerald-700 dark:text-emerald-400 shrink-0">Strength:</dt>
+              <dd class="text-slate-600 dark:text-slate-300">{a.meta.strength}</dd>
+            </div>
+            <div class="flex gap-1.5">
+              <dt class="font-semibold text-amber-700 dark:text-amber-400 shrink-0">Weakness:</dt>
+              <dd class="text-slate-600 dark:text-slate-300">{a.meta.weakness}</dd>
+            </div>
+          </dl>
+          <a
+            href={`${base}packages/${a.name}/`}
+            class="mt-auto pt-2 text-xs underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300 self-start"
+          >
+            View {a.pkg.data.title} details →
+          </a>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  {/* Decision guide FAQ */}
+  <section class="mt-16">
+    <h2 class="text-2xl font-bold">Decision guide</h2>
+    <p class="mt-1 text-sm text-slate-500">
+      Common questions answered — which agent fits your workflow?
+    </p>
+    <div class="mt-6 space-y-6 max-w-3xl">
+      {faqItems.map((faq) => (
+        <div class="rounded-lg border border-slate-200 dark:border-slate-800 p-5">
+          <h3 class="font-semibold text-base">{faq.question}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+            {faq.answer}
+          </p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  {/* Install all at once */}
+  <section class="mt-16">
+    <h2 class="text-2xl font-bold">Install all of them at once</h2>
+    <p class="mt-2 text-sm text-slate-500 max-w-2xl">
+      Flox lets you mix and match agents without conflicts. Add this
+      <code class="font-mono text-xs">[install]</code> block to any
+      manifest and every agent is pinned and ready to go:
+    </p>
+    <div class="mt-5 relative">
+      <div
+        class="absolute -inset-2 bg-gradient-to-br from-kind-env/10 via-transparent to-kind-plugin/10 rounded-2xl blur-2xl"
+        aria-hidden="true"
+      ></div>
+      <pre class="relative font-mono text-sm leading-relaxed p-6 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 overflow-x-auto"><code><span class="text-slate-400"># .flox/env/manifest.toml</span>
+<span class="text-slate-500">[install]</span>
+claude-code.pkg-path  = <span class="text-kind-env">"flox/claude-code"</span>
+claude-code.publisher = <span class="text-kind-env">"flox"</span>
+
+codex.pkg-path        = <span class="text-kind-env">"flox/codex"</span>
+codex.publisher       = <span class="text-kind-env">"flox"</span>
+
+crush.pkg-path        = <span class="text-kind-env">"flox/crush"</span>
+crush.publisher       = <span class="text-kind-env">"flox"</span>
+
+opencode.pkg-path     = <span class="text-kind-env">"flox/opencode"</span>
+opencode.publisher    = <span class="text-kind-env">"flox"</span>
+
+openclaw.pkg-path     = <span class="text-kind-env">"flox/openclaw"</span>
+openclaw.publisher    = <span class="text-kind-env">"flox"</span>
+
+agent-deck.pkg-path   = <span class="text-kind-env">"flox/agent-deck"</span>
+agent-deck.publisher  = <span class="text-kind-env">"flox"</span></code></pre>
+    </div>
+    <p class="mt-3 text-xs text-slate-500">
+      New to Flox?{" "}
+      <code class="font-mono">curl -L https://downloads.flox.dev/by-env/stable/install.sh | bash</code>
+      {" "}—{" "}
+      <a href="https://flox.dev/docs/install-flox/" class="underline">docs →</a>
+    </p>
+  </section>
+
+  {/* Footer cross-links */}
+  <section class="mt-20 pt-10 border-t border-slate-200 dark:border-slate-800">
+    <h2 class="text-base font-semibold">Explore more</h2>
+    <div class="mt-3 flex flex-wrap gap-4 text-sm">
+      <a href={`${base}packages/`} class="underline">All packages →</a>
+      <a href={`${base}envs/`} class="underline">All environments →</a>
+      <a href={`${base}search/`} class="underline">Search the catalog →</a>
+    </div>
+  </section>
+</Layout>
