@@ -8,6 +8,7 @@
   git,
   pnpmConfigHook,
   pnpm_11,
+  pnpm-fixup-state-db,
   nodejs_22,
   makeWrapper,
   versionCheckHook,
@@ -30,12 +31,27 @@ stdenv.mkDerivation (finalAttrs: {
     inherit hash;
   };
 
-  pnpmDeps = fetchPnpmDeps {
+  # nixpkgs <26.11's fetchPnpmDeps fixupPhase only cleans v3 and v10
+  # pnpm store dirs. pnpm 11 uses v11, so transient `tmp/`/`projects/`
+  # state and a non-normalized `index.db` leak into the tarball and
+  # produce different pnpmDepsHash on each builder. Mirror the v11
+  # cleanup landed upstream in nixpkgs commit 83ace87 + 7cb14ad.
+  pnpmDeps = (fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
     pnpm = pnpm_11;
     fetcherVersion = 3;
     hash = pnpmDepsHash;
-  };
+  }).overrideAttrs (old: {
+    nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [
+      pnpm-fixup-state-db
+    ];
+    preFixup = (old.preFixup or "") + ''
+      rm -rf "$storePath/v11/tmp" "$storePath/v11/projects"
+      if [ -f "$storePath/v11/index.db" ]; then
+        pnpm-fixup-state-db "$storePath/v11"
+      fi
+    '';
+  });
 
   nativeBuildInputs = [
     cmake
