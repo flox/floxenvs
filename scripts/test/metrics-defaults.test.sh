@@ -109,5 +109,51 @@ echo "$out" | jq -e '
 ' >/dev/null
 assert_eq "env defaults all pass" "true" "true"
 
+
+# ── metrics-defaults pkg path ────────────────────────────
+PKG_DIR="$TMP/sample-pkg"
+mkdir -p "$PKG_DIR"
+cat > "$PKG_DIR/default.nix" <<'EOF'
+{ pkgs ? import <nixpkgs> {} }: pkgs.hello
+EOF
+cat > "$PKG_DIR/publish.json" <<'EOF'
+{"org":"flox","systems":["aarch64-darwin"]}
+EOF
+cat > "$PKG_DIR/hashes.json" <<'EOF'
+{"version":"1.0.0","srcHash":"sha256-AAA"}
+EOF
+cat > "$PKG_DIR/upgrade.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+echo "ok"
+EOF
+chmod +x "$PKG_DIR/upgrade.sh"
+cat > "$PKG_DIR/meta.yaml" <<'EOF'
+kind: pkg
+name: sample-pkg
+title: Sample Pkg
+publisher: flox
+tagline: A sample pkg.
+category: tool
+tags: [sample]
+status: stable
+license: MIT
+links:
+  source: https://example
+EOF
+
+pout=$(default_pkg_checks "sample-pkg" "$PKG_DIR")
+echo "$pout" | jq -e '
+  (.checks | map(.id) | contains([
+    "has-default-nix",
+    "has-publish-json",
+    "publish-json-valid",
+    "meta-yaml-complete",
+    "has-upgrade-sh",
+    "has-hashes-json"
+  ]))
+' >/dev/null
+assert_eq "pkg defaults has core checks" "true" "true"
+
 echo "--- $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]
