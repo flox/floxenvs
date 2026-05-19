@@ -1,10 +1,18 @@
 ---
 import "../styles/global.css";
-const { title, description } = Astro.props as {
+const {
+  title,
+  description,
+  ogImage,
+} = Astro.props as {
   title: string;
   description?: string;
+  ogImage?: string;
 };
 const base = import.meta.env.BASE_URL;
+const site = Astro.site?.toString() ?? "";
+const defaultOg = `${site}${base}og/default.png`;
+const og = ogImage ?? defaultOg;
 ---
 <!doctype html>
 <html lang="en">
@@ -14,6 +22,12 @@ const base = import.meta.env.BASE_URL;
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
     <link rel="icon" href={`${base}favicon.svg`} />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:image" content={og} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={og} />
   </head>
   <body class="font-sans antialiased min-h-dvh bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
     <header class="border-b border-slate-200 dark:border-slate-800">

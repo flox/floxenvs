@@ -28,6 +28,10 @@ const { envs: dEnvs, pkgs: dPkgs } = deriveBundling(
 );
 const bundles = dEnvs[0].bundles_pkgs;
 
+const ogImage = env.data.featured
+  ? `${base}og/env/${env.data.name}.png`
+  : undefined;
+
 const tabs = [
   env.data.install?.include && { label: "Include", code: env.data.install.include },
   env.data.install?.activate && { label: "Activate", code: env.data.install.activate },
@@ -41,7 +45,11 @@ const recommendedPkgs = pkgs.filter((p) => {
   return false;
 });
 ---
-<Layout title={`${env.data.title} · flox/envs`} description={env.data.tagline}>
+<Layout
+  title={`${env.data.title} · flox/envs`}
+  description={env.data.tagline}
+  ogImage={ogImage}
+>
   <nav class="text-sm text-slate-500 mb-4">
     <a href={`${base}envs/`} class="underline">Environments</a> / {env.data.name}
   </nav>

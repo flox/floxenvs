@@ -33,8 +33,16 @@ const otherPkgs = (await getCollection("packages")).filter((p) =>
 const tabs = pkg.data.install?.pkg
   ? [{ label: "Manifest", code: pkg.data.install.pkg }]
   : [];
+
+const ogImage = pkg.data.featured
+  ? `${base}og/pkg/${pkg.data.name}.png`
+  : undefined;
 ---
-<Layout title={`${pkg.data.title} · flox/envs`} description={pkg.data.tagline}>
+<Layout
+  title={`${pkg.data.title} · flox/envs`}
+  description={pkg.data.tagline}
+  ogImage={ogImage}
+>
   <nav class="text-sm text-slate-500 mb-4">
     <a href={`${base}packages/`} class="underline">Packages</a>
     {pkg.data.subkind === "plugin" && (
