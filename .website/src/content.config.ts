@@ -3,6 +3,11 @@ import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { parse as parseYaml } from "yaml";
 import { parseInstalledPackages } from "./lib/parseManifest";
+import {
+  MetricsSchema,
+  defaultMetrics,
+  type Metrics,
+} from "./lib/metricsSchema";
 
 const REPO_ROOT = path.resolve(import.meta.dirname, "..", "..");
 
@@ -66,6 +71,7 @@ const envSchema = z.object({
   readme: z.string().default(""),
   recipe_readme: z.string().default(""),
   recipe_manifest: z.string().default(""),
+  metrics: MetricsSchema,
 });
 
 const pkgSchema = z.object({
@@ -76,6 +82,7 @@ const pkgSchema = z.object({
   plugin_for: z.string().nullable().optional(),
   skill_for: z.string().nullable().optional(),
   readme: z.string().default(""),
+  metrics: MetricsSchema,
 });
 
 async function readFileOrEmpty(p: string): Promise<string> {
@@ -83,6 +90,21 @@ async function readFileOrEmpty(p: string): Promise<string> {
     return await fs.readFile(p, "utf-8");
   } catch {
     return "";
+  }
+}
+
+const METRICS_ROOT = path.join(REPO_ROOT, "audit");
+
+async function loadMetrics(
+  kind: "env" | "pkg",
+  name: string,
+): Promise<Metrics> {
+  const p = path.join(METRICS_ROOT, kind, name, "metrics.json");
+  try {
+    const raw = await fs.readFile(p, "utf-8");
+    return MetricsSchema.parse(JSON.parse(raw));
+  } catch {
+    return defaultMetrics({ kind, name });
   }
 }
 
@@ -119,6 +141,7 @@ async function loadEnvs() {
       path.join(REPO_ROOT, demoDir, ".flox/env/manifest.toml"),
     );
 
+    const metrics = await loadMetrics("env", e.name);
     out.push({
       id: e.name,
       ...meta,
@@ -126,6 +149,7 @@ async function loadEnvs() {
       readme,
       recipe_readme: recipeReadme,
       recipe_manifest: recipeManifest,
+      metrics,
     });
   }
   return out;
@@ -153,7 +177,8 @@ async function loadPkgs() {
     const readme = await readFileOrEmpty(
       path.join(pkgsDir, e.name, "README.md"),
     );
-    out.push({ id: e.name, ...meta, readme });
+    const metrics = await loadMetrics("pkg", e.name);
+    out.push({ id: e.name, ...meta, readme, metrics });
   }
   return out;
 }
