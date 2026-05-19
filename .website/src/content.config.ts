@@ -1,4 +1,5 @@
 import { defineCollection, z } from "astro:content";
+import { execFileSync } from "node:child_process";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { parse as parseYaml } from "yaml";
@@ -11,11 +12,27 @@ import {
 
 const REPO_ROOT = path.resolve(import.meta.dirname, "..", "..");
 
+// Best-effort last-commit ISO date for a directory. Falls back
+// to "" when git is missing (CI shallow clones, etc).
+function gitLastCommitISO(absDir: string): string {
+  try {
+    const out = execFileSync(
+      "git",
+      ["log", "-1", "--format=%cI", "--", absDir],
+      { cwd: REPO_ROOT, stdio: ["ignore", "pipe", "ignore"] },
+    );
+    return out.toString().trim();
+  } catch {
+    return "";
+  }
+}
+
 const baseFields = {
   name: z.string(),
   title: z.string(),
   publisher: z.string().default("flox"),
   tagline: z.string(),
+  intro: z.string().optional(),
   summary: z.array(z.string()).default([]),
   category: z.enum(["ai","language","database","service","tool","runtime"]),
   ai_role: z
@@ -71,6 +88,7 @@ const envSchema = z.object({
   readme: z.string().default(""),
   recipe_readme: z.string().default(""),
   recipe_manifest: z.string().default(""),
+  last_updated: z.string().default(""),
   metrics: MetricsSchema,
 });
 
@@ -82,6 +100,7 @@ const pkgSchema = z.object({
   plugin_for: z.string().nullable().optional(),
   skill_for: z.string().nullable().optional(),
   readme: z.string().default(""),
+  last_updated: z.string().default(""),
   metrics: MetricsSchema,
 });
 
@@ -142,6 +161,7 @@ async function loadEnvs() {
     );
 
     const metrics = await loadMetrics("env", e.name);
+    const lastUpdated = gitLastCommitISO(path.join(REPO_ROOT, e.name));
     out.push({
       id: e.name,
       ...meta,
@@ -149,6 +169,7 @@ async function loadEnvs() {
       readme,
       recipe_readme: recipeReadme,
       recipe_manifest: recipeManifest,
+      last_updated: lastUpdated,
       metrics,
     });
   }
@@ -178,7 +199,14 @@ async function loadPkgs() {
       path.join(pkgsDir, e.name, "README.md"),
     );
     const metrics = await loadMetrics("pkg", e.name);
-    out.push({ id: e.name, ...meta, readme, metrics });
+    const lastUpdated = gitLastCommitISO(path.join(pkgsDir, e.name));
+    out.push({
+      id: e.name,
+      ...meta,
+      readme,
+      last_updated: lastUpdated,
+      metrics,
+    });
   }
   return out;
 }

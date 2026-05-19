@@ -128,8 +128,28 @@ const jsonLd = [
   <h1 class="text-3xl font-bold">{pkg.data.title}</h1>
   <p class="mt-2 text-slate-600 dark:text-slate-300">{pkg.data.tagline}</p>
 
+  <p class="mt-4 text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-3xl">
+    {pkg.data.intro ? pkg.data.intro : (
+      <Fragment>
+        <strong>flox/{pkg.data.name}</strong> is a Flox package{" "}
+        {pkg.data.upstream?.name ? <Fragment>wrapping <a href={pkg.data.upstream.url} class="underline">{pkg.data.upstream.name}</a></Fragment> : "for Flox environments"}.
+        Add it to a manifest via{" "}
+        <code class="font-mono text-sm">{`${pkg.data.name}.pkg-path = "flox/${pkg.data.name}"`}</code>{" "}
+        in any <code class="font-mono text-sm">[install]</code> block.
+        {" "}Published by Flox under {pkg.data.license ?? "an open-source"} license
+        {pkg.data.maintainer && <Fragment>, maintained by {pkg.data.maintainer}</Fragment>}.
+        {pkg.data.subkind === "plugin" && pkg.data.plugin_for && (
+          <Fragment> Designed to plug into <a href={`${base}packages/${pkg.data.plugin_for}/`} class="underline">{pkg.data.plugin_for}</a>.</Fragment>
+        )}
+        {pkg.data.subkind === "skill" && pkg.data.skill_for && (
+          <Fragment> A skill for <a href={`${base}packages/${pkg.data.skill_for}/`} class="underline">{pkg.data.skill_for}</a>.</Fragment>
+        )}
+      </Fragment>
+    )}
+  </p>
+
   {pkg.data.summary.length > 0 && (
-    <ul class="mt-4 list-disc list-inside text-sm">
+    <ul class="mt-5 list-disc list-inside text-sm space-y-1">
       {pkg.data.summary.map((s: string) => <li>{s}</li>)}
     </ul>
   )}
@@ -236,6 +256,13 @@ const jsonLd = [
               <a href={`${base}envs/${e.data.name}/`} class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300">{e.data.name}</a>
             ))}
           </span>
+        </SidebarEntry>
+      )}
+      {pkg.data.last_updated && (
+        <SidebarEntry label="Last updated">
+          <time datetime={pkg.data.last_updated}>
+            {pkg.data.last_updated.slice(0, 10)}
+          </time>
         </SidebarEntry>
       )}
       {pkg.data.links?.floxhub && (
