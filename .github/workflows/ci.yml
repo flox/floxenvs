@@ -69,6 +69,7 @@ jobs:
             | scripts/wait-should-poll.sh envs)"
           echo "should_poll=$should_poll" >> "$GITHUB_OUTPUT"
           echo "Changed files:"
+          # shellcheck disable=SC2001  # prefix every line with spaces
           echo "$changed" | sed 's/^/  /'
           echo "should_poll=$should_poll"
 
@@ -288,6 +289,7 @@ jobs:
             | scripts/wait-should-poll.sh packages)"
           echo "should_poll=$should_poll" >> "$GITHUB_OUTPUT"
           echo "Changed files:"
+          # shellcheck disable=SC2001  # prefix every line with spaces
           echo "$changed" | sed 's/^/  /'
           echo "should_poll=$should_poll"
 
@@ -631,6 +633,8 @@ jobs:
       github.ref == 'refs/heads/main'
       && github.event_name == 'push'
       && needs.result.result == 'success'
+    permissions:
+      contents: "write"
     uses: "./.github/workflows/website.yml"
     with:
       sha: ${{ github.sha }}
