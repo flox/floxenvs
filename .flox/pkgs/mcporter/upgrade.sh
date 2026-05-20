@@ -34,7 +34,7 @@ jq -n \
 
 echo "Building with dummy pnpmDepsHash to compute real one..."
 pnpm_hash=$(flox build mcporter 2>&1 \
-  | grep -A1 "hash mismatch in fixed-output derivation" \
+  | grep -A2 "hash mismatch in fixed-output derivation" \
   | grep "got:" | head -1 | awk '{print $NF}') || true
 
 if [ -z "$pnpm_hash" ]; then

@@ -36,7 +36,7 @@ jq -n \
 echo "Building with dummy hashes to compute real ones..."
 # pnpm deps build first; capture both hashes from successive build runs.
 pnpm_hash=$(flox build agent-browser 2>&1 \
-  | grep -A1 "hash mismatch in fixed-output derivation" \
+  | grep -A2 "hash mismatch in fixed-output derivation" \
   | grep "got:" | head -1 | awk '{print $NF}') || true
 
 if [ -z "$pnpm_hash" ]; then
@@ -53,7 +53,7 @@ jq -n \
   '{version: $v, srcHash: $s, cargoHash: $c, pnpmDepsHash: $p}' > "$HASHES_FILE"
 
 cargo_hash=$(flox build agent-browser 2>&1 \
-  | grep -A1 "hash mismatch in fixed-output derivation" \
+  | grep -A2 "hash mismatch in fixed-output derivation" \
   | grep "got:" | head -1 | awk '{print $NF}') || true
 
 if [ -z "$cargo_hash" ]; then
