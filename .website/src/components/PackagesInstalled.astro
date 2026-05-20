@@ -1,0 +1,80 @@
+---
+interface InstalledPkg {
+  name: string;
+  path: string;
+}
+interface Props {
+  pkgs: InstalledPkg[];
+  catalog: Set<string>;
+  base: string;
+}
+const { pkgs, catalog, base } = Astro.props as Props;
+
+function nixSearchUrl(path: string): string {
+  return `https://search.nixos.org/packages?query=${encodeURIComponent(path)}`;
+}
+
+function floxhubUrl(path: string): string {
+  return `https://hub.flox.dev/${path}`;
+}
+
+function isFloxPkg(path: string): boolean {
+  return path.startsWith("flox/");
+}
+
+function floxPkgName(path: string): string {
+  return path.slice("flox/".length);
+}
+---
+{pkgs.length === 0 ? null : (
+  <div class="rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 dark:bg-slate-900 text-left">
+        <tr>
+          <th class="px-3 py-2 font-medium text-slate-500 text-xs uppercase tracking-wide">Name</th>
+          <th class="px-3 py-2 font-medium text-slate-500 text-xs uppercase tracking-wide">Path</th>
+          <th class="px-3 py-2 font-medium text-slate-500 text-xs uppercase tracking-wide">Source</th>
+        </tr>
+      </thead>
+      <tbody>
+        {pkgs.map((p) => {
+          const flox = isFloxPkg(p.path);
+          const catalogName = flox ? floxPkgName(p.path) : null;
+          const inCatalog = catalogName !== null && catalog.has(catalogName);
+          return (
+            <tr class="border-t border-slate-100 dark:border-slate-900">
+              <td class="px-3 py-2 font-mono text-xs">{p.name}</td>
+              <td class="px-3 py-2 font-mono text-xs">
+                {inCatalog && catalogName ? (
+                  <a class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300" href={`${base}packages/${catalogName}/`}>{p.path}</a>
+                ) : flox ? (
+                  <a class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300" href={floxhubUrl(p.path)}>{p.path}</a>
+                ) : (
+                  <a class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300" href={nixSearchUrl(p.path)}>{p.path}</a>
+                )}
+              </td>
+              <td class="px-3 py-2 text-xs">
+                {inCatalog ? (
+                  <span class="inline-flex items-center gap-1.5 text-kind-env">
+                    <span class="inline-block w-1.5 h-1.5 rounded-full bg-kind-env"></span>
+                    catalog
+                  </span>
+                ) : flox ? (
+                  <span class="inline-flex items-center gap-1.5 text-slate-500">
+                    <span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                    floxhub
+                  </span>
+                ) : (
+                  <span class="inline-flex items-center gap-1.5 text-slate-500">
+                    <span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                    nixpkgs
+                  </span>
+                )}
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+)}

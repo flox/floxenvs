@@ -7,6 +7,7 @@ import InstallTabs from "../../components/InstallTabs.astro";
 import RecipeSection from "../../components/RecipeSection.astro";
 import Markdown from "../../components/Markdown.astro";
 import SidebarEntry from "../../components/SidebarEntry.astro";
+import PackagesInstalled from "../../components/PackagesInstalled.astro";
 import { deriveBundling } from "../../lib/derive";
 
 export async function getStaticPaths() {
@@ -17,6 +18,7 @@ export async function getStaticPaths() {
 const { env } = Astro.props as { env: { data: any } };
 const base = import.meta.env.BASE_URL;
 const pkgs = await getCollection("packages");
+const catalogPkgNames = new Set(pkgs.map((p) => p.data.name));
 
 const { envs: dEnvs, pkgs: dPkgs } = deriveBundling(
   [{
@@ -181,6 +183,25 @@ const jsonLd = [
         readme={env.data.recipe_readme}
         manifestToml={env.data.recipe_manifest}
       />
+
+      {env.data.manifest_install.length > 0 && (
+        <section class="mt-12">
+          <h2 class="text-xl font-semibold">Packages installed</h2>
+          <p class="text-sm text-slate-500 mt-1">
+            Everything <strong>flox/{env.data.name}</strong> brings into a
+            consumer manifest via <code class="text-xs font-mono">[install]</code>.
+            Catalog packages link to their detail page; everything else
+            links to FloxHub or nixpkgs.
+          </p>
+          <div class="mt-4">
+            <PackagesInstalled
+              pkgs={env.data.manifest_install}
+              catalog={catalogPkgNames}
+              base={base}
+            />
+          </div>
+        </section>
+      )}
 
       {recommendedPkgs.length > 0 && (
         <section class="mt-12">

@@ -1,0 +1,32 @@
+kind: pkg
+subkind: plain
+name: herdr
+title: Herdr
+publisher: flox
+tagline: >
+  Agent multiplexer for the terminal — drive many coding
+  agents from one TUI.
+category: ai
+ai_role: orchestrator
+tags: [agent, multiplexer, tui, orchestrator]
+stack: []
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:codex
+  - pkg:opencode
+status: beta
+license: AGPL-3.0
+upstream:
+  name: herdr
+  url: https://github.com/ogulcancelik/herdr
+  license: AGPL-3.0
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    herdr.pkg-path = "flox/herdr"
+    herdr.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/herdr
+  floxhub: https://hub.flox.dev/flox/herdr

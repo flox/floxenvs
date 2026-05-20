@@ -1,0 +1,71 @@
+kind: env
+name: lmstudio
+title: LM Studio
+publisher: flox
+tagline: >
+  Headless LM Studio with an OpenAI-compatible local API on
+  port 11234.
+seo_title: >
+  LM Studio dev environment — local LLMs with an
+  OpenAI-compatible API, GPU-accelerated
+seo_description: >
+  Flox-packaged LM Studio: `lms`, `lm-studio`, headless
+  API on 127.0.0.1:11234. macOS Metal, Linux CUDA/Vulkan.
+  Includes Claude/Codex/OpenCode launchers.
+intro: >
+  flox/lmstudio packages LM Studio as a Flox service so a
+  local OpenAI-compatible LLM endpoint is one
+  `flox activate --start-services` away. The env exposes
+  `lms` (load / serve / get / chat), the `lm-studio` GUI
+  launcher on macOS, and `lms-launch` — a helper that points
+  claude / codex / opencode at the local API in one
+  command. Headless API serves on http://127.0.0.1:11234/v1
+  by default. Requires a Metal-capable GPU on macOS or a
+  CUDA / Vulkan-capable discrete GPU on Linux; the binary
+  hard-exits without one (override with
+  `LMS_SKIP_GPU_CHECK=1` for install-only CI). Pairs well
+  with env:omlx for Apple Silicon MLX inference, with
+  env:verba for local RAG, and with env:claude for
+  Claude-Code-against-local-models workflows.
+summary:
+  - "Headless API on 127.0.0.1:11234 — OpenAI-compatible"
+  - "`lms`, `lm-studio`, `lms-launch` — local model lifecycle"
+  - "macOS Metal, Linux CUDA/Vulkan; aarch64-darwin/linux + x86_64-linux"
+  - "Boots as a Flox service"
+category: ai
+ai_role: llm-runtime
+tags: [llm, local-inference, openai-api, macos, linux]
+stack: [c++]
+featured: false
+combines_well_with:
+  - pkg:omlx
+  - env:omlx
+  - env:verba
+  - env:claude
+status: beta
+license: Unfree
+upstream:
+  name: LM Studio
+  url: https://lmstudio.ai
+  license: Unfree
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/lmstudio" }]
+  activate: |
+    flox activate -r flox/lmstudio --start-services
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/lmstudio-latest
+recipes:
+  - name: lmstudio-demo
+    title: Quick start
+    start_services: true
+    features:
+      - "Boots the headless API server"
+      - "Pings /v1/models to confirm a loaded model"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/lmstudio
+  floxhub: https://hub.flox.dev/flox/lmstudio
+  docker: https://github.com/flox/floxenvs/pkgs/container/floxenvs/lmstudio-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Almstudio

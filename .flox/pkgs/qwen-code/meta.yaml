@@ -1,0 +1,30 @@
+kind: pkg
+subkind: plain
+name: qwen-code
+title: Qwen Code
+publisher: flox
+tagline: >
+  CLI agent for Qwen3-Coder models.
+category: ai
+ai_role: agent
+tags: [agent, cli, qwen, alibaba, coding-agent]
+stack: [nodejs, typescript]
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:claude-code
+status: beta
+license: Apache-2.0
+upstream:
+  name: Qwen Code
+  url: https://github.com/QwenLM/qwen-code
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    qwen-code.pkg-path = "flox/qwen-code"
+    qwen-code.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/qwen-code
+  floxhub: https://hub.flox.dev/flox/qwen-code

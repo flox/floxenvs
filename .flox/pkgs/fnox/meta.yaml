@@ -1,0 +1,31 @@
+kind: pkg
+subkind: plain
+name: fnox
+title: fnox
+publisher: flox
+tagline: >
+  "Fort Knox" — pluggable secret manager: age, KMS,
+  1Password, Vault, password-store, OS keychain.
+category: tool
+tags: [secrets, security, age, kms, vault]
+stack: [rust]
+featured: false
+combines_well_with:
+  - env:fnox
+  - env:1password
+  - env:dotenv
+status: stable
+license: MIT
+upstream:
+  name: fnox
+  url: https://fnox.jdx.dev/
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    fnox.pkg-path = "flox/fnox"
+    fnox.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/fnox
+  floxhub: https://hub.flox.dev/flox/fnox

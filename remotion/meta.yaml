@@ -1,0 +1,69 @@
+kind: env
+name: remotion
+title: Remotion
+publisher: flox
+tagline: >
+  React-based programmatic video toolkit with the Remotion
+  best-practices skill pre-wired into Claude Code.
+seo_title: >
+  Remotion dev environment — React video toolkit with Claude
+  Code best-practices skill
+seo_description: >
+  Flox-packaged Remotion: Node 22, `npx create-video` ready,
+  and the Remotion best-practices skill auto-registered as a
+  Claude Code plugin. ffmpeg comes from Remotion itself.
+intro: >
+  flox/remotion sets up a Remotion-ready Node 22 sandbox and
+  composes flox/claude with claude-code-plugin-remotion so
+  the Remotion best-practices skill loads automatically
+  whenever Claude touches Remotion code. ffmpeg/ffprobe are
+  intentionally not in the closure — Remotion ships its own
+  via `npx remotion ffmpeg`, which is what the skill tells
+  the agent to use. Useful for building videos
+  programmatically with React (animations, audio, captions,
+  3D, transitions, charts). Combines well with env:claude
+  for the managed-config + isolated workflow, with
+  env:javascript-node for separately-pinned node tooling,
+  and with env:playwright if your video content needs to
+  capture browser screenshots.
+summary:
+  - "Node 22 ready for `npx create-video`, `remotion studio`, `remotion render`"
+  - "Remotion best-practices skill auto-loaded in Claude Code"
+  - "ffmpeg sourced from Remotion itself — no host install"
+  - "Composes cleanly with flox/claude"
+category: ai
+ai_role: tooling
+tags: [video, react, claude-code, plugin, programmatic-video]
+stack: [nodejs, typescript, react]
+featured: false
+combines_well_with:
+  - env:claude
+  - env:javascript-node
+  - env:playwright
+status: beta
+license: MIT
+upstream:
+  name: Remotion
+  url: https://remotion.dev
+  license: Remotion License
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/remotion" }]
+  activate: |
+    flox activate -r flox/remotion
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/remotion-latest
+recipes:
+  - name: remotion-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Scaffolds a blank Remotion project"
+      - "Opens the Remotion studio against the demo"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/remotion
+  floxhub: https://hub.flox.dev/flox/remotion
+  docker: https://github.com/flox/floxenvs/pkgs/container/floxenvs/remotion-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Aremotion

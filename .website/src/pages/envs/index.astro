@@ -61,6 +61,9 @@ const jsonLd = [collectionPage, { ...itemList, "@id": `${pageUrl}#items` }, brea
   <p class="mt-1 text-sm text-slate-500">
     {envs.length} environments
   </p>
+  <div class="mt-4 flex gap-2 text-sm">
+    <a href={`${base}envs/packages/`} class="underline">Packages across envs →</a>
+  </div>
   <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
     {envs.map((e) => (
       <ItemCard

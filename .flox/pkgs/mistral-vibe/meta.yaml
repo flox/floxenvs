@@ -1,0 +1,30 @@
+kind: pkg
+subkind: plain
+name: mistral-vibe
+title: Mistral Vibe
+publisher: flox
+tagline: >
+  Mistral AI's minimal CLI coding agent powered by Devstral.
+category: ai
+ai_role: agent
+tags: [agent, cli, mistral, devstral, coding-agent]
+stack: [python, rust]
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:codex
+status: beta
+license: MIT
+upstream:
+  name: mistral-vibe
+  url: https://github.com/mistralai/mistral-vibe
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    mistral-vibe.pkg-path = "flox/mistral-vibe"
+    mistral-vibe.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/mistral-vibe
+  floxhub: https://hub.flox.dev/flox/mistral-vibe

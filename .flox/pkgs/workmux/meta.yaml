@@ -1,0 +1,31 @@
+kind: pkg
+subkind: plain
+name: workmux
+title: workmux
+publisher: flox
+tagline: >
+  Git worktrees + tmux windows for zero-friction parallel
+  development.
+category: tool
+tags: [git, worktree, tmux, workflow, parallel]
+stack: [rust]
+featured: false
+combines_well_with:
+  - env:worktrunk
+  - env:claude
+  - pkg:worktrunk
+status: stable
+license: MIT
+upstream:
+  name: workmux
+  url: https://github.com/raine/workmux
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    workmux.pkg-path = "flox/workmux"
+    workmux.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/workmux
+  floxhub: https://hub.flox.dev/flox/workmux

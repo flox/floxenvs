@@ -1,0 +1,32 @@
+kind: pkg
+subkind: plain
+name: skillspector
+title: SkillSpector
+publisher: flox
+tagline: >
+  Security scanner for AI agent skills — NVIDIA's static
+  analysis for prompt-injected skill bundles.
+category: ai
+ai_role: tooling
+tags: [security, skills, scanner, nvidia, static-analysis]
+stack: [python]
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:skills-frontend-design
+  - pkg:skills-skill-creator
+status: beta
+license: Apache-2.0
+upstream:
+  name: SkillSpector
+  url: https://github.com/NVIDIA/SkillSpector
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    skillspector.pkg-path = "flox/skillspector"
+    skillspector.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/skillspector
+  floxhub: https://hub.flox.dev/flox/skillspector

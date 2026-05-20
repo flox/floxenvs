@@ -1,0 +1,29 @@
+kind: pkg
+subkind: plain
+name: temporal
+title: Temporal Server
+publisher: flox
+tagline: >
+  Temporal orchestration platform — server and tools.
+category: service
+tags: [temporal, workflow, orchestration, server, durable-execution]
+stack: [go]
+featured: false
+combines_well_with:
+  - env:temporal
+  - pkg:temporal-cli
+status: stable
+license: MIT
+upstream:
+  name: Temporal
+  url: https://temporal.io
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    temporal.pkg-path = "flox/temporal"
+    temporal.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/temporal
+  floxhub: https://hub.flox.dev/flox/temporal

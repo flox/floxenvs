@@ -1,0 +1,31 @@
+kind: pkg
+subkind: plain
+name: spec-kit
+title: Spec Kit
+publisher: flox
+tagline: >
+  GitHub Spec Kit's `specify` CLI — bootstrap spec-driven
+  dev projects for AI agents.
+category: ai
+ai_role: tooling
+tags: [agent, workflow, spec-driven, github, scaffold]
+stack: [python]
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:openspec
+status: beta
+license: MIT
+upstream:
+  name: Spec Kit
+  url: https://github.com/github/spec-kit
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    spec-kit.pkg-path = "flox/spec-kit"
+    spec-kit.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/spec-kit
+  floxhub: https://hub.flox.dev/flox/spec-kit

@@ -1,0 +1,67 @@
+kind: env
+name: fnox
+title: fnox
+publisher: flox
+tagline: >
+  "Fort Knox" — pluggable secrets layer for any Flox environment.
+seo_title: >
+  fnox dev environment — secrets in age, 1Password, Vault, KMS,
+  keychain, exposed as env vars
+seo_description: >
+  Flox-packaged fnox: one include line gives any env a
+  secrets layer backed by age, AWS/Azure/GCP KMS, 1Password,
+  Vault, password-store, OS keychain, and more.
+intro: >
+  flox/fnox layers jdx's fnox ("Fort Knox") secret manager
+  underneath any Flox env so secrets resolve at activation
+  time and reach your app as plain environment variables
+  without ever landing in shell history or git. fnox speaks
+  age-encrypted files, AWS/Azure/GCP KMS, 1Password,
+  Bitwarden, HashiCorp Vault, AWS Secrets Manager, GCP
+  Secret Manager, Doppler, Infisical, password-store, and the
+  OS keychain — pick a provider per-secret in `fnox.toml`,
+  no per-team daemon required. Use the `on-activate` hook
+  recipe to export all secrets into the env, or wrap
+  individual commands with `fnox exec` to scope leakage.
+  Pairs cleanly with env:1password for first-party secret
+  vaulting, and with env:dotenv during migration off
+  long-lived `.env` files.
+summary:
+  - "Pluggable providers — age, KMS, 1Password, Vault, ..."
+  - "Secrets load on activation or per-command via fnox exec"
+  - "Lives as a base layer — include into any env"
+  - "No daemon — secrets resolve on demand"
+category: tool
+tags: [secrets, security, age, kms, vault]
+stack: [rust]
+featured: false
+combines_well_with:
+  - env:1password
+  - env:dotenv
+status: beta
+license: MIT
+upstream:
+  name: fnox
+  url: https://fnox.jdx.dev/
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/fnox" }]
+  activate: |
+    flox activate -r flox/fnox
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/fnox-latest
+recipes:
+  - name: fnox-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Demonstrates age-encrypted secrets in git"
+      - "Loads secrets via on-activate hook"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/fnox
+  floxhub: https://hub.flox.dev/flox/fnox
+  docker: https://github.com/flox/floxenvs/pkgs/container/floxenvs/fnox-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Afnox

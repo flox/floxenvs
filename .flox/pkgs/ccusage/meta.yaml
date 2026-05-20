@@ -1,0 +1,32 @@
+kind: pkg
+subkind: plain
+name: ccusage
+title: ccusage
+publisher: flox
+tagline: >
+  Local-first token-usage and cost analyzer for AI coding
+  agents.
+category: ai
+ai_role: tooling
+tags: [observability, cost, claude-code, token-usage]
+stack: [rust]
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:claude-code
+  - pkg:codex
+status: stable
+license: MIT
+upstream:
+  name: ccusage
+  url: https://github.com/ryoppippi/ccusage
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    ccusage.pkg-path = "flox/ccusage"
+    ccusage.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/ccusage
+  floxhub: https://hub.flox.dev/flox/ccusage

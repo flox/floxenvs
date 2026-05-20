@@ -1,0 +1,70 @@
+kind: env
+name: gstack
+title: gstack
+publisher: flox
+tagline: >
+  Garry Tan's 45-skill Claude Code stack — planning, design,
+  QA, review, security, shipping — in one include line.
+seo_title: >
+  gstack dev environment for Claude Code — Garry Tan's 45
+  opinionated skills for planning, design, QA, and shipping
+seo_description: >
+  Flox-packaged gstack: 45 skills for Claude Code covering
+  the full product loop, layered on flox/claude through the
+  managed config. Self-contained — bundled bun, node, jq.
+intro: >
+  flox/gstack composes flox/claude with the
+  claude-code-plugin-gstack bundle — Garry Tan's
+  opinionated 45-skill Claude Code stack — so the agent has
+  ready-to-run workflows for every phase of the product
+  loop. The skill catalog covers planning (`/office-hours`,
+  `/plan-ceo-review`, `/plan-eng-review`, `/autoplan`),
+  design (`/design-consultation`, `/design-html`,
+  `/design-review`), QA (`/qa`, `/review`, `/security`),
+  and shipping (`/ship`, `/release-notes`). Bun, node, git,
+  jq, and curl are bundled inside the plugin tree so the
+  skill commands work regardless of what the consumer env
+  exposes. Pair with vibe-kanban for cross-session task
+  continuity, or with env:graphify for richer codebase
+  context.
+summary:
+  - "45 Claude Code skills wired through managed config"
+  - "Covers planning, design, QA, review, security, shipping"
+  - "Self-contained — bundled bun, node, git, jq, curl"
+  - "Skills resolved via $CLAUDE_PLUGIN_ROOT"
+category: ai
+ai_role: tooling
+tags: [agent, claude-code, plugin, workflow, skills]
+stack: [bun, nodejs]
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:vibe-kanban
+  - env:graphify
+status: beta
+license: MIT
+upstream:
+  name: gstack
+  url: https://github.com/garrytan/gstack
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/gstack" }]
+  activate: |
+    flox activate -r flox/gstack
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/gstack-latest
+recipes:
+  - name: gstack-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Loads the gstack skill catalog into Claude Code"
+      - "Demonstrates /office-hours and /ship"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/gstack
+  floxhub: https://hub.flox.dev/flox/gstack
+  docker: https://github.com/flox/floxenvs/pkgs/container/floxenvs/gstack-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Agstack

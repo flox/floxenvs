@@ -1,0 +1,67 @@
+kind: env
+name: worktrunk
+title: Worktrunk
+publisher: flox
+tagline: >
+  Git worktree management designed for running parallel
+  AI coding agents.
+seo_title: >
+  Worktrunk dev environment — parallel git worktrees for
+  Claude Code, Codex, Gemini CLI
+seo_description: >
+  Flox-packaged Worktrunk: `wt` and `git wt` for managing
+  many worktrees at once, designed for parallel AI coding
+  agent runs. git bundled, no host wiring.
+intro: >
+  flox/worktrunk packages the Worktrunk CLI — a git worktree
+  manager purpose-built for spinning up many AI coding
+  sessions in parallel without trampling each other's
+  branches. Exposes `wt` and the same binary as `git wt`,
+  with `git` always wrapped onto the PATH so it works
+  regardless of what the consumer env provides. Pair with
+  any coding agent env — flox/claude, pkg:codex,
+  pkg:gemini-cli, pkg:opencode — and run them side by side
+  in isolated worktrees. Useful when one repo needs many
+  concurrent agent sessions, or for branch-heavy workflows
+  (stacked PRs, large-scale refactors).
+summary:
+  - "`wt` and `git wt` — same binary, two entrypoints"
+  - "Designed for parallel AI coding agents"
+  - "Bundled git so wt's runtime works anywhere"
+  - "Per-env scratch dir under $FLOX_ENV_CACHE/worktrunk"
+category: tool
+tags: [git, worktree, agent, workflow]
+stack: [go]
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:codex
+  - pkg:gemini-cli
+  - pkg:opencode
+status: beta
+license: MIT
+upstream:
+  name: Worktrunk
+  url: https://worktrunk.dev
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/worktrunk" }]
+  activate: |
+    flox activate -r flox/worktrunk
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/worktrunk-latest
+recipes:
+  - name: worktrunk-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Walks through `wt switch -c feat`"
+      - "Pairs worktrunk with a coding agent env"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/worktrunk
+  floxhub: https://hub.flox.dev/flox/worktrunk
+  docker: https://github.com/flox/floxenvs/pkgs/container/floxenvs/worktrunk-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Aworktrunk

@@ -1,0 +1,68 @@
+kind: env
+name: iloom
+title: iloom
+publisher: flox
+tagline: >
+  Run Claude Code in isolated git worktrees and persist its
+  reasoning to your issue tracker.
+seo_title: >
+  iloom dev environment — Claude Code in git worktrees, plans
+  persisted to GitHub/Linear/Jira/BitBucket
+seo_description: >
+  Flox-packaged iloom: spins Claude Code up inside an
+  isolated worktree per issue and writes its analysis, plans,
+  and decisions back to the tracker. GitHub CLI bundled.
+intro: >
+  flox/iloom packages iloom — the workflow CLI that runs
+  Claude Code inside a fresh git worktree per issue and
+  persists every plan, decision, and review back to your
+  tracker. Supports GitHub, Linear, Jira, and BitBucket out
+  of the box. The env bundles `gh` for GitHub auth and wraps
+  the binary so `git` is always on its PATH, regardless of
+  what the consumer env provides. Bring your own coding
+  agent: layer flox/claude alongside this env for a managed
+  Claude CLI, or pair with pkg:codex / pkg:opencode for
+  alternative agents. Useful when one repo needs many
+  parallel agent sessions without trampling each other's
+  worktrees.
+summary:
+  - "Per-issue git worktree, no manual setup"
+  - "Persists agent reasoning to your issue tracker"
+  - "GitHub, Linear, Jira, BitBucket — pick one"
+  - "Bundled gh CLI and git PATH wiring"
+category: ai
+ai_role: orchestrator
+tags: [agent, worktree, git, workflow, claude-code]
+stack: [rust]
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:vibe-kanban
+  - env:graphify
+status: beta
+license: MIT
+upstream:
+  name: iloom-cli
+  url: https://github.com/iloom-ai/iloom-cli
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/iloom" }]
+  activate: |
+    flox activate -r flox/iloom
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/iloom-latest
+recipes:
+  - name: iloom-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Composes iloom with flox/claude"
+      - "Demonstrates `il start <issue-number>`"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/iloom
+  floxhub: https://hub.flox.dev/flox/iloom
+  docker: https://github.com/flox/floxenvs/pkgs/container/floxenvs/iloom-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Ailoom

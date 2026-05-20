@@ -1,0 +1,32 @@
+kind: pkg
+subkind: plain
+name: iloom-cli
+title: iloom CLI
+publisher: flox
+tagline: >
+  Control plane for AI-assisted development — Claude Code
+  in isolated worktrees, reasoning persisted to your tracker.
+category: ai
+ai_role: orchestrator
+tags: [agent, workflow, claude-code, worktree, orchestrator]
+stack: [nodejs, typescript]
+featured: false
+combines_well_with:
+  - env:iloom
+  - env:claude
+  - env:worktrunk
+status: beta
+license: BSL-1.1
+upstream:
+  name: iloom-cli
+  url: https://github.com/iloom-ai/iloom-cli
+  license: BSL-1.1
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    iloom-cli.pkg-path = "flox/iloom-cli"
+    iloom-cli.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/iloom-cli
+  floxhub: https://hub.flox.dev/flox/iloom-cli

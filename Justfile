@@ -21,23 +21,23 @@ validate:
 
 # Website: start the Astro dev server with hot reload
 website-dev:
-    cd .website && npm run dev
+    cd .website && npm ci && npm run dev
 
 # Website: produce the static build in .website/dist
 website-build:
-    cd .website && npm run build
+    cd .website && npm ci && npm run build
 
 # Website: run vitest unit tests for content libs
 website-test:
-    cd .website && npm run test
+    cd .website && npm ci && npm run test
 
 # Website: run astro check (TypeScript + Astro diagnostics)
 website-check:
-    cd .website && npm run check
+    cd .website && npm ci && npm run check
 
 # Website: build and push .website/dist to the gh-pages branch
 website-push:
-    cd .website && npm run build
+    cd .website && npm ci && npm run build
     cd .website && npx gh-pages \
         --dist dist \
         --branch gh-pages \

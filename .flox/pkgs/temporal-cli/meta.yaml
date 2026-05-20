@@ -1,0 +1,29 @@
+kind: pkg
+subkind: plain
+name: temporal-cli
+title: Temporal CLI
+publisher: flox
+tagline: >
+  Temporal CLI — dev server, workflow management, namespaces.
+category: service
+tags: [temporal, workflow, orchestration, cli]
+stack: [go]
+featured: false
+combines_well_with:
+  - env:temporal
+  - pkg:temporal
+status: stable
+license: MIT
+upstream:
+  name: Temporal CLI
+  url: https://docs.temporal.io/cli
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    temporal-cli.pkg-path = "flox/temporal-cli"
+    temporal-cli.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/temporal-cli
+  floxhub: https://hub.flox.dev/flox/temporal-cli

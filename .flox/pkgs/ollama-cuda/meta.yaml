@@ -1,0 +1,33 @@
+kind: pkg
+subkind: plain
+name: ollama-cuda
+title: Ollama (CUDA)
+publisher: flox
+tagline: >
+  Ollama with NVIDIA CUDA acceleration enabled — Linux only.
+category: ai
+ai_role: llm-runtime
+tags: [llm, ollama, cuda, nvidia, local-inference]
+stack: [go, cuda]
+featured: false
+combines_well_with:
+  - pkg:ollama
+  - env:verba
+  - env:langchain
+status: stable
+license: MIT
+upstream:
+  name: Ollama
+  url: https://ollama.com
+  license: MIT
+maintainer: "@rok"
+systems: [x86_64-linux]
+install:
+  pkg: |
+    [install]
+    ollama-cuda.pkg-path = "flox/ollama-cuda"
+    ollama-cuda.publisher = "flox"
+    ollama-cuda.systems = ["x86_64-linux"]
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/ollama-cuda
+  floxhub: https://hub.flox.dev/flox/ollama-cuda

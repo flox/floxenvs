@@ -1,0 +1,31 @@
+kind: pkg
+subkind: plain
+name: amp
+title: Amp
+publisher: flox
+tagline: >
+  Sourcegraph's agentic coding CLI — drop-in alternative to
+  Claude Code with multi-model support.
+category: ai
+ai_role: agent
+tags: [agent, cli, sourcegraph, coding-agent]
+stack: [typescript]
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:claude-code
+status: stable
+license: Unfree
+upstream:
+  name: Amp
+  url: https://ampcode.com/
+  license: Unfree
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    amp.pkg-path = "flox/amp"
+    amp.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/amp
+  floxhub: https://hub.flox.dev/flox/amp

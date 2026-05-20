@@ -1,0 +1,69 @@
+kind: env
+name: serena
+title: Serena
+publisher: flox
+tagline: >
+  Semantic IDE-grade tools for coding agents — exposed via
+  MCP over SSE.
+seo_title: >
+  Serena dev environment — IDE-grade semantic MCP toolkit
+  for Claude Code, Cursor, ChatGPT
+seo_description: >
+  Flox-packaged Serena: language-server-backed find-symbol,
+  find-references, rename, and symbolic edit, served over
+  MCP/SSE on port 19121.
+intro: >
+  flox/serena packages Serena — Oraios's MCP toolkit that
+  gives coding agents real IDE semantics — with the
+  language-server runtime pre-wired and the MCP server
+  running as a Flox service on
+  http://127.0.0.1:19121/sse by default. Serena exposes
+  symbolic operations the model can't fake with grep:
+  find-symbol, find-references, rename, symbolic edit —
+  driven by an underlying language server. Includes
+  `serena-hooks` for project-side wiring and pulls in
+  Node 20 so the bundled Pyright LSP runs without host
+  setup. Pair with env:claude or any other MCP-capable
+  agent host. Useful for codebases where wrong-file-edits
+  are expensive (large monorepos, ambiguous symbol names).
+summary:
+  - "MCP/SSE server on 127.0.0.1:19121"
+  - "find-symbol, find-references, rename, symbolic edit"
+  - "Bundled Pyright + node runtime, no host LSP setup"
+  - "Boots as a Flox service"
+category: ai
+ai_role: tooling
+tags: [agent, mcp, lsp, refactor, ide]
+stack: [python, nodejs]
+featured: false
+combines_well_with:
+  - env:claude
+  - env:graphify
+  - env:python-uv
+status: beta
+license: MIT
+upstream:
+  name: Serena
+  url: https://github.com/oraios/serena
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/serena" }]
+  activate: |
+    flox activate -r flox/serena --start-services
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/serena-latest
+recipes:
+  - name: serena-demo
+    title: Quick start
+    start_services: true
+    features:
+      - "Boots the Serena MCP server on :19121"
+      - "Demonstrates find-symbol from Claude Code"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/serena
+  floxhub: https://hub.flox.dev/flox/serena
+  docker: https://github.com/flox/floxenvs/pkgs/container/floxenvs/serena-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Aserena

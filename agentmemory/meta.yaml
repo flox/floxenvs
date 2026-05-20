@@ -1,0 +1,68 @@
+kind: env
+name: agentmemory
+title: AgentMemory
+publisher: flox
+tagline: >
+  Persistent memory for Claude Code — hooks, skills, and a REST/MCP
+  backend service in one include line.
+seo_title: >
+  AgentMemory dev environment for Claude Code — persistent agent
+  memory backed by a local service
+seo_description: >
+  Flox-packaged AgentMemory: 13 hooks, 8 skills, and the REST/MCP
+  backend on port 3111. One include line wires Claude Code to a
+  persistent, project-scoped memory store.
+intro: >
+  flox/agentmemory composes flox/claude with the
+  claude-code-plugin-agentmemory bundle and the matching
+  AgentMemory REST/MCP backend, so every new Claude Code session
+  starts with relevant prior context already injected.
+  AgentMemory captures tool usage, compresses observations into
+  long-lived facts, and exposes recall/remember/handoff skills to
+  the agent. The backend boots as a Flox service on
+  http://localhost:3111 — no global daemons, no shared state with
+  other projects. Includes the node runtime so the REST shim runs
+  without the consumer env supplying nodejs. Combines well with
+  graphify for graph-shaped retrieval and with vibe-kanban for
+  cross-session task continuity.
+summary:
+  - "Plugin tree + REST/MCP backend in one include"
+  - "13 hooks fire automatically — no per-session wiring"
+  - "8 skills: /recall, /remember, /handoff, /recap, …"
+  - "Backend boots as a Flox service on port 3111"
+category: ai
+ai_role: tooling
+tags: [agent, claude-code, memory, mcp, rag]
+stack: [nodejs, typescript]
+featured: false
+combines_well_with:
+  - env:claude
+  - env:graphify
+  - pkg:vibe-kanban
+status: beta
+license: MIT
+upstream:
+  name: agentmemory
+  url: https://github.com/rohitg00/agentmemory
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/agentmemory" }]
+  activate: |
+    flox activate -r flox/agentmemory --start-services
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/agentmemory-latest
+recipes:
+  - name: agentmemory-demo
+    title: Quick start
+    start_services: true
+    features:
+      - "Wires Claude Code with the agentmemory plugin"
+      - "REST/MCP backend launches automatically on :3111"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/agentmemory
+  floxhub: https://hub.flox.dev/flox/agentmemory
+  docker: https://github.com/flox/floxenvs/pkgs/container/floxenvs/agentmemory-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Aagentmemory

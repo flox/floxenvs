@@ -1,0 +1,31 @@
+kind: pkg
+subkind: plain
+name: openspec
+title: OpenSpec
+publisher: flox
+tagline: >
+  Spec-driven development workflow for AI coding assistants.
+category: ai
+ai_role: tooling
+tags: [agent, workflow, spec-driven, planning]
+stack: [nodejs, typescript]
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:claude-code
+  - pkg:spec-kit
+status: beta
+license: MIT
+upstream:
+  name: OpenSpec
+  url: https://github.com/Fission-AI/OpenSpec
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    openspec.pkg-path = "flox/openspec"
+    openspec.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/openspec
+  floxhub: https://hub.flox.dev/flox/openspec

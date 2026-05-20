@@ -1,0 +1,32 @@
+kind: pkg
+subkind: plain
+name: gemini-cli
+title: Gemini CLI
+publisher: flox
+tagline: >
+  Google's Gemini coding agent — same model as Gemini in the
+  browser, in your terminal.
+category: ai
+ai_role: agent
+tags: [agent, cli, google, gemini, coding-agent]
+stack: [nodejs, typescript]
+featured: true
+combines_well_with:
+  - env:claude
+  - pkg:codex
+  - env:worktrunk
+status: stable
+license: Apache-2.0
+upstream:
+  name: Gemini CLI
+  url: https://github.com/google-gemini/gemini-cli
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    gemini-cli.pkg-path = "flox/gemini-cli"
+    gemini-cli.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/gemini-cli
+  floxhub: https://hub.flox.dev/flox/gemini-cli

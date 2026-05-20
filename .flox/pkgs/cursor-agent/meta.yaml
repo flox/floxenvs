@@ -1,0 +1,31 @@
+kind: pkg
+subkind: plain
+name: cursor-agent
+title: Cursor Agent
+publisher: flox
+tagline: >
+  Cursor's headless coding agent CLI — the same model behind
+  the editor, in your terminal.
+category: ai
+ai_role: agent
+tags: [agent, cli, cursor, coding-agent]
+stack: [typescript]
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:claude-code
+status: stable
+license: Unfree
+upstream:
+  name: Cursor Agent
+  url: https://cursor.com/
+  license: Unfree
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    cursor-agent.pkg-path = "flox/cursor-agent"
+    cursor-agent.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/cursor-agent
+  floxhub: https://hub.flox.dev/flox/cursor-agent

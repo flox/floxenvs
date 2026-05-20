@@ -1,0 +1,31 @@
+kind: pkg
+subkind: plain
+name: forgecode
+title: ForgeCode
+publisher: flox
+tagline: >
+  AI pair programmer for 300+ LLM providers — runs entirely
+  in your terminal.
+category: ai
+ai_role: agent
+tags: [agent, cli, coding-agent, multi-model]
+stack: []
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:claude-code
+status: beta
+license: MIT
+upstream:
+  name: ForgeCode
+  url: https://forgecode.dev
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    forgecode.pkg-path = "flox/forgecode"
+    forgecode.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/forgecode
+  floxhub: https://hub.flox.dev/flox/forgecode
