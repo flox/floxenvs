@@ -19,19 +19,19 @@ Or from FloxHub:
 
 ```toml
 [include]
-environments = ["flox/cassandra"]
+environments = [{ remote = "flox/cassandra" }]
 ```
 
 ## Default variables
 
-| Variable | Default |
-| ----------------------- | ------------- |
-| `CASSANDRA_HOST` | `127.0.0.1` |
-| `CASSANDRA_PORT` | `19042` |
-| `CASSANDRA_STORAGE_PORT`| `7070` |
-| `CASSANDRA_CLUSTER_NAME`| `My Cluster` |
-| `CASSANDRA_SEED_ADDRS` | `127.0.0.1` |
-| `CASSANDRA_ALLOW_CLIENTS`| `true` |
+| Variable                  | Default      |
+| ------------------------- | ------------ |
+| `CASSANDRA_HOST`          | `127.0.0.1`  |
+| `CASSANDRA_PORT`          | `19042`      |
+| `CASSANDRA_STORAGE_PORT`  | `7070`       |
+| `CASSANDRA_CLUSTER_NAME`  | `My Cluster` |
+| `CASSANDRA_SEED_ADDRS`    | `127.0.0.1`  |
+| `CASSANDRA_ALLOW_CLIENTS` | `true`       |
 
 Override any variable in your own manifest:
 

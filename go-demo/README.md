@@ -22,7 +22,7 @@ go build && ./hello
 | `gotools`      | Standard tools (`goimports`, etc.)   |
 | `gomodifytags` | Struct tag modifier                  |
 | `gotests`      | Test generator                       |
-| `gore`         | Go REPL                             |
+| `gore`         | Go REPL                              |
 | `go-task`      | Task runner (Taskfile.yml)           |
 | `gum`          | Terminal UI for scripts              |
 
@@ -51,5 +51,5 @@ in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/go"]
+environments = [{ remote = "flox/go" }]
 ```

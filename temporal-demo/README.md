@@ -31,7 +31,7 @@ SQLite storage. No external dependencies required.
 
 After starting services, open the Temporal Web UI:
 
-```
+```text
 http://localhost:8233
 ```
 
@@ -94,7 +94,7 @@ the minimal environment in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/temporal"]
+environments = [{ remote = "flox/temporal" }]
 ```
 
 This gives you the Temporal dev server with sane

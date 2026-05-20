@@ -9,7 +9,7 @@ Include in your manifest:
 
 ```toml
 [include]
-environments = ["flox/claude"]
+environments = [{ remote = "flox/claude" }]
 ```
 
 ## What it provides

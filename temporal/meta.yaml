@@ -1,0 +1,53 @@
+kind: env
+name: temporal
+title: Temporal
+publisher: flox
+tagline: >
+  Temporal dev server ready to include — workflow orchestration
+  with SQLite storage and built-in Web UI, no external deps.
+summary:
+  - "Temporal dev server via `temporal-cli` — all-in-one binary"
+  - "gRPC frontend on port 7233, Web UI on port 8233"
+  - "SQLite storage under `$FLOX_ENV_CACHE/temporal`"
+  - "Works with all Temporal SDKs (Python, Go, Java, TypeScript)"
+  - "Boots as a Flox service with `--start-services`"
+category: service
+tags: [temporal, workflows, orchestration, service]
+stack: [go]
+featured: false
+combines_well_with:
+  - env:python-pip
+  - env:python-poetry
+  - env:python-uv
+  - env:go
+  - env:javascript-node
+status: stable
+license: MIT
+upstream:
+  name: Temporal
+  url: https://temporal.io/
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/temporal" }]
+  activate: |
+    flox activate -r flox/temporal --start-services
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/temporal-latest
+recipes:
+  - name: temporal-demo
+    title: Quick start
+    start_services: true
+    features:
+      - "Launches Temporal dev server as a Flox service"
+      - "Web UI available at http://127.0.0.1:8233"
+      - "Sample workflow and worker with styled terminal output"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/temporal
+  floxhub: https://hub.flox.dev/flox/temporal
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/temporal-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Atemporal

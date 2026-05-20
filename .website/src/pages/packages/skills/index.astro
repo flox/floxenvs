@@ -1,0 +1,56 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../../layouts/Layout.astro";
+import ItemCard from "../../../components/ItemCard.astro";
+
+const base = import.meta.env.BASE_URL;
+const pkgs = (await getCollection("packages"))
+  .filter((p) => p.data.subkind === "skill")
+  .sort((a, b) => a.data.name.localeCompare(b.data.name));
+---
+<Layout
+  title="Claude Code skills on Flox — packaged, pinned, one-line install"
+  description="Every Claude Code skill packaged for Flox — domain-specific capability bundles like writing, coding, and shell utilities. Each one Nix-pinned and reproducible."
+>
+  <h1 class="text-2xl font-bold">Skills</h1>
+  <p class="mt-1 text-sm text-slate-500">{pkgs.length} skills</p>
+  <p class="mt-4 text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-3xl">
+    Skills are domain-specific capability bundles for Claude Code — packaged
+    prompts, scripts, and configurations that give an agent specific
+    expertise. The packages on this page wrap each skill as a Flox-installable,
+    Nix-pinned bundle so a team gets identical agent behavior across every
+    developer's machine. Add a skill via
+    <code class="font-mono text-sm">flox/skill-&lt;name&gt;</code> in any
+    manifest's <code class="font-mono text-sm">[install]</code> block.
+  </p>
+  <p class="mt-3 text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-3xl">
+    Skills differ from plugins in scope: a plugin extends the agent
+    runtime (MCP servers, command palettes, IDE hooks) while a skill is
+    a tightly-scoped knowledge or workflow bundle. A skill might teach the
+    agent how to write release notes for your team's specific format,
+    how to triage incidents using your runbook, or how to apply your
+    company's house style to documentation. Packaging skills as Flox
+    bundles is the same trick as plugins — version-locked, manifest-included,
+    reproducible. Bring up a fresh laptop, run <code class="font-mono text-xs">flox activate</code>,
+    and the same agent with the same skills is ready to go.
+  </p>
+  <p class="mt-3 text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-3xl">
+    All skills listed below pair with <a href={`${base}envs/claude/`} class="underline">flox/claude</a>,
+    which materializes skill manifests into the agent's config tree on
+    activation. No copy-pasting prompts between machines, no drift between
+    a developer's local skills and the CI runner's.
+  </p>
+  <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    {pkgs.map((p) => (
+      <ItemCard
+        kind="pkg"
+        subkind="skill"
+        name={p.data.name}
+        title={p.data.title}
+        tagline={p.data.tagline}
+        href={`${base}packages/${p.data.name}/`}
+        ai_role={p.data.ai_role}
+      />
+    ))}
+  </div>
+</Layout>

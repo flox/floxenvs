@@ -1,0 +1,34 @@
+kind: pkg
+subkind: plain
+name: opencode
+title: Opencode
+publisher: flox
+tagline: >
+  AI coding agent built for the terminal.
+summary:
+  - "Terminal-native AI coding agent with fuzzy search via fzf"
+  - "Pre-built binary for Linux and macOS, no runtime required"
+  - "Integrates ripgrep for fast codebase search"
+category: ai
+ai_role: agent
+tags: [agent, cli, coding, coding-agent, terminal, fzf, ripgrep]
+stack: [nodejs]
+featured: false
+combines_well_with:
+  - env:claude
+status: stable
+license: MIT
+upstream:
+  name: Opencode
+  url: https://github.com/anomalyco/opencode
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    opencode.pkg-path = "flox/opencode"
+    opencode.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/opencode
+  floxhub: https://hub.flox.dev/flox/opencode

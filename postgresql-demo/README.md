@@ -116,7 +116,7 @@ environment in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/postgresql"]
+environments = [{ remote = "flox/postgresql" }]
 ```
 
 This gives you PostgreSQL with sane defaults. Override

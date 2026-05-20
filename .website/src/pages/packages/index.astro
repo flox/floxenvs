@@ -1,0 +1,82 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import ItemCard from "../../components/ItemCard.astro";
+
+const base = import.meta.env.BASE_URL;
+const pkgs = (await getCollection("packages")).sort((a, b) =>
+  a.data.name.localeCompare(b.data.name),
+);
+const origin = (Astro.site?.toString() ?? "").replace(/\/$/, "");
+const pageUrl = `${origin}${base}packages/`;
+const itemList = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Flox packages",
+  url: pageUrl,
+  numberOfItems: pkgs.length,
+  itemListElement: pkgs.map((p, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: p.data.title,
+    url: `${origin}${base}packages/${p.data.name}/`,
+  })),
+};
+const collectionPage = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "Flox packages",
+  description:
+    "Curated catalog of Flox packages — AI coding agents, Claude Code plugins and skills, CLI tools, and runtimes.",
+  url: pageUrl,
+  isPartOf: { "@type": "WebSite", "@id": `${origin}${base}#website` },
+  mainEntity: { "@id": `${pageUrl}#items` },
+};
+const breadcrumb = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "flox / envs",
+      item: `${origin}${base}`,
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Packages",
+      item: pageUrl,
+    },
+  ],
+};
+const jsonLd = [collectionPage, { ...itemList, "@id": `${pageUrl}#items` }, breadcrumb];
+---
+<Layout
+  title="Flox packages — AI coding agents, Claude Code plugins, and CLI tools"
+  description="Browse every Flox package — Claude Code, Ollama, Codex, Crush, LangChain, and dozens more. Each one ships as a Nix-pinned binary with a one-line manifest install."
+  jsonLd={jsonLd}
+>
+  <h1 class="text-2xl font-bold">Packages</h1>
+  <p class="mt-1 text-sm text-slate-500">
+    {pkgs.length} packages
+  </p>
+  <div class="mt-4 flex gap-2 text-sm">
+    <a href={`${base}packages/plugins/`} class="underline">Plugins</a>
+    <a href={`${base}packages/skills/`} class="underline">Skills</a>
+  </div>
+  <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    {pkgs.map((p) => (
+      <ItemCard
+        kind="pkg"
+        subkind={p.data.subkind}
+        name={p.data.name}
+        title={p.data.title}
+        tagline={p.data.tagline}
+        href={`${base}packages/${p.data.name}/`}
+        ai_role={p.data.ai_role}
+        category={p.data.category}
+      />
+    ))}
+  </div>
+</Layout>

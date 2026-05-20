@@ -1,0 +1,31 @@
+kind: pkg
+subkind: plain
+name: claude-managed
+title: Claude Managed
+publisher: flox
+tagline: >
+  Flox-native config management helper for Claude Code CLI.
+summary:
+  - "Assembles Claude Code config from per-package fragments on activate"
+  - "Manages rules, skills, agents, and plugins via isolated CLAUDE_CONFIG_DIR"
+  - "Bridges macOS Keychain credentials so isolated sessions authenticate"
+category: ai
+ai_role: tooling
+tags: [claude-code, config, management, go, mcp]
+stack: [go]
+featured: false
+combines_well_with:
+  - pkg:claude-code
+  - env:claude
+status: stable
+license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    claude-managed.pkg-path = "flox/claude-managed"
+    claude-managed.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/claude-managed
+  floxhub: https://hub.flox.dev/flox/claude-managed

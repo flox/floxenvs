@@ -24,7 +24,7 @@ Or from FloxHub:
 
 ```toml
 [include]
-environments = ["flox/javascript-bun"]
+environments = [{ remote = "flox/javascript-bun" }]
 ```
 
 ## Automatic dependency installation

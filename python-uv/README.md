@@ -26,7 +26,7 @@ Or from FloxHub:
 
 ```toml
 [include]
-environments = ["flox/python-uv"]
+environments = [{ remote = "flox/python-uv" }]
 ```
 
 ## Python version

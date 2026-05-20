@@ -1,0 +1,35 @@
+kind: pkg
+subkind: plain
+name: uv2nix
+title: uv2nix
+publisher: flox
+tagline: >
+  Turn a uv.lock into a fully reproducible Nix derivation.
+summary:
+  - "Convert uv lock files into Nix package sets"
+  - "Provides overlay-based Python environment composition in Nix"
+  - "Works alongside pyproject-nix and pyproject-build-systems"
+category: language
+tags: [uv, nix, python, build]
+stack: [nix]
+featured: false
+combines_well_with:
+  - pkg:uv
+  - pkg:pyproject-nix
+  - pkg:pyproject-build-systems
+status: stable
+license: MIT
+upstream:
+  name: uv2nix
+  url: https://github.com/pyproject-nix/uv2nix
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    uv2nix.pkg-path = "flox/uv2nix"
+    uv2nix.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/uv2nix
+  floxhub: https://hub.flox.dev/flox/uv2nix

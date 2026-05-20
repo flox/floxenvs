@@ -16,7 +16,7 @@ flox activate -r flox/verba-demo --start-services
 
 Then open Verba in your browser:
 
-```
+```text
 http://localhost:8000
 ```
 
@@ -50,7 +50,7 @@ minimal environment in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/verba"]
+environments = [{ remote = "flox/verba" }]
 ```
 
 This gives you Verba with sane defaults. Override

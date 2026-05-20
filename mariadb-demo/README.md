@@ -94,7 +94,7 @@ minimal environment in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/mariadb"]
+environments = [{ remote = "flox/mariadb" }]
 ```
 
 This gives you MariaDB with sane defaults. Override vars

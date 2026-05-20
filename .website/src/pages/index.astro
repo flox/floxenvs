@@ -1,0 +1,244 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import ItemCard from "../components/ItemCard.astro";
+import AiRoleFilter from "../components/AiRoleFilter.tsx";
+import AffinityGraph from "../components/AffinityGraph.tsx";
+import { computeAffinityEdges } from "../lib/affinityEdges";
+import { deriveBundling } from "../lib/derive";
+import CategoryStrip from "../components/CategoryStrip.astro";
+
+const base = import.meta.env.BASE_URL;
+const envs = await getCollection("envs");
+const pkgs = await getCollection("packages");
+
+const { envs: dEnvs, pkgs: dPkgs } = deriveBundling(
+  envs.map((e) => ({
+    name: e.data.name,
+    bundles_pkgs: e.data.bundles_pkgs,
+    manifest_install: e.data.manifest_install,
+  })),
+  pkgs.map((p) => ({ name: p.data.name })),
+);
+
+const aiEnvs = envs.filter((e) => e.data.category === "ai");
+const aiPkgs = pkgs.filter((p) => p.data.category === "ai");
+
+const featured = [
+  ...aiEnvs
+    .filter((e) => e.data.featured)
+    .map((e) => ({
+      kind: "env" as const,
+      data: e.data,
+      href: `${base}envs/${e.data.name}/`,
+    })),
+  ...aiPkgs
+    .filter((p) => p.data.featured)
+    .map((p) => ({
+      kind: "pkg" as const,
+      data: p.data,
+      href: `${base}packages/${p.data.name}/`,
+    })),
+];
+
+const graphNodes = [
+  ...aiEnvs.map((e) => ({
+    kind: "env" as const,
+    name: e.data.name,
+    title: e.data.title,
+    href: `${base}envs/${e.data.name}/`,
+  })),
+  ...aiPkgs.map((p) => ({
+    kind: "pkg" as const,
+    name: p.data.name,
+    title: p.data.title,
+    href: `${base}packages/${p.data.name}/`,
+  })),
+];
+
+const graphInputs = [
+  ...aiEnvs.map((e) => {
+    const d = dEnvs.find((x) => x.name === e.data.name)!;
+    return {
+      kind: "env" as const,
+      name: e.data.name,
+      combines_well_with: e.data.combines_well_with,
+      bundles_pkgs: d.bundles_pkgs,
+    };
+  }),
+  ...aiPkgs.map((p) => ({
+    kind: "pkg" as const,
+    name: p.data.name,
+    combines_well_with: p.data.combines_well_with,
+  })),
+];
+const edges = computeAffinityEdges(graphInputs);
+
+const featuredRecipes = aiEnvs.filter((e) => e.data.recipes.length > 0).slice(0, 6);
+
+const origin = (Astro.site?.toString() ?? "").replace(/\/$/, "");
+const homeUrl = `${origin}${base}`;
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${homeUrl}#website`,
+    name: "flox / envs",
+    url: homeUrl,
+    description: "Ready-to-use Flox environments and packages, AI first.",
+    publisher: { "@id": "https://flox.dev/#organization" },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${homeUrl}search/?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "https://flox.dev/#organization",
+    name: "Flox",
+    url: "https://flox.dev",
+    logo: `${origin}${base}favicon.svg`,
+    sameAs: [
+      "https://github.com/flox",
+      "https://hub.flox.dev",
+    ],
+  },
+];
+---
+<Layout
+  title="flox / envs — AI-first catalog of reproducible dev environments and packages"
+  description="Browse and install ready-to-use Flox environments and packages for AI coding agents, local LLMs, RAG stacks, databases, and language runtimes — each pinned by Nix, included in one manifest line, reproducible on macOS and Linux."
+  jsonLd={jsonLd}
+>
+  <section class="pt-8 pb-16 lg:pt-12 lg:pb-24">
+    <div class="grid lg:grid-cols-[1.1fr_1fr] gap-10 items-center">
+      <div>
+        <p class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.18em] text-kind-env">
+          <span class="inline-block w-1.5 h-1.5 rounded-full bg-kind-env"></span>
+          flox / envs
+        </p>
+        <h1 class="mt-4 text-4xl sm:text-5xl font-bold leading-[1.05] tracking-tight text-slate-900 dark:text-slate-50">
+          Ready-to-use<br />
+          <span class="text-kind-env">Flox</span> envs and packages.
+        </h1>
+        <p class="mt-5 text-lg leading-relaxed text-slate-600 dark:text-slate-300 max-w-xl">
+          One include line. AI agents, runtimes, plugins, skills,
+          and the glue to make them work together.
+        </p>
+        <p class="mt-4 text-base leading-relaxed text-slate-600 dark:text-slate-300 max-w-xl">
+          <strong>flox/envs</strong> is the curated catalog of
+          Flox environments and packages — reproducible dev setups
+          for AI coding agents (Claude Code, Codex, Crush),
+          local LLM runtimes (Ollama), RAG stacks (LangChain,
+          PostgreSQL + pgvector, Verba), and the languages,
+          databases, and services around them. Every entry is
+          Nix-pinned, included with a single manifest line, and
+          reproducible across every developer's machine and CI
+          runner. Published by Flox, MIT-licensed catalog source.
+        </p>
+        <div class="mt-7 flex flex-wrap gap-3">
+          <a href="#ai" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white transition">
+            Browse AI items
+            <span aria-hidden="true">→</span>
+          </a>
+          <a href={`${base}search/`} class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 text-sm font-medium hover:border-slate-500 dark:hover:border-slate-500 transition">
+            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" /></svg>
+            Search everything
+          </a>
+        </div>
+      </div>
+      <div class="relative">
+        <div class="absolute -inset-4 bg-gradient-to-br from-kind-env/10 via-transparent to-kind-plugin/10 rounded-2xl blur-2xl" aria-hidden="true"></div>
+        <pre class="relative font-mono text-sm sm:text-[15px] leading-relaxed p-6 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 overflow-x-auto"><code><span class="text-slate-400"># my-project/.flox/env/manifest.toml</span>
+<span class="text-slate-500">[include]</span>
+environments = [
+  &#123; remote = <span class="text-kind-env">"flox/claude"</span> &#125;,
+  &#123; remote = <span class="text-kind-env">"flox/postgresql"</span> &#125;,
+  &#123; remote = <span class="text-kind-env">"flox/langchain"</span> &#125;,
+]
+
+<span class="text-slate-500">[install]</span>
+ollama.pkg-path     = <span class="text-kind-plugin">"flox/ollama"</span>
+ollama.publisher    = <span class="text-kind-plugin">"flox"</span></code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section id="ai" class="mt-12">
+    <h2 class="text-2xl font-bold">AI environments and packages</h2>
+    <p class="mt-1 text-sm text-slate-500">
+      Filter by role; envs and packages are listed together.
+    </p>
+    <div class="mt-5">
+      <AiRoleFilter client:load />
+    </div>
+    <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {featured.map((f) => (
+        <div data-ai-role={f.data.ai_role ?? ""}>
+          <ItemCard
+            kind={f.kind}
+            subkind={f.kind === "pkg" ? (f.data as any).subkind : undefined}
+            name={f.data.name}
+            title={f.data.title}
+            tagline={f.data.tagline}
+            href={f.href}
+            ai_role={f.data.ai_role}
+            category={f.data.category}
+          />
+        </div>
+      ))}
+    </div>
+  </section>
+
+  {graphNodes.length > 1 && (
+    <section class="mt-16">
+      <h2 class="text-2xl font-bold">How they compose</h2>
+      <p class="mt-1 text-sm text-slate-500">
+        Edges show <span class="font-mono">combines_well_with</span> and
+        bundling relationships.
+      </p>
+      <div class="mt-6 rounded-lg border border-slate-200 dark:border-slate-800 p-4">
+        <AffinityGraph client:load edges={edges} nodes={graphNodes} />
+      </div>
+    </section>
+  )}
+
+  {featuredRecipes.length > 0 && (
+    <section class="mt-16">
+      <h2 class="text-2xl font-bold">Featured recipes</h2>
+      <p class="mt-1 text-sm text-slate-500">
+        Each recipe is the <code class="text-xs">-demo</code> variant of an env.
+      </p>
+      <div class="mt-6 flex gap-3 overflow-x-auto pb-2 -mx-6 px-6">
+        {featuredRecipes.map((e) => (
+          <a
+            href={`${base}envs/${e.data.name}/#recipes`}
+            class="shrink-0 w-72 p-4 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-slate-400"
+          >
+            <p class="text-xs font-mono text-slate-500">{e.data.name}-demo</p>
+            <h3 class="mt-1 font-semibold">{e.data.title}</h3>
+            <p class="mt-1 text-sm text-slate-600 dark:text-slate-300 line-clamp-3">
+              {e.data.tagline}
+            </p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <CategoryStrip />
+
+  <section class="mt-20 py-10 border-t border-slate-200 dark:border-slate-800 text-center">
+    <h2 class="text-lg font-semibold">Looking for everything else?</h2>
+    <div class="mt-3 flex gap-4 justify-center text-sm flex-wrap">
+      <a href={`${base}envs/`} class="underline">All environments →</a>
+      <a href={`${base}packages/`} class="underline">All packages →</a>
+      <a href={`${base}compare/ai-coding-agents/`} class="underline">Compare AI agents →</a>
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,65 @@
+---
+import KindBadge from "./KindBadge.astro";
+import KindIcon from "./KindIcon.astro";
+import type { Kind, SubKind } from "../lib/kindNames";
+
+interface Props {
+  kind: Kind;
+  subkind?: SubKind;
+  name: string;
+  title: string;
+  tagline: string;
+  href: string;
+  category?: string;
+  ai_role?: string;
+}
+const { kind, subkind, name, title, tagline, href, ai_role } =
+  Astro.props as Props;
+
+// Kind-specific tones. Border is full-around (not a side stripe);
+// the icon already carries the kind colour, the border just nudges
+// the whole card toward its kind family on hover.
+const kindKey = (subkind && subkind !== "plain") ? subkind : kind;
+const borderHover: Record<string, string> = {
+  env: "hover:border-kind-env/60",
+  pkg: "hover:border-kind-pkg/60",
+  plugin: "hover:border-kind-plugin/60",
+  skill: "hover:border-kind-skill/60",
+};
+const iconTone: Record<string, string> = {
+  env: "text-kind-env",
+  pkg: "text-kind-pkg",
+  plugin: "text-kind-plugin",
+  skill: "text-kind-skill",
+};
+---
+<a
+  href={href}
+  class:list={[
+    "group block rounded-xl p-5 transition",
+    "border border-slate-200 dark:border-slate-800",
+    "bg-white dark:bg-slate-900/60",
+    "hover:bg-slate-50 dark:hover:bg-slate-900",
+    borderHover[kindKey],
+  ]}
+>
+  <div class="flex items-center gap-2 mb-2">
+    <KindIcon kind={kindKey} className={iconTone[kindKey]} />
+    <KindBadge kind={kindKey} />
+    {ai_role && (
+      <span class="text-[11px] uppercase tracking-wider text-slate-500 font-mono">
+        {ai_role}
+      </span>
+    )}
+  </div>
+  <h3 class="font-semibold leading-snug text-slate-900 dark:text-slate-50 group-hover:underline decoration-2 underline-offset-2">
+    {title}
+  </h3>
+  <p class="mt-1.5 text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
+    {tagline}
+  </p>
+  <div class="mt-4 flex items-center gap-2 text-[11px] font-mono text-slate-400 dark:text-slate-500">
+    <span class="truncate">{name}</span>
+    <span aria-hidden="true" class="ml-auto opacity-0 group-hover:opacity-100 transition">→</span>
+  </div>
+</a>

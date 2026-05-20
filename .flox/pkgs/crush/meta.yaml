@@ -1,0 +1,34 @@
+kind: pkg
+subkind: plain
+name: crush
+title: Crush
+publisher: flox
+tagline: >
+  Charm's glamorous terminal-based AI coding agent.
+summary:
+  - "AI coding agent built by Charmbracelet with beautiful TUI"
+  - "Single Go binary with shell completion for bash, fish, and zsh"
+  - "Works with any OpenAI-compatible API endpoint"
+category: ai
+ai_role: agent
+tags: [agent, cli, charmbracelet, tui, coding, coding-agent, go]
+stack: [go]
+featured: true
+combines_well_with:
+  - env:claude
+status: stable
+license: FSL-1.1-MIT
+upstream:
+  name: Crush
+  url: https://github.com/charmbracelet/crush
+  license: FSL-1.1-MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    crush.pkg-path = "flox/crush"
+    crush.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/crush
+  floxhub: https://hub.flox.dev/flox/crush

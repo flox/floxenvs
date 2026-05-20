@@ -35,7 +35,7 @@ After starting the service, try basic operations:
 valkey-cli -h "$VALKEY_HOST" -p "$VALKEY_PORT"
 ```
 
-```
+```text
 127.0.0.1:16380> SET greeting "hello"
 OK
 127.0.0.1:16380> GET greeting
@@ -87,7 +87,7 @@ minimal environment in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/valkey"]
+environments = [{ remote = "flox/valkey" }]
 ```
 
 This gives you Valkey with sane defaults. Override

@@ -1,0 +1,50 @@
+kind: env
+name: javascript-node
+title: Node.js
+publisher: flox
+tagline: >
+  Node.js + npm, automatic install, hash-based caching.
+summary:
+  - "Latest stable Node.js via Flox (or pin a major version)"
+  - "`npm install` runs automatically on activation"
+  - "Hash-based caching skips reinstall when deps unchanged"
+  - "Include from any manifest with one line"
+category: language
+tags: [nodejs, npm, javascript, typescript]
+stack: [nodejs]
+featured: false
+combines_well_with:
+  - env:postgresql
+  - env:redis
+  - env:playwright
+  - pkg:playwright-cli
+status: stable
+license: MIT
+upstream:
+  name: Node.js
+  url: https://nodejs.org/
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/javascript-node" }]
+  activate: |
+    flox activate -r flox/javascript-node
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/javascript-node-latest
+recipes:
+  - name: javascript-node-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Sample `package.json` installs with `npm ci`"
+      - "Runs a one-shot `node` script"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/javascript-node
+  floxhub: https://hub.flox.dev/flox/javascript-node
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/javascript-node-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Ajavascript-node

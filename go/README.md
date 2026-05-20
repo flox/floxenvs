@@ -19,14 +19,14 @@ Or include it in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/go"]
+environments = [{ remote = "flox/go" }]
 ```
 
 ## Environment variables
 
-| Variable | Description                          |
-| -------- | ------------------------------------ |
-| `GOENV`  | Set to `$FLOX_ENV_CACHE/go` on activate |
+| Variable | Description                              |
+| -------- | ---------------------------------------- |
+| `GOENV`  | Set to `$FLOX_ENV_CACHE/go` on activate  |
 
 ## Editor tooling and sample app
 

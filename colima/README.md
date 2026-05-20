@@ -17,7 +17,7 @@ Add to your `manifest.toml`:
 
 ```toml
 [include]
-environments = ["flox/colima"]
+environments = [{ remote = "flox/colima" }]
 ```
 
 ## Defaults

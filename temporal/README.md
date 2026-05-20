@@ -11,7 +11,7 @@ Include this environment in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/temporal"]
+environments = [{ remote = "flox/temporal" }]
 ```
 
 Then start the service:

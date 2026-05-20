@@ -14,8 +14,7 @@ flox activate -r flox/huggingface-demo
 
 ## Walkthrough
 
-### 1. Authenticate (optional, only needed for private
-repos or higher rate limits)
+### 1. Authenticate (optional, for private repos)
 
 ```bash
 hf auth login

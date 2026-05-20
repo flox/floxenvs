@@ -1,0 +1,106 @@
+---
+import ScoreBar from "./ScoreBar.astro";
+import ScannerRow from "./ScannerRow.astro";
+import { overallStatus, capLabel } from "../lib/scoring";
+import type { Metrics } from "../lib/metricsSchema";
+
+interface Props {
+  metrics: Metrics;
+}
+const { metrics } = Astro.props as Props;
+const status = metrics.status === "missing"
+  ? "missing"
+  : overallStatus(metrics.overall);
+const statusTones: Record<string, string> = {
+  stable:  "bg-status-stable/15 text-status-stable ring-status-stable/30",
+  warn:    "bg-status-warn/15 text-status-warn ring-status-warn/30",
+  risk:    "bg-status-risk/15 text-status-risk ring-status-risk/30",
+  missing: "bg-status-missing/15 text-status-missing ring-status-missing/30",
+};
+const cap = capLabel(metrics.security.cap);
+
+const reliabilityCaption =
+  metrics.reliability.ci_green_streak_days > 0
+    ? `CI green ${metrics.reliability.ci_green_streak_days} day${
+        metrics.reliability.ci_green_streak_days === 1 ? "" : "s"
+      }${metrics.reliability.lockfile_fresh ? " · lockfile fresh" : ""}`
+    : "no recent CI data";
+
+const impactCaption =
+  metrics.impact.total > 0
+    ? `${metrics.impact.pass}/${metrics.impact.total} evals pass`
+    : "no evals.yaml";
+
+const overallDisplay = metrics.status === "missing"
+  ? "—"
+  : String(metrics.overall);
+---
+<section
+  aria-label="Score panel"
+  class="mt-8 p-6 rounded-xl border border-slate-200 dark:border-slate-800"
+>
+  <div class="grid gap-6 md:grid-cols-[120px_1fr_1fr_1.2fr]">
+    <!-- Hex overall score -->
+    <div class="flex md:block items-center gap-4">
+      <div
+        class="w-24 h-28 flex flex-col items-center justify-center
+               clip-hexagon bg-slate-50 dark:bg-slate-900"
+        aria-label={`Overall score ${overallDisplay}`}
+      >
+        <div class="text-3xl font-bold leading-none font-mono">
+          {overallDisplay}
+        </div>
+        <div class:list={[
+          "mt-1 px-2 py-0.5 text-[10px] font-mono uppercase rounded ring-1",
+          statusTones[status],
+        ]}>
+          {status === "missing" ? "no data" : status}
+        </div>
+      </div>
+    </div>
+
+    <!-- Quality -->
+    <ScoreBar
+      label="Quality"
+      score={metrics.quality.score}
+      caption={`${metrics.quality.checks.filter((c) => c.pass).length}/${metrics.quality.checks.length} checks pass`}
+    />
+
+    <!-- Reliability -->
+    <ScoreBar
+      label="Reliability"
+      score={metrics.reliability.score}
+      caption={reliabilityCaption}
+    />
+
+    <!-- Security -->
+    <div>
+      <p class="text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
+        Security
+      </p>
+      <div class="space-y-0.5">
+        {metrics.security.scanners.map((s) => (
+          <ScannerRow tool={s.tool} status={s.status} level={s.level} />
+        ))}
+      </div>
+      {cap && (
+        <p class="mt-2 text-xs text-score-red font-mono">{cap}</p>
+      )}
+    </div>
+  </div>
+
+  <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-900
+              text-sm text-slate-600 dark:text-slate-300">
+    <span class="font-medium">Impact</span>
+    <span class="ml-2 font-mono">{impactCaption}</span>
+  </div>
+</section>
+
+<style>
+  .clip-hexagon {
+    clip-path: polygon(
+      50% 0%, 100% 25%, 100% 75%,
+      50% 100%, 0% 75%, 0% 25%
+    );
+  }
+</style>

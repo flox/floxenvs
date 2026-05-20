@@ -1,0 +1,50 @@
+kind: env
+name: python-pip
+title: Python + pip
+publisher: flox
+tagline: >
+  Python 3 + pip with auto-venv and hash-cached
+  requirements.txt installs.
+summary:
+  - "Python 3 interpreter via Flox"
+  - "pip with auto-venv under `$FLOX_ENV_CACHE/python-pip`"
+  - "Hash-cached `requirements.txt` — reinstalls only on change"
+  - "Venv recreated automatically if interpreter path changes"
+  - "Include from any manifest with one line"
+category: language
+tags: [python, pip, language, venv]
+stack: [python]
+featured: false
+combines_well_with:
+  - env:postgresql
+  - env:redis
+  - env:playwright
+status: stable
+license: PSF-2.0
+upstream:
+  name: CPython
+  url: https://www.python.org/
+  license: PSF-2.0
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/python-pip" }]
+  activate: |
+    flox activate -r flox/python-pip
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/python-pip-latest
+recipes:
+  - name: python-pip-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Sample `requirements.txt` installs via auto-install hook"
+      - "Smoke-test imports `requests` and exits 0"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/python-pip
+  floxhub: https://hub.flox.dev/flox/python-pip
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/python-pip-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Apython-pip

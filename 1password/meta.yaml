@@ -1,0 +1,46 @@
+kind: env
+name: 1password
+title: 1Password CLI
+publisher: flox
+tagline: >
+  1Password CLI ready to include — automatic session
+  caching so secrets are one `op item get` away.
+summary:
+  - "1Password CLI (`op`) via Flox, no system install"
+  - "Session token cached in FLOX_ENV_CACHE on first sign-in"
+  - "Reuses cached token across activations, no repeated prompts"
+  - "Inject secrets into any env var from your hook"
+  - "Include from any manifest with one line"
+category: tool
+tags: [1password, secrets, cli, security]
+stack: [go]
+featured: false
+status: stable
+license: Proprietary
+upstream:
+  name: 1Password CLI
+  url: https://developer.1password.com/docs/cli/
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/1password" }]
+  activate: |
+    flox activate -r flox/1password
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/1password-latest
+recipes:
+  - name: 1password-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Signs in once and caches the session token"
+      - "`op vault list` and `op item list` ready to use"
+      - "Fetch secrets inline: `$(op item get name --field cred)`"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/1password
+  floxhub: https://hub.flox.dev/flox/1password
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/1password-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3A1password

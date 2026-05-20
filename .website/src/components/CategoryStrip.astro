@@ -1,0 +1,49 @@
+---
+import { getCollection } from "astro:content";
+
+const base = import.meta.env.BASE_URL;
+const envs = await getCollection("envs");
+const pkgs = await getCollection("packages");
+
+interface Group {
+  slug: string;
+  label: string;
+  count: number;
+}
+
+function count(slug: string) {
+  return envs.filter((e) => e.data.category === slug).length
+    + pkgs.filter((p) => p.data.category === slug).length;
+}
+
+// Order: language, database, service, tool. Skip "ai"
+// (that's the hero section). Skip empty categories so
+// the strip stays uncluttered on day one.
+const groups: Group[] = [
+  { slug: "language", label: "Languages",  count: count("language") },
+  { slug: "database", label: "Databases",  count: count("database") },
+  { slug: "service",  label: "Services",   count: count("service")  },
+  { slug: "tool",     label: "Tools",      count: count("tool")     },
+].filter((g) => g.count > 0);
+---
+{groups.length > 0 && (
+  <section class="mt-20">
+    <h2 class="text-xl font-semibold">Browse by category</h2>
+    <p class="mt-1 text-sm text-slate-500">
+      Languages, databases, and tools — the rest of the catalog.
+    </p>
+    <div class="mt-5 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      {groups.map((g) => (
+        <a
+          href={`${base}categories/${g.slug}/`}
+          class="block p-4 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-slate-400 transition"
+        >
+          <div class="text-sm font-semibold">{g.label}</div>
+          <div class="mt-1 text-xs text-slate-500 font-mono">
+            {g.count} items
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+)}

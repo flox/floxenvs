@@ -1,0 +1,35 @@
+kind: pkg
+subkind: plain
+name: agent-deck
+title: Agent Deck
+publisher: flox
+tagline: >
+  Terminal command center for managing multiple AI agents.
+summary:
+  - "Single TUI for launching and monitoring AI agent sessions"
+  - "Plugin-based architecture for extensible agent workflows"
+  - "Runs on all major platforms via a single Go binary"
+category: ai
+ai_role: tooling
+tags: [tui, agents, coding-agent, orchestration, go]
+stack: [go]
+featured: false
+combines_well_with:
+  - pkg:claude-code
+  - env:claude
+status: stable
+license: MIT
+upstream:
+  name: agent-deck
+  url: https://github.com/asheshgoplani/agent-deck
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    agent-deck.pkg-path = "flox/agent-deck"
+    agent-deck.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/agent-deck
+  floxhub: https://hub.flox.dev/flox/agent-deck

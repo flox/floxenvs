@@ -1,0 +1,47 @@
+kind: env
+name: go
+title: Go
+publisher: flox
+tagline: >
+  Go toolchain ready to include — go, gofmt, modules.
+summary:
+  - "Latest stable Go via Flox"
+  - "`go`, `gofmt`, `go test`, `go mod` ready"
+  - "GOPATH and GOCACHE wired under `$FLOX_ENV_CACHE`"
+  - "Include from any manifest with one line"
+category: language
+tags: [go, language, runtime, compiler]
+stack: [go]
+featured: false
+combines_well_with:
+  - env:postgresql
+  - env:redis
+  - env:playwright
+status: stable
+license: BSD-3-Clause
+upstream:
+  name: Go
+  url: https://go.dev/
+  license: BSD-3-Clause
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/go" }]
+  activate: |
+    flox activate -r flox/go
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/go-latest
+recipes:
+  - name: go-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Sample `main.go` builds and runs"
+      - "`go test ./...` against a small fixture"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/go
+  floxhub: https://hub.flox.dev/flox/go
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/go-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Ago

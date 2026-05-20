@@ -1,0 +1,34 @@
+kind: pkg
+subkind: plain
+name: pyproject-nix
+title: pyproject-nix
+publisher: flox
+tagline: >
+  Read pyproject.toml from Nix to drive Python package builds.
+summary:
+  - "Parse PEP 517/518 pyproject.toml metadata inside Nix"
+  - "Foundation library for uv2nix and pyproject-build-systems"
+  - "Enables fully declarative Python builds in the Nix ecosystem"
+category: language
+tags: [pyproject, python, nix, build]
+stack: [nix]
+featured: false
+combines_well_with:
+  - pkg:uv2nix
+  - pkg:pyproject-build-systems
+status: stable
+license: MIT
+upstream:
+  name: pyproject.nix
+  url: https://github.com/pyproject-nix/pyproject.nix
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    pyproject-nix.pkg-path = "flox/pyproject-nix"
+    pyproject-nix.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/pyproject-nix
+  floxhub: https://hub.flox.dev/flox/pyproject-nix

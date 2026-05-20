@@ -18,7 +18,7 @@ Add to your `manifest.toml`:
 
 ```toml
 [include]
-environments = ["flox/huggingface"]
+environments = [{ remote = "flox/huggingface" }]
 ```
 
 ## What is included

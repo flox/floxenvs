@@ -1,0 +1,56 @@
+kind: env
+name: valkey
+title: Valkey
+publisher: flox
+tagline: >
+  Valkey ready to include — Redis-compatible key/value store,
+  runs as a Flox service on port 16380.
+summary:
+  - "Latest stable Valkey server and CLI via Flox"
+  - "Drop-in Redis replacement — same protocol, same commands"
+  - "Binds to 127.0.0.1:16380 by default (override via vars)"
+  - "Data persisted under `$FLOX_ENV_CACHE/valkey`"
+  - "Boots as a Flox service with `--start-services`"
+category: database
+tags: [valkey, cache, kv, database, service]
+stack: [c]
+featured: false
+combines_well_with:
+  - env:redis
+  - env:python-pip
+  - env:python-poetry
+  - env:python-uv
+  - env:ruby
+  - env:rust
+  - env:go
+  - env:javascript-node
+status: stable
+license: BSD-3-Clause
+upstream:
+  name: Valkey
+  url: https://valkey.io/
+  license: BSD-3-Clause
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/valkey" }]
+  activate: |
+    flox activate -r flox/valkey --start-services
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/valkey-latest
+recipes:
+  - name: valkey-demo
+    title: Quick start
+    start_services: true
+    features:
+      - "Launches Valkey as a Flox service on port 16380"
+      - "Connects via `valkey-cli` with no extra configuration"
+      - "SET/GET examples with styled terminal output"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/valkey
+  floxhub: https://hub.flox.dev/flox/valkey
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/valkey-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Avalkey

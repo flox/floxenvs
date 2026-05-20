@@ -1,0 +1,27 @@
+# evals for the langchain env. Probes both the Python
+# environment and the Ollama runtime that langchain-demo
+# bundles.
+
+cases:
+  - id: python-langchain-imports
+    cmd: |
+      python -c "import langchain, langchain_ollama; \
+                  print('ok')"
+    assert:
+      exit_code: 0
+      stdout_matches: "^ok$"
+      max_duration_s: 10
+
+  - id: langgraph-imports
+    cmd: 'python -c "import langgraph; print(langgraph.__name__)"'
+    assert:
+      exit_code: 0
+      stdout_matches: "^langgraph$"
+      max_duration_s: 10
+
+  - id: ollama-binary-present
+    cmd: "command -v ollama && ollama --version"
+    assert:
+      exit_code: 0
+      stdout_matches: "ollama version"
+      max_duration_s: 5

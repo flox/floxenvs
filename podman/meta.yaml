@@ -1,0 +1,47 @@
+kind: env
+name: podman
+title: Podman
+publisher: flox
+tagline: >
+  Podman ready to include — rootless, daemonless OCI
+  containers on macOS and Linux.
+summary:
+  - "Podman + podman-compose via Flox, no daemon required"
+  - "QEMU VM included on macOS for Linux containers"
+  - "Containers policy auto-created on Linux for rootless use"
+  - "Docker-compose compatible with `podman-compose`"
+  - "Include from any manifest with one line"
+category: tool
+tags: [podman, container, oci, daemonless]
+stack: [go]
+featured: false
+status: stable
+license: Apache-2.0
+upstream:
+  name: Podman
+  url: https://podman.io/
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/podman" }]
+  activate: |
+    flox activate -r flox/podman
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/podman-latest
+recipes:
+  - name: podman-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Adds podman-tui, undocker, and gum for interactive use"
+      - "`podman run <image>` or `podman-compose up` right away"
+      - "VM auto-stopped on shell exit (macOS)"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/podman
+  floxhub: https://hub.flox.dev/flox/podman
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/podman-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Apodman

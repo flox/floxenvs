@@ -1,0 +1,55 @@
+kind: env
+name: redis
+title: Redis
+publisher: flox
+tagline: >
+  Redis ready to include — in-memory key/value store with
+  sane defaults, runs as a Flox service on port 16379.
+summary:
+  - "Latest stable Redis server and CLI via Flox"
+  - "Binds to 127.0.0.1:16379 by default (override via vars)"
+  - "Data persisted under `$FLOX_ENV_CACHE/redis`"
+  - "Boots as a Flox service with `--start-services`"
+  - "Override `REDIS_HOST` and `REDIS_PORT` in your manifest"
+category: database
+tags: [redis, cache, kv, database, service]
+stack: [c]
+featured: false
+combines_well_with:
+  - env:python-pip
+  - env:python-poetry
+  - env:python-uv
+  - env:ruby
+  - env:rust
+  - env:go
+  - env:javascript-node
+status: stable
+license: BSD-3-Clause
+upstream:
+  name: Redis
+  url: https://redis.io/
+  license: BSD-3-Clause
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/redis" }]
+  activate: |
+    flox activate -r flox/redis --start-services
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/redis-latest
+recipes:
+  - name: redis-demo
+    title: Quick start
+    start_services: true
+    features:
+      - "Launches Redis as a Flox service on port 16379"
+      - "Connects via `redis-cli` with no extra configuration"
+      - "SET/GET examples with styled terminal output"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/redis
+  floxhub: https://hub.flox.dev/flox/redis
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/redis-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Aredis

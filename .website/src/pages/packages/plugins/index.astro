@@ -1,0 +1,55 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../../layouts/Layout.astro";
+import ItemCard from "../../../components/ItemCard.astro";
+
+const base = import.meta.env.BASE_URL;
+const pkgs = (await getCollection("packages"))
+  .filter((p) => p.data.subkind === "plugin")
+  .sort((a, b) => a.data.name.localeCompare(b.data.name));
+---
+<Layout
+  title="Claude Code plugins on Flox — pinned, reproducible, one-line install"
+  description="Every Claude Code plugin packaged for Flox — context handlers, tool integrations, and workflow extensions. Each one Nix-pinned and includable from any manifest."
+>
+  <h1 class="text-2xl font-bold">Plugins</h1>
+  <p class="mt-1 text-sm text-slate-500">{pkgs.length} plugins</p>
+  <p class="mt-4 text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-3xl">
+    Plugins extend a Claude Code agent with context handlers, tool integrations,
+    and workflow extensions. The packages on this page wrap each plugin as a
+    Flox-installable, Nix-pinned bundle so a team gets identical plugin
+    behavior across every developer's machine and every CI runner. Add a
+    plugin via <code class="font-mono text-sm">flox/claude-code-plugin-&lt;name&gt;</code>
+    in any manifest's <code class="font-mono text-sm">[install]</code> block.
+  </p>
+  <p class="mt-3 text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-3xl">
+    Why install plugins this way? Claude Code plugins ship as static files —
+    settings, MCP server definitions, command and skill manifests, and
+    instruction fragments. The hard part is not installing them once but
+    keeping them pinned and consistent across a team: which version,
+    which configuration, which set of plugins on which env. Wrapping each
+    plugin as a Flox package solves that. The package declares its
+    contents, the version is locked in your manifest, and activating the
+    Flox env materializes the plugin into the agent's config tree. No
+    manual file copying, no drift between laptops, no "works on mine"
+    when a CI job runs the same agent on a different commit.
+  </p>
+  <p class="mt-3 text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-3xl">
+    All plugins listed below combine with <a href={`${base}envs/claude/`} class="underline">flox/claude</a>
+    — the env auto-assembles plugin fragments under <code class="font-mono text-xs">~/.claude/</code>
+    so installing a plugin package is the entire setup.
+  </p>
+  <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    {pkgs.map((p) => (
+      <ItemCard
+        kind="pkg"
+        subkind="plugin"
+        name={p.data.name}
+        title={p.data.title}
+        tagline={p.data.tagline}
+        href={`${base}packages/${p.data.name}/`}
+        ai_role={p.data.ai_role}
+      />
+    ))}
+  </div>
+</Layout>

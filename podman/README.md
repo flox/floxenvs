@@ -8,7 +8,7 @@ Include this environment in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/podman"]
+environments = [{ remote = "flox/podman" }]
 ```
 
 ## What's included

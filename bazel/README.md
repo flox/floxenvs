@@ -22,14 +22,14 @@ Or include it in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/bazel"]
+environments = [{ remote = "flox/bazel" }]
 ```
 
 ## Environment variables
 
-| Variable           | Description                              |
-| ------------------ | ---------------------------------------- |
-| `BAZEL_CACHE_DIR`  | `$FLOX_ENV_CACHE/bazel` (created on activate) |
+| Variable          | Description                                    |
+| ----------------- | ---------------------------------------------- |
+| `BAZEL_CACHE_DIR` | `$FLOX_ENV_CACHE/bazel` (created on activate)  |
 
 Point Bazel's output at this directory to keep build
 state isolated per environment:
@@ -61,8 +61,8 @@ works everywhere.
 
 Upstream stable on <https://bazel.build/> is `9.1.0`.
 
-| Alternative    | Version |
-| -------------- | ------- |
+| Alternative                        | Version |
+| ---------------------------------- | ------- |
 | `bazel` from nixpkgs (older major) | `7.6.0` |
 
 ## Demo and sample project

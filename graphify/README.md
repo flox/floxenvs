@@ -35,7 +35,7 @@ Add to your `manifest.toml`:
 
 ```toml
 [include]
-environments = ["flox/graphify"]
+environments = [{ remote = "flox/graphify" }]
 ```
 
 Then customize vars in your own manifest to override
@@ -74,10 +74,10 @@ folder, including:
 
 ## Services
 
-| Service | Description |
-| ------- | ----------- |
-| `graphify-watch` | Watches `$GRAPHIFY_PROJECT_ROOT` and rebuilds the graph on code changes |
-| `graphify-mcp` | MCP stdio server backed by `graphify-out/graph.json` (waits for the file to appear) |
+| Service          | Description                                       |
+| ---------------- | ------------------------------------------------- |
+| `graphify-watch` | Watches project root, rebuilds graph on changes   |
+| `graphify-mcp`   | MCP stdio server backed by `graph.json`           |
 
 Start them:
 
@@ -93,17 +93,17 @@ so the natural order is just `flox services start`.
 
 ## Environment variables
 
-| Variable | Description |
-| -------- | ----------- |
-| `GRAPHIFY_INSTALL_PACKAGE` | PyPI spec installed in the venv (default `graphifyy[mcp,watch]`) |
-| `GRAPHIFY_PROJECT_ROOT` | Folder graphify watches and serves (default: the dir containing `.flox/`, i.e. `$FLOX_ENV_PROJECT`) |
+| Variable                   | Description                                 |
+| -------------------------- | ------------------------------------------- |
+| `GRAPHIFY_INSTALL_PACKAGE` | PyPI spec; default `graphifyy[mcp,watch]`   |
+| `GRAPHIFY_PROJECT_ROOT`    | Watched folder; default `$FLOX_ENV_PROJECT` |
 
 Pin a version or point at a different folder by
 overriding in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/graphify"]
+environments = [{ remote = "flox/graphify" }]
 
 [vars]
 GRAPHIFY_INSTALL_PACKAGE = "graphifyy[mcp,watch]==0.1.14"

@@ -18,7 +18,7 @@ Include this environment in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/rust"]
+environments = [{ remote = "flox/rust" }]
 ```
 
 Then add project-specific packages (rust-analyzer, cargo

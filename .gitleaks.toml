@@ -1,0 +1,30 @@
+# Gitleaks configuration for flox/floxenvs.
+#
+# Inherits the gitleaks defaults and adds allowlist entries
+# for known dummy values that appear in READMEs and
+# examples.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Known demo dummies and fixed-output Nix hashes"
+
+regexes = [
+  # Dummy Anthropic key used in docs and examples.
+  '''sk-ant-demo-[A-Za-z0-9-]+''',
+  # Generic demo API key placeholder.
+  '''sk-demo-[A-Za-z0-9-]+''',
+  # Nix fixed-output zero hash used when bootstrapping
+  # vendor hashes in upgrade.sh.
+  '''sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=''',
+]
+
+paths = [
+  '''(.*/)?manifest\.lock$''',
+  '''(.*/)?package-lock\.json$''',
+  '''(.*/)?hashes\.json$''',
+  '''.website/dist/.*''',
+  '''.website/.astro/.*''',
+  '''.website/node_modules/.*''',
+]

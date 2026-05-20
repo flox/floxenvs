@@ -1,0 +1,50 @@
+kind: env
+name: javascript-deno
+title: Deno
+publisher: flox
+tagline: >
+  Deno runtime with automatic install and permission model.
+summary:
+  - "Deno runtime via Flox"
+  - "`deno install` runs automatically on activation"
+  - "Hash-based caching skips reinstall when deps unchanged"
+  - "Explicit permission flags keep scripts secure"
+  - "Include from any manifest with one line"
+category: language
+tags: [deno, javascript, typescript]
+stack: [rust]
+featured: false
+combines_well_with:
+  - env:postgresql
+  - env:redis
+  - env:playwright
+status: stable
+license: MIT
+upstream:
+  name: Deno
+  url: https://deno.com/
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/javascript-deno" }]
+  activate: |
+    flox activate -r flox/javascript-deno
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/javascript-deno-latest
+recipes:
+  - name: javascript-deno-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Runs a TypeScript script with `deno run`"
+      - "Permissions opted-in explicitly"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/javascript-deno
+  floxhub: https://hub.flox.dev/flox/javascript-deno
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/javascript-deno-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Ajavascript-deno

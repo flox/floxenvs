@@ -1,0 +1,47 @@
+kind: env
+name: mkcert
+title: mkcert
+publisher: flox
+tagline: >
+  Locally-trusted TLS certificates via mkcert — HTTPS
+  in development with zero browser warnings.
+summary:
+  - "mkcert + nssTools installed as a matched package group"
+  - "Local CA created once, certs regenerated when domains change"
+  - "NODE_EXTRA_CA_CERTS set automatically for Node.js apps"
+  - "PKCS#12 bundle generated alongside PEM files"
+  - "Include from any manifest with one line"
+category: tool
+tags: [tls, certificates, dev-https]
+stack: [go]
+featured: false
+status: stable
+license: BSD-3-Clause
+upstream:
+  name: mkcert
+  url: https://github.com/FiloSottile/mkcert
+  license: BSD-3-Clause
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/mkcert" }]
+  activate: |
+    flox activate -r flox/mkcert
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/mkcert-latest
+recipes:
+  - name: mkcert-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Installs local CA and generates certs for example.com"
+      - "Shows cert paths and Node.js CA variable on activation"
+      - "Override domains via `MKCERT_DOMAINS` in [vars]"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/mkcert
+  floxhub: https://hub.flox.dev/flox/mkcert
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/mkcert-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Amkcert

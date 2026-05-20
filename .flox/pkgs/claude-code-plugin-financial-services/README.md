@@ -16,7 +16,7 @@ Add to a `flox/claude`-based environment:
 schema-version = "1.10.0"
 
 [include]
-environments = ["flox/claude"]
+environments = [{ remote = "flox/claude" }]
 
 [install]
 financial-services.pkg-path = "claude-code-plugin-financial-services"

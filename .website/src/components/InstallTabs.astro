@@ -1,0 +1,57 @@
+---
+interface Tab {
+  label: string;
+  code: string;
+}
+interface Props {
+  tabs: Tab[];
+}
+const { tabs } = Astro.props as Props;
+const id = Math.random().toString(36).slice(2);
+---
+<div class="rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
+  <div role="tablist" class="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
+    {tabs.map((t, i) => (
+      <button
+        role="tab"
+        aria-selected={i === 0 ? "true" : "false"}
+        aria-controls={`${id}-panel-${i}`}
+        data-tab-target={`${id}-panel-${i}`}
+        class="px-4 py-2 text-sm font-mono data-[active=true]:bg-white dark:data-[active=true]:bg-slate-950 data-[active=true]:font-semibold"
+        data-active={i === 0 ? "true" : "false"}
+      >
+        {t.label}
+      </button>
+    ))}
+  </div>
+  {tabs.map((t, i) => (
+    <pre
+      id={`${id}-panel-${i}`}
+      role="tabpanel"
+      data-tab-panel
+      hidden={i !== 0}
+      class="text-sm font-mono p-4 m-0 overflow-x-auto"
+    ><code>{t.code}</code></pre>
+  ))}
+</div>
+<script>
+  for (const tablist of document.querySelectorAll('[role="tablist"]')) {
+    const tabs = tablist.querySelectorAll('[role="tab"]');
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const targetId = tab.getAttribute("data-tab-target");
+        const panels = tablist.parentElement!.querySelectorAll(
+          "[data-tab-panel]",
+        );
+        panels.forEach((p) => p.toggleAttribute(
+          "hidden", p.id !== targetId,
+        ));
+        tabs.forEach((t) => {
+          const isActive = t === tab;
+          t.setAttribute("aria-selected", String(isActive));
+          t.setAttribute("data-active", String(isActive));
+        });
+      });
+    });
+  }
+</script>

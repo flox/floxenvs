@@ -10,7 +10,7 @@ Include this environment in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/1password"]
+environments = [{ remote = "flox/1password" }]
 
 [hook]
 on-activate = '''

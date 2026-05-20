@@ -1,0 +1,47 @@
+---
+import { scoreTone } from "../lib/scoreTone";
+
+interface Props {
+  label: string;
+  score: number;
+  caption?: string;
+}
+const { label, score, caption } = Astro.props as Props;
+const tone = scoreTone(score);
+const tones: Record<string, string> = {
+  green: "bg-score-green",
+  amber: "bg-score-amber",
+  red:   "bg-score-red",
+};
+const textTones: Record<string, string> = {
+  green: "text-score-green",
+  amber: "text-score-amber",
+  red:   "text-score-red",
+};
+---
+<div class="space-y-1">
+  <div class="flex items-baseline gap-2 text-sm">
+    <span class="font-medium text-slate-700 dark:text-slate-200">
+      {label}
+    </span>
+    <span class:list={["font-mono", textTones[tone]]}>
+      {score}%
+    </span>
+  </div>
+  <div
+    class="h-2 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden"
+    role="progressbar"
+    aria-valuenow={score}
+    aria-valuemin="0"
+    aria-valuemax="100"
+    aria-label={label}
+  >
+    <div
+      class:list={["h-full", tones[tone]]}
+      style={`width:${score}%`}
+    ></div>
+  </div>
+  {caption && (
+    <p class="text-xs text-slate-500 leading-tight">{caption}</p>
+  )}
+</div>

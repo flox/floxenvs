@@ -1,0 +1,48 @@
+kind: env
+name: ruby
+title: Ruby
+publisher: flox
+tagline: >
+  Ruby + Bundler with native-gem build deps wired up.
+summary:
+  - "Latest stable Ruby via Flox"
+  - "Bundler included — `bundle install` just works"
+  - "Gem cache stored under `$FLOX_ENV_CACHE/ruby`"
+  - "Auto-installs gems on activate when Gemfile present"
+  - "Include from any manifest with one line"
+category: language
+tags: [ruby, language, bundler]
+stack: [ruby]
+featured: false
+combines_well_with:
+  - env:postgresql
+  - env:redis
+  - env:playwright
+status: stable
+license: Ruby
+upstream:
+  name: Ruby
+  url: https://www.ruby-lang.org/
+  license: Ruby
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/ruby" }]
+  activate: |
+    flox activate -r flox/ruby
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/ruby-latest
+recipes:
+  - name: ruby-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Sample Gemfile resolves and installs"
+      - "`bundle exec rake test` against a fixture"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/ruby
+  floxhub: https://hub.flox.dev/flox/ruby
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/ruby-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Aruby

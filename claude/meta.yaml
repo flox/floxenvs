@@ -1,0 +1,65 @@
+kind: env
+name: claude
+title: Claude Code
+publisher: flox
+tagline: >
+  Claude Code CLI with managed config assembly and MCP fragments.
+intro: >
+  Claude Code is Anthropic's terminal-based AI coding agent,
+  and the flox/claude environment ships it pre-wired with a
+  managed configuration layer that assembles `~/.claude/`
+  settings, MCP server definitions, and CLAUDE.md instructions
+  from drop-in fragments at activation time. Add it to any
+  Flox manifest with one include line and the agent is ready
+  to run — API key or interactive browser auth, your choice.
+  The bundled isolated mode points Claude at a per-project
+  `$FLOX_ENV_CACHE` so untrusted codebases never touch your
+  global Claude state, which makes it safe to run against
+  pull requests from contributors you don't yet trust. The
+  environment composes cleanly with the claude-code-plugin-*
+  packages (SEO, financial services, TypeScript LSP, UI/UX
+  Pro Max, and Superpowers) and with graphify for
+  knowledge-graph context. Use it as the default agent in a
+  multi-tool setup with codex, crush, or opencode, or run it
+  alone — every choice is one manifest line away.
+summary:
+  - "One-line include — claude CLI ready in any Flox env"
+  - "Auto-assembles settings, MCP servers, and instructions"
+  - "Isolated mode for full sandboxing from ~/.claude/"
+  - "Works with API key or interactive auth"
+category: ai
+ai_role: agent
+tags: [agent, cli, anthropic, mcp]
+stack: [nodejs, typescript]
+featured: true
+combines_well_with:
+  - pkg:graphify
+  - env:playwright
+  - pkg:vibe-kanban
+status: stable
+license: MIT
+upstream:
+  name: Claude Code
+  url: https://github.com/anthropics/claude-code
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/claude" }]
+  activate: |
+    flox activate -r flox/claude
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/claude-latest
+recipes:
+  - name: claude-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Managed config assembly with example fragments"
+      - "MCP server setup in 10 lines"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/claude
+  floxhub: https://hub.flox.dev/flox/claude
+  docker: https://github.com/flox/floxenvs/pkgs/container/floxenvs/claude-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Aclaude

@@ -1,0 +1,310 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import KindBadge from "../../components/KindBadge.astro";
+import ScoreSlot from "../../components/ScoreSlot.astro";
+import InstallTabs from "../../components/InstallTabs.astro";
+import SidebarEntry from "../../components/SidebarEntry.astro";
+import Markdown from "../../components/Markdown.astro";
+
+export async function getStaticPaths() {
+  const pkgs = await getCollection("packages");
+  return pkgs.map((p) => ({ params: { name: p.data.name }, props: { pkg: p } }));
+}
+
+const { pkg } = Astro.props as { pkg: { data: any } };
+const base = import.meta.env.BASE_URL;
+const envs = await getCollection("envs");
+
+const useWithEnvs = envs.filter((e) => {
+  const reverseRef = pkg.data.combines_well_with.includes(`env:${e.data.name}`);
+  const forwardRef = e.data.combines_well_with.includes(`pkg:${pkg.data.name}`);
+  const bundled = (e.data.manifest_install ?? [])
+    .some((mi: { name: string }) => mi.name === pkg.data.name);
+  return reverseRef || forwardRef || bundled;
+});
+
+const otherPkgs = (await getCollection("packages")).filter((p) =>
+  p.data.name !== pkg.data.name &&
+  (pkg.data.combines_well_with.includes(`pkg:${p.data.name}`) ||
+   p.data.combines_well_with.includes(`pkg:${pkg.data.name}`)),
+);
+
+const tabs = pkg.data.install?.pkg
+  ? [{ label: "Manifest", code: pkg.data.install.pkg }]
+  : [];
+
+const ogImage = `${base}og/pkg/${pkg.data.name}.png`;
+
+const origin = (Astro.site?.toString() ?? "").replace(/\/$/, "");
+const pageUrl = `${origin}${base}packages/${pkg.data.name}/`;
+const subkindLabel = pkg.data.subkind === "plugin"
+  ? "Plugins"
+  : pkg.data.subkind === "skill"
+  ? "Skills"
+  : null;
+const subkindHref = pkg.data.subkind === "plugin"
+  ? `${origin}${base}packages/plugins/`
+  : pkg.data.subkind === "skill"
+  ? `${origin}${base}packages/skills/`
+  : null;
+const breadcrumbItems = [
+  {
+    "@type": "ListItem",
+    position: 1,
+    name: "flox / envs",
+    item: `${origin}${base}`,
+  },
+  {
+    "@type": "ListItem",
+    position: 2,
+    name: "Packages",
+    item: `${origin}${base}packages/`,
+  },
+];
+if (subkindLabel && subkindHref) {
+  breadcrumbItems.push({
+    "@type": "ListItem",
+    position: 3,
+    name: subkindLabel,
+    item: subkindHref,
+  });
+}
+breadcrumbItems.push({
+  "@type": "ListItem",
+  position: breadcrumbItems.length + 1,
+  name: pkg.data.title,
+  item: pageUrl,
+});
+const osList = pkg.data.systems?.length
+  ? Array.from(new Set(pkg.data.systems.map((s: string) =>
+      s.endsWith("-linux") ? "Linux"
+      : s.endsWith("-darwin") ? "macOS"
+      : s)))
+  : ["Linux", "macOS"];
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: pkg.data.title,
+    description: pkg.data.tagline,
+    applicationCategory: "DeveloperApplication",
+    operatingSystem: osList,
+    license: pkg.data.license
+      ? (pkg.data.license === "Unfree"
+        ? "LicenseRef-proprietary"
+        : `https://spdx.org/licenses/${pkg.data.license}.html`)
+      : undefined,
+    url: pageUrl,
+    codeRepository: pkg.data.links?.source,
+    isBasedOn: pkg.data.upstream?.url,
+    dateModified: pkg.data.last_updated || undefined,
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+      availability: "https://schema.org/InStock",
+      description: pkg.data.license === "Unfree"
+        ? "Free to install via Flox; upstream service may require a paid subscription or API key."
+        : "Free and open source — install via the Flox package manager.",
+    },
+    publisher: {
+      "@type": "Organization",
+      "@id": "https://flox.dev/#organization",
+      name: "Flox",
+      url: "https://flox.dev",
+    },
+    author: pkg.data.maintainer?.startsWith("@")
+      ? {
+          "@type": "Person",
+          name: pkg.data.maintainer === "@rok" ? "Rok Garbas" : pkg.data.maintainer,
+          identifier: pkg.data.maintainer,
+          url: `https://github.com/${pkg.data.maintainer.slice(1)}`,
+        }
+      : undefined,
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: breadcrumbItems,
+  },
+];
+
+// Cross-link to the comparison page for the AI coding agents.
+const isAgentPkg = ["claude-code","codex","crush","opencode","openclaw","agent-deck"]
+  .includes(pkg.data.name);
+---
+<Layout
+  title={(pkg.data.seo_title
+    ?? `${pkg.data.title} on Flox — ${pkg.data.tagline.trim().replace(/\.\s*$/, "")}`).trim()}
+  description={(pkg.data.seo_description ?? pkg.data.tagline).trim()}
+  ogImage={ogImage}
+  ogType="product"
+  jsonLd={jsonLd}
+>
+  <nav class="text-sm text-slate-500 mb-4">
+    <a href={`${base}packages/`} class="underline">Packages</a>
+    {pkg.data.subkind === "plugin" && (
+      <> / <a href={`${base}packages/plugins/`} class="underline">Plugins</a></>
+    )}
+    {pkg.data.subkind === "skill" && (
+      <> / <a href={`${base}packages/skills/`} class="underline">Skills</a></>
+    )}
+    {" "}/ {pkg.data.name}
+  </nav>
+
+  <div class="flex items-center gap-3 mb-2">
+    <KindBadge kind={pkg.data.subkind ?? "pkg"} />
+    <span class="text-xs font-mono text-slate-500">{pkg.data.status}</span>
+  </div>
+  <h1 class="text-3xl font-bold">{pkg.data.title}</h1>
+  <p class="mt-2 text-slate-600 dark:text-slate-300">{pkg.data.tagline}</p>
+
+  <p class="mt-4 text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-3xl">
+    {pkg.data.intro ? pkg.data.intro : (
+      <Fragment>
+        <strong>flox/{pkg.data.name}</strong> is a Flox package {pkg.data.upstream?.name ? <Fragment>wrapping <a href={pkg.data.upstream.url} class="underline">{pkg.data.upstream.name}</a></Fragment> : "for Flox environments"}. Add it to a manifest via <code class="font-mono text-sm">{`${pkg.data.name}.pkg-path = "flox/${pkg.data.name}"`}</code> in any <code class="font-mono text-sm">[install]</code> block. Published by Flox under {pkg.data.license ?? "an open-source"} license{pkg.data.maintainer ? `, maintained by ${pkg.data.maintainer}` : null}.{pkg.data.subkind === "plugin" && pkg.data.plugin_for ? <Fragment> Designed to plug into <a href={`${base}packages/${pkg.data.plugin_for}/`} class="underline">{pkg.data.plugin_for}</a>.</Fragment> : null}{pkg.data.subkind === "skill" && pkg.data.skill_for ? <Fragment> A skill for <a href={`${base}packages/${pkg.data.skill_for}/`} class="underline">{pkg.data.skill_for}</a>.</Fragment> : null}
+      </Fragment>
+    )}
+  </p>
+
+  {pkg.data.summary.length > 0 && (
+    <ul class="mt-5 list-disc list-inside text-sm space-y-1">
+      {pkg.data.summary.map((s: string) => <li>{s}</li>)}
+    </ul>
+  )}
+
+  <aside class="mt-6 max-w-3xl rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 px-4 py-3 text-sm">
+    <strong>New to Flox?</strong> Install it in 30 seconds:{" "}
+    <code class="font-mono text-xs">curl -L https://downloads.flox.dev/by-env/stable/install.sh | bash</code>{" "}
+    — then add this package to a Flox manifest's <code class="font-mono text-xs">[install]</code> block.{" "}
+    <a href="https://flox.dev/docs/install-flox/" class="underline">Docs →</a>
+  </aside>
+
+  {isAgentPkg && (
+    <p class="mt-4 max-w-3xl text-sm text-slate-500">
+      Choosing between agents? See the{" "}
+      <a href={`${base}compare/ai-coding-agents/`} class="underline font-medium">AI coding agents comparison</a>
+      {" "}for a side-by-side rundown.
+    </p>
+  )}
+
+  <div class="grid lg:grid-cols-[1fr_280px] gap-10 mt-10">
+    <div>
+      <ScoreSlot
+        kind="pkg"
+        name={pkg.data.name}
+        metrics={pkg.data.metrics}
+      />
+
+      {tabs.length > 0 && (
+        <section class="mt-8">
+          <h2 class="text-xl font-semibold mb-3">Install</h2>
+          <InstallTabs tabs={tabs} />
+        </section>
+      )}
+
+      {useWithEnvs.length > 0 && (
+        <section class="mt-12">
+          <h2 class="text-xl font-semibold">Use with these environments</h2>
+          <div class="mt-4 grid sm:grid-cols-2 gap-3">
+            {useWithEnvs.map((e) => (
+              <a
+                href={`${base}envs/${e.data.name}/`}
+                class="block p-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-slate-400"
+              >
+                <div class="flex items-center gap-2">
+                  <KindBadge kind="env" />
+                  <span class="font-semibold">{e.data.title}</span>
+                </div>
+                <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                  {e.data.tagline}
+                </p>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {otherPkgs.length > 0 && (
+        <section class="mt-12">
+          <h2 class="text-xl font-semibold">Combines with these packages</h2>
+          <div class="mt-4 grid sm:grid-cols-2 gap-3">
+            {otherPkgs.map((p) => (
+              <a
+                href={`${base}packages/${p.data.name}/`}
+                class="block p-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-slate-400"
+              >
+                <div class="flex items-center gap-2">
+                  <KindBadge kind={p.data.subkind ?? "pkg"} />
+                  <span class="font-semibold">{p.data.title}</span>
+                </div>
+                <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                  {p.data.tagline}
+                </p>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {pkg.data.readme && (
+        <section class="mt-12">
+          <h2 class="text-xl font-semibold">Documentation</h2>
+          <Markdown source={pkg.data.readme} className="mt-3" />
+        </section>
+      )}
+    </div>
+
+    <aside class="space-y-1">
+      <SidebarEntry label="Status">{pkg.data.status}</SidebarEntry>
+      <SidebarEntry label="Publisher">{pkg.data.publisher}</SidebarEntry>
+      {pkg.data.license && <SidebarEntry label="License">{pkg.data.license}</SidebarEntry>}
+      {pkg.data.upstream && (
+        <SidebarEntry label="Upstream">
+          <a href={pkg.data.upstream.url} class="underline">
+            {pkg.data.upstream.name}
+          </a>
+        </SidebarEntry>
+      )}
+      {pkg.data.maintainer && (
+        <SidebarEntry label="Maintainer">{pkg.data.maintainer}</SidebarEntry>
+      )}
+      {pkg.data.plugin_for && (
+        <SidebarEntry label="Plugin for">
+          <a href={`${base}packages/${pkg.data.plugin_for}/`} class="underline">
+            {pkg.data.plugin_for}
+          </a>
+        </SidebarEntry>
+      )}
+      {pkg.data.skill_for && (
+        <SidebarEntry label="Skill for">
+          <a href={`${base}packages/${pkg.data.skill_for}/`} class="underline">
+            {pkg.data.skill_for}
+          </a>
+        </SidebarEntry>
+      )}
+      {useWithEnvs.length > 0 && (
+        <SidebarEntry label="Bundled by envs">
+          <span class="inline-flex flex-wrap gap-x-1.5 gap-y-1">
+            {useWithEnvs.map((e) => (
+              <a href={`${base}envs/${e.data.name}/`} class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300">{e.data.name}</a>
+            ))}
+          </span>
+        </SidebarEntry>
+      )}
+      {pkg.data.last_updated && (
+        <SidebarEntry label="Last updated">
+          <time datetime={pkg.data.last_updated}>
+            {pkg.data.last_updated.slice(0, 10)}
+          </time>
+        </SidebarEntry>
+      )}
+      {pkg.data.links?.floxhub && (
+        <SidebarEntry label="FloxHub">
+          <a href={pkg.data.links.floxhub} class="underline">link</a>
+        </SidebarEntry>
+      )}
+    </aside>
+  </div>
+</Layout>

@@ -9,7 +9,7 @@ Include this environment in your project manifest:
 
 ```toml
 [include]
-environments = ["flox/mysql"]
+environments = [{ remote = "flox/mysql" }]
 ```
 
 Activate and start the service:
@@ -22,13 +22,13 @@ flox activate -- flox services start
 
 Override these in your own manifest under `[vars]`:
 
-| Variable       | Default     | Description              |
-| -------------- | ----------- | ------------------------ |
-| MYSQL_HOST     | 127.0.0.1   | Bind address             |
-| MYSQL_PORT     | 13306       | TCP port                 |
-| MYSQL_DATABASE | mydb        | Database created on init |
+| Variable       | Default     | Description                          |
+| -------------- | ----------- | ------------------------------------ |
+| MYSQL_HOST     | 127.0.0.1   | Bind address                         |
+| MYSQL_PORT     | 13306       | TCP port                             |
+| MYSQL_DATABASE | mydb        | Database created on init             |
 | MYSQL_USER     | (your user) | DB user (defaults to $USER if empty) |
-| MYSQL_PWD      | mypass      | DB user password         |
+| MYSQL_PWD      | mypass      | DB user password                     |
 
 ## Connection examples
 
@@ -44,7 +44,7 @@ automatically.
 
 From application code, use the connection string:
 
-```
+```text
 mysql://$MYSQL_USER:$MYSQL_PWD@$MYSQL_HOST:$MYSQL_PORT/$MYSQL_DATABASE
 ```
 

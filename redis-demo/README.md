@@ -35,7 +35,7 @@ After starting the service, try basic operations:
 redis-cli -h "$REDIS_HOST" -p "$REDIS_PORT"
 ```
 
-```
+```text
 127.0.0.1:16379> SET greeting "hello"
 OK
 127.0.0.1:16379> GET greeting
@@ -80,7 +80,7 @@ minimal environment in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/redis"]
+environments = [{ remote = "flox/redis" }]
 ```
 
 This gives you Redis with sane defaults. Override

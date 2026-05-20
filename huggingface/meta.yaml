@@ -1,0 +1,42 @@
+kind: env
+name: huggingface
+title: Hugging Face Hub
+publisher: flox
+tagline: >
+  Hugging Face Hub CLI environment for downloading models,
+  datasets, and Spaces artifacts.
+summary:
+  - "One-line include — hf CLI and huggingface-cli alias ready in any env"
+  - "Cache anchored to FLOX_ENV_CACHE so models persist across activations"
+  - "Bundled hf-xet binary accelerates downloads via chunk deduplication"
+  - "tiny-agents runtime included for minimal agent workflows"
+category: ai
+ai_role: tooling
+tags: [huggingface, models, datasets, cli, llm]
+stack: [python]
+featured: true
+combines_well_with:
+  - env:langchain
+  - env:verba
+status: stable
+license: MIT
+upstream:
+  name: huggingface_hub
+  url: https://github.com/huggingface/huggingface_hub
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/huggingface" }]
+  activate: |
+    flox activate -r flox/huggingface
+recipes:
+  - name: huggingface-demo
+    start_services: false
+    features:
+      - "Styled banner with auth, download, and cache-scan commands"
+      - "High-performance transfer mode indicator in the welcome screen"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/huggingface
+  floxhub: https://hub.flox.dev/flox/huggingface

@@ -1,0 +1,269 @@
+name: "Website"
+
+on:
+  workflow_dispatch:
+    inputs:
+      items:
+        description: >
+          Comma-separated <kind>:<name> entries
+          (e.g. `env:claude,pkg:ollama`), or `changed`, or `all`.
+        type: string
+        default: "changed"
+      force_rescan:
+        description: "Ignore audit cache and re-run all scanners."
+        type: boolean
+        default: false
+  workflow_call:
+    inputs:
+      sha:
+        type: string
+        required: true
+      triggered_by:
+        type: string
+        default: "ci"
+      items:
+        type: string
+        default: "changed"
+      force_rescan:
+        type: boolean
+        default: false
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+permissions:
+  contents: "read"
+  pages: "write"
+  id-token: "write"
+
+jobs:
+  detect-changed:
+    name: "Detect changed items"
+    runs-on: "ubuntu-latest"
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      count: ${{ steps.matrix.outputs.count }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: "Install yq, jq, gh"
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq jq yq
+      - name: "Compute matrix"
+        id: matrix
+        env:
+          TRIGGER: ${{ github.event_name }}
+          SHA: ${{ inputs.sha || github.sha }}
+          INPUT_ITEMS: ${{ inputs.items || 'changed' }}
+        run: |
+          set -euo pipefail
+          export REPO_ROOT="$PWD"
+          matrix=$(bash scripts/changed-items.sh)
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          count=$(echo "$matrix" | jq '.include | length')
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          echo "$matrix" | jq .
+
+  audit-item:
+    name: "Audit ${{ matrix.kind }}:${{ matrix.name }}"
+    needs: detect-changed
+    if: needs.detect-changed.outputs.count != '0'
+    runs-on: "ubuntu-latest"
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.detect-changed.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: "Install tools"
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq jq yq shellcheck
+          curl -sSL -o /tmp/gitleaks.tgz \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz
+          sudo tar -xzf /tmp/gitleaks.tgz -C /usr/local/bin gitleaks
+      - name: "Resolve item directory"
+        id: dir
+        run: |
+          case "${{ matrix.kind }}" in
+            env) echo "dir=${{ matrix.name }}" >> "$GITHUB_OUTPUT" ;;
+            pkg) echo "dir=.flox/pkgs/${{ matrix.name }}" >> "$GITHUB_OUTPUT" ;;
+          esac
+      - name: "Content hash"
+        id: hash
+        run: |
+          MAIN_H=$(git rev-parse "HEAD:${{ steps.dir.outputs.dir }}" 2>/dev/null || echo none)
+          DEMO_H=$(git rev-parse "HEAD:${{ matrix.name }}-demo" 2>/dev/null || echo none)
+          CONF_H=$(git rev-parse "HEAD:.gitleaks.toml" 2>/dev/null || echo none)
+          KEY="audit-v1-${{ matrix.kind }}-${{ matrix.name }}-${MAIN_H}-${DEMO_H}-${CONF_H}"
+          echo "key=$KEY" >> "$GITHUB_OUTPUT"
+      - name: "Restore cache"
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: "audit/${{ matrix.kind }}/${{ matrix.name }}/metrics.json"
+          key: ${{ steps.hash.outputs.key }}
+      - name: "Run audit"
+        if: steps.cache.outputs.cache-hit != 'true' || inputs.force_rescan
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          REPO_ROOT: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          bash scripts/run-audit.sh \
+            "${{ matrix.kind }}" "${{ matrix.name }}"
+      - name: "Upload metrics.json artifact"
+        uses: actions/upload-artifact@v4
+        with:
+          name: "metrics-${{ matrix.kind }}-${{ matrix.name }}"
+          path: "audit/${{ matrix.kind }}/${{ matrix.name }}/metrics.json"
+          if-no-files-found: "error"
+
+  collect-metrics:
+    name: "Collect metrics"
+    needs: ["detect-changed", "audit-item"]
+    if: always() && needs.detect-changed.result == 'success'
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v4
+      - name: "Install jq"
+        run: sudo apt-get install -y -qq jq
+      - name: "Stage directory"
+        run: mkdir -p .website/src/content/metrics/env \
+                       .website/src/content/metrics/pkg
+      - name: "Download changed-item artifacts"
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "metrics-*"
+          path: "_metrics_in"
+          merge-multiple: false
+      - name: "Stage changed-item metrics"
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          for d in _metrics_in/metrics-*; do
+            base=$(basename "$d")
+            # name = metrics-<kind>-<name>
+            kind=$(echo "$base" | cut -d- -f2)
+            name=$(echo "$base" | cut -d- -f3-)
+            cp "$d/metrics.json" \
+               ".website/src/content/metrics/$kind/$name.json"
+          done
+      - name: "Fetch prior metrics for unchanged items"
+        env:
+          DEPLOY_URL: "https://flox.github.io/floxenvs"
+        run: |
+          set -euo pipefail
+          export REPO_ROOT="$PWD"
+          mapfile -t items < <(bash scripts/list-items.sh)
+          for item in "${items[@]}"; do
+            kind="${item%%:*}"; name="${item##*:}"
+            target=".website/src/content/metrics/$kind/$name.json"
+            [ -f "$target" ] && continue
+            case "$kind" in
+              env) url="$DEPLOY_URL/envs/$name/metrics.json" ;;
+              pkg) url="$DEPLOY_URL/packages/$name/metrics.json" ;;
+            esac
+            if curl -sfL --max-time 10 -o "$target" "$url"; then
+              echo "fetched prior metrics for $item"
+            else
+              echo "no prior metrics for $item; leaving default"
+            fi
+          done
+      - name: "Upload staged metrics"
+        uses: actions/upload-artifact@v4
+        with:
+          name: "site-metrics-staged"
+          path: ".website/src/content/metrics"
+
+  build-site:
+    name: "Build site"
+    needs: ["collect-metrics"]
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: ".website/package-lock.json"
+      - name: "Download staged metrics"
+        uses: actions/download-artifact@v4
+        with:
+          name: "site-metrics-staged"
+          path: ".website/src/content/metrics"
+      - name: "Surface metrics.json into dist for next deploy"
+        run: |
+          set -euo pipefail
+          # Copy each metrics.json into .website/public so the
+          # build embeds it at the same URL the next run
+          # of collect-metrics will fetch from.
+          while IFS= read -r f; do
+            rel="${f#.website/src/content/metrics/}"
+            kind="${rel%%/*}"
+            name="$(basename "${rel#"$kind"/}" .json)"
+            case "$kind" in
+              env) dest=".website/public/envs/$name/metrics.json" ;;
+              pkg) dest=".website/public/packages/$name/metrics.json" ;;
+            esac
+            mkdir -p "$(dirname "$dest")"
+            cp "$f" "$dest"
+          done < <(find .website/src/content/metrics -name '*.json')
+      - name: "Install"
+        working-directory: ".website"
+        run: "npm ci"
+      - name: "Build"
+        working-directory: ".website"
+        env:
+          SITE_URL: ${{ vars.SITE_URL || 'https://envs.flox.dev' }}
+          BASE_PATH: ${{ vars.BASE_PATH || '/' }}
+        run: "npm run build"
+      - name: "Upload dist artifact for the deploy job"
+        uses: actions/upload-artifact@v4
+        with:
+          name: "website-dist"
+          path: ".website/dist"
+          retention-days: 1
+
+  deploy:
+    name: "Deploy"
+    needs: ["build-site"]
+    runs-on: "ubuntu-latest"
+    permissions:
+      contents: "write"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: "Download built site"
+        uses: actions/download-artifact@v4
+        with:
+          name: "website-dist"
+          path: ".website/dist"
+      - name: "Publish to gh-pages branch"
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ".website/dist"
+          publish_branch: "gh-pages"
+          enable_jekyll: false
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
+          commit_message: >-
+            deploy: ${{ inputs.sha || github.sha }}
+            (from ${{ inputs.triggered_by || github.event_name }})
+      - name: "Mark deployed SHA"
+        if: success() && inputs.triggered_by == 'ci'
+        env:
+          DEPLOY_SHA: ${{ inputs.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          git config user.email "ci@flox.dev"
+          git config user.name  "flox-ci"
+          git tag -f site-last-deployed "$DEPLOY_SHA"
+          git push -f origin site-last-deployed

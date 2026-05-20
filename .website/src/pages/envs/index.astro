@@ -1,0 +1,77 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import ItemCard from "../../components/ItemCard.astro";
+
+const base = import.meta.env.BASE_URL;
+const envs = (await getCollection("envs")).sort((a, b) =>
+  a.data.name.localeCompare(b.data.name),
+);
+const origin = (Astro.site?.toString() ?? "").replace(/\/$/, "");
+const pageUrl = `${origin}${base}envs/`;
+const itemList = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Flox environments",
+  url: pageUrl,
+  numberOfItems: envs.length,
+  itemListElement: envs.map((e, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: e.data.title,
+    url: `${origin}${base}envs/${e.data.name}/`,
+  })),
+};
+const collectionPage = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "Flox environments",
+  description:
+    "Curated catalog of Flox environments — reproducible dev setups for AI, databases, languages, and services.",
+  url: pageUrl,
+  isPartOf: { "@type": "WebSite", "@id": `${origin}${base}#website` },
+  mainEntity: { "@id": `${pageUrl}#items` },
+};
+const breadcrumb = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "flox / envs",
+      item: `${origin}${base}`,
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Environments",
+      item: pageUrl,
+    },
+  ],
+};
+const jsonLd = [collectionPage, { ...itemList, "@id": `${pageUrl}#items` }, breadcrumb];
+---
+<Layout
+  title="Flox environments — reproducible AI, database, and language dev setups"
+  description="Browse every Flox environment in the catalog — Claude Code, PostgreSQL + pgvector, LangChain, Ollama, and more. One-line manifest include per env."
+  jsonLd={jsonLd}
+>
+  <h1 class="text-2xl font-bold">Environments</h1>
+  <p class="mt-1 text-sm text-slate-500">
+    {envs.length} environments
+  </p>
+  <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    {envs.map((e) => (
+      <ItemCard
+        kind="env"
+        name={e.data.name}
+        title={e.data.title}
+        tagline={e.data.tagline}
+        href={`${base}envs/${e.data.name}/`}
+        ai_role={e.data.ai_role}
+        category={e.data.category}
+      />
+    ))}
+  </div>
+</Layout>

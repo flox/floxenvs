@@ -1,0 +1,48 @@
+kind: env
+name: rust
+title: Rust
+publisher: flox
+tagline: >
+  Rust + Cargo, stable channel, ready to `cargo run`.
+summary:
+  - "Latest stable rustc, cargo, clippy, rustfmt via Flox"
+  - "Platform linker (clang/gcc) included automatically"
+  - "Standard library source for IDE support"
+  - "All toolchain packages pinned to a compatible revision"
+  - "Include from any manifest with one line"
+category: language
+tags: [rust, language, cargo]
+stack: [rust]
+featured: false
+combines_well_with:
+  - env:postgresql
+  - env:redis
+  - env:playwright
+status: stable
+license: "MIT OR Apache-2.0"
+upstream:
+  name: Rust
+  url: https://www.rust-lang.org/
+  license: "MIT OR Apache-2.0"
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/rust" }]
+  activate: |
+    flox activate -r flox/rust
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/rust-latest
+recipes:
+  - name: rust-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Sample crate builds with `cargo build`"
+      - "`cargo test` against fixtures"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/rust
+  floxhub: https://hub.flox.dev/flox/rust
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/rust-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Arust

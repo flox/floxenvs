@@ -1,0 +1,266 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import KindBadge from "../../components/KindBadge.astro";
+import ScoreSlot from "../../components/ScoreSlot.astro";
+import InstallTabs from "../../components/InstallTabs.astro";
+import RecipeSection from "../../components/RecipeSection.astro";
+import Markdown from "../../components/Markdown.astro";
+import SidebarEntry from "../../components/SidebarEntry.astro";
+import { deriveBundling } from "../../lib/derive";
+
+export async function getStaticPaths() {
+  const envs = await getCollection("envs");
+  return envs.map((e) => ({ params: { name: e.data.name }, props: { env: e } }));
+}
+
+const { env } = Astro.props as { env: { data: any } };
+const base = import.meta.env.BASE_URL;
+const pkgs = await getCollection("packages");
+
+const { envs: dEnvs, pkgs: dPkgs } = deriveBundling(
+  [{
+    name: env.data.name,
+    bundles_pkgs: env.data.bundles_pkgs,
+    manifest_install: env.data.manifest_install,
+  }],
+  pkgs.map((p) => ({ name: p.data.name })),
+);
+const bundles = dEnvs[0].bundles_pkgs;
+
+const ogImage = `${base}og/env/${env.data.name}.png`;
+
+const tabs = [
+  env.data.install?.include && { label: "Include", code: env.data.install.include },
+  env.data.install?.activate && { label: "Activate", code: env.data.install.activate },
+  env.data.install?.docker && { label: "Docker", code: env.data.install.docker },
+].filter(Boolean) as { label: string; code: string }[];
+
+const recommendedPkgs = pkgs.filter((p) => {
+  if (bundles.includes(p.data.name)) return false;
+  if (env.data.combines_well_with.includes(`pkg:${p.data.name}`)) return true;
+  if (p.data.combines_well_with.includes(`env:${env.data.name}`)) return true;
+  return false;
+});
+
+const origin = (Astro.site?.toString() ?? "").replace(/\/$/, "");
+const pageUrl = `${origin}${base}envs/${env.data.name}/`;
+// Derive OS from `systems` if present; default to the four canonical Flox
+// targets if absent (every Flox env in this repo ships for all four).
+const osList = env.data.systems?.length
+  ? Array.from(new Set(env.data.systems.map((s: string) =>
+      s.endsWith("-linux") ? "Linux"
+      : s.endsWith("-darwin") ? "macOS"
+      : s)))
+  : ["Linux", "macOS"];
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: env.data.title,
+    description: env.data.tagline,
+    applicationCategory: "DeveloperApplication",
+    operatingSystem: osList,
+    license: env.data.license
+      ? (env.data.license === "Unfree"
+        ? "LicenseRef-proprietary"
+        : `https://spdx.org/licenses/${env.data.license}.html`)
+      : undefined,
+    url: pageUrl,
+    codeRepository: env.data.links?.source,
+    isBasedOn: env.data.upstream?.url,
+    dateModified: env.data.last_updated || undefined,
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+      availability: "https://schema.org/InStock",
+      description: env.data.license === "Unfree"
+        ? "Free to install via Flox; upstream service may require a paid subscription or API key."
+        : "Free and open source — install via the Flox package manager.",
+    },
+    publisher: {
+      "@type": "Organization",
+      "@id": "https://flox.dev/#organization",
+      name: "Flox",
+      url: "https://flox.dev",
+    },
+    author: env.data.maintainer?.startsWith("@")
+      ? {
+          "@type": "Person",
+          name: env.data.maintainer === "@rok" ? "Rok Garbas" : env.data.maintainer,
+          identifier: env.data.maintainer,
+          url: `https://github.com/${env.data.maintainer.slice(1)}`,
+        }
+      : undefined,
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "flox / envs",
+        item: `${origin}${base}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Environments",
+        item: `${origin}${base}envs/`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: env.data.title,
+        item: pageUrl,
+      },
+    ],
+  },
+];
+---
+<Layout
+  title={(env.data.seo_title
+    ?? `${env.data.title} dev environment on Flox — ${env.data.tagline.trim().replace(/\.\s*$/, "")}`).trim()}
+  description={(env.data.seo_description ?? env.data.tagline).trim()}
+  ogImage={ogImage}
+  ogType="product"
+  jsonLd={jsonLd}
+>
+  <nav class="text-sm text-slate-500 mb-4">
+    <a href={`${base}envs/`} class="underline">Environments</a> / {env.data.name}
+  </nav>
+  <div class="flex items-center gap-3 mb-2">
+    <KindBadge kind="env" />
+    <span class="text-xs font-mono text-slate-500">{env.data.status}</span>
+  </div>
+  <h1 class="text-3xl font-bold">{env.data.title}</h1>
+  <p class="mt-2 text-slate-600 dark:text-slate-300">{env.data.tagline}</p>
+
+  {/* Auto-generated intro paragraph, citable, populated from meta.yaml fields.
+       Hand-authored override via env.data.intro. */}
+  <p class="mt-4 text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-3xl">
+    {env.data.intro ? env.data.intro : (
+      <Fragment>
+        The <strong>flox/{env.data.name}</strong> environment packages {env.data.upstream?.name ?? env.data.title} for one-line inclusion in any Flox manifest. Add it via <code class="font-mono text-sm">{`{ remote = "flox/${env.data.name}" }`}</code> and the toolchain is pinned, services are wired, and the demo recipe starts cleanly. Published by Flox under {env.data.license ?? "an open-source"} license{env.data.upstream?.url ? <Fragment>, upstream <a href={env.data.upstream.url} class="underline">{env.data.upstream.name}</a></Fragment> : null}{env.data.maintainer ? `, maintained by ${env.data.maintainer}` : null}.
+      </Fragment>
+    )}
+  </p>
+
+  {env.data.summary.length > 0 && (
+    <ul class="mt-5 list-disc list-inside text-sm space-y-1">
+      {env.data.summary.map((s: string) => <li>{s}</li>)}
+    </ul>
+  )}
+
+  {/* Prereq onboarding hook for users new to Flox. */}
+  <aside class="mt-6 max-w-3xl rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 px-4 py-3 text-sm">
+    <strong>New to Flox?</strong> Install it in 30 seconds:{" "}
+    <code class="font-mono text-xs">curl -L https://downloads.flox.dev/by-env/stable/install.sh | bash</code>{" "}
+    — then run the activate command below. <a href="https://flox.dev/docs/install-flox/" class="underline">Docs →</a>
+  </aside>
+
+  <div class="grid lg:grid-cols-[1fr_280px] gap-10 mt-10">
+    <div>
+      <ScoreSlot
+        kind="env"
+        name={env.data.name}
+        metrics={env.data.metrics}
+      />
+
+      {tabs.length > 0 && (
+        <section class="mt-8">
+          <h2 class="text-xl font-semibold mb-3">Install</h2>
+          <InstallTabs tabs={tabs} />
+        </section>
+      )}
+
+      <RecipeSection
+        recipes={env.data.recipes}
+        readme={env.data.recipe_readme}
+        manifestToml={env.data.recipe_manifest}
+      />
+
+      {recommendedPkgs.length > 0 && (
+        <section class="mt-12">
+          <h2 class="text-xl font-semibold">Recommended packages</h2>
+          <p class="text-sm text-slate-500 mt-1">
+            Packages that pair well with this env.
+          </p>
+          <div class="mt-4 grid sm:grid-cols-2 gap-3">
+            {recommendedPkgs.map((p) => (
+              <a
+                href={`${base}packages/${p.data.name}/`}
+                class="block p-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-slate-400"
+              >
+                <div class="flex items-center gap-2">
+                  <KindBadge kind={p.data.subkind ?? "pkg"} />
+                  <span class="font-semibold">{p.data.title}</span>
+                </div>
+                <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                  {p.data.tagline}
+                </p>
+                {p.data.install?.pkg && (
+                  <pre class="mt-2 text-xs font-mono p-2 rounded bg-slate-50 dark:bg-slate-900 overflow-x-auto"><code>{p.data.install.pkg}</code></pre>
+                )}
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {env.data.readme && (
+        <section class="mt-12">
+          <h2 class="text-xl font-semibold">Documentation</h2>
+          <Markdown source={env.data.readme} className="mt-3" />
+        </section>
+      )}
+    </div>
+
+    <aside class="space-y-1">
+      <SidebarEntry label="Status">{env.data.status}</SidebarEntry>
+      <SidebarEntry label="Publisher">{env.data.publisher}</SidebarEntry>
+      {env.data.license && <SidebarEntry label="License">{env.data.license}</SidebarEntry>}
+      {env.data.upstream && (
+        <SidebarEntry label="Upstream">
+          <a href={env.data.upstream.url} class="underline">
+            {env.data.upstream.name}
+          </a>
+          {env.data.upstream.license && (
+            <span class="text-slate-500"> · {env.data.upstream.license}</span>
+          )}
+        </SidebarEntry>
+      )}
+      {env.data.maintainer && (
+        <SidebarEntry label="Maintainer">{env.data.maintainer}</SidebarEntry>
+      )}
+      {bundles.length > 0 && (
+        <SidebarEntry label="Bundles packages">
+          <span class="inline-flex flex-wrap gap-x-1.5 gap-y-1">
+            {bundles.map((b: string) => (
+              <a href={`${base}packages/${b}/`} class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300">{b}</a>
+            ))}
+          </span>
+        </SidebarEntry>
+      )}
+      {env.data.links?.floxhub && (
+        <SidebarEntry label="FloxHub">
+          <a href={env.data.links.floxhub} class="underline">link</a>
+        </SidebarEntry>
+      )}
+      {env.data.links?.source && (
+        <SidebarEntry label="Source">
+          <a href={env.data.links.source} class="underline">repo</a>
+        </SidebarEntry>
+      )}
+      {env.data.last_updated && (
+        <SidebarEntry label="Last updated">
+          <time datetime={env.data.last_updated}>
+            {env.data.last_updated.slice(0, 10)}
+          </time>
+        </SidebarEntry>
+      )}
+    </aside>
+  </div>
+</Layout>

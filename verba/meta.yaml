@@ -1,0 +1,65 @@
+kind: env
+name: verba
+title: Verba
+publisher: flox
+tagline: >
+  Verba RAG environment with Weaviate vector database, Ollama LLM
+  backend, and the Verba web UI — all as background services.
+intro: >
+  flox/verba is a one-include RAG (Retrieval-Augmented
+  Generation) stack: Weaviate as the vector database, Ollama
+  as the local LLM, the Verba web UI on
+  http://localhost:8000, and a model-puller service that
+  warms the cache on first activation. All four pieces run
+  as managed Flox services, so a single
+  `flox activate -r flox/verba --start-services` brings the
+  whole stack up coordinated and ready to ingest documents.
+  The chat and embedding models are configurable via
+  OLLAMA_MODEL and OLLAMA_EMBED_MODEL environment variables;
+  defaults are llama3.1 for chat and nomic-embed-text for
+  embeddings, but you can swap in anything Ollama supports
+  without touching configuration files. The Python runtime
+  is cached in `$FLOX_ENV_CACHE` for fast re-activations.
+  Designed for teams who want a private, on-premise RAG
+  pipeline without cloud dependencies — useful for internal
+  documentation search, compliance research, and any
+  workflow where the source data can't leave the network.
+  Pairs with flox/postgresql when Weaviate is not the right
+  vector store and with flox/langchain for downstream Python
+  orchestration of the same Ollama instance.
+summary:
+  - "One-line include — Verba RAG stack ready with Weaviate and Ollama"
+  - "Four coordinated services: weaviate, ollama, verba, and model puller"
+  - "Configurable chat and embedding models via OLLAMA_MODEL vars"
+  - "Python venv cached in FLOX_ENV_CACHE for fast re-activations"
+category: ai
+ai_role: rag
+tags: [rag, weaviate, ollama, vector-db, python]
+stack: [python, weaviate, ollama]
+featured: true
+combines_well_with:
+  - env:omlx
+  - env:postgresql
+  - env:langchain
+status: stable
+license: MIT
+upstream:
+  name: Verba
+  url: https://github.com/weaviate/Verba
+  license: BSD-3-Clause
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/verba" }]
+  activate: |
+    flox activate -r flox/verba --start-services
+recipes:
+  - name: verba-demo
+    start_services: true
+    features:
+      - "Styled banner with service URLs for Weaviate, Ollama, and Verba"
+      - "Displays active chat and embedding model names at startup"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/verba
+  floxhub: https://hub.flox.dev/flox/verba

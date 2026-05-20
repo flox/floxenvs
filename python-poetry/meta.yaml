@@ -1,0 +1,51 @@
+kind: env
+name: python-poetry
+title: Python + Poetry
+publisher: flox
+tagline: >
+  Python 3 + Poetry with managed venv and hash-cached
+  poetry.lock installs.
+summary:
+  - "Python 3 interpreter via Flox"
+  - "Poetry package manager included"
+  - "Venv created via `poetry env use` and activated on entry"
+  - "Hash-cached `poetry.lock` — reinstalls only on change"
+  - "Include from any manifest with one line"
+category: language
+tags: [python, poetry, language, venv]
+stack: [python]
+featured: false
+combines_well_with:
+  - env:postgresql
+  - env:redis
+  - env:playwright
+status: stable
+license: PSF-2.0
+upstream:
+  name: CPython
+  url: https://www.python.org/
+  license: PSF-2.0
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/python-poetry" }]
+  activate: |
+    flox activate -r flox/python-poetry
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/python-poetry-latest
+recipes:
+  - name: python-poetry-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Sample `pyproject.toml` resolves with `poetry install`"
+      - "`poetry install` populates `.venv` deterministically"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/python-poetry
+  floxhub: https://hub.flox.dev/flox/python-poetry
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/python-poetry-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Apython-poetry

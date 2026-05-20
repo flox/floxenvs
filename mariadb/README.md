@@ -11,7 +11,7 @@ Include in your own Flox manifest:
 
 ```toml
 [include]
-environments = ["flox/mariadb"]
+environments = [{ remote = "flox/mariadb" }]
 ```
 
 Activate and start the service:

@@ -22,7 +22,7 @@ Add to your `manifest.toml`:
 
 ```toml
 [include]
-environments = ["flox/valkey"]
+environments = [{ remote = "flox/valkey" }]
 ```
 
 Then customize vars in your own manifest to override
@@ -61,7 +61,7 @@ After activation, these are available in your shell:
 
 Most Redis-compatible clients accept a URL in this form:
 
-```
+```text
 redis://$VALKEY_HOST:$VALKEY_PORT
 ```
 

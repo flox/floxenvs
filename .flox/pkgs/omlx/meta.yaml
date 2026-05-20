@@ -1,0 +1,35 @@
+kind: pkg
+subkind: plain
+name: omlx
+title: Omlx
+publisher: flox
+tagline: >
+  LLM inference server optimized for Apple Silicon with MLX.
+summary:
+  - "Runs quantized LLMs locally using Apple's MLX framework"
+  - "Serves an OpenAI-compatible API endpoint on macOS"
+  - "Apple Silicon only — maximum throughput on M-series chips"
+category: ai
+ai_role: llm-runtime
+tags: [llm, mlx, apple-silicon, macos, openai-compatible, python]
+stack: [python, mlx]
+featured: true
+combines_well_with:
+  - env:omlx
+  - env:verba
+status: stable
+license: Apache-2.0
+upstream:
+  name: omlx
+  url: https://github.com/jundot/omlx
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    omlx.pkg-path = "flox/omlx"
+    omlx.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/omlx
+  floxhub: https://hub.flox.dev/flox/omlx

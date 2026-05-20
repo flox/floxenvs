@@ -1,0 +1,42 @@
+kind: env
+name: omlx
+title: oMLX
+publisher: flox
+tagline: >
+  LLM inference server with continuous batching and tiered KV
+  caching, optimized for Apple Silicon.
+summary:
+  - "One-line include — oMLX server ready on Apple M1+ with macOS 15+"
+  - "OpenAI-compatible API at /v1 for drop-in model serving"
+  - "Admin UI for model download and server management"
+  - "Runs as a background service on a configurable port"
+category: ai
+ai_role: llm-runtime
+tags: [llm, inference, apple-silicon, mlx, openai-compatible]
+stack: [python, mlx]
+featured: true
+combines_well_with:
+  - env:verba
+  - env:langchain
+status: stable
+license: MIT
+upstream:
+  name: oMLX
+  url: https://github.com/jundot/omlx
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/omlx" }]
+  activate: |
+    flox activate -r flox/omlx --start-services
+recipes:
+  - name: omlx-demo
+    start_services: true
+    features:
+      - "Styled walkthrough with server URL and admin UI link"
+      - "Example huggingface-cli model download command"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/omlx
+  floxhub: https://hub.flox.dev/flox/omlx

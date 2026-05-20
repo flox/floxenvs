@@ -1,0 +1,65 @@
+---
+import type { Kind, SubKind } from "../lib/kindNames";
+
+interface Props {
+  kind: Kind | SubKind;
+  className?: string;
+}
+const { kind, className = "" } = Astro.props as Props;
+
+// Each icon is an inline SVG selected by kind. Colors are
+// applied via the parent's text color (`currentColor`),
+// so the icon takes the surrounding tone — matching the
+// kind-colored stripe and badge.
+const labels: Record<string, string> = {
+  env: "Environment",
+  pkg: "Package",
+  plain: "Package",
+  plugin: "Plugin",
+  skill: "Skill",
+};
+const label = labels[kind] ?? "Item";
+---
+<svg
+  class:list={["w-4 h-4 shrink-0", className]}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.6"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  role="img"
+  aria-label={label}
+>
+  {kind === "env" && (
+    <>
+      <path d="M3 7l9-4 9 4-9 4-9-4z" />
+      <path d="M3 12l9 4 9-4" />
+      <path d="M3 17l9 4 9-4" />
+    </>
+  )}
+  {(kind === "pkg" || kind === "plain") && (
+    <>
+      <path d="M3 7l9-4 9 4v10l-9 4-9-4V7z" />
+      <path d="M3 7l9 4 9-4" />
+      <path d="M12 11v10" />
+    </>
+  )}
+  {kind === "plugin" && (
+    <>
+      <path d="M9 3h6v3a2 2 0 1 0 0 4v4H9v3H6a2 2 0 1 0 0-4H3v-6h3a2 2 0 1 0 0-4h3z" />
+    </>
+  )}
+  {kind === "skill" && (
+    <>
+      <path d="M12 3v4" />
+      <path d="M12 17v4" />
+      <path d="M3 12h4" />
+      <path d="M17 12h4" />
+      <path d="M5.6 5.6l2.8 2.8" />
+      <path d="M15.6 15.6l2.8 2.8" />
+      <path d="M5.6 18.4l2.8-2.8" />
+      <path d="M15.6 8.4l2.8-2.8" />
+    </>
+  )}
+</svg>

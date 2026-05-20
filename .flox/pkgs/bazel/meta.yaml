@@ -1,0 +1,37 @@
+kind: pkg
+subkind: plain
+name: bazel
+title: Bazel
+publisher: flox
+tagline: >
+  Bazel build system with a Flox-aware wrapper script.
+summary:
+  - "Hermetic, scalable builds for monorepos"
+  - "Wrapped so it runs cleanly inside any Flox env"
+  - "Used as the engine for `env:bazel`"
+category: tool
+tags: [bazel, build, monorepo, jvm]
+stack: [java]
+featured: false
+combines_well_with:
+  - env:bazel
+  - env:go
+  - env:javascript-node
+status: stable
+license: Apache-2.0
+upstream:
+  name: Bazel
+  url: https://bazel.build/
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    bazel.pkg-path = "flox/bazel"
+    bazel.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/bazel
+  floxhub: https://hub.flox.dev/flox/bazel
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Abazel

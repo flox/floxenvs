@@ -101,7 +101,7 @@ the minimal environment in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/mongodb"]
+environments = [{ remote = "flox/mongodb" }]
 ```
 
 This gives you the MongoDB server with sane defaults.

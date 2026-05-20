@@ -1,0 +1,80 @@
+kind: env
+name: postgresql
+title: PostgreSQL
+publisher: flox
+tagline: >
+  PostgreSQL ready to include — Unix-socket default, sane
+  data dirs, services that come up clean.
+seo_title: >
+  PostgreSQL + pgvector dev environment — isolated per project,
+  boots as a Flox service
+seo_description: >
+  Drop-in PostgreSQL for any project — pgvector-ready for RAG,
+  Unix-socket by default, per-project data dirs under
+  $FLOX_ENV_CACHE, boots as a Flox service. One include line.
+intro: >
+  flox/postgresql is a complete PostgreSQL development
+  environment in one include line: the latest stable
+  PostgreSQL binary, a per-project data directory rooted in
+  `$FLOX_ENV_CACHE`, and a service definition that brings
+  the server up on activation. By default the server listens
+  on a Unix socket inside the env cache so local apps connect
+  with `psql` and standard libpq tooling without TCP setup;
+  override `PGPORT` and `PGHOST` to switch to TCP when the
+  app needs network reachability. No global PostgreSQL
+  install is touched, and shutting down the env via
+  `flox services stop postgresql` leaves the host clean.
+  Useful for dev environments where every checkout brings up
+  its own database, for CI pipelines that need an ephemeral
+  database per job, and for the local half of a RAG stack
+  via the pgvector extension. Pairs with flox/langchain or
+  flox/verba for vector storage, and with the various
+  language envs (Python, Node, Ruby) for application
+  development. Published by Flox under the PostgreSQL
+  license.
+summary:
+  - "Latest stable PostgreSQL via Flox"
+  - "Unix-socket connection by default (override to TCP)"
+  - "Trust auth for development, user `pguser` / db `pgdb`"
+  - "Data lives under `$FLOX_ENV_CACHE/postgres/data`"
+  - "Boots as a Flox service with `--start-services`"
+category: database
+tags: [postgres, sql, database, service]
+stack: [c]
+featured: false
+combines_well_with:
+  - env:python-pip
+  - env:python-poetry
+  - env:python-uv
+  - env:ruby
+  - env:rust
+  - env:go
+  - env:javascript-node
+status: stable
+license: PostgreSQL
+upstream:
+  name: PostgreSQL
+  url: https://www.postgresql.org/
+  license: PostgreSQL
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/postgresql" }]
+  activate: |
+    flox activate -r flox/postgresql --start-services
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/postgresql-latest
+recipes:
+  - name: postgresql-demo
+    title: Quick start
+    start_services: true
+    features:
+      - "Launches PostgreSQL as a Flox service"
+      - "Connects via `psql` over Unix socket with no setup"
+      - "Sample SQL to seed `pgdb` on first run"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/postgresql
+  floxhub: https://hub.flox.dev/flox/postgresql
+  docker: https://github.com/flox/floxenvs/pkgs/container/floxenvs/postgresql-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Apostgresql

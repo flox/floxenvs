@@ -9,7 +9,7 @@ Include this environment in your own manifest:
 
 ```toml
 [include]
-environments = ["flox/dotenv"]
+environments = [{ remote = "flox/dotenv" }]
 ```
 
 By default it loads `.env` in the current directory. Override

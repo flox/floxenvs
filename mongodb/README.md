@@ -18,7 +18,7 @@ Add to your `manifest.toml`:
 
 ```toml
 [include]
-environments = ["flox/mongodb"]
+environments = [{ remote = "flox/mongodb" }]
 ```
 
 Then customize vars in your own manifest as needed.
@@ -44,13 +44,13 @@ MONGO_PORT = "37017"
 
 ## Connection string
 
-```
+```text
 mongodb://$MONGO_HOST:$MONGO_PORT
 ```
 
 With defaults:
 
-```
+```text
 mongodb://127.0.0.1:27017
 ```
 

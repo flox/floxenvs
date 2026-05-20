@@ -1,0 +1,175 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import ItemCard from "../../components/ItemCard.astro";
+import { CATEGORIES } from "../../lib/kindNames";
+
+export async function getStaticPaths() {
+  return CATEGORIES.map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const base = import.meta.env.BASE_URL;
+const envs = (await getCollection("envs")).filter((e) => e.data.category === slug);
+const pkgs = (await getCollection("packages")).filter((p) => p.data.category === slug);
+
+// Per-category copy: a citable intro paragraph (~50-100 words), a SERP
+// description targeting the natural queries for each category bucket,
+// and a canonical display name (the `capitalize` Tailwind class was
+// rendering the raw slug to crawlers; we now emit the display label).
+const COPY: Record<
+  string,
+  { label: string; title: string; description: string; intro: string }
+> = {
+  ai: {
+    label: "AI",
+    title: "AI environments and packages on Flox — agents, LLMs, RAG",
+    description: "Curated Flox catalog entries for AI work — coding agents (Claude Code, Codex, Crush), local LLM runtimes (Ollama), RAG stacks (LangChain, Verba, pgvector), and the orchestrators and skills around them.",
+    intro: "AI-focused Flox environments and packages, curated for reproducibility. This category covers everything an AI-first dev needs: coding agents like Claude Code and Codex, local LLM runtimes such as Ollama, retrieval-augmented generation stacks (LangChain, Verba, pgvector via the PostgreSQL env), and the orchestration layers and skills that compose them. Every entry installs with a single manifest line and is pinned by Nix for stable, hermetic builds.",
+  },
+  database: {
+    label: "Database",
+    title: "Database environments on Flox — PostgreSQL, MariaDB, MongoDB, and more",
+    description: "Drop-in Flox environments for development databases — PostgreSQL with pgvector, MariaDB, MongoDB, Cassandra, and key-value stores. Per-project data dirs, Unix sockets by default, no global install touched.",
+    intro: "Reproducible development databases packaged as Flox environments. Each entry — PostgreSQL (pgvector-ready), MariaDB, MongoDB, Cassandra, Valkey, and others — boots as a Flox service with isolated, per-project data directories under $FLOX_ENV_CACHE. No global database install is touched and stopping the env leaves the host clean. Pick the engine that fits your workload: PostgreSQL for relational + vector (pgvector) and full-text search; MariaDB for MySQL-compatible OLTP; MongoDB for schemaless document storage; Cassandra for wide-column distributed workloads; Valkey or Redis for key-value caching and pub/sub. Each engine pairs naturally with the language envs (Python, Node, Ruby, Go) for application development, and PostgreSQL pairs with the RAG envs (LangChain, Verba) for the retrieval half of an LLM stack. Same manifest, same version pin, identical behavior across every developer machine and CI runner.",
+  },
+  language: {
+    label: "Language",
+    title: "Language environments on Flox — Python, Node, Go, Rust, Ruby, Bun, Deno",
+    description: "Pinned language toolchains for any Flox project — Python (pip, poetry, uv), JavaScript (Node, Bun, Deno), Go, Rust, Ruby, Elixir, and the JVM. One include line per env.",
+    intro: "Pinned language toolchains for reproducible Flox projects. This category covers Python (with pip, poetry, or uv flavors), JavaScript on Node, Bun, or Deno, Go, Rust, Ruby, Elixir, and the JVM. Each environment ships a single specific toolchain version per release, so the binary you got today is the binary you get on every machine tomorrow.",
+  },
+  runtime: {
+    label: "Runtime",
+    title: "Runtime environments on Flox — container, JVM, language hosts",
+    description: "Reproducible runtime environments — Podman / OCI containers, JVM hosts, and other binary execution platforms. Pinned, hermetic, and one-line includable.",
+    intro: "Runtime hosts and execution environments packaged for Flox. Podman and OCI tooling for daemonless container workflows, JVM runtimes for Java and Kotlin work, and other binary execution platforms — each one pinned by Nix and includable in a single manifest line.",
+  },
+  service: {
+    label: "Service",
+    title: "Service environments on Flox — proxies, schedulers, queues",
+    description: "Long-running development services packaged as Flox environments — nginx proxies, queue brokers, orchestrators, and dashboards. Boots as a Flox service per project.",
+    intro: "Long-running development services packaged for Flox. Reverse proxies (nginx), queue brokers, orchestration layers, and operational dashboards — each one boots as a Flox service with per-project state, so multiple checkouts run side-by-side without contention.",
+  },
+  tool: {
+    label: "Tools",
+    title: "Developer tools on Flox — CLI utilities, test runners, formatters",
+    description: "CLI tools packaged for Flox — fzf, ripgrep, dotenv, mocks, formatters, browser automation, and developer utilities. Each one installs from any manifest.",
+    intro: "Single-purpose developer tools packaged as Flox CLI utilities. Search and navigation (fzf, ripgrep), env management (dotenv), browser automation (playwright), AWS local emulation (localstack), and the rest of the daily developer toolkit — each one Nix-pinned and one manifest line away.",
+  },
+};
+const copy = COPY[slug!] ?? {
+  label: slug!.replace(/\b\w/g, (c) => c.toUpperCase()),
+  title: `${slug} · flox/envs`,
+  description: `Flox environments and packages in the ${slug} category.`,
+  intro: `Flox environments and packages in the ${slug} category.`,
+};
+
+const origin = (Astro.site?.toString() ?? "").replace(/\/$/, "");
+const pageUrl = `${origin}${base}categories/${slug}/`;
+const total = envs.length + pkgs.length;
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: copy.title,
+    description: copy.description,
+    url: pageUrl,
+    isPartOf: { "@type": "WebSite", "@id": `${origin}${base}#website` },
+    mainEntity: { "@id": `${pageUrl}#items` },
+    publisher: {
+      "@type": "Organization",
+      "@id": "https://flox.dev/#organization",
+      name: "Flox",
+      url: "https://flox.dev",
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@id": `${pageUrl}#items`,
+    "@type": "ItemList",
+    name: `Flox catalog: ${copy.label}`,
+    url: pageUrl,
+    numberOfItems: total,
+    itemListElement: [
+      ...envs.map((e, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: e.data.title,
+        url: `${origin}${base}envs/${e.data.name}/`,
+      })),
+      ...pkgs.map((p, i) => ({
+        "@type": "ListItem",
+        position: envs.length + i + 1,
+        name: p.data.title,
+        url: `${origin}${base}packages/${p.data.name}/`,
+      })),
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "flox / envs",
+        item: `${origin}${base}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: copy.label,
+        item: pageUrl,
+      },
+    ],
+  },
+];
+
+// Per-env tagline one-liners for the database category to lift the
+// previously-thin /categories/database/ page past the 500-word floor
+// and give each listed engine an extractable distinguishing sentence.
+const DATABASE_NOTES: Record<string, string> = {
+  postgresql: "Relational + pgvector + full-text search. The default pick for OLTP and the retrieval half of a RAG stack.",
+  mariadb: "MySQL-compatible OLTP. Drop-in for legacy MySQL apps without the licensing question.",
+  mongodb: "Schemaless document storage. Useful when the schema is genuinely fluid or unknown.",
+  cassandra: "Wide-column distributed store. Picked for write-heavy workloads where horizontal scale matters more than joins.",
+  valkey: "Open-source Redis fork backed by the Linux Foundation. Key-value caching and pub/sub.",
+  redis: "Key-value cache, queue, and pub/sub. Same wire protocol as Valkey — pick by license preference.",
+};
+---
+<Layout title={copy.title} description={copy.description} jsonLd={jsonLd}>
+  <h1 class="text-2xl font-bold">{copy.label}</h1>
+  <p class="mt-1 text-sm text-slate-500">
+    {total} item{total === 1 ? "" : "s"}
+  </p>
+  <p class="mt-4 text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-3xl">
+    {copy.intro}
+  </p>
+  {slug === "database" && (
+    <section class="mt-6 max-w-3xl">
+      <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">When to pick which</h2>
+      <ul class="mt-2 space-y-1.5 text-sm text-slate-700 dark:text-slate-300">
+        {envs.filter((e) => DATABASE_NOTES[e.data.name]).map((e) => (
+          <li>
+            <a href={`${base}envs/${e.data.name}/`} class="font-semibold underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300">{e.data.title}</a>
+            <span class="text-slate-500"> — {DATABASE_NOTES[e.data.name]}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+  <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    {envs.map((e) => (
+      <ItemCard kind="env" name={e.data.name} title={e.data.title}
+        tagline={e.data.tagline} href={`${base}envs/${e.data.name}/`}
+        ai_role={e.data.ai_role} category={e.data.category} />
+    ))}
+    {pkgs.map((p) => (
+      <ItemCard kind="pkg" subkind={p.data.subkind} name={p.data.name}
+        title={p.data.title} tagline={p.data.tagline}
+        href={`${base}packages/${p.data.name}/`}
+        ai_role={p.data.ai_role} category={p.data.category} />
+    ))}
+  </div>
+</Layout>

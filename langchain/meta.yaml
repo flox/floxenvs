@@ -1,0 +1,62 @@
+kind: env
+name: langchain
+title: LangChain (+ Ollama)
+publisher: flox
+tagline: >
+  LangChain and LangGraph wired up to a local Ollama runtime.
+intro: >
+  flox/langchain is a complete local-LLM development
+  environment: LangChain plus LangGraph for orchestration,
+  the langchain-ollama and langchain-community integrations,
+  and Ollama running as a managed Flox service in the
+  background. One `flox activate --start-services` and the
+  Python runtime is ready, the model server is up on
+  127.0.0.1:11434, and the connection info is printed on
+  activation. Pull a model with `ollama pull llama3.1`, then
+  invoke it from Python via `ChatOllama(model="llama3.1")`
+  with no further wiring required. Useful for offline RAG
+  pipelines, agent prototyping, and any LangChain workflow
+  where you do not want to pay per-token to a cloud provider
+  during iteration — or where the data simply can't leave the
+  developer's machine. The Python virtualenv lives in
+  `$FLOX_ENV_CACHE` so reactivations are fast. Pairs with
+  flox/verba for a turnkey RAG stack with Weaviate as the
+  vector store, with flox/postgresql when you need a SQL
+  vector backend via pgvector, and with flox/omlx on Apple
+  Silicon when you want MLX inference instead of Ollama.
+summary:
+  - "LangGraph orchestration framework"
+  - "LangChain-Ollama and LangChain-Community integrations"
+  - "Ollama runs as a background Flox service"
+  - "Connection info on activation"
+category: ai
+ai_role: orchestrator
+tags: [langchain, orchestrator, local-llm, python]
+stack: [python]
+featured: true
+combines_well_with:
+  - pkg:ollama
+  - env:verba
+  - env:postgresql
+status: stable
+license: MIT
+upstream:
+  name: LangChain
+  url: https://github.com/langchain-ai/langchain
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/langchain" }]
+  activate: |
+    flox activate -r flox/langchain --start-services
+recipes:
+  - name: langchain-demo
+    start_services: true
+    features:
+      - "Ollama service started automatically"
+      - "Pull a model and invoke it from Python"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/langchain
+  floxhub: https://hub.flox.dev/flox/langchain

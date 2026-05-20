@@ -20,7 +20,7 @@ Add to your `manifest.toml`:
 
 ```toml
 [include]
-environments = ["flox/omlx"]
+environments = [{ remote = "flox/omlx" }]
 ```
 
 ## What is included
