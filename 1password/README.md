@@ -1,5 +1,8 @@
 # 1Password
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2F1password%2Fdevcontainer.json)
+
 Minimal 1Password CLI environment with automatic session
 caching. Designed to be included as a base layer in other
 Flox environments.

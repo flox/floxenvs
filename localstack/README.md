@@ -1,5 +1,8 @@
 # localstack
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Flocalstack%2Fdevcontainer.json)
+
 Minimal LocalStack environment for use with Flox
 `[include]`.
 

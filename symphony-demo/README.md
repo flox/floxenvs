@@ -1,5 +1,8 @@
 # symphony-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fsymphony-demo%2Fdevcontainer.json)
+
 Interactive [Symphony](https://github.com/openai/symphony)
 demo environment. Starts the Phoenix dashboard with an
 in-memory tracker by default, switches to a Linear

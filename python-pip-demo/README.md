@@ -1,5 +1,8 @@
 # python-pip-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fpython-pip-demo%2Fdevcontainer.json)
+
 Demo project showing Python + pip with automatic virtual
 environment management, powered by the
 [python-pip](../python-pip) base environment.

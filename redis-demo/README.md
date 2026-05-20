@@ -1,5 +1,8 @@
 # redis-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fredis-demo%2Fdevcontainer.json)
+
 Full Redis demo environment that walks you through
 connection, basic operations, and service management
 with Flox.

@@ -1,5 +1,8 @@
 # nginx
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fnginx%2Fdevcontainer.json)
+
 Minimal Nginx environment. Include it in your own manifest
 to get a working web server with sane defaults.
 

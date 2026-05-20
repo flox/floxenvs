@@ -1,5 +1,8 @@
 # temporal-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Ftemporal-demo%2Fdevcontainer.json)
+
 Full Temporal demo environment with styled terminal
 output. Includes the Temporal dev server (via the
 minimal [temporal](../temporal/) layer) and `gum` for

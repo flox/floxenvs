@@ -1,5 +1,8 @@
 # python-uv
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fpython-uv%2Fdevcontainer.json)
+
 Minimal Python + uv environment with automatic virtual
 environment management. Designed for use as an `[include]`
 base layer.

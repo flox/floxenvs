@@ -1,5 +1,8 @@
 # mariadb-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fmariadb-demo%2Fdevcontainer.json)
+
 Full MariaDB demo environment with styled connection info,
 service management, and CRUD examples.
 

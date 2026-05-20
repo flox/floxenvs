@@ -1,5 +1,8 @@
 # mongodb
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fmongodb%2Fdevcontainer.json)
+
 Minimal MongoDB environment for use with `[include]`.
 Provides a MongoDB server with sane defaults, designed
 for composition into your own project environment.

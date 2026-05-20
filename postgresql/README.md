@@ -1,5 +1,8 @@
 # postgresql
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fpostgresql%2Fdevcontainer.json)
+
 Minimal PostgreSQL environment. Include it in your own
 manifest to get a working PostgreSQL setup with sane
 defaults.

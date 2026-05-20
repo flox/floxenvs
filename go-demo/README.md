@@ -1,5 +1,8 @@
 # Go Demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fgo-demo%2Fdevcontainer.json)
+
 Full Go development environment with editor tooling,
 a task runner, and a sample "Hello World" application.
 

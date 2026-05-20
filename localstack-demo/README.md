@@ -1,5 +1,8 @@
 # localstack-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Flocalstack-demo%2Fdevcontainer.json)
+
 Full LocalStack demo environment with styled terminal
 output and service management.
 

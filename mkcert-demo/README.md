@@ -1,5 +1,8 @@
 # mkcert-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fmkcert-demo%2Fdevcontainer.json)
+
 Demo environment showcasing the
 [mkcert](../mkcert/) base layer with formatted terminal
 output using [gum](https://github.com/charmbracelet/gum).

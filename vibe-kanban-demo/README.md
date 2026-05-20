@@ -1,5 +1,8 @@
 # Vibe Kanban Demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fvibe-kanban-demo%2Fdevcontainer.json)
+
 Interactive demo of the [Vibe Kanban](../vibe-kanban/)
 environment with a styled banner.
 

@@ -1,5 +1,8 @@
 # Ruby Demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fruby-demo%2Fdevcontainer.json)
+
 Full Ruby development environment with a sample app
 and bundled gems. Builds on the minimal
 [ruby](../ruby/) environment via `[include]`.

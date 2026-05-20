@@ -1,5 +1,8 @@
 # verba-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fverba-demo%2Fdevcontainer.json)
+
 Full Verba RAG demo environment that shows service
 URLs, Ollama model configuration, and styled terminal
 output with Flox.

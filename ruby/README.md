@@ -1,5 +1,8 @@
 # Ruby
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fruby%2Fdevcontainer.json)
+
 Minimal Ruby environment providing the Ruby interpreter
 and Bundler, designed for use as an `[include]` base in
 other Flox environments.

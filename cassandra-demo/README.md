@@ -1,5 +1,8 @@
 # Cassandra Demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fcassandra-demo%2Fdevcontainer.json)
+
 Demo environment for Apache Cassandra 4.x. Includes the
 minimal [cassandra](../cassandra) environment and adds
 styled terminal output with `gum`.
