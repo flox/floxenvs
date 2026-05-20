@@ -101,10 +101,12 @@ venv.overrideAttrs (old: {
     homepage = "https://github.com/basicmachines-co/basic-memory";
     license = lib.licenses.agpl3Plus;
     mainProgram = "basic-memory";
+    # x86_64-darwin is excluded: onnxruntime ships no compatible
+    # wheel for the platform (and nixpkgs is dropping support in
+    # 26.05 anyway). fastembed pulls onnxruntime in.
     platforms = [
       "aarch64-darwin"
       "aarch64-linux"
-      "x86_64-darwin"
       "x86_64-linux"
     ];
   };
