@@ -49,18 +49,24 @@ jq -n \
   '{version: $v, hash: $h, pnpmDepsHash: $p}' > "$HASHES_FILE"
 
 echo "Building with dummy pnpmDepsHash to compute real one..."
-pnpm_hash=$(flox build openclaw 2>&1 \
-  | grep "got:" \
-  | head -1 \
-  | awk '{print $2}') || true
+prefetch_log=$(mktemp)
+flox build openclaw > "$prefetch_log" 2>&1 || true
 
-if [ -z "$pnpm_hash" ]; then
-  echo "ERROR: Could not extract pnpmDepsHash from build output"
+# Scope the `got:` match to the FOD hash-mismatch block. Without the
+# range pattern, unrelated `got:` lines in pnpm output (or earlier
+# successful FOD fetches) can leak through and yield a wrong hash.
+pnpm_hash=$(awk '/hash mismatch in fixed-output derivation/,0 {
+  if (/got:/) { print $NF; exit }
+}' "$prefetch_log")
+
+if [[ "$pnpm_hash" != sha256-* ]]; then
+  echo "ERROR: Could not extract pnpmDepsHash. Build output:" >&2
+  tail -30 "$prefetch_log" >&2
   cp "$tmp_hashes" "$HASHES_FILE"
-  rm -f "$tmp_hashes"
+  rm -f "$tmp_hashes" "$prefetch_log"
   exit 1
 fi
-rm -f "$tmp_hashes"
+rm -f "$tmp_hashes" "$prefetch_log"
 
 echo "  pnpmDepsHash: $pnpm_hash"
 
