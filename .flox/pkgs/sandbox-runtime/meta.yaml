@@ -1,0 +1,31 @@
+kind: pkg
+subkind: plain
+name: sandbox-runtime
+title: Sandbox Runtime
+publisher: flox
+tagline: >
+  Anthropic's lightweight filesystem + network sandbox for
+  AI agents — exposed as `srt`.
+category: ai
+ai_role: tooling
+tags: [sandbox, security, agent, anthropic, bubblewrap]
+stack: [nodejs, typescript]
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:claude-code
+status: beta
+license: Apache-2.0
+upstream:
+  name: sandbox-runtime
+  url: https://github.com/anthropic-experimental/sandbox-runtime
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    sandbox-runtime.pkg-path = "flox/sandbox-runtime"
+    sandbox-runtime.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/sandbox-runtime
+  floxhub: https://hub.flox.dev/flox/sandbox-runtime

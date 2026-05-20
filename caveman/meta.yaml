@@ -1,0 +1,70 @@
+kind: env
+name: caveman
+title: Caveman
+publisher: flox
+tagline: >
+  Claude Code with the caveman plugin pre-wired —
+  ultra-compressed agent communication, ~75% fewer tokens.
+seo_title: >
+  Caveman dev environment for Claude Code — compress agent
+  output by 75% with zero accuracy loss
+seo_description: >
+  Flox-packaged caveman: 7 skills, SessionStart hook, and a
+  /caveman intensity switch (lite/full/ultra). Composes with
+  flox/claude in one include line.
+intro: >
+  flox/caveman layers the caveman plugin on top of flox/claude
+  so the Claude Code agent talks back in a hyper-compressed
+  style that strips filler tokens while keeping full technical
+  accuracy. A SessionStart hook activates the mode on every new
+  session, and a UserPromptSubmit hook handles
+  `/caveman lite|full|ultra` to dial intensity up or down at
+  will. Includes seven skills — caveman, caveman-commit,
+  caveman-review, caveman-compress, caveman-stats,
+  caveman-help, cavecrew — so commits, PR reviews, memory
+  files, and subagent delegation all benefit from the
+  compression. Node.js and Python are bundled inside the
+  plugin tree, so the hooks run without the consumer env
+  having to install either runtime. Useful for long agent
+  sessions where the model spends too much of its window on
+  prose.
+summary:
+  - "~75% token reduction with full technical accuracy"
+  - "7 caveman-* skills wired through claude-managed"
+  - "SessionStart hook + /caveman intensity switch"
+  - "Self-contained — bundled node and python"
+category: ai
+ai_role: tooling
+tags: [agent, claude-code, plugin, compression, token-saving]
+stack: [nodejs, python]
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:claude-code-plugin-superpowers
+status: beta
+license: MIT
+upstream:
+  name: caveman
+  url: https://github.com/JuliusBrussee/caveman
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/caveman" }]
+  activate: |
+    flox activate -r flox/caveman
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/caveman-latest
+recipes:
+  - name: caveman-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Activates caveman mode for every Claude session"
+      - "Switch intensity with /caveman ultra"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/caveman
+  floxhub: https://hub.flox.dev/flox/caveman
+  docker: https://github.com/flox/floxenvs/pkgs/container/floxenvs/caveman-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Acaveman

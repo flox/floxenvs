@@ -1,0 +1,25 @@
+kind: pkg
+subkind: plugin
+name: claude-code-plugin-agentmemory
+title: AgentMemory
+plugin_for: claude-code
+publisher: flox
+tagline: >
+  Persistent agent memory plugin for Claude Code — 13 hooks
+  and 8 skills, backed by a REST/MCP service.
+category: ai
+ai_role: tooling
+tags: [claude-code, plugin, memory, mcp, agent]
+status: beta
+license: Apache-2.0
+featured: false
+install:
+  pkg: |
+    [install]
+    claude-code.pkg-path = "flox/claude-code"
+    claude-code.publisher = "flox"
+    claude-code-plugin-agentmemory.pkg-path = "flox/claude-code-plugin-agentmemory"
+    claude-code-plugin-agentmemory.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/claude-code-plugin-agentmemory
+  floxhub: https://hub.flox.dev/flox/claude-code-plugin-agentmemory

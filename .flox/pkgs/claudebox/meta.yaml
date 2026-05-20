@@ -1,0 +1,31 @@
+kind: pkg
+subkind: plain
+name: claudebox
+title: ClaudeBox
+publisher: flox
+tagline: >
+  Sandboxed environment for running Claude Code — bundles
+  shell, git, ripgrep, fd, jq, curl, and more.
+category: ai
+ai_role: tooling
+tags: [claude-code, sandbox, isolation, security]
+stack: [bun, bash]
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:claude-code
+status: beta
+license: MIT
+upstream:
+  name: claudebox
+  url: https://github.com/numtide/claudebox
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    claudebox.pkg-path = "flox/claudebox"
+    claudebox.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/claudebox
+  floxhub: https://hub.flox.dev/flox/claudebox

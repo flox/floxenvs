@@ -1,0 +1,30 @@
+kind: pkg
+subkind: plain
+name: goose-cli
+title: Goose
+publisher: flox
+tagline: >
+  Block's open-source local-first AI engineering agent.
+category: ai
+ai_role: agent
+tags: [agent, cli, coding-agent, block, open-source]
+stack: [rust]
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:ollama
+status: stable
+license: Apache-2.0
+upstream:
+  name: Goose
+  url: https://github.com/block/goose
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    goose-cli.pkg-path = "flox/goose-cli"
+    goose-cli.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/goose-cli
+  floxhub: https://hub.flox.dev/flox/goose-cli

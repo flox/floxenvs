@@ -1,0 +1,66 @@
+kind: env
+name: basic-memory
+title: Basic Memory
+publisher: flox
+tagline: >
+  Local-first knowledge graph backed by Markdown notes, exposed
+  as an MCP server.
+seo_title: >
+  Basic Memory dev environment — local-first Markdown knowledge
+  graph with MCP server
+seo_description: >
+  Flox-packaged Basic Memory: Markdown-backed knowledge graph
+  with FastEmbed semantic search and an MCP server for Claude
+  Code, Cursor, ChatGPT. One include line, no daemons.
+intro: >
+  flox/basic-memory packages Basic Memory — Basic Machines' open
+  source, local-first knowledge graph built on plain Markdown
+  files — with FastEmbed and sqlite-vec already in the Nix
+  closure so semantic search works on first run. The env
+  exposes the `basic-memory` CLI (with the short alias `bm`) and
+  can be wired as an MCP server for any MCP client. Pair with
+  flox/claude or flox/basic-memory-demo to get the MCP wiring
+  written into a project-scoped `.mcp.json` for you. Useful as
+  a personal second-brain that agents can read and write, or as
+  a shared project log that survives chat compaction.
+summary:
+  - "Markdown notes form a local knowledge graph"
+  - "MCP server for Claude Code, Cursor, ChatGPT"
+  - "FastEmbed + sqlite-vec bundled for semantic search"
+  - "All state under per-user config dir — nothing global"
+category: ai
+ai_role: rag
+tags: [mcp, memory, knowledge-graph, markdown, rag]
+stack: [python]
+featured: false
+combines_well_with:
+  - env:claude
+  - env:graphify
+  - env:verba
+status: beta
+license: AGPL-3.0
+upstream:
+  name: Basic Memory
+  url: https://github.com/basicmachines-co/basic-memory
+  license: AGPL-3.0
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/basic-memory" }]
+  activate: |
+    flox activate -r flox/basic-memory
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/basic-memory-latest
+recipes:
+  - name: basic-memory-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Composes Basic Memory with flox/claude"
+      - "Writes project-scoped .mcp.json for Claude Code"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/basic-memory
+  floxhub: https://hub.flox.dev/flox/basic-memory
+  docker: https://github.com/flox/floxenvs/pkgs/container/floxenvs/basic-memory-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Abasic-memory

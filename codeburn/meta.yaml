@@ -1,0 +1,68 @@
+kind: env
+name: codeburn
+title: CodeBurn
+publisher: flox
+tagline: >
+  Local-first TUI dashboard for AI coding tool spend — by task,
+  model, project, and provider.
+seo_title: >
+  CodeBurn dev environment — local TUI for Claude/Codex/Cursor
+  token spend, no API keys
+seo_description: >
+  Flox-packaged CodeBurn: an interactive TUI that auto-detects
+  sessions across 20+ AI coding tools, prices every call via
+  LiteLLM, and runs entirely on disk — no proxy, no keys.
+intro: >
+  flox/codeburn ships CodeBurn — getagentseal's local-first
+  AI coding token dashboard — ready to run in any Flox
+  environment. CodeBurn reads session data straight off disk
+  from 20+ AI coding tools (Claude Code, Codex, Cursor, Gemini
+  CLI, Aider, Continue, Roo Code, …) and prices every call
+  using LiteLLM's model pricing tables. No proxy, no
+  wrapping, no API keys — your traffic never leaves the
+  machine. The TUI covers daily / weekly / monthly windows,
+  side-by-side model comparisons, "yield" (productive vs
+  reverted spend), and one-line copy-paste optimizations. Pair
+  with any flox env that runs a coding agent (claude, codex,
+  crush, opencode) to keep an eye on the bill while you build.
+summary:
+  - "Interactive TUI for AI coding tool spend"
+  - "Reads session data locally — no proxy, no API keys"
+  - "Auto-detects Claude Code, Codex, Cursor, 17+ others"
+  - "Prices every call via LiteLLM tables"
+category: ai
+ai_role: tooling
+tags: [agent, observability, tui, cost, pricing]
+stack: [python]
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:codex
+  - pkg:opencode
+status: beta
+license: MIT
+upstream:
+  name: CodeBurn
+  url: https://github.com/getagentseal/codeburn
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/codeburn" }]
+  activate: |
+    flox activate -r flox/codeburn
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/codeburn-latest
+recipes:
+  - name: codeburn-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Boots the codeburn TUI on top of flox/claude"
+      - "Reports today + month spend in one screen"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/codeburn
+  floxhub: https://hub.flox.dev/flox/codeburn
+  docker: https://github.com/flox/floxenvs/pkgs/container/floxenvs/codeburn-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Acodeburn

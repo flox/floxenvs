@@ -1,0 +1,32 @@
+kind: pkg
+subkind: plain
+name: codeburn
+title: CodeBurn
+publisher: flox
+tagline: >
+  Local-first TUI dashboard for AI coding token spend —
+  Claude, Codex, Cursor, 17+ others.
+category: ai
+ai_role: tooling
+tags: [observability, cost, tui, agent, pricing]
+stack: [nodejs]
+featured: false
+combines_well_with:
+  - env:codeburn
+  - env:claude
+  - pkg:codex
+status: beta
+license: MIT
+upstream:
+  name: CodeBurn
+  url: https://github.com/getagentseal/codeburn
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    codeburn.pkg-path = "flox/codeburn"
+    codeburn.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/codeburn
+  floxhub: https://hub.flox.dev/flox/codeburn

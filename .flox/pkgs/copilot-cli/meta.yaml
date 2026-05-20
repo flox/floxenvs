@@ -1,0 +1,30 @@
+kind: pkg
+subkind: plain
+name: copilot-cli
+title: GitHub Copilot CLI
+publisher: flox
+tagline: >
+  GitHub Copilot's agentic coding CLI for the terminal.
+category: ai
+ai_role: agent
+tags: [agent, cli, github, copilot, coding-agent]
+stack: [nodejs, typescript]
+featured: true
+combines_well_with:
+  - env:claude
+  - pkg:codex
+status: stable
+license: Unfree
+upstream:
+  name: GitHub Copilot CLI
+  url: https://github.com/github/copilot-cli
+  license: Unfree
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    copilot-cli.pkg-path = "flox/copilot-cli"
+    copilot-cli.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/copilot-cli
+  floxhub: https://hub.flox.dev/flox/copilot-cli

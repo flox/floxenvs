@@ -1,0 +1,31 @@
+kind: pkg
+subkind: plain
+name: agent-browser
+title: Agent Browser
+publisher: flox
+tagline: >
+  Headless browser automation CLI for AI agents — Vercel's
+  Chromium-driven dashboard for tool-using LLMs.
+category: ai
+ai_role: tooling
+tags: [agent, browser, automation, chromium, vercel]
+stack: [nodejs, rust, typescript]
+featured: false
+combines_well_with:
+  - env:claude
+  - env:playwright
+status: beta
+license: Apache-2.0
+upstream:
+  name: agent-browser
+  url: https://github.com/vercel-labs/agent-browser
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    agent-browser.pkg-path = "flox/agent-browser"
+    agent-browser.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/agent-browser
+  floxhub: https://hub.flox.dev/flox/agent-browser

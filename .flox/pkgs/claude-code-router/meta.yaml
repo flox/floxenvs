@@ -1,0 +1,32 @@
+kind: pkg
+subkind: plain
+name: claude-code-router
+title: Claude Code Router
+publisher: flox
+tagline: >
+  Routing proxy that lets Claude Code talk to any LLM
+  provider — local models, OpenAI, Gemini, DeepSeek.
+category: ai
+ai_role: tooling
+tags: [claude-code, router, proxy, multi-model]
+stack: [nodejs, typescript]
+featured: false
+combines_well_with:
+  - env:claude
+  - env:lmstudio
+  - pkg:ollama
+status: beta
+license: MIT
+upstream:
+  name: claude-code-router
+  url: https://github.com/musistudio/claude-code-router
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    claude-code-router.pkg-path = "flox/claude-code-router"
+    claude-code-router.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/claude-code-router
+  floxhub: https://hub.flox.dev/flox/claude-code-router

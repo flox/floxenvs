@@ -1,0 +1,30 @@
+kind: pkg
+subkind: plain
+name: coderabbit-cli
+title: CodeRabbit CLI
+publisher: flox
+tagline: >
+  AI-powered code review CLI from CodeRabbit.
+category: ai
+ai_role: tooling
+tags: [code-review, agent, cli, ci]
+stack: [typescript]
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:claude-code
+status: stable
+license: Unfree
+upstream:
+  name: CodeRabbit CLI
+  url: https://coderabbit.ai
+  license: Unfree
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    coderabbit-cli.pkg-path = "flox/coderabbit-cli"
+    coderabbit-cli.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/coderabbit-cli
+  floxhub: https://hub.flox.dev/flox/coderabbit-cli

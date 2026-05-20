@@ -1,0 +1,31 @@
+kind: pkg
+subkind: plain
+name: serena
+title: Serena
+publisher: flox
+tagline: >
+  MCP toolkit for coding agents — IDE-grade semantic tools
+  (find-symbol, find-references, rename, symbolic edit).
+category: ai
+ai_role: tooling
+tags: [mcp, lsp, ide, refactor, agent]
+stack: [python, nodejs]
+featured: false
+combines_well_with:
+  - env:serena
+  - env:claude
+status: beta
+license: MIT
+upstream:
+  name: Serena
+  url: https://github.com/oraios/serena
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    serena.pkg-path = "flox/serena"
+    serena.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/serena
+  floxhub: https://hub.flox.dev/flox/serena

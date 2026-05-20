@@ -1,0 +1,25 @@
+kind: pkg
+subkind: plugin
+name: claude-code-plugin-gstack
+title: gstack
+plugin_for: claude-code
+publisher: flox
+tagline: >
+  Garry Tan's 45-skill Claude Code stack — planning, design,
+  QA, review, security, shipping.
+category: ai
+ai_role: tooling
+tags: [claude-code, plugin, workflow, skills, shipping]
+status: beta
+license: MIT
+featured: false
+install:
+  pkg: |
+    [install]
+    claude-code.pkg-path = "flox/claude-code"
+    claude-code.publisher = "flox"
+    claude-code-plugin-gstack.pkg-path = "flox/claude-code-plugin-gstack"
+    claude-code-plugin-gstack.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/claude-code-plugin-gstack
+  floxhub: https://hub.flox.dev/flox/claude-code-plugin-gstack
