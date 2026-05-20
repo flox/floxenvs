@@ -5,26 +5,56 @@ environments = [
   { dir = "../temporal" }
 ]
 
-# gum is a demo-only tool for styled terminal output.
-
+# Go toolchain for the sample workflow + worker.
+# gcc is needed because Go's cgo-enabled stdlib build
+# step on first activation calls out to a C compiler.
 [install]
+go.pkg-path = "go"
+go.pkg-group = "go"
+gcc.pkg-path = "gcc"
+gcc.pkg-group = "go"
+# Used by test.sh to parse `temporal task-queue describe`
+# JSON output for the worker-readiness check.
+jq.pkg-path = "jq"
+jq.pkg-group = "demo-tools"
+# Demo-only banner UI.
 gum.pkg-path = "gum"
 gum.pkg-group = "demo-tools"
 
 [hook]
 on-activate = '''
+# Point Go's caches at a writable location.
+# Default GOPATH is $HOME/go, which fails inside the
+# CI test namespace where HOME=/var/empty (read-only).
+export GOPATH="$FLOX_ENV_CACHE/go"
+export GOMODCACHE="$GOPATH/pkg/mod"
+export GOCACHE="$FLOX_ENV_CACHE/go-build"
+mkdir -p "$GOPATH" "$GOCACHE"
+
 if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
   gum style --border double --margin '1 2' \
     --padding '1 4' \
-    'Start Temporal in the background:' \
+    'Start Temporal + worker in the background:' \
     '  flox services start' \
     '  flox activate --start-services' '' \
-    'Temporal gRPC endpoint:' \
-    "  $TEMPORAL_HOST:$TEMPORAL_PORT" '' \
+    'Send a hello workflow:' \
+    '  go run ./start YourName' '' \
     'Temporal Web UI:' \
-    "  http://$TEMPORAL_HOST:$TEMPORAL_UI_PORT" '' \
-    'Temporal CLI:' \
-    '  temporal operator namespace list' \
-    '  temporal workflow list'
+    "  http://$TEMPORAL_HOST:$TEMPORAL_UI_PORT"
 fi
+'''
+
+[services]
+worker.command = '''
+  cd "$FLOX_ENV_PROJECT"
+  export GOPATH="$FLOX_ENV_CACHE/go"
+  export GOMODCACHE="$GOPATH/pkg/mod"
+  export GOCACHE="$FLOX_ENV_CACHE/go-build"
+  mkdir -p "$GOPATH" "$GOCACHE"
+  until temporal workflow list \
+      --address "$TEMPORAL_HOST:$TEMPORAL_PORT" \
+      >/dev/null 2>&1; do
+    sleep 1
+  done
+  exec go run ./worker
 '''

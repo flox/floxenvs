@@ -16,8 +16,19 @@ schema-version = "1.10.0"
 #   TEMPORAL_PORT = "17233"
 
 [install]
+# `temporal-cli` (cmd: temporal) bundles the dev server and Web UI
+# used by the [services] block below — perfect for local dev.
+# Resolves to flox/temporal-cli once .flox/pkgs/temporal-cli is
+# published; falls back to nixpkgs temporal-cli otherwise.
 temporal-cli.pkg-path = "temporal-cli"
 temporal-cli.pkg-group = "temporal"
+
+# `temporal` ships the production server binaries
+# (temporal-server, temporal-sql-tool, temporal-cassandra-tool,
+# tdbg) for users who need to run against external storage or
+# debug a real cluster.
+temporal.pkg-path = "temporal"
+temporal.pkg-group = "temporal"
 
 [vars]
 TEMPORAL_HOST = "127.0.0.1"
