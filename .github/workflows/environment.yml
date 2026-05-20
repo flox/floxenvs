@@ -35,6 +35,9 @@ jobs:
       - name: "Install flox"
         uses: "flox/install-flox-action@6e70b2624cea62b0f11ea4a28e719fe1c86c028b" # v2.4.1
 
+      - name: "Install Nix"
+        uses: "DeterminateSystems/nix-installer-action@main"
+
       - name: "Check lockfiles are up to date"
         run: |
           set -euo pipefail
