@@ -62,6 +62,7 @@ for p in "${changed[@]}"; do
     .github/workflows/environment.yml) echo "true"; exit 0 ;;
     .github/workflows/ci_pkgs.yml) ;;
     .github/workflows/ci_*.yml) echo "true"; exit 0 ;;
+    .flox/pkgs/basic-memory/*) echo "true"; exit 0 ;;
     *)
       for env in "${envs[@]}"; do
         case "$p" in

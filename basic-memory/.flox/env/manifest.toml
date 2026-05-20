@@ -1,0 +1,20 @@
+schema-version = "1.10.0"
+
+# Minimal Basic Memory environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/basic-memory"]
+
+[install]
+basic-memory.pkg-path = "flox/basic-memory"
+basic-memory.pkg-group = "basic-memory"
+basic-memory.version = "^0.21.1"
+# onnxruntime (pulled in by fastembed) ships no wheel for
+# x86_64-darwin; the catalog package targets only these systems.
+basic-memory.systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]
+
+[vars]
+# BASIC_MEMORY_CONFIG_DIR overrides the per-user state location
+# (default: ~/.basic-memory). Useful for env-isolated setups.
