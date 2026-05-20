@@ -69,7 +69,7 @@ jobs:
             | scripts/wait-should-poll.sh envs)"
           echo "should_poll=$should_poll" >> "$GITHUB_OUTPUT"
           echo "Changed files:"
-          echo "$changed" | sed 's/^/  /'
+          awk '{print "  "$0}' <<< "$changed"
           echo "should_poll=$should_poll"
 
       - name: "Short-circuit (no env paths changed)"
@@ -288,7 +288,7 @@ jobs:
             | scripts/wait-should-poll.sh packages)"
           echo "should_poll=$should_poll" >> "$GITHUB_OUTPUT"
           echo "Changed files:"
-          echo "$changed" | sed 's/^/  /'
+          awk '{print "  "$0}' <<< "$changed"
           echo "should_poll=$should_poll"
 
       - name: "Short-circuit (no pkg paths changed)"
@@ -561,12 +561,18 @@ jobs:
           # Containers are built on ubuntu-latest (x86_64-linux). If the
           # env doesn't support x86_64-linux, skip the containerize job.
           # Empty `systems` in the manifest means "all systems" (default).
-          ENV_LINUX=$(jq -r '
-            .manifest.options.systems // []
-            | if length == 0 then "true"
-              else (index("x86_64-linux") | if . != null then "true" else "false" end)
-              end
-          ' "$LOCK")
+          # Missing lockfile = bootstrap state (env workflow exists but
+          # the env dir isn't published yet); skip containerization.
+          if [ -f "$LOCK" ]; then
+            ENV_LINUX=$(jq -r '
+              .manifest.options.systems // []
+              | if length == 0 then "true"
+                else (index("x86_64-linux") | if . != null then "true" else "false" end)
+                end
+            ' "$LOCK")
+          else
+            ENV_LINUX="false"
+          fi
           echo "env_linux=$ENV_LINUX" >> "$GITHUB_OUTPUT"
 
           DEMO_LOCK="$ENV-demo/.flox/env/manifest.lock"
