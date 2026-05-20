@@ -36,12 +36,41 @@ jobs:
           SINGLE_ENV: "${{ inputs.environment }}"
         run: |
           if [ -n "$SINGLE_ENV" ]; then
-            # Single environment mode
+            # Single environment mode. Reuse discover-envs.sh
+            # to pick a runner compatible with the env's lock
+            # systems (avoids hard-coding ubuntu-latest for
+            # darwin-only envs like omlx).
+            LOCK="$SINGLE_ENV/.flox/env/manifest.lock"
+            if [ ! -f "$LOCK" ]; then
+              echo "Error: $LOCK not found"
+              exit 1
+            fi
+
             has_demo="false"
             if [ -d "${SINGLE_ENV}-demo/.flox/env" ]; then
               has_demo="true"
             fi
-            envs="[{\"name\":\"$SINGLE_ENV\",\"has_demo\":$has_demo}]"
+
+            systems="$(jq -r '
+              .manifest.options.systems // []
+              | map(select(. != "x86_64-darwin"))
+              | if length == 0 then
+                  ["aarch64-darwin","aarch64-linux","x86_64-linux"]
+                else . end
+              | .[]
+            ' "$LOCK")"
+            runs_on="$(
+              if   echo "$systems" | grep -qx 'x86_64-linux';   then echo "ubuntu-latest"
+              elif echo "$systems" | grep -qx 'aarch64-linux';  then echo "ubuntu-24.04-arm"
+              elif echo "$systems" | grep -qx 'aarch64-darwin'; then echo "macos-latest"
+              else echo "ERROR"; fi
+            )"
+            if [ "$runs_on" = "ERROR" ]; then
+              echo "Error: no supported runner for systems: $systems"
+              exit 1
+            fi
+
+            envs="[{\"name\":\"$SINGLE_ENV\",\"has_demo\":$has_demo,\"runs_on\":\"$runs_on\"}]"
 
             echo "-- single env --------------"
             echo "$envs" | jq .
@@ -55,7 +84,7 @@ jobs:
 
   upgrade:
     name: "Upgrade '${{ matrix.name }}'"
-    runs-on: "ubuntu-latest"
+    runs-on: "${{ matrix.runs_on }}"
     timeout-minutes: 30
 
     needs:
