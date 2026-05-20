@@ -1,0 +1,52 @@
+name: "Invariants"
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+
+jobs:
+
+  lockfile-present:
+    name: "Every env has manifest.lock"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 5
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
+
+      - name: "Check every env has a manifest.lock"
+        run: |
+          set -euo pipefail
+
+          # Every dir matching <env>/.flox/env/manifest.toml must
+          # have a sibling manifest.lock. The rest of CI assumes
+          # this invariant (containerize, lockfile-freshness,
+          # composed-include resolution all jq the lockfile
+          # without guarding the read).
+          fail=0
+          for manifest in */.flox/env/manifest.toml; do
+            env_dir="${manifest%/.flox/env/manifest.toml}"
+            lock="$env_dir/.flox/env/manifest.lock"
+            if [ ! -f "$lock" ]; then
+              echo "::error file=$manifest::env '$env_dir' is missing manifest.lock"
+              fail=1
+            fi
+          done
+
+          if [ $fail -ne 0 ]; then
+            echo ""
+            echo "To fix locally:"
+            echo "  (cd <env> && flox edit -f .flox/env/manifest.toml)"
+            echo ""
+            echo "Then commit the generated manifest.lock alongside"
+            echo "manifest.toml."
+            exit 1
+          fi
+
+          echo "OK: every env has a manifest.lock"
