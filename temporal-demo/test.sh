@@ -35,7 +35,7 @@ if [ "$MAX_ATTEMPTS" -eq 0 ]; then
 fi
 
 echo ">>> Waiting for worker to poll my-task-queue .."
-MAX_ATTEMPTS=60
+MAX_ATTEMPTS=120
 while [ "$MAX_ATTEMPTS" -gt 0 ]; do
   pollers=$(temporal task-queue describe \
       --task-queue my-task-queue \
