@@ -32,6 +32,13 @@ const baseFields = {
   title: z.string(),
   publisher: z.string().default("flox"),
   tagline: z.string(),
+  // Optional SEO overrides. seo_title replaces the auto-built page
+  // <title>; seo_description replaces the meta description. Use them
+  // when the tagline alone misses key intent keywords for SERP / AI
+  // overview citation (e.g., surfacing "pgvector" on the postgres
+  // page or "install" on a tool page).
+  seo_title: z.string().optional(),
+  seo_description: z.string().optional(),
   intro: z.string().optional(),
   summary: z.array(z.string()).default([]),
   category: z.enum(["ai","language","database","service","tool","runtime"]),

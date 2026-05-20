@@ -34,11 +34,14 @@ function gitLastCommitISO(absDir) {
 const BUILD_TIME = new Date().toISOString();
 
 // Cache per-directory git lookups so the serialize callback
-// stays cheap when called N times for the same dir.
+// stays cheap when called N times for the same dir. Returns
+// the empty string when git has no history for that path —
+// callers must do the BUILD_TIME fallback themselves so a
+// missing-history sibling cannot poison `newest()` of peers.
 const lastModCache = new Map();
 function dirLastMod(dir) {
   if (lastModCache.has(dir)) return lastModCache.get(dir);
-  const t = gitLastCommitISO(dir) || BUILD_TIME;
+  const t = gitLastCommitISO(dir);
   lastModCache.set(dir, t);
   return t;
 }
@@ -94,14 +97,15 @@ function lastModFor(urlPath) {
   }
   // Env detail
   if (segments[0] === "envs" && segments[1] && segments.length === 2) {
-    return dirLastMod(path.join(REPO_ROOT, segments[1]));
+    return dirLastMod(path.join(REPO_ROOT, segments[1])) || BUILD_TIME;
   }
   // Pkg detail
   if (
     segments[0] === "packages" && segments[1] && segments.length === 2 &&
     segments[1] !== "plugins" && segments[1] !== "skills"
   ) {
-    return dirLastMod(path.join(REPO_ROOT, ".flox", "pkgs", segments[1]));
+    return dirLastMod(path.join(REPO_ROOT, ".flox", "pkgs", segments[1]))
+      || BUILD_TIME;
   }
   // Envs index — newest env dir
   if (segments[0] === "envs" && segments.length === 1) {
@@ -137,6 +141,33 @@ function lastModFor(urlPath) {
   return BUILD_TIME;
 }
 
+// Post-build patch for `dist/sitemap-index.xml`. @astrojs/sitemap
+// emits the index without a `<lastmod>` on its `<sitemap>` entries,
+// which makes the index opaque to Googlebot's differential crawl
+// scheduling. We patch in the newest `<lastmod>` from sitemap-0.xml.
+function sitemapIndexLastmod() {
+  return {
+    name: "sitemap-index-lastmod",
+    hooks: {
+      "astro:build:done": ({ dir }) => {
+        const outDir = fileURLToPath(dir);
+        const idx = path.join(outDir, "sitemap-index.xml");
+        const sm0 = path.join(outDir, "sitemap-0.xml");
+        if (!fs.existsSync(idx) || !fs.existsSync(sm0)) return;
+        const body = fs.readFileSync(sm0, "utf8");
+        const stamps = [...body.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)]
+          .map((m) => m[1]);
+        const newestStamp = stamps.sort().pop() || BUILD_TIME;
+        const patched = fs.readFileSync(idx, "utf8").replace(
+          /(<sitemap><loc>[^<]+<\/loc>)(<\/sitemap>)/,
+          `$1<lastmod>${newestStamp}</lastmod>$2`,
+        );
+        fs.writeFileSync(idx, patched);
+      },
+    },
+  };
+}
+
 export default defineConfig({
   site: SITE,
   base: BASE,
@@ -145,10 +176,24 @@ export default defineConfig({
   integrations: [
     preact(),
     sitemap({
+      // Exclude utility / non-content pages: client-side search,
+      // OG image endpoints. These provide no SERP value and would
+      // dilute the sitemap.
+      filter: (page) => {
+        try {
+          const p = new URL(page).pathname;
+          if (p.endsWith("/search/")) return false;
+          if (p.includes("/og/")) return false;
+          return true;
+        } catch {
+          return true;
+        }
+      },
       serialize(item) {
         return { ...item, lastmod: lastModFor(item.url) };
       },
     }),
+    sitemapIndexLastmod(),
   ],
   vite: { plugins: [tailwindcss()] },
 });

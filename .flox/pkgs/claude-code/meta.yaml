@@ -5,13 +5,42 @@ title: Claude Code
 publisher: flox
 tagline: >
   Anthropic's Claude Code agent CLI.
+seo_title: >
+  Claude Code on Flox — Anthropic's coding agent, one-line
+  manifest install
+seo_description: >
+  Reproducible Claude Code via Flox — Anthropic's agentic CLI
+  with MCP tools and bubblewrap sandbox, auto-updater disabled
+  for Nix stability. Install in one line on Linux and macOS.
+intro: >
+  flox/claude-code packages Anthropic's Claude Code agent CLI
+  as a Nix-pinned binary for any Flox manifest. Add it via
+  `claude-code.pkg-path = "flox/claude-code"` and the exact
+  same binary is reproducible across every developer's
+  machine and every CI runner — no per-host install drift,
+  no surprise auto-updates breaking your prompts mid-flight.
+  Claude Code is Anthropic's official agentic CLI: it reads
+  whole codebases, executes shell commands, runs MCP tools,
+  and (on Linux) runs inside a bubblewrap sandbox when you
+  ask for safer-by-default file access. Authentication uses
+  your Anthropic API key or Claude subscription. The Flox
+  package disables the upstream auto-updater so the version
+  you pinned stays pinned until you bump the manifest
+  yourself. Combines well with flox/claude (managed config
+  + MCP fragments + isolated mode), with editor plugin
+  packages like flox/claude-code-plugin-*, and with other
+  agents in the catalog (codex, crush, opencode) for
+  side-by-side comparison. Published by Flox under the
+  upstream Unfree license; the package is free to install,
+  the upstream service requires an Anthropic API key or paid
+  subscription to use.
 summary:
   - "Agentic coding tool that understands your entire codebase"
   - "Pre-packaged binary with auto-updater disabled for Nix stability"
   - "Supports bubblewrap sandbox on Linux for safe code execution"
 category: ai
 ai_role: agent
-tags: [agent, cli, anthropic, mcp, coding]
+tags: [agent, cli, anthropic, mcp, coding, coding-agent]
 stack: [nodejs, typescript]
 featured: true
 combines_well_with:

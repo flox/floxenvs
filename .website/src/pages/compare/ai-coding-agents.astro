@@ -100,6 +100,11 @@ const pageUrl = `${origin}${base}compare/ai-coding-agents/`;
 
 const faqItems = [
   {
+    question: "How do these agents compare to Cursor, GitHub Copilot, and Windsurf?",
+    answer:
+      "Cursor, Copilot, and Windsurf are IDE-embedded — they live inside a specific editor and assume you stay inside it. Every agent listed here is terminal-first: they run in any shell, work alongside any editor, and are reproducibly pinned by Flox so the binary you got today is the binary you get on every machine tomorrow. The trade-off is no inline UI in the editor; the win is editor-agnostic workflows, scripting, CI, and no vendor lock-in to a single IDE.",
+  },
+  {
     question: "Which is the best AI coding agent for Claude users?",
     answer:
       "Claude Code is the canonical choice for Claude users. It is Anthropic's official CLI, ships with MCP tool support and a bubblewrap sandbox on Linux, and is pre-packaged by Flox so the auto-updater is disabled for reproducible Nix builds. Install it in one line: flox install flox/claude-code.",
@@ -134,6 +139,27 @@ const faqItems = [
 const jsonLd = [
   {
     "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: "AI coding agents on Flox — compared",
+    description:
+      "Side-by-side comparison of every AI coding agent packaged for Flox in 2026 — license, models supported, MCP, terminal vs IDE, plus install snippets.",
+    url: pageUrl,
+    dateModified: new Date().toISOString(),
+    inLanguage: "en",
+    publisher: {
+      "@type": "Organization",
+      "@id": "https://flox.dev/#organization",
+      name: "Flox",
+      url: "https://flox.dev",
+    },
+    about: agents.map((a) => ({
+      "@type": "SoftwareApplication",
+      name: a.pkg.data.title,
+      url: `${origin}${base}packages/${a.name}/`,
+    })),
+  },
+  {
+    "@context": "https://schema.org",
     "@type": "FAQPage",
     mainEntity: faqItems.map((faq) => ({
       "@type": "Question",
@@ -156,6 +182,30 @@ const jsonLd = [
       name: a.pkg.data.title,
       url: `${origin}${base}packages/${a.name}/`,
     })),
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "flox / envs",
+        item: `${origin}${base}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Compare",
+        item: `${origin}${base}compare/`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: "AI coding agents",
+        item: pageUrl,
+      },
+    ],
   },
 ];
 ---
@@ -286,12 +336,22 @@ const jsonLd = [
               <dd class="text-slate-600 dark:text-slate-300">{a.meta.weakness}</dd>
             </div>
           </dl>
-          <a
-            href={`${base}packages/${a.name}/`}
-            class="mt-auto pt-2 text-xs underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300 self-start"
-          >
-            View {a.pkg.data.title} details →
-          </a>
+          <div class="mt-auto pt-2 flex flex-col items-start gap-1 text-xs">
+            <a
+              href={`${base}packages/${a.name}/`}
+              class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300"
+            >
+              View {a.pkg.data.title} package →
+            </a>
+            {a.name === "claude-code" && (
+              <a
+                href={`${base}envs/claude/`}
+                class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300"
+              >
+                Full Claude env (MCP, managed config) →
+              </a>
+            )}
+          </div>
         </div>
       ))}
     </div>

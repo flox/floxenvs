@@ -28,9 +28,7 @@ const { envs: dEnvs, pkgs: dPkgs } = deriveBundling(
 );
 const bundles = dEnvs[0].bundles_pkgs;
 
-const ogImage = env.data.featured
-  ? `${base}og/env/${env.data.name}.png`
-  : undefined;
+const ogImage = `${base}og/env/${env.data.name}.png`;
 
 const tabs = [
   env.data.install?.include && { label: "Include", code: env.data.install.include },
@@ -64,7 +62,9 @@ const jsonLd = [
     applicationCategory: "DeveloperApplication",
     operatingSystem: osList,
     license: env.data.license
-      ? `https://spdx.org/licenses/${env.data.license}.html`
+      ? (env.data.license === "Unfree"
+        ? "LicenseRef-proprietary"
+        : `https://spdx.org/licenses/${env.data.license}.html`)
       : undefined,
     url: pageUrl,
     codeRepository: env.data.links?.source,
@@ -75,6 +75,9 @@ const jsonLd = [
       price: "0",
       priceCurrency: "USD",
       availability: "https://schema.org/InStock",
+      description: env.data.license === "Unfree"
+        ? "Free to install via Flox; upstream service may require a paid subscription or API key."
+        : "Free and open source — install via the Flox package manager.",
     },
     publisher: {
       "@type": "Organization",
@@ -82,6 +85,13 @@ const jsonLd = [
       name: "Flox",
       url: "https://flox.dev",
     },
+    author: env.data.maintainer?.startsWith("@")
+      ? {
+          "@type": "Person",
+          name: env.data.maintainer,
+          url: `https://github.com/${env.data.maintainer.slice(1)}`,
+        }
+      : undefined,
   },
   {
     "@context": "https://schema.org",
@@ -110,8 +120,9 @@ const jsonLd = [
 ];
 ---
 <Layout
-  title={`${env.data.title} · flox/envs`}
-  description={env.data.tagline}
+  title={(env.data.seo_title
+    ?? `${env.data.title} dev environment on Flox — ${env.data.tagline.trim().replace(/\.\s*$/, "")}`).trim()}
+  description={(env.data.seo_description ?? env.data.tagline).trim()}
   ogImage={ogImage}
   ogType="product"
   jsonLd={jsonLd}

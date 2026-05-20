@@ -12,11 +12,54 @@ const { slug } = Astro.params;
 const base = import.meta.env.BASE_URL;
 const envs = (await getCollection("envs")).filter((e) => e.data.category === slug);
 const pkgs = (await getCollection("packages")).filter((p) => p.data.category === slug);
+
+// Per-category copy: a citable intro paragraph (~50 words) and a SERP
+// description targeting the natural queries for each category bucket.
+const COPY: Record<string, { title: string; description: string; intro: string }> = {
+  ai: {
+    title: "AI environments and packages on Flox — agents, LLMs, RAG",
+    description: "Curated Flox catalog entries for AI work — coding agents (Claude Code, Codex, Crush), local LLM runtimes (Ollama), RAG stacks (LangChain, Verba, pgvector), and the orchestrators and skills around them.",
+    intro: "AI-focused Flox environments and packages, curated for reproducibility. This category covers everything an AI-first dev needs: coding agents like Claude Code and Codex, local LLM runtimes such as Ollama, retrieval-augmented generation stacks (LangChain, Verba, pgvector via the PostgreSQL env), and the orchestration layers and skills that compose them. Every entry installs with a single manifest line and is pinned by Nix for stable, hermetic builds.",
+  },
+  database: {
+    title: "Database environments on Flox — PostgreSQL, MariaDB, MongoDB, and more",
+    description: "Drop-in Flox environments for development databases — PostgreSQL with pgvector, MariaDB, MongoDB, Cassandra, and key-value stores. Per-project data dirs, Unix sockets by default, no global install touched.",
+    intro: "Reproducible development databases packaged as Flox environments. Each entry — PostgreSQL (pgvector-ready), MariaDB, MongoDB, Cassandra, Valkey, and others — boots as a Flox service with isolated, per-project data directories under $FLOX_ENV_CACHE. No global database install is touched and stopping the env leaves the host clean.",
+  },
+  language: {
+    title: "Language environments on Flox — Python, Node, Go, Rust, Ruby, Bun, Deno",
+    description: "Pinned language toolchains for any Flox project — Python (pip, poetry, uv), JavaScript (Node, Bun, Deno), Go, Rust, Ruby, Elixir, and the JVM. One include line per env.",
+    intro: "Pinned language toolchains for reproducible Flox projects. This category covers Python (with pip, poetry, or uv flavors), JavaScript on Node, Bun, or Deno, Go, Rust, Ruby, Elixir, and the JVM. Each environment ships a single specific toolchain version per release, so the binary you got today is the binary you get on every machine tomorrow.",
+  },
+  runtime: {
+    title: "Runtime environments on Flox — container, JVM, language hosts",
+    description: "Reproducible runtime environments — Podman / OCI containers, JVM hosts, and other binary execution platforms. Pinned, hermetic, and one-line includable.",
+    intro: "Runtime hosts and execution environments packaged for Flox. Podman and OCI tooling for daemonless container workflows, JVM runtimes for Java and Kotlin work, and other binary execution platforms — each one pinned by Nix and includable in a single manifest line.",
+  },
+  service: {
+    title: "Service environments on Flox — proxies, schedulers, queues",
+    description: "Long-running development services packaged as Flox environments — nginx proxies, queue brokers, orchestrators, and dashboards. Boots as a Flox service per project.",
+    intro: "Long-running development services packaged for Flox. Reverse proxies (nginx), queue brokers, orchestration layers, and operational dashboards — each one boots as a Flox service with per-project state, so multiple checkouts run side-by-side without contention.",
+  },
+  tool: {
+    title: "Developer tools on Flox — CLI utilities, test runners, formatters",
+    description: "CLI tools packaged for Flox — fzf, ripgrep, dotenv, mocks, formatters, browser automation, and developer utilities. Each one installs from any manifest.",
+    intro: "Single-purpose developer tools packaged as Flox CLI utilities. Search and navigation (fzf, ripgrep), env management (dotenv), browser automation (playwright), AWS local emulation (localstack), and the rest of the daily developer toolkit — each one Nix-pinned and one manifest line away.",
+  },
+};
+const copy = COPY[slug] ?? {
+  title: `${slug} · flox/envs`,
+  description: `Flox environments and packages in the ${slug} category.`,
+  intro: `Flox environments and packages in the ${slug} category.`,
+};
 ---
-<Layout title={`${slug} · flox/envs`}>
+<Layout title={copy.title} description={copy.description}>
   <h1 class="text-2xl font-bold capitalize">{slug}</h1>
   <p class="mt-1 text-sm text-slate-500">
     {envs.length + pkgs.length} items
+  </p>
+  <p class="mt-4 text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-3xl">
+    {copy.intro}
   </p>
   <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
     {envs.map((e) => (

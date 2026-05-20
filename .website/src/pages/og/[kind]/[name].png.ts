@@ -13,15 +13,16 @@ export const getStaticPaths: GetStaticPaths = async () => {
     params: { kind: string; name: string };
     props: { title: string; tagline: string };
   }[] = [];
+  // Generate per-item OG for every env and package. The earlier
+  // gating on `featured` left most detail pages sharing the generic
+  // `og/default.png`, which audits flagged as a CTR / citability loss.
   for (const e of envs) {
-    if (!e.data.featured) continue;
     out.push({
       params: { kind: "env", name: e.data.name },
       props: { title: e.data.title, tagline: e.data.tagline },
     });
   }
   for (const p of pkgs) {
-    if (!p.data.featured) continue;
     out.push({
       params: { kind: "pkg", name: p.data.name },
       props: { title: p.data.title, tagline: p.data.tagline },

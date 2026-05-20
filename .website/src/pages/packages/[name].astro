@@ -34,9 +34,7 @@ const tabs = pkg.data.install?.pkg
   ? [{ label: "Manifest", code: pkg.data.install.pkg }]
   : [];
 
-const ogImage = pkg.data.featured
-  ? `${base}og/pkg/${pkg.data.name}.png`
-  : undefined;
+const ogImage = `${base}og/pkg/${pkg.data.name}.png`;
 
 const origin = (Astro.site?.toString() ?? "").replace(/\/$/, "");
 const pageUrl = `${origin}${base}packages/${pkg.data.name}/`;
@@ -93,7 +91,9 @@ const jsonLd = [
     applicationCategory: "DeveloperApplication",
     operatingSystem: osList,
     license: pkg.data.license
-      ? `https://spdx.org/licenses/${pkg.data.license}.html`
+      ? (pkg.data.license === "Unfree"
+        ? "LicenseRef-proprietary"
+        : `https://spdx.org/licenses/${pkg.data.license}.html`)
       : undefined,
     url: pageUrl,
     codeRepository: pkg.data.links?.source,
@@ -104,6 +104,9 @@ const jsonLd = [
       price: "0",
       priceCurrency: "USD",
       availability: "https://schema.org/InStock",
+      description: pkg.data.license === "Unfree"
+        ? "Free to install via Flox; upstream service may require a paid subscription or API key."
+        : "Free and open source — install via the Flox package manager.",
     },
     publisher: {
       "@type": "Organization",
@@ -111,6 +114,13 @@ const jsonLd = [
       name: "Flox",
       url: "https://flox.dev",
     },
+    author: pkg.data.maintainer?.startsWith("@")
+      ? {
+          "@type": "Person",
+          name: pkg.data.maintainer,
+          url: `https://github.com/${pkg.data.maintainer.slice(1)}`,
+        }
+      : undefined,
   },
   {
     "@context": "https://schema.org",
@@ -124,8 +134,9 @@ const isAgentPkg = ["claude-code","codex","crush","opencode","openclaw","agent-d
   .includes(pkg.data.name);
 ---
 <Layout
-  title={`${pkg.data.title} · flox/envs`}
-  description={pkg.data.tagline}
+  title={(pkg.data.seo_title
+    ?? `${pkg.data.title} on Flox — ${pkg.data.tagline.trim().replace(/\.\s*$/, "")}`).trim()}
+  description={(pkg.data.seo_description ?? pkg.data.tagline).trim()}
   ogImage={ogImage}
   ogType="product"
   jsonLd={jsonLd}

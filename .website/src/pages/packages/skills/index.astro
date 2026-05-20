@@ -8,9 +8,21 @@ const pkgs = (await getCollection("packages"))
   .filter((p) => p.data.subkind === "skill")
   .sort((a, b) => a.data.name.localeCompare(b.data.name));
 ---
-<Layout title="Skills · flox/envs">
+<Layout
+  title="Claude Code skills on Flox — packaged, pinned, one-line install"
+  description="Every Claude Code skill packaged for Flox — domain-specific capability bundles like writing, coding, and shell utilities. Each one Nix-pinned and reproducible."
+>
   <h1 class="text-2xl font-bold">Skills</h1>
   <p class="mt-1 text-sm text-slate-500">{pkgs.length} skills</p>
+  <p class="mt-4 text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-3xl">
+    Skills are domain-specific capability bundles for Claude Code — packaged
+    prompts, scripts, and configurations that give an agent specific
+    expertise. The packages on this page wrap each skill as a Flox-installable,
+    Nix-pinned bundle so a team gets identical agent behavior across every
+    developer's machine. Add a skill via
+    <code class="font-mono text-sm">flox/skill-&lt;name&gt;</code> in any
+    manifest's <code class="font-mono text-sm">[install]</code> block.
+  </p>
   <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
     {pkgs.map((p) => (
       <ItemCard

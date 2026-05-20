@@ -5,12 +5,14 @@ const {
   description,
   ogImage,
   ogType,
+  noindex,
   jsonLd,
 } = Astro.props as {
   title: string;
   description?: string;
   ogImage?: string;
   ogType?: string;
+  noindex?: boolean;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 };
 const base = import.meta.env.BASE_URL;
@@ -34,6 +36,7 @@ const ldArray = jsonLd
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
+    {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonical} />
     <link rel="icon" href={`${base}favicon.svg`} />
     {/* Static-host partial security mitigation. GitHub Pages

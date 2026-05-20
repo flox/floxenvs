@@ -8,9 +8,20 @@ const pkgs = (await getCollection("packages"))
   .filter((p) => p.data.subkind === "plugin")
   .sort((a, b) => a.data.name.localeCompare(b.data.name));
 ---
-<Layout title="Plugins · flox/envs">
+<Layout
+  title="Claude Code plugins on Flox — pinned, reproducible, one-line install"
+  description="Every Claude Code plugin packaged for Flox — context handlers, tool integrations, and workflow extensions. Each one Nix-pinned and includable from any manifest."
+>
   <h1 class="text-2xl font-bold">Plugins</h1>
   <p class="mt-1 text-sm text-slate-500">{pkgs.length} plugins</p>
+  <p class="mt-4 text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-3xl">
+    Plugins extend a Claude Code agent with context handlers, tool integrations,
+    and workflow extensions. The packages on this page wrap each plugin as a
+    Flox-installable, Nix-pinned binary so a team gets identical plugin
+    behavior across every developer's machine and every CI runner. Add a
+    plugin via <code class="font-mono text-sm">flox/claude-code-plugin-&lt;name&gt;</code>
+    in any manifest's <code class="font-mono text-sm">[install]</code> block.
+  </p>
   <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
     {pkgs.map((p) => (
       <ItemCard
