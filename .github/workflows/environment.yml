@@ -19,6 +19,7 @@ jobs:
     timeout-minutes: 5
 
     outputs:
+      bootstrap: "${{ steps.discover.outputs.bootstrap }}"
       matrix: "${{ steps.discover.outputs.matrix }}"
       runs_on: "${{ steps.discover.outputs.runs_on }}"
       start_services: "${{ steps.discover.outputs.start_services }}"
@@ -38,6 +39,19 @@ jobs:
         run: |
           set -euo pipefail
           ENV="${{ inputs.environment }}"
+
+          # Bootstrap state: the env has no committed
+          # manifest.lock yet. This is the expected state for
+          # the first PR that introduces an env whose custom
+          # package isn't published to FloxHub yet (the
+          # package gets published from main, then a follow-
+          # up PR adds the lockfile). Skip the freshness
+          # check; the Discover step will short-circuit
+          # downstream test/push jobs.
+          if [ ! -f "$ENV/.flox/env/manifest.lock" ]; then
+            echo "Bootstrap: $ENV/.flox/env/manifest.lock not present — skipping lockfile check."
+            exit 0
+          fi
 
           # Regenerate lock for minimal env
           pushd "$ENV"
@@ -104,10 +118,24 @@ jobs:
           ENV="${{ inputs.environment }}"
           LOCK="$ENV/.flox/env/manifest.lock"
 
+          # Bootstrap state — see "Check lockfiles are up to
+          # date" above for context. Emit safe defaults and
+          # set bootstrap=true so test/push jobs skip.
           if [ ! -f "$LOCK" ]; then
-            echo "Error: $LOCK not found"
-            exit 1
+            echo "Bootstrap: $LOCK not present — emitting empty matrices."
+            {
+              echo "bootstrap=true"
+              echo "matrix={\"system\":[]}"
+              echo "runs_on=ubuntu-latest"
+              echo "start_services=false"
+              echo "has_demo=false"
+              echo "demo_matrix={\"system\":[]}"
+              echo "demo_runs_on=ubuntu-latest"
+              echo "demo_start_services=false"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
           fi
+          echo "bootstrap=false" >> "$GITHUB_OUTPUT"
 
           # Extract systems (exclude x86_64-darwin, default if empty)
           SYSTEMS=$(jq -r '
@@ -189,6 +217,8 @@ jobs:
 
     needs:
       - "discover"
+
+    if: needs.discover.outputs.bootstrap != 'true'
 
     strategy:
       fail-fast: false
@@ -331,7 +361,9 @@ jobs:
       - "discover"
       - "test"
 
-    if: (github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'workflow_dispatch'
+    if: >-
+      ((github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'workflow_dispatch')
+      && needs.discover.outputs.bootstrap != 'true'
 
     env:
       FLOX_BIN: "flox -vvv"
@@ -404,6 +436,7 @@ jobs:
     if: >-
       ((github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'workflow_dispatch')
       && needs.discover.outputs.has_demo == 'true'
+      && needs.discover.outputs.bootstrap != 'true'
 
     env:
       FLOX_BIN: "flox -vvv"

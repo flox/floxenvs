@@ -94,6 +94,8 @@ Most environments follow a dual-layer pattern:
 | _└ mkcert-demo_ | | [floxhub](https://hub.flox.dev/flox/mkcert-demo) · [docs](mkcert-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/mkcert-demo-latest) |
 | playwright | Browser automation + MCP | [floxhub](https://hub.flox.dev/flox/playwright) · [docs](playwright/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/playwright-latest) |
 | _└ playwright-demo_ | | [floxhub](https://hub.flox.dev/flox/playwright-demo) · [docs](playwright-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/playwright-demo-latest) |
+| worktrunk | Git worktree manager for AI agents | [floxhub](https://hub.flox.dev/flox/worktrunk) · [docs](worktrunk/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/worktrunk-latest) |
+| _└ worktrunk-demo_ | | [floxhub](https://hub.flox.dev/flox/worktrunk-demo) · [docs](worktrunk-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/worktrunk-demo-latest) |
 
 ## AI & ML
 
