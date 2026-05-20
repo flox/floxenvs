@@ -6,13 +6,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HASHES_FILE="$SCRIPT_DIR/hashes.json"
 
 # CodeRabbit publishes the current CLI version at a stable endpoint.
-VERSION_URL="https://cli.coderabbit.ai/releases/latest"
+# The official install.sh fetches this same VERSION file to detect latest.
+VERSION_URL="https://cli.coderabbit.ai/releases/latest/VERSION"
 
 current_version=$(jq -r '.version' "$HASHES_FILE")
-# Follow redirect to /releases/<version> and extract the version path
-latest_version=$(curl -sILf "$VERSION_URL" \
-  | grep -i '^location:' | tail -1 \
-  | sed -E 's|.*/releases/([^/[:space:]]+).*|\1|' | tr -d '[:space:]')
+latest_version=$(curl -sfL "$VERSION_URL" | tr -d '[:space:]')
 
 echo "Current: $current_version, Latest: $latest_version"
 
