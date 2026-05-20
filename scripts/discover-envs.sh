@@ -48,6 +48,20 @@ get_systems() {
   echo "$systems"
 }
 
+# Pick a GitHub Actions runner that can build the env.
+# Prefer Linux (cheaper minutes); fall back to macOS for
+# darwin-only envs. Mirrors environment.yml.
+runner_for_systems() {
+  local systems="$1"
+  if   echo "$systems" | grep -qx 'x86_64-linux';   then echo "ubuntu-latest"
+  elif echo "$systems" | grep -qx 'aarch64-linux';  then echo "ubuntu-24.04-arm"
+  elif echo "$systems" | grep -qx 'aarch64-darwin'; then echo "macos-latest"
+  else
+    echo "no supported runner for systems: $systems" >&2
+    return 1
+  fi
+}
+
 # ── Environment discovery ──────────────────────────────────
 
 find_locks() {
@@ -226,8 +240,9 @@ mode_discover() {
 
 mode_update() {
   # Output JSON array of minimal (non-demo) envs with
-  # a has_demo flag. Used by update.yml to upgrade env
-  # and its demo together.
+  # a has_demo flag and runs_on selector. Used by
+  # upgrade_envs.yml to upgrade env + demo together on
+  # a runner compatible with the env's lockfile systems.
   local envs=()
 
   while IFS= read -r lock; do
@@ -247,7 +262,12 @@ mode_update() {
       has_demo="true"
     fi
 
-    envs+=("{\"name\":\"$name\",\"has_demo\":$has_demo}")
+    local systems
+    systems="$(get_systems "$lock")"
+    local runs_on
+    runs_on="$(runner_for_systems "$systems")"
+
+    envs+=("{\"name\":\"$name\",\"has_demo\":$has_demo,\"runs_on\":\"$runs_on\"}")
   done < <(find_locks)
 
   local json
