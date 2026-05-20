@@ -41,7 +41,7 @@ mv "$HASHES_FILE.tmp" "$HASHES_FILE"
 
 echo "Building with dummy cargoHash to compute real one..."
 cargo_hash=$(flox build goose-cli 2>&1 \
-  | grep -A1 "hash mismatch in fixed-output derivation" \
+  | grep -A2 "hash mismatch in fixed-output derivation" \
   | grep "got:" | head -1 | awk '{print $NF}') || true
 
 if [ -z "$cargo_hash" ]; then
