@@ -18,6 +18,12 @@ cd "$REPO_ROOT"
 TEMPLATE="$REPO_ROOT/.devcontainer/scripts/template.json"
 OUT_DIR="$REPO_ROOT/.devcontainer"
 
+# Escape characters that have meaning on the replacement side of `sed s|||`:
+# backslash, ampersand, and the delimiter `|` itself.
+sed_escape() {
+  printf '%s' "$1" | sed -e 's/[\\&|]/\\&/g'
+}
+
 FLOX_VERSION="$(flox_pinned_version flake.nix)"
 if [ -z "$FLOX_VERSION" ]; then
   echo "ERROR: could not extract flox version from flake.nix" >&2
@@ -55,20 +61,35 @@ render_one() {
   ports_attributes="$(render_ports_attributes "$overlay_json")"
   extensions="$(render_extensions "$overlay_json")"
 
+  # Escape sed metacharacters in all substitution values.
+  local display_name_esc cpus_esc memory_esc storage_esc env_dir_esc
+  local flox_version_esc forward_ports_esc ports_attributes_esc
+  local extensions_esc
+  display_name_esc="$(sed_escape "$display_name")"
+  cpus_esc="$(sed_escape "$cpus")"
+  memory_esc="$(sed_escape "$memory")"
+  storage_esc="$(sed_escape "$storage")"
+  env_dir_esc="$(sed_escape "$env_dir")"
+  flox_version_esc="$(sed_escape "$FLOX_VERSION")"
+  forward_ports_esc="$(sed_escape "$forward_ports")"
+  ports_attributes_esc="$(sed_escape "$ports_attributes")"
+  extensions_esc="$(sed_escape "$extensions")"
+
   local out="$OUT_DIR/$env_dir/devcontainer.json"
   mkdir -p "$(dirname "$out")"
 
   # Note: sed delimiters use | because paths contain /.
+  # All values are escaped to prevent metacharacters from breaking substitution.
   sed \
-    -e "s|__DISPLAY_NAME__|$display_name|g" \
-    -e "s|__FLOX_VERSION__|$FLOX_VERSION|g" \
-    -e "s|__ENV_DIR__|$env_dir|g" \
-    -e "s|__CPUS__|$cpus|g" \
-    -e "s|__MEMORY__|$memory|g" \
-    -e "s|__STORAGE__|$storage|g" \
-    -e "s|__FORWARD_PORTS__|$forward_ports|g" \
-    -e "s|__PORTS_ATTRIBUTES__|$ports_attributes|g" \
-    -e "s|__EXTENSIONS__|$extensions|g" \
+    -e "s|__DISPLAY_NAME__|$display_name_esc|g" \
+    -e "s|__FLOX_VERSION__|$flox_version_esc|g" \
+    -e "s|__ENV_DIR__|$env_dir_esc|g" \
+    -e "s|__CPUS__|$cpus_esc|g" \
+    -e "s|__MEMORY__|$memory_esc|g" \
+    -e "s|__STORAGE__|$storage_esc|g" \
+    -e "s|__FORWARD_PORTS__|$forward_ports_esc|g" \
+    -e "s|__PORTS_ATTRIBUTES__|$ports_attributes_esc|g" \
+    -e "s|__EXTENSIONS__|$extensions_esc|g" \
     "$TEMPLATE" \
     | jq . > "$out"
 
