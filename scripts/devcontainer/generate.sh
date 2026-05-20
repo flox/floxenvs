@@ -92,8 +92,29 @@ render_one() {
   echo "  wrote $out"
 }
 
-# For now, render a single hardcoded env. Iteration comes
-# in a later task.
-render_one "postgresql-demo"
+# Iterate over every env. An "env" is any top-level
+# directory that contains .flox/env/manifest.lock. We
+# match the same discovery rules as scripts/discover-envs.sh.
+
+while IFS= read -r lock; do
+  env_dir="$(basename \
+    "$(dirname "$(dirname "$(dirname "$lock")")")")"
+  overlay_toml="$env_dir/.devcontainer.toml"
+  overlay_json="$(toml_to_json "$overlay_toml")"
+
+  skip_reason="$(should_skip "$overlay_json" "$lock")"
+  if [ -n "$skip_reason" ]; then
+    echo "  skip $env_dir ($skip_reason)"
+    continue
+  fi
+
+  render_one "$env_dir"
+done < <(find . -maxdepth 4 -path '*/.flox/env/manifest.lock' \
+  -not -path './.flox/*' \
+  -not -path './_worktrees/*' \
+  -not -path './.worktrees/*' \
+  -not -path '*/remote/*' \
+  -not -path '*/.git/*' \
+  | sort)
 
 echo "Done."
