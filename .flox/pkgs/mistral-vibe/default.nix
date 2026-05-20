@@ -223,20 +223,55 @@ python.pkgs.buildPythonApplication {
     zstandard
   ];
 
-  # Relax version constraints — nixpkgs versions are slightly older but
-  # compatible. NOTE: do NOT relax opentelemetry-* here; those constraints
-  # encode real API requirements and are satisfied by the overrides above.
+  # Relax version constraints — mistral-vibe 2.10.0 switched pyproject.toml
+  # to lockfile-style `==` pins for every (incl. transitive) dependency,
+  # so virtually any nixpkgs skew triggers a failure. The opentelemetry
+  # overrides above provide 1.40.0 / 0.61b0, which is strictly newer than
+  # upstream's `==1.39.1` / `==0.60b1` pins and still satisfies the
+  # `GEN_AI_PROVIDER_NAME` symbol mistral-vibe needs.
   pythonRelaxDeps = [
     "agent-client-protocol"
+    "attrs"
+    "cachetools"
     "certifi"
+    "charset-normalizer"
+    "click"
     "cryptography"
     "gitpython"
     "giturlparse"
+    "google-auth"
+    "googleapis-common-protos"
+    "idna"
+    "importlib-metadata"
+    "jaraco-context"
+    "jsonpointer"
     "keyring"
+    "linkify-it-py"
+    "mcp"
     "mistralai"
+    "more-itertools"
+    "opentelemetry-api"
+    "opentelemetry-exporter-otlp-proto-common"
+    "opentelemetry-exporter-otlp-proto-http"
+    "opentelemetry-proto"
+    "opentelemetry-sdk"
+    "opentelemetry-semantic-conventions"
+    "packaging"
+    "platformdirs"
+    "protobuf"
+    "pyasn1"
     "pydantic"
     "pydantic-settings"
+    "python-dotenv"
+    "python-multipart"
     "pyyaml"
+    "rich"
+    "smmap"
+    "sounddevice"
+    "sse-starlette"
+    "starlette"
+    "uc-micro-py"
+    "uvicorn"
     "watchfiles"
     "zstandard"
   ];
