@@ -13,19 +13,25 @@ project, see [temporal](../temporal/) or use
 
 ```bash
 flox activate -r flox/temporal-demo --start-services
+go run ./start World
 ```
 
-The Temporal dev server starts in the background with
-SQLite storage. No external dependencies required.
+You should see `Workflow result: Hello World` printed
+by the starter. The Temporal Web UI is at
+<http://127.0.0.1:8233>.
 
 ## What this demo includes
 
-- Temporal dev server with built-in Web UI
-- `temporal` CLI for workflow and namespace management
-- `gum` for styled terminal output
-- Automatic data directory creation on activation
-- Service definition for background Temporal server
-- Connection info display on activation
+- Temporal dev server with built-in Web UI (inherited
+  from the [temporal](../temporal/) minimal env)
+- A Go worker (`worker/main.go`) running as a flox
+  service on `my-task-queue`
+- A starter binary (`start/main.go`) that triggers a
+  `SayHelloWorkflow`
+- A trivial `greeting` Go package showing the
+  workflow/activity split
+- `gum` for the activation banner
+- `jq` for the test harness's worker-readiness probe
 
 ## Web UI
 
