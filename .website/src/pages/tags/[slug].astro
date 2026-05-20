@@ -14,13 +14,158 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 const base = import.meta.env.BASE_URL;
-const envs = (await getCollection("envs")).filter((e) => e.data.tags.includes(slug!));
-const pkgs = (await getCollection("packages")).filter((p) => p.data.tags.includes(slug!));
+const envs = (await getCollection("envs")).filter((e) =>
+  e.data.tags.includes(slug!),
+);
+const pkgs = (await getCollection("packages")).filter((p) =>
+  p.data.tags.includes(slug!),
+);
+
+const origin = (Astro.site?.toString() ?? "").replace(/\/$/, "");
+const pageUrl = `${origin}${base}tags/${slug}/`;
+const total = envs.length + pkgs.length;
+
+// Friendly display label. Hyphen → space, plus a few hand-curated
+// acronyms / brand casings that the slug form would otherwise lose.
+const ACRONYMS: Record<string, string> = {
+  ai: "AI",
+  cli: "CLI",
+  tui: "TUI",
+  ide: "IDE",
+  llm: "LLM",
+  rag: "RAG",
+  api: "API",
+  os: "OS",
+  oci: "OCI",
+  jvm: "JVM",
+  sql: "SQL",
+  kv: "KV",
+  tls: "TLS",
+  mcp: "MCP",
+  lsp: "LSP",
+  mlx: "MLX",
+  e2e: "E2E",
+  npm: "npm",
+  pip: "pip",
+  uv: "uv",
+  fzf: "fzf",
+  ripgrep: "ripgrep",
+  postgres: "Postgres",
+  mariadb: "MariaDB",
+  mongodb: "MongoDB",
+  cassandra: "Cassandra",
+  langchain: "LangChain",
+  ollama: "Ollama",
+  huggingface: "Hugging Face",
+  openai: "OpenAI",
+  anthropic: "Anthropic",
+  microsoft: "Microsoft",
+  charmbracelet: "Charmbracelet",
+  nix: "Nix",
+  podman: "Podman",
+  docker: "Docker",
+  nginx: "nginx",
+  valkey: "Valkey",
+  redis: "Redis",
+  mysql: "MySQL",
+  apple_silicon: "Apple Silicon",
+  "apple-silicon": "Apple Silicon",
+  nodejs: "Node.js",
+  bun: "Bun",
+  deno: "Deno",
+  rust: "Rust",
+  ruby: "Ruby",
+  go: "Go",
+  elixir: "Elixir",
+  python: "Python",
+  typescript: "TypeScript",
+  javascript: "JavaScript",
+  graph_rag: "Graph RAG",
+  "graph-rag": "Graph RAG",
+  "vector-db": "Vector DB",
+  "local-llm": "Local LLM",
+  "coding-agent": "Coding agent",
+  "dev-https": "Dev HTTPS",
+  "package-manager": "Package manager",
+  "knowledge-graph": "Knowledge graph",
+  "build-systems": "Build systems",
+  "task-management": "Task management",
+  "self-hosted": "Self-hosted",
+  "openai-compatible": "OpenAI-compatible",
+  "open-source": "Open source",
+};
+function displayName(s: string): string {
+  if (s in ACRONYMS) return ACRONYMS[s];
+  return s.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+const label = displayName(slug!);
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `Flox catalog: #${slug}`,
+    description: `Flox environments and packages tagged #${slug} — ${total} item${total === 1 ? "" : "s"} in the catalog.`,
+    url: pageUrl,
+    isPartOf: { "@type": "WebSite", "@id": `${origin}${base}#website` },
+    mainEntity: { "@id": `${pageUrl}#items` },
+    publisher: {
+      "@type": "Organization",
+      "@id": "https://flox.dev/#organization",
+      name: "Flox",
+      url: "https://flox.dev",
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@id": `${pageUrl}#items`,
+    "@type": "ItemList",
+    name: `Items tagged #${slug}`,
+    url: pageUrl,
+    numberOfItems: total,
+    itemListElement: [
+      ...envs.map((e, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: e.data.title,
+        url: `${origin}${base}envs/${e.data.name}/`,
+      })),
+      ...pkgs.map((p, i) => ({
+        "@type": "ListItem",
+        position: envs.length + i + 1,
+        name: p.data.title,
+        url: `${origin}${base}packages/${p.data.name}/`,
+      })),
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "flox / envs",
+        item: `${origin}${base}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: `#${slug}`,
+        item: pageUrl,
+      },
+    ],
+  },
+];
 ---
-<Layout title={`#${slug} · flox/envs`}>
-  <h1 class="text-2xl font-bold">#{slug}</h1>
+<Layout
+  title={`#${slug} — Flox environments and packages tagged ${label}`}
+  description={`Browse every Flox environment and package tagged #${slug} (${label}) — ${total} item${total === 1 ? "" : "s"} in the catalog. One manifest line per install.`}
+  jsonLd={jsonLd}
+>
+  <h1 class="text-2xl font-bold">#{label}</h1>
   <p class="mt-1 text-sm text-slate-500">
-    {envs.length + pkgs.length} items
+    {total} item{total === 1 ? "" : "s"} tagged <code class="font-mono text-xs">#{slug}</code>
   </p>
   <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
     {envs.map((e) => (

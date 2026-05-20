@@ -152,6 +152,12 @@ const jsonLd = [
       name: "Flox",
       url: "https://flox.dev",
     },
+    author: {
+      "@type": "Organization",
+      "@id": "https://flox.dev/#organization",
+      name: "Flox",
+      url: "https://flox.dev",
+    },
     about: agents.map((a) => ({
       "@type": "SoftwareApplication",
       name: a.pkg.data.title,
@@ -196,13 +202,7 @@ const jsonLd = [
       {
         "@type": "ListItem",
         position: 2,
-        name: "Compare",
-        item: `${origin}${base}compare/`,
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: "AI coding agents",
+        name: "AI coding agents — compared",
         item: pageUrl,
       },
     ],
@@ -232,10 +232,19 @@ const jsonLd = [
       AI coding agents on Flox — compared
     </h1>
     <p class="mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-300 max-w-3xl">
-      This is the canonical side-by-side comparison for picking an AI coding
-      agent from the Flox catalog in 2026. Every agent listed below ships as a
-      reproducible Flox package — one line to install, zero version drift,
-      works on macOS and Linux.
+      This is the canonical 2026 side-by-side comparison for picking an AI
+      coding agent from the Flox catalog. Six terminal-first agents are
+      covered — Anthropic's Claude Code, OpenAI's Codex, Charmbracelet's
+      Crush, Opencode, Openclaw, and the Agent Deck orchestrator — across
+      license, supported provider, multi-model and offline capability,
+      terminal vs IDE surface, and last-update freshness. "Terminal-first"
+      means each agent lives in any shell rather than embedding inside a
+      specific editor like Cursor, Copilot, or Windsurf — the trade-off is
+      no inline IDE UI, the win is editor-agnostic workflows, scriptability,
+      and zero vendor lock-in. Every agent below ships as a reproducible
+      Flox package: one manifest line to install, zero version drift, the
+      identical binary on every developer's machine and every CI runner,
+      on macOS and Linux.
     </p>
   </section>
 

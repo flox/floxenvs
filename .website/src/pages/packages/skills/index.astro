@@ -23,6 +23,23 @@ const pkgs = (await getCollection("packages"))
     <code class="font-mono text-sm">flox/skill-&lt;name&gt;</code> in any
     manifest's <code class="font-mono text-sm">[install]</code> block.
   </p>
+  <p class="mt-3 text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-3xl">
+    Skills differ from plugins in scope: a plugin extends the agent
+    runtime (MCP servers, command palettes, IDE hooks) while a skill is
+    a tightly-scoped knowledge or workflow bundle. A skill might teach the
+    agent how to write release notes for your team's specific format,
+    how to triage incidents using your runbook, or how to apply your
+    company's house style to documentation. Packaging skills as Flox
+    bundles is the same trick as plugins — version-locked, manifest-included,
+    reproducible. Bring up a fresh laptop, run <code class="font-mono text-xs">flox activate</code>,
+    and the same agent with the same skills is ready to go.
+  </p>
+  <p class="mt-3 text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-3xl">
+    All skills listed below pair with <a href={`${base}envs/claude/`} class="underline">flox/claude</a>,
+    which materializes skill manifests into the agent's config tree on
+    activation. No copy-pasting prompts between machines, no drift between
+    a developer's local skills and the CI runner's.
+  </p>
   <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
     {pkgs.map((p) => (
       <ItemCard

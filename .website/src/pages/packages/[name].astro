@@ -117,7 +117,8 @@ const jsonLd = [
     author: pkg.data.maintainer?.startsWith("@")
       ? {
           "@type": "Person",
-          name: pkg.data.maintainer,
+          name: pkg.data.maintainer === "@rok" ? "Rok Garbas" : pkg.data.maintainer,
+          identifier: pkg.data.maintainer,
           url: `https://github.com/${pkg.data.maintainer.slice(1)}`,
         }
       : undefined,

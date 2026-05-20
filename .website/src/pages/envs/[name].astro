@@ -88,7 +88,8 @@ const jsonLd = [
     author: env.data.maintainer?.startsWith("@")
       ? {
           "@type": "Person",
-          name: env.data.maintainer,
+          name: env.data.maintainer === "@rok" ? "Rok Garbas" : env.data.maintainer,
+          identifier: env.data.maintainer,
           url: `https://github.com/${env.data.maintainer.slice(1)}`,
         }
       : undefined,
