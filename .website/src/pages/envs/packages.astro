@@ -1,0 +1,212 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import KindBadge from "../../components/KindBadge.astro";
+
+const base = import.meta.env.BASE_URL;
+const envs = (await getCollection("envs")).sort((a, b) =>
+  a.data.name.localeCompare(b.data.name),
+);
+const pkgs = await getCollection("packages");
+const catalog = new Set(pkgs.map((p) => p.data.name));
+
+interface Row {
+  env: string;
+  title: string;
+  tagline: string;
+  category: string;
+  count: number;
+  catalogCount: number;
+  packages: { name: string; path: string }[];
+}
+
+const rows: Row[] = envs.map((e) => {
+  const list = (e.data.manifest_install ?? []) as { name: string; path: string }[];
+  const catalogCount = list.filter(
+    (p) => p.path.startsWith("flox/") &&
+           catalog.has(p.path.slice("flox/".length)),
+  ).length;
+  return {
+    env: e.data.name,
+    title: e.data.title,
+    tagline: e.data.tagline,
+    category: e.data.category,
+    count: list.length,
+    catalogCount,
+    packages: list,
+  };
+}).filter((r) => r.count > 0);
+
+// Build the reverse index — which envs install each package.
+type PathInfo = { envs: string[]; flox: boolean; catalog: boolean };
+const reverse = new Map<string, PathInfo>();
+for (const r of rows) {
+  for (const p of r.packages) {
+    const key = p.path;
+    if (!reverse.has(key)) {
+      const flox = key.startsWith("flox/");
+      const catalogHit = flox && catalog.has(key.slice("flox/".length));
+      reverse.set(key, { envs: [], flox, catalog: catalogHit });
+    }
+    reverse.get(key)!.envs.push(r.env);
+  }
+}
+const reverseRows = Array.from(reverse.entries())
+  .map(([path, info]) => ({ path, ...info }))
+  .sort((a, b) => b.envs.length - a.envs.length || a.path.localeCompare(b.path));
+
+const totalInstalls = rows.reduce((acc, r) => acc + r.count, 0);
+const uniquePaths = reverse.size;
+
+const origin = (Astro.site?.toString() ?? "").replace(/\/$/, "");
+const pageUrl = `${origin}${base}envs/packages/`;
+const breadcrumb = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "flox / envs", item: `${origin}${base}` },
+    { "@type": "ListItem", position: 2, name: "Environments", item: `${origin}${base}envs/` },
+    { "@type": "ListItem", position: 3, name: "Packages across envs", item: pageUrl },
+  ],
+};
+
+function nixSearchUrl(path: string): string {
+  return `https://search.nixos.org/packages?query=${encodeURIComponent(path)}`;
+}
+function floxhubUrl(path: string): string {
+  return `https://hub.flox.dev/${path}`;
+}
+---
+<Layout
+  title="Packages installed across every Flox env — full cross-env package matrix"
+  description="See every package every Flox environment installs, with reverse-lookup for which envs pull in each package. Catalog packages link to their detail page; everything else to FloxHub or nixpkgs."
+  jsonLd={breadcrumb}
+>
+  <nav class="text-sm text-slate-500 mb-4">
+    <a href={`${base}envs/`} class="underline">Environments</a> / packages
+  </nav>
+  <h1 class="text-3xl font-bold">Packages across environments</h1>
+  <p class="mt-2 text-slate-600 dark:text-slate-300 max-w-3xl">
+    Every package every Flox environment in this catalog installs into a
+    consumer manifest. Each entry shows where the package resolves from —
+    the <strong>flox/envs</strong> catalog itself (green), the FloxHub
+    publisher namespace (grey), or upstream nixpkgs (grey).
+  </p>
+  <div class="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-sm text-slate-500">
+    <span><strong class="text-slate-700 dark:text-slate-200">{rows.length}</strong> environments</span>
+    <span><strong class="text-slate-700 dark:text-slate-200">{totalInstalls}</strong> package installs</span>
+    <span><strong class="text-slate-700 dark:text-slate-200">{uniquePaths}</strong> unique pkg-paths</span>
+  </div>
+
+  <section class="mt-12">
+    <h2 class="text-2xl font-semibold">By environment</h2>
+    <p class="text-sm text-slate-500 mt-1">
+      What each env brings in via its <code class="text-xs font-mono">[install]</code> block.
+    </p>
+    <div class="mt-6 space-y-6">
+      {rows.map((r) => (
+        <article id={`env-${r.env}`} class="rounded-lg border border-slate-200 dark:border-slate-800 p-5">
+          <header class="flex flex-wrap items-baseline gap-3">
+            <KindBadge kind="env" />
+            <a href={`${base}envs/${r.env}/`} class="text-lg font-semibold underline-offset-2 hover:underline">
+              {r.title}
+            </a>
+            <span class="text-xs font-mono text-slate-500">{r.env}</span>
+            <span class="ml-auto text-sm text-slate-500">
+              {r.count} package{r.count === 1 ? "" : "s"}
+              {r.catalogCount > 0 && (
+                <span class="ml-2 text-kind-env">· {r.catalogCount} from catalog</span>
+              )}
+            </span>
+          </header>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">{r.tagline}</p>
+          <ul class="mt-4 flex flex-wrap gap-1.5">
+            {r.packages.map((p) => {
+              const flox = p.path.startsWith("flox/");
+              const catalogName = flox ? p.path.slice("flox/".length) : null;
+              const inCatalog = catalogName !== null && catalog.has(catalogName);
+              const href = inCatalog && catalogName
+                ? `${base}packages/${catalogName}/`
+                : flox
+                ? floxhubUrl(p.path)
+                : nixSearchUrl(p.path);
+              const cls = inCatalog
+                ? "border-kind-env/40 bg-kind-env/5 text-kind-env hover:border-kind-env"
+                : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-slate-400";
+              return (
+                <li>
+                  <a href={href} class={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded border text-xs font-mono ${cls}`}>
+                    <span>{p.name}</span>
+                    {p.name !== p.path && (
+                      <span class="text-[10px] opacity-60">{p.path}</span>
+                    )}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="mt-16">
+    <h2 class="text-2xl font-semibold">By package — reverse lookup</h2>
+    <p class="text-sm text-slate-500 mt-1">
+      Which envs install each pkg-path, sorted by how many envs share it.
+    </p>
+    <div class="mt-6 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 dark:bg-slate-900 text-left">
+          <tr>
+            <th class="px-3 py-2 font-medium text-slate-500 text-xs uppercase tracking-wide">Path</th>
+            <th class="px-3 py-2 font-medium text-slate-500 text-xs uppercase tracking-wide">Source</th>
+            <th class="px-3 py-2 font-medium text-slate-500 text-xs uppercase tracking-wide">Installed in</th>
+          </tr>
+        </thead>
+        <tbody>
+          {reverseRows.map((row) => {
+            const catalogName = row.catalog ? row.path.slice("flox/".length) : null;
+            const href = row.catalog && catalogName
+              ? `${base}packages/${catalogName}/`
+              : row.flox
+              ? floxhubUrl(row.path)
+              : nixSearchUrl(row.path);
+            return (
+              <tr class="border-t border-slate-100 dark:border-slate-900 align-top">
+                <td class="px-3 py-2 font-mono text-xs">
+                  <a class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300" href={href}>{row.path}</a>
+                </td>
+                <td class="px-3 py-2 text-xs whitespace-nowrap">
+                  {row.catalog ? (
+                    <span class="inline-flex items-center gap-1.5 text-kind-env">
+                      <span class="inline-block w-1.5 h-1.5 rounded-full bg-kind-env"></span>
+                      catalog
+                    </span>
+                  ) : row.flox ? (
+                    <span class="inline-flex items-center gap-1.5 text-slate-500">
+                      <span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                      floxhub
+                    </span>
+                  ) : (
+                    <span class="inline-flex items-center gap-1.5 text-slate-500">
+                      <span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                      nixpkgs
+                    </span>
+                  )}
+                </td>
+                <td class="px-3 py-2 text-xs">
+                  <span class="inline-flex flex-wrap gap-x-1.5 gap-y-1">
+                    {row.envs.map((envName) => (
+                      <a href={`${base}envs/${envName}/`} class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300">{envName}</a>
+                    ))}
+                  </span>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</Layout>
