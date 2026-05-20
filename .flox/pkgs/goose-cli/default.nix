@@ -4,6 +4,7 @@
   fetchFromGitHub,
   fetchurl,
   rustPlatform,
+  cmake,
   pkg-config,
   openssl,
   libxcb,
@@ -40,7 +41,15 @@ rustPlatform.buildRustPackage {
 
   inherit cargoHash;
 
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+  ];
+
+  # cmake's nix hook sets CMAKE_BUILD_TYPE=Release which the
+  # llama-cpp-sys-2 crate's build script overrides. Disable the hook so
+  # the crate stays in control of its own cmake invocation.
+  dontUseCmakeConfigure = true;
 
   buildInputs = [
     openssl
