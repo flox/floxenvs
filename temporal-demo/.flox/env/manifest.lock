@@ -34,7 +34,7 @@
       "TEMPORAL_UI_PORT": "8233"
     },
     "hook": {
-      "on-activate": "export TEMPORAL_DATA=\"$FLOX_ENV_CACHE/temporal\"\n\nif [ ! -d \"$TEMPORAL_DATA\" ]; then\n  mkdir -p \"$TEMPORAL_DATA\"\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Temporal + worker in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Send a hello workflow:' \\\n    '  go run ./start YourName' '' \\\n    'Temporal Web UI:' \\\n    \"  http://$TEMPORAL_HOST:$TEMPORAL_UI_PORT\"\nfi\n"
+      "on-activate": "export TEMPORAL_DATA=\"$FLOX_ENV_CACHE/temporal\"\n\nif [ ! -d \"$TEMPORAL_DATA\" ]; then\n  mkdir -p \"$TEMPORAL_DATA\"\nfi\n\n# Point Go's caches at a writable location.\n# Default GOPATH is $HOME/go, which fails inside the\n# CI test namespace where HOME=/var/empty (read-only).\nexport GOPATH=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$GOPATH/pkg/mod\"\nexport GOCACHE=\"$FLOX_ENV_CACHE/go-build\"\nmkdir -p \"$GOPATH\" \"$GOCACHE\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Temporal + worker in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Send a hello workflow:' \\\n    '  go run ./start YourName' '' \\\n    'Temporal Web UI:' \\\n    \"  http://$TEMPORAL_HOST:$TEMPORAL_UI_PORT\"\nfi\n"
     },
     "options": {},
     "services": {
@@ -42,7 +42,7 @@
         "command": "  TEMPORAL_DATA=\"$FLOX_ENV_CACHE/temporal\"\n  mkdir -p \"$TEMPORAL_DATA\"\n  exec temporal server start-dev \\\n    --ip \"$TEMPORAL_HOST\" \\\n    --port \"$TEMPORAL_PORT\" \\\n    --ui-port \"$TEMPORAL_UI_PORT\" \\\n    --db-filename \"$TEMPORAL_DATA/temporal.db\"\n"
       },
       "worker": {
-        "command": "  cd \"$FLOX_ENV_PROJECT\"\n  until temporal workflow list \\\n      --address \"$TEMPORAL_HOST:$TEMPORAL_PORT\" \\\n      >/dev/null 2>&1; do\n    sleep 1\n  done\n  exec go run ./worker\n"
+        "command": "  cd \"$FLOX_ENV_PROJECT\"\n  export GOPATH=\"$FLOX_ENV_CACHE/go\"\n  export GOMODCACHE=\"$GOPATH/pkg/mod\"\n  export GOCACHE=\"$FLOX_ENV_CACHE/go-build\"\n  mkdir -p \"$GOPATH\" \"$GOCACHE\"\n  until temporal workflow list \\\n      --address \"$TEMPORAL_HOST:$TEMPORAL_PORT\" \\\n      >/dev/null 2>&1; do\n    sleep 1\n  done\n  exec go run ./worker\n"
       }
     }
   },
@@ -813,12 +813,12 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Temporal + worker in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Send a hello workflow:' \\\n    '  go run ./start YourName' '' \\\n    'Temporal Web UI:' \\\n    \"  http://$TEMPORAL_HOST:$TEMPORAL_UI_PORT\"\nfi\n"
+        "on-activate": "# Point Go's caches at a writable location.\n# Default GOPATH is $HOME/go, which fails inside the\n# CI test namespace where HOME=/var/empty (read-only).\nexport GOPATH=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$GOPATH/pkg/mod\"\nexport GOCACHE=\"$FLOX_ENV_CACHE/go-build\"\nmkdir -p \"$GOPATH\" \"$GOCACHE\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Temporal + worker in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Send a hello workflow:' \\\n    '  go run ./start YourName' '' \\\n    'Temporal Web UI:' \\\n    \"  http://$TEMPORAL_HOST:$TEMPORAL_UI_PORT\"\nfi\n"
       },
       "options": {},
       "services": {
         "worker": {
-          "command": "  cd \"$FLOX_ENV_PROJECT\"\n  until temporal workflow list \\\n      --address \"$TEMPORAL_HOST:$TEMPORAL_PORT\" \\\n      >/dev/null 2>&1; do\n    sleep 1\n  done\n  exec go run ./worker\n"
+          "command": "  cd \"$FLOX_ENV_PROJECT\"\n  export GOPATH=\"$FLOX_ENV_CACHE/go\"\n  export GOMODCACHE=\"$GOPATH/pkg/mod\"\n  export GOCACHE=\"$FLOX_ENV_CACHE/go-build\"\n  mkdir -p \"$GOPATH\" \"$GOCACHE\"\n  until temporal workflow list \\\n      --address \"$TEMPORAL_HOST:$TEMPORAL_PORT\" \\\n      >/dev/null 2>&1; do\n    sleep 1\n  done\n  exec go run ./worker\n"
         }
       },
       "include": {
