@@ -1,0 +1,51 @@
+name: "CI: devcontainers"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".devcontainer/**"
+      - "scripts/devcontainer/**"
+      - "*/.devcontainer.toml"
+      - "flake.nix"
+      - ".github/workflows/ci_devcontainers.yml"
+  pull_request:
+    paths:
+      - ".devcontainer/**"
+      - "scripts/devcontainer/**"
+      - "*/.devcontainer.toml"
+      - "flake.nix"
+      - ".github/workflows/ci_devcontainers.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+
+jobs:
+  freshness:
+    name: "Check devcontainers are up to date"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 10
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
+
+      - name: "Install Nix"
+        uses: "DeterminateSystems/nix-installer-action@main"
+
+      - name: "Run generator"
+        run: |
+          set -euo pipefail
+          nix --extra-experimental-features 'nix-command flakes' \
+            run .#generate-devcontainers
+
+      - name: "Verify no drift"
+        run: |
+          set -euo pipefail
+          if ! git diff --exit-code -- .devcontainer/ ; then
+            echo ""
+            echo "Error: .devcontainer/ is out of date."
+            echo "Run 'just generate-devcontainers' and commit."
+            exit 1
+          fi
+          echo "Devcontainers are up to date."

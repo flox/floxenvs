@@ -111,6 +111,19 @@ jobs:
           fi
           echo "Lockfiles are up to date (scrape_date / schema-version drift ignored)."
 
+      - name: "Check devcontainers are up to date"
+        run: |
+          set -euo pipefail
+          nix --extra-experimental-features 'nix-command flakes' \
+            run .#generate-devcontainers
+          if ! git diff --exit-code -- .devcontainer/ ; then
+            echo ""
+            echo "Error: .devcontainer/ is out of date."
+            echo "Run 'just generate-devcontainers' and commit."
+            exit 1
+          fi
+          echo "Devcontainers are up to date."
+
       - name: "Discover environment"
         id: "discover"
         run: |
