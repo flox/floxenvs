@@ -1,0 +1,32 @@
+{
+  "name": "playwright-demo",
+  "image": "ghcr.io/flox/flox:v1.12.0",
+  "workspaceFolder": "/workspaces/floxenvs/playwright-demo",
+  "runArgs": [
+    "--security-opt",
+    "seccomp=unconfined"
+  ],
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
+  },
+  "mounts": [
+    "source=floxenvs-nix-store,target=/nix,type=volume"
+  ],
+  "forwardPorts": [],
+  "portsAttributes": {},
+  "containerEnv": {
+    "FLOX_DISABLE_METRICS": "true"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "flox.flox"
+      ]
+    }
+  },
+  "postCreateCommand": "bash /workspaces/floxenvs/.devcontainer/scripts/post-create.sh playwright-demo",
+  "postStartCommand": "bash /workspaces/floxenvs/.devcontainer/scripts/post-start.sh playwright-demo",
+  "remoteUser": "root"
+}

@@ -1,0 +1,32 @@
+{
+  "name": "localstack",
+  "image": "ghcr.io/flox/flox:v1.12.0",
+  "workspaceFolder": "/workspaces/floxenvs/localstack",
+  "runArgs": [
+    "--security-opt",
+    "seccomp=unconfined"
+  ],
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
+  },
+  "mounts": [
+    "source=floxenvs-nix-store,target=/nix,type=volume"
+  ],
+  "forwardPorts": [],
+  "portsAttributes": {},
+  "containerEnv": {
+    "FLOX_DISABLE_METRICS": "true"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "flox.flox"
+      ]
+    }
+  },
+  "postCreateCommand": "bash /workspaces/floxenvs/.devcontainer/scripts/post-create.sh localstack",
+  "postStartCommand": "bash /workspaces/floxenvs/.devcontainer/scripts/post-start.sh localstack",
+  "remoteUser": "root"
+}
