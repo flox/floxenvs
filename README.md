@@ -18,6 +18,24 @@ Or run as a Docker container:
 docker run -it ghcr.io/flox/floxenvs:<name>-latest
 ```
 
+## Open in Codespaces
+
+Every environment is available as a one-click GitHub
+Codespace. Two variants:
+
+- **`<name>-demo`** — the full demo with sample data,
+  services started, and a gum welcome.
+- **`<name>`** — the minimal base environment, for
+  hacking on the manifest itself.
+
+First Codespace boot is slower (downloads packages into
+a persistent `/nix` volume); subsequent boots reuse the
+cache.
+
+**Note:** Codespaces in enterprise GitHub orgs that
+restrict `seccomp=unconfined` will fail to start the
+container.
+
 ## Dual-layer pattern
 
 Most environments follow a dual-layer pattern:
