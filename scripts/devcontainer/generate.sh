@@ -15,14 +15,7 @@ cd "$REPO_ROOT"
 # shellcheck source=scripts/devcontainer/lib.sh disable=SC1091
 . "$REPO_ROOT/scripts/devcontainer/lib.sh"
 
-TEMPLATE="$REPO_ROOT/.devcontainer/scripts/template.json"
 OUT_DIR="$REPO_ROOT/.devcontainer"
-
-# Escape characters that have meaning on the replacement side of `sed s|||`:
-# backslash, ampersand, and the delimiter `|` itself.
-sed_escape() {
-  printf '%s' "$1" | sed -e 's/[\\&|]/\\&/g'
-}
 
 FLOX_VERSION="$(flox_pinned_version flake.nix)"
 if [ -z "$FLOX_VERSION" ]; then
@@ -44,11 +37,9 @@ render_one() {
   local overlay_json
   overlay_json="$(toml_to_json "$overlay_toml")"
 
-  local display_name
+  local display_name cpus memory storage
   display_name="$(overlay_str "$overlay_json" \
     '."display-name"' "$env_dir")"
-
-  local cpus memory storage
   cpus="$(overlay_int "$overlay_json" \
     '."host-requirements".cpus' "$DEFAULT_CPUS")"
   memory="$(overlay_str "$overlay_json" \
@@ -61,37 +52,42 @@ render_one() {
   ports_attributes="$(render_ports_attributes "$overlay_json")"
   extensions="$(render_extensions "$overlay_json")"
 
-  # Escape sed metacharacters in all substitution values.
-  local display_name_esc cpus_esc memory_esc storage_esc env_dir_esc
-  local flox_version_esc forward_ports_esc ports_attributes_esc
-  local extensions_esc
-  display_name_esc="$(sed_escape "$display_name")"
-  cpus_esc="$(sed_escape "$cpus")"
-  memory_esc="$(sed_escape "$memory")"
-  storage_esc="$(sed_escape "$storage")"
-  env_dir_esc="$(sed_escape "$env_dir")"
-  flox_version_esc="$(sed_escape "$FLOX_VERSION")"
-  forward_ports_esc="$(sed_escape "$forward_ports")"
-  ports_attributes_esc="$(sed_escape "$ports_attributes")"
-  extensions_esc="$(sed_escape "$extensions")"
-
   local out="$OUT_DIR/$env_dir/devcontainer.json"
   mkdir -p "$(dirname "$out")"
 
-  # Note: sed delimiters use | because paths contain /.
-  # All values are escaped to prevent metacharacters from breaking substitution.
-  sed \
-    -e "s|__DISPLAY_NAME__|$display_name_esc|g" \
-    -e "s|__FLOX_VERSION__|$flox_version_esc|g" \
-    -e "s|__ENV_DIR__|$env_dir_esc|g" \
-    -e "s|__CPUS__|$cpus_esc|g" \
-    -e "s|__MEMORY__|$memory_esc|g" \
-    -e "s|__STORAGE__|$storage_esc|g" \
-    -e "s|__FORWARD_PORTS__|$forward_ports_esc|g" \
-    -e "s|__PORTS_ATTRIBUTES__|$ports_attributes_esc|g" \
-    -e "s|__EXTENSIONS__|$extensions_esc|g" \
-    "$TEMPLATE" \
-    | jq . > "$out"
+  # Build the devcontainer.json with jq. Using jq -n with
+  # --arg/--argjson handles JSON encoding for all values
+  # safely (no sed escaping concerns). The shape mirrors
+  # .devcontainer/scripts/template.json — keep them in sync.
+  jq -n \
+    --arg display_name "$display_name" \
+    --arg flox_version "$FLOX_VERSION" \
+    --arg env_dir "$env_dir" \
+    --argjson cpus "$cpus" \
+    --arg memory "$memory" \
+    --arg storage "$storage" \
+    --argjson forward_ports "$forward_ports" \
+    --argjson ports_attributes "$ports_attributes" \
+    --argjson extensions "$extensions" \
+    '{
+      name: $display_name,
+      image: ("ghcr.io/flox/flox:" + $flox_version),
+      workspaceFolder: ("/workspaces/floxenvs/" + $env_dir),
+      runArgs: ["--security-opt", "seccomp=unconfined"],
+      hostRequirements: {
+        cpus: $cpus,
+        memory: $memory,
+        storage: $storage
+      },
+      mounts: ["source=floxenvs-nix-store,target=/nix,type=volume"],
+      forwardPorts: $forward_ports,
+      portsAttributes: $ports_attributes,
+      containerEnv: { FLOX_DISABLE_METRICS: "true" },
+      customizations: { vscode: { extensions: $extensions } },
+      postCreateCommand: ("bash /workspaces/floxenvs/.devcontainer/scripts/post-create.sh " + $env_dir),
+      postStartCommand: ("bash /workspaces/floxenvs/.devcontainer/scripts/post-start.sh " + $env_dir),
+      remoteUser: "root"
+    }' > "$out"
 
   echo "  wrote $out"
 }
