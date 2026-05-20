@@ -1,0 +1,29 @@
+{
+  "name": "__DISPLAY_NAME__",
+  "image": "ghcr.io/flox/flox:__FLOX_VERSION__",
+  "workspaceFolder": "/workspaces/floxenvs/__ENV_DIR__",
+  "runArgs": [
+    "--security-opt", "seccomp=unconfined"
+  ],
+  "hostRequirements": {
+    "cpus": __CPUS__,
+    "memory": "__MEMORY__",
+    "storage": "__STORAGE__"
+  },
+  "mounts": [
+    "source=floxenvs-nix-store,target=/nix,type=volume"
+  ],
+  "forwardPorts": __FORWARD_PORTS__,
+  "portsAttributes": __PORTS_ATTRIBUTES__,
+  "containerEnv": {
+    "FLOX_DISABLE_METRICS": "true"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": __EXTENSIONS__
+    }
+  },
+  "postCreateCommand": "bash /workspaces/floxenvs/.devcontainer/scripts/post-create.sh __ENV_DIR__",
+  "postStartCommand": "bash /workspaces/floxenvs/.devcontainer/scripts/post-start.sh __ENV_DIR__",
+  "remoteUser": "root"
+}
