@@ -77,13 +77,15 @@ stdenv.mkDerivation {
     done < <(find "$PLUGIN_DIR" -type f \
               \( -name '*.mjs' -o -name '*.cjs' -o -name '*.js' \))
 
-    # Repoint `node ''${CLAUDE_PLUGIN_ROOT}/scripts/<X>.mjs` hook
+    # Repoint `node "''${CLAUDE_PLUGIN_ROOT}/scripts/<X>.mjs"` hook
     # commands at the bundled node, so they don't depend on the
-    # consumer env having nodejs on PATH.
+    # consumer env having nodejs on PATH. Upstream (v0.9.21+) wraps
+    # the path in JSON-escaped quotes, so the literal bytes in the
+    # file are `node \"''${CLAUDE_PLUGIN_ROOT}/...\"`.
     substituteInPlace "$PLUGIN_DIR/hooks/hooks.json" \
       --replace-fail \
-      'node ${pluginRootRef}/' \
-      '${pluginRootRef}/bin/node ${pluginRootRef}/'
+      'node \"${pluginRootRef}/' \
+      '\"${pluginRootRef}/bin/node\" \"${pluginRootRef}/'
 
     # Repoint the MCP server invocation at the bundled npx for the
     # same reason. `command` is the literal string `npx` in upstream;
