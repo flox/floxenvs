@@ -36,6 +36,7 @@ jobs:
       aarch64-linux: "${{ steps.discover.outputs.aarch64-linux }}"
       x86_64-darwin: "${{ steps.discover.outputs.x86_64-darwin }}"
       x86_64-linux: "${{ steps.discover.outputs.x86_64-linux }}"
+      publish_matrix: "${{ steps.discover.outputs.publish_matrix }}"
 
     steps:
       - name: "Checkout"
@@ -126,6 +127,27 @@ jobs:
             echo "$sys=$sys_pkgs" >> "$GITHUB_OUTPUT"
             echo "  $sys: $sys_pkgs"
           done
+
+          # Per-(package, system) tuples for the publish matrix
+          DEFAULT_SYS='["aarch64-darwin","aarch64-linux","x86_64-darwin","x86_64-linux"]'
+          publish_matrix="[]"
+          for pkg in $(echo "$pkgs" | jq -r '.[]'); do
+            PJ=".flox/pkgs/$pkg/publish.json"
+            if [ -f "$PJ" ]; then
+              pkg_sys=$(jq -rc \
+                ".systems // $DEFAULT_SYS" "$PJ")
+            else
+              pkg_sys="$DEFAULT_SYS"
+            fi
+            for sys in $(echo "$pkg_sys" | jq -r '.[]'); do
+              publish_matrix=$(echo "$publish_matrix" \
+                | jq -c \
+                  --arg p "$pkg" --arg s "$sys" \
+                  '. + [{package: $p, system: $s}]')
+            done
+          done
+          echo "publish_matrix=$publish_matrix" >> "$GITHUB_OUTPUT"
+          echo "  publish_matrix: $publish_matrix"
 
   # ── Build: one job per system ───────────────────────
 
@@ -261,10 +283,10 @@ jobs:
       - name: "Build"
         run: flox build "${{ matrix.package }}" --system x86_64-linux
 
-  # ── Publish: single job, loops over systems ─────────
+  # ── Publish: one job per (package, system) ──────────
 
   publish:
-    name: "Publish '${{ matrix.package }}'"
+    name: "Publish '${{ matrix.package }}' (${{ matrix.system }})"
     runs-on: "ubuntu-latest"
     timeout-minutes: 30
     needs:
@@ -277,15 +299,15 @@ jobs:
       always()
       && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
       && github.ref_name == 'main'
-      && needs.discover.outputs.packages != '[]'
+      && needs.discover.outputs.publish_matrix != '[]'
       && !contains(needs.*.result, 'failure')
       && !contains(needs.*.result, 'cancelled')
 
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 4
       matrix:
-        package: ${{ fromJSON(needs.discover.outputs.packages) }}
+        include: ${{ fromJSON(needs.discover.outputs.publish_matrix) }}
 
     steps:
       - name: "Checkout"
@@ -309,15 +331,11 @@ jobs:
           remote-builders: "${{ vars.MANAGED_REMOTE_BUILDERS }}"
       - name: "Get FloxHub token"
         run: echo "FLOX_FLOXHUB_TOKEN=${{ secrets.FLOX_FLOXHUB_TOKEN }}" >> $GITHUB_ENV
-      - name: "Publish for all systems"
+      - name: "Publish"
         run: |
           PKG="${{ matrix.package }}"
+          SYS="${{ matrix.system }}"
           PJ=".flox/pkgs/$PKG/publish.json"
           ORG=$(jq -r '.org // "flox"' "$PJ" 2>/dev/null || echo flox)
-          DEFAULT='["aarch64-darwin","aarch64-linux","x86_64-darwin","x86_64-linux"]'
-          SYSTEMS=$(jq -rc ".systems // $DEFAULT" "$PJ" 2>/dev/null || echo "$DEFAULT")
-          for sys in $(echo "$SYSTEMS" | jq -r '.[]'); do
-            echo "Publishing $PKG to $ORG ($sys)"
-            flox publish -o "$ORG" "$PKG" \
-              --system "$sys"
-          done
+          echo "Publishing $PKG to $ORG ($SYS)"
+          flox publish -o "$ORG" "$PKG" --system "$SYS"
