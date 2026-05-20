@@ -101,6 +101,8 @@ Most environments follow a dual-layer pattern:
 
 | Environment | Description | Links |
 | ----------- | ----------- | ----- |
+| basic-memory | Local-first knowledge graph + MCP server | [floxhub](https://hub.flox.dev/flox/basic-memory) · [docs](basic-memory/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/basic-memory-latest) |
+| _└ basic-memory-demo_ | | [floxhub](https://hub.flox.dev/flox/basic-memory-demo) · [docs](basic-memory-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/basic-memory-demo-latest) |
 | huggingface | Hugging Face Hub CLI | [floxhub](https://hub.flox.dev/flox/huggingface) · [docs](huggingface/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/huggingface-latest) |
 | _└ huggingface-demo_ | | [floxhub](https://hub.flox.dev/flox/huggingface-demo) · [docs](huggingface-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/huggingface-demo-latest) |
 | graphify | Knowledge-graph skill for Claude Code | [floxhub](https://hub.flox.dev/flox/graphify) · [docs](graphify/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/graphify-latest) |
