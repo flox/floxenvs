@@ -24,14 +24,6 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "openclaw";
   inherit version;
 
-  # `pnpm build`/`pnpm ui:build` can spend long stretches in a single
-  # bundler invocation on slower builders (notably x86_64-darwin via
-  # Rosetta), and the heartbeat in buildPhase doesn't always reach the
-  # outer `flox build` process's silence detector. Bump Nix's
-  # max-silent-time so the derivation doesn't get killed at 1800s on
-  # these builders. Cap at 2h to still catch genuinely stuck builds.
-  __maxSilentTime = 7200;
-
   src = fetchFromGitHub {
     owner = "openclaw";
     repo = "openclaw";
