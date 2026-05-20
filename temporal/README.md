@@ -1,9 +1,17 @@
 # temporal
 
 Temporal dev server with SQLite storage and built-in
-Web UI. Uses `temporal-cli` which bundles the server,
-UI, and CLI in a single package. No external
-dependencies required.
+Web UI. Bundles two Flox-packaged binaries:
+
+- `temporal-cli` (cmd `temporal`) — workflow/namespace
+  management plus an embedded dev server with Web UI.
+  Drives the `[services]` block below.
+- `temporal` server (cmd `temporal-server`, plus
+  `temporal-sql-tool`, `temporal-cassandra-tool`,
+  `tdbg`) — production binaries for running against
+  PostgreSQL/MySQL/Cassandra clusters.
+
+No external dependencies required for dev use.
 
 ## Usage
 
@@ -47,6 +55,21 @@ c, err := client.Dial(client.Options{
     HostPort: "127.0.0.1:7233",
 })
 ```
+
+## Production server
+
+For non-dev use, `temporal-server` is available as
+well. It speaks the same protocol but needs an
+external database. Point it at a config file:
+
+```bash
+temporal-server start \
+  --config /path/to/config \
+  --service frontend,history,matching,worker
+```
+
+`temporal-sql-tool` and `temporal-cassandra-tool`
+handle schema setup; `tdbg` is the debugger.
 
 ## See Also
 
