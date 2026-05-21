@@ -42,7 +42,7 @@ jq -n \
 
 echo "Building with dummy npmDepsHash to compute real one..."
 npm_hash=$(flox build openspec 2>&1 \
-  | grep -A1 "hash mismatch in fixed-output derivation" \
+  | grep -A2 "hash mismatch in fixed-output derivation" \
   | grep "got:" | head -1 | awk '{print $NF}') || true
 
 if [ -z "$npm_hash" ]; then
