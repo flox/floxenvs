@@ -1,5 +1,5 @@
---- a/fincept-qt/src/python/PythonSetupManager.cpp	2026-05-21 02:35:17
-+++ b/fincept-qt/src/python/PythonSetupManager.cpp	2026-05-21 02:38:09
+--- a/src/python/PythonSetupManager.cpp	2026-05-21 02:35:17
++++ b/src/python/PythonSetupManager.cpp	2026-05-21 02:38:09
 @@ -208,6 +208,16 @@
  SetupStatus PythonSetupManager::check_status() const {
      SetupStatus status;
@@ -14,6 +14,6 @@
 +        status.python_installed = true;
 +        status.python_version = QStringLiteral("nix-managed");
 +    }
- 
+
      LOG_INFO("PythonSetup", "=== check_status BEGIN === install_dir: " + status.install_dir);
- 
+

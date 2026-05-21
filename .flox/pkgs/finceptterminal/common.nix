@@ -64,6 +64,14 @@ stdenv.mkDerivation (finalAttrs: {
     "-DFETCHCONTENT_SOURCE_DIR_QGEOVIEW=${fc.qgeoview}"
     "-DFETCHCONTENT_SOURCE_DIR_QTADS=${fc.qtads}"
     "-DFETCHCONTENT_SOURCE_DIR_ED25519=${fc.ed25519}"
+    # QtADS derives its version from `git describe` against its own
+    # repo. With FETCHCONTENT_SOURCE_DIR_QTADS pointing at our
+    # fetchgit prefetch (no .git tree), the describe yields
+    # "GIT-NOTFOUND" and CMake rejects it as a malformed version.
+    # The escape hatch: pre-set ADS_VERSION (upstream pins QtADS at
+    # rev 87cffe5d, tagged 4.5.0 — see comment near
+    # FetchContent_Declare(QtADS) in fincept-qt/CMakeLists.txt).
+    "-DADS_VERSION=4.5.0"
     # Skip the test suite — we don't ship the test binaries.
     "-DFINCEPT_BUILD_TESTS=OFF"
     # LTO slows the build massively; off for our (non-shipping) builds.
@@ -93,6 +101,20 @@ stdenv.mkDerivation (finalAttrs: {
       # Point the CMake flag at the writable copy.
       cmakeFlagsArray+=(-DFETCHCONTENT_SOURCE_DIR_QGEOVIEW="$qgv_writable")
     fi
+
+    # QtADS's root CMakeLists only adds cmake/modules to
+    # CMAKE_MODULE_PATH inside the `if(NOT ADS_VERSION)` branch. We
+    # set ADS_VERSION (see comment in common.nix cmakeFlags) which
+    # skips that branch — but src/CMakeLists.txt still does
+    # `include(Versioning)`, which then can't find the module.
+    # Make a writable copy and prepend the module-path setup
+    # unconditionally.
+    qtads_writable=$(mktemp -d)
+    cp -R "${fc.qtads}"/. "$qtads_writable/"
+    chmod -R u+w "$qtads_writable"
+    sed -i '1i list(APPEND CMAKE_MODULE_PATH "''${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")' \
+      "$qtads_writable/CMakeLists.txt"
+    cmakeFlagsArray+=(-DFETCHCONTENT_SOURCE_DIR_QTADS="$qtads_writable")
   '';
 
   # No installPhase here — linux.nix and darwin.nix each provide

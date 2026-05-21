@@ -1,8 +1,8 @@
---- a/fincept-qt/src/core/config/AppPaths.cpp	2026-05-21 02:35:17
-+++ b/fincept-qt/src/core/config/AppPaths.cpp	2026-05-21 02:35:48
+--- a/src/core/config/AppPaths.cpp	2026-05-21 02:35:17
++++ b/src/core/config/AppPaths.cpp	2026-05-21 02:35:48
 @@ -11,6 +11,13 @@
  namespace fincept {
- 
+
  QString AppPaths::root() {
 +    // Flox/Nix override: allow a fully pre-provisioned install dir.
 +    // When FINCEPT_INSTALL_DIR is set the runtime reads its UV / Python

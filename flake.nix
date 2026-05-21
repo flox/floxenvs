@@ -11,18 +11,18 @@
       flake-utils,
       nixpkgs,
       flox,
-    } @ inputs:
+    }@inputs:
     flake-utils.lib.eachDefaultSystem (
       system:
       let
         lib = nixpkgs.lib;
         pkgs = nixpkgs.legacyPackages.${system};
 
-        claude-managed = pkgs.callPackage
-          ./.flox/pkgs/claude-managed/default.nix {};
+        claude-managed = pkgs.callPackage ./.flox/pkgs/claude-managed/default.nix { };
 
-        symphony = pkgs.callPackage
-          ./.flox/pkgs/symphony/default.nix {};
+        symphony = pkgs.callPackage ./.flox/pkgs/symphony/default.nix { };
+
+        finceptterminal = pkgs.callPackage ./.flox/pkgs/finceptterminal/default.nix { };
 
         batsWithLibs = pkgs.bats.withLibraries (p: [
           p.bats-support
@@ -31,68 +31,68 @@
 
         e2eTestDir = ./.flox/pkgs/claude-managed/e2e;
 
-        runTestCmNix =
-          pkgs.writeShellScriptBin
-            "run-test-claude-managed-with-nix"
-            ''
-              set -euo pipefail
-              export PATH="${lib.makeBinPath [
-                claude-managed
-                batsWithLibs
-                pkgs.coreutils
-              ]}:$PATH"
-              export BATS_SUPPORT_LIB="${pkgs.bats.libraries.bats-support}/share/bats/bats-support"
-              export BATS_ASSERT_LIB="${pkgs.bats.libraries.bats-assert}/share/bats/bats-assert"
-              if [ $# -gt 0 ]; then
-                bats "$@"
-              else
-                bats --jobs 1 ${e2eTestDir}/*.bats
-              fi
-            '';
+        runTestCmNix = pkgs.writeShellScriptBin "run-test-claude-managed-with-nix" ''
+          set -euo pipefail
+          export PATH="${
+            lib.makeBinPath [
+              claude-managed
+              batsWithLibs
+              pkgs.coreutils
+            ]
+          }:$PATH"
+          export BATS_SUPPORT_LIB="${pkgs.bats.libraries.bats-support}/share/bats/bats-support"
+          export BATS_ASSERT_LIB="${pkgs.bats.libraries.bats-assert}/share/bats/bats-assert"
+          if [ $# -gt 0 ]; then
+            bats "$@"
+          else
+            bats --jobs 1 ${e2eTestDir}/*.bats
+          fi
+        '';
 
-        runTestCmFlox =
-          pkgs.writeShellScriptBin
-            "run-test-claude-managed-with-flox"
-            ''
-              set -euo pipefail
-              export PATH="${lib.makeBinPath [
-                batsWithLibs
-                pkgs.coreutils
-              ]}:$PATH"
-              export BATS_SUPPORT_LIB="${pkgs.bats.libraries.bats-support}/share/bats/bats-support"
-              export BATS_ASSERT_LIB="${pkgs.bats.libraries.bats-assert}/share/bats/bats-assert"
-              export FLOX_DISABLE_METRICS=true
+        runTestCmFlox = pkgs.writeShellScriptBin "run-test-claude-managed-with-flox" ''
+          set -euo pipefail
+          export PATH="${
+            lib.makeBinPath [
+              batsWithLibs
+              pkgs.coreutils
+            ]
+          }:$PATH"
+          export BATS_SUPPORT_LIB="${pkgs.bats.libraries.bats-support}/share/bats/bats-support"
+          export BATS_ASSERT_LIB="${pkgs.bats.libraries.bats-assert}/share/bats/bats-assert"
+          export FLOX_DISABLE_METRICS=true
 
-              flox_bin="${lib.makeBinPath [
-                flox.packages."${system}".default
-              ]}"
-              export PATH="$flox_bin:$PATH"
+          flox_bin="${
+            lib.makeBinPath [
+              flox.packages."${system}".default
+            ]
+          }"
+          export PATH="$flox_bin:$PATH"
 
-              tmpdir="$(mktemp -d)"
-              trap 'rm -rf "$tmpdir"' EXIT
+          tmpdir="$(mktemp -d)"
+          trap 'rm -rf "$tmpdir"' EXIT
 
-              binary_dir="$(nix build --no-link --print-out-paths \
-                '${inputs.self}#packages.${system}.claude-managed')"
+          binary_dir="$(nix build --no-link --print-out-paths \
+            '${inputs.self}#packages.${system}.claude-managed')"
 
-              cd "$tmpdir"
-              flox init
+          cd "$tmpdir"
+          flox init
 
-              manifest_tpl=${pkgs.writeText "manifest-template.toml" ''
-                schema-version = "1.10.0"
+          manifest_tpl=${pkgs.writeText "manifest-template.toml" ''
+            schema-version = "1.10.0"
 
-                [hook]
-                on-activate = """
-                export PATH="__BINARY_DIR__/bin:$PATH"
-                """
-              ''}
-              sed "s|__BINARY_DIR__|$binary_dir|g" "$manifest_tpl" > .flox/env/manifest.toml
+            [hook]
+            on-activate = """
+            export PATH="__BINARY_DIR__/bin:$PATH"
+            """
+          ''}
+          sed "s|__BINARY_DIR__|$binary_dir|g" "$manifest_tpl" > .flox/env/manifest.toml
 
-              if [ $# -gt 0 ]; then
-                flox activate -c "bats $*"
-              else
-                flox activate -c "bats --jobs 1 ${e2eTestDir}/*.bats"
-              fi
-            '';
+          if [ $# -gt 0 ]; then
+            flox activate -c "bats $*"
+          else
+            flox activate -c "bats --jobs 1 ${e2eTestDir}/*.bats"
+          fi
+        '';
 
         # Single entry point: nix run .#run-test -- <env-name>
         runTestScript = pkgs.writeShellScriptBin "run-test" ''
@@ -125,7 +125,19 @@
 
           export FLOX_DISABLE_METRICS=true
           export FLOX_ENVS_TESTING=1
-          export PATH="${lib.makeBinPath (with pkgs; [ coreutils flox.packages."${system}".default ] ++ lib.optionals stdenv.isLinux [ util-linux passt ])}:$PATH"
+          export PATH="${
+            lib.makeBinPath (
+              with pkgs;
+              [
+                coreutils
+                flox.packages."${system}".default
+              ]
+              ++ lib.optionals stdenv.isLinux [
+                util-linux
+                passt
+              ]
+            )
+          }:$PATH"
           export LANG=
           export LC_COLLATE="C"
           export LC_CTYPE="C"
@@ -373,6 +385,7 @@
       {
         packages.claude-managed = claude-managed;
         packages.symphony = symphony;
+        packages.finceptterminal = finceptterminal;
 
         apps.run-test = {
           type = "app";
