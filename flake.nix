@@ -5,12 +5,27 @@
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   inputs.flox.url = "github:flox/flox/refs/tags/v1.12.1";
 
+  inputs.pyproject-nix.url = "github:pyproject-nix/pyproject.nix";
+  inputs.pyproject-nix.inputs.nixpkgs.follows = "nixpkgs";
+
+  inputs.uv2nix.url = "github:pyproject-nix/uv2nix";
+  inputs.uv2nix.inputs.pyproject-nix.follows = "pyproject-nix";
+  inputs.uv2nix.inputs.nixpkgs.follows = "nixpkgs";
+
+  inputs.pyproject-build-systems.url = "github:pyproject-nix/build-system-pkgs";
+  inputs.pyproject-build-systems.inputs.pyproject-nix.follows = "pyproject-nix";
+  inputs.pyproject-build-systems.inputs.uv2nix.follows = "uv2nix";
+  inputs.pyproject-build-systems.inputs.nixpkgs.follows = "nixpkgs";
+
   outputs =
     {
       self,
       flake-utils,
       nixpkgs,
       flox,
+      pyproject-nix,
+      uv2nix,
+      pyproject-build-systems,
     }@inputs:
     flake-utils.lib.eachDefaultSystem (
       system:
@@ -22,7 +37,9 @@
 
         symphony = pkgs.callPackage ./.flox/pkgs/symphony/default.nix { };
 
-        finceptterminal = pkgs.callPackage ./.flox/pkgs/finceptterminal/default.nix { };
+        finceptterminal = pkgs.callPackage ./.flox/pkgs/finceptterminal/default.nix {
+          inherit (inputs) pyproject-nix uv2nix pyproject-build-systems;
+        };
 
         batsWithLibs = pkgs.bats.withLibraries (p: [
           p.bats-support

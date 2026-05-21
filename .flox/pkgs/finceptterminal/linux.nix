@@ -12,6 +12,11 @@
   wayland,
   expat,
   portaudio,
+  # Forwarded from default.nix; consumed by Task 6.3+ once
+  # python-env.nix exists. Referenced here so callPackage will
+  # demand it (and surface the "python-env.nix pending" throw
+  # until Task 6.3 lands).
+  pythonEnv,
 }:
 
 let
