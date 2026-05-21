@@ -60,6 +60,22 @@ sana-pull MODEL_ID    # pull a specific model
 sana-pull --list      # print curated model IDs
 ```
 
+## Available models
+
+`sana-pull --list` knows about these curated SANA
+diffusers checkpoints:
+
+| Model ID | Size | Resolution |
+| -------- | ---- | ---------- |
+| `Efficient-Large-Model/Sana_600M_1024px_diffusers` | ~1.2 GB | 1024 |
+| `Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers` | ~3.2 GB | 1024 (default) |
+| `Efficient-Large-Model/Sana_1600M_2Kpx_BF16_diffusers` | ~3.2 GB | 2048 |
+| `Efficient-Large-Model/Sana_1600M_4Kpx_BF16_diffusers` | ~3.2 GB | 4096 |
+
+Any HuggingFace `SanaPipeline`-compatible model ID
+also works — pass it to `sana-pull MODEL_ID` or
+`sana-generate --model MODEL_ID`.
+
 ## Configuration
 
 | Variable | Default | Purpose |
