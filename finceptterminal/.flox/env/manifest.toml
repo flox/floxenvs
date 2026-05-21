@@ -1,0 +1,36 @@
+schema-version = "1.10.0"
+
+# Minimal Fincept Terminal environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/finceptterminal"]
+#
+# Fincept Terminal is a native Qt 6 / C++20 desktop application
+# for financial analytics. Requires a graphical session — X11 or
+# Wayland on Linux, native on macOS. Headless CI activates the
+# env but does not launch the GUI.
+#
+# Platforms: aarch64-darwin, x86_64-linux. No aarch64-linux
+# (uv lockfile excludes it because pyqlib has no arm64 wheel),
+# no x86_64-darwin (upstream ships no Intel-Mac build).
+
+[install]
+finceptterminal.pkg-path = "flox/finceptterminal"
+finceptterminal.pkg-group = "finceptterminal"
+
+[vars]
+FINCEPT_DATA_DIR = ""
+
+[hook]
+on-activate = '''
+export FINCEPT_DATA_DIR="${FINCEPT_DATA_DIR:-$FLOX_ENV_CACHE/finceptterminal}"
+mkdir -p "$FINCEPT_DATA_DIR"
+# Profile data (logs, user settings) goes under XDG_DATA_HOME —
+# isolate it from any prior non-Nix install on the same machine.
+export XDG_DATA_HOME="$FINCEPT_DATA_DIR"
+'''
+
+[options]
+systems = ["aarch64-darwin", "x86_64-linux"]
