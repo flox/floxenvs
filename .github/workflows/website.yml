@@ -45,7 +45,7 @@ jobs:
       matrix: ${{ steps.matrix.outputs.matrix }}
       count: ${{ steps.matrix.outputs.count }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: "Install yq, jq, gh"
@@ -76,7 +76,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.detect-changed.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: "Install tools"
@@ -103,7 +103,7 @@ jobs:
           echo "key=$KEY" >> "$GITHUB_OUTPUT"
       - name: "Restore cache"
         id: cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: "audit/${{ matrix.kind }}/${{ matrix.name }}/metrics.json"
           key: ${{ steps.hash.outputs.key }}
@@ -118,7 +118,7 @@ jobs:
           bash scripts/run-audit.sh \
             "${{ matrix.kind }}" "${{ matrix.name }}"
       - name: "Upload metrics.json artifact"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: "metrics-${{ matrix.kind }}-${{ matrix.name }}"
           path: "audit/${{ matrix.kind }}/${{ matrix.name }}/metrics.json"
@@ -130,14 +130,14 @@ jobs:
     if: always() && needs.detect-changed.result == 'success'
     runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: "Install jq"
         run: sudo apt-get install -y -qq jq
       - name: "Stage directory"
         run: mkdir -p .website/src/content/metrics/env \
                        .website/src/content/metrics/pkg
       - name: "Download changed-item artifacts"
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: "metrics-*"
           path: "_metrics_in"
@@ -176,7 +176,7 @@ jobs:
             fi
           done
       - name: "Upload staged metrics"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: "site-metrics-staged"
           path: ".website/src/content/metrics"
@@ -186,14 +186,14 @@ jobs:
     needs: ["collect-metrics"]
     runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: "npm"
           cache-dependency-path: ".website/package-lock.json"
       - name: "Download staged metrics"
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: "site-metrics-staged"
           path: ".website/src/content/metrics"
@@ -224,7 +224,7 @@ jobs:
           BASE_PATH: ${{ vars.BASE_PATH || '/' }}
         run: "npm run build"
       - name: "Upload dist artifact for the deploy job"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: "website-dist"
           path: ".website/dist"
@@ -237,11 +237,11 @@ jobs:
     permissions:
       contents: "write"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: "Download built site"
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: "website-dist"
           path: ".website/dist"
