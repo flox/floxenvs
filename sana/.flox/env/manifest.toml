@@ -1,0 +1,250 @@
+schema-version = "1.11.0"
+
+# Minimal SANA environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/sana"]
+#
+# Provides `sana-generate` and `sana-pull` CLI scripts
+# for NVIDIA SANA text-to-image inference via
+# HuggingFace `diffusers`. Models cache under
+# $FLOX_ENV_CACHE/huggingface (inherited from
+# flox/huggingface).
+#
+# Works on:
+#   - aarch64-darwin (Apple Silicon, MPS backend)
+#   - aarch64-linux  (CPU backend)
+#   - x86_64-linux   (CPU backend; CUDA if available)
+#
+# Generation on CPU takes minutes per 1024px image;
+# real-time use requires Apple Silicon or NVIDIA GPU.
+
+[include]
+environments = [
+  { remote = "flox/huggingface" }
+]
+
+[install]
+python.pkg-path = "python312"
+python.pkg-group = "sana"
+torch.pkg-path = "python312Packages.torch"
+torch.pkg-group = "sana"
+diffusers.pkg-path = "python312Packages.diffusers"
+diffusers.pkg-group = "sana"
+transformers.pkg-path = "python312Packages.transformers"
+transformers.pkg-group = "sana"
+accelerate.pkg-path = "python312Packages.accelerate"
+accelerate.pkg-group = "sana"
+sentencepiece.pkg-path = "python312Packages.sentencepiece"
+sentencepiece.pkg-group = "sana"
+pillow.pkg-path = "python312Packages.pillow"
+pillow.pkg-group = "sana"
+protobuf.pkg-path = "python312Packages.protobuf"
+protobuf.pkg-group = "sana"
+
+[vars]
+SANA_DEFAULT_MODEL = "Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers"
+
+[hook]
+on-activate = '''
+sana_dir="$FLOX_ENV_CACHE/sana"
+sana_bin="$sana_dir/bin"
+mkdir -p "$sana_bin"
+export SANA_DATA_DIR="$sana_dir"
+export PATH="$sana_bin:$PATH"
+
+# _sana_device.py: shared device/dtype selector.
+cat > "$sana_bin/_sana_device.py" <<'PYEOF'
+"""Device selection helper for SANA scripts."""
+def best_device():
+    import torch
+    if torch.cuda.is_available():
+        return "cuda", torch.bfloat16
+    if torch.backends.mps.is_available():
+        return "mps", torch.bfloat16
+    return "cpu", torch.float32
+PYEOF
+
+# sana-pull: download a SANA model into HF_HOME.
+cat > "$sana_bin/sana-pull" <<'SHEOF'
+#!/usr/bin/env bash
+set -eo pipefail
+
+CURATED=(
+  "Efficient-Large-Model/Sana_600M_1024px_diffusers"
+  "Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers"
+  "Efficient-Large-Model/Sana_1600M_2Kpx_BF16_diffusers"
+  "Efficient-Large-Model/Sana_1600M_4Kpx_BF16_diffusers"
+)
+DEFAULT="${SANA_DEFAULT_MODEL:-Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers}"
+
+usage() {
+  cat <<EOF
+sana-pull — download a SANA model into HF_HOME
+
+Usage:
+  sana-pull                # pull the default model
+  sana-pull <model-id>     # pull a specific model
+  sana-pull --list         # print curated model IDs
+  sana-pull --help         # show this message
+
+Default model: $DEFAULT
+
+Curated models:
+$(printf '  - %s\n' "${CURATED[@]}")
+EOF
+}
+
+case "${1:-}" in
+  ""|--default)
+    exec hf download "$DEFAULT"
+    ;;
+  --list)
+    printf '%s\n' "${CURATED[@]}"
+    ;;
+  -h|--help)
+    usage
+    ;;
+  -*)
+    echo "sana-pull: unknown flag: $1" >&2
+    usage >&2
+    exit 1
+    ;;
+  *)
+    exec hf download "$1"
+    ;;
+esac
+SHEOF
+chmod +x "$sana_bin/sana-pull"
+
+# sana-generate: text-to-image via SANA diffusers pipeline.
+cat > "$sana_bin/sana-generate" <<'PYEOF'
+#!/usr/bin/env python3
+"""sana-generate: text-to-image via SANA diffusers pipeline."""
+import argparse
+import os
+import sys
+import time
+from pathlib import Path
+
+_HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(_HERE))
+from _sana_device import best_device  # noqa: E402
+
+DEFAULT_MODEL = os.environ.get(
+    "SANA_DEFAULT_MODEL",
+    "Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers",
+)
+
+
+def parse_args():
+    p = argparse.ArgumentParser(
+        prog="sana-generate",
+        description=(
+            "Generate an image with NVIDIA SANA via "
+            "HuggingFace diffusers."
+        ),
+    )
+    p.add_argument("prompt", help="text prompt")
+    p.add_argument(
+        "--model",
+        default=DEFAULT_MODEL,
+        help=f"HuggingFace model ID (default: {DEFAULT_MODEL})",
+    )
+    p.add_argument(
+        "--output",
+        "-o",
+        default=None,
+        help="output path (default: sana-<unixtime>.png)",
+    )
+    p.add_argument("--width", type=int, default=1024)
+    p.add_argument("--height", type=int, default=1024)
+    p.add_argument(
+        "--steps",
+        type=int,
+        default=20,
+        help="number of inference steps",
+    )
+    p.add_argument(
+        "--guidance",
+        type=float,
+        default=4.5,
+        help="classifier-free guidance scale",
+    )
+    p.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="random seed (default: unseeded)",
+    )
+    return p.parse_args()
+
+
+def main():
+    args = parse_args()
+    import torch
+    from diffusers import SanaPipeline
+
+    device, dtype = best_device()
+    if device == "cpu":
+        print(
+            "[sana-generate] WARNING: no GPU detected. "
+            "CPU inference will take minutes per image.",
+            file=sys.stderr,
+        )
+
+    print(
+        f"[sana-generate] loading {args.model} "
+        f"on {device} ({dtype})",
+        file=sys.stderr,
+    )
+    pipe = SanaPipeline.from_pretrained(
+        args.model, torch_dtype=dtype,
+    )
+    pipe.to(device)
+    pipe.vae.to(dtype)
+    pipe.text_encoder.to(dtype)
+
+    generator = None
+    if args.seed is not None:
+        generator = torch.Generator(
+            device=device,
+        ).manual_seed(args.seed)
+
+    print(
+        f"[sana-generate] generating {args.width}x{args.height}, "
+        f"steps={args.steps}, guidance={args.guidance}",
+        file=sys.stderr,
+    )
+    image = pipe(
+        prompt=args.prompt,
+        height=args.height,
+        width=args.width,
+        guidance_scale=args.guidance,
+        num_inference_steps=args.steps,
+        generator=generator,
+    ).images[0]
+
+    output = args.output or f"sana-{int(time.time())}.png"
+    image.save(output)
+    print(output)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        sys.exit(130)
+    except SystemExit:
+        raise
+    except Exception as exc:
+        print(
+            f"[sana-generate] error: {exc}",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+PYEOF
+chmod +x "$sana_bin/sana-generate"
+'''
