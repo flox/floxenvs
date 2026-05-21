@@ -4,6 +4,7 @@
   fetchFromGitHub,
   fetchurl,
   rustPlatform,
+  cacert,
   cmake,
   pkg-config,
   openssl,
@@ -44,6 +45,7 @@ rustPlatform.buildRustPackage {
   nativeBuildInputs = [
     cmake
     pkg-config
+    rustPlatform.bindgenHook
   ];
 
   # cmake's nix hook sets CMAKE_BUILD_TYPE=Release which the
@@ -65,7 +67,12 @@ rustPlatform.buildRustPackage {
   ];
 
   # Tests need writable XDG dirs and run only goose-cli's test target.
+  # cacert provides the CA bundle for reqwest's TLS init (otherwise
+  # tests that build an HTTP client panic with "No CA certificates
+  # were loaded from the system" on Linux, where there's no system
+  # trust store in the Nix sandbox).
   doCheck = true;
+  nativeCheckInputs = [ cacert ];
   checkPhase = ''
     runHook preCheck
 
@@ -78,7 +85,12 @@ rustPlatform.buildRustPackage {
       $XDG_CONFIG_HOME $XDG_DATA_HOME \
       $XDG_STATE_HOME $XDG_CACHE_HOME
 
-    cargo test --package goose-cli --release
+    # Skip tests that require live network access (sigstore.dev for
+    # SLSA provenance verification, langfuse for tracing). These
+    # can't run in the Nix sandbox.
+    cargo test --package goose-cli --release -- \
+      --skip commands::update::tests::test_verify_provenance_warns_on_missing_attestation \
+      --skip logging::tests::test_langfuse_layer_creation
 
     runHook postCheck
   '';
