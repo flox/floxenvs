@@ -55,7 +55,10 @@ let
         });
     in
     {
-      # Overrides added in Task 4 as build failures surface.
+      # Git-sourced: uv doesn't capture the package's
+      # declared build-system requirements in the lockfile,
+      # so uv2nix builds it without setuptools available.
+      hermes-agent = addSetuptools prev.hermes-agent;
     };
 
   pythonSet =
