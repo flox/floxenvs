@@ -1,4 +1,4 @@
-{ stdenvNoCC, lib, fetchFromGitHub }:
+{ stdenvNoCC, lib, fetchFromGitHub, jq }:
 
 let
   data = builtins.fromJSON (builtins.readFile ./hashes.json);
@@ -17,11 +17,26 @@ stdenvNoCC.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
+  nativeBuildInputs = [ jq ];
+
   installPhase = ''
     runHook preInstall
+
     PLUGIN_DIR="$out/share/claude-code/plugins/session-report"
-    mkdir -p "$PLUGIN_DIR"
+    mkdir -p "$PLUGIN_DIR/.claude-plugin"
+
     cp -r "$src/plugins/session-report/." "$PLUGIN_DIR/"
+
+    # Upstream plugins/session-report/ ships LICENSE + skills/ but no
+    # .claude-plugin/plugin.json — the metadata lives in the repo-level
+    # marketplace.json. Synthesize plugin.json so Claude Code registers
+    # the plugin.
+    entry=$(jq '.plugins[] | select(.name == "session-report")' \
+      "$src/.claude-plugin/marketplace.json")
+    echo "$entry" \
+      | jq '{name, description, author, homepage}' \
+      > "$PLUGIN_DIR/.claude-plugin/plugin.json"
+
     runHook postInstall
   '';
 
