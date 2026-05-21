@@ -1,0 +1,28 @@
+schema-version = "1.11.0"
+
+[include]
+environments = [
+  { dir = "../hermes" }
+]
+
+# gum is a demo-only tool for styled terminal output.
+
+[install]
+gum.pkg-path  = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'Hermes Agent — self-improving AI from Nous Research' '' \
+    'First run:' \
+    '  hermes setup     — interactive wizard' \
+    '  hermes model     — pick a provider/model' '' \
+    'Talk to it:' \
+    '  hermes           — terminal UI' \
+    '  hermes gateway   — Telegram/Discord/Slack' '' \
+    "HERMES_HOME=$HERMES_HOME"
+fi
+'''
