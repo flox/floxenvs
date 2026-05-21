@@ -23,6 +23,12 @@ if [ -z "${HF_HOME:-}" ]; then
 fi
 echo ">>> HF_HOME=$HF_HOME"
 
+if [ ! -d "$HF_HOME" ]; then
+  echo "Error: HF_HOME directory does not exist: $HF_HOME"
+  exit 1
+fi
+echo ">>> HF_HOME directory exists"
+
 if [ -z "${SANA_DATA_DIR:-}" ]; then
   echo "Error: SANA_DATA_DIR not set."
   exit 1
@@ -43,7 +49,13 @@ echo ">>> sana-pull --help"
 sana-pull --help >/dev/null
 
 echo ">>> sana-pull --list"
-sana-pull --list
+sana_pull_list=$(sana-pull --list)
+echo "$sana_pull_list"
+if ! echo "$sana_pull_list" | grep -q "Efficient-Large-Model"; then
+  echo "Error: 'sana-pull --list' output missing curated model IDs."
+  exit 1
+fi
+echo ">>> sana-pull --list output validated"
 
 # ── Python import check ───────────────────────────────
 echo ">>> python: importing SanaPipeline"
