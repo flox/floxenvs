@@ -1,5 +1,8 @@
 # Basic Memory + Claude Code Demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fbasic-memory-demo%2Fdevcontainer.json)
+
 Interactive demo combining
 [Basic Memory](https://github.com/basicmachines-co/basic-memory)
 with Claude Code. Activating this env writes a project-scope

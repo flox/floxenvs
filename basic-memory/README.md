@@ -1,5 +1,8 @@
 # Basic Memory
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fbasic-memory%2Fdevcontainer.json)
+
 Ready-to-use [Basic Memory](https://github.com/basicmachines-co/basic-memory)
 environment — a local-first knowledge graph backed by Markdown
 notes, exposed as an MCP server for Claude Code, Cursor, ChatGPT,

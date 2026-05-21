@@ -1,5 +1,8 @@
 # lmstudio-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Flmstudio-demo%2Fdevcontainer.json)
+
 Interactive variant of [lmstudio](../lmstudio/) with a
 gum-styled onboarding banner. Shows the activation
 flow, model download, and how to point an agentic CLI

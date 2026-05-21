@@ -1,5 +1,8 @@
 # agentmemory-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fagentmemory-demo%2Fdevcontainer.json)
+
 Interactive walkthrough for the [agentmemory](../agentmemory/)
 environment. Wraps the minimal env with `gum` and prints
 a styled banner explaining how to start the backend,

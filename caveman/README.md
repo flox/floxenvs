@@ -1,5 +1,8 @@
 # Caveman
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fcaveman%2Fdevcontainer.json)
+
 Claude Code environment with the
 [caveman](https://github.com/JuliusBrussee/caveman)
 plugin pre-installed.

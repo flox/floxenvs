@@ -1,5 +1,8 @@
 # remotion
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fremotion%2Fdevcontainer.json)
+
 Minimal [Remotion](https://remotion.dev) environment. Include
 it in your own manifest to get Claude Code with the Remotion
 best-practices skill pre-registered as a plugin, plus Node.js
@@ -55,16 +58,23 @@ environments = ["flox/remotion"]
 
 ## What the skill covers
 
-| Topic | Rule file |
-| ----- | --------- |
+| Topic | Rule files |
+| ----- | ---------- |
 | Animations & timing | `timing.md`, `text-animations.md`, `transitions.md` |
-| Audio & captions | `audio.md`, `voiceover.md`, `display-captions.md`, `subtitles.md`, `import-srt-captions.md`, `transcribe-captions.md`, `silence-detection.md` |
-| Video sources | `videos.md`, `gifs.md`, `transparent-videos.md`, `trimming.md` |
+| Audio & captions | `audio.md`, `voiceover.md`, `display-captions.md`, |
+| | `subtitles.md`, `import-srt-captions.md`, |
+| | `transcribe-captions.md`, `silence-detection.md` |
+| Video sources | `videos.md`, `gifs.md`, `transparent-videos.md`, |
+| | `trimming.md` |
 | Images & fonts | `images.md`, `google-fonts.md`, `local-fonts.md` |
-| 3D & effects | `3d.md`, `lottie.md`, `light-leaks.md`, `html-in-canvas.md` |
+| 3D & effects | `3d.md`, `lottie.md`, `light-leaks.md`, |
+| | `html-in-canvas.md` |
 | Maps & charts | `maplibre.md`, `audio-visualization.md` |
-| Composition API | `compositions.md`, `sequencing.md`, `parameters.md`, `calculate-metadata.md` |
-| ffmpeg & measurement | `ffmpeg.md`, `measuring-dom-nodes.md`, `measuring-text.md`, `get-audio-duration.md`, `get-video-duration.md`, `get-video-dimensions.md` |
+| Composition API | `compositions.md`, `sequencing.md`, `parameters.md`, |
+| | `calculate-metadata.md` |
+| ffmpeg & measurement | `ffmpeg.md`, `measuring-dom-nodes.md`, |
+| | `measuring-text.md`, `get-audio-duration.md`, |
+| | `get-video-duration.md`, `get-video-dimensions.md` |
 | Styling | `tailwind.md` |
 | Misc | `sfx.md` |
 

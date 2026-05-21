@@ -1,5 +1,8 @@
 # lmstudio
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Flmstudio%2Fdevcontainer.json)
+
 Minimal LM Studio environment. LM Studio is a desktop +
 CLI tool for running local LLMs and exposing them via
 an OpenAI-compatible API.

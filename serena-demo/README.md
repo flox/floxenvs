@@ -1,5 +1,8 @@
 # serena-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fserena-demo%2Fdevcontainer.json)
+
 Interactive walkthrough for the
 [`flox/serena`](../serena/) environment. Ships a two-file
 sample Python project so you can exercise Serena's semantic

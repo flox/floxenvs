@@ -1,5 +1,8 @@
 # Bazel Demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fbazel-demo%2Fdevcontainer.json)
+
 Full Bazel environment with a sample Go application
 built via `rules_go` and wrapped in a Flox manifest
 build.

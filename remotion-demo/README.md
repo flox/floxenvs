@@ -1,5 +1,8 @@
 # remotion-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fremotion-demo%2Fdevcontainer.json)
+
 Demo variant of [remotion](../remotion) — adds `gum` for a
 styled welcome banner with quick-start commands.
 

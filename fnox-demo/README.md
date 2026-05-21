@@ -1,5 +1,8 @@
 # fnox Demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Ffnox-demo%2Fdevcontainer.json)
+
 Interactive demo of the [fnox](../fnox/) environment showing
 several ways to pull secrets into your shell.
 

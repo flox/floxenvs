@@ -1,5 +1,8 @@
 # CodeBurn Demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fcodeburn-demo%2Fdevcontainer.json)
+
 Interactive demo of the [CodeBurn](../codeburn/)
 environment with a styled banner.
 

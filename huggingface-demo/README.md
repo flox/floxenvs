@@ -1,5 +1,8 @@
 # huggingface-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fhuggingface-demo%2Fdevcontainer.json)
+
 Interactive demo for the
 [Hugging Face Hub](https://huggingface.co/) CLI. Adds
 [`gum`](https://github.com/charmbracelet/gum) on top of

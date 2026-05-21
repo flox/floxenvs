@@ -1,5 +1,8 @@
 # Bazel
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fbazel%2Fdevcontainer.json)
+
 Minimal Bazel environment providing the Bazel build
 system for use as a layer in other environments.
 
