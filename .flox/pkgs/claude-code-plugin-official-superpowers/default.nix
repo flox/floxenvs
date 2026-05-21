@@ -10,7 +10,7 @@ let
   inherit (versionData) version srcHash;
 in
 stdenv.mkDerivation {
-  pname = "claude-code-plugin-superpowers";
+  pname = "claude-code-plugin-official-superpowers";
   inherit version;
 
   src = fetchFromGitHub {
