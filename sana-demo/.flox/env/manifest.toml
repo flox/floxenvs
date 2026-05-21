@@ -60,7 +60,6 @@ def _load():
     global _pipe
     if _pipe is not None:
         return _pipe
-    import torch  # noqa: F401  (kept for symmetry)
     from diffusers import SanaPipeline
     from _sana_device import best_device
 
@@ -174,7 +173,5 @@ fi
 [services]
 sana-gradio.command = '''
 sana_bin="${SANA_DATA_DIR:-$FLOX_ENV_CACHE/sana}/bin"
-export SANA_GRADIO_HOST="${SANA_GRADIO_HOST:-127.0.0.1}"
-export SANA_GRADIO_PORT="${SANA_GRADIO_PORT:-17860}"
 exec python "$sana_bin/sana-gradio"
 '''
