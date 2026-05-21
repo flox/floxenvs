@@ -1,0 +1,16 @@
+--- a/fincept-qt/src/core/config/AppPaths.cpp	2026-05-21 02:35:17
++++ b/fincept-qt/src/core/config/AppPaths.cpp	2026-05-21 02:35:48
+@@ -11,6 +11,13 @@
+ namespace fincept {
+ 
+ QString AppPaths::root() {
++    // Flox/Nix override: allow a fully pre-provisioned install dir.
++    // When FINCEPT_INSTALL_DIR is set the runtime reads its UV / Python
++    // bootstrap state from there instead of the platform default.
++    const QString override_dir = qEnvironmentVariable("FINCEPT_INSTALL_DIR");
++    if (!override_dir.isEmpty()) {
++        return override_dir;
++    }
+ #ifdef _WIN32
+     // Use GenericDataLocation which returns %LOCALAPPDATA% directly on Windows,
+     // avoiding the fragile double-cdUp() from AppLocalDataLocation.
