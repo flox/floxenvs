@@ -396,6 +396,22 @@
           REPO_ROOT="''${REPO_ROOT:-$PWD}"
           exec bash "$REPO_ROOT/scripts/devcontainer/generate.sh" "$@"
         '';
+
+        checkDevcontainersCoverageScript = pkgs.writeShellScriptBin "check-devcontainers-coverage" ''
+          set -euo pipefail
+          export PATH="${
+            lib.makeBinPath [
+              pkgs.bash
+              pkgs.coreutils
+              pkgs.findutils
+              pkgs.gnugrep
+              pkgs.jq
+              pkgs.yj
+            ]
+          }:$PATH"
+          REPO_ROOT="''${REPO_ROOT:-$PWD}"
+          exec bash "$REPO_ROOT/scripts/devcontainer/check-coverage.sh" "$@"
+        '';
       in
       {
         packages.claude-managed = claude-managed;
@@ -409,6 +425,11 @@
         apps.generate-devcontainers = {
           type = "app";
           program = "${generateDevcontainersScript}/bin/generate-devcontainers";
+        };
+
+        apps.check-devcontainers-coverage = {
+          type = "app";
+          program = "${checkDevcontainersCoverageScript}/bin/check-devcontainers-coverage";
         };
 
         apps.run-test-claude-managed-with-nix = {

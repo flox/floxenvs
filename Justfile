@@ -23,6 +23,10 @@ validate:
 generate-devcontainers:
     nix run .#generate-devcontainers
 
+# Verify every env has a devcontainer.json or explicit skip
+check-devcontainers-coverage:
+    nix run .#check-devcontainers-coverage
+
 # Website: start the Astro dev server with hot reload
 website-dev:
     cd .website && npm ci && npm run dev

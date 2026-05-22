@@ -49,3 +49,9 @@ jobs:
             exit 1
           fi
           echo "Devcontainers are up to date."
+
+      - name: "Verify coverage invariant"
+        run: |
+          set -euo pipefail
+          nix --extra-experimental-features 'nix-command flakes' \
+            run .#check-devcontainers-coverage
