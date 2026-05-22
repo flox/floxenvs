@@ -70,4 +70,15 @@ d, dt = best_device()
 print(f'device={d} dtype={dt}')
 "
 
+# ── Linux-only CUDA-accelerated kernels ───────────────
+case "$(uname -s)" in
+  Linux)
+    echo ">>> python: importing xformers"
+    python -c "import xformers; print('xformers', xformers.__version__)"
+    ;;
+  Darwin)
+    echo ">>> skipping xformers on Darwin (Linux-only)"
+    ;;
+esac
+
 echo ">>> sana environment is working"
