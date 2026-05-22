@@ -1,0 +1,50 @@
+schema-version = "1.11.0"
+
+# Minimal Hermes Agent environment for use with [include].
+#
+# Hermes Agent is a self-improving AI agent CLI from Nous
+# Research. Run it as a terminal UI or as a messaging
+# gateway (Telegram, Discord, Slack, ...).
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/hermes"]
+#
+# Provides the `hermes` CLI, with `HERMES_HOME` anchored at
+# `$FLOX_ENV_CACHE/hermes` so skills, memory, and config
+# persist per-env without polluting `~/.hermes`.
+
+[install]
+hermes-agent.pkg-path  = "flox/hermes-agent"
+hermes-agent.pkg-group = "hermes"
+# Hermes shells out to these at runtime.
+ripgrep.pkg-path  = "ripgrep"
+ripgrep.pkg-group = "hermes"
+ffmpeg.pkg-path   = "ffmpeg"
+ffmpeg.pkg-group  = "hermes"
+git.pkg-path      = "git"
+git.pkg-group     = "hermes"
+nodejs.pkg-path   = "nodejs_22"
+nodejs.pkg-group  = "hermes"
+
+[vars]
+HERMES_HOME = ""
+
+[hook]
+on-activate = '''
+HERMES_HOME="$FLOX_ENV_CACHE/hermes"
+export HERMES_HOME
+mkdir -p "$HERMES_HOME"
+
+# Lazy-install backends (anthropic, exa, faster-whisper, ...)
+# would try to `pip install` into the read-only Nix venv and
+# fail. Seed the user config to disable them so the user
+# gets clean FeatureUnavailable errors instead of pip
+# tracebacks.
+config="$HERMES_HOME/config.yaml"
+if [ ! -f "$config" ]; then
+  printf 'security:\n  allow_lazy_installs: false\n' \
+    > "$config"
+fi
+'''

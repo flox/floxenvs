@@ -1,0 +1,9 @@
+[project]
+name = "hermes-agent-flox"
+version = "0.0.0"
+description = "Flox wrapper to lock hermes-agent"
+requires-python = ">=3.11, <3.14"
+dependencies = ["hermes-agent[all]"]
+
+[tool.uv.sources]
+hermes-agent = { git = "https://github.com/NousResearch/hermes-agent.git", tag = "v2026.5.16" }

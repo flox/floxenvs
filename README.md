@@ -127,6 +127,8 @@ Most environments follow a dual-layer pattern:
 | _└ vibe-kanban-demo_ | | [floxhub](https://hub.flox.dev/flox/vibe-kanban-demo) · [docs](vibe-kanban-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/vibe-kanban-demo-latest) |
 | serena | MCP toolkit for coding agents | [floxhub](https://hub.flox.dev/flox/serena) · [docs](serena/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/serena-latest) |
 | _└ serena-demo_ | | [floxhub](https://hub.flox.dev/flox/serena-demo) · [docs](serena-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/serena-demo-latest) |
+| hermes | Self-improving AI agent (Nous Research) | [floxhub](https://hub.flox.dev/flox/hermes) · [docs](hermes/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/hermes-latest) |
+| _└ hermes-demo_ | | [floxhub](https://hub.flox.dev/flox/hermes-demo) · [docs](hermes-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/hermes-demo-latest) |
 | codeburn | AI coding token observability TUI | [floxhub](https://hub.flox.dev/flox/codeburn) · [docs](codeburn/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/codeburn-latest) |
 | _└ codeburn-demo_ | | [floxhub](https://hub.flox.dev/flox/codeburn-demo) · [docs](codeburn-demo/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/codeburn-demo-latest) |
 | iloom | AI-assisted dev in isolated worktrees | [floxhub](https://hub.flox.dev/flox/iloom) · [docs](iloom/README.md) · [docker](https://github.com/flox/floxenvs/pkgs/container/floxenvs/iloom-latest) |
