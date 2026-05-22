@@ -162,6 +162,16 @@ let
       });
       pyside6-addons = prev.pyside6-addons.overrideAttrs (old: {
         dontWrapQtApps = true;
+        # The pyside6-addons wheel's *.abi3.so modules dlopen
+        # libpyside6.abi3.so.6.8 and libshiboken6.abi3.so.6.8, which
+        # ship inside the sibling pyside6-essentials and shiboken6
+        # site-packages dirs. auto-patchelf can't see across packages
+        # at build time, but the venv's combined site-packages makes
+        # them resolvable at runtime.
+        autoPatchelfIgnoreMissingDeps = [
+          "libpyside6.abi3.so.6.8"
+          "libshiboken6.abi3.so.6.8"
+        ];
         buildInputs =
           (old.buildInputs or [ ])
           ++ (with qt6; [
