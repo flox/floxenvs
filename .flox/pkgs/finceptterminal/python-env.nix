@@ -2,16 +2,71 @@
   lib,
   python311,
   callPackage,
-  pyproject-nix,
-  uv2nix,
-  pyproject-build-systems,
+  fetchFromGitHub,
   portaudio,
   qt6,
   libxkbcommon,
+  # pyproject-nix / uv2nix / pyproject-build-systems are optionally
+  # forwarded by callers that have them as flake inputs. When absent
+  # (e.g. `flox publish` invokes callPackage from bare nixpkgs), we
+  # fall back to fetchFromGitHub-pinned versions below. Hashes here
+  # MUST match flake.lock — see `jq '.nodes' flake.lock`.
+  pyproject-nix ? null,
+  uv2nix ? null,
+  pyproject-build-systems ? null,
 }:
 
 let
-  workspace = uv2nix.lib.workspace.loadWorkspace {
+  # Bootstrap fallback: when the caller did not supply the three
+  # uv2nix-family flake inputs, fetch them by pinned rev. The hashes
+  # are kept in sync with flake.lock; updating one requires updating
+  # the other (a follow-up task could derive these from flake.lock
+  # via jq in upgrade.sh).
+  pyproject-nix-resolved =
+    if pyproject-nix != null then
+      pyproject-nix
+    else
+      import (fetchFromGitHub {
+        owner = "pyproject-nix";
+        repo = "pyproject.nix";
+        rev = "a228447c3e179d477c1b6246ef3efa8cfe3c469a";
+        hash = "sha256-GSKXTAnFqRAMlZkJrIPcQMYf+lpMr66K3i60mB9STvc=";
+      }) { inherit lib; };
+
+  uv2nix-resolved =
+    if uv2nix != null then
+      uv2nix
+    else
+      import
+        (fetchFromGitHub {
+          owner = "pyproject-nix";
+          repo = "uv2nix";
+          rev = "69aec536f6d1acc415ed2e20299312802aba98c6";
+          hash = "sha256-P1LHCRdYpdtHAEzuEsNHrI6d9mVPl5a2fyFDZGHNVbI=";
+        })
+        {
+          pyproject-nix = pyproject-nix-resolved;
+          inherit lib;
+        };
+
+  pyproject-build-systems-resolved =
+    if pyproject-build-systems != null then
+      pyproject-build-systems
+    else
+      import
+        (fetchFromGitHub {
+          owner = "pyproject-nix";
+          repo = "build-system-pkgs";
+          rev = "ffaa2161dd5d63e0e94591f86b54fc239660fb2e";
+          hash = "sha256-qapCOQmR++yZSY43dzrp3wCrkOTLpod+ONtJWBk6iKU=";
+        })
+        {
+          pyproject-nix = pyproject-nix-resolved;
+          uv2nix = uv2nix-resolved;
+          inherit lib;
+        };
+
+  workspace = uv2nix-resolved.lib.workspace.loadWorkspace {
     workspaceRoot = ./python;
   };
 
@@ -107,7 +162,13 @@ let
       # system Qt 6 — auto-patchelf can't find libQt6Core/libQt6Gui/etc.
       # We inject the matching nixpkgs Qt 6 libs so the runtime closure
       # is complete. libxkbcommon covers a separate xkb plugin dep.
+      #
+      # dontWrapQtApps disables nixpkgs's Qt-wrapper hook that would
+      # otherwise fail with "this derivation depends on qtbase, but no
+      # wrapping behavior was specified" — the wheel is a Python pkg
+      # not a Qt application, so the auto-wrapping doesn't apply.
       pyside6-essentials = prev.pyside6-essentials.overrideAttrs (old: {
+        dontWrapQtApps = true;
         buildInputs =
           (old.buildInputs or [ ])
           ++ (with qt6; [
@@ -122,6 +183,7 @@ let
           ++ [ libxkbcommon ];
       });
       pyside6-addons = prev.pyside6-addons.overrideAttrs (old: {
+        dontWrapQtApps = true;
         buildInputs =
           (old.buildInputs or [ ])
           ++ (with qt6; [
@@ -142,12 +204,12 @@ let
     };
 
   pythonSet =
-    (callPackage pyproject-nix.build.packages {
+    (callPackage pyproject-nix-resolved.build.packages {
       python = python311;
     }).overrideScope
       (
         lib.composeManyExtensions [
-          pyproject-build-systems.overlays.wheel
+          pyproject-build-systems-resolved.overlays.wheel
           overlay
           pyprojectOverrides
         ]
