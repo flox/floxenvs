@@ -143,6 +143,11 @@ let
       # not a Qt application, so the auto-wrapping doesn't apply.
       pyside6-essentials = prev.pyside6-essentials.overrideAttrs (old: {
         dontWrapQtApps = true;
+        # Every .abi3.so in the wheel dlopens libshiboken6.abi3.so.6.8,
+        # which ships in the sibling shiboken6 package. Same
+        # cross-package issue as pyside6-addons — the merged venv
+        # site-packages resolves it at runtime.
+        autoPatchelfIgnoreMissingDeps = true;
         buildInputs =
           (old.buildInputs or [ ])
           ++ (with qt6; [
