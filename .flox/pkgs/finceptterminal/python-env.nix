@@ -225,5 +225,10 @@ in
     "lib/python3.11/site-packages/README*"
     "lib/python3.11/site-packages/tests/*"
     "lib/python3.11/site-packages/tests"
+    # akracer (0.0.14) re-ships the py_mini_racer module under the
+    # same import path as py-mini-racer (0.6.0); whichever the venv
+    # picks first wins.
+    "lib/python3.11/site-packages/py_mini_racer/*"
+    "lib/python3.11/site-packages/py_mini_racer"
   ];
 })
