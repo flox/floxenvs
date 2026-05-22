@@ -179,7 +179,27 @@ common.overrideAttrs (old: {
     # FINCEPT_INSTALL_DIR still wins.
     cat > "$out/bin/finceptterminal" <<WRAPPER
     #!${stdenv.shell}
-    export FINCEPT_INSTALL_DIR="\''${FINCEPT_INSTALL_DIR:-$install_dir}"
+    # The install-dir under \$out/ contains both immutable bits (uv,
+    # python, venv-numpy{1,2}, sentinel) AND mutable bits the runtime
+    # later wants to populate (workspace.db, logs/, cache/, models/,
+    # workspaces/, crashdumps/, ...). The Nix store is read-only, so
+    # we mirror the immutable entries into a per-user writable copy
+    # and point FINCEPT_INSTALL_DIR at the writable side. The flox
+    # env sets FINCEPT_DATA_DIR to \$FLOX_ENV_CACHE/finceptterminal in
+    # its on-activate hook; we use it when present and otherwise fall
+    # back to \$XDG_DATA_HOME (or \$HOME/.local/share).
+    nix_install_dir="$install_dir"
+    data_dir="\''${FINCEPT_DATA_DIR:-\''${XDG_DATA_HOME:-\$HOME/.local/share}/finceptterminal}"
+    user_install_dir="\''${FINCEPT_INSTALL_DIR:-\$data_dir/install-dir}"
+    mkdir -p "\$user_install_dir"
+    for entry in .fincept-nix-managed uv python venv-numpy1 venv-numpy2; do
+      target="\$nix_install_dir/\$entry"
+      link="\$user_install_dir/\$entry"
+      if [ -e "\$target" ] && [ ! -e "\$link" ]; then
+        ln -s "\$target" "\$link"
+      fi
+    done
+    export FINCEPT_INSTALL_DIR="\$user_install_dir"
     export QT_PLUGIN_PATH="$out/lib/qt-6/plugins\''${QT_PLUGIN_PATH:+:\$QT_PLUGIN_PATH}"
     export QT_QPA_PLATFORM_PLUGIN_PATH="$out/lib/qt-6/plugins/platforms\''${QT_QPA_PLATFORM_PLUGIN_PATH:+:\$QT_QPA_PLATFORM_PLUGIN_PATH}"
     export LD_LIBRARY_PATH="${

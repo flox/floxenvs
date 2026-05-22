@@ -146,7 +146,23 @@ common.overrideAttrs (old: {
     mkdir -p "$out/bin"
     cat > "$out/bin/finceptterminal" <<WRAPPER
     #!${stdenv.shell}
-    export FINCEPT_INSTALL_DIR="\''${FINCEPT_INSTALL_DIR:-$install_dir}"
+    # See linux.nix for the rationale — install-dir holds both
+    # immutable bits (uv, python, venv-numpy{1,2}, sentinel) and
+    # mutable bits (workspace.db, logs/, cache/, ...). The Nix store
+    # is read-only, so mirror the immutable entries into a per-user
+    # writable copy and point FINCEPT_INSTALL_DIR there.
+    nix_install_dir="$install_dir"
+    data_dir="\''${FINCEPT_DATA_DIR:-\''${XDG_DATA_HOME:-\$HOME/.local/share}/finceptterminal}"
+    user_install_dir="\''${FINCEPT_INSTALL_DIR:-\$data_dir/install-dir}"
+    mkdir -p "\$user_install_dir"
+    for entry in .fincept-nix-managed uv python venv-numpy1 venv-numpy2; do
+      target="\$nix_install_dir/\$entry"
+      link="\$user_install_dir/\$entry"
+      if [ -e "\$target" ] && [ ! -e "\$link" ]; then
+        ln -s "\$target" "\$link"
+      fi
+    done
+    export FINCEPT_INSTALL_DIR="\$user_install_dir"
     export DYLD_LIBRARY_PATH="${
       lib.makeLibraryPath [
         openssl
