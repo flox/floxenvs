@@ -1,5 +1,8 @@
 # playwright
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fplaywright%2Fdevcontainer.json)
+
 Minimal Playwright environment. Provides the
 Playwright library and test runner, browser drivers,
 [Microsoft's `playwright-cli`](https://github.com/microsoft/playwright-cli),

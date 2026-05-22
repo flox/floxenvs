@@ -1,5 +1,8 @@
 # gstack
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fgstack%2Fdevcontainer.json)
+
 Ready-to-use environment for [gstack][upstream] —
 Garry Tan's Claude Code stack of 45 opinionated skills
 covering planning, design, QA, code review, security,

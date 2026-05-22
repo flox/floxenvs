@@ -1,5 +1,8 @@
 # graphify-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fgraphify-demo%2Fdevcontainer.json)
+
 Full [graphify](https://github.com/safishamsi/graphify)
 demo environment with a styled terminal banner showing
 the common commands.

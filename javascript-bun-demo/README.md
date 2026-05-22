@@ -1,5 +1,8 @@
 # javascript-bun-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fjavascript-bun-demo%2Fdevcontainer.json)
+
 Demo environment that extends
 [javascript-bun](../javascript-bun/) with a sample project
 and interactive UI tools.

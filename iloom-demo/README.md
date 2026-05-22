@@ -1,5 +1,8 @@
 # iloom Demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Filoom-demo%2Fdevcontainer.json)
+
 Interactive demo of the [iloom](../iloom/) environment with
 a styled banner showing the most-used commands.
 

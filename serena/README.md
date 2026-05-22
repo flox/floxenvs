@@ -1,5 +1,8 @@
 # serena
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fserena%2Fdevcontainer.json)
+
 Minimal Serena environment. Provides the
 [Serena](https://github.com/oraios/serena) CLI and the
 `serena-mcp` background service for exposing Serena's MCP
@@ -31,16 +34,16 @@ environments = ["flox/serena"]
 | Package | Description |
 | ------- | ----------- |
 | `flox/serena` | The `serena` and `serena-hooks` CLIs |
-| `nodejs_20`   | Runtime for Serena's bundled Pyright LSP |
+| `nodejs_20` | Runtime for Serena's bundled Pyright LSP |
 
 ## Configuration variables
 
 | Variable | Default | Description |
 | -------- | ------- | ----------- |
-| `SERENA_MCP_HOST`  | `127.0.0.1` | MCP server bind address |
-| `SERENA_MCP_PORT`  | `19121`     | MCP server port (ADR-003) |
-| `SERENA_TRANSPORT` | `sse`       | `sse` or `stdio` |
-| `SERENA_DATA_DIR`  | `$FLOX_ENV_CACHE/serena` | State / cache root |
+| `SERENA_MCP_HOST` | `127.0.0.1` | MCP server bind address |
+| `SERENA_MCP_PORT` | `19121` | MCP server port (ADR-003) |
+| `SERENA_TRANSPORT` | `sse` | `sse` or `stdio` |
+| `SERENA_DATA_DIR` | `$FLOX_ENV_CACHE/serena` | State / cache root |
 
 Override any in your own manifest before
 `[include]`-ing this environment.

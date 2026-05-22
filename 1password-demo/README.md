@@ -1,5 +1,8 @@
 # 1Password Demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2F1password-demo%2Fdevcontainer.json)
+
 Interactive demo of the 1Password CLI environment. This
 environment includes the minimal `1password` base layer
 and adds a welcome banner with usage instructions.

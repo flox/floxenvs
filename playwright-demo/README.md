@@ -1,5 +1,8 @@
 # playwright-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fplaywright-demo%2Fdevcontainer.json)
+
 Interactive walkthrough for the `flox/playwright`
 environment. Ships a tiny sample test that exercises
 `demo.playwright.dev/todomvc` so you can verify the

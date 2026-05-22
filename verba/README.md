@@ -1,5 +1,8 @@
 # verba
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fverba%2Fdevcontainer.json)
+
 Minimal Verba RAG environment. Include it in your
 own manifest to get Weaviate, Ollama, and the Verba
 application with sane defaults.

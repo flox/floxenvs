@@ -1,5 +1,8 @@
 # javascript-node
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fjavascript-node%2Fdevcontainer.json)
+
 Minimal Node.js + npm environment with automatic dependency
 installation. Designed for use as an `[include]` base layer.
 

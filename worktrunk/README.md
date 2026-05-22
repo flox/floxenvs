@@ -1,5 +1,8 @@
 # Worktrunk
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fworktrunk%2Fdevcontainer.json)
+
 Ready-to-use [Worktrunk](https://worktrunk.dev) environment.
 Worktrunk is a CLI for git worktree management, designed for
 running AI coding agents (Claude Code, Codex, Gemini CLI, ...)
@@ -34,7 +37,7 @@ regardless of what the consuming environment provides.
 
 | Variable | Default | Purpose |
 | -------- | ------- | ------- |
-| `WORKTRUNK_CACHE` | `$FLOX_ENV_CACHE/worktrunk` | Scratch dir scoped to this env |
+| `WORKTRUNK_CACHE` | `$FLOX_ENV_CACHE/worktrunk` | Scratch dir for this env |
 
 Worktrunk's own configuration lives in the host repo's
 `.git/config` and in user-level files under

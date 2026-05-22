@@ -1,5 +1,8 @@
 # Rust Demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Frust-demo%2Fdevcontainer.json)
+
 Full Rust development environment with editor tooling and
 a sample application. Built on top of the minimal
 [rust](../rust/) environment via `[include]`.

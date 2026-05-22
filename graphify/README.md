@@ -1,5 +1,8 @@
 # graphify
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fgraphify%2Fdevcontainer.json)
+
 Minimal [graphify](https://github.com/safishamsi/graphify)
 environment. Include it in your own manifest to get
 Python 3.11, the `graphify` CLI, and Claude Code with

@@ -1,5 +1,8 @@
 # mongodb-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fmongodb-demo%2Fdevcontainer.json)
+
 Full MongoDB demo environment with an interactive
 client and styled terminal UI. Includes the MongoDB
 server (via the minimal [mongodb](../mongodb/) layer),

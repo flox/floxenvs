@@ -1,5 +1,8 @@
 # Claude Code
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fclaude%2Fdevcontainer.json)
+
 Ready-to-use Claude Code environment with
 managed configuration.
 

@@ -1,5 +1,8 @@
 # agentmemory
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fagentmemory%2Fdevcontainer.json)
+
 Minimal [agentmemory](https://github.com/rohitg00/agentmemory)
 environment. Include it in your own manifest to get
 Claude Code wired up with the agentmemory plugin plus
@@ -43,7 +46,7 @@ environments = ["flox/agentmemory"]
 | ------- | ----------- |
 | `flox/claude-code` | Claude Code CLI |
 | `flox/claude-managed` | Plugin discovery + config assembly |
-| `flox/claude-code-plugin-agentmemory` | Plugin (13 hooks, 8 skills, MCP shim) |
+| `flox/claude-code-plugin-agentmemory` | Plugin (13 hooks, 8 skills, MCP) |
 | `nodejs_20` | Runtime for the REST backend |
 
 The plugin tree lands under
@@ -56,7 +59,8 @@ consumer's PATH.
 
 | Service | Description |
 | ------- | ----------- |
-| `agentmemory` | REST + MCP backend (port `3111`) launched via `npx @agentmemory/agentmemory@$AGENTMEMORY_VERSION` |
+| `agentmemory` | REST + MCP backend (port `3111`) via |
+| | `npx @agentmemory/agentmemory@$AGENTMEMORY_VERSION` |
 
 Start it:
 
@@ -74,9 +78,9 @@ SQLite state and the npm cache live under
 
 | Variable | Default | Description |
 | -------- | ------- | ----------- |
-| `AGENTMEMORY_URL` | `http://localhost:3111` | REST endpoint the plugin hooks talk to |
-| `AGENTMEMORY_INJECT_CONTEXT` | `true` | When `"true"`, SessionStart injects context |
-| `AGENTMEMORY_VERSION` | `0.9.20` | Pinned upstream server version pulled via `npx` |
+| `AGENTMEMORY_URL` | `http://localhost:3111` | REST endpoint hooks talk to |
+| `AGENTMEMORY_INJECT_CONTEXT` | `true` | Injects context on SessionStart |
+| `AGENTMEMORY_VERSION` | `0.9.20` | Pinned server version for `npx` |
 | `AGENTMEMORY_SECRET` | _(unset)_ | Bearer token sent to the REST endpoint |
 
 Override in your own manifest:

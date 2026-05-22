@@ -1,5 +1,8 @@
 # dotenv
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fdotenv%2Fdevcontainer.json)
+
 Automatically load environment variables from a `.env` file
 on Flox activation.
 

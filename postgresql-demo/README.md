@@ -1,5 +1,8 @@
 # postgresql-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fpostgresql-demo%2Fdevcontainer.json)
+
 Full PostgreSQL demo environment that walks you through
 configuration options, version selection, and service
 management with Flox.

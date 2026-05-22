@@ -1,0 +1,34 @@
+{
+  "name": "valkey",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu26.04",
+  "workspaceFolder": "/workspaces/floxenvs/valkey",
+  "runArgs": [
+    "--security-opt",
+    "seccomp=unconfined"
+  ],
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
+  },
+  "mounts": [
+    "source=floxenvs-nix-store,target=/nix,type=volume"
+  ],
+  "forwardPorts": [],
+  "portsAttributes": {},
+  "containerEnv": {
+    "FLOX_DISABLE_METRICS": "true",
+    "FLOX_VERSION": "v1.12.1",
+    "NIX_REMOTE": "auto"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "flox.flox"
+      ]
+    }
+  },
+  "postCreateCommand": "bash /workspaces/floxenvs/.devcontainer/scripts/post-create.sh valkey",
+  "postStartCommand": "bash /workspaces/floxenvs/.devcontainer/scripts/post-start.sh valkey",
+  "remoteUser": "root"
+}

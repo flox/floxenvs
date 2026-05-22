@@ -1,5 +1,8 @@
 # mysql
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fmysql%2Fdevcontainer.json)
+
 Minimal MySQL 8.4 server environment for use with Flox
 `[include]`.
 

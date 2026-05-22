@@ -1,5 +1,8 @@
 # redis
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fredis%2Fdevcontainer.json)
+
 Minimal Redis environment. Include it in your own
 manifest to get a working Redis server and CLI with
 sane defaults.

@@ -1,5 +1,8 @@
 # temporal
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Ftemporal%2Fdevcontainer.json)
+
 Temporal dev server with SQLite storage and built-in
 Web UI. Bundles two Flox-packaged binaries:
 

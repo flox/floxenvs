@@ -1,5 +1,8 @@
 # fnox
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Ffnox%2Fdevcontainer.json)
+
 Minimal [fnox](https://fnox.jdx.dev/) environment. fnox
 ("Fort Knox") manages secrets via encryption (age, AWS/Azure/
 GCP KMS) or cloud providers (1Password, Bitwarden, HashiCorp

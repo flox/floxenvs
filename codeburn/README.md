@@ -1,5 +1,8 @@
 # CodeBurn
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fcodeburn%2Fdevcontainer.json)
+
 Ready-to-use [CodeBurn](https://github.com/getagentseal/codeburn)
 environment. CodeBurn is an interactive TUI dashboard that
 shows where your AI coding tokens go — by task type, model,

@@ -19,6 +19,14 @@ list-envs:
 validate:
     bash scripts/discover-envs.sh --validate
 
+# Generate per-env devcontainer configs into .devcontainer/
+generate-devcontainers:
+    nix run .#generate-devcontainers
+
+# Verify every env has a devcontainer.json or explicit skip
+check-devcontainers-coverage:
+    nix run .#check-devcontainers-coverage
+
 # Website: start the Astro dev server with hot reload
 website-dev:
     cd .website && npm ci && npm run dev

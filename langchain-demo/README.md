@@ -1,5 +1,8 @@
 # langchain-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Flangchain-demo%2Fdevcontainer.json)
+
 Full LangChain demo environment that walks you through
 using LangGraph, LangChain-Ollama, and LangChain-Community
 with a local Ollama service managed by Flox.

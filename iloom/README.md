@@ -1,5 +1,8 @@
 # iloom
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Filoom%2Fdevcontainer.json)
+
 Ready-to-use [iloom](https://github.com/iloom-ai/iloom-cli)
 environment. iloom is a developer workflow system that runs
 Claude Code in isolated git worktrees and persists the AI's

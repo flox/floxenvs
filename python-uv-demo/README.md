@@ -1,5 +1,8 @@
 # python-uv-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fpython-uv-demo%2Fdevcontainer.json)
+
 Demo project showing Python + uv with automatic virtual
 environment management, powered by the
 [python-uv](../python-uv) base environment.

@@ -1,5 +1,8 @@
 # python-poetry-demo
 
+<!-- codespaces-badge -->
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fpython-poetry-demo%2Fdevcontainer.json)
+
 Demo project showing Python + Poetry with automatic virtual
 environment management, powered by the
 [python-poetry](../python-poetry) base environment.
