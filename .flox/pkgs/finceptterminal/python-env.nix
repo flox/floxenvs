@@ -230,5 +230,12 @@ in
     # picks first wins.
     "lib/python3.11/site-packages/py_mini_racer/*"
     "lib/python3.11/site-packages/py_mini_racer"
+    # The nvidia-*-cu12 / nvidia-*-cu13 sibling packages overlap on
+    # the shared `nvidia/` namespace and its include/lib subtrees
+    # (e.g. nvidia/nccl/include/nccl.h). uv installs the same way;
+    # first-wins is fine because the runtime never invokes the
+    # CUDA bits in this environment.
+    "lib/python3.11/site-packages/nvidia/*"
+    "lib/python3.11/site-packages/nvidia"
   ];
 })
