@@ -72,18 +72,23 @@ let
   # NVIDIA wheels bundle CUDA-toolchain-internal .so files that
   # depend on other NVIDIA libs (libnvJitLink, libcublas, libcusparse,
   # libmlx5, libibverbs, libucp, etc.) which aren't available outside
-  # a CUDA toolchain install. Since the FinceptTerminal Python runtime
-  # never invokes the GPU bits (the C++ Qt app is the user-facing
-  # surface; Python is for analytics), missing CUDA-internal deps at
-  # patchelf time are harmless.
+  # a CUDA toolchain install. The Linux torch wheel ships the same
+  # CUDA-linked .so files inside its own package (libtorch_cuda.so,
+  # libtorch_cuda_linalg.so, libtorch_nvshmem.so, libtorch_python.so).
+  # Since the FinceptTerminal Python runtime never invokes the GPU
+  # bits (the C++ Qt app is the user-facing surface; Python is for
+  # analytics), missing CUDA-internal deps at patchelf time are
+  # harmless on both nvidia-* and torch-family packages.
   #
-  # Rather than listing every nvidia-* package individually, we
-  # discover them from `prev` and apply the override uniformly.
-  ignoreNvidiaPatchelf =
+  # Rather than listing every offender individually, we discover them
+  # from `prev` and apply the override uniformly.
+  ignoreCudaPatchelf =
     prev:
     let
-      isNvidia = name: lib.hasPrefix "nvidia-" name;
-      names = builtins.filter isNvidia (builtins.attrNames prev);
+      isCuda =
+        name:
+        lib.hasPrefix "nvidia-" name || name == "torch" || name == "torchaudio" || name == "torchvision";
+      names = builtins.filter isCuda (builtins.attrNames prev);
       mk = name: {
         ${name} = prev.${name}.overrideAttrs (_: {
           autoPatchelfIgnoreMissingDeps = true;
@@ -96,7 +101,7 @@ let
   # entry should document *why* it's here.
   pyprojectOverrides =
     final: prev:
-    (ignoreNvidiaPatchelf prev)
+    (ignoreCudaPatchelf prev)
     // {
       # Pure-Python sdist-only packages missing a build-system declaration.
       gym = needsSetuptools final prev "gym";
@@ -173,8 +178,8 @@ let
           ];
       });
 
-      # All nvidia-* packages are handled by ignoreNvidiaPatchelf above
-      # (applied via `(ignoreNvidiaPatchelf prev) // { ... }`). Explicit
+      # All nvidia-* packages are handled by ignoreCudaPatchelf above
+      # (applied via `(ignoreCudaPatchelf prev) // { ... }`). Explicit
       # nvidia-* entries below would override that; we don't need any.
     };
 
