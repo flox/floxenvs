@@ -162,16 +162,17 @@ let
       });
       pyside6-addons = prev.pyside6-addons.overrideAttrs (old: {
         dontWrapQtApps = true;
-        # The pyside6-addons wheel's *.abi3.so modules dlopen
-        # libpyside6.abi3.so.6.8 and libshiboken6.abi3.so.6.8, which
-        # ship inside the sibling pyside6-essentials and shiboken6
-        # site-packages dirs. auto-patchelf can't see across packages
-        # at build time, but the venv's combined site-packages makes
-        # them resolvable at runtime.
-        autoPatchelfIgnoreMissingDeps = [
-          "libpyside6.abi3.so.6.8"
-          "libshiboken6.abi3.so.6.8"
-        ];
+        # The pyside6-addons wheel pulls in a long tail of optional Qt
+        # modules (WebEngine, Nfc, Quick3D, Speech, Multimedia plugins)
+        # whose bundled .so files reference cross-package libs
+        # (libpyside6.abi3.so, libshiboken6.abi3.so), bundled Qt libs
+        # the wheel ships at PySide6/Qt/lib/ but auto-patchelf doesn't
+        # see, and a grab-bag of system libs (libXdamage, libXrandr,
+        # libasound, libxshmfence, libpcsclite, libspeechd, …). The
+        # venv resolves all of these at runtime via co-located libs
+        # and standard LD search paths, so we suppress the
+        # build-time auto-patchelf check uniformly.
+        autoPatchelfIgnoreMissingDeps = true;
         buildInputs =
           (old.buildInputs or [ ])
           ++ (with qt6; [
