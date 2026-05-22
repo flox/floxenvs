@@ -47,15 +47,26 @@ Variables inherited from
 
 ## Performance notes
 
-| System | Backend | First request | Subsequent |
-| ------ | ------- | ------------- | ---------- |
-| Apple Silicon | MPS | 30-60s (load) | seconds |
-| NVIDIA + CUDA | CUDA | 10-20s (load) | sub-second |
-| CPU-only | CPU | minutes (load) | minutes |
+| System              | Backend           | First request  | Subsequent       |
+| ------------------- | ----------------- | -------------- | ---------------- |
+| Linux + NVIDIA      | CUDA              | 10-20s (load)  | sub-second/image |
+| Linux (no GPU)      | CPU               | minutes (load) | minutes/image    |
+| macOS Apple Silicon | CPU (MPS broken)  | minutes (load) | minutes/image    |
 
 The first generation pays a model-load cost. The web
 UI loads the model lazily on the first click of
 "Generate".
+
+On Mac, MPS currently crashes — set `SANA_FORCE_CPU=1`
+before activating to skip the broken MPS path:
+
+```sh
+SANA_FORCE_CPU=1 flox activate -r flox/sana-demo
+flox services start sana-gradio
+```
+
+See [`sana/README.md` known issues](../sana/README.md#known-issues)
+for details.
 
 ## See also
 
