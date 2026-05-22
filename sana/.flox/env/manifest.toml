@@ -14,12 +14,15 @@ schema-version = "1.11.0"
 # flox/huggingface).
 #
 # Works on:
-#   - aarch64-darwin (Apple Silicon, MPS backend)
-#   - aarch64-linux  (CPU backend)
-#   - x86_64-linux   (CPU backend; CUDA if available)
+#   - x86_64-linux   (CUDA: torch + transformers from
+#                    flox-cuda; xformers + flash-attn
+#                    from nixpkgs)
+#   - aarch64-linux  (same as x86_64-linux)
+#   - aarch64-darwin (CPU-only; MPS crashes on macOS
+#                    26.x + torch 2.9.x — see README)
 #
 # Generation on CPU takes minutes per 1024px image;
-# real-time use requires Apple Silicon or NVIDIA GPU.
+# real-time use requires Linux + NVIDIA GPU.
 
 [include]
 environments = [
@@ -27,21 +30,43 @@ environments = [
 ]
 
 [install]
-python.pkg-path = "python312"
+python.pkg-path = "python313"
 python.pkg-group = "sana"
-torch.pkg-path = "python312Packages.torch"
+
+# Torch: CUDA-built on Linux, nixpkgs on Darwin (both 2.9.1)
+torch.pkg-path = "flox-cuda/python3Packages.torch"
+torch.version = "2.9.1"
 torch.pkg-group = "sana"
-diffusers.pkg-path = "python312Packages.diffusers"
-diffusers.pkg-group = "sana"
-transformers.pkg-path = "python312Packages.transformers"
+torch.systems = ["x86_64-linux", "aarch64-linux"]
+
+torch-darwin.pkg-path = "python313Packages.torch"
+torch-darwin.pkg-group = "sana"
+torch-darwin.systems = ["aarch64-darwin"]
+
+# Transformers: CUDA-built on Linux, nixpkgs on Darwin
+transformers.pkg-path = "flox-cuda/python3Packages.transformers"
 transformers.pkg-group = "sana"
-accelerate.pkg-path = "python312Packages.accelerate"
+transformers.systems = ["x86_64-linux", "aarch64-linux"]
+
+transformers-darwin.pkg-path = "python313Packages.transformers"
+transformers-darwin.pkg-group = "sana"
+transformers-darwin.systems = ["aarch64-darwin"]
+
+# Linux-only CUDA kernels (no Darwin entry)
+xformers.pkg-path = "python313Packages.xformers"
+xformers.pkg-group = "sana"
+xformers.systems = ["x86_64-linux", "aarch64-linux"]
+
+# Pure-python (universal): py3.12 -> py3.13 path bump only
+diffusers.pkg-path = "python313Packages.diffusers"
+diffusers.pkg-group = "sana"
+accelerate.pkg-path = "python313Packages.accelerate"
 accelerate.pkg-group = "sana"
-sentencepiece.pkg-path = "python312Packages.sentencepiece"
+sentencepiece.pkg-path = "python313Packages.sentencepiece"
 sentencepiece.pkg-group = "sana"
-pillow.pkg-path = "python312Packages.pillow"
+pillow.pkg-path = "python313Packages.pillow"
 pillow.pkg-group = "sana"
-protobuf.pkg-path = "python312Packages.protobuf"
+protobuf.pkg-path = "python313Packages.protobuf"
 protobuf.pkg-group = "sana"
 
 [vars]
@@ -59,7 +84,9 @@ export PATH="$sana_bin:$PATH"
 cat > "$sana_bin/_sana_device.py" <<'PYEOF'
 """Device selection helper for SANA scripts."""
 def best_device():
-    import torch
+    import os, torch
+    if os.environ.get("SANA_FORCE_CPU") == "1":
+        return "cpu", torch.float32
     if torch.cuda.is_available():
         return "cuda", torch.bfloat16
     if torch.backends.mps.is_available():
@@ -206,6 +233,12 @@ def main():
     pipe.to(device)
     pipe.vae.to(dtype)
     pipe.text_encoder.to(dtype)
+
+    if device == "cuda":
+        try:
+            pipe.enable_xformers_memory_efficient_attention()
+        except (ImportError, ModuleNotFoundError):
+            pass
 
     generator = None
     if args.seed is not None:
