@@ -84,16 +84,13 @@ also works — pass it to `sana-pull MODEL_ID` or
 | `SANA_DATA_DIR` | `$FLOX_ENV_CACHE/sana` | per-env data + script staging |
 | `HF_HOME` | `$FLOX_ENV_CACHE/huggingface` | model cache (inherited) |
 
-## Backend support
+## Platform support
 
-| System | Backend | Speed for 1024px |
-| ------ | ------- | ---------------- |
-| `aarch64-darwin` (M-series, 16 GB+) | MPS (bfloat16) | seconds |
-| `x86_64-linux` with NVIDIA + drivers | CUDA (bfloat16) | seconds |
-| `x86_64-linux` or `aarch64-linux` CPU-only | CPU (float32) | minutes |
-
-CPU inference works but is slow. For real-time use,
-prefer Apple Silicon or NVIDIA hardware.
+| System              | Backend           | Speed                       | Notes                                                                                                        |
+| ------------------- | ----------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Linux + NVIDIA      | CUDA              | sub-second/image after load | First-class. flox-cuda torch + transformers; nixpkgs xformers; PyTorch SDPA handles flash-attention-2.      |
+| Linux (no GPU)      | CPU               | minutes/image               | Same env, falls back automatically.                                                                          |
+| macOS Apple Silicon | CPU (MPS broken)  | minutes/image               | See "Known issues" below.                                                                                    |
 
 ## What's not included
 
@@ -102,10 +99,28 @@ The following are out of scope and require the
 upstream NVlabs/Sana conda environment:
 
 - Training pipelines
-- `flash-attn`, `xformers`, `triton` custom kernels
+- `triton` custom kernels
 - 4-bit / 8-bit quantization (Nunchaku, bitsandbytes)
 - SANA-Video, SANA-Sprint, SANA-WM pipelines
 - ControlNet variants
+
+## Known issues
+
+### MPS hard-crashes on macOS 26.x + torch 2.9.x
+
+SANA's pipeline SIGTRAPs at the first inference call on
+MPS regardless of dtype (bf16, fp16, fp32) and regardless
+of `PYTORCH_ENABLE_MPS_FALLBACK`. The CPU path works
+correctly. Set `SANA_FORCE_CPU=1` to skip the MPS attempt
+entirely:
+
+```sh
+SANA_FORCE_CPU=1 sana-generate "a red frog"
+```
+
+This is an upstream SANA + Metal kernel incompatibility,
+not a flox env issue. Real-time generation on a Mac is
+not currently possible.
 
 ## See also
 
