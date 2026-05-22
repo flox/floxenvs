@@ -37,9 +37,7 @@
 
         symphony = pkgs.callPackage ./.flox/pkgs/symphony/default.nix { };
 
-        finceptterminal = pkgs.callPackage ./.flox/pkgs/finceptterminal/default.nix {
-          inherit (inputs) pyproject-nix uv2nix pyproject-build-systems;
-        };
+        finceptterminal = pkgs.callPackage ./.flox/pkgs/finceptterminal/default.nix { };
 
         batsWithLibs = pkgs.bats.withLibraries (p: [
           p.bats-support

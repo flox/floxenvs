@@ -1,72 +1,41 @@
 {
   lib,
+  stdenv,
   python311,
   callPackage,
-  fetchFromGitHub,
   portaudio,
   qt6,
   libxkbcommon,
-  # pyproject-nix / uv2nix / pyproject-build-systems are optionally
-  # forwarded by callers that have them as flake inputs. When absent
-  # (e.g. `flox publish` invokes callPackage from bare nixpkgs), we
-  # fall back to fetchFromGitHub-pinned versions below. Hashes here
-  # MUST match flake.lock — see `jq '.nodes' flake.lock`.
-  pyproject-nix ? null,
-  uv2nix ? null,
-  pyproject-build-systems ? null,
 }:
 
 let
-  # Bootstrap fallback: when the caller did not supply the three
-  # uv2nix-family flake inputs, fetch them by pinned rev. The hashes
-  # are kept in sync with flake.lock; updating one requires updating
-  # the other (a follow-up task could derive these from flake.lock
-  # via jq in upgrade.sh).
-  pyproject-nix-resolved =
-    if pyproject-nix != null then
-      pyproject-nix
-    else
-      import (fetchFromGitHub {
-        owner = "pyproject-nix";
-        repo = "pyproject.nix";
-        rev = "a228447c3e179d477c1b6246ef3efa8cfe3c469a";
-        hash = "sha256-GSKXTAnFqRAMlZkJrIPcQMYf+lpMr66K3i60mB9STvc=";
-      }) { inherit lib; };
+  # Build the three uv2nix Nix libraries directly from their
+  # sibling wrapper packages. Each wrapper is a fixed-output
+  # derivation that fetches the upstream repo via fetchFromGitHub
+  # and exports the source under $out/<libname>/. This matches the
+  # serena / basic-memory pattern and works uniformly under
+  # `flox build` and `flox publish` (neither of which pass flake
+  # inputs).
+  pyproject-nix-pkg = callPackage ../pyproject-nix { };
+  uv2nix-pkg = callPackage ../uv2nix { };
+  pyproject-build-systems-pkg = callPackage ../pyproject-build-systems { };
 
-  uv2nix-resolved =
-    if uv2nix != null then
-      uv2nix
-    else
-      import
-        (fetchFromGitHub {
-          owner = "pyproject-nix";
-          repo = "uv2nix";
-          rev = "69aec536f6d1acc415ed2e20299312802aba98c6";
-          hash = "sha256-P1LHCRdYpdtHAEzuEsNHrI6d9mVPl5a2fyFDZGHNVbI=";
-        })
-        {
-          pyproject-nix = pyproject-nix-resolved;
-          inherit lib;
-        };
+  pyproject-nix-lib = import "${pyproject-nix-pkg}/pyproject-nix" {
+    inherit lib;
+  };
 
-  pyproject-build-systems-resolved =
-    if pyproject-build-systems != null then
-      pyproject-build-systems
-    else
-      import
-        (fetchFromGitHub {
-          owner = "pyproject-nix";
-          repo = "build-system-pkgs";
-          rev = "ffaa2161dd5d63e0e94591f86b54fc239660fb2e";
-          hash = "sha256-qapCOQmR++yZSY43dzrp3wCrkOTLpod+ONtJWBk6iKU=";
-        })
-        {
-          pyproject-nix = pyproject-nix-resolved;
-          uv2nix = uv2nix-resolved;
-          inherit lib;
-        };
+  uv2nix-module = import "${uv2nix-pkg}/uv2nix" {
+    inherit lib;
+    pyproject-nix = pyproject-nix-lib;
+  };
 
-  workspace = uv2nix-resolved.lib.workspace.loadWorkspace {
+  build-systems-overlays = import "${pyproject-build-systems-pkg}/pyproject-build-systems" {
+    inherit lib;
+    uv2nix = uv2nix-module;
+    pyproject-nix = pyproject-nix-lib;
+  };
+
+  workspace = uv2nix-module.lib.workspace.loadWorkspace {
     workspaceRoot = ./python;
   };
 
@@ -176,11 +145,15 @@ let
             qtdeclarative
             qtmultimedia
             qtwebsockets
-            qtwayland
             qtsvg
             qttools
           ])
-          ++ [ libxkbcommon ];
+          # qtwayland / libxkbcommon are Linux-only — qtwayland.meta
+          # explicitly excludes Darwin and libxkbcommon is X11 stack.
+          ++ lib.optionals stdenv.hostPlatform.isLinux [
+            qt6.qtwayland
+            libxkbcommon
+          ];
       });
       pyside6-addons = prev.pyside6-addons.overrideAttrs (old: {
         dontWrapQtApps = true;
@@ -191,11 +164,13 @@ let
             qtdeclarative
             qtmultimedia
             qtwebsockets
-            qtwayland
             qtsvg
             qttools
           ])
-          ++ [ libxkbcommon ];
+          ++ lib.optionals stdenv.hostPlatform.isLinux [
+            qt6.qtwayland
+            libxkbcommon
+          ];
       });
 
       # All nvidia-* packages are handled by ignoreNvidiaPatchelf above
@@ -204,15 +179,30 @@ let
     };
 
   pythonSet =
-    (callPackage pyproject-nix-resolved.build.packages {
+    (callPackage pyproject-nix-lib.build.packages {
       python = python311;
     }).overrideScope
       (
         lib.composeManyExtensions [
-          pyproject-build-systems-resolved.overlays.wheel
+          build-systems-overlays.overlays.wheel
           overlay
           pyprojectOverrides
         ]
       );
 in
-pythonSet.mkVirtualEnv "finceptterminal-python-env" workspace.deps.default
+# Sloppy wheels in the FinceptTerminal dep graph ship top-level
+# files inside site-packages (LICENSE.txt, tests/ trees, etc.) that
+# collide between packages. uv tolerates these because it links
+# package-at-a-time; pyproject-nix's mkVirtualEnv merges all packages
+# into one tree and refuses on non-identical file collisions. We
+# allow first-wins for LICENSE/README/tests at site-packages root,
+# which mirrors uv's de-facto behavior. mkVirtualenvFlags is rebuilt
+# from finalAttrs.venvIgnoreCollisions automatically.
+(pythonSet.mkVirtualEnv "finceptterminal-python-env" workspace.deps.default).overrideAttrs (old: {
+  venvIgnoreCollisions = (old.venvIgnoreCollisions or [ ]) ++ [
+    "lib/python3.11/site-packages/LICENSE*"
+    "lib/python3.11/site-packages/README*"
+    "lib/python3.11/site-packages/tests/*"
+    "lib/python3.11/site-packages/tests"
+  ];
+})

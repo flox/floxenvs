@@ -1,18 +1,12 @@
 {
   stdenv,
   callPackage,
-  pyproject-nix,
-  uv2nix,
-  pyproject-build-systems,
-  ...
-}@args:
+}:
 
 let
   pythonEnv =
     if builtins.pathExists ./python-env.nix then
-      callPackage ./python-env.nix {
-        inherit pyproject-nix uv2nix pyproject-build-systems;
-      }
+      callPackage ./python-env.nix { }
     else
       throw "finceptterminal: python-env.nix pending Task 6.3";
 in
