@@ -6,6 +6,8 @@
   darwin,
   openssl,
   expat,
+  libiconv,
+  libiconvReal,
   uv,
   pythonEnv,
 }:
@@ -40,6 +42,55 @@ common.overrideAttrs (old: {
     "${qt6.qtbase}/bin/macdeployqt" \
       "$out/Applications/FinceptTerminal.app" \
       -verbose=1 || true
+
+    # Dual libiconv fix: the Nix dep graph mixes two libiconv ABIs.
+    # Apple's libiconv exports `_iconv*` (libcups, libglib, libintl,
+    # libodbc link against this — compat version 7.0.0) and GNU
+    # libiconv exports `_libiconv*` (libgnutls, libidn2, libunistring,
+    # … — compat version 10.0.0). macdeployqt collapses both into a
+    # single `libiconv.2.dylib`, so half the consumers crash at first
+    # launch with `Symbol not found: _iconv` or `_libiconv`.
+    #
+    # Workaround: ship both libiconvs side by side (the GNU build at
+    # the canonical name, Apple's at `libiconv-apple.2.dylib`) and
+    # rewrite the load command on every Apple-ABI consumer to point at
+    # the alternate file. Distinguishing the two is straightforward —
+    # the compat-version field in the install_name differs (7 vs 10).
+    frameworks="$out/Applications/FinceptTerminal.app/Contents/Frameworks"
+    if [ -e "$frameworks/libiconv.2.dylib" ]; then
+      chmod -R u+w "$frameworks"
+
+      # Drop in the GNU build at the canonical path.
+      cp -f ${libiconvReal}/lib/libiconv.2.dylib \
+            "$frameworks/libiconv.2.dylib"
+      chmod u+w "$frameworks/libiconv.2.dylib"
+      install_name_tool -id @executable_path/../Frameworks/libiconv.2.dylib \
+        "$frameworks/libiconv.2.dylib"
+
+      # Drop in Apple's build under an alternate filename.
+      cp -f ${libiconv}/lib/libiconv.2.dylib \
+            "$frameworks/libiconv-apple.2.dylib"
+      chmod u+w "$frameworks/libiconv-apple.2.dylib"
+      install_name_tool -id @executable_path/../Frameworks/libiconv-apple.2.dylib \
+        "$frameworks/libiconv-apple.2.dylib"
+
+      # Rewrite the load command on Apple-ABI consumers. The compat
+      # version is encoded in `otool -L` as `(compatibility version
+      # 7.0.0, current version 7.0.0)` — match on that to identify the
+      # consumers without hardcoding a list.
+      for dylib in "$frameworks"/*.dylib; do
+        [ "$dylib" = "$frameworks/libiconv.2.dylib" ] && continue
+        [ "$dylib" = "$frameworks/libiconv-apple.2.dylib" ] && continue
+        if otool -L "$dylib" 2>/dev/null | \
+            grep -q 'Frameworks/libiconv.2.dylib (compatibility version 7'; then
+          chmod u+w "$dylib"
+          install_name_tool -change \
+            @executable_path/../Frameworks/libiconv.2.dylib \
+            @executable_path/../Frameworks/libiconv-apple.2.dylib \
+            "$dylib"
+        fi
+      done
+    fi
 
     # Re-sign ad-hoc after bundle modification.
     /usr/bin/codesign --force --deep --sign - \
