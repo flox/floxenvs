@@ -71,7 +71,7 @@ render_one() {
     --argjson extensions "$extensions" \
     '{
       name: $display_name,
-      image: ("ghcr.io/flox/flox:" + $flox_version),
+      image: "mcr.microsoft.com/devcontainers/base:ubuntu26.04",
       workspaceFolder: ("/workspaces/floxenvs/" + $env_dir),
       runArgs: ["--security-opt", "seccomp=unconfined"],
       hostRequirements: {
@@ -82,7 +82,11 @@ render_one() {
       mounts: ["source=floxenvs-nix-store,target=/nix,type=volume"],
       forwardPorts: $forward_ports,
       portsAttributes: $ports_attributes,
-      containerEnv: { FLOX_DISABLE_METRICS: "true" },
+      containerEnv: {
+        FLOX_DISABLE_METRICS: "true",
+        FLOX_VERSION: $flox_version,
+        NIX_REMOTE: "auto"
+      },
       customizations: { vscode: { extensions: $extensions } },
       postCreateCommand: ("bash /workspaces/floxenvs/.devcontainer/scripts/post-create.sh " + $env_dir),
       postStartCommand: ("bash /workspaces/floxenvs/.devcontainer/scripts/post-start.sh " + $env_dir),

@@ -1,6 +1,6 @@
 {
   "name": "__DISPLAY_NAME__",
-  "image": "ghcr.io/flox/flox:__FLOX_VERSION__",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu26.04",
   "workspaceFolder": "/workspaces/floxenvs/__ENV_DIR__",
   "runArgs": [
     "--security-opt", "seccomp=unconfined"
@@ -16,7 +16,9 @@
   "forwardPorts": __FORWARD_PORTS__,
   "portsAttributes": __PORTS_ATTRIBUTES__,
   "containerEnv": {
-    "FLOX_DISABLE_METRICS": "true"
+    "FLOX_DISABLE_METRICS": "true",
+    "FLOX_VERSION": "__FLOX_VERSION__",
+    "NIX_REMOTE": "auto"
   },
   "customizations": {
     "vscode": {

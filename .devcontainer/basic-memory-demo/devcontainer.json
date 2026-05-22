@@ -1,6 +1,6 @@
 {
   "name": "basic-memory-demo",
-  "image": "ghcr.io/flox/flox:v1.12.1",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu26.04",
   "workspaceFolder": "/workspaces/floxenvs/basic-memory-demo",
   "runArgs": [
     "--security-opt",
@@ -17,7 +17,9 @@
   "forwardPorts": [],
   "portsAttributes": {},
   "containerEnv": {
-    "FLOX_DISABLE_METRICS": "true"
+    "FLOX_DISABLE_METRICS": "true",
+    "FLOX_VERSION": "v1.12.1",
+    "NIX_REMOTE": "auto"
   },
   "customizations": {
     "vscode": {

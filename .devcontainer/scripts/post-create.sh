@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 #
 # Runs once after the devcontainer is built.
-# - Symlinks the nix glibc loader + libs at FHS paths so
-#   VS Code Remote Server's glibc-linked node can exec on
-#   the Nix-only flox image.
+# - Installs flox from the official Debian package (the
+#   base image is mcr.microsoft.com/devcontainers/base:
+#   ubuntu26.04, so VS Code Remote Server, sshd, node etc.
+#   all work out of the box).
 # - Pre-resolves and downloads the env's packages so the
 #   first VS Code shell doesn't sit on a cold nix pull.
 # - Adds an auto-activate snippet to /root/.bashrc so VS
@@ -19,47 +20,28 @@ WS_ENV="/workspaces/floxenvs/$ENV_DIR"
 git config --global --add safe.directory \
   /workspaces/floxenvs
 
-# VS Code Remote Server ships a prebuilt, glibc-linked
-# node. The flox image is Nix-only (no /lib64, no FHS
-# libs), so the ELF interpreter lookup fails and the
-# workbench reports "failed to start vs code remote
-# server". Point the canonical loader + libc paths at
-# nix glibc / gcc-lib so it can exec.
-case "$(uname -m)" in
-  x86_64)  LDR=ld-linux-x86-64.so.2 ; LDR_DIR=/lib64 ;;
-  aarch64) LDR=ld-linux-aarch64.so.1 ; LDR_DIR=/lib  ;;
-  *)       LDR= ; LDR_DIR= ;;
-esac
-NIX_GLIBC=
-for c in /nix/store/*-glibc-2*; do
-  case "$c" in *-bin|*-dev|*-debug|*-static) continue;; esac
-  [ -e "$c/lib/$LDR" ] || continue
-  NIX_GLIBC="$c/lib"
-  break
-done
-NIX_GCC=
-for c in /nix/store/*-gcc-*-lib*/lib; do
-  [ -e "$c/libstdc++.so.6" ] || continue
-  NIX_GCC="$c"
-  break
-done
-if [ -n "$LDR" ] && [ -n "$NIX_GLIBC" ]; then
-  mkdir -p "$LDR_DIR" /lib /usr/lib
-  ln -sf "$NIX_GLIBC/$LDR" "$LDR_DIR/$LDR"
-  for lib in libc.so.6 libdl.so.2 libpthread.so.0 \
-             librt.so.1 libm.so.6 libresolv.so.2 \
-             libutil.so.1 libnsl.so.1; do
-    [ -e "$NIX_GLIBC/$lib" ] || continue
-    ln -sf "$NIX_GLIBC/$lib" "/lib/$lib"
-    ln -sf "$NIX_GLIBC/$lib" "/usr/lib/$lib"
-  done
-  if [ -n "$NIX_GCC" ]; then
-    for lib in libstdc++.so.6 libgcc_s.so.1; do
-      [ -e "$NIX_GCC/$lib" ] || continue
-      ln -sf "$NIX_GCC/$lib" "/lib/$lib"
-      ln -sf "$NIX_GCC/$lib" "/usr/lib/$lib"
-    done
-  fi
+# Install flox from the official .deb if not already
+# present. The /nix store is on a named volume, so on
+# container rebuild flox-as-binary is gone but the store
+# payload is preserved — dpkg -i is idempotent and fast
+# in that case.
+if ! command -v flox >/dev/null 2>&1; then
+  : "${FLOX_VERSION:?FLOX_VERSION must be set in containerEnv}"
+  case "$(uname -m)" in
+    x86_64)  ARCH=x86_64  ;;
+    aarch64) ARCH=aarch64 ;;
+    *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
+  esac
+  # downloads.flox.dev URLs use the bare version without
+  # the "v" prefix that the flake.nix tag carries.
+  VER="${FLOX_VERSION#v}"
+  DEB_URL="https://downloads.flox.dev/by-env/stable/deb/flox-${VER}.${ARCH}-linux.deb"
+  echo "Installing flox ${VER} for ${ARCH} from ${DEB_URL}"
+  curl --fail --location --silent --show-error \
+    -o /tmp/flox.deb "$DEB_URL"
+  DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    /tmp/flox.deb
+  rm -f /tmp/flox.deb
 fi
 
 # Pre-resolve. The `-- true` form runs activation hooks
