@@ -36,6 +36,18 @@ common.overrideAttrs (old: {
     portaudio
   ];
 
+  # We copy the binary directly out of $build_dir at installPhase
+  # instead of letting cmake run its install step. Without this flag
+  # the binary keeps cmake's BUILD_RPATH (which points back into
+  # $build_dir/_deps/*), and stdenv's reference scan rejects it.
+  # `CMAKE_BUILD_WITH_INSTALL_RPATH=ON` makes cmake bake the
+  # install-tree RPATH straight into the build-tree binary, which is
+  # exactly what we want here — and it costs nothing because we never
+  # run the binary from the build dir.
+  cmakeFlags = old.cmakeFlags ++ [
+    "-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON"
+  ];
+
   # We bypass CPack/IFW (that builds the upstream installer, not
   # what we want here) and install the binary + Qt plugins +
   # resources manually.
