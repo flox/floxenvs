@@ -20,7 +20,7 @@ environments = [
 [install]
 gum.pkg-path = "gum"
 gum.pkg-group = "demo-tools"
-gradio.pkg-path = "python312Packages.gradio"
+gradio.pkg-path = "python313Packages.gradio"
 gradio.pkg-group = "sana"
 
 [vars]
@@ -75,6 +75,11 @@ def _load():
     pipe.to(device)
     pipe.vae.to(dtype)
     pipe.text_encoder.to(dtype)
+    if device == "cuda":
+        try:
+            pipe.enable_xformers_memory_efficient_attention()
+        except (ImportError, ModuleNotFoundError):
+            pass
     _pipe = pipe
     return pipe
 

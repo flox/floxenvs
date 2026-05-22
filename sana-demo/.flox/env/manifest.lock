@@ -4,15 +4,15 @@
     "schema-version": "1.11.0",
     "install": {
       "accelerate": {
-        "pkg-path": "python312Packages.accelerate",
+        "pkg-path": "python313Packages.accelerate",
         "pkg-group": "sana"
       },
       "diffusers": {
-        "pkg-path": "python312Packages.diffusers",
+        "pkg-path": "python313Packages.diffusers",
         "pkg-group": "sana"
       },
       "gradio": {
-        "pkg-path": "python312Packages.gradio",
+        "pkg-path": "python313Packages.gradio",
         "pkg-group": "sana"
       },
       "gum": {
@@ -24,28 +24,59 @@
         "pkg-group": "huggingface"
       },
       "pillow": {
-        "pkg-path": "python312Packages.pillow",
+        "pkg-path": "python313Packages.pillow",
         "pkg-group": "sana"
       },
       "protobuf": {
-        "pkg-path": "python312Packages.protobuf",
+        "pkg-path": "python313Packages.protobuf",
         "pkg-group": "sana"
       },
       "python": {
-        "pkg-path": "python312",
+        "pkg-path": "python313",
         "pkg-group": "sana"
       },
       "sentencepiece": {
-        "pkg-path": "python312Packages.sentencepiece",
+        "pkg-path": "python313Packages.sentencepiece",
         "pkg-group": "sana"
       },
       "torch": {
-        "pkg-path": "python312Packages.torch",
-        "pkg-group": "sana"
+        "pkg-path": "flox-cuda/python3Packages.torch",
+        "pkg-group": "sana",
+        "version": "2.9.1",
+        "systems": [
+          "x86_64-linux",
+          "aarch64-linux"
+        ]
+      },
+      "torch-darwin": {
+        "pkg-path": "python313Packages.torch",
+        "pkg-group": "sana",
+        "systems": [
+          "aarch64-darwin"
+        ]
       },
       "transformers": {
-        "pkg-path": "python312Packages.transformers",
-        "pkg-group": "sana"
+        "pkg-path": "flox-cuda/python3Packages.transformers",
+        "pkg-group": "sana",
+        "systems": [
+          "x86_64-linux",
+          "aarch64-linux"
+        ]
+      },
+      "transformers-darwin": {
+        "pkg-path": "python313Packages.transformers",
+        "pkg-group": "sana",
+        "systems": [
+          "aarch64-darwin"
+        ]
+      },
+      "xformers": {
+        "pkg-path": "python313Packages.xformers",
+        "pkg-group": "sana",
+        "systems": [
+          "x86_64-linux",
+          "aarch64-linux"
+        ]
       }
     },
     "vars": {
@@ -55,7 +86,7 @@
       "SANA_GRADIO_PORT": "17860"
     },
     "hook": {
-      "on-activate": "HF_HOME=\"$FLOX_ENV_CACHE/huggingface\"\nexport HF_HOME\nmkdir -p \"$HF_HOME\"\n\nsana_dir=\"$FLOX_ENV_CACHE/sana\"\nsana_bin=\"$sana_dir/bin\"\nmkdir -p \"$sana_bin\"\nexport SANA_DATA_DIR=\"$sana_dir\"\nexport PATH=\"$sana_bin:$PATH\"\n\n# _sana_device.py: shared device/dtype selector.\ncat > \"$sana_bin/_sana_device.py\" <<'PYEOF'\n\"\"\"Device selection helper for SANA scripts.\"\"\"\ndef best_device():\n    import torch\n    if torch.cuda.is_available():\n        return \"cuda\", torch.bfloat16\n    if torch.backends.mps.is_available():\n        return \"mps\", torch.bfloat16\n    return \"cpu\", torch.float32\nPYEOF\n\n# sana-pull: download a SANA model into HF_HOME.\ncat > \"$sana_bin/sana-pull\" <<'SHEOF'\n#!/usr/bin/env bash\nset -eo pipefail\n\nCURATED=(\n  \"Efficient-Large-Model/Sana_600M_1024px_diffusers\"\n  \"Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers\"\n  \"Efficient-Large-Model/Sana_1600M_2Kpx_BF16_diffusers\"\n  \"Efficient-Large-Model/Sana_1600M_4Kpx_BF16_diffusers\"\n)\nDEFAULT=\"${SANA_DEFAULT_MODEL:-Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers}\"\n\nusage() {\n  cat <<EOF\nsana-pull — download a SANA model into HF_HOME\n\nUsage:\n  sana-pull                # pull the default model\n  sana-pull <model-id>     # pull a specific model\n  sana-pull --list         # print curated model IDs\n  sana-pull --help         # show this message\n\nDefault model: $DEFAULT\n\nCurated models:\n$(printf '  - %s\\n' \"${CURATED[@]}\")\nEOF\n}\n\ncase \"${1:-}\" in\n  \"\"|--default)\n    exec hf download \"$DEFAULT\"\n    ;;\n  --list)\n    printf '%s\\n' \"${CURATED[@]}\"\n    ;;\n  -h|--help)\n    usage\n    ;;\n  -*)\n    echo \"sana-pull: unknown flag: $1\" >&2\n    usage >&2\n    exit 1\n    ;;\n  *)\n    exec hf download \"$1\"\n    ;;\nesac\nSHEOF\nchmod +x \"$sana_bin/sana-pull\"\n\n# sana-generate: text-to-image via SANA diffusers pipeline.\ncat > \"$sana_bin/sana-generate\" <<'PYEOF'\n#!/usr/bin/env python3\n\"\"\"sana-generate: text-to-image via SANA diffusers pipeline.\"\"\"\nimport argparse\nimport os\nimport sys\nimport time\nfrom pathlib import Path\n\n_HERE = Path(__file__).resolve().parent\nsys.path.insert(0, str(_HERE))\nfrom _sana_device import best_device  # noqa: E402\n\nDEFAULT_MODEL = os.environ.get(\n    \"SANA_DEFAULT_MODEL\",\n    \"Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers\",\n)\n\n\ndef parse_args():\n    p = argparse.ArgumentParser(\n        prog=\"sana-generate\",\n        description=(\n            \"Generate an image with NVIDIA SANA via \"\n            \"HuggingFace diffusers.\"\n        ),\n    )\n    p.add_argument(\"prompt\", help=\"text prompt\")\n    p.add_argument(\n        \"--model\",\n        default=DEFAULT_MODEL,\n        help=f\"HuggingFace model ID (default: {DEFAULT_MODEL})\",\n    )\n    p.add_argument(\n        \"--output\",\n        \"-o\",\n        default=None,\n        help=\"output path (default: sana-<unixtime>.png)\",\n    )\n    p.add_argument(\"--width\", type=int, default=1024)\n    p.add_argument(\"--height\", type=int, default=1024)\n    p.add_argument(\n        \"--steps\",\n        type=int,\n        default=20,\n        help=\"number of inference steps\",\n    )\n    p.add_argument(\n        \"--guidance\",\n        type=float,\n        default=4.5,\n        help=\"classifier-free guidance scale\",\n    )\n    p.add_argument(\n        \"--seed\",\n        type=int,\n        default=None,\n        help=\"random seed (default: unseeded)\",\n    )\n    return p.parse_args()\n\n\ndef main():\n    args = parse_args()\n    import torch\n    from diffusers import SanaPipeline\n\n    device, dtype = best_device()\n    if device == \"cpu\":\n        print(\n            \"[sana-generate] WARNING: no GPU detected. \"\n            \"CPU inference will take minutes per image.\",\n            file=sys.stderr,\n        )\n\n    print(\n        f\"[sana-generate] loading {args.model} \"\n        f\"on {device} ({dtype})\",\n        file=sys.stderr,\n    )\n    pipe = SanaPipeline.from_pretrained(\n        args.model, torch_dtype=dtype,\n    )\n    pipe.to(device)\n    pipe.vae.to(dtype)\n    pipe.text_encoder.to(dtype)\n\n    generator = None\n    if args.seed is not None:\n        generator = torch.Generator(\n            device=device,\n        ).manual_seed(args.seed)\n\n    print(\n        f\"[sana-generate] generating {args.width}x{args.height}, \"\n        f\"steps={args.steps}, guidance={args.guidance}\",\n        file=sys.stderr,\n    )\n    image = pipe(\n        prompt=args.prompt,\n        height=args.height,\n        width=args.width,\n        guidance_scale=args.guidance,\n        num_inference_steps=args.steps,\n        generator=generator,\n    ).images[0]\n\n    output = args.output or f\"sana-{int(time.time())}.png\"\n    image.save(output)\n    print(output)\n\n\nif __name__ == \"__main__\":\n    try:\n        main()\n    except KeyboardInterrupt:\n        sys.exit(130)\n    except SystemExit:\n        raise\n    except Exception as exc:\n        print(\n            f\"[sana-generate] error: {exc}\",\n            file=sys.stderr,\n        )\n        sys.exit(2)\nPYEOF\nchmod +x \"$sana_bin/sana-generate\"\n\nsana_bin=\"${SANA_DATA_DIR:-$FLOX_ENV_CACHE/sana}/bin\"\nmkdir -p \"$sana_bin\"\n\ncat > \"$sana_bin/sana-gradio\" <<'PYEOF'\n#!/usr/bin/env python3\n\"\"\"sana-gradio: Gradio web UI for SANA text-to-image.\"\"\"\nimport os\nimport sys\nfrom pathlib import Path\n\nHOST = os.environ.get(\"SANA_GRADIO_HOST\", \"127.0.0.1\")\nPORT = int(os.environ.get(\"SANA_GRADIO_PORT\", \"17860\"))\nDEFAULT_MODEL = os.environ.get(\n    \"SANA_DEFAULT_MODEL\",\n    \"Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers\",\n)\nSKIP_LOAD = os.environ.get(\"SANA_SKIP_LOAD\", \"\") == \"1\"\n\n_HERE = Path(__file__).resolve().parent\nsys.path.insert(0, str(_HERE))\n\nimport gradio as gr  # noqa: E402\n\n_pipe = None\n\n\ndef _load():\n    \"\"\"Lazily load the SANA pipeline on first call.\"\"\"\n    global _pipe\n    if _pipe is not None:\n        return _pipe\n    from diffusers import SanaPipeline\n    from _sana_device import best_device\n\n    device, dtype = best_device()\n    print(\n        f\"[sana-gradio] loading {DEFAULT_MODEL} \"\n        f\"on {device} ({dtype})\",\n        file=sys.stderr,\n    )\n    pipe = SanaPipeline.from_pretrained(\n        DEFAULT_MODEL, torch_dtype=dtype,\n    )\n    pipe.to(device)\n    pipe.vae.to(dtype)\n    pipe.text_encoder.to(dtype)\n    _pipe = pipe\n    return pipe\n\n\ndef generate(prompt, steps, guidance, seed, width, height):\n    import torch\n    pipe = _load()\n    device = next(pipe.transformer.parameters()).device.type\n    gen = None\n    if seed is not None and int(seed) >= 0:\n        gen = torch.Generator(device=device).manual_seed(int(seed))\n    image = pipe(\n        prompt=prompt,\n        height=int(height),\n        width=int(width),\n        guidance_scale=float(guidance),\n        num_inference_steps=int(steps),\n        generator=gen,\n    ).images[0]\n    return image\n\n\ndef build_ui():\n    with gr.Blocks(title=\"SANA\") as demo:\n        gr.Markdown(\"# SANA Text-to-Image\")\n        prompt = gr.Textbox(label=\"Prompt\", lines=2)\n        with gr.Row():\n            steps = gr.Slider(\n                1, 50, value=20, step=1, label=\"Steps\",\n            )\n            guidance = gr.Slider(\n                1.0, 10.0, value=4.5, label=\"Guidance\",\n            )\n        with gr.Row():\n            width = gr.Slider(\n                512, 2048, value=1024, step=64, label=\"Width\",\n            )\n            height = gr.Slider(\n                512, 2048, value=1024, step=64, label=\"Height\",\n            )\n        seed = gr.Number(\n            value=-1, label=\"Seed (-1 = random)\", precision=0,\n        )\n        button = gr.Button(\"Generate\")\n        out = gr.Image(label=\"Result\")\n        button.click(\n            generate,\n            [prompt, steps, guidance, seed, width, height],\n            out,\n        )\n    return demo\n\n\ndef build_skip_load_ui():\n    with gr.Blocks(title=\"SANA (test mode)\") as demo:\n        gr.Markdown(\n            \"## SANA test mode\\n\"\n            \"SANA_SKIP_LOAD=1 — model not loaded.\"\n        )\n    return demo\n\n\ndef main():\n    demo = build_skip_load_ui() if SKIP_LOAD else build_ui()\n    print(\n        f\"[sana-gradio] starting on http://{HOST}:{PORT} \"\n        f\"(skip_load={SKIP_LOAD})\",\n        file=sys.stderr,\n    )\n    demo.launch(\n        server_name=HOST,\n        server_port=PORT,\n        inbrowser=False,\n    )\n\n\nif __name__ == \"__main__\":\n    main()\nPYEOF\nchmod +x \"$sana_bin/sana-gradio\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center --width 60 \\\n    --margin \"1\" --padding \"1 4\" \\\n    \"SANA demo\" \\\n    \"\" \\\n    \"Pull a model:    sana-pull\" \\\n    \"Generate:        sana-generate \\\"your prompt\\\"\" \\\n    \"Web UI:          flox services start sana-gradio\" \\\n    \"                 then open http://${SANA_GRADIO_HOST}:${SANA_GRADIO_PORT}\"\nfi\n"
+      "on-activate": "HF_HOME=\"$FLOX_ENV_CACHE/huggingface\"\nexport HF_HOME\nmkdir -p \"$HF_HOME\"\n\nsana_dir=\"$FLOX_ENV_CACHE/sana\"\nsana_bin=\"$sana_dir/bin\"\nmkdir -p \"$sana_bin\"\nexport SANA_DATA_DIR=\"$sana_dir\"\nexport PATH=\"$sana_bin:$PATH\"\n\n# _sana_device.py: shared device/dtype selector.\ncat > \"$sana_bin/_sana_device.py\" <<'PYEOF'\n\"\"\"Device selection helper for SANA scripts.\"\"\"\ndef best_device():\n    import os, torch\n    if os.environ.get(\"SANA_FORCE_CPU\") == \"1\":\n        return \"cpu\", torch.float32\n    if torch.cuda.is_available():\n        return \"cuda\", torch.bfloat16\n    if torch.backends.mps.is_available():\n        return \"mps\", torch.bfloat16\n    return \"cpu\", torch.float32\nPYEOF\n\n# sana-pull: download a SANA model into HF_HOME.\ncat > \"$sana_bin/sana-pull\" <<'SHEOF'\n#!/usr/bin/env bash\nset -eo pipefail\n\nCURATED=(\n  \"Efficient-Large-Model/Sana_600M_1024px_diffusers\"\n  \"Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers\"\n  \"Efficient-Large-Model/Sana_1600M_2Kpx_BF16_diffusers\"\n  \"Efficient-Large-Model/Sana_1600M_4Kpx_BF16_diffusers\"\n)\nDEFAULT=\"${SANA_DEFAULT_MODEL:-Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers}\"\n\nusage() {\n  cat <<EOF\nsana-pull — download a SANA model into HF_HOME\n\nUsage:\n  sana-pull                # pull the default model\n  sana-pull <model-id>     # pull a specific model\n  sana-pull --list         # print curated model IDs\n  sana-pull --help         # show this message\n\nDefault model: $DEFAULT\n\nCurated models:\n$(printf '  - %s\\n' \"${CURATED[@]}\")\nEOF\n}\n\ncase \"${1:-}\" in\n  \"\"|--default)\n    exec hf download \"$DEFAULT\"\n    ;;\n  --list)\n    printf '%s\\n' \"${CURATED[@]}\"\n    ;;\n  -h|--help)\n    usage\n    ;;\n  -*)\n    echo \"sana-pull: unknown flag: $1\" >&2\n    usage >&2\n    exit 1\n    ;;\n  *)\n    exec hf download \"$1\"\n    ;;\nesac\nSHEOF\nchmod +x \"$sana_bin/sana-pull\"\n\n# sana-generate: text-to-image via SANA diffusers pipeline.\ncat > \"$sana_bin/sana-generate\" <<'PYEOF'\n#!/usr/bin/env python3\n\"\"\"sana-generate: text-to-image via SANA diffusers pipeline.\"\"\"\nimport argparse\nimport os\nimport sys\nimport time\nfrom pathlib import Path\n\n_HERE = Path(__file__).resolve().parent\nsys.path.insert(0, str(_HERE))\nfrom _sana_device import best_device  # noqa: E402\n\nDEFAULT_MODEL = os.environ.get(\n    \"SANA_DEFAULT_MODEL\",\n    \"Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers\",\n)\n\n\ndef parse_args():\n    p = argparse.ArgumentParser(\n        prog=\"sana-generate\",\n        description=(\n            \"Generate an image with NVIDIA SANA via \"\n            \"HuggingFace diffusers.\"\n        ),\n    )\n    p.add_argument(\"prompt\", help=\"text prompt\")\n    p.add_argument(\n        \"--model\",\n        default=DEFAULT_MODEL,\n        help=f\"HuggingFace model ID (default: {DEFAULT_MODEL})\",\n    )\n    p.add_argument(\n        \"--output\",\n        \"-o\",\n        default=None,\n        help=\"output path (default: sana-<unixtime>.png)\",\n    )\n    p.add_argument(\"--width\", type=int, default=1024)\n    p.add_argument(\"--height\", type=int, default=1024)\n    p.add_argument(\n        \"--steps\",\n        type=int,\n        default=20,\n        help=\"number of inference steps\",\n    )\n    p.add_argument(\n        \"--guidance\",\n        type=float,\n        default=4.5,\n        help=\"classifier-free guidance scale\",\n    )\n    p.add_argument(\n        \"--seed\",\n        type=int,\n        default=None,\n        help=\"random seed (default: unseeded)\",\n    )\n    return p.parse_args()\n\n\ndef main():\n    args = parse_args()\n    import torch\n    from diffusers import SanaPipeline\n\n    device, dtype = best_device()\n    if device == \"cpu\":\n        print(\n            \"[sana-generate] WARNING: no GPU detected. \"\n            \"CPU inference will take minutes per image.\",\n            file=sys.stderr,\n        )\n\n    print(\n        f\"[sana-generate] loading {args.model} \"\n        f\"on {device} ({dtype})\",\n        file=sys.stderr,\n    )\n    pipe = SanaPipeline.from_pretrained(\n        args.model, torch_dtype=dtype,\n    )\n    pipe.to(device)\n    pipe.vae.to(dtype)\n    pipe.text_encoder.to(dtype)\n\n    if device == \"cuda\":\n        try:\n            pipe.enable_xformers_memory_efficient_attention()\n        except (ImportError, ModuleNotFoundError):\n            pass\n\n    generator = None\n    if args.seed is not None:\n        generator = torch.Generator(\n            device=device,\n        ).manual_seed(args.seed)\n\n    print(\n        f\"[sana-generate] generating {args.width}x{args.height}, \"\n        f\"steps={args.steps}, guidance={args.guidance}\",\n        file=sys.stderr,\n    )\n    image = pipe(\n        prompt=args.prompt,\n        height=args.height,\n        width=args.width,\n        guidance_scale=args.guidance,\n        num_inference_steps=args.steps,\n        generator=generator,\n    ).images[0]\n\n    output = args.output or f\"sana-{int(time.time())}.png\"\n    image.save(output)\n    print(output)\n\n\nif __name__ == \"__main__\":\n    try:\n        main()\n    except KeyboardInterrupt:\n        sys.exit(130)\n    except SystemExit:\n        raise\n    except Exception as exc:\n        print(\n            f\"[sana-generate] error: {exc}\",\n            file=sys.stderr,\n        )\n        sys.exit(2)\nPYEOF\nchmod +x \"$sana_bin/sana-generate\"\n\nsana_bin=\"${SANA_DATA_DIR:-$FLOX_ENV_CACHE/sana}/bin\"\nmkdir -p \"$sana_bin\"\n\ncat > \"$sana_bin/sana-gradio\" <<'PYEOF'\n#!/usr/bin/env python3\n\"\"\"sana-gradio: Gradio web UI for SANA text-to-image.\"\"\"\nimport os\nimport sys\nfrom pathlib import Path\n\nHOST = os.environ.get(\"SANA_GRADIO_HOST\", \"127.0.0.1\")\nPORT = int(os.environ.get(\"SANA_GRADIO_PORT\", \"17860\"))\nDEFAULT_MODEL = os.environ.get(\n    \"SANA_DEFAULT_MODEL\",\n    \"Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers\",\n)\nSKIP_LOAD = os.environ.get(\"SANA_SKIP_LOAD\", \"\") == \"1\"\n\n_HERE = Path(__file__).resolve().parent\nsys.path.insert(0, str(_HERE))\n\nimport gradio as gr  # noqa: E402\n\n_pipe = None\n\n\ndef _load():\n    \"\"\"Lazily load the SANA pipeline on first call.\"\"\"\n    global _pipe\n    if _pipe is not None:\n        return _pipe\n    from diffusers import SanaPipeline\n    from _sana_device import best_device\n\n    device, dtype = best_device()\n    print(\n        f\"[sana-gradio] loading {DEFAULT_MODEL} \"\n        f\"on {device} ({dtype})\",\n        file=sys.stderr,\n    )\n    pipe = SanaPipeline.from_pretrained(\n        DEFAULT_MODEL, torch_dtype=dtype,\n    )\n    pipe.to(device)\n    pipe.vae.to(dtype)\n    pipe.text_encoder.to(dtype)\n    if device == \"cuda\":\n        try:\n            pipe.enable_xformers_memory_efficient_attention()\n        except (ImportError, ModuleNotFoundError):\n            pass\n    _pipe = pipe\n    return pipe\n\n\ndef generate(prompt, steps, guidance, seed, width, height):\n    import torch\n    pipe = _load()\n    device = next(pipe.transformer.parameters()).device.type\n    gen = None\n    if seed is not None and int(seed) >= 0:\n        gen = torch.Generator(device=device).manual_seed(int(seed))\n    image = pipe(\n        prompt=prompt,\n        height=int(height),\n        width=int(width),\n        guidance_scale=float(guidance),\n        num_inference_steps=int(steps),\n        generator=gen,\n    ).images[0]\n    return image\n\n\ndef build_ui():\n    with gr.Blocks(title=\"SANA\") as demo:\n        gr.Markdown(\"# SANA Text-to-Image\")\n        prompt = gr.Textbox(label=\"Prompt\", lines=2)\n        with gr.Row():\n            steps = gr.Slider(\n                1, 50, value=20, step=1, label=\"Steps\",\n            )\n            guidance = gr.Slider(\n                1.0, 10.0, value=4.5, label=\"Guidance\",\n            )\n        with gr.Row():\n            width = gr.Slider(\n                512, 2048, value=1024, step=64, label=\"Width\",\n            )\n            height = gr.Slider(\n                512, 2048, value=1024, step=64, label=\"Height\",\n            )\n        seed = gr.Number(\n            value=-1, label=\"Seed (-1 = random)\", precision=0,\n        )\n        button = gr.Button(\"Generate\")\n        out = gr.Image(label=\"Result\")\n        button.click(\n            generate,\n            [prompt, steps, guidance, seed, width, height],\n            out,\n        )\n    return demo\n\n\ndef build_skip_load_ui():\n    with gr.Blocks(title=\"SANA (test mode)\") as demo:\n        gr.Markdown(\n            \"## SANA test mode\\n\"\n            \"SANA_SKIP_LOAD=1 — model not loaded.\"\n        )\n    return demo\n\n\ndef main():\n    demo = build_skip_load_ui() if SKIP_LOAD else build_ui()\n    print(\n        f\"[sana-gradio] starting on http://{HOST}:{PORT} \"\n        f\"(skip_load={SKIP_LOAD})\",\n        file=sys.stderr,\n    )\n    demo.launch(\n        server_name=HOST,\n        server_port=PORT,\n        inbrowser=False,\n    )\n\n\nif __name__ == \"__main__\":\n    main()\nPYEOF\nchmod +x \"$sana_bin/sana-gradio\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center --width 60 \\\n    --margin \"1\" --padding \"1 4\" \\\n    \"SANA demo\" \\\n    \"\" \\\n    \"Pull a model:    sana-pull\" \\\n    \"Generate:        sana-generate \\\"your prompt\\\"\" \\\n    \"Web UI:          flox services start sana-gradio\" \\\n    \"                 then open http://${SANA_GRADIO_HOST}:${SANA_GRADIO_PORT}\"\nfi\n"
     },
     "options": {},
     "services": {
@@ -185,28 +216,28 @@
     {
       "attr_path": "huggingface-hub",
       "broken": false,
-      "derivation": "/nix/store/l57jkalkc7hzfvr4pmpbypb5rkl07jyz-python3.13-huggingface-hub-1.15.0.drv",
+      "derivation": "/nix/store/zfnpgz29vcj2fkaaiq2b9pblzpgzhyyq-python3.13-huggingface-hub-1.16.0.drv",
       "description": "Download and publish models and other files on the huggingface.co hub",
       "install_id": "huggingface-hub",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "name": "huggingface-hub-1.15.0",
+      "locked_url": "https://github.com/flox/floxenvs?rev=b1ff5fcd4e10580d428979e5e4e9f297551f25c8",
+      "name": "huggingface-hub-1.16.0",
       "pname": "huggingface-hub",
-      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "rev_count": 3677,
-      "rev_date": "2026-05-20T12:30:23Z",
-      "scrape_date": "2026-05-21T08:02:04.820710Z",
+      "rev": "b1ff5fcd4e10580d428979e5e4e9f297551f25c8",
+      "rev_count": 3801,
+      "rev_date": "2026-05-21T13:29:26Z",
+      "scrape_date": "2026-05-22T22:17:58.086989Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "1.15.0",
+      "version": "1.16.0",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/0bbs1q4n02s2sv93b4zicgdb3f9dnfvl-python3.13-huggingface-hub-1.15.0-dist",
-        "out": "/nix/store/v4ccshkdnklndkds6kh118lfx0hfb0n3-python3.13-huggingface-hub-1.15.0"
+        "dist": "/nix/store/kyacxc9705xm5wnshg09x92vx4241642-python3.13-huggingface-hub-1.16.0-dist",
+        "out": "/nix/store/ii9j15awxg1996pb6nlaml02p327mqpr-python3.13-huggingface-hub-1.16.0"
       },
       "system": "aarch64-darwin",
       "group": "huggingface",
@@ -215,28 +246,28 @@
     {
       "attr_path": "huggingface-hub",
       "broken": false,
-      "derivation": "/nix/store/gl9jy04qccbyhhdnjszq1r3g2frdj0wy-python3.13-huggingface-hub-1.15.0.drv",
+      "derivation": "/nix/store/znz7jlc2spw1nd9m8pyhdgs5qyykc2ik-python3.13-huggingface-hub-1.16.0.drv",
       "description": "Download and publish models and other files on the huggingface.co hub",
       "install_id": "huggingface-hub",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "name": "huggingface-hub-1.15.0",
+      "locked_url": "https://github.com/flox/floxenvs?rev=b1ff5fcd4e10580d428979e5e4e9f297551f25c8",
+      "name": "huggingface-hub-1.16.0",
       "pname": "huggingface-hub",
-      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "rev_count": 3677,
-      "rev_date": "2026-05-20T12:30:23Z",
-      "scrape_date": "2026-05-21T08:02:04.820712Z",
+      "rev": "b1ff5fcd4e10580d428979e5e4e9f297551f25c8",
+      "rev_count": 3801,
+      "rev_date": "2026-05-21T13:29:26Z",
+      "scrape_date": "2026-05-22T22:17:58.086993Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "1.15.0",
+      "version": "1.16.0",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/sln5874kdc971kys8pgpsy6hh3skpvkv-python3.13-huggingface-hub-1.15.0-dist",
-        "out": "/nix/store/px2kky61y2xhph878dlqzslnzdb02rm1-python3.13-huggingface-hub-1.15.0"
+        "dist": "/nix/store/znyw1rf79mbay0m18fqiia4p5l6nq470-python3.13-huggingface-hub-1.16.0-dist",
+        "out": "/nix/store/4zmqzdxd4xy87hn73hd1g0hnnwy795fq-python3.13-huggingface-hub-1.16.0"
       },
       "system": "aarch64-linux",
       "group": "huggingface",
@@ -245,28 +276,28 @@
     {
       "attr_path": "huggingface-hub",
       "broken": false,
-      "derivation": "/nix/store/nivcr67i9hv198b94gf7zxynfkxkvf4k-python3.13-huggingface-hub-1.15.0.drv",
+      "derivation": "/nix/store/kwnhrsf3nfyvpkmsqa0dk7crh4i4sw48-python3.13-huggingface-hub-1.16.0.drv",
       "description": "Download and publish models and other files on the huggingface.co hub",
       "install_id": "huggingface-hub",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "name": "huggingface-hub-1.15.0",
+      "locked_url": "https://github.com/flox/floxenvs?rev=b1ff5fcd4e10580d428979e5e4e9f297551f25c8",
+      "name": "huggingface-hub-1.16.0",
       "pname": "huggingface-hub",
-      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "rev_count": 3677,
-      "rev_date": "2026-05-20T12:30:23Z",
-      "scrape_date": "2026-05-21T08:02:04.820713Z",
+      "rev": "b1ff5fcd4e10580d428979e5e4e9f297551f25c8",
+      "rev_count": 3801,
+      "rev_date": "2026-05-21T13:29:26Z",
+      "scrape_date": "2026-05-22T22:17:58.086994Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "1.15.0",
+      "version": "1.16.0",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/dm69qq5v52374x3mrqhnszk4sxbg1vkp-python3.13-huggingface-hub-1.15.0-dist",
-        "out": "/nix/store/lmm0fcx93nf566mwljv9p61daw5cg5my-python3.13-huggingface-hub-1.15.0"
+        "dist": "/nix/store/pwm33v22gcxhgnlv3g5x7p0dqv0hsi8w-python3.13-huggingface-hub-1.16.0-dist",
+        "out": "/nix/store/0znzp6zdixn1sjpsdgzp3ry69r2y98lm-python3.13-huggingface-hub-1.16.0"
       },
       "system": "x86_64-darwin",
       "group": "huggingface",
@@ -275,51 +306,49 @@
     {
       "attr_path": "huggingface-hub",
       "broken": false,
-      "derivation": "/nix/store/7sb41isj376k9fg1l2a0b8wnxzxny4fv-python3.13-huggingface-hub-1.15.0.drv",
+      "derivation": "/nix/store/6zqaf6pcn8ybw2gy1f5hq2alk988d036-python3.13-huggingface-hub-1.16.0.drv",
       "description": "Download and publish models and other files on the huggingface.co hub",
       "install_id": "huggingface-hub",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "name": "huggingface-hub-1.15.0",
+      "locked_url": "https://github.com/flox/floxenvs?rev=b1ff5fcd4e10580d428979e5e4e9f297551f25c8",
+      "name": "huggingface-hub-1.16.0",
       "pname": "huggingface-hub",
-      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "rev_count": 3677,
-      "rev_date": "2026-05-20T12:30:23Z",
-      "scrape_date": "2026-05-21T08:02:04.820714Z",
+      "rev": "b1ff5fcd4e10580d428979e5e4e9f297551f25c8",
+      "rev_count": 3801,
+      "rev_date": "2026-05-21T13:29:26Z",
+      "scrape_date": "2026-05-22T22:17:58.086994Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "1.15.0",
+      "version": "1.16.0",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/cvl6ql2sliqbzx0zgb7z14z2rk521nwi-python3.13-huggingface-hub-1.15.0-dist",
-        "out": "/nix/store/mgnssrbwrayvasn87zbq2fcxzjkn0qrc-python3.13-huggingface-hub-1.15.0"
+        "dist": "/nix/store/hg07ywjzc947g1fxz912s5mhz42987dy-python3.13-huggingface-hub-1.16.0-dist",
+        "out": "/nix/store/lqbifljyr9bjmsd1cn84mx4cb86bfsnz-python3.13-huggingface-hub-1.16.0"
       },
       "system": "x86_64-linux",
       "group": "huggingface",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.accelerate",
+      "attr_path": "python313Packages.accelerate",
       "broken": false,
-      "derivation": "/nix/store/ai6z01kmvd3hmhv1vxp15m3aqg0ydxvi-python3.12-accelerate-1.12.0.drv",
+      "derivation": "/nix/store/0hpxf60zlw16xq2dsrd6f9ilc7l3plkx-python3.13-accelerate-1.12.0.drv",
       "description": "Simple way to train and use PyTorch models with multi-GPU, TPU, mixed-precision",
       "install_id": "accelerate",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-accelerate-1.12.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-accelerate-1.12.0",
       "pname": "accelerate",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:03:09.813532Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T04:39:42.606450Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
       "version": "1.12.0",
@@ -327,31 +356,29 @@
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/d6rx2v2g8863ckawv99f4r6s2zwzqfqc-python3.12-accelerate-1.12.0-dist",
-        "out": "/nix/store/3p3lhh1hmd792fnzsxgs355fs4djxisk-python3.12-accelerate-1.12.0"
+        "dist": "/nix/store/an0w5jvfqmwjk5irmc81b2751mb36vkc-python3.13-accelerate-1.12.0-dist",
+        "out": "/nix/store/w2bl9iv53picnqpqx3v65799zxwxqkdp-python3.13-accelerate-1.12.0"
       },
       "system": "aarch64-darwin",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.accelerate",
+      "attr_path": "python313Packages.accelerate",
       "broken": false,
-      "derivation": "/nix/store/fdd495zb3nvlkryk7c581ylrkymddxb6-python3.12-accelerate-1.12.0.drv",
+      "derivation": "/nix/store/54lg838ax4lf0qxlln0g7i059g4cjgv3-python3.13-accelerate-1.12.0.drv",
       "description": "Simple way to train and use PyTorch models with multi-GPU, TPU, mixed-precision",
       "install_id": "accelerate",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-accelerate-1.12.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-accelerate-1.12.0",
       "pname": "accelerate",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:19:49.161041Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T05:12:36.540443Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
       "version": "1.12.0",
@@ -359,31 +386,29 @@
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/y65b6c52d08lvryxrhlsrjdj265p5knp-python3.12-accelerate-1.12.0-dist",
-        "out": "/nix/store/l5i23bf6jvh31a9m1rmglg03xqb48lz8-python3.12-accelerate-1.12.0"
+        "dist": "/nix/store/wnzczrss5c7nbz8mifhhcm9iis3yknsq-python3.13-accelerate-1.12.0-dist",
+        "out": "/nix/store/bs0svh2jqck8sz5iv2pmpai8ghprm154-python3.13-accelerate-1.12.0"
       },
       "system": "aarch64-linux",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.accelerate",
+      "attr_path": "python313Packages.accelerate",
       "broken": false,
-      "derivation": "/nix/store/kzakxb2a6yr6n0xxvrd5446p0262nyka-python3.12-accelerate-1.12.0.drv",
+      "derivation": "/nix/store/qh2vijzd3danz8saxqivbxk9lfl1hxyv-python3.13-accelerate-1.12.0.drv",
       "description": "Simple way to train and use PyTorch models with multi-GPU, TPU, mixed-precision",
       "install_id": "accelerate",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-accelerate-1.12.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-accelerate-1.12.0",
       "pname": "accelerate",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:35:35.070415Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T05:44:17.755848Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
       "version": "1.12.0",
@@ -391,31 +416,29 @@
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/m4fgm7s59an8xkbl9nhy2n8blbcf2fvb-python3.12-accelerate-1.12.0-dist",
-        "out": "/nix/store/4glrcbb6fcyqgkmzv9wkys1d60g6vpk2-python3.12-accelerate-1.12.0"
+        "dist": "/nix/store/9akvpmfnrskraaab3cx53q9apyrn2y53-python3.13-accelerate-1.12.0-dist",
+        "out": "/nix/store/p5phyi4d0nmbs4k1hp6ykxr1m6l685xx-python3.13-accelerate-1.12.0"
       },
       "system": "x86_64-darwin",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.accelerate",
+      "attr_path": "python313Packages.accelerate",
       "broken": false,
-      "derivation": "/nix/store/a0v6xm1c0lz4pnahac7az684pwl6x8qi-python3.12-accelerate-1.12.0.drv",
+      "derivation": "/nix/store/vmwbjn0b66q1fd5cjk2gk8lgs2qsw1vd-python3.13-accelerate-1.12.0.drv",
       "description": "Simple way to train and use PyTorch models with multi-GPU, TPU, mixed-precision",
       "install_id": "accelerate",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-accelerate-1.12.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-accelerate-1.12.0",
       "pname": "accelerate",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:52:08.968258Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T06:21:13.355866Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
       "version": "1.12.0",
@@ -423,802 +446,789 @@
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/05i0kqgphxla4dz5bbh439dfzypkl6bb-python3.12-accelerate-1.12.0-dist",
-        "out": "/nix/store/993r33dkkzh6agghlj6hzi1rsyqhhgyv-python3.12-accelerate-1.12.0"
+        "dist": "/nix/store/l9cv84bma2dd8j1l82l5m1gw1a8998xg-python3.13-accelerate-1.12.0-dist",
+        "out": "/nix/store/wav63xvrcnmnsi4xql1s5cbgbm48h85q-python3.13-accelerate-1.12.0"
       },
       "system": "x86_64-linux",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.diffusers",
+      "attr_path": "python313Packages.diffusers",
       "broken": false,
-      "derivation": "/nix/store/81pdjbb56xhxn4bvslkl6nd07dpfijhz-python3.12-diffusers-0.35.1.drv",
+      "derivation": "/nix/store/kh5a9hq2mcrpzpa3wwam8k7wz1l03gz2-python3.13-diffusers-0.35.1.drv",
       "description": "State-of-the-art diffusion models for image and audio generation in PyTorch",
       "install_id": "diffusers",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-diffusers-0.35.1",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-diffusers-0.35.1",
       "pname": "diffusers",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:03:13.018010Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T04:39:45.789540Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
       "version": "0.35.1",
       "outputs_to_install": [
+        "out",
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/mh5rnrvnckyaq1cf72wpwpyjqdg43wb0-python3.12-diffusers-0.35.1-dist",
-        "out": "/nix/store/kfq652f01ggq42wdp9qf83rijhgpziam-python3.12-diffusers-0.35.1"
+        "dist": "/nix/store/kv13rj3mgcgdh51dpx64g1aw1bqakp6i-python3.13-diffusers-0.35.1-dist",
+        "out": "/nix/store/rkk2vkww5wv1wlxmdlc7ws7av2y4g02q-python3.13-diffusers-0.35.1"
       },
       "system": "aarch64-darwin",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.diffusers",
+      "attr_path": "python313Packages.diffusers",
       "broken": false,
-      "derivation": "/nix/store/k6bjqwpv5p629dqfzc4kr882xhdfqlk8-python3.12-diffusers-0.35.1.drv",
+      "derivation": "/nix/store/x8wgmyhhkcrnqgmqg0acj3xrfpl7964y-python3.13-diffusers-0.35.1.drv",
       "description": "State-of-the-art diffusion models for image and audio generation in PyTorch",
       "install_id": "diffusers",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-diffusers-0.35.1",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-diffusers-0.35.1",
       "pname": "diffusers",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:19:52.916873Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T05:12:40.530584Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
       "version": "0.35.1",
       "outputs_to_install": [
+        "out",
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/9wm4ylh7hqp17pw7f3ghmsn7cfz87xhp-python3.12-diffusers-0.35.1-dist",
-        "out": "/nix/store/525m1sl0kh0ghxivlf3f5bzd0pihd1j1-python3.12-diffusers-0.35.1"
+        "dist": "/nix/store/j5dg1rr95zmlf5a0j264dqqgps9mnbx5-python3.13-diffusers-0.35.1-dist",
+        "out": "/nix/store/5mq4vliv2wkaqy0wmp77n6x3x9dqj9ap-python3.13-diffusers-0.35.1"
       },
       "system": "aarch64-linux",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.diffusers",
+      "attr_path": "python313Packages.diffusers",
       "broken": false,
-      "derivation": "/nix/store/1nzpa3idc2mzjmvnndnf6q5hxrrp10pn-python3.12-diffusers-0.35.1.drv",
+      "derivation": "/nix/store/6nyz44x56mnhr6dgr3i60sa3d5n3p4hi-python3.13-diffusers-0.35.1.drv",
       "description": "State-of-the-art diffusion models for image and audio generation in PyTorch",
       "install_id": "diffusers",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-diffusers-0.35.1",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-diffusers-0.35.1",
       "pname": "diffusers",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:35:38.013128Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T05:44:20.891574Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
       "version": "0.35.1",
       "outputs_to_install": [
+        "out",
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/z5flp9b5j3rb8q59aj55hq0j8zqcry45-python3.12-diffusers-0.35.1-dist",
-        "out": "/nix/store/4s4f1hmz2h7k7zqgibhi02flj37pg4c3-python3.12-diffusers-0.35.1"
+        "dist": "/nix/store/17y69nyyw0rxf0rg22agql5zpry203rx-python3.13-diffusers-0.35.1-dist",
+        "out": "/nix/store/l1rq3ydj8zw53dxaczzdhnakzclc2fv8-python3.13-diffusers-0.35.1"
       },
       "system": "x86_64-darwin",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.diffusers",
+      "attr_path": "python313Packages.diffusers",
       "broken": false,
-      "derivation": "/nix/store/frddbp7vmx7rjyc373a7a3y31wixbr1w-python3.12-diffusers-0.35.1.drv",
+      "derivation": "/nix/store/g1nka4s76j3b8wdkpxjvkly77dqfa09j-python3.13-diffusers-0.35.1.drv",
       "description": "State-of-the-art diffusion models for image and audio generation in PyTorch",
       "install_id": "diffusers",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-diffusers-0.35.1",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-diffusers-0.35.1",
       "pname": "diffusers",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:52:12.963904Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T06:21:17.529094Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
       "version": "0.35.1",
       "outputs_to_install": [
+        "out",
+        "out",
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/2wk3s64lqxr9v76fwr6cf3a0sqa57jn2-python3.12-diffusers-0.35.1-dist",
-        "out": "/nix/store/and2fn79mshpliqfdykghr5wzxh4gmwi-python3.12-diffusers-0.35.1"
+        "dist": "/nix/store/fiabx87g56zf4ra84wfzmxldnxx7qs2s-python3.13-diffusers-0.35.1-dist",
+        "out": "/nix/store/ajbp84k51avk2cnchvpcxf3v2jcanl83-python3.13-diffusers-0.35.1"
       },
       "system": "x86_64-linux",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.gradio",
+      "attr_path": "python313Packages.gradio",
       "broken": false,
-      "derivation": "/nix/store/nklv3f7s8zw69jv6xzbq9nnla532c1cr-python3.12-gradio-6.1.0.drv",
+      "derivation": "/nix/store/ha8afhnsbwzchb1a1sbqcjvd578ajvgi-python3.13-gradio-6.5.1.drv",
       "description": "Python library for easily interacting with trained machine learning models",
       "install_id": "gradio",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-gradio-6.1.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-gradio-6.5.1",
       "pname": "gradio",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:03:15.338003Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T04:39:48.116912Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
-      "version": "6.1.0",
+      "version": "6.5.1",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/lm3alp150szi9s55farp0kp9jk8gbl8x-python3.12-gradio-6.1.0-dist",
-        "out": "/nix/store/k09psr95vq2qbqnzch7yp0ki3j8xggvf-python3.12-gradio-6.1.0"
+        "dist": "/nix/store/ihaq5xfnj4gm38ncgpdqm17s322nmfkc-python3.13-gradio-6.5.1-dist",
+        "out": "/nix/store/5amjsawbbspvk8ny3zbc4v455bhwql46-python3.13-gradio-6.5.1"
       },
       "system": "aarch64-darwin",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.gradio",
+      "attr_path": "python313Packages.gradio",
       "broken": false,
-      "derivation": "/nix/store/5kq1rv1p5s3dksw2awln9hvqnznh0rfq-python3.12-gradio-6.1.0.drv",
+      "derivation": "/nix/store/zl4j4b7zqxwbpmlci4xxqwxd8h5myr5n-python3.13-gradio-6.5.1.drv",
       "description": "Python library for easily interacting with trained machine learning models",
       "install_id": "gradio",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-gradio-6.1.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-gradio-6.5.1",
       "pname": "gradio",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:19:55.630503Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T05:12:43.391735Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
-      "version": "6.1.0",
+      "version": "6.5.1",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/i7cl30sc8ga0iknflpnn5qybqzbp9n27-python3.12-gradio-6.1.0-dist",
-        "out": "/nix/store/s5l57h9xc9zp92dwqdg98pnbdzi895m4-python3.12-gradio-6.1.0"
+        "dist": "/nix/store/nrm6y9w3r360vvgi8wwglaaa3v7cdwc9-python3.13-gradio-6.5.1-dist",
+        "out": "/nix/store/gqmlgqajxx2nky43f4kbzbbjmb9kh4qd-python3.13-gradio-6.5.1"
       },
       "system": "aarch64-linux",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.gradio",
+      "attr_path": "python313Packages.gradio",
       "broken": false,
-      "derivation": "/nix/store/znl50bxzm80pw4slgkkla7pxv3qg3dcl-python3.12-gradio-6.1.0.drv",
+      "derivation": "/nix/store/9w0jj0vqrf53spfd5gip7apmb9cqwz4m-python3.13-gradio-6.5.1.drv",
       "description": "Python library for easily interacting with trained machine learning models",
       "install_id": "gradio",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-gradio-6.1.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-gradio-6.5.1",
       "pname": "gradio",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:35:40.193696Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T05:44:23.187818Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
-      "version": "6.1.0",
+      "version": "6.5.1",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/0fb6rv8l4445y3x3qjjyc47lwpxvlgv9-python3.12-gradio-6.1.0-dist",
-        "out": "/nix/store/x6n0b1z73wfcr2n6xcvixbk3p6fbc5vp-python3.12-gradio-6.1.0"
+        "dist": "/nix/store/qan51yhsyn2dg6yrs2qz8pr2xkr6c9j2-python3.13-gradio-6.5.1-dist",
+        "out": "/nix/store/6l7vs03vx8m0rvwf4kfqk37ahjlr9bpw-python3.13-gradio-6.5.1"
       },
       "system": "x86_64-darwin",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.gradio",
+      "attr_path": "python313Packages.gradio",
       "broken": false,
-      "derivation": "/nix/store/gg97h9dcyc1r6h0gn656n3cb4nd6l9aw-python3.12-gradio-6.1.0.drv",
+      "derivation": "/nix/store/43z1ns6plq0y2h0xzjgn0kp4z1v074aq-python3.13-gradio-6.5.1.drv",
       "description": "Python library for easily interacting with trained machine learning models",
       "install_id": "gradio",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-gradio-6.1.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-gradio-6.5.1",
       "pname": "gradio",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:52:15.809252Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T06:21:20.553856Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
-      "version": "6.1.0",
+      "version": "6.5.1",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/s8da86yn1x25vlzzwpvbmwii6xbb7axj-python3.12-gradio-6.1.0-dist",
-        "out": "/nix/store/r91cy4pxdzlsv57wdhmz9hx9px7v9d1c-python3.12-gradio-6.1.0"
+        "dist": "/nix/store/5bw4gh5b7a0zyy15s8bsc0z00mi4g6cs-python3.13-gradio-6.5.1-dist",
+        "out": "/nix/store/r7m97fvxz0j2qagyw4l09zlywlqiyqx4-python3.13-gradio-6.5.1"
       },
       "system": "x86_64-linux",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.pillow",
+      "attr_path": "python313Packages.pillow",
       "broken": false,
-      "derivation": "/nix/store/2qpw7glirwi5pw75lspickbpkjlk4idy-python3.12-pillow-12.0.0.drv",
+      "derivation": "/nix/store/c6v8yn35g8g9zd66r5hnaimb3mpvkbrl-python3.13-pillow-12.1.0.drv",
       "description": "Friendly PIL fork (Python Imaging Library)",
       "install_id": "pillow",
       "license": "MIT-CMU",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-pillow-12.0.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-pillow-12.1.0",
       "pname": "pillow",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:03:20.601593Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T04:39:53.406615Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
-      "version": "12.0.0",
+      "version": "12.1.0",
       "outputs_to_install": [
+        "out",
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/cf800ad6nm89k5kvza87ncfginizwl2c-python3.12-pillow-12.0.0-dist",
-        "out": "/nix/store/8wznnwbvg1k7r8035yc2b6d9rwxaf43k-python3.12-pillow-12.0.0"
+        "dist": "/nix/store/ny4n7v6kr90mp8rj7xnzz95xnjnm91a8-python3.13-pillow-12.1.0-dist",
+        "out": "/nix/store/kq8lvl16rrszn0limlv111f5q5c81xy0-python3.13-pillow-12.1.0"
       },
       "system": "aarch64-darwin",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.pillow",
+      "attr_path": "python313Packages.pillow",
       "broken": false,
-      "derivation": "/nix/store/mp9pkcr2jcz8sjrpm3m4zf90mi6ah4sd-python3.12-pillow-12.0.0.drv",
+      "derivation": "/nix/store/3cjfhrnaklkcw7kwd8cag47jpf3w4pl2-python3.13-pillow-12.1.0.drv",
       "description": "Friendly PIL fork (Python Imaging Library)",
       "install_id": "pillow",
       "license": "MIT-CMU",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-pillow-12.0.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-pillow-12.1.0",
       "pname": "pillow",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:20:01.953942Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T05:12:49.973128Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
-      "version": "12.0.0",
+      "version": "12.1.0",
       "outputs_to_install": [
+        "out",
+        "out",
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/xfzgfl2f7j1115041pq1ra3lnmwvhr2a-python3.12-pillow-12.0.0-dist",
-        "out": "/nix/store/6w7xh34xj26w884zmmiwlyawshww6hd4-python3.12-pillow-12.0.0"
+        "dist": "/nix/store/c4f6cfyisj6h018l6khh9rp0ypmx5w3k-python3.13-pillow-12.1.0-dist",
+        "out": "/nix/store/s4ynim73abb8dlzcs5d05s61gx0l6jrs-python3.13-pillow-12.1.0"
       },
       "system": "aarch64-linux",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.pillow",
+      "attr_path": "python313Packages.pillow",
       "broken": false,
-      "derivation": "/nix/store/kz94ldl4lxn071jryw2xcl0jyc5h1zwh-python3.12-pillow-12.0.0.drv",
+      "derivation": "/nix/store/7frz7wr9hdmgcxg9prmqc5hz6n9q6rkw-python3.13-pillow-12.1.0.drv",
       "description": "Friendly PIL fork (Python Imaging Library)",
       "install_id": "pillow",
       "license": "MIT-CMU",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-pillow-12.0.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-pillow-12.1.0",
       "pname": "pillow",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:35:45.049718Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T05:44:28.422623Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
-      "version": "12.0.0",
+      "version": "12.1.0",
       "outputs_to_install": [
+        "out",
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/qv1fjqcgsciirgmsw7p4c71lz7chwfxk-python3.12-pillow-12.0.0-dist",
-        "out": "/nix/store/98l9smipp83qaap0dzb4c7mh5p79ih1l-python3.12-pillow-12.0.0"
+        "dist": "/nix/store/2xj5ysxm0m64abj17q13xcv4117vm92c-python3.13-pillow-12.1.0-dist",
+        "out": "/nix/store/7f53xdmg93qsslshqknl2zfg4fbjpc6v-python3.13-pillow-12.1.0"
       },
       "system": "x86_64-darwin",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.pillow",
+      "attr_path": "python313Packages.pillow",
       "broken": false,
-      "derivation": "/nix/store/nglf6bc2cn1vi0hq94vipziwv91hxcpd-python3.12-pillow-12.0.0.drv",
+      "derivation": "/nix/store/0vnpkm4ss81kbxmlks0xdczbk1mw4ba0-python3.13-pillow-12.1.0.drv",
       "description": "Friendly PIL fork (Python Imaging Library)",
       "install_id": "pillow",
       "license": "MIT-CMU",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-pillow-12.0.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-pillow-12.1.0",
       "pname": "pillow",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:52:22.297544Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T06:21:27.448626Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
-      "version": "12.0.0",
+      "version": "12.1.0",
       "outputs_to_install": [
+        "out",
+        "out",
+        "out",
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/hhqs1gwswl59m310674id56ln0bmm04h-python3.12-pillow-12.0.0-dist",
-        "out": "/nix/store/341slf4ary2700z1b20186qyaqp46q2h-python3.12-pillow-12.0.0"
+        "dist": "/nix/store/d4lq17cn8jbicy22i2ir8qf8jm7y2hx4-python3.13-pillow-12.1.0-dist",
+        "out": "/nix/store/k5hjvcdk83wpvpg3zzi8i449k0wzgywm-python3.13-pillow-12.1.0"
       },
       "system": "x86_64-linux",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.protobuf",
+      "attr_path": "python313Packages.protobuf",
       "broken": false,
-      "derivation": "/nix/store/dhrsg03pywa27yh4dkfzprlny87myy6s-python3.12-protobuf-6.33.1.drv",
+      "derivation": "/nix/store/xpyy7hhgldyq13vrjjl4ag5h4k2gs43r-python3.13-protobuf-6.33.3.drv",
       "description": "Protocol Buffers are Google's data interchange format",
       "install_id": "protobuf",
       "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-protobuf-6.33.1",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-protobuf-6.33.3",
       "pname": "protobuf",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:03:21.022684Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T04:39:53.822718Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
-      "version": "6.33.1",
+      "version": "6.33.3",
       "outputs_to_install": [
+        "out",
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/2snqwc4i2w0d4hn7q38nwki6kkn0b957-python3.12-protobuf-6.33.1-dist",
-        "out": "/nix/store/5inidrhy8q5li3vbf3lxd32bnsczhgmy-python3.12-protobuf-6.33.1"
+        "dist": "/nix/store/wdzlxi5w8hpb4m6s93r2mxsr7cbk50l6-python3.13-protobuf-6.33.3-dist",
+        "out": "/nix/store/gnfyg1sjjks3in6pxvzkpww2xxnlb0xa-python3.13-protobuf-6.33.3"
       },
       "system": "aarch64-darwin",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.protobuf",
+      "attr_path": "python313Packages.protobuf",
       "broken": false,
-      "derivation": "/nix/store/608sx0xh5664shyh21fw5b24c6znyrni-python3.12-protobuf-6.33.1.drv",
+      "derivation": "/nix/store/lz8w0z1g00dlmdx09cs67zq5zyg06lx8-python3.13-protobuf-6.33.3.drv",
       "description": "Protocol Buffers are Google's data interchange format",
       "install_id": "protobuf",
       "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-protobuf-6.33.1",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-protobuf-6.33.3",
       "pname": "protobuf",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:20:02.499183Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T05:12:50.472638Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
-      "version": "6.33.1",
+      "version": "6.33.3",
       "outputs_to_install": [
+        "out",
+        "out",
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/gywciygcpyjwfyhr03hn9aqhczw2604y-python3.12-protobuf-6.33.1-dist",
-        "out": "/nix/store/lh16s0j05bds1pb5jp1s6zq2c89713vd-python3.12-protobuf-6.33.1"
+        "dist": "/nix/store/0jm1zdm7iarmvi13m4bvs0x6pc6h1g2j-python3.13-protobuf-6.33.3-dist",
+        "out": "/nix/store/j7zz86kgm88lcfimxzz7hcmpnnhpdmbd-python3.13-protobuf-6.33.3"
       },
       "system": "aarch64-linux",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.protobuf",
+      "attr_path": "python313Packages.protobuf",
       "broken": false,
-      "derivation": "/nix/store/5ivzgsfq0fgyayvxmsbgassm3qfvnlyq-python3.12-protobuf-6.33.1.drv",
+      "derivation": "/nix/store/bjmgv81ig1gjc4zgmprjkr7xhms3d618-python3.13-protobuf-6.33.3.drv",
       "description": "Protocol Buffers are Google's data interchange format",
       "install_id": "protobuf",
       "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-protobuf-6.33.1",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-protobuf-6.33.3",
       "pname": "protobuf",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:35:45.443531Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T05:44:28.840180Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
-      "version": "6.33.1",
+      "version": "6.33.3",
       "outputs_to_install": [
+        "out",
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/h9wa9g5iyjx3bxsnvbzc5x5mji3fp79h-python3.12-protobuf-6.33.1-dist",
-        "out": "/nix/store/lfh522lw3ch1dpx5m7cj6a5nlxn6278i-python3.12-protobuf-6.33.1"
+        "dist": "/nix/store/8wva3hd8nm31d9x34mrnwibgvlklvp3f-python3.13-protobuf-6.33.3-dist",
+        "out": "/nix/store/zkx7blnfdik83r9lv3j754z45dfhq4ks-python3.13-protobuf-6.33.3"
       },
       "system": "x86_64-darwin",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.protobuf",
+      "attr_path": "python313Packages.protobuf",
       "broken": false,
-      "derivation": "/nix/store/npbzsyfcx83qlpml70iva43ypsrs8hap-python3.12-protobuf-6.33.1.drv",
+      "derivation": "/nix/store/kxdx5s5sxi2qi26d1br0iqh0gx90slzn-python3.13-protobuf-6.33.3.drv",
       "description": "Protocol Buffers are Google's data interchange format",
       "install_id": "protobuf",
       "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-protobuf-6.33.1",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-protobuf-6.33.3",
       "pname": "protobuf",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:52:22.794770Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T06:21:27.969536Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
-      "version": "6.33.1",
+      "version": "6.33.3",
       "outputs_to_install": [
+        "out",
+        "out",
+        "out",
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/7h7hjz5p3py09swzfyd7c8n6ry3rnlny-python3.12-protobuf-6.33.1-dist",
-        "out": "/nix/store/0ncirnfvrsygf0bc8mryzkh5lq3pvwlm-python3.12-protobuf-6.33.1"
+        "dist": "/nix/store/m2kz1ikmjbc9jk0x8z3bcwxk6f10svy4-python3.13-protobuf-6.33.3-dist",
+        "out": "/nix/store/z2yfrx5f3flcy044mw8lzvsvx03cv4gg-python3.13-protobuf-6.33.3"
       },
       "system": "x86_64-linux",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312",
+      "attr_path": "python313",
       "broken": false,
-      "derivation": "/nix/store/wvzb99k7ssym0kcv9ciflr7g84ag61hq-python3-3.12.12.drv",
+      "derivation": "/nix/store/2f9f2hcw24ncf86i63v9apf9s0k2fgyz-python3-3.13.11.drv",
       "description": "High-level dynamically-typed programming language",
       "install_id": "python",
       "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3-3.12.12",
-      "pname": "python312",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:03:09.802456Z",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3-3.13.11",
+      "pname": "python313",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T04:39:42.592141Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
-      "version": "python3-3.12.12",
+      "version": "python3-3.13.11",
       "outputs_to_install": [
+        "out",
+        "out",
+        "out",
+        "out",
         "out",
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/nrk1773m026hlgkk7vlpvc2s6zlwf1rh-python3-3.12.12"
+        "out": "/nix/store/qzgxkh5rnlswnj5ywhag0djwvn83kr3r-python3-3.13.11"
       },
       "system": "aarch64-darwin",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312",
+      "attr_path": "python313",
       "broken": false,
-      "derivation": "/nix/store/qhm42a1wqax818vzdd5cww2161ghndnz-python3-3.12.12.drv",
+      "derivation": "/nix/store/cadmaxzh2h1i0id6zfa5zq0mjpr9qqda-python3-3.13.11.drv",
       "description": "High-level dynamically-typed programming language",
       "install_id": "python",
       "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3-3.12.12",
-      "pname": "python312",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:19:49.148407Z",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3-3.13.11",
+      "pname": "python313",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T05:12:36.522115Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
-      "version": "python3-3.12.12",
+      "version": "python3-3.13.11",
       "outputs_to_install": [
+        "out",
+        "out",
+        "out",
         "out",
         "out"
       ],
       "outputs": {
-        "debug": "/nix/store/b26kb9x8r02z43r0jjkj08rc5g1vf6ig-python3-3.12.12-debug",
-        "out": "/nix/store/yyns9w3mfdxn5jwqa3lbp461wq9nl5p7-python3-3.12.12"
+        "debug": "/nix/store/bzb0vriv1a1kaz9zv6lzv62zkcvvm88r-python3-3.13.11-debug",
+        "out": "/nix/store/ygzfhw5nxrn7qqfqmz2s9p6cikcjqqkh-python3-3.13.11"
       },
       "system": "aarch64-linux",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312",
+      "attr_path": "python313",
       "broken": false,
-      "derivation": "/nix/store/x9a8pck9qmr00br97rjsksd3dzkgicpn-python3-3.12.12.drv",
+      "derivation": "/nix/store/dk525f5vnsqf4c5m90rhm2hazww34xmx-python3-3.13.11.drv",
       "description": "High-level dynamically-typed programming language",
       "install_id": "python",
       "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3-3.12.12",
-      "pname": "python312",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:35:35.060199Z",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3-3.13.11",
+      "pname": "python313",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T05:44:17.740882Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
-      "version": "python3-3.12.12",
+      "version": "python3-3.13.11",
       "outputs_to_install": [
+        "out",
+        "out",
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/978h7w9sbz3f6qi6ra4pp6prqflgqyqq-python3-3.12.12"
+        "out": "/nix/store/5wy2gaa1kaskq3j63zwl1jw6a0ffllx5-python3-3.13.11"
       },
       "system": "x86_64-darwin",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312",
+      "attr_path": "python313",
       "broken": false,
-      "derivation": "/nix/store/292x6hs174q68ibb9n1b3p4hpqsbyprh-python3-3.12.12.drv",
+      "derivation": "/nix/store/bmlsz2bfdg16dr10k8rm3hmkq09h06nr-python3-3.13.11.drv",
       "description": "High-level dynamically-typed programming language",
       "install_id": "python",
       "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3-3.12.12",
-      "pname": "python312",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:52:08.954314Z",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3-3.13.11",
+      "pname": "python313",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T06:21:13.337278Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
-      "version": "python3-3.12.12",
+      "version": "python3-3.13.11",
       "outputs_to_install": [
+        "out",
+        "out",
+        "out",
         "out",
         "out",
         "out",
         "out"
       ],
       "outputs": {
-        "debug": "/nix/store/y2128xkl79k97arhvrsq2p2rmr0dim75-python3-3.12.12-debug",
-        "out": "/nix/store/fdibxyh7xcmqrc172y78awzhxs292gq1-python3-3.12.12"
+        "debug": "/nix/store/gvhg8py0jr9v83ysqb86rr2s1yidppca-python3-3.13.11-debug",
+        "out": "/nix/store/slhpx9glq7vl99bwi93bgrhn3syv98s1-python3-3.13.11"
       },
       "system": "x86_64-linux",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.sentencepiece",
+      "attr_path": "python313Packages.sentencepiece",
       "broken": false,
-      "derivation": "/nix/store/g5iwbwy6iliha0iq4q6gdx4lx9crpqmd-python3.12-sentencepiece-0.2.1.drv",
+      "derivation": "/nix/store/h2n4gcaw643rjzgmf640a72fykfrfb44-python3.13-sentencepiece-0.2.1.drv",
       "description": "Unsupervised text tokenizer for Neural Network-based text generation",
       "install_id": "sentencepiece",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-sentencepiece-0.2.1",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-sentencepiece-0.2.1",
       "pname": "sentencepiece",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:03:25.319414Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T04:39:58.147296Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
       "version": "0.2.1",
       "outputs_to_install": [
+        "out",
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/xlgldy99bxsa09vcq5rjacksshzznfhs-python3.12-sentencepiece-0.2.1-dist",
-        "out": "/nix/store/1y0hd9sfjnrg7s7klbdr3vxw5klryrnf-python3.12-sentencepiece-0.2.1"
+        "dist": "/nix/store/dzlawn48ms6izy8ghzlh4wc988m49y6q-python3.13-sentencepiece-0.2.1-dist",
+        "out": "/nix/store/gpf0ddvl138rc6ki5yny13w3ppbhxayr-python3.13-sentencepiece-0.2.1"
       },
       "system": "aarch64-darwin",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.sentencepiece",
+      "attr_path": "python313Packages.sentencepiece",
       "broken": false,
-      "derivation": "/nix/store/4ak1af28bz0knvypmn9fnkyq1f0h0d44-python3.12-sentencepiece-0.2.1.drv",
+      "derivation": "/nix/store/xx3y0pfx4w70n77s4ackahjh0dy6n6cx-python3.13-sentencepiece-0.2.1.drv",
       "description": "Unsupervised text tokenizer for Neural Network-based text generation",
       "install_id": "sentencepiece",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-sentencepiece-0.2.1",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-sentencepiece-0.2.1",
       "pname": "sentencepiece",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:20:07.661577Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T05:12:55.782862Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
       "version": "0.2.1",
       "outputs_to_install": [
+        "out",
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/rdqdvqnad3lbkgarbldjb5yw269b2ryg-python3.12-sentencepiece-0.2.1-dist",
-        "out": "/nix/store/3mq7syxmmh1wkq4ck6i4c1fakh8npmfj-python3.12-sentencepiece-0.2.1"
+        "dist": "/nix/store/0bsnadwl3wina3ln2pw921hfhrcmsfff-python3.13-sentencepiece-0.2.1-dist",
+        "out": "/nix/store/6p1vcb3vn9npyrl30na9k0x4fhvcx03i-python3.13-sentencepiece-0.2.1"
       },
       "system": "aarch64-linux",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.sentencepiece",
+      "attr_path": "python313Packages.sentencepiece",
       "broken": false,
-      "derivation": "/nix/store/lcv51ix7v3qagkgapy72pzk3bjc6lqc8-python3.12-sentencepiece-0.2.1.drv",
+      "derivation": "/nix/store/j1my9wax70rc7zi8n9jik43a3gl4rqjp-python3.13-sentencepiece-0.2.1.drv",
       "description": "Unsupervised text tokenizer for Neural Network-based text generation",
       "install_id": "sentencepiece",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-sentencepiece-0.2.1",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-sentencepiece-0.2.1",
       "pname": "sentencepiece",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:35:49.444774Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T05:44:33.133825Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
       "version": "0.2.1",
       "outputs_to_install": [
+        "out",
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/ail5rgxz2jc7hpm2j5a2g38ir276niyq-python3.12-sentencepiece-0.2.1-dist",
-        "out": "/nix/store/vy7sjlhchml20hvy1255sp7c8pvn4g44-python3.12-sentencepiece-0.2.1"
+        "dist": "/nix/store/9p4l0xv5rxvggr1gkxynnxwlpb6b69m8-python3.13-sentencepiece-0.2.1-dist",
+        "out": "/nix/store/8lg7fg4nqw9k6w677nf787afnw1g9kb0-python3.13-sentencepiece-0.2.1"
       },
       "system": "x86_64-darwin",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.sentencepiece",
+      "attr_path": "python313Packages.sentencepiece",
       "broken": false,
-      "derivation": "/nix/store/ny2k3xvfcar6anvzga22534bc1mwi0rq-python3.12-sentencepiece-0.2.1.drv",
+      "derivation": "/nix/store/kn5smnk1g2rcdgd81gb4mmz89lhpa67n-python3.13-sentencepiece-0.2.1.drv",
       "description": "Unsupervised text tokenizer for Neural Network-based text generation",
       "install_id": "sentencepiece",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-sentencepiece-0.2.1",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-sentencepiece-0.2.1",
       "pname": "sentencepiece",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:52:28.064380Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T06:21:33.513190Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
       "version": "0.2.1",
       "outputs_to_install": [
+        "out",
+        "out",
+        "out",
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/z99nkxf0l0zhc33076yasil6xibqwv2m-python3.12-sentencepiece-0.2.1-dist",
-        "out": "/nix/store/rcsx2kq5v6d7hc389a09ma1angjpszmg-python3.12-sentencepiece-0.2.1"
+        "dist": "/nix/store/sjhs8cq05grnnrh1d2m9wikqbhkd08fw-python3.13-sentencepiece-0.2.1-dist",
+        "out": "/nix/store/kld4kmkhb0i5nwvl7vd509svb786jz73-python3.13-sentencepiece-0.2.1"
       },
       "system": "x86_64-linux",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.torch",
+      "attr_path": "python3Packages.torch",
       "broken": false,
-      "derivation": "/nix/store/f5g6l119agizn3ksdshz4hz8ily13cck-python3.12-torch-2.9.1.drv",
+      "derivation": "/nix/store/p98vn4f33sy78474kiqd6r14r1fn50k8-python3.13-torch-2.9.1.drv",
       "description": "PyTorch: Tensors and Dynamic neural networks in Python with strong GPU acceleration",
       "install_id": "torch",
       "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-torch-2.9.1",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-torch-2.9.1",
       "pname": "torch",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:03:27.104529Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-05-22T22:19:31.891874Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
       "version": "2.9.1",
@@ -1226,69 +1236,32 @@
         "out"
       ],
       "outputs": {
-        "cxxdev": "/nix/store/qyrq23xaxn4xg35d6548zl79fw0s9gav-python3.12-torch-2.9.1-cxxdev",
-        "dev": "/nix/store/2hah6hcia4m2siwss5p6p7p7idrb1wa6-python3.12-torch-2.9.1-dev",
-        "dist": "/nix/store/fwfrwc9f8mcpql0y3x6ap1afblj4yb3x-python3.12-torch-2.9.1-dist",
-        "lib": "/nix/store/p5yrqqhfxpwsbcq2r2aw9ka65csnzchs-python3.12-torch-2.9.1-lib",
-        "out": "/nix/store/d12was1p1yc0hjkp0jjrjnj7bva8rmbw-python3.12-torch-2.9.1"
-      },
-      "system": "aarch64-darwin",
-      "group": "sana",
-      "priority": 5
-    },
-    {
-      "attr_path": "python312Packages.torch",
-      "broken": false,
-      "derivation": "/nix/store/x4ba37cghxs2nrnfvmimwj5i64w5cg9y-python3.12-torch-2.9.1.drv",
-      "description": "PyTorch: Tensors and Dynamic neural networks in Python with strong GPU acceleration",
-      "install_id": "torch",
-      "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-torch-2.9.1",
-      "pname": "torch",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:20:09.826465Z",
-      "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "2.9.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "cxxdev": "/nix/store/my0ln7gilp09b7390pv7cgkld7s97qs6-python3.12-torch-2.9.1-cxxdev",
-        "dev": "/nix/store/l7s7wzdqk3qbqqk7gyiyivqjm0jkil1w-python3.12-torch-2.9.1-dev",
-        "dist": "/nix/store/in97h5blh8nh7cnrgcc215rwwm3fdv2k-python3.12-torch-2.9.1-dist",
-        "lib": "/nix/store/fzk78gvabkdrvpi3h4anya34y24sl7kq-python3.12-torch-2.9.1-lib",
-        "out": "/nix/store/yfygk4331mglcc6xj602xgr8325n9hxp-python3.12-torch-2.9.1"
+        "cxxdev": "/nix/store/n9l1bgf7rr46mc3g8zhghyp4yhv12wgd-python3.13-torch-2.9.1-cxxdev",
+        "dev": "/nix/store/4kswl6zq5dv05ikr4j3rcvwk8v08yfh3-python3.13-torch-2.9.1-dev",
+        "dist": "/nix/store/0gfr8lsk0lsrfpslrz7gxzw9rw3gfp9p-python3.13-torch-2.9.1-dist",
+        "lib": "/nix/store/zyv8b53q7nq0qapz4s5vnhfmjndssh0a-python3.13-torch-2.9.1-lib",
+        "out": "/nix/store/pxlllldlj7j498iapg7liv4b4vc6fbbb-python3.13-torch-2.9.1"
       },
       "system": "aarch64-linux",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.torch",
+      "attr_path": "python3Packages.torch",
       "broken": false,
-      "derivation": "/nix/store/9xygd05iq5a89pvd8cgfg68wq779hv67-python3.12-torch-2.9.1.drv",
+      "derivation": "/nix/store/lp4m0kxdci3bpfw3zx0nhr41wl0i9r3f-python3.13-torch-2.9.1.drv",
       "description": "PyTorch: Tensors and Dynamic neural networks in Python with strong GPU acceleration",
       "install_id": "torch",
       "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-torch-2.9.1",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-torch-2.9.1",
       "pname": "torch",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:35:51.083166Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-05-22T22:19:31.891875Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
       "version": "2.9.1",
@@ -1296,174 +1269,196 @@
         "out"
       ],
       "outputs": {
-        "cxxdev": "/nix/store/30apz22ap3k2k4bki8bqsl0hgx5b8fbp-python3.12-torch-2.9.1-cxxdev",
-        "dev": "/nix/store/xjf1dvm1l7apqnkjnx9wdlp50lgp8j0h-python3.12-torch-2.9.1-dev",
-        "dist": "/nix/store/dkjxycalfbcc6sm02mxrvpdnwhb7gybw-python3.12-torch-2.9.1-dist",
-        "lib": "/nix/store/imqiqsyllj2zpscs3fqyxgwj19igl5qg-python3.12-torch-2.9.1-lib",
-        "out": "/nix/store/xd1k7wriglan0gz5hplwakndlbm51lai-python3.12-torch-2.9.1"
-      },
-      "system": "x86_64-darwin",
-      "group": "sana",
-      "priority": 5
-    },
-    {
-      "attr_path": "python312Packages.torch",
-      "broken": false,
-      "derivation": "/nix/store/zv0why3lds17n1i45rldp3wpqagnhhf8-python3.12-torch-2.9.1.drv",
-      "description": "PyTorch: Tensors and Dynamic neural networks in Python with strong GPU acceleration",
-      "install_id": "torch",
-      "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-torch-2.9.1",
-      "pname": "torch",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:52:30.273607Z",
-      "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "2.9.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "cxxdev": "/nix/store/x92k9bn8y44xlxicqh1cx6b3z8fgm21y-python3.12-torch-2.9.1-cxxdev",
-        "dev": "/nix/store/a116adbb9wmk9dvgb3bicy6f7ksy1vn6-python3.12-torch-2.9.1-dev",
-        "dist": "/nix/store/i745pgkk0784hjxm8qnrv91m420wzvnr-python3.12-torch-2.9.1-dist",
-        "lib": "/nix/store/xdkc5krks0qr91fliz5zxl11cflkqm88-python3.12-torch-2.9.1-lib",
-        "out": "/nix/store/ckbi4xsg4d9flm0p9x79g0zfbrg1m6m5-python3.12-torch-2.9.1"
+        "cxxdev": "/nix/store/30bqqqf3mbhnjki9q77kf81612sbrdw7-python3.13-torch-2.9.1-cxxdev",
+        "dev": "/nix/store/w8804rjg97j6l295m8lyib69f8fx36rj-python3.13-torch-2.9.1-dev",
+        "dist": "/nix/store/nzdb5f1yvy44c18c63mh2ngnyb644h0q-python3.13-torch-2.9.1-dist",
+        "lib": "/nix/store/zf53rvp3l98rxl7njnw74j9sb9aggsy8-python3.13-torch-2.9.1-lib",
+        "out": "/nix/store/sm8y4v7pyl8r4x27247phcnk357mak20-python3.13-torch-2.9.1"
       },
       "system": "x86_64-linux",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.transformers",
+      "attr_path": "python313Packages.torch",
       "broken": false,
-      "derivation": "/nix/store/mq4xa7vc38c2qyz93pxjaa6sj4phpv4g-python3.12-transformers-4.57.3.drv",
-      "description": "Natural Language Processing for TensorFlow 2.0 and PyTorch",
-      "install_id": "transformers",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-transformers-4.57.3",
-      "pname": "transformers",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:03:27.223175Z",
+      "derivation": "/nix/store/sbkb2cvd7j94zw5l6rnvya48cb476f4c-python3.13-torch-2.9.1.drv",
+      "description": "PyTorch: Tensors and Dynamic neural networks in Python with strong GPU acceleration",
+      "install_id": "torch-darwin",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-torch-2.9.1",
+      "pname": "torch",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T04:39:59.950269Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
-      "version": "4.57.3",
+      "version": "2.9.1",
       "outputs_to_install": [
+        "out",
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/s1wg338m97r6f48jmlj7v7ygyljsq651-python3.12-transformers-4.57.3-dist",
-        "out": "/nix/store/0dv2mh3601s1c8zv9pk2bjzfwm0dq1qx-python3.12-transformers-4.57.3"
+        "cxxdev": "/nix/store/92hfi6ywgcqgbaim2y2jxhag00ffh34q-python3.13-torch-2.9.1-cxxdev",
+        "dev": "/nix/store/af7imxnmz4nrbqk23f37qqlkfp6d4vdv-python3.13-torch-2.9.1-dev",
+        "dist": "/nix/store/c49wzwiab5i331696znipgp7nd5md08s-python3.13-torch-2.9.1-dist",
+        "lib": "/nix/store/9l6fnzgf2fi9y7lja5l335fwmsnp1whd-python3.13-torch-2.9.1-lib",
+        "out": "/nix/store/z0a9cggs82aq5l251pr86f05pff33ds7-python3.13-torch-2.9.1"
       },
       "system": "aarch64-darwin",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.transformers",
+      "attr_path": "python3Packages.transformers",
       "broken": false,
-      "derivation": "/nix/store/1d4z0gjkly94lav0l5wm62sjqx7mmlqf-python3.12-transformers-4.57.3.drv",
+      "derivation": "/nix/store/16yk89mknjzxvcpzid6swac7fkjn6h17-python3.13-transformers-4.57.6.drv",
       "description": "Natural Language Processing for TensorFlow 2.0 and PyTorch",
       "install_id": "transformers",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-transformers-4.57.3",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-transformers-4.57.6",
       "pname": "transformers",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:20:09.980413Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-05-22T22:19:31.891877Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
-      "version": "4.57.3",
+      "version": "4.57.6",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/zqp23wp9h14fa26iv1hfbc2isclbvsrp-python3.12-transformers-4.57.3-dist",
-        "out": "/nix/store/7h5n3ycpi5k4vkk1kgz674hrw777dfys-python3.12-transformers-4.57.3"
+        "dist": "/nix/store/ans45awc1i4zp67ag0603lg72pqac920-python3.13-transformers-4.57.6-dist",
+        "out": "/nix/store/cmymqv385i6hcm54qfp0wj5pfz3wz56p-python3.13-transformers-4.57.6"
       },
       "system": "aarch64-linux",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.transformers",
+      "attr_path": "python3Packages.transformers",
       "broken": false,
-      "derivation": "/nix/store/hpn3pfi3qa7sabybl6871vvg0axng4in-python3.12-transformers-4.57.3.drv",
+      "derivation": "/nix/store/56f3myi3vn7gqa8rhgc62862j4mxxxrj-python3.13-transformers-4.57.6.drv",
       "description": "Natural Language Processing for TensorFlow 2.0 and PyTorch",
       "install_id": "transformers",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-transformers-4.57.3",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-transformers-4.57.6",
       "pname": "transformers",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:35:51.189686Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-05-22T22:19:31.891877Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
-      "version": "4.57.3",
+      "version": "4.57.6",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/hjc4fcqllikzzm0vw53j1jpl2rcxa4d4-python3.12-transformers-4.57.3-dist",
-        "out": "/nix/store/1h20x7h982xqmb4l1x5zfiwxgw2z8hks-python3.12-transformers-4.57.3"
+        "dist": "/nix/store/wls4ix960mii6v9q8mhp1pd6bgwkya7q-python3.13-transformers-4.57.6-dist",
+        "out": "/nix/store/zkyin1x5sfpg48m2aw7jv6zwpj37l8v7-python3.13-transformers-4.57.6"
       },
-      "system": "x86_64-darwin",
+      "system": "x86_64-linux",
       "group": "sana",
       "priority": 5
     },
     {
-      "attr_path": "python312Packages.transformers",
+      "attr_path": "python313Packages.transformers",
       "broken": false,
-      "derivation": "/nix/store/i81v3pk7bwgfhza6vaps4gz8bgdyh0vz-python3.12-transformers-4.57.3.drv",
+      "derivation": "/nix/store/x5m4is8f3bwwaybq92dvn58znw5mkqvj-python3.13-transformers-4.57.6.drv",
       "description": "Natural Language Processing for TensorFlow 2.0 and PyTorch",
-      "install_id": "transformers",
+      "install_id": "transformers-darwin",
       "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "python3.12-transformers-4.57.3",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-transformers-4.57.6",
       "pname": "transformers",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:52:30.425956Z",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T04:40:00.074749Z",
       "stabilities": [
-        "unstable",
-        "staging",
-        "stable"
+        "unstable"
       ],
       "unfree": false,
-      "version": "4.57.3",
+      "version": "4.57.6",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/0bghxqpx20ydyj01ifj0ky72f7jvq35y-python3.13-transformers-4.57.6-dist",
+        "out": "/nix/store/xyx00z0yjmghiv9f47n7dszzk8gf9q69-python3.13-transformers-4.57.6"
+      },
+      "system": "aarch64-darwin",
+      "group": "sana",
+      "priority": 5
+    },
+    {
+      "attr_path": "python313Packages.xformers",
+      "broken": false,
+      "derivation": "/nix/store/qp3y883s0y4vvcrmary3s9rhq48qa99q-python3.13-xformers-0.0.30.drv",
+      "description": "Collection of composable Transformer building blocks",
+      "install_id": "xformers",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-xformers-0.0.30",
+      "pname": "xformers",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T05:13:01.058138Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.0.30",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "dist": "/nix/store/gp9422f362mjqwnbqfysffg9rnfj49hs-python3.12-transformers-4.57.3-dist",
-        "out": "/nix/store/hrsyvh8bsqgazs09qg8nnwdnhqhqqmmq-python3.12-transformers-4.57.3"
+        "dist": "/nix/store/wllx52bdpsgbjgwr4qnjs6giijbgb2ap-python3.13-xformers-0.0.30-dist",
+        "out": "/nix/store/2ash987jwwpagdfigng94r9cvg1cm0d6-python3.13-xformers-0.0.30"
+      },
+      "system": "aarch64-linux",
+      "group": "sana",
+      "priority": 5
+    },
+    {
+      "attr_path": "python313Packages.xformers",
+      "broken": false,
+      "derivation": "/nix/store/m173cpvv4qcbjli08cbk3mny0qy8d4gg-python3.13-xformers-0.0.30.drv",
+      "description": "Collection of composable Transformer building blocks",
+      "install_id": "xformers",
+      "license": "BSD-3-Clause",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "name": "python3.13-xformers-0.0.30",
+      "pname": "xformers",
+      "rev": "ec7c70d12ce2fc37cb92aff673dcdca89d187bae",
+      "rev_count": 944744,
+      "rev_date": "2026-02-11T20:21:07Z",
+      "scrape_date": "2026-02-14T06:21:39.000950Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.0.30",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/pxv38djlcyi5vf6lanw34mjwm1ysp4bh-python3.13-xformers-0.0.30-dist",
+        "out": "/nix/store/bx71n3i333bal2a8l9v9a84jksa407i6-python3.13-xformers-0.0.30"
       },
       "system": "x86_64-linux",
       "group": "sana",
@@ -1475,7 +1470,7 @@
       "schema-version": "1.11.0",
       "install": {
         "gradio": {
-          "pkg-path": "python312Packages.gradio",
+          "pkg-path": "python313Packages.gradio",
           "pkg-group": "sana"
         },
         "gum": {
@@ -1488,7 +1483,7 @@
         "SANA_GRADIO_PORT": "17860"
       },
       "hook": {
-        "on-activate": "sana_bin=\"${SANA_DATA_DIR:-$FLOX_ENV_CACHE/sana}/bin\"\nmkdir -p \"$sana_bin\"\n\ncat > \"$sana_bin/sana-gradio\" <<'PYEOF'\n#!/usr/bin/env python3\n\"\"\"sana-gradio: Gradio web UI for SANA text-to-image.\"\"\"\nimport os\nimport sys\nfrom pathlib import Path\n\nHOST = os.environ.get(\"SANA_GRADIO_HOST\", \"127.0.0.1\")\nPORT = int(os.environ.get(\"SANA_GRADIO_PORT\", \"17860\"))\nDEFAULT_MODEL = os.environ.get(\n    \"SANA_DEFAULT_MODEL\",\n    \"Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers\",\n)\nSKIP_LOAD = os.environ.get(\"SANA_SKIP_LOAD\", \"\") == \"1\"\n\n_HERE = Path(__file__).resolve().parent\nsys.path.insert(0, str(_HERE))\n\nimport gradio as gr  # noqa: E402\n\n_pipe = None\n\n\ndef _load():\n    \"\"\"Lazily load the SANA pipeline on first call.\"\"\"\n    global _pipe\n    if _pipe is not None:\n        return _pipe\n    from diffusers import SanaPipeline\n    from _sana_device import best_device\n\n    device, dtype = best_device()\n    print(\n        f\"[sana-gradio] loading {DEFAULT_MODEL} \"\n        f\"on {device} ({dtype})\",\n        file=sys.stderr,\n    )\n    pipe = SanaPipeline.from_pretrained(\n        DEFAULT_MODEL, torch_dtype=dtype,\n    )\n    pipe.to(device)\n    pipe.vae.to(dtype)\n    pipe.text_encoder.to(dtype)\n    _pipe = pipe\n    return pipe\n\n\ndef generate(prompt, steps, guidance, seed, width, height):\n    import torch\n    pipe = _load()\n    device = next(pipe.transformer.parameters()).device.type\n    gen = None\n    if seed is not None and int(seed) >= 0:\n        gen = torch.Generator(device=device).manual_seed(int(seed))\n    image = pipe(\n        prompt=prompt,\n        height=int(height),\n        width=int(width),\n        guidance_scale=float(guidance),\n        num_inference_steps=int(steps),\n        generator=gen,\n    ).images[0]\n    return image\n\n\ndef build_ui():\n    with gr.Blocks(title=\"SANA\") as demo:\n        gr.Markdown(\"# SANA Text-to-Image\")\n        prompt = gr.Textbox(label=\"Prompt\", lines=2)\n        with gr.Row():\n            steps = gr.Slider(\n                1, 50, value=20, step=1, label=\"Steps\",\n            )\n            guidance = gr.Slider(\n                1.0, 10.0, value=4.5, label=\"Guidance\",\n            )\n        with gr.Row():\n            width = gr.Slider(\n                512, 2048, value=1024, step=64, label=\"Width\",\n            )\n            height = gr.Slider(\n                512, 2048, value=1024, step=64, label=\"Height\",\n            )\n        seed = gr.Number(\n            value=-1, label=\"Seed (-1 = random)\", precision=0,\n        )\n        button = gr.Button(\"Generate\")\n        out = gr.Image(label=\"Result\")\n        button.click(\n            generate,\n            [prompt, steps, guidance, seed, width, height],\n            out,\n        )\n    return demo\n\n\ndef build_skip_load_ui():\n    with gr.Blocks(title=\"SANA (test mode)\") as demo:\n        gr.Markdown(\n            \"## SANA test mode\\n\"\n            \"SANA_SKIP_LOAD=1 — model not loaded.\"\n        )\n    return demo\n\n\ndef main():\n    demo = build_skip_load_ui() if SKIP_LOAD else build_ui()\n    print(\n        f\"[sana-gradio] starting on http://{HOST}:{PORT} \"\n        f\"(skip_load={SKIP_LOAD})\",\n        file=sys.stderr,\n    )\n    demo.launch(\n        server_name=HOST,\n        server_port=PORT,\n        inbrowser=False,\n    )\n\n\nif __name__ == \"__main__\":\n    main()\nPYEOF\nchmod +x \"$sana_bin/sana-gradio\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center --width 60 \\\n    --margin \"1\" --padding \"1 4\" \\\n    \"SANA demo\" \\\n    \"\" \\\n    \"Pull a model:    sana-pull\" \\\n    \"Generate:        sana-generate \\\"your prompt\\\"\" \\\n    \"Web UI:          flox services start sana-gradio\" \\\n    \"                 then open http://${SANA_GRADIO_HOST}:${SANA_GRADIO_PORT}\"\nfi\n"
+        "on-activate": "sana_bin=\"${SANA_DATA_DIR:-$FLOX_ENV_CACHE/sana}/bin\"\nmkdir -p \"$sana_bin\"\n\ncat > \"$sana_bin/sana-gradio\" <<'PYEOF'\n#!/usr/bin/env python3\n\"\"\"sana-gradio: Gradio web UI for SANA text-to-image.\"\"\"\nimport os\nimport sys\nfrom pathlib import Path\n\nHOST = os.environ.get(\"SANA_GRADIO_HOST\", \"127.0.0.1\")\nPORT = int(os.environ.get(\"SANA_GRADIO_PORT\", \"17860\"))\nDEFAULT_MODEL = os.environ.get(\n    \"SANA_DEFAULT_MODEL\",\n    \"Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers\",\n)\nSKIP_LOAD = os.environ.get(\"SANA_SKIP_LOAD\", \"\") == \"1\"\n\n_HERE = Path(__file__).resolve().parent\nsys.path.insert(0, str(_HERE))\n\nimport gradio as gr  # noqa: E402\n\n_pipe = None\n\n\ndef _load():\n    \"\"\"Lazily load the SANA pipeline on first call.\"\"\"\n    global _pipe\n    if _pipe is not None:\n        return _pipe\n    from diffusers import SanaPipeline\n    from _sana_device import best_device\n\n    device, dtype = best_device()\n    print(\n        f\"[sana-gradio] loading {DEFAULT_MODEL} \"\n        f\"on {device} ({dtype})\",\n        file=sys.stderr,\n    )\n    pipe = SanaPipeline.from_pretrained(\n        DEFAULT_MODEL, torch_dtype=dtype,\n    )\n    pipe.to(device)\n    pipe.vae.to(dtype)\n    pipe.text_encoder.to(dtype)\n    if device == \"cuda\":\n        try:\n            pipe.enable_xformers_memory_efficient_attention()\n        except (ImportError, ModuleNotFoundError):\n            pass\n    _pipe = pipe\n    return pipe\n\n\ndef generate(prompt, steps, guidance, seed, width, height):\n    import torch\n    pipe = _load()\n    device = next(pipe.transformer.parameters()).device.type\n    gen = None\n    if seed is not None and int(seed) >= 0:\n        gen = torch.Generator(device=device).manual_seed(int(seed))\n    image = pipe(\n        prompt=prompt,\n        height=int(height),\n        width=int(width),\n        guidance_scale=float(guidance),\n        num_inference_steps=int(steps),\n        generator=gen,\n    ).images[0]\n    return image\n\n\ndef build_ui():\n    with gr.Blocks(title=\"SANA\") as demo:\n        gr.Markdown(\"# SANA Text-to-Image\")\n        prompt = gr.Textbox(label=\"Prompt\", lines=2)\n        with gr.Row():\n            steps = gr.Slider(\n                1, 50, value=20, step=1, label=\"Steps\",\n            )\n            guidance = gr.Slider(\n                1.0, 10.0, value=4.5, label=\"Guidance\",\n            )\n        with gr.Row():\n            width = gr.Slider(\n                512, 2048, value=1024, step=64, label=\"Width\",\n            )\n            height = gr.Slider(\n                512, 2048, value=1024, step=64, label=\"Height\",\n            )\n        seed = gr.Number(\n            value=-1, label=\"Seed (-1 = random)\", precision=0,\n        )\n        button = gr.Button(\"Generate\")\n        out = gr.Image(label=\"Result\")\n        button.click(\n            generate,\n            [prompt, steps, guidance, seed, width, height],\n            out,\n        )\n    return demo\n\n\ndef build_skip_load_ui():\n    with gr.Blocks(title=\"SANA (test mode)\") as demo:\n        gr.Markdown(\n            \"## SANA test mode\\n\"\n            \"SANA_SKIP_LOAD=1 — model not loaded.\"\n        )\n    return demo\n\n\ndef main():\n    demo = build_skip_load_ui() if SKIP_LOAD else build_ui()\n    print(\n        f\"[sana-gradio] starting on http://{HOST}:{PORT} \"\n        f\"(skip_load={SKIP_LOAD})\",\n        file=sys.stderr,\n    )\n    demo.launch(\n        server_name=HOST,\n        server_port=PORT,\n        inbrowser=False,\n    )\n\n\nif __name__ == \"__main__\":\n    main()\nPYEOF\nchmod +x \"$sana_bin/sana-gradio\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center --width 60 \\\n    --margin \"1\" --padding \"1 4\" \\\n    \"SANA demo\" \\\n    \"\" \\\n    \"Pull a model:    sana-pull\" \\\n    \"Generate:        sana-generate \\\"your prompt\\\"\" \\\n    \"Web UI:          flox services start sana-gradio\" \\\n    \"                 then open http://${SANA_GRADIO_HOST}:${SANA_GRADIO_PORT}\"\nfi\n"
       },
       "options": {},
       "services": {
@@ -1510,11 +1505,11 @@
           "schema-version": "1.11.0",
           "install": {
             "accelerate": {
-              "pkg-path": "python312Packages.accelerate",
+              "pkg-path": "python313Packages.accelerate",
               "pkg-group": "sana"
             },
             "diffusers": {
-              "pkg-path": "python312Packages.diffusers",
+              "pkg-path": "python313Packages.diffusers",
               "pkg-group": "sana"
             },
             "huggingface-hub": {
@@ -1522,28 +1517,59 @@
               "pkg-group": "huggingface"
             },
             "pillow": {
-              "pkg-path": "python312Packages.pillow",
+              "pkg-path": "python313Packages.pillow",
               "pkg-group": "sana"
             },
             "protobuf": {
-              "pkg-path": "python312Packages.protobuf",
+              "pkg-path": "python313Packages.protobuf",
               "pkg-group": "sana"
             },
             "python": {
-              "pkg-path": "python312",
+              "pkg-path": "python313",
               "pkg-group": "sana"
             },
             "sentencepiece": {
-              "pkg-path": "python312Packages.sentencepiece",
+              "pkg-path": "python313Packages.sentencepiece",
               "pkg-group": "sana"
             },
             "torch": {
-              "pkg-path": "python312Packages.torch",
-              "pkg-group": "sana"
+              "pkg-path": "flox-cuda/python3Packages.torch",
+              "pkg-group": "sana",
+              "version": "2.9.1",
+              "systems": [
+                "x86_64-linux",
+                "aarch64-linux"
+              ]
+            },
+            "torch-darwin": {
+              "pkg-path": "python313Packages.torch",
+              "pkg-group": "sana",
+              "systems": [
+                "aarch64-darwin"
+              ]
             },
             "transformers": {
-              "pkg-path": "python312Packages.transformers",
-              "pkg-group": "sana"
+              "pkg-path": "flox-cuda/python3Packages.transformers",
+              "pkg-group": "sana",
+              "systems": [
+                "x86_64-linux",
+                "aarch64-linux"
+              ]
+            },
+            "transformers-darwin": {
+              "pkg-path": "python313Packages.transformers",
+              "pkg-group": "sana",
+              "systems": [
+                "aarch64-darwin"
+              ]
+            },
+            "xformers": {
+              "pkg-path": "python313Packages.xformers",
+              "pkg-group": "sana",
+              "systems": [
+                "x86_64-linux",
+                "aarch64-linux"
+              ]
             }
           },
           "vars": {
@@ -1551,7 +1577,7 @@
             "SANA_DEFAULT_MODEL": "Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers"
           },
           "hook": {
-            "on-activate": "HF_HOME=\"$FLOX_ENV_CACHE/huggingface\"\nexport HF_HOME\nmkdir -p \"$HF_HOME\"\n\nsana_dir=\"$FLOX_ENV_CACHE/sana\"\nsana_bin=\"$sana_dir/bin\"\nmkdir -p \"$sana_bin\"\nexport SANA_DATA_DIR=\"$sana_dir\"\nexport PATH=\"$sana_bin:$PATH\"\n\n# _sana_device.py: shared device/dtype selector.\ncat > \"$sana_bin/_sana_device.py\" <<'PYEOF'\n\"\"\"Device selection helper for SANA scripts.\"\"\"\ndef best_device():\n    import torch\n    if torch.cuda.is_available():\n        return \"cuda\", torch.bfloat16\n    if torch.backends.mps.is_available():\n        return \"mps\", torch.bfloat16\n    return \"cpu\", torch.float32\nPYEOF\n\n# sana-pull: download a SANA model into HF_HOME.\ncat > \"$sana_bin/sana-pull\" <<'SHEOF'\n#!/usr/bin/env bash\nset -eo pipefail\n\nCURATED=(\n  \"Efficient-Large-Model/Sana_600M_1024px_diffusers\"\n  \"Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers\"\n  \"Efficient-Large-Model/Sana_1600M_2Kpx_BF16_diffusers\"\n  \"Efficient-Large-Model/Sana_1600M_4Kpx_BF16_diffusers\"\n)\nDEFAULT=\"${SANA_DEFAULT_MODEL:-Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers}\"\n\nusage() {\n  cat <<EOF\nsana-pull — download a SANA model into HF_HOME\n\nUsage:\n  sana-pull                # pull the default model\n  sana-pull <model-id>     # pull a specific model\n  sana-pull --list         # print curated model IDs\n  sana-pull --help         # show this message\n\nDefault model: $DEFAULT\n\nCurated models:\n$(printf '  - %s\\n' \"${CURATED[@]}\")\nEOF\n}\n\ncase \"${1:-}\" in\n  \"\"|--default)\n    exec hf download \"$DEFAULT\"\n    ;;\n  --list)\n    printf '%s\\n' \"${CURATED[@]}\"\n    ;;\n  -h|--help)\n    usage\n    ;;\n  -*)\n    echo \"sana-pull: unknown flag: $1\" >&2\n    usage >&2\n    exit 1\n    ;;\n  *)\n    exec hf download \"$1\"\n    ;;\nesac\nSHEOF\nchmod +x \"$sana_bin/sana-pull\"\n\n# sana-generate: text-to-image via SANA diffusers pipeline.\ncat > \"$sana_bin/sana-generate\" <<'PYEOF'\n#!/usr/bin/env python3\n\"\"\"sana-generate: text-to-image via SANA diffusers pipeline.\"\"\"\nimport argparse\nimport os\nimport sys\nimport time\nfrom pathlib import Path\n\n_HERE = Path(__file__).resolve().parent\nsys.path.insert(0, str(_HERE))\nfrom _sana_device import best_device  # noqa: E402\n\nDEFAULT_MODEL = os.environ.get(\n    \"SANA_DEFAULT_MODEL\",\n    \"Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers\",\n)\n\n\ndef parse_args():\n    p = argparse.ArgumentParser(\n        prog=\"sana-generate\",\n        description=(\n            \"Generate an image with NVIDIA SANA via \"\n            \"HuggingFace diffusers.\"\n        ),\n    )\n    p.add_argument(\"prompt\", help=\"text prompt\")\n    p.add_argument(\n        \"--model\",\n        default=DEFAULT_MODEL,\n        help=f\"HuggingFace model ID (default: {DEFAULT_MODEL})\",\n    )\n    p.add_argument(\n        \"--output\",\n        \"-o\",\n        default=None,\n        help=\"output path (default: sana-<unixtime>.png)\",\n    )\n    p.add_argument(\"--width\", type=int, default=1024)\n    p.add_argument(\"--height\", type=int, default=1024)\n    p.add_argument(\n        \"--steps\",\n        type=int,\n        default=20,\n        help=\"number of inference steps\",\n    )\n    p.add_argument(\n        \"--guidance\",\n        type=float,\n        default=4.5,\n        help=\"classifier-free guidance scale\",\n    )\n    p.add_argument(\n        \"--seed\",\n        type=int,\n        default=None,\n        help=\"random seed (default: unseeded)\",\n    )\n    return p.parse_args()\n\n\ndef main():\n    args = parse_args()\n    import torch\n    from diffusers import SanaPipeline\n\n    device, dtype = best_device()\n    if device == \"cpu\":\n        print(\n            \"[sana-generate] WARNING: no GPU detected. \"\n            \"CPU inference will take minutes per image.\",\n            file=sys.stderr,\n        )\n\n    print(\n        f\"[sana-generate] loading {args.model} \"\n        f\"on {device} ({dtype})\",\n        file=sys.stderr,\n    )\n    pipe = SanaPipeline.from_pretrained(\n        args.model, torch_dtype=dtype,\n    )\n    pipe.to(device)\n    pipe.vae.to(dtype)\n    pipe.text_encoder.to(dtype)\n\n    generator = None\n    if args.seed is not None:\n        generator = torch.Generator(\n            device=device,\n        ).manual_seed(args.seed)\n\n    print(\n        f\"[sana-generate] generating {args.width}x{args.height}, \"\n        f\"steps={args.steps}, guidance={args.guidance}\",\n        file=sys.stderr,\n    )\n    image = pipe(\n        prompt=args.prompt,\n        height=args.height,\n        width=args.width,\n        guidance_scale=args.guidance,\n        num_inference_steps=args.steps,\n        generator=generator,\n    ).images[0]\n\n    output = args.output or f\"sana-{int(time.time())}.png\"\n    image.save(output)\n    print(output)\n\n\nif __name__ == \"__main__\":\n    try:\n        main()\n    except KeyboardInterrupt:\n        sys.exit(130)\n    except SystemExit:\n        raise\n    except Exception as exc:\n        print(\n            f\"[sana-generate] error: {exc}\",\n            file=sys.stderr,\n        )\n        sys.exit(2)\nPYEOF\nchmod +x \"$sana_bin/sana-generate\"\n"
+            "on-activate": "HF_HOME=\"$FLOX_ENV_CACHE/huggingface\"\nexport HF_HOME\nmkdir -p \"$HF_HOME\"\n\nsana_dir=\"$FLOX_ENV_CACHE/sana\"\nsana_bin=\"$sana_dir/bin\"\nmkdir -p \"$sana_bin\"\nexport SANA_DATA_DIR=\"$sana_dir\"\nexport PATH=\"$sana_bin:$PATH\"\n\n# _sana_device.py: shared device/dtype selector.\ncat > \"$sana_bin/_sana_device.py\" <<'PYEOF'\n\"\"\"Device selection helper for SANA scripts.\"\"\"\ndef best_device():\n    import os, torch\n    if os.environ.get(\"SANA_FORCE_CPU\") == \"1\":\n        return \"cpu\", torch.float32\n    if torch.cuda.is_available():\n        return \"cuda\", torch.bfloat16\n    if torch.backends.mps.is_available():\n        return \"mps\", torch.bfloat16\n    return \"cpu\", torch.float32\nPYEOF\n\n# sana-pull: download a SANA model into HF_HOME.\ncat > \"$sana_bin/sana-pull\" <<'SHEOF'\n#!/usr/bin/env bash\nset -eo pipefail\n\nCURATED=(\n  \"Efficient-Large-Model/Sana_600M_1024px_diffusers\"\n  \"Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers\"\n  \"Efficient-Large-Model/Sana_1600M_2Kpx_BF16_diffusers\"\n  \"Efficient-Large-Model/Sana_1600M_4Kpx_BF16_diffusers\"\n)\nDEFAULT=\"${SANA_DEFAULT_MODEL:-Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers}\"\n\nusage() {\n  cat <<EOF\nsana-pull — download a SANA model into HF_HOME\n\nUsage:\n  sana-pull                # pull the default model\n  sana-pull <model-id>     # pull a specific model\n  sana-pull --list         # print curated model IDs\n  sana-pull --help         # show this message\n\nDefault model: $DEFAULT\n\nCurated models:\n$(printf '  - %s\\n' \"${CURATED[@]}\")\nEOF\n}\n\ncase \"${1:-}\" in\n  \"\"|--default)\n    exec hf download \"$DEFAULT\"\n    ;;\n  --list)\n    printf '%s\\n' \"${CURATED[@]}\"\n    ;;\n  -h|--help)\n    usage\n    ;;\n  -*)\n    echo \"sana-pull: unknown flag: $1\" >&2\n    usage >&2\n    exit 1\n    ;;\n  *)\n    exec hf download \"$1\"\n    ;;\nesac\nSHEOF\nchmod +x \"$sana_bin/sana-pull\"\n\n# sana-generate: text-to-image via SANA diffusers pipeline.\ncat > \"$sana_bin/sana-generate\" <<'PYEOF'\n#!/usr/bin/env python3\n\"\"\"sana-generate: text-to-image via SANA diffusers pipeline.\"\"\"\nimport argparse\nimport os\nimport sys\nimport time\nfrom pathlib import Path\n\n_HERE = Path(__file__).resolve().parent\nsys.path.insert(0, str(_HERE))\nfrom _sana_device import best_device  # noqa: E402\n\nDEFAULT_MODEL = os.environ.get(\n    \"SANA_DEFAULT_MODEL\",\n    \"Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers\",\n)\n\n\ndef parse_args():\n    p = argparse.ArgumentParser(\n        prog=\"sana-generate\",\n        description=(\n            \"Generate an image with NVIDIA SANA via \"\n            \"HuggingFace diffusers.\"\n        ),\n    )\n    p.add_argument(\"prompt\", help=\"text prompt\")\n    p.add_argument(\n        \"--model\",\n        default=DEFAULT_MODEL,\n        help=f\"HuggingFace model ID (default: {DEFAULT_MODEL})\",\n    )\n    p.add_argument(\n        \"--output\",\n        \"-o\",\n        default=None,\n        help=\"output path (default: sana-<unixtime>.png)\",\n    )\n    p.add_argument(\"--width\", type=int, default=1024)\n    p.add_argument(\"--height\", type=int, default=1024)\n    p.add_argument(\n        \"--steps\",\n        type=int,\n        default=20,\n        help=\"number of inference steps\",\n    )\n    p.add_argument(\n        \"--guidance\",\n        type=float,\n        default=4.5,\n        help=\"classifier-free guidance scale\",\n    )\n    p.add_argument(\n        \"--seed\",\n        type=int,\n        default=None,\n        help=\"random seed (default: unseeded)\",\n    )\n    return p.parse_args()\n\n\ndef main():\n    args = parse_args()\n    import torch\n    from diffusers import SanaPipeline\n\n    device, dtype = best_device()\n    if device == \"cpu\":\n        print(\n            \"[sana-generate] WARNING: no GPU detected. \"\n            \"CPU inference will take minutes per image.\",\n            file=sys.stderr,\n        )\n\n    print(\n        f\"[sana-generate] loading {args.model} \"\n        f\"on {device} ({dtype})\",\n        file=sys.stderr,\n    )\n    pipe = SanaPipeline.from_pretrained(\n        args.model, torch_dtype=dtype,\n    )\n    pipe.to(device)\n    pipe.vae.to(dtype)\n    pipe.text_encoder.to(dtype)\n\n    if device == \"cuda\":\n        try:\n            pipe.enable_xformers_memory_efficient_attention()\n        except (ImportError, ModuleNotFoundError):\n            pass\n\n    generator = None\n    if args.seed is not None:\n        generator = torch.Generator(\n            device=device,\n        ).manual_seed(args.seed)\n\n    print(\n        f\"[sana-generate] generating {args.width}x{args.height}, \"\n        f\"steps={args.steps}, guidance={args.guidance}\",\n        file=sys.stderr,\n    )\n    image = pipe(\n        prompt=args.prompt,\n        height=args.height,\n        width=args.width,\n        guidance_scale=args.guidance,\n        num_inference_steps=args.steps,\n        generator=generator,\n    ).images[0]\n\n    output = args.output or f\"sana-{int(time.time())}.png\"\n    image.save(output)\n    print(output)\n\n\nif __name__ == \"__main__\":\n    try:\n        main()\n    except KeyboardInterrupt:\n        sys.exit(130)\n    except SystemExit:\n        raise\n    except Exception as exc:\n        print(\n            f\"[sana-generate] error: {exc}\",\n            file=sys.stderr,\n        )\n        sys.exit(2)\nPYEOF\nchmod +x \"$sana_bin/sana-generate\"\n"
           },
           "options": {}
         },
