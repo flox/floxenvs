@@ -1,0 +1,182 @@
+schema-version = "1.11.0"
+
+# SANA demo environment with web UI.
+#
+# Provides everything in `flox/sana` plus:
+#   - A Gradio web UI on http://127.0.0.1:17860
+#   - `gum` for terminal banner
+#   - A sample prompt to get started
+#
+# For non-interactive use, prefer the minimal env:
+#
+#   [include]
+#   environments = ["flox/sana"]
+
+[include]
+environments = [
+  { dir = "../sana" }
+]
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+gradio.pkg-path = "python313Packages.gradio"
+gradio.pkg-group = "sana"
+
+[vars]
+SANA_GRADIO_HOST = "127.0.0.1"
+SANA_GRADIO_PORT = "17860"
+
+[hook]
+on-activate = '''
+sana_bin="${SANA_DATA_DIR:-$FLOX_ENV_CACHE/sana}/bin"
+mkdir -p "$sana_bin"
+
+cat > "$sana_bin/sana-gradio" <<'PYEOF'
+#!/usr/bin/env python3
+"""sana-gradio: Gradio web UI for SANA text-to-image."""
+import os
+import sys
+from pathlib import Path
+
+HOST = os.environ.get("SANA_GRADIO_HOST", "127.0.0.1")
+PORT = int(os.environ.get("SANA_GRADIO_PORT", "17860"))
+DEFAULT_MODEL = os.environ.get(
+    "SANA_DEFAULT_MODEL",
+    "Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers",
+)
+SKIP_LOAD = os.environ.get("SANA_SKIP_LOAD", "") == "1"
+
+_HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(_HERE))
+
+import gradio as gr  # noqa: E402
+
+_pipe = None
+
+
+def _load():
+    """Lazily load the SANA pipeline on first call."""
+    global _pipe
+    if _pipe is not None:
+        return _pipe
+    from diffusers import SanaPipeline
+    from _sana_device import best_device
+
+    device, dtype = best_device()
+    print(
+        f"[sana-gradio] loading {DEFAULT_MODEL} "
+        f"on {device} ({dtype})",
+        file=sys.stderr,
+    )
+    pipe = SanaPipeline.from_pretrained(
+        DEFAULT_MODEL, torch_dtype=dtype,
+    )
+    pipe.to(device)
+    pipe.vae.to(dtype)
+    pipe.text_encoder.to(dtype)
+    if device == "cuda":
+        try:
+            pipe.enable_xformers_memory_efficient_attention()
+        except (ImportError, ModuleNotFoundError):
+            pass
+    _pipe = pipe
+    return pipe
+
+
+def generate(prompt, steps, guidance, seed, width, height):
+    import torch
+    pipe = _load()
+    device = next(pipe.transformer.parameters()).device.type
+    gen = None
+    if seed is not None and int(seed) >= 0:
+        gen = torch.Generator(device=device).manual_seed(int(seed))
+    image = pipe(
+        prompt=prompt,
+        height=int(height),
+        width=int(width),
+        guidance_scale=float(guidance),
+        num_inference_steps=int(steps),
+        generator=gen,
+    ).images[0]
+    return image
+
+
+def build_ui():
+    with gr.Blocks(title="SANA") as demo:
+        gr.Markdown("# SANA Text-to-Image")
+        prompt = gr.Textbox(label="Prompt", lines=2)
+        with gr.Row():
+            steps = gr.Slider(
+                1, 50, value=20, step=1, label="Steps",
+            )
+            guidance = gr.Slider(
+                1.0, 10.0, value=4.5, label="Guidance",
+            )
+        with gr.Row():
+            width = gr.Slider(
+                512, 2048, value=1024, step=64, label="Width",
+            )
+            height = gr.Slider(
+                512, 2048, value=1024, step=64, label="Height",
+            )
+        seed = gr.Number(
+            value=-1, label="Seed (-1 = random)", precision=0,
+        )
+        button = gr.Button("Generate")
+        out = gr.Image(label="Result")
+        button.click(
+            generate,
+            [prompt, steps, guidance, seed, width, height],
+            out,
+        )
+    return demo
+
+
+def build_skip_load_ui():
+    with gr.Blocks(title="SANA (test mode)") as demo:
+        gr.Markdown(
+            "## SANA test mode\n"
+            "SANA_SKIP_LOAD=1 — model not loaded."
+        )
+    return demo
+
+
+def main():
+    demo = build_skip_load_ui() if SKIP_LOAD else build_ui()
+    print(
+        f"[sana-gradio] starting on http://{HOST}:{PORT} "
+        f"(skip_load={SKIP_LOAD})",
+        file=sys.stderr,
+    )
+    demo.launch(
+        server_name=HOST,
+        server_port=PORT,
+        inbrowser=False,
+    )
+
+
+if __name__ == "__main__":
+    main()
+PYEOF
+chmod +x "$sana_bin/sana-gradio"
+
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style \
+    --foreground 212 --border-foreground 212 \
+    --border double --align center --width 60 \
+    --margin "1" --padding "1 4" \
+    "SANA demo" \
+    "" \
+    "Pull a model:    sana-pull" \
+    "Generate:        sana-generate \"your prompt\"" \
+    "Web UI:          flox services start sana-gradio" \
+    "                 then open http://${SANA_GRADIO_HOST}:${SANA_GRADIO_PORT}"
+fi
+'''
+
+[services]
+sana-gradio.command = '''
+sana_bin="${SANA_DATA_DIR:-$FLOX_ENV_CACHE/sana}/bin"
+exec python "$sana_bin/sana-gradio"
+'''

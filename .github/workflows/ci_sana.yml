@@ -1,0 +1,36 @@
+name: "CI: sana"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "sana/**"
+      - "sana-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_sana.yml"
+  pull_request:
+    paths:
+      - "sana/**"
+      - "sana-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_sana.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "sana"
+    secrets: inherit
