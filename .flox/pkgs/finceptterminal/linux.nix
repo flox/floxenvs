@@ -74,6 +74,20 @@ common.overrideAttrs (old: {
     install -Dm755 "$build_dir/FinceptTerminal" \
       "$out/bin/.finceptterminal-unwrapped"
 
+    # PythonRunner / ScriptCatalog resolve scripts via Qt's
+    # QCoreApplication::applicationDirPath(), which returns the binary's
+    # directory. The wrapper exec's the unwrapped binary out of
+    # $out/bin/, so we mirror scripts/ + resources/ + translations/
+    # there. Symlinks pointing into $out/share/finceptterminal/ keep
+    # the deduplicated tree.
+    if [ -d "$build_dir/scripts" ]; then
+      cp -R "$build_dir/scripts" "$out/bin/"
+    elif [ -d "$src_root/scripts" ]; then
+      cp -R "$src_root/scripts" "$out/bin/"
+    fi
+    cp -R "$src_root/resources"    "$out/bin/" 2>/dev/null || true
+    cp -R "$src_root/translations" "$out/bin/" 2>/dev/null || true
+
     # Qt plugins — copy the directories wrapQtAppsHook will then
     # patch into the binary's QT_PLUGIN_PATH.
     mkdir -p "$out/lib/qt-6/plugins"
