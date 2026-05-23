@@ -37,6 +37,22 @@ common.overrideAttrs (old: {
     mkdir -p "$out/Applications"
     cp -R "$build_dir/FinceptTerminal.app" "$out/Applications/"
 
+    # Mirror scripts/ + resources/ + translations/ next to the binary
+    # inside Contents/MacOS/. Qt's QCoreApplication::applicationDirPath
+    # returns Contents/MacOS on macOS, and several upstream paths
+    # (PythonRunner, ScriptCatalog) resolve scripts relative to it.
+    # Without these, the app crashes at first launch trying to import
+    # scripts/agents/finagent_core/main.py.
+    macos_dir="$out/Applications/FinceptTerminal.app/Contents/MacOS"
+    chmod -R u+w "$macos_dir"
+    if [ -d "$build_dir/scripts" ]; then
+      cp -R "$build_dir/scripts" "$macos_dir/"
+    elif [ -d "$src_root/scripts" ]; then
+      cp -R "$src_root/scripts" "$macos_dir/"
+    fi
+    cp -R "$src_root/resources"    "$macos_dir/" 2>/dev/null || true
+    cp -R "$src_root/translations" "$macos_dir/" 2>/dev/null || true
+
     # macdeployqt vendors the Qt frameworks into the .app so it works
     # outside the build sandbox.
     "${qt6.qtbase}/bin/macdeployqt" \
