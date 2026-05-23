@@ -1,0 +1,199 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.11.0",
+    "install": {
+      "finceptterminal": {
+        "pkg-path": "flox/finceptterminal",
+        "pkg-group": "finceptterminal"
+      },
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": "demo-tools"
+      }
+    },
+    "vars": {
+      "FINCEPT_DATA_DIR": ""
+    },
+    "hook": {
+      "on-activate": "export FINCEPT_DATA_DIR=\"${FINCEPT_DATA_DIR:-$FLOX_ENV_CACHE/finceptterminal}\"\nmkdir -p \"$FINCEPT_DATA_DIR\"\n# Profile data (logs, user settings) goes under XDG_DATA_HOME —\n# isolate it from any prior non-Nix install on the same machine.\nexport XDG_DATA_HOME=\"$FINCEPT_DATA_DIR\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    --foreground 212 --border-foreground 212 \\\n    'Fincept Terminal — native Qt financial-analytics desktop' '' \\\n    'Launch the GUI:' \\\n    '  finceptterminal' '' \\\n    \"Data dir: ${XDG_DATA_HOME}\" \\\n    \"Python:   ${FINCEPT_INSTALL_DIR}/venv-numpy2/bin/python3\" '' \\\n    'First launch goes straight to the main window — the Python' \\\n    'venv is pre-built into the Nix store; no UV bootstrap runs.' '' \\\n    'Commercial use requires a separate license from Fincept Corp:' \\\n    'github.com/Fincept-Corporation/FinceptTerminal/blob/main/docs/COMMERCIAL_LICENSE.md'\nfi\n"
+    },
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "x86_64-linux"
+      ]
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/3if65h5mjjgjwgvd18srmm35cn3w6xs8-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=d233902339c02a9c334e7e593de68855ad26c4cb",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "d233902339c02a9c334e7e593de68855ad26c4cb",
+      "rev_count": 998534,
+      "rev_date": "2026-05-15T18:21:44Z",
+      "scrape_date": "2026-05-17T07:05:52.142375Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ba53aq5kpjm2qb817qgxswy2hvnkxnyj-gum-0.17.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/835d9xq5q9w2hv6dzlsc3yjbh44kmpjn-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=d233902339c02a9c334e7e593de68855ad26c4cb",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "d233902339c02a9c334e7e593de68855ad26c4cb",
+      "rev_count": 998534,
+      "rev_date": "2026-05-15T18:21:44Z",
+      "scrape_date": "2026-05-17T08:32:12.167065Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/c149nbx8xh8knvply95623gnwqds19xr-gum-0.17.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "finceptterminal",
+      "broken": false,
+      "derivation": "/nix/store/z1bxa70h6rnbq4lpxfprvvina845x3i6-finceptterminal-v4.0.3+flox.drv",
+      "description": "Native Qt 6 / C++20 financial-analytics desktop terminal",
+      "install_id": "finceptterminal",
+      "license": "AGPL-3.0-only",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=c714d73338e27957b0673fade8d2428e7d6996cb",
+      "name": "finceptterminal-v4.0.3+flox",
+      "pname": "finceptterminal",
+      "rev": "c714d73338e27957b0673fade8d2428e7d6996cb",
+      "rev_count": 3835,
+      "rev_date": "2026-05-23T00:07:28Z",
+      "scrape_date": "2026-05-23T00:48:06.146122Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "v4.0.3+flox",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/pb0bpvb5i2k9gn5mmq7fmkz0rr56y3x0-finceptterminal-v4.0.3+flox"
+      },
+      "system": "aarch64-darwin",
+      "group": "finceptterminal",
+      "priority": 5
+    },
+    {
+      "attr_path": "finceptterminal",
+      "broken": false,
+      "derivation": "/nix/store/i3nb63cg02f3f902wmpldf5zs785x115-finceptterminal-v4.0.3+flox.drv",
+      "description": "Native Qt 6 / C++20 financial-analytics desktop terminal",
+      "install_id": "finceptterminal",
+      "license": "AGPL-3.0-only",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=c714d73338e27957b0673fade8d2428e7d6996cb",
+      "name": "finceptterminal-v4.0.3+flox",
+      "pname": "finceptterminal",
+      "rev": "c714d73338e27957b0673fade8d2428e7d6996cb",
+      "rev_count": 3835,
+      "rev_date": "2026-05-23T00:07:28Z",
+      "scrape_date": "2026-05-23T00:48:06.146123Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "v4.0.3+flox",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ggx19lrlprgmvgkzpqkfnv9pnvd514yk-finceptterminal-v4.0.3+flox"
+      },
+      "system": "x86_64-linux",
+      "group": "finceptterminal",
+      "priority": 5
+    }
+  ],
+  "compose": {
+    "composer": {
+      "schema-version": "1.11.0",
+      "install": {
+        "gum": {
+          "pkg-path": "gum",
+          "pkg-group": "demo-tools"
+        }
+      },
+      "hook": {
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    --foreground 212 --border-foreground 212 \\\n    'Fincept Terminal — native Qt financial-analytics desktop' '' \\\n    'Launch the GUI:' \\\n    '  finceptterminal' '' \\\n    \"Data dir: ${XDG_DATA_HOME}\" \\\n    \"Python:   ${FINCEPT_INSTALL_DIR}/venv-numpy2/bin/python3\" '' \\\n    'First launch goes straight to the main window — the Python' \\\n    'venv is pre-built into the Nix store; no UV bootstrap runs.' '' \\\n    'Commercial use requires a separate license from Fincept Corp:' \\\n    'github.com/Fincept-Corporation/FinceptTerminal/blob/main/docs/COMMERCIAL_LICENSE.md'\nfi\n"
+      },
+      "options": {},
+      "include": {
+        "environments": [
+          {
+            "dir": "../finceptterminal"
+          }
+        ]
+      }
+    },
+    "include": [
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "finceptterminal": {
+              "pkg-path": "flox/finceptterminal",
+              "pkg-group": "finceptterminal"
+            }
+          },
+          "vars": {
+            "FINCEPT_DATA_DIR": ""
+          },
+          "hook": {
+            "on-activate": "export FINCEPT_DATA_DIR=\"${FINCEPT_DATA_DIR:-$FLOX_ENV_CACHE/finceptterminal}\"\nmkdir -p \"$FINCEPT_DATA_DIR\"\n# Profile data (logs, user settings) goes under XDG_DATA_HOME —\n# isolate it from any prior non-Nix install on the same machine.\nexport XDG_DATA_HOME=\"$FINCEPT_DATA_DIR\"\n"
+          },
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "x86_64-linux"
+            ]
+          }
+        },
+        "name": "finceptterminal",
+        "descriptor": {
+          "dir": "../finceptterminal"
+        }
+      }
+    ],
+    "warnings": []
+  }
+}

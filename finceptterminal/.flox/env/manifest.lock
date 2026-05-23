@@ -1,0 +1,84 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "finceptterminal": {
+        "pkg-path": "flox/finceptterminal",
+        "pkg-group": "finceptterminal"
+      }
+    },
+    "vars": {
+      "FINCEPT_DATA_DIR": ""
+    },
+    "hook": {
+      "on-activate": "export FINCEPT_DATA_DIR=\"${FINCEPT_DATA_DIR:-$FLOX_ENV_CACHE/finceptterminal}\"\nmkdir -p \"$FINCEPT_DATA_DIR\"\n# Profile data (logs, user settings) goes under XDG_DATA_HOME —\n# isolate it from any prior non-Nix install on the same machine.\nexport XDG_DATA_HOME=\"$FINCEPT_DATA_DIR\"\n"
+    },
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "x86_64-linux"
+      ]
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "finceptterminal",
+      "broken": false,
+      "derivation": "/nix/store/z1bxa70h6rnbq4lpxfprvvina845x3i6-finceptterminal-v4.0.3+flox.drv",
+      "description": "Native Qt 6 / C++20 financial-analytics desktop terminal",
+      "install_id": "finceptterminal",
+      "license": "AGPL-3.0-only",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=c714d73338e27957b0673fade8d2428e7d6996cb",
+      "name": "finceptterminal-v4.0.3+flox",
+      "pname": "finceptterminal",
+      "rev": "c714d73338e27957b0673fade8d2428e7d6996cb",
+      "rev_count": 3835,
+      "rev_date": "2026-05-23T00:07:28Z",
+      "scrape_date": "2026-05-23T00:47:57.524369Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "v4.0.3+flox",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/pb0bpvb5i2k9gn5mmq7fmkz0rr56y3x0-finceptterminal-v4.0.3+flox"
+      },
+      "system": "aarch64-darwin",
+      "group": "finceptterminal",
+      "priority": 5
+    },
+    {
+      "attr_path": "finceptterminal",
+      "broken": false,
+      "derivation": "/nix/store/i3nb63cg02f3f902wmpldf5zs785x115-finceptterminal-v4.0.3+flox.drv",
+      "description": "Native Qt 6 / C++20 financial-analytics desktop terminal",
+      "install_id": "finceptterminal",
+      "license": "AGPL-3.0-only",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=c714d73338e27957b0673fade8d2428e7d6996cb",
+      "name": "finceptterminal-v4.0.3+flox",
+      "pname": "finceptterminal",
+      "rev": "c714d73338e27957b0673fade8d2428e7d6996cb",
+      "rev_count": 3835,
+      "rev_date": "2026-05-23T00:07:28Z",
+      "scrape_date": "2026-05-23T00:47:57.524375Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "v4.0.3+flox",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ggx19lrlprgmvgkzpqkfnv9pnvd514yk-finceptterminal-v4.0.3+flox"
+      },
+      "system": "x86_64-linux",
+      "group": "finceptterminal",
+      "priority": 5
+    }
+  ]
+}
