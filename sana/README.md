@@ -106,7 +106,7 @@ upstream NVlabs/Sana conda environment:
 
 ## Known issues
 
-### MPS hard-crashes on macOS 26.x + torch 2.9.x
+### MPS hard-crashes on macOS 26.x
 
 SANA's pipeline SIGTRAPs at the first inference call on
 MPS regardless of dtype (bf16, fp16, fp32) and regardless
