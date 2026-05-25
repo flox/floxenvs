@@ -16,27 +16,27 @@ let
   inherit (versionData) version hash cargoHash;
 in
 rustPlatform.buildRustPackage {
-  pname = "deepseek-tui";
+  pname = "codewhale";
   inherit version;
 
   src = fetchFromGitHub {
     owner = "Hmbown";
-    repo = "DeepSeek-TUI";
+    repo = "CodeWhale";
     tag = "v${version}";
     inherit hash;
   };
 
   inherit cargoHash;
 
-  # Build only the user-facing binaries (`deepseek` dispatcher and the
-  # `deepseek-tui` runtime). The workspace's default-members also pull in
-  # `deepseek-app-server`, which is linked into the TUI crate, so we
+  # Build only the user-facing binaries (`codewhale` dispatcher and the
+  # `codewhale-tui` runtime). The workspace's default-members also pull in
+  # `codewhale-app-server`, which is linked into the TUI crate, so we
   # don't need to build it as a separate binary.
   cargoBuildFlags = [
     "--package"
-    "deepseek-tui-cli"
+    "codewhale-cli"
     "--package"
-    "deepseek-tui"
+    "codewhale-tui"
   ];
 
   nativeBuildInputs = [
@@ -51,21 +51,21 @@ rustPlatform.buildRustPackage {
   doCheck = false;
 
   postInstall = ''
-    installShellCompletion --cmd deepseek \
-      --bash <($out/bin/deepseek completion bash) \
-      --fish <($out/bin/deepseek completion fish) \
-      --zsh <($out/bin/deepseek completion zsh)
+    installShellCompletion --cmd codewhale \
+      --bash <($out/bin/codewhale completion bash) \
+      --fish <($out/bin/codewhale completion fish) \
+      --zsh <($out/bin/codewhale completion zsh)
   '';
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
 
   meta = {
-    description = "Coding agent for DeepSeek models that runs in your terminal";
-    homepage = "https://github.com/Hmbown/DeepSeek-TUI";
-    changelog = "https://github.com/Hmbown/DeepSeek-TUI/releases/tag/v${version}";
+    description = "Agentic coding terminal for open-source and open-weight models";
+    homepage = "https://github.com/Hmbown/CodeWhale";
+    changelog = "https://github.com/Hmbown/CodeWhale/releases/tag/v${version}";
     license = lib.licenses.mit;
-    mainProgram = "deepseek";
+    mainProgram = "codewhale";
     platforms = lib.platforms.unix;
   };
 }
