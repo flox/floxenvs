@@ -102,14 +102,12 @@ let
     packageOverrides = _pyfinal: pyprev: {
       inherit textual-speedups tree-sitter-bash;
 
-      # mistral-vibe pins textual==8.2.4. Textual 8.2.5 removed the
-      # built-in "textual-ansi" theme that vibe sets at startup,
-      # causing "Theme 'textual-ansi' has not been registered".
+      # mistral-vibe pins textual==8.2.7.
       textual = pyprev.textual.overridePythonAttrs (old: rec {
-        version = "8.2.4";
+        version = "8.2.7";
         src = old.src.override {
           tag = "v${version}";
-          hash = "sha256-827cm9pcj1o1FYeaoWKCJ6dEyXeDop4kYd205cySTfg=";
+          hash = "sha256-jRTdxVpeRk8gAur5+VpLVVghBdYenXysoEFRBfczkR4=";
         };
       });
 
