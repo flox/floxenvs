@@ -19,7 +19,7 @@ latest_version=$(
   curl -sfL --retry 3 --retry-delay 5 \
     -H "Accept: application/vnd.github+json" \
     "${auth_header[@]}" \
-    "https://api.github.com/repos/Hmbown/DeepSeek-TUI/releases" \
+    "https://api.github.com/repos/Hmbown/CodeWhale/releases" \
   | jq -r '[.[] | select(.prerelease == false and .draft == false)][0].tag_name' \
   | sed 's/^v//'
 )
@@ -31,11 +31,11 @@ if [ "$current_version" = "$latest_version" ]; then
   exit 0
 fi
 
-echo "Updating deepseek-tui from $current_version to $latest_version"
+echo "Updating codewhale from $current_version to $latest_version"
 
 # Prefetch source from GitHub. Matches what `fetchFromGitHub` produces:
 # GitHub's archive tarball, unpacked and hashed.
-src_url="https://github.com/Hmbown/DeepSeek-TUI/archive/refs/tags/v${latest_version}.tar.gz"
+src_url="https://github.com/Hmbown/CodeWhale/archive/refs/tags/v${latest_version}.tar.gz"
 echo "Fetching source from $src_url ..."
 src_raw=$(nix-prefetch-url --unpack "$src_url" 2>/dev/null)
 src_hash=$(nix --extra-experimental-features nix-command \
@@ -62,7 +62,7 @@ write_hashes "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
 
 echo "Building with dummy cargoHash to compute real one..."
 prefetch_log=$(mktemp)
-flox build deepseek-tui > "$prefetch_log" 2>&1 || true
+flox build codewhale > "$prefetch_log" 2>&1 || true
 
 cargo_hash=$(awk '/hash mismatch in fixed-output derivation/,0 {
   if (/got:/) { print $NF; exit }
