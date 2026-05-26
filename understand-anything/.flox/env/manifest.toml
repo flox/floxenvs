@@ -1,0 +1,133 @@
+schema-version = "1.10.0"
+
+# Minimal Understand-Anything environment for use with
+# [include]. Wires the upstream Claude Code plugin from
+# https://github.com/Lum1104/Understand-Anything into
+# claude-managed so the /understand, /understand-chat,
+# /understand-diff, /understand-domain, /understand-explain,
+# /understand-knowledge, /understand-onboard, and
+# /understand-dashboard slash commands are available on
+# `flox activate`.
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = [{ remote = "flox/understand-anything" }]
+#
+# Pin a different upstream version by overriding UA_VERSION
+# in your own [vars]. Set UA_PREBUILD = "1" to compile
+# packages/core at activation time (default: lazy build on
+# first /understand invocation).
+
+[include]
+environments = [
+  { dir = "../claude" }
+]
+
+[install]
+nodejs.pkg-path = "nodejs_22"
+nodejs.pkg-group = "understand-anything"
+pnpm.pkg-path = "pnpm_10"
+pnpm.pkg-group = "understand-anything"
+python.pkg-path = "python3"
+python.pkg-group = "understand-anything"
+git.pkg-path = "git"
+git.pkg-group = "understand-anything-tools"
+jq.pkg-path = "jq"
+jq.pkg-group = "understand-anything-tools"
+
+[vars]
+# Upstream repo and pinned release tag. Override either in
+# your own [vars] before [include]-ing this env.
+UA_REPO_URL = "https://github.com/Lum1104/Understand-Anything.git"
+UA_VERSION  = "v2.7.3"
+
+# Set to "1" to run `pnpm install && pnpm build` during
+# activation instead of waiting for the /understand skill
+# to bootstrap it on first use. Off by default because the
+# build pulls tree-sitter native deps and takes a couple of
+# minutes; subsequent activations are no-ops either way.
+UA_PREBUILD = "0"
+
+[hook]
+on-activate = '''
+ua_cache="$FLOX_ENV_CACHE/understand-anything"
+ua_repo="$ua_cache/repo"
+ua_plugin="$ua_repo/understand-anything-plugin"
+mkdir -p "$ua_cache"
+
+# Clone if missing, otherwise fast-forward to UA_VERSION.
+# Shallow clone keeps the cache small; we re-fetch the tag
+# whenever the pinned version changes.
+if [ ! -d "$ua_repo/.git" ]; then
+  rm -rf "$ua_repo"
+  git clone --quiet --depth 1 --branch "$UA_VERSION" \
+    "$UA_REPO_URL" "$ua_repo" 2>/dev/null \
+    || git clone --quiet "$UA_REPO_URL" "$ua_repo"
+  git -C "$ua_repo" checkout --quiet "$UA_VERSION" 2>/dev/null || true
+elif [ "$(git -C "$ua_repo" describe --tags --exact-match \
+            2>/dev/null)" != "$UA_VERSION" ]; then
+  git -C "$ua_repo" fetch --quiet --tags --depth 1 \
+    origin "refs/tags/$UA_VERSION:refs/tags/$UA_VERSION" \
+    2>/dev/null || git -C "$ua_repo" fetch --quiet --tags
+  git -C "$ua_repo" checkout --quiet "$UA_VERSION"
+fi
+
+# Expose the plugin root at the path SKILL.md falls back to
+# when CLAUDE_PLUGIN_ROOT is unset (e.g. when scripts are
+# invoked outside Claude Code's hook context). Leave any
+# pre-existing user link alone.
+if [ ! -e "$HOME/.understand-anything-plugin" ]; then
+  ln -s "$ua_plugin" "$HOME/.understand-anything-plugin"
+fi
+
+# claude-managed `plugins add` reads installed_plugins.json
+# from the plugin dir and merges it into the config's
+# trusted-plugins list. Without it Claude Code lists the
+# plugin but treats it as untrusted, suppressing hook
+# execution. Generate it from the pinned commit each time
+# so version + sha stay in sync with the checked-out tree.
+ua_version="$(git -C "$ua_repo" describe --tags \
+  --always 2>/dev/null | sed 's/^v//')"
+ua_sha="$(git -C "$ua_repo" rev-parse HEAD 2>/dev/null)"
+cat > "$ua_plugin/installed_plugins.json" <<JSON
+{
+  "plugins": {
+    "understand-anything@flox": [
+      {
+        "installPath": "",
+        "scope": "project",
+        "version": "$ua_version",
+        "gitCommitSha": "$ua_sha"
+      }
+    ]
+  },
+  "version": 2
+}
+JSON
+
+# Optional eager build. The /understand skill itself runs
+# the same commands the first time it is invoked, so this
+# is a UX nicety, not a correctness requirement.
+if [ "$UA_PREBUILD" = "1" ] \
+   && [ ! -f "$ua_plugin/packages/core/dist/index.js" ]; then
+  (
+    cd "$ua_plugin" \
+      && pnpm install --frozen-lockfile >/dev/null 2>&1 \
+      && pnpm --filter @understand-anything/core build \
+           >/dev/null 2>&1
+  ) || echo "understand-anything: pre-build failed; /understand will retry on first use"
+fi
+
+# Register the plugin with claude-managed. The flox/claude
+# hook above already ran `plugins clean`, so this just adds
+# a symlink under $CLAUDE_CONFIG_DIR/plugins/ that the
+# generated `claude` wrapper picks up at exec time via
+# --plugin-dir. Idempotent: re-running it on a subsequent
+# activation is harmless.
+if command -v claude-managed >/dev/null 2>&1; then
+  cmd_dir="${CLAUDE_CONFIG_DIR:-$FLOX_ENV_PROJECT/.claude-managed}"
+  claude-managed --config-dir "$cmd_dir" plugins add \
+    "$ua_plugin" >/dev/null 2>&1 || true
+fi
+'''

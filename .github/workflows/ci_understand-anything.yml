@@ -1,0 +1,36 @@
+name: "CI: understand-anything"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "understand-anything/**"
+      - "understand-anything-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_understand-anything.yml"
+  pull_request:
+    paths:
+      - "understand-anything/**"
+      - "understand-anything-demo/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_understand-anything.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "understand-anything"
+    secrets: inherit

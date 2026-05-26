@@ -1,0 +1,71 @@
+kind: env
+name: understand-anything
+title: Understand Anything
+publisher: flox
+tagline: >
+  Turn any codebase into an interactive knowledge graph
+  for Claude Code — 8 slash commands, ready in one include.
+seo_title: >
+  Understand-Anything dev environment for Claude Code —
+  knowledge graphs, onboarding, diff impact, deep-dive explain
+seo_description: >
+  Flox-packaged Understand-Anything: /understand, /understand-chat,
+  /understand-diff, /understand-domain, /understand-explain,
+  /understand-knowledge, /understand-onboard, /understand-dashboard.
+  Composes with flox/claude in one include line.
+intro: >
+  flox/understand-anything wires the upstream Understand-Anything
+  plugin (Lum1104/Understand-Anything) into flox/claude so Claude
+  Code can analyze a project through a multi-agent pipeline and
+  produce a queryable knowledge graph saved as JSON. Eight slash
+  commands cover the full lifecycle — build the graph with
+  /understand, ask questions with /understand-chat, score a diff
+  with /understand-diff, extract domains with /understand-domain,
+  dig into a single file with /understand-explain, ingest an LLM
+  wiki with /understand-knowledge, write an onboarding guide with
+  /understand-onboard, and launch the interactive visualizer with
+  /understand-dashboard. The plugin checkout is cloned into
+  $FLOX_ENV_CACHE on first activate and pinned to UA_VERSION;
+  override the var to roll forward or back. Node 22, pnpm, Python
+  3, and git are pulled in alongside flox/claude so /understand
+  bootstraps cleanly without leaning on the consumer's PATH.
+summary:
+  - "8 slash commands for knowledge graphs, diffs, onboarding"
+  - "One include line composes with flox/claude"
+  - "Pinned plugin checkout — override UA_VERSION to bump"
+  - "Node + pnpm + Python bundled so /understand just works"
+category: ai
+ai_role: tooling
+tags: [agent, claude-code, plugin, knowledge-graph, onboarding]
+stack: [nodejs, typescript, python]
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:graphify
+status: beta
+license: MIT
+upstream:
+  name: Understand-Anything
+  url: https://github.com/Lum1104/Understand-Anything
+  license: MIT
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/understand-anything" }]
+  activate: |
+    flox activate -r flox/understand-anything
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/understand-anything-latest
+recipes:
+  - name: understand-anything-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Banner with the slash commands cheat-sheet"
+      - "Pre-built packages/core for instant /understand"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/understand-anything
+  floxhub: https://hub.flox.dev/flox/understand-anything
+  docker: https://github.com/flox/floxenvs/pkgs/container/floxenvs/understand-anything-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Aunderstand-anything
