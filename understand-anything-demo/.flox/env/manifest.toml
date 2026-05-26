@@ -1,0 +1,40 @@
+schema-version = "1.10.0"
+
+[include]
+environments = [
+  { dir = "../understand-anything" }
+]
+
+# gum is a demo-only tool for styled terminal output.
+# Pre-build packages/core during activate so the banner
+# can promise a working `/understand` without the
+# couple-of-minutes pnpm install on first invocation.
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[vars]
+UA_PREBUILD = "1"
+
+[hook]
+on-activate = '''
+if [ "${FLOX_ENVS_TESTING:-}" != "1" ]; then
+  gum style \
+    --foreground 212 --border-foreground 212 \
+    --border double --align center \
+    --width 60 --margin "1 2" --padding "1 2" \
+    "Understand Anything" \
+    "Turn any codebase into a knowledge graph."
+  echo ""
+  echo "  claude                — start Claude Code"
+  echo "  /understand .         — build graph for cwd"
+  echo "  /understand-chat      — ask the graph"
+  echo "  /understand-diff      — analyze current diff"
+  echo "  /understand-domain    — extract business flows"
+  echo "  /understand-explain   — deep-dive on a file"
+  echo "  /understand-onboard   — write an onboarding guide"
+  echo "  /understand-dashboard — launch the visualizer"
+  echo ""
+fi
+'''
