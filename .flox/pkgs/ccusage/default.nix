@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  fetchurl,
   rustPlatform,
   pkg-config,
   libiconv,
@@ -11,7 +12,19 @@
 
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version srcHash cargoHash;
+  inherit (versionData)
+    version
+    srcHash
+    cargoHash
+    litellmOwner
+    litellmRepo
+    litellmRev
+    litellmPricingHash
+    ;
+  litellmPricing = fetchurl {
+    url = "https://raw.githubusercontent.com/${litellmOwner}/${litellmRepo}/${litellmRev}/model_prices_and_context_window.json";
+    hash = litellmPricingHash;
+  };
 in
 rustPlatform.buildRustPackage {
   pname = "ccusage";
@@ -43,9 +56,9 @@ rustPlatform.buildRustPackage {
     libiconv
   ];
 
-  # Skip the network fetch for OpenRouter pricing data during build; the
-  # binary fetches at runtime instead.
-  env.CCUSAGE_SKIP_PRICING_FETCH = "1";
+  # Sandboxed builds on Linux have no network; point the build script at a
+  # pre-fetched LiteLLM pricing snapshot instead of letting it call out.
+  env.CCUSAGE_PRICING_JSON_PATH = litellmPricing;
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [
