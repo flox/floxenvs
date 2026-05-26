@@ -1,0 +1,68 @@
+kind: env
+name: honcho
+title: Honcho
+publisher: flox
+tagline: >
+  Self-hostable memory infrastructure for stateful agents —
+  FastAPI server, background deriver, postgres+pgvector,
+  redis, and the Python SDK in one flox env.
+seo_title: >
+  Honcho dev environment — self-host the AI memory server
+  with one flox include
+seo_description: >
+  Flox-packaged Honcho: Plastic Labs' open-source memory
+  layer for stateful agents. Includes the FastAPI server,
+  background reasoning worker, honcho-ai Python SDK, and
+  postgres+pgvector + redis as flox services.
+intro: >
+  flox/honcho packages the open-source Honcho server (the
+  Plastic Labs memory layer for stateful agents) with all of
+  its runtime dependencies sealed into one Nix closure. The
+  env ships the FastAPI app, the background `deriver` worker
+  that builds peer representations, and the `honcho-ai`
+  Python SDK — plus a local PostgreSQL (with pgvector) and
+  Redis wired up as flox services so a single `flox activate
+  --start-services` gets you a running stack. Set an LLM
+  provider key (OpenAI / Anthropic / Gemini) and the
+  reasoning endpoints come alive too.
+summary:
+  - "Run Honcho locally — FastAPI server + deriver worker"
+  - "Bundled honcho-ai SDK, no `pip install` needed"
+  - "PostgreSQL + pgvector + Redis as flox services"
+  - "Alembic migrations applied on first activate"
+category: ai
+ai_role: memory
+tags: [memory, agents, llm, fastapi, postgres, redis]
+stack: [python]
+featured: false
+combines_well_with:
+  - env:claude
+  - env:basic-memory
+  - env:postgresql
+status: beta
+license: AGPL-3.0
+upstream:
+  name: Honcho
+  url: https://github.com/plastic-labs/honcho
+  license: AGPL-3.0
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/honcho" }]
+  activate: |
+    flox activate -r flox/honcho --start-services
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/honcho-latest
+recipes:
+  - name: honcho-demo
+    title: Quick start
+    start_services: true
+    features:
+      - "Bundles the minimal env with a sample quickstart.py"
+      - "Runs the full Store → Reason → Query → Inject loop"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/honcho
+  floxhub: https://hub.flox.dev/flox/honcho
+  docker: https://github.com/flox/floxenvs/pkgs/container/floxenvs/honcho-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Ahoncho
