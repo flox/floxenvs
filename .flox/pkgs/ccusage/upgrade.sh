@@ -25,12 +25,37 @@ src_hash=$(nix-prefetch-url --unpack "$src_url" 2>/dev/null)
 src_sri=$(nix hash convert --hash-algo sha256 --to sri "$src_hash")
 echo "  srcHash: $src_sri"
 
+# Resolve the LiteLLM pricing snapshot pinned by upstream's flake.lock so
+# Linux sandbox builds don't try to fetch it over the network.
+flake_lock=$(curl -sfL \
+  "https://raw.githubusercontent.com/ryoppippi/ccusage/v${latest_version}/flake.lock")
+litellm_owner=$(echo "$flake_lock" | jq -r '.nodes.litellm.locked.owner')
+litellm_repo=$(echo "$flake_lock" | jq -r '.nodes.litellm.locked.repo')
+litellm_rev=$(echo "$flake_lock" | jq -r '.nodes.litellm.locked.rev')
+pricing_url="https://raw.githubusercontent.com/${litellm_owner}/${litellm_repo}/${litellm_rev}/model_prices_and_context_window.json"
+pricing_hash=$(nix-prefetch-url "$pricing_url" 2>/dev/null)
+pricing_sri=$(nix hash convert --hash-algo sha256 --to sri "$pricing_hash")
+echo "  litellmRev: $litellm_rev"
+echo "  litellmPricingHash: $pricing_sri"
+
 dummy="sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
 jq -n \
   --arg v "$latest_version" \
   --arg s "$src_sri" \
   --arg c "$dummy" \
-  '{version: $v, srcHash: $s, cargoHash: $c}' > "$HASHES_FILE"
+  --arg lo "$litellm_owner" \
+  --arg lr "$litellm_repo" \
+  --arg lrev "$litellm_rev" \
+  --arg lh "$pricing_sri" \
+  '{
+    version: $v,
+    srcHash: $s,
+    cargoHash: $c,
+    litellmOwner: $lo,
+    litellmRepo: $lr,
+    litellmRev: $lrev,
+    litellmPricingHash: $lh,
+  }' > "$HASHES_FILE"
 
 echo "Building with dummy cargoHash to compute real one..."
 cargo_hash=$(flox build ccusage 2>&1 \
@@ -48,6 +73,18 @@ jq -n \
   --arg v "$latest_version" \
   --arg s "$src_sri" \
   --arg c "$cargo_hash" \
-  '{version: $v, srcHash: $s, cargoHash: $c}' > "$HASHES_FILE"
+  --arg lo "$litellm_owner" \
+  --arg lr "$litellm_repo" \
+  --arg lrev "$litellm_rev" \
+  --arg lh "$pricing_sri" \
+  '{
+    version: $v,
+    srcHash: $s,
+    cargoHash: $c,
+    litellmOwner: $lo,
+    litellmRepo: $lr,
+    litellmRev: $lrev,
+    litellmPricingHash: $lh,
+  }' > "$HASHES_FILE"
 
 echo "Updated to $latest_version"
