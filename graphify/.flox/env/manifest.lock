@@ -8,6 +8,14 @@
         "pkg-group": "graphify",
         "priority": 0
       },
+      "binutils": {
+        "pkg-path": "binutils",
+        "pkg-group": "graphify-build",
+        "systems": [
+          "x86_64-linux",
+          "aarch64-linux"
+        ]
+      },
       "claude-code": {
         "pkg-path": "flox/claude-code",
         "pkg-group": "claude-code"
@@ -30,7 +38,8 @@
         "systems": [
           "x86_64-linux",
           "aarch64-linux"
-        ]
+        ],
+        "outputs": "all"
       },
       "pkg-config": {
         "pkg-path": "pkg-config",
@@ -445,20 +454,89 @@
       "priority": 5
     },
     {
+      "attr_path": "binutils",
+      "broken": false,
+      "derivation": "/nix/store/rwpk6x5adm06l3qx8lsc5yirfs717x5s-binutils-wrapper-2.46.drv",
+      "description": "Tools for manipulating binaries (linker, assembler, etc.) (wrapper script)",
+      "install_id": "binutils",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=64c08a7ca051951c8eae34e3e3cb1e202fe36786",
+      "name": "binutils-wrapper-2.46",
+      "pname": "binutils",
+      "rev": "64c08a7ca051951c8eae34e3e3cb1e202fe36786",
+      "rev_count": 1004030,
+      "rev_date": "2026-05-23T18:24:25Z",
+      "scrape_date": "2026-05-26T07:34:25.889663Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.46",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/9w0q0i5mhz1j5bhdi41v2shv9hd02h6v-binutils-wrapper-2.46-info",
+        "man": "/nix/store/h1fmpvqhryyb5aipjzlppgr27i7w1nmr-binutils-wrapper-2.46-man",
+        "out": "/nix/store/80qdvnjd83wlh75pds2mp21h9l3a7ny7-binutils-wrapper-2.46"
+      },
+      "system": "aarch64-linux",
+      "group": "graphify-build",
+      "priority": 5
+    },
+    {
+      "attr_path": "binutils",
+      "broken": false,
+      "derivation": "/nix/store/fr4s6crprj60n9wwcyf7icplz8dxp1ls-binutils-wrapper-2.46.drv",
+      "description": "Tools for manipulating binaries (linker, assembler, etc.) (wrapper script)",
+      "install_id": "binutils",
+      "license": "GPL-3.0-or-later",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=64c08a7ca051951c8eae34e3e3cb1e202fe36786",
+      "name": "binutils-wrapper-2.46",
+      "pname": "binutils",
+      "rev": "64c08a7ca051951c8eae34e3e3cb1e202fe36786",
+      "rev_count": 1004030,
+      "rev_date": "2026-05-23T18:24:25Z",
+      "scrape_date": "2026-05-26T08:32:50.955794Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.46",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "info": "/nix/store/mlfnw3b798bj39i25nn145kdyrxsirwp-binutils-wrapper-2.46-info",
+        "man": "/nix/store/8zd61mzpnwpq1x9p45w9ifii7rpxgrq7-binutils-wrapper-2.46-man",
+        "out": "/nix/store/mbyy19mdwnfvfwmdi0gqgggx0njvpl1w-binutils-wrapper-2.46"
+      },
+      "system": "x86_64-linux",
+      "group": "graphify-build",
+      "priority": 5
+    },
+    {
       "attr_path": "gcc-unwrapped",
       "broken": false,
       "derivation": "/nix/store/mngp6xq7rmcsw7sxhsldd8mxhfgbpfvq-gcc-15.2.0.drv",
       "description": "GNU Compiler Collection, version 15.2.0",
       "install_id": "gcc-unwrapped",
       "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=29916453413845e54a65b8a1cf996842300cd299",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=64c08a7ca051951c8eae34e3e3cb1e202fe36786",
       "name": "gcc-15.2.0",
       "pname": "gcc-unwrapped",
-      "rev": "29916453413845e54a65b8a1cf996842300cd299",
-      "rev_count": 1003640,
-      "rev_date": "2026-05-23T03:54:30Z",
-      "scrape_date": "2026-05-24T07:05:51.538505Z",
+      "rev": "64c08a7ca051951c8eae34e3e3cb1e202fe36786",
+      "rev_count": 1004030,
+      "rev_date": "2026-05-23T18:24:25Z",
+      "scrape_date": "2026-05-26T07:06:03.754750Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -484,14 +562,15 @@
       "description": "GNU Compiler Collection, version 15.2.0",
       "install_id": "gcc-unwrapped",
       "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=29916453413845e54a65b8a1cf996842300cd299",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=64c08a7ca051951c8eae34e3e3cb1e202fe36786",
       "name": "gcc-15.2.0",
       "pname": "gcc-unwrapped",
-      "rev": "29916453413845e54a65b8a1cf996842300cd299",
-      "rev_count": 1003640,
-      "rev_date": "2026-05-23T03:54:30Z",
-      "scrape_date": "2026-05-24T07:34:05.724959Z",
+      "rev": "64c08a7ca051951c8eae34e3e3cb1e202fe36786",
+      "rev_count": 1004030,
+      "rev_date": "2026-05-23T18:24:25Z",
+      "scrape_date": "2026-05-26T07:34:27.446099Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -520,14 +599,15 @@
       "description": "GNU Compiler Collection, version 15.2.0",
       "install_id": "gcc-unwrapped",
       "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=29916453413845e54a65b8a1cf996842300cd299",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=64c08a7ca051951c8eae34e3e3cb1e202fe36786",
       "name": "gcc-15.2.0",
       "pname": "gcc-unwrapped",
-      "rev": "29916453413845e54a65b8a1cf996842300cd299",
-      "rev_count": 1003640,
-      "rev_date": "2026-05-23T03:54:30Z",
-      "scrape_date": "2026-05-24T08:01:33.135287Z",
+      "rev": "64c08a7ca051951c8eae34e3e3cb1e202fe36786",
+      "rev_count": 1004030,
+      "rev_date": "2026-05-23T18:24:25Z",
+      "scrape_date": "2026-05-26T08:02:12.937643Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -553,14 +633,15 @@
       "description": "GNU Compiler Collection, version 15.2.0",
       "install_id": "gcc-unwrapped",
       "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=29916453413845e54a65b8a1cf996842300cd299",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=64c08a7ca051951c8eae34e3e3cb1e202fe36786",
       "name": "gcc-15.2.0",
       "pname": "gcc-unwrapped",
-      "rev": "29916453413845e54a65b8a1cf996842300cd299",
-      "rev_count": 1003640,
-      "rev_date": "2026-05-23T03:54:30Z",
-      "scrape_date": "2026-05-24T08:31:57.083157Z",
+      "rev": "64c08a7ca051951c8eae34e3e3cb1e202fe36786",
+      "rev_count": 1004030,
+      "rev_date": "2026-05-23T18:24:25Z",
+      "scrape_date": "2026-05-26T08:32:52.651819Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -589,14 +670,15 @@
       "description": "GNU C Library",
       "install_id": "glibc",
       "license": "LGPL-2.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=29916453413845e54a65b8a1cf996842300cd299",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=64c08a7ca051951c8eae34e3e3cb1e202fe36786",
       "name": "glibc-2.42-61",
       "pname": "glibc",
-      "rev": "29916453413845e54a65b8a1cf996842300cd299",
-      "rev_count": 1003640,
-      "rev_date": "2026-05-23T03:54:30Z",
-      "scrape_date": "2026-05-24T07:34:05.963088Z",
+      "rev": "64c08a7ca051951c8eae34e3e3cb1e202fe36786",
+      "rev_count": 1004030,
+      "rev_date": "2026-05-23T18:24:25Z",
+      "scrape_date": "2026-05-26T07:34:27.685964Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -624,19 +706,22 @@
       "description": "GNU C Library",
       "install_id": "glibc",
       "license": "LGPL-2.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=29916453413845e54a65b8a1cf996842300cd299",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=64c08a7ca051951c8eae34e3e3cb1e202fe36786",
       "name": "glibc-2.42-61",
       "pname": "glibc",
-      "rev": "29916453413845e54a65b8a1cf996842300cd299",
-      "rev_count": 1003640,
-      "rev_date": "2026-05-23T03:54:30Z",
-      "scrape_date": "2026-05-24T08:31:57.339270Z",
+      "rev": "64c08a7ca051951c8eae34e3e3cb1e202fe36786",
+      "rev_count": 1004030,
+      "rev_date": "2026-05-23T18:24:25Z",
+      "scrape_date": "2026-05-26T08:32:52.905623Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
       "version": "2.42-61",
       "outputs_to_install": [
+        "bin",
+        "bin",
         "bin",
         "bin"
       ],
@@ -659,14 +744,15 @@
       "description": "Tool that allows packages to find out information about other packages (wrapper script)",
       "install_id": "pkg-config",
       "license": "GPL-2.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=29916453413845e54a65b8a1cf996842300cd299",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=64c08a7ca051951c8eae34e3e3cb1e202fe36786",
       "name": "pkg-config-wrapper-0.29.2",
       "pname": "pkg-config",
-      "rev": "29916453413845e54a65b8a1cf996842300cd299",
-      "rev_count": 1003640,
-      "rev_date": "2026-05-23T03:54:30Z",
-      "scrape_date": "2026-05-24T07:06:29.083255Z",
+      "rev": "64c08a7ca051951c8eae34e3e3cb1e202fe36786",
+      "rev_count": 1004030,
+      "rev_date": "2026-05-23T18:24:25Z",
+      "scrape_date": "2026-05-26T07:06:41.921502Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -691,14 +777,15 @@
       "description": "Tool that allows packages to find out information about other packages (wrapper script)",
       "install_id": "pkg-config",
       "license": "GPL-2.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=29916453413845e54a65b8a1cf996842300cd299",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=64c08a7ca051951c8eae34e3e3cb1e202fe36786",
       "name": "pkg-config-wrapper-0.29.2",
       "pname": "pkg-config",
-      "rev": "29916453413845e54a65b8a1cf996842300cd299",
-      "rev_count": 1003640,
-      "rev_date": "2026-05-23T03:54:30Z",
-      "scrape_date": "2026-05-24T07:35:02.423714Z",
+      "rev": "64c08a7ca051951c8eae34e3e3cb1e202fe36786",
+      "rev_count": 1004030,
+      "rev_date": "2026-05-23T18:24:25Z",
+      "scrape_date": "2026-05-26T07:35:25.467638Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -724,14 +811,15 @@
       "description": "Tool that allows packages to find out information about other packages (wrapper script)",
       "install_id": "pkg-config",
       "license": "GPL-2.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=29916453413845e54a65b8a1cf996842300cd299",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=64c08a7ca051951c8eae34e3e3cb1e202fe36786",
       "name": "pkg-config-wrapper-0.29.2",
       "pname": "pkg-config",
-      "rev": "29916453413845e54a65b8a1cf996842300cd299",
-      "rev_count": 1003640,
-      "rev_date": "2026-05-23T03:54:30Z",
-      "scrape_date": "2026-05-24T08:02:12.017562Z",
+      "rev": "64c08a7ca051951c8eae34e3e3cb1e202fe36786",
+      "rev_count": 1004030,
+      "rev_date": "2026-05-23T18:24:25Z",
+      "scrape_date": "2026-05-26T08:02:50.886718Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
@@ -756,14 +844,15 @@
       "description": "Tool that allows packages to find out information about other packages (wrapper script)",
       "install_id": "pkg-config",
       "license": "GPL-2.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=29916453413845e54a65b8a1cf996842300cd299",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=64c08a7ca051951c8eae34e3e3cb1e202fe36786",
       "name": "pkg-config-wrapper-0.29.2",
       "pname": "pkg-config",
-      "rev": "29916453413845e54a65b8a1cf996842300cd299",
-      "rev_count": 1003640,
-      "rev_date": "2026-05-23T03:54:30Z",
-      "scrape_date": "2026-05-24T08:32:55.642309Z",
+      "rev": "64c08a7ca051951c8eae34e3e3cb1e202fe36786",
+      "rev_count": 1004030,
+      "rev_date": "2026-05-23T18:24:25Z",
+      "scrape_date": "2026-05-26T08:33:50.777986Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
