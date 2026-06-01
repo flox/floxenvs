@@ -1,13 +1,15 @@
 # shellcheck shell=bash
 # Helpers used by generate.sh. Source, do not execute.
 
-# Read the pinned flox version from flake.nix.
-# Format expected: inputs.flox.url = "github:flox/flox/refs/tags/v1.12.0";
+# Read the pinned flox version from flake.nix. Accepts either
+# a tag ref (`refs/tags/vX.Y.Z`) or a release branch ref
+# (`release-X.Y.Z`) — release PRs may land before the tag is
+# published. Always emits `vX.Y.Z`.
 flox_pinned_version() {
   local flake="${1:-flake.nix}"
-  grep -oE 'refs/tags/v[0-9]+\.[0-9]+\.[0-9]+' "$flake" \
+  grep -oE '(refs/tags/v|release-)[0-9]+\.[0-9]+\.[0-9]+' "$flake" \
     | head -1 \
-    | sed 's|refs/tags/||'
+    | sed -E 's|^(refs/tags/v\|release-)|v|'
 }
 
 # Convert a TOML file to JSON on stdout via yj. yj is

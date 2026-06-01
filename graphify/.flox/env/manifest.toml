@@ -28,8 +28,12 @@ gcc-unwrapped.pkg-group = "graphify-build"
 pkg-config.pkg-path = "pkg-config"
 pkg-config.pkg-group = "graphify-build"
 glibc.pkg-path = "glibc"
+glibc.outputs = "all"
 glibc.pkg-group = "graphify-build"
 glibc.systems = ["x86_64-linux", "aarch64-linux"]
+binutils.pkg-path = "binutils"
+binutils.pkg-group = "graphify-build"
+binutils.systems = ["x86_64-linux", "aarch64-linux"]
 
 [vars]
 # PyPI distribution name (CLI binary is `graphify`). The
