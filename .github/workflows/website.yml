@@ -51,7 +51,13 @@ jobs:
       - name: "Install yq, jq, gh"
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq jq yq
+          sudo apt-get install -y -qq jq
+          # mikefarah/yq (Go). Ubuntu's apt `yq` is the python jq-wrapper,
+          # which is incompatible with the mikefarah syntax the audit
+          # scripts use (e.g. `yq -o=json`).
+          sudo curl -sSL -o /usr/local/bin/yq \
+            https://github.com/mikefarah/yq/releases/download/v4.44.6/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
       - name: "Compute matrix"
         id: matrix
         env:
@@ -82,7 +88,13 @@ jobs:
       - name: "Install tools"
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq jq yq shellcheck
+          sudo apt-get install -y -qq jq shellcheck
+          # mikefarah/yq (Go). Ubuntu's apt `yq` is the python jq-wrapper,
+          # which is incompatible with the mikefarah syntax the audit
+          # scripts use (e.g. `yq -o=json`).
+          sudo curl -sSL -o /usr/local/bin/yq \
+            https://github.com/mikefarah/yq/releases/download/v4.44.6/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
           curl -sSL -o /tmp/gitleaks.tgz \
             https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz
           sudo tar -xzf /tmp/gitleaks.tgz -C /usr/local/bin gitleaks

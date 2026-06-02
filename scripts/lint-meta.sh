@@ -95,9 +95,7 @@ required_pkg=(install)
         (.combines_well_with | length > 0)' \
        "$meta" >/dev/null 2>&1; then
     if yq -e '
-      .combines_well_with | all(
-        test("^env:") or test("^pkg:")
-      )
+      .combines_well_with | all_c(test("^(env|pkg):"))
     ' "$meta" >/dev/null 2>&1; then
       sh_check_json "meta-yaml-cww-prefixed" true 5
     else
