@@ -25,6 +25,18 @@ src_hash=$(nix-prefetch-url --unpack "$src_url" 2>/dev/null)
 src_sri=$(nix hash convert --hash-algo sha256 --to sri "$src_hash")
 echo "  srcHash: $src_sri"
 
+# ollama 0.30+ fetches a pinned llama.cpp revision via CMake FetchContent.
+# The pin lives in the repo's LLAMA_CPP_VERSION file; prefetch that exact
+# revision so default.nix can supply it to the sandboxed build offline.
+llama_cpp_tag=$(curl -sfL \
+  "https://raw.githubusercontent.com/ollama/ollama/v${latest_version}/LLAMA_CPP_VERSION" \
+  | tr -d '[:space:]')
+echo "Pinned llama.cpp: $llama_cpp_tag"
+llama_url="https://github.com/ggml-org/llama.cpp/archive/refs/tags/${llama_cpp_tag}.tar.gz"
+llama_hash=$(nix-prefetch-url --unpack "$llama_url" 2>/dev/null)
+llama_sri=$(nix hash convert --hash-algo sha256 --to sri "$llama_hash")
+echo "  llamaCppHash: $llama_sri"
+
 # Build with a dummy vendorHash to get the real one. The goModules
 # fixed-output derivation is built before compilation, so the hash
 # mismatch surfaces immediately.
@@ -35,7 +47,10 @@ jq -n \
   --arg v "$latest_version" \
   --arg s "$src_sri" \
   --arg vh "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" \
-  '{version: $v, srcHash: $s, vendorHash: $vh}' > "$HASHES_FILE"
+  --arg lt "$llama_cpp_tag" \
+  --arg lh "$llama_sri" \
+  '{version: $v, srcHash: $s, vendorHash: $vh, llamaCppTag: $lt, llamaCppHash: $lh}' \
+  > "$HASHES_FILE"
 
 echo "Building with dummy vendorHash to compute real one..."
 prefetch_log=$(mktemp)
@@ -61,6 +76,9 @@ jq -n \
   --arg v "$latest_version" \
   --arg s "$src_sri" \
   --arg vh "$vendor_hash" \
-  '{version: $v, srcHash: $s, vendorHash: $vh}' > "$HASHES_FILE"
+  --arg lt "$llama_cpp_tag" \
+  --arg lh "$llama_sri" \
+  '{version: $v, srcHash: $s, vendorHash: $vh, llamaCppTag: $lt, llamaCppHash: $lh}' \
+  > "$HASHES_FILE"
 
 echo "Updated to $latest_version"
