@@ -53,6 +53,11 @@ if command -v gh >/dev/null 2>&1 \
         "repos/${REPO}/actions/workflows/${workflow_file}/runs?branch=main&per_page=30" \
         2>/dev/null); then
     note="gh api failed; using defaults"
+    # On failure (e.g. 404 for an item without a ci_<name>.yml, like an
+    # env that has no dedicated workflow) gh still writes the error JSON
+    # body to stdout. Clear it so the non-empty guard below skips the
+    # parsing that would otherwise hit `.workflow_runs[]` on null.
+    runs_json=""
   fi
 else
   note="no GITHUB_TOKEN; reliability defaults to neutral"
@@ -66,18 +71,18 @@ score=80
 if [ -n "$runs_json" ]; then
   # Count consecutive successful main runs from newest.
   streak=$(echo "$runs_json" | jq '
-    [.workflow_runs[]
+    [(.workflow_runs // [])[]
      | select(.head_branch == "main")
      | .conclusion]
     | (. + ["FAIL"])
     | (index("failure") // index("FAIL"))
   ')
   last_at=$(echo "$runs_json" | jq -r '
-    [.workflow_runs[] | select(.head_branch == "main")][0]
+    [(.workflow_runs // [])[] | select(.head_branch == "main")][0]
     .created_at // ""
   ' | cut -d T -f1)
   avg_s=$(echo "$runs_json" | jq '
-    [.workflow_runs[]
+    [(.workflow_runs // [])[]
      | select(.head_branch == "main")
      | (((.updated_at | fromdateiso8601))
         - ((.created_at | fromdateiso8601)))]
