@@ -422,6 +422,26 @@ jobs:
           fi
           popd
 
+      - name: "Rewrite include to use remote environments"
+        env:
+          FLOX_REMOTE_OWNER: "${{ steps.org.outputs.owner }}"
+        run: |
+          ENV="${{ inputs.environment }}"
+          MANIFEST="$ENV/.flox/env/manifest.toml"
+          # A non-demo env can still include local siblings (e.g.
+          # understand-anything includes ../claude). FloxHub rejects
+          # pushes whose manifest includes local environments, so rewrite
+          # any `{ dir = "../X" }` to its published `{ remote = "OWNER/X" }`
+          # form and re-lock. No-op for envs without local includes.
+          if grep -q '{ dir = "\.\./' "$MANIFEST"; then
+            sed -E "s#\{ dir = \"\.\./([A-Za-z0-9_.-]+)\" \}#{ remote = \"$FLOX_REMOTE_OWNER/\1\" }#g" "$MANIFEST" > "$MANIFEST.new"
+            mv "$MANIFEST.new" "$MANIFEST"
+            cat "$MANIFEST"
+            pushd "$ENV"
+            flox include upgrade
+            popd
+          fi
+
       - name: "Sync to remote environment"
         env:
           FLOX_REMOTE_OWNER: "${{ steps.org.outputs.owner }}"
@@ -488,7 +508,12 @@ jobs:
           # sed -i is non-portable between GNU (Linux) and BSD (macOS) sed;
           # write through a temp file so the same step works on both runners.
           MANIFEST="$DEMO_DIR/.flox/env/manifest.toml"
-          sed "s|{ dir = \"../$ENV\" }|{ remote = \"$FLOX_REMOTE_OWNER/$ENV\" }|g" "$MANIFEST" > "$MANIFEST.new"
+          # Rewrite every local `{ dir = "../X" }` include to its
+          # published `{ remote = "OWNER/X" }` form; FloxHub rejects
+          # pushes whose manifest includes local environments. The demo
+          # can include siblings beyond its own parent (e.g. ../claude),
+          # so match any sibling rather than only ../$ENV.
+          sed -E "s#\{ dir = \"\.\./([A-Za-z0-9_.-]+)\" \}#{ remote = \"$FLOX_REMOTE_OWNER/\1\" }#g" "$MANIFEST" > "$MANIFEST.new"
           mv "$MANIFEST.new" "$MANIFEST"
           cat "$DEMO_DIR/.flox/env/manifest.toml"
 
