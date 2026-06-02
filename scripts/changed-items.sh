@@ -25,11 +25,16 @@ resolve_base() {
   local b
   b=$(
     cd "$ROOT" || exit 1
-    if git rev-parse site-last-deployed 2>/dev/null; then
-      :
+    # --verify --quiet prints nothing and fails cleanly when the tag is
+    # missing (e.g. before the first successful deploy); without it,
+    # `git rev-parse` echoes the literal ref to stdout, which would then
+    # be used as a bogus diff base.
+    if sha=$(git rev-parse --verify --quiet \
+               "refs/tags/site-last-deployed^{commit}"); then
+      echo "$sha"
     else
-      git rev-list --max-parents=0 HEAD
-    fi | head -1
+      git rev-list --max-parents=0 HEAD | head -1
+    fi
   )
   echo "$b"
 }
