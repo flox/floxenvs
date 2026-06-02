@@ -14,7 +14,25 @@
 let
   versionData =
     builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version srcHash vendorHash;
+  inherit (versionData)
+    version
+    srcHash
+    vendorHash
+    llamaCppTag
+    llamaCppHash
+    ;
+
+  # ollama 0.30+ no longer vendors llama.cpp in-tree. Its CMake build
+  # fetches a pinned llama.cpp commit (see ollama's LLAMA_CPP_VERSION) via
+  # FetchContent at build time, which can't reach the network in the Nix
+  # sandbox. Prefetch that exact revision so the build can consume it
+  # offline (wired in via preBuild below).
+  llamaCppSrc = fetchFromGitHub {
+    owner = "ggml-org";
+    repo = "llama.cpp";
+    tag = llamaCppTag;
+    hash = llamaCppHash;
+  };
 in
 buildGoModule (finalAttrs: {
   pname = "ollama";
@@ -70,7 +88,19 @@ buildGoModule (finalAttrs: {
   );
 
   preBuild = ''
+    # Hand the prefetched llama.cpp tree to CMake's FetchContent instead of
+    # letting it git-clone at build time. Copy to a writable location first:
+    # Ollama's compat layer patches the llama.cpp source in place during
+    # configure, and the Nix store copy is read-only.
+    cp -r ${llamaCppSrc} llama-cpp-src
+    chmod -R u+w llama-cpp-src
+
+    # OLLAMA_MLX_BACKENDS="" disables the new Apple MLX backend, whose
+    # auto-detection demands Xcode's full Metal toolchain (unavailable in
+    # the sandbox). Metal acceleration still comes via llama.cpp/ggml.
     cmake -B build \
+      -DFETCHCONTENT_SOURCE_DIR_LLAMA_CPP="$PWD/llama-cpp-src" \
+      -DOLLAMA_MLX_BACKENDS="" \
       -DCMAKE_SKIP_BUILD_RPATH=ON \
       -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON
     cmake --build build -j $NIX_BUILD_CORES
