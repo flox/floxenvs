@@ -96,9 +96,13 @@ jobs:
       - name: "Content hash"
         id: hash
         run: |
-          MAIN_H=$(git rev-parse "HEAD:${{ steps.dir.outputs.dir }}" 2>/dev/null || echo none)
-          DEMO_H=$(git rev-parse "HEAD:${{ matrix.name }}-demo" 2>/dev/null || echo none)
-          CONF_H=$(git rev-parse "HEAD:.gitleaks.toml" 2>/dev/null || echo none)
+          # --verify --quiet prints nothing and fails cleanly when the
+          # path is absent. Without it, `git rev-parse "HEAD:missing"`
+          # echoes the literal arg to stdout, embedding a newline in the
+          # cache key that corrupts $GITHUB_OUTPUT ("Invalid format").
+          MAIN_H=$(git rev-parse --verify --quiet "HEAD:${{ steps.dir.outputs.dir }}" || echo none)
+          DEMO_H=$(git rev-parse --verify --quiet "HEAD:${{ matrix.name }}-demo" || echo none)
+          CONF_H=$(git rev-parse --verify --quiet "HEAD:.gitleaks.toml" || echo none)
           KEY="audit-v1-${{ matrix.kind }}-${{ matrix.name }}-${MAIN_H}-${DEMO_H}-${CONF_H}"
           echo "key=$KEY" >> "$GITHUB_OUTPUT"
       - name: "Restore cache"
