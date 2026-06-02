@@ -95,7 +95,8 @@ buildNpmPackage (finalAttrs: {
       packages/channels/base \
       packages/channels/telegram \
       packages/channels/weixin \
-      packages/channels/dingtalk
+      packages/channels/dingtalk \
+      packages/channels/feishu
     do
       npm run build --workspace=$ws
     done
