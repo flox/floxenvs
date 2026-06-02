@@ -1,0 +1,31 @@
+kind: pkg
+subkind: plain
+name: whichllm
+title: whichllm
+publisher: flox
+tagline: >
+  Find the best LLM that runs on your hardware — auto-detects
+  GPU/CPU/RAM and ranks HuggingFace models that actually fit.
+category: ai
+ai_role: tooling
+tags: [llm, models, hardware, huggingface, cli]
+stack: [python]
+featured: false
+combines_well_with:
+  - pkg:huggingface-hub
+  - pkg:lmstudio
+status: beta
+license: MIT
+upstream:
+  name: whichllm
+  url: https://github.com/Andyyyy64/whichllm
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    whichllm.pkg-path = "flox/whichllm"
+    whichllm.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/whichllm
+  floxhub: https://hub.flox.dev/flox/whichllm
