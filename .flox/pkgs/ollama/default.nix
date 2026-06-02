@@ -109,6 +109,22 @@ buildGoModule (finalAttrs: {
   postInstall = ''
     mkdir -p $out/lib
     cp -r build/lib/ollama $out/lib/
+  ''
+  + lib.optionalString stdenv.hostPlatform.isLinux ''
+    # The llama.cpp CPU backend variants are built in a CMake
+    # ExternalProject and copied into lib/ollama via a raw file(GLOB)
+    # install, so they keep their build-tree RPATH — a forbidden
+    # reference to /build/. Strip those entries; the libraries sit
+    # beside their dependencies ($ORIGIN), and the remaining entries
+    # already point into the store.
+    for f in $out/lib/ollama/*; do
+      [ -f "$f" ] || continue
+      rpath=$(patchelf --print-rpath "$f" 2>/dev/null) || continue
+      [ -n "$rpath" ] || continue
+      cleaned=$(printf '%s' "$rpath" | tr ':' '\n' \
+        | grep -v '^/build' | paste -sd: -)
+      patchelf --set-rpath "$cleaned" "$f"
+    done
   '';
 
   ldflags = [
