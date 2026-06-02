@@ -26,12 +26,21 @@ git config --global --add safe.directory \
 # payload is preserved — dpkg -i is idempotent and fast
 # in that case.
 if ! command -v flox >/dev/null 2>&1; then
-  : "${FLOX_VERSION:?FLOX_VERSION must be set in containerEnv}"
   case "$(uname -m)" in
     x86_64)  ARCH=x86_64  ;;
     aarch64) ARCH=aarch64 ;;
     *) echo "unsupported arch: $(uname -m)" >&2; exit 1 ;;
   esac
+  # Read the pinned flox version straight from flake.nix so a
+  # bump there needs no devcontainer regeneration. Reuses the
+  # same helper the generator uses.
+  # shellcheck source=/dev/null
+  . /workspaces/floxenvs/scripts/devcontainer/lib.sh
+  FLOX_VERSION="$(flox_pinned_version /workspaces/floxenvs/flake.nix)"
+  if [ -z "$FLOX_VERSION" ]; then
+    echo "ERROR: could not read flox version from flake.nix" >&2
+    exit 1
+  fi
   # downloads.flox.dev URLs use the bare version without
   # the "v" prefix that the flake.nix tag carries.
   VER="${FLOX_VERSION#v}"

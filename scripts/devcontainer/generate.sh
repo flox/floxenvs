@@ -17,12 +17,10 @@ cd "$REPO_ROOT"
 
 OUT_DIR="$REPO_ROOT/.devcontainer"
 
-FLOX_VERSION="$(flox_pinned_version flake.nix)"
-if [ -z "$FLOX_VERSION" ]; then
-  echo "ERROR: could not extract flox version from flake.nix" >&2
-  exit 1
-fi
-echo "Using flox version: $FLOX_VERSION"
+# The flox version is intentionally NOT baked into the
+# generated devcontainer.json files. post-create.sh reads it
+# live from flake.nix at container build time, so a version
+# bump needs no devcontainer regeneration.
 
 # Defaults applied when the overlay omits a field.
 DEFAULT_CPUS=4
@@ -61,7 +59,6 @@ render_one() {
   # .devcontainer/scripts/template.json — keep them in sync.
   jq -n \
     --arg display_name "$display_name" \
-    --arg flox_version "$FLOX_VERSION" \
     --arg env_dir "$env_dir" \
     --argjson cpus "$cpus" \
     --arg memory "$memory" \
@@ -84,7 +81,6 @@ render_one() {
       portsAttributes: $ports_attributes,
       containerEnv: {
         FLOX_DISABLE_METRICS: "true",
-        FLOX_VERSION: $flox_version,
         NIX_REMOTE: "auto"
       },
       customizations: { vscode: { extensions: $extensions } },
