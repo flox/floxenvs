@@ -55,7 +55,7 @@ jobs:
       - name: "Compute matrix"
         id: matrix
         env:
-          TRIGGER: ${{ github.event_name }}
+          TRIGGER: ${{ github.event_name == 'workflow_dispatch' && 'workflow_dispatch' || 'workflow_call' }}
           SHA: ${{ inputs.sha || github.sha }}
           INPUT_ITEMS: ${{ inputs.items || 'changed' }}
         run: |
