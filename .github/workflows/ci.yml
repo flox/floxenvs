@@ -630,9 +630,11 @@ jobs:
     name: "Website"
     needs: ["result", "containerize"]
     if: |
-      github.ref == 'refs/heads/main'
+      always()
+      && github.ref == 'refs/heads/main'
       && github.event_name == 'push'
       && needs.result.result == 'success'
+      && needs.containerize.result != 'failure'
     permissions:
       contents: "write"
       pages: "write"
