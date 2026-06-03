@@ -1,0 +1,33 @@
+{
+  "name": "sfw",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu26.04",
+  "workspaceFolder": "/workspaces/floxenvs/sfw",
+  "runArgs": [
+    "--security-opt",
+    "seccomp=unconfined"
+  ],
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
+  },
+  "mounts": [
+    "source=floxenvs-nix-store,target=/nix,type=volume"
+  ],
+  "forwardPorts": [],
+  "portsAttributes": {},
+  "containerEnv": {
+    "FLOX_DISABLE_METRICS": "true",
+    "NIX_REMOTE": "auto"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "flox.flox"
+      ]
+    }
+  },
+  "postCreateCommand": "bash /workspaces/floxenvs/.devcontainer/scripts/post-create.sh sfw",
+  "postStartCommand": "bash /workspaces/floxenvs/.devcontainer/scripts/post-start.sh sfw",
+  "remoteUser": "root"
+}

@@ -1,0 +1,68 @@
+kind: env
+name: sfw
+title: Socket Firewall
+publisher: flox
+tagline: >
+  Transparent supply-chain firewall — routes npm/pip/cargo through
+  Socket Firewall to block malicious packages.
+seo_title: >
+  sfw dev environment — Socket Firewall for npm, pip, yarn, pnpm,
+  uv, cargo
+seo_description: >
+  Flox-packaged Socket Firewall Free: one include line transparently
+  routes npm, yarn, pnpm, pip, uv, and cargo through sfw to block
+  installation of known-malicious packages — no command changes.
+intro: >
+  flox/sfw layers SocketDev's Socket Firewall Free underneath any
+  Flox env and wires its PATH shims so that npm, yarn, pnpm, pip,
+  uv, and cargo are transparently routed through `sfw`. Each install
+  is checked against Socket's malicious-package intelligence and
+  blocked before it can run, with no change to how you invoke your
+  package manager — the wrapping works in interactive shells,
+  scripts, `flox activate -- cmd`, sub-processes, CI, and
+  agent-driven invocations alike. A prompt hook keeps the shim dir
+  at the front of PATH even after you source a third-party activate
+  script (e.g. a Python venv), so installs inside the venv stay
+  protected. Bring your own package managers from the system, a
+  layered env, or another included environment.
+summary:
+  - "Transparently routes npm/yarn/pnpm/pip/uv/cargo through sfw"
+  - "Blocks known-malicious packages before they install"
+  - "No command changes — wraps shells, scripts, and CI alike"
+  - "Lives as a base layer — include into any env"
+category: tool
+tags: [security, supply-chain, npm, pip, cargo, firewall]
+stack: [typescript]
+featured: false
+combines_well_with:
+  - env:python-uv
+  - env:javascript-node
+  - pkg:claude-code
+status: beta
+license: Unfree
+upstream:
+  name: Socket Firewall Free
+  url: https://github.com/SocketDev/sfw-free
+  license: Unfree
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/sfw" }]
+  activate: |
+    flox activate -r flox/sfw
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/sfw-latest
+recipes:
+  - name: sfw-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Pre-installs nodejs, pip, and cargo"
+      - "Per-env install targets — no sudo, no $HOME pollution"
+      - "Walks through blocked-package examples"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/sfw
+  floxhub: https://hub.flox.dev/flox/sfw
+  docker: https://github.com/flox/floxenvs/pkgs/container/floxenvs/sfw-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Asfw

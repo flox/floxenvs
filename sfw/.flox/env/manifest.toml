@@ -1,0 +1,47 @@
+schema-version = "1.10.0"
+
+# Minimal Socket Firewall environment for use with [include].
+#
+# Installs flox/sfw (Socket Firewall Free) and wires its PATH shims so
+# that npm, yarn, pnpm, pip, uv, and cargo found on PATH are routed
+# through `sfw` transparently — blocking installation of known-malicious
+# packages without changing how you invoke your package manager.
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = [{ remote = "flox/sfw" }]
+#
+# Bring your own package managers (system, a layered env, or another
+# included environment); the shims wrap whichever ones are on PATH.
+
+[install]
+sfw.pkg-path = "flox/sfw"
+sfw.pkg-group = "sfw"
+
+[hook]
+on-activate = '''
+# Route supported package managers on PATH through sfw transparently
+# (shims shipped with the flox/sfw package). This covers
+# `flox activate -- cmd`, scripts, and CI; [profile.common] re-prepends
+# it for interactive shells, whose PATH flox may reset to put
+# $FLOX_ENV/bin first after the hook runs.
+export PATH="$FLOX_ENV/libexec/sfw-shims:$PATH"
+'''
+
+[profile]
+common = '''
+# Re-prepend the shim dir for interactive shells (see hook note above).
+export PATH="$FLOX_ENV/libexec/sfw-shims:$PATH"
+'''
+
+# Source the helpers shipped with flox/sfw. They re-prepend the shim dir
+# on every prompt, so when you later source a third-party activate script
+# (e.g. a Python venv's bin/activate) that prepends its own bin, the sfw
+# shim is restored to the front of PATH before the next command runs.
+bash = '''
+source "$FLOX_ENV/libexec/sfw-shims/activate.bash"
+'''
+zsh = '''
+source "$FLOX_ENV/libexec/sfw-shims/activate.zsh"
+'''

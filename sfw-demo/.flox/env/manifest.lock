@@ -1,0 +1,696 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "cargo": {
+        "pkg-path": "cargo",
+        "pkg-group": "demo-tools"
+      },
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": "demo-tools"
+      },
+      "nodejs": {
+        "pkg-path": "nodejs",
+        "pkg-group": "demo-tools"
+      },
+      "pip": {
+        "pkg-path": "python313Packages.pip",
+        "pkg-group": "demo-tools"
+      },
+      "sfw": {
+        "pkg-path": "flox/sfw",
+        "pkg-group": "sfw"
+      }
+    },
+    "hook": {
+      "on-activate": "# Route supported package managers on PATH through sfw transparently\n# (shims shipped with the flox/sfw package). This covers\n# `flox activate -- cmd`, scripts, and CI; [profile.common] re-prepends\n# it for interactive shells, whose PATH flox may reset to put\n# $FLOX_ENV/bin first after the hook runs.\nexport PATH=\"$FLOX_ENV/libexec/sfw-shims:$PATH\"\n\n# Per-environment \"global\" install locations so package-manager installs\n# land inside $FLOX_ENV_CACHE without sudo or polluting $HOME.\nexport NPM_CONFIG_PREFIX=\"$FLOX_ENV_CACHE/npm-global\"\nmkdir -p \"$NPM_CONFIG_PREFIX/bin\"\nexport CARGO_HOME=\"$FLOX_ENV_CACHE/cargo\"\nmkdir -p \"$CARGO_HOME/bin\"\n\n# pip on nixpkgs python is marked EXTERNALLY-MANAGED (PEP 668), has\n# require-virtualenv set, and --user disabled; the one install mode it\n# allows is `pip install --target=<dir>`.\nunset PIP_CONFIG_FILE\nexport PIP_REQUIRE_VIRTUALENV=false\nexport PIP_BREAK_SYSTEM_PACKAGES=true\nexport PIP_TARGET=\"$FLOX_ENV_CACHE/pip-target\"\nmkdir -p \"$PIP_TARGET\"\n\n# Keep the sfw shim dir at the front of PATH, ahead of the per-env\n# install bins, so npm/pip/cargo still resolve to the shim and route\n# through sfw. (The included flox/sfw env also prepends it; this is\n# the belt-and-suspenders re-prepend after we add the install bins.)\nexport PATH=\"$FLOX_ENV/libexec/sfw-shims:$NPM_CONFIG_PREFIX/bin:$CARGO_HOME/bin:$PATH\"\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --border rounded --border-foreground 212 \\\n    --padding \"1 2\" --margin \"1 0\" \\\n    \"$(gum style --bold --foreground 212 'Socket Firewall demo (sfw-demo)')\" \\\n    \"\" \\\n    \"$(gum style --bold --foreground 196 'WARNING: best run inside a container or sandbox')\" \\\n    \"\" \\\n    \"$(gum style --italic 'npm, pip, and cargo route through sfw automatically.')\" \\\n    \"\" \\\n    \"$(gum style --bold 'Try a flagged package (sfw blocks it):')\" \\\n    \"  npm install lodahs\" \\\n    \"  pip install fabrice\" \\\n    \"  cargo install rustdecimal\" \\\n    \"\" \\\n    \"$(gum style --bold 'And a clean one (sfw lets it through):')\" \\\n    \"  npm install lodash\" \\\n    \"\" \\\n    \"Full walkthrough: README.md\"\nfi\n"
+    },
+    "profile": {
+      "common": "# Re-prepend the shim dir for interactive shells (see hook note above).\nexport PATH=\"$FLOX_ENV/libexec/sfw-shims:$PATH\"\n",
+      "bash": "source \"$FLOX_ENV/libexec/sfw-shims/activate.bash\"\n",
+      "zsh": "source \"$FLOX_ENV/libexec/sfw-shims/activate.zsh\"\n"
+    },
+    "options": {}
+  },
+  "packages": [
+    {
+      "attr_path": "cargo",
+      "broken": false,
+      "derivation": "/nix/store/i3wanwihpf5c4m5vr50da8jfgkj1k5sm-cargo-1.95.0.drv",
+      "description": "Downloads your Rust project's dependencies and builds your project",
+      "install_id": "cargo",
+      "license": "[ MIT, Apache-2.0 ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "cargo-1.95.0",
+      "pname": "cargo",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T08:55:40.012326Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.95.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/2vdxz4xwplgb5rgfhqr0jr85fd7qqgmb-cargo-1.95.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "cargo",
+      "broken": false,
+      "derivation": "/nix/store/y7c5m0xdmigfryrd5zc3p7ggkyx1138h-cargo-1.95.0.drv",
+      "description": "Downloads your Rust project's dependencies and builds your project",
+      "install_id": "cargo",
+      "license": "[ MIT, Apache-2.0 ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "cargo-1.95.0",
+      "pname": "cargo",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T09:40:18.726470Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.95.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/f8rxcxfwk1qhazprqnfji401x08xp9dr-cargo-1.95.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "cargo",
+      "broken": false,
+      "derivation": "/nix/store/4s0nk3ijs08dwjnml3cjbn9j3jnm3z0k-cargo-1.95.0.drv",
+      "description": "Downloads your Rust project's dependencies and builds your project",
+      "install_id": "cargo",
+      "license": "[ MIT, Apache-2.0 ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "cargo-1.95.0",
+      "pname": "cargo",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T10:24:47.221933Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.95.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/5z8rq35zk9jqnnfw4m49fwpgq7phdhai-cargo-1.95.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "cargo",
+      "broken": false,
+      "derivation": "/nix/store/ppn0zk880wbmyp80ibpzjyjwdzp89fky-cargo-1.95.0.drv",
+      "description": "Downloads your Rust project's dependencies and builds your project",
+      "install_id": "cargo",
+      "license": "[ MIT, Apache-2.0 ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "cargo-1.95.0",
+      "pname": "cargo",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T11:06:42.717884Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.95.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/z480b23kymbmrijrl49246mrzyphli15-cargo-1.95.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/jsk66asqq2wnckkllv9sm1y94mxl0asm-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T08:55:41.531546Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/6jb5frkadampkcmbjynch118cc4smzfj-gum-0.17.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/2nqf2anq5klv1xf66jgz1gm8xrdid4ax-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T09:40:21.932721Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/8p8fi8pl4lb776q2gnby3rd3mcbj5grh-gum-0.17.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/ib5kcnql661slkgn223m5c17g6b9ala3-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T10:24:48.710970Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/n20dhdnibsqb890jvwhyw4xd3qqkazly-gum-0.17.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/isk54hr8s4cw8z3yiksk07yi1bzfmamh-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T11:06:45.838851Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/2ii7sbkq44zrkv4iv6g7bqi47m4ch28b-gum-0.17.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "nodejs",
+      "broken": false,
+      "derivation": "/nix/store/vbx35am7lar9zvwhk4nfl3lysmbd0ils-nodejs-24.15.0.drv",
+      "description": "Event-driven I/O framework for the V8 JavaScript engine",
+      "install_id": "nodejs",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "nodejs-24.15.0",
+      "pname": "nodejs",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T08:56:05.100848Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "24.15.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/3mvbmkd7lmxi3xlka1avra24flwbgjv9-nodejs-24.15.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "nodejs",
+      "broken": false,
+      "derivation": "/nix/store/zc41z1042wi0d1gmyc8mlwv5av8fds2q-nodejs-24.15.0.drv",
+      "description": "Event-driven I/O framework for the V8 JavaScript engine",
+      "install_id": "nodejs",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "nodejs-24.15.0",
+      "pname": "nodejs",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T09:40:59.202885Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "24.15.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rmdjmd0iy5zlyg0j2i1cd0s7ha1562fs-nodejs-24.15.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "nodejs",
+      "broken": false,
+      "derivation": "/nix/store/f0ay9hny5gn4c0lfrb95xrakm7yf3s2q-nodejs-24.15.0.drv",
+      "description": "Event-driven I/O framework for the V8 JavaScript engine",
+      "install_id": "nodejs",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "nodejs-24.15.0",
+      "pname": "nodejs",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T10:25:13.022223Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "24.15.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rhv8jiklgw2bw4ljh4nm3h3r3bpnkcl3-nodejs-24.15.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "nodejs",
+      "broken": false,
+      "derivation": "/nix/store/f8i8jydaqs0ngxm97c091zna2mnjb43f-nodejs-24.15.0.drv",
+      "description": "Event-driven I/O framework for the V8 JavaScript engine",
+      "install_id": "nodejs",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "nodejs-24.15.0",
+      "pname": "nodejs",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T11:07:24.655920Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "24.15.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/5a8ysg1jnj8jmzzyfcfw7rvpvnp5rfpa-nodejs-24.15.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "python313Packages.pip",
+      "broken": false,
+      "derivation": "/nix/store/qb0c4mir0469plafpkki9mwgn7lv3qz8-python3.13-pip-25.3.drv",
+      "description": "PyPA recommended tool for installing Python packages",
+      "install_id": "pip",
+      "license": "[ MIT ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "python3.13-pip-25.3",
+      "pname": "pip",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T08:56:31.920952Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "25.3",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/s609bcv18lafja5aqch4wgr6whmrc8md-python3.13-pip-25.3-dist",
+        "man": "/nix/store/qr1w31hdk091xipm2kspss6rigjlmc0p-python3.13-pip-25.3-man",
+        "out": "/nix/store/9szjhahyli9mb1yfz8gyny8vy3lfsxy6-python3.13-pip-25.3"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "python313Packages.pip",
+      "broken": false,
+      "derivation": "/nix/store/55mnm7s01wrksab0kfjbjs4jhh541x3v-python3.13-pip-25.3.drv",
+      "description": "PyPA recommended tool for installing Python packages",
+      "install_id": "pip",
+      "license": "[ MIT ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "python3.13-pip-25.3",
+      "pname": "pip",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T09:41:34.900403Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "25.3",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/a84zir49j127l1xln4zpbzgpyqlckiz6-python3.13-pip-25.3-dist",
+        "man": "/nix/store/8xm9f53g3cdw02kmrcwj91nwr12w3w5d-python3.13-pip-25.3-man",
+        "out": "/nix/store/8x0vvbzfmww1lmzzc0dzdrizm7cwlxy4-python3.13-pip-25.3"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "python313Packages.pip",
+      "broken": false,
+      "derivation": "/nix/store/63yvzka8y5jszpizwff2k0vjiz3di1l4-python3.13-pip-25.3.drv",
+      "description": "PyPA recommended tool for installing Python packages",
+      "install_id": "pip",
+      "license": "[ MIT ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "python3.13-pip-25.3",
+      "pname": "pip",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T10:25:40.066882Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "25.3",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/as4d6rh6y3f0m74w8rjgvzhq47nfnkq7-python3.13-pip-25.3-dist",
+        "man": "/nix/store/v8gyicm02ngk0zq02xd5l4ps0cps346w-python3.13-pip-25.3-man",
+        "out": "/nix/store/dw0j9dls6b5r76pbgs0868505yanllmg-python3.13-pip-25.3"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "python313Packages.pip",
+      "broken": false,
+      "derivation": "/nix/store/0k5phkvk01xp87a1sfy50qyl7ygsa4g3-python3.13-pip-25.3.drv",
+      "description": "PyPA recommended tool for installing Python packages",
+      "install_id": "pip",
+      "license": "[ MIT ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "python3.13-pip-25.3",
+      "pname": "pip",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T11:08:02.011302Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "25.3",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "dist": "/nix/store/gphwd3z80jqnks6smc5mdg4xhbxxx428-python3.13-pip-25.3-dist",
+        "man": "/nix/store/7zrn94q0wkdp91k414ji2vhfsi43brcb-python3.13-pip-25.3-man",
+        "out": "/nix/store/w3hms7aiqkz33zqh1bh3g11y6106ar3n-python3.13-pip-25.3"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "sfw",
+      "broken": false,
+      "derivation": "/nix/store/7r2wldkd9l5f0vbfcl0ymbk1nidv3zyc-sfw-1.12.0.drv",
+      "description": "Socket Firewall Free - wraps your package manager to prevent installation of malicious packages",
+      "install_id": "sfw",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=7758b326136694d37198c0e0125b1e1406344b51",
+      "name": "sfw-1.12.0",
+      "pname": "sfw",
+      "rev": "7758b326136694d37198c0e0125b1e1406344b51",
+      "rev_count": 5849,
+      "rev_date": "2026-06-03T13:25:53Z",
+      "scrape_date": "2026-06-03T20:55:49.259429Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "1.12.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/l0hc6j4w6g1ikw8ra59hxjrpr0rciv90-sfw-1.12.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "sfw",
+      "priority": 5
+    },
+    {
+      "attr_path": "sfw",
+      "broken": false,
+      "derivation": "/nix/store/sdhqf1aq5njsjhm0jxgr6dr8i0fx9zab-sfw-1.12.0.drv",
+      "description": "Socket Firewall Free - wraps your package manager to prevent installation of malicious packages",
+      "install_id": "sfw",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=7758b326136694d37198c0e0125b1e1406344b51",
+      "name": "sfw-1.12.0",
+      "pname": "sfw",
+      "rev": "7758b326136694d37198c0e0125b1e1406344b51",
+      "rev_count": 5849,
+      "rev_date": "2026-06-03T13:25:53Z",
+      "scrape_date": "2026-06-03T20:55:49.259441Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "1.12.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/5fic9fqb5g97kpg4rrxsicpy9lssja87-sfw-1.12.0"
+      },
+      "system": "aarch64-linux",
+      "group": "sfw",
+      "priority": 5
+    },
+    {
+      "attr_path": "sfw",
+      "broken": false,
+      "derivation": "/nix/store/xjj2qhxnfwfj6h5kpc4qwlrmhdlr8f8k-sfw-1.12.0.drv",
+      "description": "Socket Firewall Free - wraps your package manager to prevent installation of malicious packages",
+      "install_id": "sfw",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=7758b326136694d37198c0e0125b1e1406344b51",
+      "name": "sfw-1.12.0",
+      "pname": "sfw",
+      "rev": "7758b326136694d37198c0e0125b1e1406344b51",
+      "rev_count": 5849,
+      "rev_date": "2026-06-03T13:25:53Z",
+      "scrape_date": "2026-06-03T20:55:49.259443Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "1.12.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/4pc0g3pf18z0jybb0bf81flpx0sh6rw7-sfw-1.12.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "sfw",
+      "priority": 5
+    },
+    {
+      "attr_path": "sfw",
+      "broken": false,
+      "derivation": "/nix/store/4p67l45nzbcv0b37rininl9zvny17zbq-sfw-1.12.0.drv",
+      "description": "Socket Firewall Free - wraps your package manager to prevent installation of malicious packages",
+      "install_id": "sfw",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=7758b326136694d37198c0e0125b1e1406344b51",
+      "name": "sfw-1.12.0",
+      "pname": "sfw",
+      "rev": "7758b326136694d37198c0e0125b1e1406344b51",
+      "rev_count": 5849,
+      "rev_date": "2026-06-03T13:25:53Z",
+      "scrape_date": "2026-06-03T20:55:49.259444Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "1.12.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/dygcc9h8qqqiw5sd4wxpqq031ah81j6i-sfw-1.12.0"
+      },
+      "system": "x86_64-linux",
+      "group": "sfw",
+      "priority": 5
+    }
+  ],
+  "compose": {
+    "composer": {
+      "schema-version": "1.10.0",
+      "install": {
+        "cargo": {
+          "pkg-path": "cargo",
+          "pkg-group": "demo-tools"
+        },
+        "gum": {
+          "pkg-path": "gum",
+          "pkg-group": "demo-tools"
+        },
+        "nodejs": {
+          "pkg-path": "nodejs",
+          "pkg-group": "demo-tools"
+        },
+        "pip": {
+          "pkg-path": "python313Packages.pip",
+          "pkg-group": "demo-tools"
+        }
+      },
+      "hook": {
+        "on-activate": "# Per-environment \"global\" install locations so package-manager installs\n# land inside $FLOX_ENV_CACHE without sudo or polluting $HOME.\nexport NPM_CONFIG_PREFIX=\"$FLOX_ENV_CACHE/npm-global\"\nmkdir -p \"$NPM_CONFIG_PREFIX/bin\"\nexport CARGO_HOME=\"$FLOX_ENV_CACHE/cargo\"\nmkdir -p \"$CARGO_HOME/bin\"\n\n# pip on nixpkgs python is marked EXTERNALLY-MANAGED (PEP 668), has\n# require-virtualenv set, and --user disabled; the one install mode it\n# allows is `pip install --target=<dir>`.\nunset PIP_CONFIG_FILE\nexport PIP_REQUIRE_VIRTUALENV=false\nexport PIP_BREAK_SYSTEM_PACKAGES=true\nexport PIP_TARGET=\"$FLOX_ENV_CACHE/pip-target\"\nmkdir -p \"$PIP_TARGET\"\n\n# Keep the sfw shim dir at the front of PATH, ahead of the per-env\n# install bins, so npm/pip/cargo still resolve to the shim and route\n# through sfw. (The included flox/sfw env also prepends it; this is\n# the belt-and-suspenders re-prepend after we add the install bins.)\nexport PATH=\"$FLOX_ENV/libexec/sfw-shims:$NPM_CONFIG_PREFIX/bin:$CARGO_HOME/bin:$PATH\"\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --border rounded --border-foreground 212 \\\n    --padding \"1 2\" --margin \"1 0\" \\\n    \"$(gum style --bold --foreground 212 'Socket Firewall demo (sfw-demo)')\" \\\n    \"\" \\\n    \"$(gum style --bold --foreground 196 'WARNING: best run inside a container or sandbox')\" \\\n    \"\" \\\n    \"$(gum style --italic 'npm, pip, and cargo route through sfw automatically.')\" \\\n    \"\" \\\n    \"$(gum style --bold 'Try a flagged package (sfw blocks it):')\" \\\n    \"  npm install lodahs\" \\\n    \"  pip install fabrice\" \\\n    \"  cargo install rustdecimal\" \\\n    \"\" \\\n    \"$(gum style --bold 'And a clean one (sfw lets it through):')\" \\\n    \"  npm install lodash\" \\\n    \"\" \\\n    \"Full walkthrough: README.md\"\nfi\n"
+      },
+      "options": {},
+      "include": {
+        "environments": [
+          {
+            "dir": "../sfw"
+          }
+        ]
+      }
+    },
+    "include": [
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "sfw": {
+              "pkg-path": "flox/sfw",
+              "pkg-group": "sfw"
+            }
+          },
+          "hook": {
+            "on-activate": "# Route supported package managers on PATH through sfw transparently\n# (shims shipped with the flox/sfw package). This covers\n# `flox activate -- cmd`, scripts, and CI; [profile.common] re-prepends\n# it for interactive shells, whose PATH flox may reset to put\n# $FLOX_ENV/bin first after the hook runs.\nexport PATH=\"$FLOX_ENV/libexec/sfw-shims:$PATH\"\n"
+          },
+          "profile": {
+            "common": "# Re-prepend the shim dir for interactive shells (see hook note above).\nexport PATH=\"$FLOX_ENV/libexec/sfw-shims:$PATH\"\n",
+            "bash": "source \"$FLOX_ENV/libexec/sfw-shims/activate.bash\"\n",
+            "zsh": "source \"$FLOX_ENV/libexec/sfw-shims/activate.zsh\"\n"
+          },
+          "options": {}
+        },
+        "name": "sfw",
+        "descriptor": {
+          "dir": "../sfw"
+        }
+      }
+    ],
+    "warnings": []
+  }
+}

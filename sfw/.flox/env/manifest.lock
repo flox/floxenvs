@@ -1,0 +1,143 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "sfw": {
+        "pkg-path": "flox/sfw",
+        "pkg-group": "sfw"
+      }
+    },
+    "hook": {
+      "on-activate": "# Route supported package managers on PATH through sfw transparently\n# (shims shipped with the flox/sfw package). This covers\n# `flox activate -- cmd`, scripts, and CI; [profile.common] re-prepends\n# it for interactive shells, whose PATH flox may reset to put\n# $FLOX_ENV/bin first after the hook runs.\nexport PATH=\"$FLOX_ENV/libexec/sfw-shims:$PATH\"\n"
+    },
+    "profile": {
+      "common": "# Re-prepend the shim dir for interactive shells (see hook note above).\nexport PATH=\"$FLOX_ENV/libexec/sfw-shims:$PATH\"\n",
+      "bash": "source \"$FLOX_ENV/libexec/sfw-shims/activate.bash\"\n",
+      "zsh": "source \"$FLOX_ENV/libexec/sfw-shims/activate.zsh\"\n"
+    },
+    "options": {}
+  },
+  "packages": [
+    {
+      "attr_path": "sfw",
+      "broken": false,
+      "derivation": "/nix/store/7r2wldkd9l5f0vbfcl0ymbk1nidv3zyc-sfw-1.12.0.drv",
+      "description": "Socket Firewall Free - wraps your package manager to prevent installation of malicious packages",
+      "install_id": "sfw",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=7758b326136694d37198c0e0125b1e1406344b51",
+      "name": "sfw-1.12.0",
+      "pname": "sfw",
+      "rev": "7758b326136694d37198c0e0125b1e1406344b51",
+      "rev_count": 5849,
+      "rev_date": "2026-06-03T13:25:53Z",
+      "scrape_date": "2026-06-03T20:53:55.576001Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "1.12.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/l0hc6j4w6g1ikw8ra59hxjrpr0rciv90-sfw-1.12.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "sfw",
+      "priority": 5
+    },
+    {
+      "attr_path": "sfw",
+      "broken": false,
+      "derivation": "/nix/store/sdhqf1aq5njsjhm0jxgr6dr8i0fx9zab-sfw-1.12.0.drv",
+      "description": "Socket Firewall Free - wraps your package manager to prevent installation of malicious packages",
+      "install_id": "sfw",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=7758b326136694d37198c0e0125b1e1406344b51",
+      "name": "sfw-1.12.0",
+      "pname": "sfw",
+      "rev": "7758b326136694d37198c0e0125b1e1406344b51",
+      "rev_count": 5849,
+      "rev_date": "2026-06-03T13:25:53Z",
+      "scrape_date": "2026-06-03T20:53:55.576004Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "1.12.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/5fic9fqb5g97kpg4rrxsicpy9lssja87-sfw-1.12.0"
+      },
+      "system": "aarch64-linux",
+      "group": "sfw",
+      "priority": 5
+    },
+    {
+      "attr_path": "sfw",
+      "broken": false,
+      "derivation": "/nix/store/xjj2qhxnfwfj6h5kpc4qwlrmhdlr8f8k-sfw-1.12.0.drv",
+      "description": "Socket Firewall Free - wraps your package manager to prevent installation of malicious packages",
+      "install_id": "sfw",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=7758b326136694d37198c0e0125b1e1406344b51",
+      "name": "sfw-1.12.0",
+      "pname": "sfw",
+      "rev": "7758b326136694d37198c0e0125b1e1406344b51",
+      "rev_count": 5849,
+      "rev_date": "2026-06-03T13:25:53Z",
+      "scrape_date": "2026-06-03T20:53:55.576005Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "1.12.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/4pc0g3pf18z0jybb0bf81flpx0sh6rw7-sfw-1.12.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "sfw",
+      "priority": 5
+    },
+    {
+      "attr_path": "sfw",
+      "broken": false,
+      "derivation": "/nix/store/4p67l45nzbcv0b37rininl9zvny17zbq-sfw-1.12.0.drv",
+      "description": "Socket Firewall Free - wraps your package manager to prevent installation of malicious packages",
+      "install_id": "sfw",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=7758b326136694d37198c0e0125b1e1406344b51",
+      "name": "sfw-1.12.0",
+      "pname": "sfw",
+      "rev": "7758b326136694d37198c0e0125b1e1406344b51",
+      "rev_count": 5849,
+      "rev_date": "2026-06-03T13:25:53Z",
+      "scrape_date": "2026-06-03T20:53:55.576006Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "1.12.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/dygcc9h8qqqiw5sd4wxpqq031ah81j6i-sfw-1.12.0"
+      },
+      "system": "x86_64-linux",
+      "group": "sfw",
+      "priority": 5
+    }
+  ]
+}
