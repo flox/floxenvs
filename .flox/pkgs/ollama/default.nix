@@ -6,6 +6,7 @@
   cmake,
   gitMinimal,
   coreutils,
+  bash,
   apple-sdk_15,
   versionCheckHook,
   writableTmpDirAsHomeHook,
@@ -57,20 +58,25 @@ buildGoModule (finalAttrs: {
     apple-sdk_15
   ];
 
-  # Mirrors nixpkgs ollama: stamp the version and rewrite a few
+  # Mirrors nixpkgs ollama: stamp the version and rewrite the
   # /bin/<tool> shellouts in launch tests so they resolve in the
   # build sandbox.
   postPatch = ''
     substituteInPlace version/version.go \
       --replace-fail 0.0.0 '${finalAttrs.version}'
-    for f in cmd/launch/openclaw_test.go \
-             cmd/launch/hermes_test.go \
-             cmd/launch/kimi_test.go; do
+    # The cmd/launch "Ensure<tool>Installed" tests write helper scripts that
+    # shell out to absolute /bin paths — /bin/sh shebangs plus coreutils — so
+    # they resolve on the Darwin builder but not inside the Linux build
+    # sandbox. Rewrite them to the Nix-provided tools. Cover every *_test.go
+    # so launch integrations added in later releases (e.g. cline, qwen in
+    # 0.30.2) don't reintroduce the failure.
+    for f in cmd/launch/*_test.go; do
       [ -f "$f" ] || continue
       substituteInPlace "$f" \
         --replace-quiet '/bin/mkdir' '${coreutils}/bin/mkdir' \
         --replace-quiet '/bin/cat'   '${coreutils}/bin/cat' \
-        --replace-quiet '/bin/chmod' '${coreutils}/bin/chmod'
+        --replace-quiet '/bin/chmod' '${coreutils}/bin/chmod' \
+        --replace-quiet '/bin/sh'    '${bash}/bin/sh'
     done
     rm -rf app
   ''
@@ -94,6 +100,18 @@ buildGoModule (finalAttrs: {
     # configure, and the Nix store copy is read-only.
     cp -r ${llamaCppSrc} llama-cpp-src
     chmod -R u+w llama-cpp-src
+
+    # Apply ollama's llama.cpp "compat" layer (llama/compat/**/*.patch).
+    # Upstream applies these via FetchContent's PATCH_COMMAND, but because
+    # we hand CMake a prefetched tree through FETCHCONTENT_SOURCE_DIR_LLAMA_CPP,
+    # FetchContent uses it directly and SKIPS the patch step. In 0.30.2 the
+    # new laguna compat model ships a patch that *declares* the
+    # llama_model_laguna class which llama/compat/models/laguna.cpp defines —
+    # without it the build fails to compile. Mirror apply-patch.cmake: apply
+    # every compat patch inside the llama.cpp source tree.
+    for p in $(find "$PWD/llama/compat" -name '*.patch' | sort); do
+      ( cd llama-cpp-src && git apply --whitespace=nowarn "$p" )
+    done
 
     # OLLAMA_MLX_BACKENDS="" disables the new Apple MLX backend, whose
     # auto-detection demands Xcode's full Metal toolchain (unavailable in
