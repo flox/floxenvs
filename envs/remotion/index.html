@@ -1,0 +1,234 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Remotion dev environment — React video toolkit with Claude Code best-practices skill</title><meta name="description" content="Flox-packaged Remotion: Node 22, `npx create-video` ready, and the Remotion best-practices skill auto-registered as a Claude Code plugin. ffmpeg comes from Remotion itself."><link rel="canonical" href="https://flox.github.io/floxenvs/envs/remotion/"><link rel="icon" href="/floxenvs/favicon.svg"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"><meta name="referrer" content="strict-origin-when-cross-origin"><meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), interest-cohort=()"><meta property="og:title" content="Remotion dev environment — React video toolkit with Claude Code best-practices skill"><meta property="og:description" content="Flox-packaged Remotion: Node 22, `npx create-video` ready, and the Remotion best-practices skill auto-registered as a Claude Code plugin. ffmpeg comes from Remotion itself."><meta property="og:image" content="https://flox.github.io/floxenvs/og/env/remotion.png"><meta property="og:url" content="https://flox.github.io/floxenvs/envs/remotion/"><meta property="og:type" content="product"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://flox.github.io/floxenvs/og/env/remotion.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Remotion","description":"React-based programmatic video toolkit with the Remotion best-practices skill pre-wired into Claude Code.\n","applicationCategory":"DeveloperApplication","operatingSystem":["Linux","macOS"],"license":"https://spdx.org/licenses/MIT.html","url":"https://flox.github.io/floxenvs/envs/remotion/","codeRepository":"https://github.com/flox/floxenvs/tree/main/remotion","isBasedOn":"https://remotion.dev","dateModified":"2026-06-03T11:20:23+02:00","offers":{"@type":"Offer","price":"0","priceCurrency":"USD","availability":"https://schema.org/InStock","description":"Free and open source — install via the Flox package manager."},"publisher":{"@type":"Organization","@id":"https://flox.dev/#organization","name":"Flox","url":"https://flox.dev"},"author":{"@type":"Person","name":"Rok Garbas","identifier":"@rok","url":"https://github.com/rok"}}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"flox / envs","item":"https://flox.github.io/floxenvs/"},{"@type":"ListItem","position":2,"name":"Environments","item":"https://flox.github.io/floxenvs/envs/"},{"@type":"ListItem","position":3,"name":"Remotion","item":"https://flox.github.io/floxenvs/envs/remotion/"}]}</script><script>
+      // Apply theme before paint to avoid FOUC. Honors the
+      // stored choice, otherwise falls back to system pref.
+      (function () {
+        try {
+          var stored = localStorage.getItem("theme");
+          var dark = stored === "dark"
+            || (!stored && window.matchMedia(
+              "(prefers-color-scheme: dark)").matches);
+          if (dark) document.documentElement.classList.add("dark");
+        } catch (e) {}
+      })();
+    </script><link rel="stylesheet" href="/floxenvs/_astro/_slug_.BYNwMe91.css">
+<style>.clip-hexagon[data-astro-cid-exkfadj5]{clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)}
+</style></head> <body class="font-sans antialiased min-h-dvh bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100"> <header class="border-b border-slate-200 dark:border-slate-800"> <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center gap-6"> <a href="/floxenvs/" class="font-bold tracking-tight">flox / envs</a> <a href="/floxenvs/envs/" class="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">Envs</a> <a href="/floxenvs/packages/" class="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">Packages</a> <a href="/floxenvs/search/" class="ml-auto inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white" aria-label="Search"> <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"> <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd"></path> </svg> <span>Search</span> </a> <button id="theme-toggle" type="button" class="inline-flex items-center justify-center w-8 h-8 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800" aria-label="Toggle dark mode" title="Toggle dark mode"> <svg class="w-4 h-4 dark:hidden" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"> <path d="M10 2a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 2zM10 15a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 15zM10 7a3 3 0 100 6 3 3 0 000-6zM15.657 5.404a.75.75 0 10-1.06-1.06l-1.061 1.06a.75.75 0 001.06 1.06l1.06-1.06zM6.464 14.596a.75.75 0 10-1.06-1.06l-1.06 1.06a.75.75 0 001.06 1.06l1.06-1.06zM18 10a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0118 10zM5 10a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 015 10zM14.596 15.657a.75.75 0 001.06-1.06l-1.06-1.061a.75.75 0 10-1.06 1.06l1.06 1.06zM5.404 6.464a.75.75 0 001.06-1.06l-1.06-1.06a.75.75 0 10-1.061 1.06l1.06 1.06z"></path> </svg> <svg class="w-4 h-4 hidden dark:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"> <path fill-rule="evenodd" d="M7.455 2.004a.75.75 0 01.26.77 7 7 0 009.958 7.967.75.75 0 011.067.853A8.5 8.5 0 116.647 1.921a.75.75 0 01.808.083z" clip-rule="evenodd"></path> </svg> </button> <a href="https://github.com/flox/floxenvs" class="inline-flex items-center justify-center w-8 h-8 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800" aria-label="GitHub repository" title="GitHub repository"> <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"> <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path> </svg> </a> </nav> </header> <main class="max-w-6xl mx-auto px-6 py-10">  <nav class="text-sm text-slate-500 mb-4"> <a href="/floxenvs/envs/" class="underline">Environments</a> / remotion </nav> <div class="flex items-center gap-3 mb-2"> <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono uppercase tracking-wide ring-1 bg-kind-env/15 text-kind-env ring-kind-env/30" data-kind="env"> ENV </span> <span class="text-xs font-mono text-slate-500">beta</span> </div> <h1 class="text-3xl font-bold">Remotion</h1> <p class="mt-2 text-slate-600 dark:text-slate-300">React-based programmatic video toolkit with the Remotion best-practices skill pre-wired into Claude Code.
+</p> <p class="mt-4 text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-3xl"> flox/remotion sets up a Remotion-ready Node 22 sandbox and composes flox/claude with claude-code-plugin-remotion so the Remotion best-practices skill loads automatically whenever Claude touches Remotion code. ffmpeg/ffprobe are intentionally not in the closure — Remotion ships its own via `npx remotion ffmpeg`, which is what the skill tells the agent to use. Useful for building videos programmatically with React (animations, audio, captions, 3D, transitions, charts). Combines well with env:claude for the managed-config + isolated workflow, with env:javascript-node for separately-pinned node tooling, and with env:playwright if your video content needs to capture browser screenshots.
+ </p> <ul class="mt-5 list-disc list-inside text-sm space-y-1"> <li>Node 22 ready for `npx create-video`, `remotion studio`, `remotion render`</li><li>Remotion best-practices skill auto-loaded in Claude Code</li><li>ffmpeg sourced from Remotion itself — no host install</li><li>Composes cleanly with flox/claude</li> </ul><aside class="mt-6 max-w-3xl rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 px-4 py-3 text-sm"> <strong>New to Flox?</strong> Install it in 30 seconds:  <code class="font-mono text-xs">curl -L https://downloads.flox.dev/by-env/stable/install.sh | bash</code> 
+— then run the activate command below. <a href="https://flox.dev/docs/install-flox/" class="underline">Docs →</a> </aside> <div class="grid lg:grid-cols-[1fr_280px] gap-10 mt-10"> <div> <section aria-label="Score panel" class="mt-8 p-6 rounded-xl border border-slate-200 dark:border-slate-800" data-astro-cid-exkfadj5> <div class="grid gap-6 md:grid-cols-[120px_1fr_1fr_1.2fr]" data-astro-cid-exkfadj5> <!-- Hex overall score --> <div class="flex md:block items-center gap-4" data-astro-cid-exkfadj5> <div class="w-24 h-28 flex flex-col items-center justify-center
+               clip-hexagon bg-slate-50 dark:bg-slate-900" aria-label="Overall score —" data-astro-cid-exkfadj5> <div class="text-3xl font-bold leading-none font-mono" data-astro-cid-exkfadj5> — </div> <div class="mt-1 px-2 py-0.5 text-[10px] font-mono uppercase rounded ring-1 bg-status-missing/15 text-status-missing ring-status-missing/30" data-astro-cid-exkfadj5> no data </div> </div> </div> <!-- Quality --> <div class="space-y-1"> <div class="flex items-baseline gap-2 text-sm"> <span class="font-medium text-slate-700 dark:text-slate-200"> Quality </span> <span class="font-mono text-score-red"> 0%
+</span> </div> <div class="h-2 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Quality"> <div class="h-full bg-score-red" style="width:0%"></div> </div> <p class="text-xs text-slate-500 leading-tight">0/0 checks pass</p> </div> <!-- Reliability --> <div class="space-y-1"> <div class="flex items-baseline gap-2 text-sm"> <span class="font-medium text-slate-700 dark:text-slate-200"> Reliability </span> <span class="font-mono text-score-red"> 0%
+</span> </div> <div class="h-2 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Reliability"> <div class="h-full bg-score-red" style="width:0%"></div> </div> <p class="text-xs text-slate-500 leading-tight">no recent CI data</p> </div> <!-- Security --> <div data-astro-cid-exkfadj5> <p class="text-sm font-medium text-slate-700 dark:text-slate-200 mb-1" data-astro-cid-exkfadj5>
+Security
+</p> <div class="space-y-0.5" data-astro-cid-exkfadj5>  </div>  </div> </div> <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-900
+              text-sm text-slate-600 dark:text-slate-300" data-astro-cid-exkfadj5> <span class="font-medium" data-astro-cid-exkfadj5>Impact</span> <span class="ml-2 font-mono" data-astro-cid-exkfadj5>no evals.yaml</span> </div> </section>  <section class="mt-8"> <h2 class="text-xl font-semibold mb-3">Install</h2> <div class="rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden"> <div role="tablist" class="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"> <button role="tab" aria-selected="true" aria-controls="82iiw5tiewm-panel-0" data-tab-target="82iiw5tiewm-panel-0" class="px-4 py-2 text-sm font-mono data-[active=true]:bg-white dark:data-[active=true]:bg-slate-950 data-[active=true]:font-semibold" data-active="true"> Include </button><button role="tab" aria-selected="false" aria-controls="82iiw5tiewm-panel-1" data-tab-target="82iiw5tiewm-panel-1" class="px-4 py-2 text-sm font-mono data-[active=true]:bg-white dark:data-[active=true]:bg-slate-950 data-[active=true]:font-semibold" data-active="false"> Activate </button><button role="tab" aria-selected="false" aria-controls="82iiw5tiewm-panel-2" data-tab-target="82iiw5tiewm-panel-2" class="px-4 py-2 text-sm font-mono data-[active=true]:bg-white dark:data-[active=true]:bg-slate-950 data-[active=true]:font-semibold" data-active="false"> Docker </button> </div> <pre id="82iiw5tiewm-panel-0" role="tabpanel" data-tab-panel class="text-sm font-mono p-4 m-0 overflow-x-auto"><code>[include]
+environments = [{ remote = &quot;flox/remotion&quot; }]
+</code></pre><pre id="82iiw5tiewm-panel-1" role="tabpanel" data-tab-panel hidden class="text-sm font-mono p-4 m-0 overflow-x-auto"><code>flox activate -r flox/remotion
+</code></pre><pre id="82iiw5tiewm-panel-2" role="tabpanel" data-tab-panel hidden class="text-sm font-mono p-4 m-0 overflow-x-auto"><code>docker run -it ghcr.io/flox/floxenvs/remotion-latest
+</code></pre> </div> <script type="module">for(const a of document.querySelectorAll('[role="tablist"]')){const r=a.querySelectorAll('[role="tab"]');r.forEach(e=>{e.addEventListener("click",()=>{const c=e.getAttribute("data-tab-target");a.parentElement.querySelectorAll("[data-tab-panel]").forEach(t=>t.toggleAttribute("hidden",t.id!==c)),r.forEach(t=>{const l=t===e;t.setAttribute("aria-selected",String(l)),t.setAttribute("data-active",String(l))})})})}</script> </section> <section class="mt-12"><h2 class="text-xl font-semibold">Recipes</h2><div class="mt-6 rounded-lg border border-slate-200 dark:border-slate-800 p-6"><div class="flex items-baseline gap-3 mb-3"><h3 class="font-semibold">Quick start</h3><code class="text-xs text-slate-500">remotion-demo</code></div><ul class="list-disc list-inside text-sm text-slate-600 dark:text-slate-300 mb-4"><li>Scaffolds a blank Remotion project</li><li>Opens the Remotion studio against the demo</li></ul><details class="mb-4"><summary class="cursor-pointer text-sm font-mono text-slate-500">
+composed manifest.toml
+</summary><div class="prose prose-sm dark:prose-invert max-w-none mt-2"><pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="toml"><code><span class="line"><span style="color:#ADBAC7">schema-version = </span><span style="color:#96D0FF">"1.10.0"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ADBAC7">[</span><span style="color:#F69D50">include</span><span style="color:#ADBAC7">]</span></span>
+<span class="line"><span style="color:#ADBAC7">environments = [</span></span>
+<span class="line"><span style="color:#ADBAC7">  { dir = </span><span style="color:#96D0FF">"../remotion"</span><span style="color:#ADBAC7"> }</span></span>
+<span class="line"><span style="color:#ADBAC7">]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#768390"># gum is a demo-only tool for styled terminal output.</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ADBAC7">[</span><span style="color:#F69D50">install</span><span style="color:#ADBAC7">]</span></span>
+<span class="line"><span style="color:#ADBAC7">gum.pkg-path = </span><span style="color:#96D0FF">"gum"</span></span>
+<span class="line"><span style="color:#ADBAC7">gum.pkg-group = </span><span style="color:#96D0FF">"demo-tools"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ADBAC7">[</span><span style="color:#F69D50">hook</span><span style="color:#ADBAC7">]</span></span>
+<span class="line"><span style="color:#ADBAC7">on-activate = </span><span style="color:#96D0FF">'''</span></span>
+<span class="line"><span style="color:#96D0FF">if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then</span></span>
+<span class="line"><span style="color:#96D0FF">  gum style --border double --margin '1 2' \</span></span>
+<span class="line"><span style="color:#96D0FF">    --padding '1 4' \</span></span>
+<span class="line"><span style="color:#96D0FF">    'Remotion + Claude Code' '' \</span></span>
+<span class="line"><span style="color:#96D0FF">    'Scaffold a new video project:' \</span></span>
+<span class="line"><span style="color:#96D0FF">    '  npx create-video@latest --yes --blank --no-tailwind my-video' '' \</span></span>
+<span class="line"><span style="color:#96D0FF">    'Inside a Remotion project:' \</span></span>
+<span class="line"><span style="color:#96D0FF">    '  npx remotion studio       Open the visual editor' \</span></span>
+<span class="line"><span style="color:#96D0FF">    '  npx remotion render       Render to MP4' \</span></span>
+<span class="line"><span style="color:#96D0FF">    '  npx remotion ffmpeg ...   Bundled ffmpeg' '' \</span></span>
+<span class="line"><span style="color:#96D0FF">    'Ask Claude (skill auto-loads on Remotion code):' \</span></span>
+<span class="line"><span style="color:#96D0FF">    '  claude' '' \</span></span>
+<span class="line"><span style="color:#96D0FF">    "Node: $(node --version)"</span></span>
+<span class="line"><span style="color:#96D0FF">fi</span></span>
+<span class="line"><span style="color:#96D0FF">'''</span></span>
+<span class="line"></span></code></pre></div></details><div class="prose prose-sm dark:prose-invert max-w-none mt-4"><h1 id="remotion-demo">remotion-demo</h1>
+<!-- codespaces-badge -->
+<p><a href="https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fremotion-demo%2Fdevcontainer.json"><img src="https://github.com/codespaces/badge.svg" alt="Open in Codespaces"></a></p>
+<p>Demo variant of <a href="../remotion">remotion</a> — adds <code>gum</code> for a
+styled welcome banner with quick-start commands.</p>
+<h2 id="quick-start">Quick start</h2>
+<pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#F69D50">flox</span><span style="color:#96D0FF"> activate</span><span style="color:#6CB6FF"> -r</span><span style="color:#96D0FF"> flox/remotion-demo</span></span></code></pre>
+<p>The banner prints the canonical bootstrap commands for a new
+Remotion project. From here:</p>
+<pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#768390"># Scaffold a fresh blank project (npm)</span></span>
+<span class="line"><span style="color:#F69D50">npx</span><span style="color:#96D0FF"> create-video@latest</span><span style="color:#6CB6FF"> --yes</span><span style="color:#6CB6FF"> --blank</span><span style="color:#6CB6FF"> --no-tailwind</span><span style="color:#96D0FF"> my-video</span></span>
+<span class="line"><span style="color:#6CB6FF">cd</span><span style="color:#96D0FF"> my-video</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#768390"># Open the visual editor</span></span>
+<span class="line"><span style="color:#F69D50">npx</span><span style="color:#96D0FF"> remotion</span><span style="color:#96D0FF"> studio</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#768390"># Render to MP4</span></span>
+<span class="line"><span style="color:#F69D50">npx</span><span style="color:#96D0FF"> remotion</span><span style="color:#96D0FF"> render</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#768390"># Open Claude Code — the remotion-best-practices skill is</span></span>
+<span class="line"><span style="color:#768390"># already registered. Whenever you ask Claude to touch</span></span>
+<span class="line"><span style="color:#768390"># Remotion code, the skill auto-loads with the topic rules</span></span>
+<span class="line"><span style="color:#768390"># (animations, audio, captions, 3D, transitions, etc.).</span></span>
+<span class="line"><span style="color:#F69D50">claude</span></span></code></pre>
+<h2 id="whats-added-on-top-of-floxremotion">What’s added on top of <code>flox/remotion</code></h2>
+<ul>
+<li><code>gum</code> — styled banner during <code>on-activate</code></li>
+</ul>
+<p>Everything else (Node.js 22, ffmpeg, Claude Code, and the
+<code>claude-code-plugin-remotion</code> plugin) comes from the
+included <a href="../remotion">remotion</a> environment.</p>
+<h2 id="see-also">See also</h2>
+<ul>
+<li><a href="../remotion">remotion</a> — minimal env meant for
+<code>[include]</code> in your own projects</li>
+<li>Upstream skill source:
+<a href="https://github.com/remotion-dev/skills">https://github.com/remotion-dev/skills</a></li>
+<li>Remotion docs: <a href="https://remotion.dev">https://remotion.dev</a></li>
+</ul></div></div></section> <section class="mt-12"> <h2 class="text-xl font-semibold">Packages installed</h2> <p class="text-sm text-slate-500 mt-1">
+Everything <strong>flox/remotion</strong> brings into a
+            consumer manifest via <code class="text-xs font-mono">[install]</code>.
+            Catalog packages link to their detail page; everything else
+            links to FloxHub or nixpkgs.
+</p> <div class="mt-4"> <div class="rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden"><table class="w-full text-sm"><thead class="bg-slate-50 dark:bg-slate-900 text-left"><tr><th class="px-3 py-2 font-medium text-slate-500 text-xs uppercase tracking-wide">Name</th><th class="px-3 py-2 font-medium text-slate-500 text-xs uppercase tracking-wide">Path</th><th class="px-3 py-2 font-medium text-slate-500 text-xs uppercase tracking-wide">Source</th></tr></thead><tbody><tr class="border-t border-slate-100 dark:border-slate-900"><td class="px-3 py-2 font-mono text-xs">claude-code</td><td class="px-3 py-2 font-mono text-xs"><a class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300" href="/floxenvs/packages/claude-code/">flox/claude-code</a></td><td class="px-3 py-2 text-xs"><span class="inline-flex items-center gap-1.5 text-kind-env"><span class="inline-block w-1.5 h-1.5 rounded-full bg-kind-env"></span>
+catalog
+</span></td></tr><tr class="border-t border-slate-100 dark:border-slate-900"><td class="px-3 py-2 font-mono text-xs">claude-managed</td><td class="px-3 py-2 font-mono text-xs"><a class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300" href="/floxenvs/packages/claude-managed/">flox/claude-managed</a></td><td class="px-3 py-2 text-xs"><span class="inline-flex items-center gap-1.5 text-kind-env"><span class="inline-block w-1.5 h-1.5 rounded-full bg-kind-env"></span>
+catalog
+</span></td></tr><tr class="border-t border-slate-100 dark:border-slate-900"><td class="px-3 py-2 font-mono text-xs">claude-code-plugin-remotion</td><td class="px-3 py-2 font-mono text-xs"><a class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300" href="/floxenvs/packages/claude-code-plugin-remotion/">flox/claude-code-plugin-remotion</a></td><td class="px-3 py-2 text-xs"><span class="inline-flex items-center gap-1.5 text-kind-env"><span class="inline-block w-1.5 h-1.5 rounded-full bg-kind-env"></span>
+catalog
+</span></td></tr><tr class="border-t border-slate-100 dark:border-slate-900"><td class="px-3 py-2 font-mono text-xs">nodejs</td><td class="px-3 py-2 font-mono text-xs"><a class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300" href="https://search.nixos.org/packages?query=nodejs_22">nodejs_22</a></td><td class="px-3 py-2 text-xs"><span class="inline-flex items-center gap-1.5 text-slate-500"><span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+nixpkgs
+</span></td></tr></tbody></table></div> </div> </section>  <section class="mt-12"> <h2 class="text-xl font-semibold">Documentation</h2> <div class="prose prose-sm dark:prose-invert max-w-none mt-3"><h1 id="remotion">remotion</h1>
+<!-- codespaces-badge -->
+<p><a href="https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fremotion%2Fdevcontainer.json"><img src="https://github.com/codespaces/badge.svg" alt="Open in Codespaces"></a></p>
+<p>Minimal <a href="https://remotion.dev">Remotion</a> environment. Include
+it in your own manifest to get Claude Code with the Remotion
+best-practices skill pre-registered as a plugin, plus Node.js
+22 so <code>npx create-video</code>, <code>npx remotion studio</code>, and
+<code>npx remotion render</code> work out of the box.</p>
+<p><code>ffmpeg</code>/<code>ffprobe</code> are intentionally not installed — Remotion
+ships its own via <code>npx remotion ffmpeg</code>, which is what the
+skill tells Claude to use.</p>
+<p>Remotion lets you build videos programmatically with React —
+animations, audio, captions, 3D, transitions, charts, and
+more.</p>
+<h2 id="quick-start">Quick start</h2>
+<p>Activate directly:</p>
+<pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#F69D50">flox</span><span style="color:#96D0FF"> activate</span><span style="color:#6CB6FF"> -r</span><span style="color:#96D0FF"> flox/remotion</span></span></code></pre>
+<p>Scaffold a new project and open the studio:</p>
+<pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#F69D50">npx</span><span style="color:#96D0FF"> create-video@latest</span><span style="color:#6CB6FF"> --yes</span><span style="color:#6CB6FF"> --blank</span><span style="color:#6CB6FF"> --no-tailwind</span><span style="color:#96D0FF"> my-video</span></span>
+<span class="line"><span style="color:#6CB6FF">cd</span><span style="color:#96D0FF"> my-video</span></span>
+<span class="line"><span style="color:#F69D50">npx</span><span style="color:#96D0FF"> remotion</span><span style="color:#96D0FF"> studio</span></span></code></pre>
+<p>Open Claude Code in the project and the <code>remotion-best-practices</code>
+skill is already registered — Claude will automatically load
+it whenever you work with Remotion code.</p>
+<h2 id="include-in-your-project">Include in your project</h2>
+<p>Add to your <code>manifest.toml</code>:</p>
+<pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="toml"><code><span class="line"><span style="color:#ADBAC7">[</span><span style="color:#F69D50">include</span><span style="color:#ADBAC7">]</span></span>
+<span class="line"><span style="color:#ADBAC7">environments = [</span><span style="color:#96D0FF">"flox/remotion"</span><span style="color:#ADBAC7">]</span></span></code></pre>
+<h2 id="what-is-included">What is included</h2>
+<ul>
+<li><code>claude-code</code> — the Claude Code CLI</li>
+<li><code>claude-managed</code> — auto-registers the bundled plugin</li>
+<li><code>claude-code-plugin-remotion</code> — Remotion best-practices
+skill (1 SKILL.md + 36 topic rules) installed under
+<code>share/claude-code/plugins/remotion/</code></li>
+<li><code>nodejs_22</code> — for <code>npx remotion …</code> and
+<code>npx create-video@latest</code></li>
+</ul>
+<h2 id="what-the-skill-covers">What the skill covers</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Topic</th><th>Rule files</th></tr></thead><tbody><tr><td>Animations &#x26; timing</td><td><code>timing.md</code>, <code>text-animations.md</code>, <code>transitions.md</code></td></tr><tr><td>Audio &#x26; captions</td><td><code>audio.md</code>, <code>voiceover.md</code>, <code>display-captions.md</code>,</td></tr><tr><td></td><td><code>subtitles.md</code>, <code>import-srt-captions.md</code>,</td></tr><tr><td></td><td><code>transcribe-captions.md</code>, <code>silence-detection.md</code></td></tr><tr><td>Video sources</td><td><code>videos.md</code>, <code>gifs.md</code>, <code>transparent-videos.md</code>,</td></tr><tr><td></td><td><code>trimming.md</code></td></tr><tr><td>Images &#x26; fonts</td><td><code>images.md</code>, <code>google-fonts.md</code>, <code>local-fonts.md</code></td></tr><tr><td>3D &#x26; effects</td><td><code>3d.md</code>, <code>lottie.md</code>, <code>light-leaks.md</code>,</td></tr><tr><td></td><td><code>html-in-canvas.md</code></td></tr><tr><td>Maps &#x26; charts</td><td><code>maplibre.md</code>, <code>audio-visualization.md</code></td></tr><tr><td>Composition API</td><td><code>compositions.md</code>, <code>sequencing.md</code>, <code>parameters.md</code>,</td></tr><tr><td></td><td><code>calculate-metadata.md</code></td></tr><tr><td>ffmpeg &#x26; measurement</td><td><code>ffmpeg.md</code>, <code>measuring-dom-nodes.md</code>,</td></tr><tr><td></td><td><code>measuring-text.md</code>, <code>get-audio-duration.md</code>,</td></tr><tr><td></td><td><code>get-video-duration.md</code>, <code>get-video-dimensions.md</code></td></tr><tr><td>Styling</td><td><code>tailwind.md</code></td></tr><tr><td>Misc</td><td><code>sfx.md</code></td></tr></tbody></table>
+<h2 id="see-also">See also</h2>
+<p>For a styled demo with a sample blank project, see
+<a href="../remotion-demo/">remotion-demo</a>.</p>
+<p>Upstream skill source:
+<a href="https://github.com/remotion-dev/skills">https://github.com/remotion-dev/skills</a></p>
+<p>Remotion docs: <a href="https://remotion.dev">https://remotion.dev</a></p></div> </section> </div> <aside class="space-y-1"> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Status</span> <span class="flex-1 break-words">beta</span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Publisher</span> <span class="flex-1 break-words">flox</span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">License</span> <span class="flex-1 break-words">MIT</span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Upstream</span> <span class="flex-1 break-words"> <a href="https://remotion.dev" class="underline"> Remotion </a> <span class="text-slate-500"> · Remotion License</span></span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Maintainer</span> <span class="flex-1 break-words">@rok</span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Bundles packages</span> <span class="flex-1 break-words"> <span class="inline-flex flex-wrap gap-x-1.5 gap-y-1"> <a href="/floxenvs/packages/claude-code/" class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300">claude-code</a><a href="/floxenvs/packages/claude-managed/" class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300">claude-managed</a><a href="/floxenvs/packages/claude-code-plugin-remotion/" class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300">claude-code-plugin-remotion</a> </span> </span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">FloxHub</span> <span class="flex-1 break-words"> <a href="https://hub.flox.dev/flox/remotion" class="underline">link</a> </span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Source</span> <span class="flex-1 break-words"> <a href="https://github.com/flox/floxenvs/tree/main/remotion" class="underline">repo</a> </span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Last updated</span> <span class="flex-1 break-words"> <time datetime="2026-06-03T11:20:23+02:00"> 2026-06-03 </time> </span> </div> </aside> </div>  </main> <footer class="border-t border-slate-200 dark:border-slate-800 mt-20"> <div class="max-w-6xl mx-auto px-6 py-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-8 text-sm"> <div> <p class="font-bold tracking-tight text-slate-900 dark:text-slate-100">flox / envs</p> <p class="mt-1 text-slate-500">Ready-to-use Flox envs and packages for AI and dev tooling.</p> </div> <div> <p class="font-semibold text-slate-700 dark:text-slate-300">Flox</p> <ul class="mt-1 space-y-1 text-slate-500"> <li><a class="hover:underline" href="https://flox.dev">flox.dev</a></li> <li><a class="hover:underline" href="https://flox.dev/docs">Documentation</a></li> <li><a class="hover:underline" href="https://hub.flox.dev/flox">FloxHub catalog</a></li> </ul> </div> <div> <p class="font-semibold text-slate-700 dark:text-slate-300">Catalog</p> <ul class="mt-1 space-y-1 text-slate-500"> <li><a class="hover:underline" href="/floxenvs/envs/">All environments</a></li> <li><a class="hover:underline" href="/floxenvs/packages/">All packages</a></li> <li><a class="hover:underline" href="/floxenvs/search/">Search</a></li> <li><a class="hover:underline" href="/floxenvs/sitemap-index.xml">Sitemap</a></li> </ul> </div> <div> <p class="font-semibold text-slate-700 dark:text-slate-300">Project</p> <ul class="mt-1 space-y-1 text-slate-500"> <li><a class="hover:underline" href="https://github.com/flox/floxenvs">Source on GitHub</a></li> <li><a class="hover:underline" href="https://github.com/flox/floxenvs/discussions">Discussions</a></li> <li><a class="hover:underline" href="https://github.com/flox/floxenvs/issues">Issues</a></li> <li><a class="hover:underline" href="https://github.com/flox/floxenvs/blob/main/LICENSE">MIT license</a></li> </ul> </div> </div> <div class="border-t border-slate-100 dark:border-slate-900"> <div class="max-w-6xl mx-auto px-6 py-4 text-xs text-slate-400 dark:text-slate-500 flex flex-wrap items-center gap-x-4 gap-y-1"> <span>© Flox, Inc.</span> <span aria-hidden="true">·</span> <span>Catalog source: <a class="underline" href="https://github.com/flox/floxenvs">flox/floxenvs</a></span> <span aria-hidden="true">·</span> <span>
+Built <time datetime="2026-06-03T09:22:51.563Z">2026-06-03</time> </span> </div> </div> </footer> <script type="module">const e=document.getElementById("theme-toggle");e&&e.addEventListener("click",()=>{const t=document.documentElement.classList.toggle("dark");try{localStorage.setItem("theme",t?"dark":"light")}catch{}});</script> </body> </html>
