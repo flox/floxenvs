@@ -150,8 +150,9 @@ jobs:
       - name: "Install jq"
         run: sudo apt-get install -y -qq jq
       - name: "Stage directory"
-        run: mkdir -p .website/src/content/metrics/env \
-                       .website/src/content/metrics/pkg
+        run: |
+          mkdir -p .website/src/content/metrics/env
+          mkdir -p .website/src/content/metrics/pkg
       - name: "Download changed-item artifacts"
         uses: "actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c" # v8
         with:
