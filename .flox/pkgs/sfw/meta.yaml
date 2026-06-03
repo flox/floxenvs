@@ -1,0 +1,31 @@
+kind: pkg
+subkind: plain
+name: sfw
+title: Socket Firewall
+publisher: flox
+tagline: >
+  Socket Firewall Free — wraps your package manager to block
+  installation of malicious packages.
+category: tool
+tags: [security, supply-chain, npm, pip, cargo, firewall]
+stack: [typescript]
+featured: false
+combines_well_with:
+  - pkg:claude-code
+  - env:python-uv
+  - env:javascript-node
+status: stable
+license: Unfree
+upstream:
+  name: Socket Firewall Free
+  url: https://github.com/SocketDev/sfw-free
+  license: Unfree
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    sfw.pkg-path = "flox/sfw"
+    sfw.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/sfw
+  floxhub: https://hub.flox.dev/flox/sfw
