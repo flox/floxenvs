@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Honcho FastAPI server.
+exec @OUT@/bin/uvicorn src.main:app \
+  --host "${HONCHO_HOST:-127.0.0.1}" \
+  --port "${HONCHO_PORT:-8000}" \
+  "$@"
