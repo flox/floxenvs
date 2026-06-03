@@ -3,6 +3,15 @@
   "manifest": {
     "schema-version": "1.10.0",
     "install": {
+      "claude-code": {
+        "pkg-path": "flox/claude-code",
+        "pkg-group": "claude-code"
+      },
+      "claude-managed": {
+        "pkg-path": "flox/claude-managed",
+        "pkg-group": "claude-managed",
+        "version": "^0.4.1"
+      },
       "gcc": {
         "pkg-path": "gcc",
         "pkg-group": "go"
@@ -19,6 +28,10 @@
         "pkg-path": "jq",
         "pkg-group": "demo-tools"
       },
+      "skills-temporal-developer": {
+        "pkg-path": "flox/skills-temporal-developer",
+        "pkg-group": "skills-temporal-developer"
+      },
       "temporal": {
         "pkg-path": "temporal",
         "pkg-group": "temporal"
@@ -34,7 +47,12 @@
       "TEMPORAL_UI_PORT": "8233"
     },
     "hook": {
-      "on-activate": "export TEMPORAL_DATA=\"$FLOX_ENV_CACHE/temporal\"\n\nif [ ! -d \"$TEMPORAL_DATA\" ]; then\n  mkdir -p \"$TEMPORAL_DATA\"\nfi\n\n# Point Go's caches at a writable location.\n# Default GOPATH is $HOME/go, which fails inside the\n# CI test namespace where HOME=/var/empty (read-only).\nexport GOPATH=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$GOPATH/pkg/mod\"\nexport GOCACHE=\"$FLOX_ENV_CACHE/go-build\"\nmkdir -p \"$GOPATH\" \"$GOCACHE\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Temporal + worker in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Send a hello workflow:' \\\n    '  go run ./start YourName' '' \\\n    'Temporal Web UI:' \\\n    \"  http://$TEMPORAL_HOST:$TEMPORAL_UI_PORT\"\nfi\n"
+      "on-activate": "export TEMPORAL_DATA=\"$FLOX_ENV_CACHE/temporal\"\n\nif [ ! -d \"$TEMPORAL_DATA\" ]; then\n  mkdir -p \"$TEMPORAL_DATA\"\nfi\n\neval \"$(claude-managed setup-hook)\"\n\n# Point Go's caches at a writable location.\n# Default GOPATH is $HOME/go, which fails inside the\n# CI test namespace where HOME=/var/empty (read-only).\nexport GOPATH=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$GOPATH/pkg/mod\"\nexport GOCACHE=\"$FLOX_ENV_CACHE/go-build\"\nmkdir -p \"$GOPATH\" \"$GOCACHE\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Temporal + worker in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Send a hello workflow:' \\\n    '  go run ./start YourName' '' \\\n    'Temporal Web UI:' \\\n    \"  http://$TEMPORAL_HOST:$TEMPORAL_UI_PORT\"\nfi\n"
+    },
+    "profile": {
+      "bash": "eval \"$(claude-managed setup-profile-bash)\"\n",
+      "zsh": "eval \"$(claude-managed setup-profile-zsh)\"\n",
+      "fish": "claude-managed setup-profile-fish | source\n"
     },
     "options": {},
     "services": {
@@ -47,6 +65,246 @@
     }
   },
   "packages": [
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/ssx5fd7bdjl8icv9pmrs8xsf8bnz9xks-claude-code-2.1.161.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=74b2e238c851768bccea8eaf86fb511e890e6bb0",
+      "name": "claude-code-2.1.161",
+      "pname": "claude-code",
+      "rev": "74b2e238c851768bccea8eaf86fb511e890e6bb0",
+      "rev_count": 5804,
+      "rev_date": "2026-06-03T01:23:41Z",
+      "scrape_date": "2026-06-03T12:02:20.733578Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "2.1.161",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/6pzc0gzr2830v7b7a430y0qlyv9ds6ia-claude-code-2.1.161"
+      },
+      "system": "aarch64-darwin",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/9w0bn68wdwpwm0mj960r437nwmd8z52a-claude-code-2.1.161.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=74b2e238c851768bccea8eaf86fb511e890e6bb0",
+      "name": "claude-code-2.1.161",
+      "pname": "claude-code",
+      "rev": "74b2e238c851768bccea8eaf86fb511e890e6bb0",
+      "rev_count": 5804,
+      "rev_date": "2026-06-03T01:23:41Z",
+      "scrape_date": "2026-06-03T12:02:20.733583Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "2.1.161",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/f6kgyh1bd2dlgs6c9rvhyb750g8sa3n6-claude-code-2.1.161"
+      },
+      "system": "aarch64-linux",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/s28mv7jp09cz6spymrqk5p00mcv5g4nl-claude-code-2.1.161.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=74b2e238c851768bccea8eaf86fb511e890e6bb0",
+      "name": "claude-code-2.1.161",
+      "pname": "claude-code",
+      "rev": "74b2e238c851768bccea8eaf86fb511e890e6bb0",
+      "rev_count": 5804,
+      "rev_date": "2026-06-03T01:23:41Z",
+      "scrape_date": "2026-06-03T12:02:20.733584Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "2.1.161",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/j3bs3azxzjyjpqx5bm7fzkbr4qss50n8-claude-code-2.1.161"
+      },
+      "system": "x86_64-darwin",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/kn9302pxs5y4mpixd16dg702inkg5xw4-claude-code-2.1.161.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=74b2e238c851768bccea8eaf86fb511e890e6bb0",
+      "name": "claude-code-2.1.161",
+      "pname": "claude-code",
+      "rev": "74b2e238c851768bccea8eaf86fb511e890e6bb0",
+      "rev_count": 5804,
+      "rev_date": "2026-06-03T01:23:41Z",
+      "scrape_date": "2026-06-03T12:02:20.733585Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "2.1.161",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/4i5qnbk3zyzyxyanh7a968cpxvknm1lh-claude-code-2.1.161"
+      },
+      "system": "x86_64-linux",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/jrvmawn988xs2da7mg9dzfg3h3jf5gm3-claude-managed-0.4.1.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
+      "name": "claude-managed-0.4.1",
+      "pname": "claude-managed",
+      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
+      "rev_count": 3677,
+      "rev_date": "2026-05-20T12:30:23Z",
+      "scrape_date": "2026-06-03T12:02:20.733593Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/c4caj5rhq2l7p7j5p569a1f08pz5s41v-claude-managed-0.4.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "claude-managed",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/b0iga9ysmq5jga9xmnqf5884qhl7idjp-claude-managed-0.4.1.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
+      "name": "claude-managed-0.4.1",
+      "pname": "claude-managed",
+      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
+      "rev_count": 3677,
+      "rev_date": "2026-05-20T12:30:23Z",
+      "scrape_date": "2026-06-03T12:02:20.733600Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ikmmb7a0zfdwsyzcgczv7sam426n7y82-claude-managed-0.4.1"
+      },
+      "system": "aarch64-linux",
+      "group": "claude-managed",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/nv6viy7wixxv9f92jh5pbzss4ipkmsaz-claude-managed-0.4.1.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
+      "name": "claude-managed-0.4.1",
+      "pname": "claude-managed",
+      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
+      "rev_count": 3677,
+      "rev_date": "2026-05-20T12:30:23Z",
+      "scrape_date": "2026-06-03T12:02:20.733601Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/6mavy5l8gbcq21qxnlxip78dqdr960lm-claude-managed-0.4.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "claude-managed",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/xql8a4pin3z899a09rs9hbc5axcnbi93-claude-managed-0.4.1.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
+      "name": "claude-managed-0.4.1",
+      "pname": "claude-managed",
+      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
+      "rev_count": 3677,
+      "rev_date": "2026-05-20T12:30:23Z",
+      "scrape_date": "2026-06-03T12:02:20.733602Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ak71ws4lbp04ik1cvqws4drjbiaw5cin-claude-managed-0.4.1"
+      },
+      "system": "x86_64-linux",
+      "group": "claude-managed",
+      "priority": 5
+    },
     {
       "attr_path": "gum",
       "broken": false,
@@ -566,6 +824,126 @@
       "priority": 5
     },
     {
+      "attr_path": "skills-temporal-developer",
+      "broken": false,
+      "derivation": "/nix/store/sfydl176xyp7awcvvnaavwhnidz0crp1-skills-temporal-developer-0.5.0.drv",
+      "description": "Temporal Developer skill for Claude Code and OpenCode — build, debug, and manage Temporal workflows, activities, and workers across Python, TypeScript, Go, Java, .NET, and Ruby.",
+      "install_id": "skills-temporal-developer",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=65fa946c70f80eb0465d42c568315c4d6ddd2e00",
+      "name": "skills-temporal-developer-0.5.0",
+      "pname": "skills-temporal-developer",
+      "rev": "65fa946c70f80eb0465d42c568315c4d6ddd2e00",
+      "rev_count": 5845,
+      "rev_date": "2026-06-03T11:55:22Z",
+      "scrape_date": "2026-06-03T12:02:20.733611Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.5.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/00sxi0s4cg0ppy7a00v5aa3mym2p267j-skills-temporal-developer-0.5.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "skills-temporal-developer",
+      "priority": 5
+    },
+    {
+      "attr_path": "skills-temporal-developer",
+      "broken": false,
+      "derivation": "/nix/store/g9iib5ly8y5gxb2fqkbrg4ak614w0r02-skills-temporal-developer-0.5.0.drv",
+      "description": "Temporal Developer skill for Claude Code and OpenCode — build, debug, and manage Temporal workflows, activities, and workers across Python, TypeScript, Go, Java, .NET, and Ruby.",
+      "install_id": "skills-temporal-developer",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=65fa946c70f80eb0465d42c568315c4d6ddd2e00",
+      "name": "skills-temporal-developer-0.5.0",
+      "pname": "skills-temporal-developer",
+      "rev": "65fa946c70f80eb0465d42c568315c4d6ddd2e00",
+      "rev_count": 5845,
+      "rev_date": "2026-06-03T11:55:22Z",
+      "scrape_date": "2026-06-03T12:02:20.733620Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.5.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/vh9jsn0qfh670b5a55sk1bjyygv42v0s-skills-temporal-developer-0.5.0"
+      },
+      "system": "aarch64-linux",
+      "group": "skills-temporal-developer",
+      "priority": 5
+    },
+    {
+      "attr_path": "skills-temporal-developer",
+      "broken": false,
+      "derivation": "/nix/store/d4a3bq591y5ny391zp4x2zipd9n42q0h-skills-temporal-developer-0.5.0.drv",
+      "description": "Temporal Developer skill for Claude Code and OpenCode — build, debug, and manage Temporal workflows, activities, and workers across Python, TypeScript, Go, Java, .NET, and Ruby.",
+      "install_id": "skills-temporal-developer",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=65fa946c70f80eb0465d42c568315c4d6ddd2e00",
+      "name": "skills-temporal-developer-0.5.0",
+      "pname": "skills-temporal-developer",
+      "rev": "65fa946c70f80eb0465d42c568315c4d6ddd2e00",
+      "rev_count": 5845,
+      "rev_date": "2026-06-03T11:55:22Z",
+      "scrape_date": "2026-06-03T12:02:20.733621Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.5.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/248sik2k7pb2lh3vs3rq4aw7023arr0c-skills-temporal-developer-0.5.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "skills-temporal-developer",
+      "priority": 5
+    },
+    {
+      "attr_path": "skills-temporal-developer",
+      "broken": false,
+      "derivation": "/nix/store/b44i977aksd8w0s3jx28smccnqa02wkz-skills-temporal-developer-0.5.0.drv",
+      "description": "Temporal Developer skill for Claude Code and OpenCode — build, debug, and manage Temporal workflows, activities, and workers across Python, TypeScript, Go, Java, .NET, and Ruby.",
+      "install_id": "skills-temporal-developer",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=65fa946c70f80eb0465d42c568315c4d6ddd2e00",
+      "name": "skills-temporal-developer-0.5.0",
+      "pname": "skills-temporal-developer",
+      "rev": "65fa946c70f80eb0465d42c568315c4d6ddd2e00",
+      "rev_count": 5845,
+      "rev_date": "2026-06-03T11:55:22Z",
+      "scrape_date": "2026-06-03T12:02:20.733621Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.5.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/07f4fx3z95yn97ig0bjjx41xv8imjnqq-skills-temporal-developer-0.5.0"
+      },
+      "system": "x86_64-linux",
+      "group": "skills-temporal-developer",
+      "priority": 5
+    },
+    {
       "attr_path": "temporal",
       "broken": false,
       "derivation": "/nix/store/b3bwdward2cyi523xq9xp23vqbgb07gz-temporal-1.30.4.drv",
@@ -825,6 +1203,10 @@
         "jq": {
           "pkg-path": "jq",
           "pkg-group": "demo-tools"
+        },
+        "skills-temporal-developer": {
+          "pkg-path": "flox/skills-temporal-developer",
+          "pkg-group": "skills-temporal-developer"
         }
       },
       "hook": {
@@ -840,6 +1222,9 @@
         "environments": [
           {
             "dir": "../temporal"
+          },
+          {
+            "dir": "../claude"
           }
         ]
       }
@@ -876,6 +1261,35 @@
         "name": "temporal",
         "descriptor": {
           "dir": "../temporal"
+        }
+      },
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "claude-code": {
+              "pkg-path": "flox/claude-code",
+              "pkg-group": "claude-code"
+            },
+            "claude-managed": {
+              "pkg-path": "flox/claude-managed",
+              "pkg-group": "claude-managed",
+              "version": "^0.4.1"
+            }
+          },
+          "hook": {
+            "on-activate": "eval \"$(claude-managed setup-hook)\"\n"
+          },
+          "profile": {
+            "bash": "eval \"$(claude-managed setup-profile-bash)\"\n",
+            "zsh": "eval \"$(claude-managed setup-profile-zsh)\"\n",
+            "fish": "claude-managed setup-profile-fish | source\n"
+          },
+          "options": {}
+        },
+        "name": "claude",
+        "descriptor": {
+          "dir": "../claude"
         }
       }
     ],
