@@ -95,6 +95,18 @@ buildGoModule (finalAttrs: {
     cp -r ${llamaCppSrc} llama-cpp-src
     chmod -R u+w llama-cpp-src
 
+    # Apply ollama's llama.cpp "compat" layer (llama/compat/**/*.patch).
+    # Upstream applies these via FetchContent's PATCH_COMMAND, but because
+    # we hand CMake a prefetched tree through FETCHCONTENT_SOURCE_DIR_LLAMA_CPP,
+    # FetchContent uses it directly and SKIPS the patch step. In 0.30.2 the
+    # new laguna compat model ships a patch that *declares* the
+    # llama_model_laguna class which llama/compat/models/laguna.cpp defines —
+    # without it the build fails to compile. Mirror apply-patch.cmake: apply
+    # every compat patch inside the llama.cpp source tree.
+    for p in $(find "$PWD/llama/compat" -name '*.patch' | sort); do
+      ( cd llama-cpp-src && git apply --whitespace=nowarn "$p" )
+    done
+
     # OLLAMA_MLX_BACKENDS="" disables the new Apple MLX backend, whose
     # auto-detection demands Xcode's full Metal toolchain (unavailable in
     # the sandbox). Metal acceleration still comes via llama.cpp/ggml.
