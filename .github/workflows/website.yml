@@ -150,8 +150,9 @@ jobs:
       - name: "Install jq"
         run: sudo apt-get install -y -qq jq
       - name: "Stage directory"
-        run: mkdir -p .website/src/content/metrics/env \
-                       .website/src/content/metrics/pkg
+        run: |
+          mkdir -p .website/src/content/metrics/env
+          mkdir -p .website/src/content/metrics/pkg
       - name: "Download changed-item artifacts"
         uses: "actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c" # v8
         with:
@@ -233,6 +234,17 @@ jobs:
       - name: "Install"
         working-directory: ".website"
         run: "npm ci"
+      - name: "Provide a font for OG image rendering"
+        run: |
+          # The OG image route (src/pages/og/[kind]/[name].png.ts) needs
+          # a TTF and reads OG_FONT_PATH first. Install Inter when
+          # available; fc-match always resolves to some installed font,
+          # so the build never hard-fails on a missing font.
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fontconfig
+          sudo apt-get install -y -qq fonts-inter \
+            || echo "fonts-inter unavailable; falling back to default font"
+          echo "OG_FONT_PATH=$(fc-match -f '%{file}' Inter)" >> "$GITHUB_ENV"
       - name: "Build"
         working-directory: ".website"
         env:
