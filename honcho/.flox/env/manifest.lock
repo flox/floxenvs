@@ -1,0 +1,542 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "honcho": {
+        "pkg-path": "flox/honcho",
+        "pkg-group": "honcho",
+        "version": "^3.0.7",
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
+      "pgvector": {
+        "pkg-path": "postgresqlPackages.pgvector",
+        "pkg-group": "honcho-pg"
+      },
+      "postgresql": {
+        "pkg-path": "postgresql",
+        "pkg-group": "honcho-pg",
+        "outputs": "all"
+      },
+      "redis": {
+        "pkg-path": "redis",
+        "pkg-group": "honcho-redis"
+      }
+    },
+    "vars": {
+      "AUTH_USE_AUTH": "false",
+      "CACHE_ENABLED": "true",
+      "HONCHO_HOST": "127.0.0.1",
+      "HONCHO_PORT": "18000",
+      "HONCHO_URL": "http://127.0.0.1:18000",
+      "PGDATABASE": "honcho",
+      "PGHOSTADDR": "127.0.0.1",
+      "PGPASS": "honcho",
+      "PGPORT": "15432",
+      "PGUSER": "honcho",
+      "REDIS_PORT": "16379"
+    },
+    "hook": {
+      "on-activate": "export HONCHO_CACHE=\"$FLOX_ENV_CACHE/honcho\"\nexport PGDIR=\"$HONCHO_CACHE/pgdata\"\nexport PGDATA=\"$PGDIR/data\"\nexport REDISDIR=\"$HONCHO_CACHE/redis\"\nexport LOGDIR=\"$HONCHO_CACHE/logs\"\nmkdir -p \"$PGDIR\" \"$REDISDIR\" \"$LOGDIR\"\n\n# Unix socket dir kept short (<103 bytes) — hashed per env.\nexport PG_SOCKETDIR=\"/tmp/flox-honcho-pg-$(echo \"$PGDIR\" | cksum | cut -d\" \" -f1)\"\nmkdir -p \"$PG_SOCKETDIR\"\n\nexport PGHOST=\"$PGHOSTADDR\"\nexport DB_CONNECTION_URI=\"postgresql+psycopg://$PGUSER:$PGPASS@$PGHOSTADDR:$PGPORT/$PGDATABASE\"\nexport CACHE_URL=\"redis://$PGHOSTADDR:$REDIS_PORT/0?suppress=true\"\n\n# Where pg_config et al find pgvector's .so — flox links the\n# extension into $FLOX_ENV but postgres needs the dynamic\n# library lookup to work.\nexport PG_LIBDIR=\"$FLOX_ENV/lib\"\nexport PG_SHAREDIR=\"$FLOX_ENV/share/postgresql\"\n\nINIT_LOG=\"$PGDIR/init.log\"\n\npg_init_fail() {\n  echo \"ERROR: PostgreSQL initialization failed.\" >&2\n  [ -f \"$INIT_LOG\" ] && { echo \"--- init.log ---\" >&2; cat \"$INIT_LOG\" >&2; echo \"--- end init.log ---\" >&2; }\n  exit 1\n}\n\nif [[ ! -d \"$PGDATA\" ]]; then\n  mkdir -p \"$PGDATA\"\n  initdb \"$PGDATA\" \\\n    --locale=C --encoding=UTF8 --auth=trust \\\n    --username \"$PGUSER\" \\\n    >> \"$INIT_LOG\" 2>&1 || pg_init_fail\n\n  pg_ctl -D \"$PGDATA\" -w start \\\n    -o \"-c unix_socket_directories=$PG_SOCKETDIR -c listen_addresses=$PGHOSTADDR -p $PGPORT\" \\\n    >> \"$INIT_LOG\" 2>&1 || pg_init_fail\n\n  createdb -h \"$PG_SOCKETDIR\" -p \"$PGPORT\" -U \"$PGUSER\" \"$PGDATABASE\" \\\n    >> \"$INIT_LOG\" 2>&1 || pg_init_fail\n  psql -h \"$PG_SOCKETDIR\" -p \"$PGPORT\" -U \"$PGUSER\" -d \"$PGDATABASE\" \\\n    -c \"CREATE EXTENSION IF NOT EXISTS vector\" \\\n    >> \"$INIT_LOG\" 2>&1 || pg_init_fail\n\n  # Run alembic migrations once at init.\n  honcho-migrate upgrade head >> \"$INIT_LOG\" 2>&1 || pg_init_fail\n\n  pg_ctl -D \"$PGDATA\" -m fast -w stop >> \"$INIT_LOG\" 2>&1\n  rm -f \"$INIT_LOG\"\nfi\n\n# One-shot reminder: honcho's reasoning paths need an LLM key.\n# /health and the storage API work without one, so this is a\n# soft warning, not a hard failure.\nif [ -z \"${LLM_OPENAI_API_KEY:-}${LLM_ANTHROPIC_API_KEY:-}${LLM_GEMINI_API_KEY:-}\" ] \\\n    && [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  echo \"honcho: no LLM_*_API_KEY set — chat/reasoning endpoints will fail.\" >&2\n  echo \"        set LLM_OPENAI_API_KEY (or _ANTHROPIC_, _GEMINI_) before using them.\" >&2\nfi\n"
+    },
+    "options": {},
+    "services": {
+      "honcho-api": {
+        "command": "until pg_isready -h \"$PGHOSTADDR\" -p \"$PGPORT\" -q 2>/dev/null; do sleep 0.3; done\nexec honcho-server\n"
+      },
+      "honcho-deriver": {
+        "command": "until pg_isready -h \"$PGHOSTADDR\" -p \"$PGPORT\" -q 2>/dev/null; do sleep 0.3; done\nexec honcho-deriver\n"
+      },
+      "postgres": {
+        "command": "export PGDATA=\"$FLOX_ENV_CACHE/honcho/pgdata/data\"\nexport PG_SOCKETDIR=\"/tmp/flox-honcho-pg-$(echo \"$FLOX_ENV_CACHE/honcho/pgdata\" | cksum | cut -d\" \" -f1)\"\nmkdir -p \"$PG_SOCKETDIR\"\nexec postgres -D \"$PGDATA\" \\\n  -c unix_socket_directories=\"$PG_SOCKETDIR\" \\\n  -c listen_addresses=\"$PGHOSTADDR\" \\\n  -p \"$PGPORT\"\n"
+      },
+      "redis": {
+        "command": "exec redis-server --port \"$REDIS_PORT\" \\\n  --bind \"$PGHOSTADDR\" \\\n  --dir \"$FLOX_ENV_CACHE/honcho/redis\" \\\n  --save \"\"\n"
+      }
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "honcho",
+      "broken": false,
+      "derivation": "/nix/store/v9p28pjc811fgnizkiaqzc1m24y183ir-honcho-env.drv",
+      "description": "Self-hostable memory infrastructure for stateful agents.",
+      "install_id": "honcho",
+      "license": "AGPL-3.0-only",
+      "locked_url": "https://github.com/flox/floxenvs?rev=37da37844c73c50f0e986581be15be43d6c5f8a5",
+      "name": "honcho-env",
+      "pname": "honcho",
+      "rev": "37da37844c73c50f0e986581be15be43d6c5f8a5",
+      "rev_count": 6091,
+      "rev_date": "2026-06-04T01:57:04Z",
+      "scrape_date": "2026-06-04T07:07:04.527049Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.0.9",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/k24xz1xq5dvb0y6wapd7ygzf0zss7s53-honcho-env"
+      },
+      "system": "aarch64-darwin",
+      "group": "honcho",
+      "priority": 5
+    },
+    {
+      "attr_path": "honcho",
+      "broken": false,
+      "derivation": "/nix/store/1sk496a57bn8bj4c589naab4krapk6k0-honcho-env.drv",
+      "description": "Self-hostable memory infrastructure for stateful agents.",
+      "install_id": "honcho",
+      "license": "AGPL-3.0-only",
+      "locked_url": "https://github.com/flox/floxenvs?rev=37da37844c73c50f0e986581be15be43d6c5f8a5",
+      "name": "honcho-env",
+      "pname": "honcho",
+      "rev": "37da37844c73c50f0e986581be15be43d6c5f8a5",
+      "rev_count": 6091,
+      "rev_date": "2026-06-04T01:57:04Z",
+      "scrape_date": "2026-06-04T07:07:04.527054Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.0.9",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/hvjvjm9pl48lyyafb7zg6n7536kpkv6k-honcho-env"
+      },
+      "system": "aarch64-linux",
+      "group": "honcho",
+      "priority": 5
+    },
+    {
+      "attr_path": "honcho",
+      "broken": false,
+      "derivation": "/nix/store/v7604wkmf16lkzxl1zfkmcn8i7n2984z-honcho-env.drv",
+      "description": "Self-hostable memory infrastructure for stateful agents.",
+      "install_id": "honcho",
+      "license": "AGPL-3.0-only",
+      "locked_url": "https://github.com/flox/floxenvs?rev=37da37844c73c50f0e986581be15be43d6c5f8a5",
+      "name": "honcho-env",
+      "pname": "honcho",
+      "rev": "37da37844c73c50f0e986581be15be43d6c5f8a5",
+      "rev_count": 6091,
+      "rev_date": "2026-06-04T01:57:04Z",
+      "scrape_date": "2026-06-04T07:07:04.527055Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "3.0.9",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/8x3rhg29iaa6ryaajs72g4sadwgjkscm-honcho-env"
+      },
+      "system": "x86_64-linux",
+      "group": "honcho",
+      "priority": 5
+    },
+    {
+      "attr_path": "postgresqlPackages.pgvector",
+      "broken": false,
+      "derivation": "/nix/store/3jaxnlvhk90qgyniplpf7040lfqxq5nf-pgvector-0.8.2.drv",
+      "description": "Open-source vector similarity search for PostgreSQL",
+      "install_id": "pgvector",
+      "license": "PostgreSQL",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "pgvector-0.8.2",
+      "pname": "pgvector",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T08:56:19.903535Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.8.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/xa7l3zsv58sdbrc0dcpzkm7kdyvmb7dh-pgvector-0.8.2"
+      },
+      "system": "aarch64-darwin",
+      "group": "honcho-pg",
+      "priority": 5
+    },
+    {
+      "attr_path": "postgresqlPackages.pgvector",
+      "broken": false,
+      "derivation": "/nix/store/rvbqpybvw3jccz47hgam7jx8qzlykhml-pgvector-0.8.2.drv",
+      "description": "Open-source vector similarity search for PostgreSQL",
+      "install_id": "pgvector",
+      "license": "PostgreSQL",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "pgvector-0.8.2",
+      "pname": "pgvector",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T09:41:19.530179Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.8.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/hv1v8273b9vqgdkzlmh3dgx8p8wzvlnb-pgvector-0.8.2"
+      },
+      "system": "aarch64-linux",
+      "group": "honcho-pg",
+      "priority": 5
+    },
+    {
+      "attr_path": "postgresqlPackages.pgvector",
+      "broken": false,
+      "derivation": "/nix/store/63ylaj8ikblgiqh3x7df66bb2bigypan-pgvector-0.8.2.drv",
+      "description": "Open-source vector similarity search for PostgreSQL",
+      "install_id": "pgvector",
+      "license": "PostgreSQL",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "pgvector-0.8.2",
+      "pname": "pgvector",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T10:25:27.971517Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.8.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/qg6gzqhb1hhf8dygjxlsf6wc5dbkcv5r-pgvector-0.8.2"
+      },
+      "system": "x86_64-darwin",
+      "group": "honcho-pg",
+      "priority": 5
+    },
+    {
+      "attr_path": "postgresqlPackages.pgvector",
+      "broken": false,
+      "derivation": "/nix/store/2j7rwdc02knzwdwksqb8p2sklzp2izxc-pgvector-0.8.2.drv",
+      "description": "Open-source vector similarity search for PostgreSQL",
+      "install_id": "pgvector",
+      "license": "PostgreSQL",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "pgvector-0.8.2",
+      "pname": "pgvector",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T11:07:45.798796Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.8.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/68wki41wk7gh4bqdibslx60naxicf9v6-pgvector-0.8.2"
+      },
+      "system": "x86_64-linux",
+      "group": "honcho-pg",
+      "priority": 5
+    },
+    {
+      "attr_path": "postgresql",
+      "broken": false,
+      "derivation": "/nix/store/kp8iay7c452pay6v8h57z3f3w1mc7145-postgresql-17.10.drv",
+      "description": "Powerful, open source object-relational database system",
+      "install_id": "postgresql",
+      "license": "PostgreSQL",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "postgresql-17.10",
+      "pname": "postgresql",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T08:56:19.172405Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "17.10",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/y2yfqp710f5ggzj972wvdw27c4465g9b-postgresql-17.10-dev",
+        "doc": "/nix/store/rbd7809q978mm98d2ah6q06hh1fak4g3-postgresql-17.10-doc",
+        "jit": "/nix/store/jvvc8129hqsxvwxdvhgz8jhsajbyci9s-postgresql-17.10-jit",
+        "lib": "/nix/store/chrd4xzfvh20skzq21p5q96cm1hwsr91-postgresql-17.10-lib",
+        "man": "/nix/store/fbqgpjlxp8kjlln7f2rqlidz86dq1dxj-postgresql-17.10-man",
+        "out": "/nix/store/k5mjkij9d9fcikm1pshcads63fsyf08r-postgresql-17.10",
+        "plperl": "/nix/store/jfdxbynhcf8a69s2b9k2sm0yicdy9chb-postgresql-17.10-plperl",
+        "plpython3": "/nix/store/x8kr0c530y07ml1f2k2q1h70j2bi5ndm-postgresql-17.10-plpython3",
+        "pltcl": "/nix/store/xnqihgavm8j2p3bxrhx21v0cr4w4bvyq-postgresql-17.10-pltcl"
+      },
+      "system": "aarch64-darwin",
+      "group": "honcho-pg",
+      "priority": 5
+    },
+    {
+      "attr_path": "postgresql",
+      "broken": false,
+      "derivation": "/nix/store/8iz58x0k51gspybibpmb1a8q0kcbrwvw-postgresql-17.10.drv",
+      "description": "Powerful, open source object-relational database system",
+      "install_id": "postgresql",
+      "license": "PostgreSQL",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "postgresql-17.10",
+      "pname": "postgresql",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T09:41:18.611789Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "17.10",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/dbbqlaba1d5db0l4a5xlgzvkk16bb1ql-postgresql-17.10-debug",
+        "dev": "/nix/store/ckkjpnmpd0lgs28bhq76ffbknkbw0r2l-postgresql-17.10-dev",
+        "doc": "/nix/store/srbnmzjyc6fq3bp33lxv7185d85g44bg-postgresql-17.10-doc",
+        "jit": "/nix/store/08a4srs7r0mskz9qnzd00h5h00008v4q-postgresql-17.10-jit",
+        "lib": "/nix/store/bs4ds2zwwfjnp2bz2nqpbm3jc1xw2f76-postgresql-17.10-lib",
+        "man": "/nix/store/954b3d8ksbv0s2jh3p4a0i9jfcj4f1j3-postgresql-17.10-man",
+        "out": "/nix/store/cyh24i9352vrbk53nx4lvq1m98ff8aii-postgresql-17.10",
+        "plperl": "/nix/store/qrwc6i1vnfhl95dy5hq9172429yf0i4w-postgresql-17.10-plperl",
+        "plpython3": "/nix/store/xzhgi5yphr8awiw5ji2nmqdzqxdjshqx-postgresql-17.10-plpython3",
+        "pltcl": "/nix/store/3xqvyngzy2hxckg1q4d6sbn7grj8kmnm-postgresql-17.10-pltcl"
+      },
+      "system": "aarch64-linux",
+      "group": "honcho-pg",
+      "priority": 5
+    },
+    {
+      "attr_path": "postgresql",
+      "broken": false,
+      "derivation": "/nix/store/f48lnpbd2qa77s0gj3hnd9ix1alm5qx0-postgresql-17.10.drv",
+      "description": "Powerful, open source object-relational database system",
+      "install_id": "postgresql",
+      "license": "PostgreSQL",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "postgresql-17.10",
+      "pname": "postgresql",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T10:25:27.252670Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "17.10",
+      "outputs_to_install": [
+        "man",
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/3f6llql2ck6q7gnnyz0ysrrwkv2gghky-postgresql-17.10-dev",
+        "doc": "/nix/store/1235f75980ib2z42isq8w00css1n4f66-postgresql-17.10-doc",
+        "jit": "/nix/store/sax9v31mpzjxngi20jwfhy32hn1d1anm-postgresql-17.10-jit",
+        "lib": "/nix/store/s3fshal7dhhmbcsm336fghkq6bzd70lq-postgresql-17.10-lib",
+        "man": "/nix/store/rg1kk7km61j8z1j6wbz3cv76zdccijp0-postgresql-17.10-man",
+        "out": "/nix/store/2d6cqkal090xcmk7vpkvh24sl3infbby-postgresql-17.10",
+        "plperl": "/nix/store/rbdah6bn3zm84inf5b5aqyshvri7d7lz-postgresql-17.10-plperl",
+        "plpython3": "/nix/store/7bli73px1dfsfy1fwsxs30yxq17kvaxs-postgresql-17.10-plpython3",
+        "pltcl": "/nix/store/s0flr58ascaiv0mlvwfgq2gmpzgy277a-postgresql-17.10-pltcl"
+      },
+      "system": "x86_64-darwin",
+      "group": "honcho-pg",
+      "priority": 5
+    },
+    {
+      "attr_path": "postgresql",
+      "broken": false,
+      "derivation": "/nix/store/0jfsxlv4jmzayvm4r81zg7yc7jv0s7n3-postgresql-17.10.drv",
+      "description": "Powerful, open source object-relational database system",
+      "install_id": "postgresql",
+      "license": "PostgreSQL",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "postgresql-17.10",
+      "pname": "postgresql",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T11:07:44.853697Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "17.10",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "debug": "/nix/store/lfgkjigmsr1pyyyf42d5ilnc003bjxn7-postgresql-17.10-debug",
+        "dev": "/nix/store/2y8a47fzhkibnfy5lzrv16ylj5rn2pj7-postgresql-17.10-dev",
+        "doc": "/nix/store/c8wad1x0pmvysnfkz5d9rcpb872qc2j7-postgresql-17.10-doc",
+        "jit": "/nix/store/phskfynzln3q5qhc1m0i2g7n585129yn-postgresql-17.10-jit",
+        "lib": "/nix/store/h0mwgi47x8cmwyfqgbi3spsyr8hwidn0-postgresql-17.10-lib",
+        "man": "/nix/store/csjq4w1qavdihdq7hywbr0cdf2rzpfz9-postgresql-17.10-man",
+        "out": "/nix/store/8zm2sma9jgvq101yy4x45za4y28yd164-postgresql-17.10",
+        "plperl": "/nix/store/h98zq6zgf63dwix04cp93c0m3wk29acy-postgresql-17.10-plperl",
+        "plpython3": "/nix/store/wy8i0s38mq87j1cbq69i950rb26z7pz1-postgresql-17.10-plpython3",
+        "pltcl": "/nix/store/dd2j50hn9p1capz9kqcbj1773v4agpfj-postgresql-17.10-pltcl"
+      },
+      "system": "x86_64-linux",
+      "group": "honcho-pg",
+      "priority": 5
+    },
+    {
+      "attr_path": "redis",
+      "broken": false,
+      "derivation": "/nix/store/0akvl4q399wfq5hjrgazgyb3pafb2w16-redis-8.8.0.drv",
+      "description": "Open source, advanced key-value store",
+      "install_id": "redis",
+      "license": "AGPL-3.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "redis-8.8.0",
+      "pname": "redis",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T08:57:07.130547Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.8.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/k09zvy10hm4fzml8wmfw8qw66pkipjjd-redis-8.8.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "honcho-redis",
+      "priority": 5
+    },
+    {
+      "attr_path": "redis",
+      "broken": false,
+      "derivation": "/nix/store/k187y29z89y8ch9qgh455wr2fc65l4g4-redis-8.8.0.drv",
+      "description": "Open source, advanced key-value store",
+      "install_id": "redis",
+      "license": "AGPL-3.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "redis-8.8.0",
+      "pname": "redis",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T09:42:18.977176Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.8.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/4n6678b29rxi4r4cfbgwq1pq17cpgard-redis-8.8.0"
+      },
+      "system": "aarch64-linux",
+      "group": "honcho-redis",
+      "priority": 5
+    },
+    {
+      "attr_path": "redis",
+      "broken": false,
+      "derivation": "/nix/store/0i0y2l6z02n620fb6djp7p33xrbl8kl5-redis-8.8.0.drv",
+      "description": "Open source, advanced key-value store",
+      "install_id": "redis",
+      "license": "AGPL-3.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "redis-8.8.0",
+      "pname": "redis",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T10:26:15.613413Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.8.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/2y5s46k7x33pvc3wxdlyzwf135ahrvx2-redis-8.8.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "honcho-redis",
+      "priority": 5
+    },
+    {
+      "attr_path": "redis",
+      "broken": false,
+      "derivation": "/nix/store/znzw4njj5a6wcaqnmw8ir25ikqwdbghg-redis-8.8.0.drv",
+      "description": "Open source, advanced key-value store",
+      "install_id": "redis",
+      "license": "AGPL-3.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "redis-8.8.0",
+      "pname": "redis",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T11:08:48.067986Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.8.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/zkd0ckjz5v4izrbb719rhw6y7bb6z4sp-redis-8.8.0"
+      },
+      "system": "x86_64-linux",
+      "group": "honcho-redis",
+      "priority": 5
+    }
+  ]
+}

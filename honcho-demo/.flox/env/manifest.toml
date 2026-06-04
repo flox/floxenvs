@@ -1,0 +1,28 @@
+schema-version = "1.11.0"
+
+[include]
+environments = [{ dir = "../honcho" }]
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style \
+    --foreground 212 --border-foreground 212 \
+    --border double --align center \
+    --width 64 --margin "1 2" --padding "1 2" \
+    "Honcho" \
+    "Self-hosted memory infrastructure for stateful agents"
+  echo ""
+  echo "  flox services start             — postgres + redis + api + deriver"
+  echo "  curl $HONCHO_URL/health         — health probe (no LLM key needed)"
+  echo "  python quickstart.py            — run the Store → Reason → Query loop"
+  echo ""
+  echo "  Reasoning endpoints need an LLM key:"
+  echo "    export LLM_OPENAI_API_KEY=sk-..."
+  echo ""
+fi
+'''

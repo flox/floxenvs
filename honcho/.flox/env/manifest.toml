@@ -1,0 +1,146 @@
+schema-version = "1.10.0"
+
+# Minimal Honcho environment for use with [include].
+#
+# Self-hostable memory infrastructure for stateful agents
+# (https://github.com/plastic-labs/honcho). Bundles the
+# Honcho FastAPI server, background deriver worker, and
+# the honcho-ai Python SDK, plus a local PostgreSQL (with
+# pgvector) and Redis as flox services.
+#
+# Include in your manifest:
+#
+#   [include]
+#   environments = [{ remote = "flox/honcho" }]
+#
+# Then `flox activate --start-services` and point your
+# Honcho SDK at HONCHO_URL (default http://127.0.0.1:18000).
+
+[install]
+honcho.pkg-path = "flox/honcho"
+honcho.pkg-group = "honcho"
+honcho.version = "^3.0.7"
+# The custom package depends on lancedb, pyarrow, scikit-learn
+# wheels that aren't shipped for x86_64-darwin.
+honcho.systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]
+
+postgresql.pkg-path = "postgresql"
+postgresql.pkg-group = "honcho-pg"
+postgresql.outputs = "all"
+pgvector.pkg-path = "postgresqlPackages.pgvector"
+pgvector.pkg-group = "honcho-pg"
+
+redis.pkg-path = "redis"
+redis.pkg-group = "honcho-redis"
+
+[vars]
+HONCHO_HOST = "127.0.0.1"
+HONCHO_PORT = "18000"
+HONCHO_URL = "http://127.0.0.1:18000"
+
+# Postgres — TCP mode (psycopg URI needs host:port).
+PGHOSTADDR = "127.0.0.1"
+PGPORT = "15432"
+PGUSER = "honcho"
+PGPASS = "honcho"
+PGDATABASE = "honcho"
+
+# Redis
+REDIS_PORT = "16379"
+
+# Honcho server config
+AUTH_USE_AUTH = "false"
+CACHE_ENABLED = "true"
+
+[hook]
+on-activate = '''
+export HONCHO_CACHE="$FLOX_ENV_CACHE/honcho"
+export PGDIR="$HONCHO_CACHE/pgdata"
+export PGDATA="$PGDIR/data"
+export REDISDIR="$HONCHO_CACHE/redis"
+export LOGDIR="$HONCHO_CACHE/logs"
+mkdir -p "$PGDIR" "$REDISDIR" "$LOGDIR"
+
+# Unix socket dir kept short (<103 bytes) — hashed per env.
+export PG_SOCKETDIR="/tmp/flox-honcho-pg-$(echo "$PGDIR" | cksum | cut -d" " -f1)"
+mkdir -p "$PG_SOCKETDIR"
+
+export PGHOST="$PGHOSTADDR"
+export DB_CONNECTION_URI="postgresql+psycopg://$PGUSER:$PGPASS@$PGHOSTADDR:$PGPORT/$PGDATABASE"
+export CACHE_URL="redis://$PGHOSTADDR:$REDIS_PORT/0?suppress=true"
+
+# Where pg_config et al find pgvector's .so — flox links the
+# extension into $FLOX_ENV but postgres needs the dynamic
+# library lookup to work.
+export PG_LIBDIR="$FLOX_ENV/lib"
+export PG_SHAREDIR="$FLOX_ENV/share/postgresql"
+
+INIT_LOG="$PGDIR/init.log"
+
+pg_init_fail() {
+  echo "ERROR: PostgreSQL initialization failed." >&2
+  [ -f "$INIT_LOG" ] && { echo "--- init.log ---" >&2; cat "$INIT_LOG" >&2; echo "--- end init.log ---" >&2; }
+  exit 1
+}
+
+if [[ ! -d "$PGDATA" ]]; then
+  mkdir -p "$PGDATA"
+  initdb "$PGDATA" \
+    --locale=C --encoding=UTF8 --auth=trust \
+    --username "$PGUSER" \
+    >> "$INIT_LOG" 2>&1 || pg_init_fail
+
+  pg_ctl -D "$PGDATA" -w start \
+    -o "-c unix_socket_directories=$PG_SOCKETDIR -c listen_addresses=$PGHOSTADDR -p $PGPORT" \
+    >> "$INIT_LOG" 2>&1 || pg_init_fail
+
+  createdb -h "$PG_SOCKETDIR" -p "$PGPORT" -U "$PGUSER" "$PGDATABASE" \
+    >> "$INIT_LOG" 2>&1 || pg_init_fail
+  psql -h "$PG_SOCKETDIR" -p "$PGPORT" -U "$PGUSER" -d "$PGDATABASE" \
+    -c "CREATE EXTENSION IF NOT EXISTS vector" \
+    >> "$INIT_LOG" 2>&1 || pg_init_fail
+
+  # Run alembic migrations once at init.
+  honcho-migrate upgrade head >> "$INIT_LOG" 2>&1 || pg_init_fail
+
+  pg_ctl -D "$PGDATA" -m fast -w stop >> "$INIT_LOG" 2>&1
+  rm -f "$INIT_LOG"
+fi
+
+# One-shot reminder: honcho's reasoning paths need an LLM key.
+# /health and the storage API work without one, so this is a
+# soft warning, not a hard failure.
+if [ -z "${LLM_OPENAI_API_KEY:-}${LLM_ANTHROPIC_API_KEY:-}${LLM_GEMINI_API_KEY:-}" ] \
+    && [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  echo "honcho: no LLM_*_API_KEY set — chat/reasoning endpoints will fail." >&2
+  echo "        set LLM_OPENAI_API_KEY (or _ANTHROPIC_, _GEMINI_) before using them." >&2
+fi
+'''
+
+[services]
+postgres.command = '''
+export PGDATA="$FLOX_ENV_CACHE/honcho/pgdata/data"
+export PG_SOCKETDIR="/tmp/flox-honcho-pg-$(echo "$FLOX_ENV_CACHE/honcho/pgdata" | cksum | cut -d" " -f1)"
+mkdir -p "$PG_SOCKETDIR"
+exec postgres -D "$PGDATA" \
+  -c unix_socket_directories="$PG_SOCKETDIR" \
+  -c listen_addresses="$PGHOSTADDR" \
+  -p "$PGPORT"
+'''
+
+redis.command = '''
+exec redis-server --port "$REDIS_PORT" \
+  --bind "$PGHOSTADDR" \
+  --dir "$FLOX_ENV_CACHE/honcho/redis" \
+  --save ""
+'''
+
+honcho-api.command = '''
+until pg_isready -h "$PGHOSTADDR" -p "$PGPORT" -q 2>/dev/null; do sleep 0.3; done
+exec honcho-server
+'''
+
+honcho-deriver.command = '''
+until pg_isready -h "$PGHOSTADDR" -p "$PGPORT" -q 2>/dev/null; do sleep 0.3; done
+exec honcho-deriver
+'''
