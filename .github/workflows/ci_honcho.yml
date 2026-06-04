@@ -1,0 +1,38 @@
+name: "CI: honcho"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "honcho/**"
+      - "honcho-demo/**"
+      - ".flox/pkgs/honcho/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_honcho.yml"
+  pull_request:
+    paths:
+      - "honcho/**"
+      - "honcho-demo/**"
+      - ".flox/pkgs/honcho/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_honcho.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "honcho"
+    secrets: inherit
