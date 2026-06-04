@@ -1,0 +1,347 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Honcho dev environment — self-host the AI memory server with one flox include</title><meta name="description" content="Flox-packaged Honcho: Plastic Labs' open-source memory layer for stateful agents. Includes the FastAPI server, background reasoning worker, honcho-ai Python SDK, and postgres+pgvector + redis as flox services."><link rel="canonical" href="https://flox.github.io/floxenvs/envs/honcho/"><link rel="icon" href="/floxenvs/favicon.svg"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"><meta name="referrer" content="strict-origin-when-cross-origin"><meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), interest-cohort=()"><meta property="og:title" content="Honcho dev environment — self-host the AI memory server with one flox include"><meta property="og:description" content="Flox-packaged Honcho: Plastic Labs' open-source memory layer for stateful agents. Includes the FastAPI server, background reasoning worker, honcho-ai Python SDK, and postgres+pgvector + redis as flox services."><meta property="og:image" content="https://flox.github.io/floxenvs/og/env/honcho.png"><meta property="og:url" content="https://flox.github.io/floxenvs/envs/honcho/"><meta property="og:type" content="product"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://flox.github.io/floxenvs/og/env/honcho.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Honcho","description":"Self-hostable memory infrastructure for stateful agents — FastAPI server, background deriver, postgres+pgvector, redis, and the Python SDK in one flox env.\n","applicationCategory":"DeveloperApplication","operatingSystem":["Linux","macOS"],"license":"https://spdx.org/licenses/AGPL-3.0.html","url":"https://flox.github.io/floxenvs/envs/honcho/","codeRepository":"https://github.com/flox/floxenvs/tree/main/honcho","isBasedOn":"https://github.com/plastic-labs/honcho","dateModified":"2026-06-04T08:00:22Z","offers":{"@type":"Offer","price":"0","priceCurrency":"USD","availability":"https://schema.org/InStock","description":"Free and open source — install via the Flox package manager."},"publisher":{"@type":"Organization","@id":"https://flox.dev/#organization","name":"Flox","url":"https://flox.dev"},"author":{"@type":"Person","name":"Rok Garbas","identifier":"@rok","url":"https://github.com/rok"}}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"flox / envs","item":"https://flox.github.io/floxenvs/"},{"@type":"ListItem","position":2,"name":"Environments","item":"https://flox.github.io/floxenvs/envs/"},{"@type":"ListItem","position":3,"name":"Honcho","item":"https://flox.github.io/floxenvs/envs/honcho/"}]}</script><script>
+      // Apply theme before paint to avoid FOUC. Honors the
+      // stored choice, otherwise falls back to system pref.
+      (function () {
+        try {
+          var stored = localStorage.getItem("theme");
+          var dark = stored === "dark"
+            || (!stored && window.matchMedia(
+              "(prefers-color-scheme: dark)").matches);
+          if (dark) document.documentElement.classList.add("dark");
+        } catch (e) {}
+      })();
+    </script><link rel="stylesheet" href="/floxenvs/_astro/_slug_.BYNwMe91.css">
+<style>.clip-hexagon[data-astro-cid-exkfadj5]{clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)}
+</style></head> <body class="font-sans antialiased min-h-dvh bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100"> <header class="border-b border-slate-200 dark:border-slate-800"> <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center gap-6"> <a href="/floxenvs/" class="font-bold tracking-tight">flox / envs</a> <a href="/floxenvs/envs/" class="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">Envs</a> <a href="/floxenvs/packages/" class="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">Packages</a> <a href="/floxenvs/search/" class="ml-auto inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white" aria-label="Search"> <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"> <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd"></path> </svg> <span>Search</span> </a> <button id="theme-toggle" type="button" class="inline-flex items-center justify-center w-8 h-8 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800" aria-label="Toggle dark mode" title="Toggle dark mode"> <svg class="w-4 h-4 dark:hidden" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"> <path d="M10 2a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 2zM10 15a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 15zM10 7a3 3 0 100 6 3 3 0 000-6zM15.657 5.404a.75.75 0 10-1.06-1.06l-1.061 1.06a.75.75 0 001.06 1.06l1.06-1.06zM6.464 14.596a.75.75 0 10-1.06-1.06l-1.06 1.06a.75.75 0 001.06 1.06l1.06-1.06zM18 10a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0118 10zM5 10a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 015 10zM14.596 15.657a.75.75 0 001.06-1.06l-1.06-1.061a.75.75 0 10-1.06 1.06l1.06 1.06zM5.404 6.464a.75.75 0 001.06-1.06l-1.06-1.06a.75.75 0 10-1.061 1.06l1.06 1.06z"></path> </svg> <svg class="w-4 h-4 hidden dark:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"> <path fill-rule="evenodd" d="M7.455 2.004a.75.75 0 01.26.77 7 7 0 009.958 7.967.75.75 0 011.067.853A8.5 8.5 0 116.647 1.921a.75.75 0 01.808.083z" clip-rule="evenodd"></path> </svg> </button> <a href="https://github.com/flox/floxenvs" class="inline-flex items-center justify-center w-8 h-8 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800" aria-label="GitHub repository" title="GitHub repository"> <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"> <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path> </svg> </a> </nav> </header> <main class="max-w-6xl mx-auto px-6 py-10">  <nav class="text-sm text-slate-500 mb-4"> <a href="/floxenvs/envs/" class="underline">Environments</a> / honcho </nav> <div class="flex items-center gap-3 mb-2"> <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono uppercase tracking-wide ring-1 bg-kind-env/15 text-kind-env ring-kind-env/30" data-kind="env"> ENV </span> <span class="text-xs font-mono text-slate-500">beta</span> </div> <h1 class="text-3xl font-bold">Honcho</h1> <p class="mt-2 text-slate-600 dark:text-slate-300">Self-hostable memory infrastructure for stateful agents — FastAPI server, background deriver, postgres+pgvector, redis, and the Python SDK in one flox env.
+</p> <p class="mt-4 text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-3xl"> flox/honcho packages the open-source Honcho server (the Plastic Labs memory layer for stateful agents) with all of its runtime dependencies sealed into one Nix closure. The env ships the FastAPI app, the background `deriver` worker that builds peer representations, and the `honcho-ai` Python SDK — plus a local PostgreSQL (with pgvector) and Redis wired up as flox services so a single `flox activate --start-services` gets you a running stack. Set an LLM provider key (OpenAI / Anthropic / Gemini) and the reasoning endpoints come alive too.
+ </p> <ul class="mt-5 list-disc list-inside text-sm space-y-1"> <li>Run Honcho locally — FastAPI server + deriver worker</li><li>Bundled honcho-ai SDK, no `pip install` needed</li><li>PostgreSQL + pgvector + Redis as flox services</li><li>Alembic migrations applied on first activate</li> </ul><aside class="mt-6 max-w-3xl rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 px-4 py-3 text-sm"> <strong>New to Flox?</strong> Install it in 30 seconds:  <code class="font-mono text-xs">curl -L https://downloads.flox.dev/by-env/stable/install.sh | bash</code> 
+— then run the activate command below. <a href="https://flox.dev/docs/install-flox/" class="underline">Docs →</a> </aside> <div class="grid lg:grid-cols-[1fr_280px] gap-10 mt-10"> <div> <section aria-label="Score panel" class="mt-8 p-6 rounded-xl border border-slate-200 dark:border-slate-800" data-astro-cid-exkfadj5> <div class="grid gap-6 md:grid-cols-[120px_1fr_1fr_1.2fr]" data-astro-cid-exkfadj5> <!-- Hex overall score --> <div class="flex md:block items-center gap-4" data-astro-cid-exkfadj5> <div class="w-24 h-28 flex flex-col items-center justify-center
+               clip-hexagon bg-slate-50 dark:bg-slate-900" aria-label="Overall score —" data-astro-cid-exkfadj5> <div class="text-3xl font-bold leading-none font-mono" data-astro-cid-exkfadj5> — </div> <div class="mt-1 px-2 py-0.5 text-[10px] font-mono uppercase rounded ring-1 bg-status-missing/15 text-status-missing ring-status-missing/30" data-astro-cid-exkfadj5> no data </div> </div> </div> <!-- Quality --> <div class="space-y-1"> <div class="flex items-baseline gap-2 text-sm"> <span class="font-medium text-slate-700 dark:text-slate-200"> Quality </span> <span class="font-mono text-score-red"> 0%
+</span> </div> <div class="h-2 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Quality"> <div class="h-full bg-score-red" style="width:0%"></div> </div> <p class="text-xs text-slate-500 leading-tight">0/0 checks pass</p> </div> <!-- Reliability --> <div class="space-y-1"> <div class="flex items-baseline gap-2 text-sm"> <span class="font-medium text-slate-700 dark:text-slate-200"> Reliability </span> <span class="font-mono text-score-red"> 0%
+</span> </div> <div class="h-2 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Reliability"> <div class="h-full bg-score-red" style="width:0%"></div> </div> <p class="text-xs text-slate-500 leading-tight">no recent CI data</p> </div> <!-- Security --> <div data-astro-cid-exkfadj5> <p class="text-sm font-medium text-slate-700 dark:text-slate-200 mb-1" data-astro-cid-exkfadj5>
+Security
+</p> <div class="space-y-0.5" data-astro-cid-exkfadj5>  </div>  </div> </div> <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-900
+              text-sm text-slate-600 dark:text-slate-300" data-astro-cid-exkfadj5> <span class="font-medium" data-astro-cid-exkfadj5>Impact</span> <span class="ml-2 font-mono" data-astro-cid-exkfadj5>no evals.yaml</span> </div> </section>  <section class="mt-8"> <h2 class="text-xl font-semibold mb-3">Install</h2> <div class="rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden"> <div role="tablist" class="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"> <button role="tab" aria-selected="true" aria-controls="jnnrpfbhlyt-panel-0" data-tab-target="jnnrpfbhlyt-panel-0" class="px-4 py-2 text-sm font-mono data-[active=true]:bg-white dark:data-[active=true]:bg-slate-950 data-[active=true]:font-semibold" data-active="true"> Include </button><button role="tab" aria-selected="false" aria-controls="jnnrpfbhlyt-panel-1" data-tab-target="jnnrpfbhlyt-panel-1" class="px-4 py-2 text-sm font-mono data-[active=true]:bg-white dark:data-[active=true]:bg-slate-950 data-[active=true]:font-semibold" data-active="false"> Activate </button><button role="tab" aria-selected="false" aria-controls="jnnrpfbhlyt-panel-2" data-tab-target="jnnrpfbhlyt-panel-2" class="px-4 py-2 text-sm font-mono data-[active=true]:bg-white dark:data-[active=true]:bg-slate-950 data-[active=true]:font-semibold" data-active="false"> Docker </button> </div> <pre id="jnnrpfbhlyt-panel-0" role="tabpanel" data-tab-panel class="text-sm font-mono p-4 m-0 overflow-x-auto"><code>[include]
+environments = [{ remote = &quot;flox/honcho&quot; }]
+</code></pre><pre id="jnnrpfbhlyt-panel-1" role="tabpanel" data-tab-panel hidden class="text-sm font-mono p-4 m-0 overflow-x-auto"><code>flox activate -r flox/honcho --start-services
+</code></pre><pre id="jnnrpfbhlyt-panel-2" role="tabpanel" data-tab-panel hidden class="text-sm font-mono p-4 m-0 overflow-x-auto"><code>docker run -it ghcr.io/flox/floxenvs/honcho-latest
+</code></pre> </div> <script type="module">for(const a of document.querySelectorAll('[role="tablist"]')){const r=a.querySelectorAll('[role="tab"]');r.forEach(e=>{e.addEventListener("click",()=>{const c=e.getAttribute("data-tab-target");a.parentElement.querySelectorAll("[data-tab-panel]").forEach(t=>t.toggleAttribute("hidden",t.id!==c)),r.forEach(t=>{const l=t===e;t.setAttribute("aria-selected",String(l)),t.setAttribute("data-active",String(l))})})})}</script> </section> <section class="mt-12"><h2 class="text-xl font-semibold">Recipes</h2><div class="mt-6 rounded-lg border border-slate-200 dark:border-slate-800 p-6"><div class="flex items-baseline gap-3 mb-3"><h3 class="font-semibold">Quick start</h3><code class="text-xs text-slate-500">honcho-demo</code></div><ul class="list-disc list-inside text-sm text-slate-600 dark:text-slate-300 mb-4"><li>Bundles the minimal env with a sample quickstart.py</li><li>Runs the full Store → Reason → Query → Inject loop</li></ul><details class="mb-4"><summary class="cursor-pointer text-sm font-mono text-slate-500">
+composed manifest.toml
+</summary><div class="prose prose-sm dark:prose-invert max-w-none mt-2"><pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="toml"><code><span class="line"><span style="color:#ADBAC7">schema-version = </span><span style="color:#96D0FF">"1.11.0"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ADBAC7">[</span><span style="color:#F69D50">include</span><span style="color:#ADBAC7">]</span></span>
+<span class="line"><span style="color:#ADBAC7">environments = [{ dir = </span><span style="color:#96D0FF">"../honcho"</span><span style="color:#ADBAC7"> }]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ADBAC7">[</span><span style="color:#F69D50">install</span><span style="color:#ADBAC7">]</span></span>
+<span class="line"><span style="color:#ADBAC7">gum.pkg-path = </span><span style="color:#96D0FF">"gum"</span></span>
+<span class="line"><span style="color:#ADBAC7">gum.pkg-group = </span><span style="color:#96D0FF">"demo-tools"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ADBAC7">[</span><span style="color:#F69D50">hook</span><span style="color:#ADBAC7">]</span></span>
+<span class="line"><span style="color:#ADBAC7">on-activate = </span><span style="color:#96D0FF">'''</span></span>
+<span class="line"><span style="color:#96D0FF">if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then</span></span>
+<span class="line"><span style="color:#96D0FF">  gum style \</span></span>
+<span class="line"><span style="color:#96D0FF">    --foreground 212 --border-foreground 212 \</span></span>
+<span class="line"><span style="color:#96D0FF">    --border double --align center \</span></span>
+<span class="line"><span style="color:#96D0FF">    --width 64 --margin "1 2" --padding "1 2" \</span></span>
+<span class="line"><span style="color:#96D0FF">    "Honcho" \</span></span>
+<span class="line"><span style="color:#96D0FF">    "Self-hosted memory infrastructure for stateful agents"</span></span>
+<span class="line"><span style="color:#96D0FF">  echo ""</span></span>
+<span class="line"><span style="color:#96D0FF">  echo "  flox services start             — postgres + redis + api + deriver"</span></span>
+<span class="line"><span style="color:#96D0FF">  echo "  curl $HONCHO_URL/health         — health probe (no LLM key needed)"</span></span>
+<span class="line"><span style="color:#96D0FF">  echo "  python quickstart.py            — run the Store → Reason → Query loop"</span></span>
+<span class="line"><span style="color:#96D0FF">  echo ""</span></span>
+<span class="line"><span style="color:#96D0FF">  echo "  Reasoning endpoints need an LLM key:"</span></span>
+<span class="line"><span style="color:#96D0FF">  echo "    export LLM_OPENAI_API_KEY=sk-..."</span></span>
+<span class="line"><span style="color:#96D0FF">  echo ""</span></span>
+<span class="line"><span style="color:#96D0FF">fi</span></span>
+<span class="line"><span style="color:#96D0FF">'''</span></span>
+<span class="line"></span></code></pre></div></details><div class="prose prose-sm dark:prose-invert max-w-none mt-4"><h1 id="honcho-demo">Honcho Demo</h1>
+<!-- codespaces-badge -->
+<p><a href="https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fhoncho-demo%2Fdevcontainer.json"><img src="https://github.com/codespaces/badge.svg" alt="Open in Codespaces"></a></p>
+<p>Interactive demo for the self-hosted
+<a href="https://github.com/plastic-labs/honcho">Honcho</a> memory server.
+Composes the <a href="../honcho/">honcho</a> minimal env (server + deriver</p>
+<ul>
+<li>postgres + redis + SDK) and ships a <code>quickstart.py</code> that
+exercises the full Store → Reason → Query → Inject loop.</li>
+</ul>
+<h2 id="try-it">Try it</h2>
+<pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6CB6FF">cd</span><span style="color:#96D0FF"> honcho-demo</span></span>
+<span class="line"><span style="color:#F69D50">flox</span><span style="color:#96D0FF"> activate</span><span style="color:#6CB6FF"> --start-services</span></span>
+<span class="line"><span style="color:#768390"># Optional: enables the reasoning path</span></span>
+<span class="line"><span style="color:#F47067">export</span><span style="color:#ADBAC7"> LLM_OPENAI_API_KEY</span><span style="color:#F47067">=</span><span style="color:#ADBAC7">sk-...</span></span>
+<span class="line"><span style="color:#F69D50">python</span><span style="color:#96D0FF"> quickstart.py</span></span></code></pre>
+<p>You should see four messages stored on <code>demo-session</code>, then
+either a peer chat answer (if a key was set) or a clean skip.</p>
+<h2 id="what-you-get">What you get</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Source env</th><th>What it adds</th></tr></thead><tbody><tr><td><code>../honcho</code></td><td>server, deriver, SDK, postgres+pgvector, redis</td></tr><tr><td><code>demo-tools</code></td><td><code>gum</code> for the banner</td></tr><tr><td>(this env)</td><td><code>quickstart.py</code> sample script</td></tr></tbody></table>
+<h2 id="what-quickstartpy-does">What quickstart.py does</h2>
+<pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>1. Connects to http://127.0.0.1:18000 (override with $HONCHO_URL)</span></span>
+<span class="line"><span>2. Creates a workspace, two peers (alice + tutor), a session</span></span>
+<span class="line"><span>3. Adds four messages (storage path, no LLM key needed)</span></span>
+<span class="line"><span>4. Calls alice.representation() (storage path, no LLM key)</span></span>
+<span class="line"><span>5. If an LLM key is set:</span></span>
+<span class="line"><span>   - alice.chat("What is the user struggling with?")</span></span>
+<span class="line"><span>   - session.context(summary=True, tokens=2000).to_openai(...)</span></span></code></pre>
+<p>The script’s loop mirrors the <a href="https://github.com/plastic-labs/honcho#quickstart">upstream README quickstart</a>
+exactly, just pointed at the local server instead of
+<code>api.honcho.dev</code>.</p>
+<h2 id="services">Services</h2>
+<p>When you activate with <code>--start-services</code>, four flox services
+come up:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Service</th><th>Port</th><th>Notes</th></tr></thead><tbody><tr><td><code>postgres</code></td><td>15432</td><td>TCP mode, trust auth, with pgvector</td></tr><tr><td><code>redis</code></td><td>16379</td><td></td></tr><tr><td><code>honcho-api</code></td><td>18000</td><td>FastAPI server</td></tr><tr><td><code>honcho-deriver</code></td><td>—</td><td>Background reasoning worker</td></tr></tbody></table>
+<p>Tail logs with <code>flox services logs &#x3C;name></code>.</p>
+<h2 id="wiring-it-into-your-own-code">Wiring it into your own code</h2>
+<p>The SDK and CLI are on PATH already:</p>
+<pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="python"><code><span class="line"><span style="color:#F47067">from</span><span style="color:#ADBAC7"> honcho </span><span style="color:#F47067">import</span><span style="color:#ADBAC7"> Honcho</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ADBAC7">h </span><span style="color:#F47067">=</span><span style="color:#ADBAC7"> Honcho(</span></span>
+<span class="line"><span style="color:#F69D50">    workspace_id</span><span style="color:#F47067">=</span><span style="color:#96D0FF">"my-app"</span><span style="color:#ADBAC7">,</span></span>
+<span class="line"><span style="color:#F69D50">    base_url</span><span style="color:#F47067">=</span><span style="color:#96D0FF">"http://127.0.0.1:18000"</span><span style="color:#ADBAC7">,</span></span>
+<span class="line"><span style="color:#F69D50">    api_key</span><span style="color:#F47067">=</span><span style="color:#96D0FF">"local-dev"</span><span style="color:#ADBAC7">,   </span><span style="color:#768390"># AUTH_USE_AUTH=false in the minimal env</span></span>
+<span class="line"><span style="color:#ADBAC7">)</span></span>
+<span class="line"><span style="color:#ADBAC7">peer </span><span style="color:#F47067">=</span><span style="color:#ADBAC7"> h.peer(</span><span style="color:#96D0FF">"user-42"</span><span style="color:#ADBAC7">)</span></span>
+<span class="line"><span style="color:#ADBAC7">session </span><span style="color:#F47067">=</span><span style="color:#ADBAC7"> h.session(</span><span style="color:#96D0FF">"convo-1"</span><span style="color:#ADBAC7">)</span></span>
+<span class="line"><span style="color:#ADBAC7">session.add_messages([peer.message(</span><span style="color:#96D0FF">"hello"</span><span style="color:#ADBAC7">)])</span></span></code></pre>
+<h2 id="see-also">See also</h2>
+<ul>
+<li><a href="../honcho/">honcho</a> — minimal env you’d <code>[include]</code></li>
+<li><a href="https://github.com/plastic-labs/honcho">Honcho upstream</a></li>
+<li><a href="https://honcho.dev/docs/">Honcho docs</a></li>
+</ul></div></div></section> <section class="mt-12"> <h2 class="text-xl font-semibold">Packages installed</h2> <p class="text-sm text-slate-500 mt-1">
+Everything <strong>flox/honcho</strong> brings into a
+            consumer manifest via <code class="text-xs font-mono">[install]</code>.
+            Catalog packages link to their detail page; everything else
+            links to FloxHub or nixpkgs.
+</p> <div class="mt-4"> <div class="rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden"><table class="w-full text-sm"><thead class="bg-slate-50 dark:bg-slate-900 text-left"><tr><th class="px-3 py-2 font-medium text-slate-500 text-xs uppercase tracking-wide">Name</th><th class="px-3 py-2 font-medium text-slate-500 text-xs uppercase tracking-wide">Path</th><th class="px-3 py-2 font-medium text-slate-500 text-xs uppercase tracking-wide">Source</th></tr></thead><tbody><tr class="border-t border-slate-100 dark:border-slate-900"><td class="px-3 py-2 font-mono text-xs">honcho</td><td class="px-3 py-2 font-mono text-xs"><a class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300" href="/floxenvs/packages/honcho/">flox/honcho</a></td><td class="px-3 py-2 text-xs"><span class="inline-flex items-center gap-1.5 text-kind-env"><span class="inline-block w-1.5 h-1.5 rounded-full bg-kind-env"></span>
+catalog
+</span></td></tr><tr class="border-t border-slate-100 dark:border-slate-900"><td class="px-3 py-2 font-mono text-xs">postgresql</td><td class="px-3 py-2 font-mono text-xs"><a class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300" href="https://search.nixos.org/packages?query=postgresql">postgresql</a></td><td class="px-3 py-2 text-xs"><span class="inline-flex items-center gap-1.5 text-slate-500"><span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+nixpkgs
+</span></td></tr><tr class="border-t border-slate-100 dark:border-slate-900"><td class="px-3 py-2 font-mono text-xs">pgvector</td><td class="px-3 py-2 font-mono text-xs"><a class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300" href="https://search.nixos.org/packages?query=postgresqlPackages.pgvector">postgresqlPackages.pgvector</a></td><td class="px-3 py-2 text-xs"><span class="inline-flex items-center gap-1.5 text-slate-500"><span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+nixpkgs
+</span></td></tr><tr class="border-t border-slate-100 dark:border-slate-900"><td class="px-3 py-2 font-mono text-xs">redis</td><td class="px-3 py-2 font-mono text-xs"><a class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300" href="https://search.nixos.org/packages?query=redis">redis</a></td><td class="px-3 py-2 text-xs"><span class="inline-flex items-center gap-1.5 text-slate-500"><span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+nixpkgs
+</span></td></tr></tbody></table></div> </div> </section>  <section class="mt-12"> <h2 class="text-xl font-semibold">Documentation</h2> <div class="prose prose-sm dark:prose-invert max-w-none mt-3"><h1 id="honcho">Honcho</h1>
+<!-- codespaces-badge -->
+<p><a href="https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fhoncho%2Fdevcontainer.json"><img src="https://github.com/codespaces/badge.svg" alt="Open in Codespaces"></a></p>
+<p>Self-hostable <a href="https://github.com/plastic-labs/honcho">Honcho</a>
+environment — memory infrastructure for stateful agents. Ships the
+FastAPI server, the background <code>deriver</code> worker, the
+<code>honcho-ai</code> Python SDK, and local PostgreSQL (with pgvector) +
+Redis wired up as flox services.</p>
+<h2 id="quick-start">Quick start</h2>
+<p>Include in your manifest:</p>
+<pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="toml"><code><span class="line"><span style="color:#ADBAC7">[</span><span style="color:#F69D50">include</span><span style="color:#ADBAC7">]</span></span>
+<span class="line"><span style="color:#ADBAC7">environments = [{ remote = </span><span style="color:#96D0FF">"flox/honcho"</span><span style="color:#ADBAC7"> }]</span></span></code></pre>
+<p>Then activate and start the services:</p>
+<pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#F69D50">flox</span><span style="color:#96D0FF"> activate</span><span style="color:#6CB6FF"> --start-services</span></span></code></pre>
+<p>The Honcho API listens on <code>http://127.0.0.1:18000</code> and <code>/health</code>
+returns 200 once it’s ready. The Python SDK is importable
+straight away:</p>
+<pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="python"><code><span class="line"><span style="color:#F47067">from</span><span style="color:#ADBAC7"> honcho </span><span style="color:#F47067">import</span><span style="color:#ADBAC7"> Honcho</span></span>
+<span class="line"><span style="color:#ADBAC7">honcho </span><span style="color:#F47067">=</span><span style="color:#ADBAC7"> Honcho(</span></span>
+<span class="line"><span style="color:#F69D50">    workspace_id</span><span style="color:#F47067">=</span><span style="color:#96D0FF">"my-app"</span><span style="color:#ADBAC7">,</span></span>
+<span class="line"><span style="color:#F69D50">    base_url</span><span style="color:#F47067">=</span><span style="color:#96D0FF">"http://127.0.0.1:18000"</span><span style="color:#ADBAC7">,</span></span>
+<span class="line"><span style="color:#F69D50">    api_key</span><span style="color:#F47067">=</span><span style="color:#96D0FF">"local-dev"</span><span style="color:#ADBAC7">,</span></span>
+<span class="line"><span style="color:#ADBAC7">)</span></span></code></pre>
+<h2 id="what-it-provides">What it provides</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Binary</th><th>What it does</th></tr></thead><tbody><tr><td><code>honcho-server</code></td><td>Runs the FastAPI app via uvicorn</td></tr><tr><td><code>honcho-deriver</code></td><td>Runs the background reasoning worker</td></tr><tr><td><code>honcho-migrate</code></td><td>Runs <code>alembic upgrade head</code> against the DB</td></tr><tr><td><code>psql</code></td><td>PostgreSQL CLI</td></tr><tr><td><code>redis-cli</code></td><td>Redis CLI</td></tr></tbody></table>
+<p>Plus the <code>honcho-ai</code> Python SDK in the bundled venv —
+<code>from honcho import Honcho</code> works without <code>pip install</code>.</p>
+<h2 id="services">Services</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Service</th><th>What it does</th></tr></thead><tbody><tr><td><code>postgres</code></td><td>Local PostgreSQL with pgvector extension</td></tr><tr><td><code>redis</code></td><td>Local Redis cache</td></tr><tr><td><code>honcho-api</code></td><td>The FastAPI server on <code>$HONCHO_PORT</code></td></tr><tr><td><code>honcho-deriver</code></td><td>Background worker that builds peer reps</td></tr></tbody></table>
+<p>Start all four with <code>flox activate --start-services</code> or
+selectively via <code>flox services start &#x3C;name></code>.</p>
+<h2 id="configuration">Configuration</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Variable</th><th>Default</th><th>Purpose</th></tr></thead><tbody><tr><td><code>HONCHO_HOST</code></td><td><code>127.0.0.1</code></td><td>API bind host</td></tr><tr><td><code>HONCHO_PORT</code></td><td><code>18000</code></td><td>API port (ADR-003 <code>1</code>-prefixed)</td></tr><tr><td><code>HONCHO_URL</code></td><td><code>http://127.0.0.1:18000</code></td><td>Convenience for SDK clients</td></tr><tr><td><code>PGPORT</code></td><td><code>15432</code></td><td>PostgreSQL TCP port</td></tr><tr><td><code>PGUSER</code> / <code>PGPASS</code></td><td><code>honcho</code> / <code>honcho</code></td><td>DB credentials (trust auth, localhost)</td></tr><tr><td><code>PGDATABASE</code></td><td><code>honcho</code></td><td>Database name</td></tr><tr><td><code>REDIS_PORT</code></td><td><code>16379</code></td><td>Redis port</td></tr><tr><td><code>AUTH_USE_AUTH</code></td><td><code>false</code></td><td>Disable JWT auth (local dev)</td></tr><tr><td><code>DB_CONNECTION_URI</code></td><td>derived</td><td><code>postgresql+psycopg://...</code></td></tr><tr><td><code>CACHE_URL</code></td><td>derived</td><td><code>redis://...</code></td></tr></tbody></table>
+<p>Honcho’s reasoning endpoints (chat, representations) need at
+least one LLM provider key. Set whichever you have:</p>
+<pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#F47067">export</span><span style="color:#ADBAC7"> LLM_OPENAI_API_KEY</span><span style="color:#F47067">=</span><span style="color:#ADBAC7">sk-...</span></span>
+<span class="line"><span style="color:#768390"># or LLM_ANTHROPIC_API_KEY, LLM_GEMINI_API_KEY</span></span></code></pre>
+<p>Storage endpoints (workspaces, peers, sessions, messages,
+<code>/health</code>) work without an LLM key.</p>
+<p>See <a href="https://github.com/plastic-labs/honcho#configuration">Honcho’s configuration reference</a> for the full set
+of env vars and TOML sections.</p>
+<h2 id="how-data-is-stored">How data is stored</h2>
+<p>All state lives under <code>$FLOX_ENV_CACHE/honcho/</code>:</p>
+<ul>
+<li><code>pgdata/</code> — PostgreSQL cluster (initialized + migrated on
+first activate)</li>
+<li><code>redis/</code> — Redis dump</li>
+<li><code>logs/init.log</code> — only present if first-time init failed</li>
+</ul>
+<p><code>flox delete</code> wipes the cache.</p>
+<h2 id="see-also">See also</h2>
+<ul>
+<li><a href="../honcho-demo/">honcho-demo</a> — interactive demo with a
+sample <code>quickstart.py</code> that exercises the Store →
+Reason → Query → Inject loop</li>
+<li><a href="https://github.com/plastic-labs/honcho">Honcho upstream</a></li>
+<li><a href="https://honcho.dev/docs/">Honcho docs</a></li>
+</ul></div> </section> </div> <aside class="space-y-1"> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Status</span> <span class="flex-1 break-words">beta</span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Publisher</span> <span class="flex-1 break-words">flox</span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">License</span> <span class="flex-1 break-words">AGPL-3.0</span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Upstream</span> <span class="flex-1 break-words"> <a href="https://github.com/plastic-labs/honcho" class="underline"> Honcho </a> <span class="text-slate-500"> · AGPL-3.0</span></span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Maintainer</span> <span class="flex-1 break-words">@rok</span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Bundles packages</span> <span class="flex-1 break-words"> <span class="inline-flex flex-wrap gap-x-1.5 gap-y-1"> <a href="/floxenvs/packages/honcho/" class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300">honcho</a> </span> </span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">FloxHub</span> <span class="flex-1 break-words"> <a href="https://hub.flox.dev/flox/honcho" class="underline">link</a> </span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Source</span> <span class="flex-1 break-words"> <a href="https://github.com/flox/floxenvs/tree/main/honcho" class="underline">repo</a> </span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Last updated</span> <span class="flex-1 break-words"> <time datetime="2026-06-04T08:00:22Z"> 2026-06-04 </time> </span> </div> </aside> </div>  </main> <footer class="border-t border-slate-200 dark:border-slate-800 mt-20"> <div class="max-w-6xl mx-auto px-6 py-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-8 text-sm"> <div> <p class="font-bold tracking-tight text-slate-900 dark:text-slate-100">flox / envs</p> <p class="mt-1 text-slate-500">Ready-to-use Flox envs and packages for AI and dev tooling.</p> </div> <div> <p class="font-semibold text-slate-700 dark:text-slate-300">Flox</p> <ul class="mt-1 space-y-1 text-slate-500"> <li><a class="hover:underline" href="https://flox.dev">flox.dev</a></li> <li><a class="hover:underline" href="https://flox.dev/docs">Documentation</a></li> <li><a class="hover:underline" href="https://hub.flox.dev/flox">FloxHub catalog</a></li> </ul> </div> <div> <p class="font-semibold text-slate-700 dark:text-slate-300">Catalog</p> <ul class="mt-1 space-y-1 text-slate-500"> <li><a class="hover:underline" href="/floxenvs/envs/">All environments</a></li> <li><a class="hover:underline" href="/floxenvs/packages/">All packages</a></li> <li><a class="hover:underline" href="/floxenvs/search/">Search</a></li> <li><a class="hover:underline" href="/floxenvs/sitemap-index.xml">Sitemap</a></li> </ul> </div> <div> <p class="font-semibold text-slate-700 dark:text-slate-300">Project</p> <ul class="mt-1 space-y-1 text-slate-500"> <li><a class="hover:underline" href="https://github.com/flox/floxenvs">Source on GitHub</a></li> <li><a class="hover:underline" href="https://github.com/flox/floxenvs/discussions">Discussions</a></li> <li><a class="hover:underline" href="https://github.com/flox/floxenvs/issues">Issues</a></li> <li><a class="hover:underline" href="https://github.com/flox/floxenvs/blob/main/LICENSE">MIT license</a></li> </ul> </div> </div> <div class="border-t border-slate-100 dark:border-slate-900"> <div class="max-w-6xl mx-auto px-6 py-4 text-xs text-slate-400 dark:text-slate-500 flex flex-wrap items-center gap-x-4 gap-y-1"> <span>© Flox, Inc.</span> <span aria-hidden="true">·</span> <span>Catalog source: <a class="underline" href="https://github.com/flox/floxenvs">flox/floxenvs</a></span> <span aria-hidden="true">·</span> <span>
+Built <time datetime="2026-06-04T08:06:32.806Z">2026-06-04</time> </span> </div> </div> </footer> <script type="module">const e=document.getElementById("theme-toggle");e&&e.addEventListener("click",()=>{const t=document.documentElement.classList.toggle("dark");try{localStorage.setItem("theme",t?"dark":"light")}catch{}});</script> </body> </html>
