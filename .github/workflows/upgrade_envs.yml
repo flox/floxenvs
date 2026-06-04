@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
+        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
 
       - name: "Find environments"
         id: "envs"
@@ -98,12 +98,12 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6
+        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
         with:
           ref: "main"
 
       - name: "Install flox"
-        uses: "flox/install-flox-action@6e70b2624cea62b0f11ea4a28e719fe1c86c028b" # v2.4.1
+        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
 
       - name: "Upgrade minimal environment"
         run: |
