@@ -6,6 +6,7 @@ const LABELS: Record<AiRole | "all", string> = {
   agent: "Agent",
   "llm-runtime": "LLM runtime",
   rag: "RAG",
+  memory: "Memory",
   orchestrator: "Orchestrator",
   tooling: "Tooling",
   ide: "IDE",

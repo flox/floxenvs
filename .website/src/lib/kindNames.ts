@@ -8,6 +8,7 @@ export const AI_ROLES = [
   "agent",
   "llm-runtime",
   "rag",
+  "memory",
   "orchestrator",
   "tooling",
   "ide",
