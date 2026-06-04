@@ -1,0 +1,33 @@
+kind: pkg
+subkind: plain
+name: honcho
+title: Honcho
+publisher: flox
+tagline: >
+  Self-hostable memory infrastructure for stateful agents —
+  FastAPI server, background deriver, and Python SDK.
+category: ai
+ai_role: memory
+tags: [memory, agents, llm, mcp, fastapi]
+stack: [python]
+featured: false
+combines_well_with:
+  - env:honcho
+  - env:postgresql
+  - env:redis
+  - env:claude
+status: beta
+license: AGPL-3.0
+upstream:
+  name: Honcho
+  url: https://github.com/plastic-labs/honcho
+  license: AGPL-3.0
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    honcho.pkg-path = "flox/honcho"
+    honcho.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/honcho
+  floxhub: https://hub.flox.dev/flox/honcho

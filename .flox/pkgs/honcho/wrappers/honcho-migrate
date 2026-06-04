@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Run alembic migrations against the bundled migrations dir.
+# Defaults to `upgrade head`; pass other alembic subcommands as args.
+set -e
+
+# Locate the installed `src` package (where alembic.ini and
+# migrations/ live) regardless of the python minor version.
+SRC_DIR="$(@OUT@/bin/python -c 'import src, os; print(os.path.dirname(src.__file__))')"
+cd "$SRC_DIR"
+
+if [ "$#" -eq 0 ]; then
+  exec @OUT@/bin/alembic upgrade head
+else
+  exec @OUT@/bin/alembic "$@"
+fi

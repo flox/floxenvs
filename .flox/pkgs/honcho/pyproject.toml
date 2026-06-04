@@ -1,0 +1,13 @@
+[project]
+name = "honcho-flox"
+version = "0.0.0"
+description = "Flox wrapper to lock honcho server + honcho-ai SDK"
+requires-python = ">=3.13"
+dependencies = [
+  "honcho",
+  "honcho-ai",
+]
+
+[tool.uv.sources]
+honcho = { git = "https://github.com/plastic-labs/honcho.git", tag = "v3.0.7" }
+honcho-ai = { git = "https://github.com/plastic-labs/honcho.git", tag = "v3.0.7", subdirectory = "sdks/python" }
