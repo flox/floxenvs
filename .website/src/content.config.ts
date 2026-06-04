@@ -43,7 +43,7 @@ const baseFields = {
   summary: z.array(z.string()).default([]),
   category: z.enum(["ai","language","database","service","tool","runtime"]),
   ai_role: z
-    .enum(["agent","llm-runtime","rag","orchestrator","tooling","ide"])
+    .enum(["agent","llm-runtime","rag","memory","orchestrator","tooling","ide"])
     .optional(),
   tags: z.array(z.string()).default([]),
   stack: z.array(z.string()).default([]),
