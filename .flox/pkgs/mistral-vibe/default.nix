@@ -192,6 +192,7 @@ python.pkgs.buildPythonApplication {
     giturlparse
     google-auth
     httpx
+    humanize
     jsonpatch
     keyring
     markdownify
