@@ -35,6 +35,22 @@ let
     ps.dvisvgm
   ]);
 
+  # Bundle the Manim binary only on Linux. Manim drags
+  # moderngl-window -> pyglet -> ffmpeg-full, and in the flox catalog
+  # base set ffmpeg-full enables the HEVC encoder kvazaar, whose check
+  # phase fails to run in the macOS build sandbox (the same
+  # invalid-signature / SIGKILL issue nixpkgs hits with Darwin ffmpeg).
+  # Catalog artifacts are prebuilt, so the dep cannot be reliably patched
+  # out via an override. On Linux the whole closure builds cleanly, so we
+  # ship `manim` on PATH there; on Darwin the skill still ships and the
+  # prose tells the agent to install manim per slot.
+  bundleManim = stdenvNoCC.hostPlatform.isLinux;
+  manimNote =
+    if bundleManim then
+      "Manim CE v0.20.1, a bundled TeX distribution (for `MathTex`/`Tex` via dvisvgm), and ffmpeg are bundled with this package — the `manim` command is on PATH, nothing to install. `scripts/setup.sh` still works as a sanity check."
+    else
+      "On macOS the Manim engine is not bundled (the upstream HEVC-encoder dependency fails to build in the flox sandbox on Darwin). Install it per slot when needed: `pip install manim` plus a LaTeX distribution (`brew install --cask mactex-no-gui`). ffmpeg ships with this package. `scripts/setup.sh` verifies the slot.";
+
   src = fetchFromGitHub {
     owner = "browser-use";
     repo = "video-use";
@@ -55,13 +71,16 @@ stdenvNoCC.mkDerivation {
   installPhase = ''
     runHook preInstall
 
-    # Bundle the Manim engine on PATH for the manim-video sub-skill:
-    # the real manim plus a TeX distro and ffmpeg for MathTex + dvisvgm
-    # + scene stitching. Lands in $out/bin, which is on PATH once the
-    # package is installed into the consumer's flox env.
-    mkdir -p "$out/bin"
-    makeWrapper "${manim}/bin/manim" "$out/bin/manim" \
-      --prefix PATH : "${lib.makeBinPath [ texEnv ffmpeg ]}"
+    # Bundle the Manim engine on PATH for the manim-video sub-skill (Linux
+    # only — see bundleManim above): the real manim plus a TeX distro and
+    # ffmpeg for MathTex + dvisvgm + scene stitching. Lands in $out/bin,
+    # which is on PATH once the package is installed into the consumer's
+    # flox env.
+    ${lib.optionalString bundleManim ''
+      mkdir -p "$out/bin"
+      makeWrapper "${manim}/bin/manim" "$out/bin/manim" \
+        --prefix PATH : "${lib.makeBinPath [ texEnv ffmpeg ]}"
+    ''}
 
     # video-use is a directory skill: SKILL.md references its helpers
     # by bare name (`transcribe.py <video>`), so the whole repo tree
@@ -160,7 +179,7 @@ MD
       substituteInPlace "$md" \
         --replace-quiet \
           'Run `scripts/setup.sh` to verify all dependencies. Requires: Python 3.10+, Manim Community Edition v0.20+ (`pip install manim`), LaTeX (`texlive-full` on Linux, `mactex` on macOS), and ffmpeg. Reference docs tested against Manim CE v0.20.1.' \
-          'Manim CE v0.20.1, a bundled TeX distribution (for `MathTex`/`Tex` via dvisvgm), and ffmpeg are bundled with this package — the `manim` command is on PATH, nothing to install. `scripts/setup.sh` still works as a sanity check.'
+          ${lib.escapeShellArg manimNote}
     done
   '';
 
