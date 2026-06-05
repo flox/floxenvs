@@ -7,11 +7,22 @@ HASHES_FILE="$SCRIPT_DIR/hashes.json"
 
 current_version=$(jq -r '.version' "$HASHES_FILE")
 
-# Upstream tags releases as `skill-vX.Y.Z`. Pull the latest such tag.
-latest_tag=$(curl -sf \
-  https://api.github.com/repos/pbakaus/impeccable/releases/latest \
-  | jq -r '.tag_name')
-latest_version="${latest_tag#skill-v}"
+# Upstream publishes multiple tag tracks (skill-v*, ext-v*, cli-v*), and
+# `releases/latest` may point at a non-skill track. List tags and pick the
+# highest `skill-v*` semver explicitly.
+auth_header=()
+if [ -n "${GITHUB_TOKEN:-}" ]; then
+  auth_header=(-H "Authorization: Bearer $GITHUB_TOKEN")
+fi
+latest_version=$(curl -sf "${auth_header[@]}" \
+  https://api.github.com/repos/pbakaus/impeccable/tags \
+  | jq -r '.[].name | select(startswith("skill-v")) | ltrimstr("skill-v")' \
+  | sort -V | tail -1)
+
+if [ -z "$latest_version" ]; then
+  echo "ERROR: no skill-v* tags found" >&2
+  exit 1
+fi
 
 echo "Current: $current_version, Latest: $latest_version"
 

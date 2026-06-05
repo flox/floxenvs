@@ -9,7 +9,13 @@ current_version=$(jq -r '.version // ""' "$HASHES_FILE")
 rev=$(git ls-remote "https://github.com/$OWNER/$REPO.git" "refs/heads/$BRANCH" | awk '{print $1}')
 if [ -z "$rev" ]; then echo "Failed to resolve $BRANCH on $OWNER/$REPO" >&2; exit 1; fi
 short_sha="${rev:0:7}"
-commit_json=$(curl -sfL -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$OWNER/$REPO/commits/$rev")
+# Authenticate the API call so it isn't throttled by the shared
+# unauthenticated rate limit when many upgrade jobs run in parallel.
+auth_header=()
+if [ -n "${GITHUB_TOKEN:-}" ]; then
+  auth_header=(-H "Authorization: Bearer $GITHUB_TOKEN")
+fi
+commit_json=$(curl -sfL "${auth_header[@]}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$OWNER/$REPO/commits/$rev")
 commit_date=$(echo "$commit_json" | jq -r '.commit.committer.date' | cut -c1-10)
 new_version="unstable-${commit_date}.${short_sha}"
 echo "Current: $current_version"

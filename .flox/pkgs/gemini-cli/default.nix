@@ -91,10 +91,15 @@ buildNpmPackage (finalAttrs: {
   '';
 
   postPatch = ''
-    # Hardcode ripgrep path so ensureRgPath() returns our Nix-provided binary
-    # instead of downloading or finding a dynamically-linked one.
+    # Force ripgrep resolution to our Nix-provided binary. Upstream's
+    # resolveRipgrepPath() probes bundled vendor/ paths then the system
+    # PATH; prepend the store path as the first candidate so fileExists()
+    # always finds it, avoiding any vendored download.
     substituteInPlace packages/core/src/tools/ripGrep.ts \
-      --replace-fail "await ensureRgPath();" "'${lib.getExe ripgrep}';"
+      --replace-fail \
+        'const candidatePaths = [' \
+        'const candidatePaths = [
+      "${lib.getExe ripgrep}",'
 
     # Disable auto-update and the update nag - Nix manages updates.
     sed -i "/enableAutoUpdate: {/,/}/ s/default: true/default: false/" \
