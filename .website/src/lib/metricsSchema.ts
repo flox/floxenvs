@@ -64,7 +64,7 @@ const Impact = z.object({
 });
 
 const Identity = z.object({
-  kind: z.enum(["env", "pkg"]),
+  kind: z.enum(["env", "pkg", "skill", "agent"]),
   name: z.string(),
   dir: z.string().default(""),
 });
@@ -82,7 +82,7 @@ export const MetricsSchema = z.object({
 export type Metrics = z.infer<typeof MetricsSchema>;
 
 export function defaultMetrics(id: {
-  kind: "env" | "pkg";
+  kind: "env" | "pkg" | "skill" | "agent";
   name: string;
 }): Metrics {
   return MetricsSchema.parse({
