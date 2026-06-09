@@ -129,9 +129,61 @@ emit_review() {
     --argjson q "$q" '{identity:{kind:$kind,name:$name},quality:{score:$q}}'
 }
 
+# --- gate (deterministic structural veto) ----------------------------------
+
+# quick_validate: prefer the vendored skill-creator quick_validate.py (needs
+# PyYAML). $SKILLS_REVIEW_QUICK_VALIDATE may pin its path; the env may put it
+# on PATH. If neither runs, fall back to a minimal inline frontmatter check
+# (frontmatter parses + has name + description) so the gate stays offline and
+# dependency-free.
+quick_validate() {
+  local skill_dir="$1" qv="${SKILLS_REVIEW_QUICK_VALIDATE:-}"
+  if [ -z "$qv" ] && command -v quick_validate.py >/dev/null 2>&1; then
+    qv="$(command -v quick_validate.py)"
+  fi
+  if [ -n "$qv" ] && [ -f "$qv" ] && python3 -c 'import yaml' >/dev/null 2>&1; then
+    python3 "$qv" "$skill_dir" >/dev/null 2>&1
+    return $?
+  fi
+  inline_frontmatter_ok "$skill_dir"
+}
+
+# Minimal SKILL.md frontmatter gate: SKILL.md exists, opens with `---`,
+# closes with `---`, and the block carries `name:` and `description:`.
+inline_frontmatter_ok() {
+  local dir="$1" md="$1/SKILL.md"
+  [ -f "$md" ] || return 1
+  awk '
+    NR==1 && /^---[[:space:]]*$/ { inb=1; next }
+    inb && /^---[[:space:]]*$/   { closed=1; exit }
+    inb && /^[[:space:]]*name:/        { have_name=1 }
+    inb && /^[[:space:]]*description:/ { have_desc=1 }
+    END { exit (closed && have_name && have_desc) ? 0 : 1 }
+  ' "$md"
+}
+
+run_gate() { # echoes 100 (pass) or 0 (fail); sets $GATE_OK
+  if [ -n "${SKILLS_REVIEW_FORCE_GATE_FAIL:-}" ]; then GATE_OK=0; echo 0; return; fi
+  if [ -n "$DRY" ]; then GATE_OK=1; echo 100; return; fi
+  if [ "$KIND" = "agent" ]; then
+    # Agent gate: claudelint must parse the agent schema cleanly (0 errors).
+    local proj e
+    proj="$(stage_project)"
+    claudelint check-all --format json --cwd "$proj" > "$tmpd/gate.json" 2>/dev/null || true
+    e=$(jq -r '([.validators[]?|select(.name=="Agents Validator")|.errors|length]|add) // 0' \
+          "$tmpd/gate.json" 2>/dev/null || echo 0)
+    if [ "${e:-0}" -eq 0 ]; then GATE_OK=1; echo 100; else GATE_OK=0; echo 0; fi
+  else
+    if quick_validate "$PATH_ARG"; then GATE_OK=1; echo 100; else GATE_OK=0; echo 0; fi
+  fi
+}
+
 case "$CMD" in
   review) emit_review ;;
-  lint)   echo "lint: implemented in Task 13" >&2; exit 0 ;;
+  lint)
+    run_gate >/dev/null
+    if [ "${GATE_OK:-0}" = "1" ]; then echo "lint: OK ($KIND)"; exit 0
+    else echo "lint: FAILED gate ($KIND)" >&2; exit 1; fi ;;
   audit)  echo "audit: implemented in Task 14" >&2; exit 0 ;;
   *) echo "unknown command: $CMD" >&2; exit 2 ;;
 esac
