@@ -1,0 +1,30 @@
+kind: pkg
+subkind: plain
+name: claudelint
+title: claudelint
+publisher: flox
+tagline: >
+  Linter for the whole Claude Code project: skills, agents,
+  settings, hooks, and MCP.
+category: ai
+ai_role: tooling
+tags: [linting, agent, skills, mcp, hooks, cli]
+stack: [typescript]
+featured: false
+combines_well_with:
+  - env:claude
+status: beta
+license: MIT
+upstream:
+  name: claude-code-lint
+  url: https://github.com/pdugan20/claudelint
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    claudelint.pkg-path = "flox/claudelint"
+    claudelint.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/claudelint
+  floxhub: https://hub.flox.dev/flox/claudelint
