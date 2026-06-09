@@ -56,10 +56,12 @@ stage_project() {
 
 # --- per-tool score helpers (each echoes a 0-100; dry-run -> fixed stub) ----
 
-# skill-tools: native .score on a single skill path.
+# skill-tools: native .score on a single skill path. skill-tools can exit
+# nonzero (e.g. with --min-score) while still emitting valid JSON, so only
+# fall back to a zero score when the captured output is unparseable.
 sk_skill_tools() { [ -n "$DRY" ] && { echo 82; return; }
-  skill-tools score -f json "$1" > "$tmpd/st.json" 2>/dev/null \
-    || echo '{"score":0}' > "$tmpd/st.json"
+  skill-tools score -f json "$1" > "$tmpd/st.json" 2>/dev/null || true
+  jq -e . "$tmpd/st.json" >/dev/null 2>&1 || echo '{"score":0}' > "$tmpd/st.json"
   adapt_skill_tools "$tmpd/st.json"; }
 
 # skill-validator: check -o json -> top-level .errors / .warnings.
@@ -99,9 +101,15 @@ ag_cclint() { [ -n "$DRY" ] && { echo 100; return; }
   normalize_errwarn "${e:-0}" "${w:-0}"; }
 
 # skillcheck: SARIF -> highest severity -> score + record severity for cap.
+# NOTE: skillcheck exits nonzero when findings meet --fail-on (CRITICAL by
+# default), so the exit code is NOT an error signal — it still writes valid
+# SARIF. Only fall back to an empty run when the captured output is missing
+# or not parseable JSON.
 sec_score() { [ -n "$DRY" ] && { echo 100; echo none > "$tmpd/sev"; return; }
-  skillcheck --format sarif "$1" > "$tmpd/sc.sarif" 2>/dev/null \
-    || echo '{"runs":[]}' > "$tmpd/sc.sarif"
+  skillcheck --format sarif "$1" > "$tmpd/sc.sarif" 2>/dev/null || true
+  if ! jq -e . "$tmpd/sc.sarif" >/dev/null 2>&1; then
+    echo '{"runs":[]}' > "$tmpd/sc.sarif"
+  fi
   local sev; sev=$(adapt_sarif_severity "$tmpd/sc.sarif"); echo "$sev" > "$tmpd/sev"
   case "$sev" in
     CRITICAL) echo 50 ;;
