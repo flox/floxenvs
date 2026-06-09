@@ -1,0 +1,50 @@
+name: "CI: skills-review"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "skills-review/**"
+      - "skills-review-demo/**"
+      - ".flox/pkgs/skills-review/**"
+      - ".flox/pkgs/skill-validator/**"
+      - ".flox/pkgs/claudelint/**"
+      - ".flox/pkgs/cclint/**"
+      - ".flox/pkgs/skill-tools/**"
+      - ".flox/pkgs/agnix/**"
+      - ".flox/pkgs/skillcheck/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_skills-review.yml"
+  pull_request:
+    paths:
+      - "skills-review/**"
+      - "skills-review-demo/**"
+      - ".flox/pkgs/skills-review/**"
+      - ".flox/pkgs/skill-validator/**"
+      - ".flox/pkgs/claudelint/**"
+      - ".flox/pkgs/cclint/**"
+      - ".flox/pkgs/skill-tools/**"
+      - ".flox/pkgs/agnix/**"
+      - ".flox/pkgs/skillcheck/**"
+      - "flake.nix"
+      - "flake.lock"
+      - "scripts/**"
+      - ".github/workflows/environment.yml"
+      - ".github/workflows/ci_skills-review.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+jobs:
+  run:
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "skills-review"
+    secrets: inherit
