@@ -1,0 +1,30 @@
+kind: pkg
+subkind: plain
+name: skill-tools
+title: Skill Tools
+publisher: flox
+tagline: >
+  Score Claude Agent Skills (SKILL.md) 0-100 for quality —
+  plus validate, lint, audit, and route over skills.
+category: ai
+ai_role: tooling
+tags: [scoring, validation, linting, agent, skills, cli]
+stack: [node]
+featured: false
+combines_well_with:
+  - env:claude
+status: beta
+license: Apache-2.0
+upstream:
+  name: skill-tools
+  url: https://github.com/skill-tools/skill-tools
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    skill-tools.pkg-path = "flox/skill-tools"
+    skill-tools.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/skill-tools
+  floxhub: https://hub.flox.dev/flox/skill-tools
