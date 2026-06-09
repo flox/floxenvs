@@ -1,0 +1,30 @@
+kind: pkg
+subkind: plain
+name: skillcheck
+title: skillcheck
+publisher: flox
+tagline: >
+  SAST scanner for SKILL.md bodies — detects secrets,
+  injection, and privilege escalation, with SARIF output.
+category: ai
+ai_role: tooling
+tags: [security, sast, skills, sarif, cli]
+stack: [typescript]
+featured: false
+combines_well_with:
+  - env:claude
+status: beta
+license: MIT
+upstream:
+  name: skillcheck
+  url: https://github.com/agentigy/skillcheck
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    skillcheck.pkg-path = "flox/skillcheck"
+    skillcheck.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/skillcheck
+  floxhub: https://hub.flox.dev/flox/skillcheck
