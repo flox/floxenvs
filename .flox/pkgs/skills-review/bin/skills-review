@@ -159,7 +159,7 @@ quick_validate() {
 # Minimal SKILL.md frontmatter gate: SKILL.md exists, opens with `---`,
 # closes with `---`, and the block carries `name:` and `description:`.
 inline_frontmatter_ok() {
-  local dir="$1" md="$1/SKILL.md"
+  local md="$1/SKILL.md"
   [ -f "$md" ] || return 1
   awk '
     NR==1 && /^---[[:space:]]*$/ { inb=1; next }
