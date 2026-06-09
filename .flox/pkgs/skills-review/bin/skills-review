@@ -162,6 +162,68 @@ inline_frontmatter_ok() {
   ' "$md"
 }
 
+# Optional behavioral stage (promptfoo). Key-gated; feeds impact only.
+run_behavioral() { promptfoo eval -c "$1" >/dev/null 2>&1 && echo 80 || echo 70; }
+
+# Emit `{ "score": <ensemble>, "checks": [per-member breakdown] }` for the
+# per-kind quality ensemble. Echoing both keeps the tool invocations to one
+# pass even though this runs in a subshell.
+quality_block() {
+  local a b c wa wb wc na nb nc
+  if [ "$KIND" = "agent" ]; then
+    wa=50; na=claudelint;      a="$(cl_score "$PATH_ARG")"
+    wb=30; nb=agnix;           b="$(ag_agnix "$PATH_ARG")"
+    wc=20; nc=cclint;          c="$(ag_cclint "$PATH_ARG")"
+  else
+    wa=40; na=skill-tools;     a="$(sk_skill_tools "$PATH_ARG")"
+    wb=30; nb=skill-validator; b="$(sk_validator "$PATH_ARG")"
+    wc=30; nc=claudelint;      c="$(cl_score "$PATH_ARG")"
+  fi
+  local q; q=$(ensemble3 "$wa" "$a" "$wb" "$b" "$wc" "$c")
+  jq -nc --argjson q "$q" \
+    --arg na "$na" --argjson wa "$wa" --argjson sa "$a" \
+    --arg nb "$nb" --argjson wb "$wb" --argjson sb "$b" \
+    --arg nc "$nc" --argjson wc "$wc" --argjson sc "$c" '
+    { score:$q, checks:
+      [ {id:$na, weight:$wa, note:($sa|tostring), pass:($sa>=60)},
+        {id:$nb, weight:$wb, note:($sb|tostring), pass:($sb>=60)},
+        {id:$nc, weight:$wc, note:($sc|tostring), pass:($sc>=60)} ] }'
+}
+
+emit_audit() {
+  local q r s i sev overall status quality est
+  quality="$(quality_block)"; q="$(echo "$quality" | jq -r '.score')"
+  run_gate >/dev/null
+  # reliability = gate pass/fail, floored by claudelint conformance.
+  if [ "${GATE_OK:-0}" = "1" ]; then
+    r="$(cl_score "$PATH_ARG")"; [ "$r" -lt 60 ] && r=60
+  else
+    r=0
+  fi
+  s="$(sec_score "$PATH_ARG")"; sev="$(cat "$tmpd/sev" 2>/dev/null || echo none)"
+  if [ -n "$WITH_BEHAVIORAL" ] && [ -z "$DRY" ]; then
+    i="$(run_behavioral "$PATH_ARG")"; est=false
+  else
+    i=70; est=true
+  fi
+  overall="$(fuse "$q" "$r" "$s" "$i")"
+  overall="$(apply_cap "$overall" "$sev")"
+  status="$(pill "$overall")"
+  jq -nc --arg kind "$KIND" --arg name "$(basename "$PATH_ARG")" \
+    --arg dir "$PATH_ARG" \
+    --argjson overall "$overall" --arg status "$status" \
+    --argjson quality "$quality" \
+    --argjson r "$r" --argjson s "$s" --argjson i "$i" \
+    --argjson est "$est" \
+    --argjson cap "$(apply_cap 100 "$sev")" --arg sev "$sev" '
+    { identity:{kind:$kind, name:$name, dir:$dir},
+      overall:$overall, status:$status,
+      quality:$quality,
+      reliability:{score:$r},
+      security:{score:$s, cap:$cap, severity:$sev},
+      impact:{score:$i, estimated:$est} }'
+}
+
 run_gate() { # echoes 100 (pass) or 0 (fail); sets $GATE_OK
   if [ -n "${SKILLS_REVIEW_FORCE_GATE_FAIL:-}" ]; then GATE_OK=0; echo 0; return; fi
   if [ -n "$DRY" ]; then GATE_OK=1; echo 100; return; fi
@@ -178,12 +240,28 @@ run_gate() { # echoes 100 (pass) or 0 (fail); sets $GATE_OK
   fi
 }
 
+# Apply --threshold against an .overall-or-.quality.score in a result JSON.
+threshold_gate() { # <result-json>
+  [ -n "$THRESHOLD" ] || return 0
+  local v
+  v="$(echo "$1" | jq -r '.overall // .quality.score')"
+  [ "$v" -ge "$THRESHOLD" ] || exit 1
+}
+
 case "$CMD" in
-  review) emit_review ;;
+  review)
+    res="$(emit_review)"
+    if [ -n "$JSON" ]; then echo "$res"
+    else echo "$res" | jq -r '"\(.identity.kind) \(.identity.name): quality \(.quality.score)"'; fi
+    threshold_gate "$res" ;;
   lint)
     run_gate >/dev/null
     if [ "${GATE_OK:-0}" = "1" ]; then echo "lint: OK ($KIND)"; exit 0
     else echo "lint: FAILED gate ($KIND)" >&2; exit 1; fi ;;
-  audit)  echo "audit: implemented in Task 14" >&2; exit 0 ;;
+  audit)
+    res="$(emit_audit)"
+    if [ -n "$JSON" ]; then echo "$res"
+    else echo "$res" | jq -r '"\(.identity.kind) \(.identity.name): \(.overall) (\(.status))"'; fi
+    threshold_gate "$res" ;;
   *) echo "unknown command: $CMD" >&2; exit 2 ;;
 esac

@@ -21,3 +21,15 @@ if SKILLS_REVIEW_DRY_RUN=1 SKILLS_REVIEW_FORCE_GATE_FAIL=1 "$BIN" lint "$DIR/tes
   echo "FAIL lint bad should be nonzero"; exit 1
 fi
 echo "PASS runner.lint"
+
+out=$(SKILLS_REVIEW_DRY_RUN=1 "$BIN" audit --json "$DIR/test/skills/good")
+echo "$out" | jq -e '
+  (.overall|numbers) and
+  (.status|test("stable|warn|risk")) and
+  (.quality.score|numbers) and (.security.cap|numbers)
+' >/dev/null || { echo "FAIL audit shape"; exit 1; }
+# dry-run skill: q=ensemble3(40*82,30*90,30*70)=81, r=100(gate)->floor,
+# s=100 cap=100, i=70 -> fuse(81,?,100,70); just assert overall in 0..100.
+o=$(echo "$out" | jq -r '.overall'); [ "$o" -ge 0 ] && [ "$o" -le 100 ] \
+  || { echo "FAIL overall range"; exit 1; }
+echo "PASS runner.audit"
