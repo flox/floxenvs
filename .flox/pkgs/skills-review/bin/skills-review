@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+set -euo pipefail
+HERE="$(cd "$(dirname "$0")/.." && pwd)"
+# Source helper libs from $SKILLS_REVIEW_LIB when packaged (Task 15), else
+# from the in-tree lib/ next to this script.
+LIB="${SKILLS_REVIEW_LIB:-$HERE/lib}"
+# shellcheck source=/dev/null
+. "$LIB/score.sh"
+# shellcheck source=/dev/null
+. "$LIB/adapters.sh"
+# shellcheck source=/dev/null
+. "$LIB/detect.sh"
+
+DRY="${SKILLS_REVIEW_DRY_RUN:-}"
+CMD="${1:?usage: skills-review <lint|review|audit> [opts] <path>}"; shift
+KIND=""; JSON=""; WITH_BEHAVIORAL=""; THRESHOLD=""; PATH_ARG=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --kind) KIND="$2"; shift 2 ;;
+    --json) JSON=1; shift ;;
+    --with-behavioral) WITH_BEHAVIORAL=1; shift ;;
+    --threshold) THRESHOLD="$2"; shift 2 ;;
+    *) PATH_ARG="$1"; shift ;;
+  esac
+done
+[ -n "$PATH_ARG" ] || { echo "no path given" >&2; exit 2; }
+[ -n "$KIND" ] || KIND="$(detect_kind "$PATH_ARG")"
+
+tmpd="$(mktemp -d)"; trap 'rm -rf "$tmpd"' EXIT
+
+# --- claudelint / cclint staging -------------------------------------------
+# claudelint and cclint operate on a Claude project layout (.claude/skills
+# and .claude/agents), and cclint refuses paths outside the cwd tree. Stage
+# the artifact into a temp project under $tmpd and echo that project root.
+stage_project() {
+  local proj="$tmpd/proj"
+  rm -rf "$proj"; mkdir -p "$proj"
+  if [ "$KIND" = "agent" ]; then
+    mkdir -p "$proj/.claude/agents"
+    if [ -d "$PATH_ARG" ]; then
+      cp "$PATH_ARG"/*.md "$proj/.claude/agents/" 2>/dev/null || true
+    else
+      cp "$PATH_ARG" "$proj/.claude/agents/$(basename "$PATH_ARG")"
+    fi
+  else
+    local name; name="$(basename "${PATH_ARG%/}")"
+    mkdir -p "$proj/.claude/skills/$name"
+    if [ -d "$PATH_ARG" ]; then
+      cp "$PATH_ARG/SKILL.md" "$proj/.claude/skills/$name/SKILL.md" 2>/dev/null || true
+    else
+      cp "$PATH_ARG" "$proj/.claude/skills/$name/SKILL.md"
+    fi
+  fi
+  echo "$proj"
+}
+
+# --- per-tool score helpers (each echoes a 0-100; dry-run -> fixed stub) ----
+
+# skill-tools: native .score on a single skill path.
+sk_skill_tools() { [ -n "$DRY" ] && { echo 82; return; }
+  skill-tools score -f json "$1" > "$tmpd/st.json" 2>/dev/null \
+    || echo '{"score":0}' > "$tmpd/st.json"
+  adapt_skill_tools "$tmpd/st.json"; }
+
+# skill-validator: check -o json -> top-level .errors / .warnings.
+sk_validator() { [ -n "$DRY" ] && { echo 90; return; }
+  skill-validator check "$1" -o json > "$tmpd/sv.json" 2>/dev/null || true
+  local e w
+  read -r e w < <(adapt_errwarn_json "$tmpd/sv.json" '.errors' '.warnings')
+  normalize_errwarn "${e:-0}" "${w:-0}"; }
+
+# claudelint: check-all --format json on a staged project, scoped to the
+# relevant validator (Skills for skills, Agents for agents).
+cl_score() { [ -n "$DRY" ] && { echo 70; return; }
+  local proj vname
+  proj="$(stage_project)"
+  claudelint check-all --format json --cwd "$proj" > "$tmpd/cl.json" 2>/dev/null || true
+  if [ "$KIND" = "agent" ]; then vname="Agents Validator"; else vname="Skills Validator"; fi
+  local e w
+  read -r e w < <(adapt_errwarn_json "$tmpd/cl.json" \
+    "([.validators[]?|select(.name==\"$vname\")|.errors|length]|add)" \
+    "([.validators[]?|select(.name==\"$vname\")|.warnings|length]|add)")
+  normalize_errwarn "${e:-0}" "${w:-0}"; }
+
+# agnix: --format json -> nested .summary.errors / .summary.warnings.
+ag_agnix() { [ -n "$DRY" ] && { echo 80; return; }
+  agnix --format json --target claude-code "$1" > "$tmpd/ax.json" 2>/dev/null || true
+  local e w
+  read -r e w < <(adapt_errwarn_json "$tmpd/ax.json" '.summary.errors' '.summary.warnings')
+  normalize_errwarn "${e:-0}" "${w:-0}"; }
+
+# cclint: --format json from inside a staged project -> totalErrors/Warnings.
+ag_cclint() { [ -n "$DRY" ] && { echo 100; return; }
+  local proj
+  proj="$(stage_project)"
+  ( cd "$proj" && cclint --format json ) > "$tmpd/cc.json" 2>/dev/null || true
+  local e w
+  read -r e w < <(adapt_errwarn_json "$tmpd/cc.json" '.totalErrors' '.totalWarnings')
+  normalize_errwarn "${e:-0}" "${w:-0}"; }
+
+# skillcheck: SARIF -> highest severity -> score + record severity for cap.
+sec_score() { [ -n "$DRY" ] && { echo 100; echo none > "$tmpd/sev"; return; }
+  skillcheck --format sarif "$1" > "$tmpd/sc.sarif" 2>/dev/null \
+    || echo '{"runs":[]}' > "$tmpd/sc.sarif"
+  local sev; sev=$(adapt_sarif_severity "$tmpd/sc.sarif"); echo "$sev" > "$tmpd/sev"
+  case "$sev" in
+    CRITICAL) echo 50 ;;
+    HIGH)     echo 80 ;;
+    MEDIUM)   echo 90 ;;
+    LOW)      echo 95 ;;
+    *)        echo 100 ;;
+  esac; }
+
+# --- composition -----------------------------------------------------------
+
+compute_quality() {
+  local QS
+  if [ "$KIND" = "agent" ]; then
+    QS=$(ensemble3 50 "$(cl_score "$PATH_ARG")" 30 "$(ag_agnix "$PATH_ARG")" 20 "$(ag_cclint "$PATH_ARG")")
+  else
+    QS=$(ensemble3 40 "$(sk_skill_tools "$PATH_ARG")" 30 "$(sk_validator "$PATH_ARG")" 30 "$(cl_score "$PATH_ARG")")
+  fi
+  echo "$QS"
+}
+
+emit_review() {
+  local q; q="$(compute_quality)"
+  jq -nc --arg kind "$KIND" --arg name "$(basename "$PATH_ARG")" \
+    --argjson q "$q" '{identity:{kind:$kind,name:$name},quality:{score:$q}}'
+}
+
+case "$CMD" in
+  review) emit_review ;;
+  lint)   echo "lint: implemented in Task 13" >&2; exit 0 ;;
+  audit)  echo "audit: implemented in Task 14" >&2; exit 0 ;;
+  *) echo "unknown command: $CMD" >&2; exit 2 ;;
+esac
