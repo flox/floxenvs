@@ -18,7 +18,7 @@ On activate you get a banner and a cheat sheet. Then score
 the bundled samples:
 
 ```bash
-# A clean, well-formed skill — scores high
+# A clean, well-formed skill — scores well (stable-to-warn)
 skills-review audit samples/good-skill
 
 # A deliberately broken skill — scores low

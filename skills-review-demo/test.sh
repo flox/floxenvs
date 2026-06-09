@@ -44,4 +44,23 @@ if [ "$kind" != "agent" ]; then
 fi
 echo ">>> good-agent detected as: $kind"
 
+# ── Agent sample is genuinely clean ─────────────────────────
+# It must pass the deterministic lint gate (exit 0) and audit to a
+# stable score (overall >= 80) so the README's "clean agent" claim
+# holds against the real claudelint/agnix/cclint ensemble.
+if ! skills-review lint --kind agent samples/good-agent.md >/dev/null 2>&1; then
+  echo "Error: good-agent failed lint gate (expected pass)"
+  exit 1
+fi
+echo ">>> good-agent passes lint gate"
+
+agent_audit=$(skills-review audit --json --kind agent samples/good-agent.md)
+agent_overall=$(echo "$agent_audit" | jq -r '.overall')
+agent_status=$(echo "$agent_audit" | jq -r '.status')
+if [ "$agent_status" != "stable" ] || [ "$agent_overall" -lt 80 ]; then
+  echo "Error: expected good-agent stable (>=80), got $agent_overall ($agent_status)"
+  exit 1
+fi
+echo ">>> good-agent audits stable: $agent_overall ($agent_status)"
+
 echo ">>> skills-review-demo environment is working"
