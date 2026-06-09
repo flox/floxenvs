@@ -1,0 +1,30 @@
+kind: pkg
+subkind: plain
+name: skill-validator
+title: Skill Validator
+publisher: flox
+tagline: >
+  Validate and score Claude Agent Skills (SKILL.md) —
+  structure, content, links, and contamination checks.
+category: ai
+ai_role: tooling
+tags: [validation, linting, agent, skills, cli]
+stack: [go]
+featured: false
+combines_well_with:
+  - env:claude
+status: beta
+license: MIT
+upstream:
+  name: skill-validator
+  url: https://github.com/agent-ecosystem/skill-validator
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    skill-validator.pkg-path = "flox/skill-validator"
+    skill-validator.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/skill-validator
+  floxhub: https://hub.flox.dev/flox/skill-validator
