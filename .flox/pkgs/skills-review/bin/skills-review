@@ -54,6 +54,24 @@ stage_project() {
   echo "$proj"
 }
 
+# --- tool-failure plumbing (fail CLOSED) -----------------------------------
+# A scoring tool that CRASHES (no/garbage output) must NOT be read as a clean
+# 0-errors/0-warnings run (which would score 100 — fail OPEN). Each err/warn
+# helper guards its captured JSON: if the file is empty or not valid JSON we
+# treat the tool as failed, drop a per-tool marker so quality_block can flag
+# the corresponding check pass:false with a "<tool> failed to run" note, and
+# return 0 (fail closed). A tool exiting nonzero but still writing valid
+# findings JSON is NOT a crash and scores normally (see commit 999d3eb1e).
+
+# json_ok <file> : true iff $file is non-empty and parses as JSON.
+json_ok() { [ -s "$1" ] && jq -e . "$1" >/dev/null 2>&1; }
+
+# mark_tool_failed <tool-id> : record that <tool-id> failed to run.
+mark_tool_failed() { : > "$tmpd/failed.$1"; }
+
+# tool_failed <tool-id> : true iff <tool-id> was marked failed this run.
+tool_failed() { [ -e "$tmpd/failed.$1" ]; }
+
 # --- per-tool score helpers (each echoes a 0-100; dry-run -> fixed stub) ----
 
 # skill-tools: native .score on a single skill path. skill-tools can exit
@@ -61,12 +79,13 @@ stage_project() {
 # fall back to a zero score when the captured output is unparseable.
 sk_skill_tools() { [ -n "$DRY" ] && { echo 82; return; }
   skill-tools score -f json "$1" > "$tmpd/st.json" 2>/dev/null || true
-  jq -e . "$tmpd/st.json" >/dev/null 2>&1 || echo '{"score":0}' > "$tmpd/st.json"
+  if ! json_ok "$tmpd/st.json"; then mark_tool_failed skill-tools; echo 0; return; fi
   adapt_skill_tools "$tmpd/st.json"; }
 
 # skill-validator: check -o json -> top-level .errors / .warnings.
 sk_validator() { [ -n "$DRY" ] && { echo 90; return; }
   skill-validator check "$1" -o json > "$tmpd/sv.json" 2>/dev/null || true
+  if ! json_ok "$tmpd/sv.json"; then mark_tool_failed skill-validator; echo 0; return; fi
   local e w
   read -r e w < <(adapt_errwarn_json "$tmpd/sv.json" '.errors' '.warnings')
   normalize_errwarn "${e:-0}" "${w:-0}"; }
@@ -74,11 +93,11 @@ sk_validator() { [ -n "$DRY" ] && { echo 90; return; }
 # claudelint: check-all --format json on a staged project, scoped to the
 # relevant validator (Skills for skills, Agents for agents).
 cl_score() { [ -n "$DRY" ] && { echo 70; return; }
-  local proj vname
+  local proj vname e w
   proj="$(stage_project)"
   claudelint check-all --format json --cwd "$proj" > "$tmpd/cl.json" 2>/dev/null || true
+  if ! json_ok "$tmpd/cl.json"; then mark_tool_failed claudelint; echo 0; return; fi
   if [ "$KIND" = "agent" ]; then vname="Agents Validator"; else vname="Skills Validator"; fi
-  local e w
   read -r e w < <(adapt_errwarn_json "$tmpd/cl.json" \
     "([.validators[]?|select(.name==\"$vname\")|.errors|length]|add)" \
     "([.validators[]?|select(.name==\"$vname\")|.warnings|length]|add)")
@@ -87,6 +106,7 @@ cl_score() { [ -n "$DRY" ] && { echo 70; return; }
 # agnix: --format json -> nested .summary.errors / .summary.warnings.
 ag_agnix() { [ -n "$DRY" ] && { echo 80; return; }
   agnix --format json --target claude-code "$1" > "$tmpd/ax.json" 2>/dev/null || true
+  if ! json_ok "$tmpd/ax.json"; then mark_tool_failed agnix; echo 0; return; fi
   local e w
   read -r e w < <(adapt_errwarn_json "$tmpd/ax.json" '.summary.errors' '.summary.warnings')
   normalize_errwarn "${e:-0}" "${w:-0}"; }
@@ -96,6 +116,7 @@ ag_cclint() { [ -n "$DRY" ] && { echo 100; return; }
   local proj
   proj="$(stage_project)"
   ( cd "$proj" && cclint --format json ) > "$tmpd/cc.json" 2>/dev/null || true
+  if ! json_ok "$tmpd/cc.json"; then mark_tool_failed cclint; echo 0; return; fi
   local e w
   read -r e w < <(adapt_errwarn_json "$tmpd/cc.json" '.totalErrors' '.totalWarnings')
   normalize_errwarn "${e:-0}" "${w:-0}"; }
@@ -188,14 +209,21 @@ quality_block() {
     wc=30; nc=claudelint;      c="$(cl_score "$PATH_ARG")"
   fi
   local q; q=$(ensemble3 "$wa" "$a" "$wb" "$b" "$wc" "$c")
+  # A crashed tool (marker dropped by its helper) is surfaced as a failing
+  # check with an explicit note instead of a bare "0" — its score already
+  # dragged the ensemble down (fail closed).
+  local nota notb notc
+  tool_failed "$na" && nota="$na failed to run" || nota="$a"
+  tool_failed "$nb" && notb="$nb failed to run" || notb="$b"
+  tool_failed "$nc" && notc="$nc failed to run" || notc="$c"
   jq -nc --argjson q "$q" \
-    --arg na "$na" --argjson wa "$wa" --argjson sa "$a" \
-    --arg nb "$nb" --argjson wb "$wb" --argjson sb "$b" \
-    --arg nc "$nc" --argjson wc "$wc" --argjson sc "$c" '
+    --arg na "$na" --argjson wa "$wa" --argjson sa "$a" --arg nota "$nota" \
+    --arg nb "$nb" --argjson wb "$wb" --argjson sb "$b" --arg notb "$notb" \
+    --arg nc "$nc" --argjson wc "$wc" --argjson sc "$c" --arg notc "$notc" '
     { score:$q, checks:
-      [ {id:$na, weight:$wa, note:($sa|tostring), pass:($sa>=60)},
-        {id:$nb, weight:$wb, note:($sb|tostring), pass:($sb>=60)},
-        {id:$nc, weight:$wc, note:($sc|tostring), pass:($sc>=60)} ] }'
+      [ {id:$na, weight:$wa, note:$nota, pass:($sa>=60)},
+        {id:$nb, weight:$wb, note:$notb, pass:($sb>=60)},
+        {id:$nc, weight:$wc, note:$notc, pass:($sc>=60)} ] }'
 }
 
 emit_audit() {
@@ -236,10 +264,12 @@ run_gate() { # echoes 100 (pass) or 0 (fail); sets $GATE_OK
   if [ -n "${SKILLS_REVIEW_FORCE_GATE_FAIL:-}" ]; then GATE_OK=0; echo 0; return; fi
   if [ -n "$DRY" ]; then GATE_OK=1; echo 100; return; fi
   if [ "$KIND" = "agent" ]; then
-    # Agent gate: claudelint must parse the agent schema cleanly (0 errors).
+    # Agent gate: claudelint must run AND parse the agent schema cleanly
+    # (0 errors). A claudelint crash is a gate failure (fail closed).
     local proj e
     proj="$(stage_project)"
     claudelint check-all --format json --cwd "$proj" > "$tmpd/gate.json" 2>/dev/null || true
+    if ! json_ok "$tmpd/gate.json"; then GATE_OK=0; echo 0; return; fi
     e=$(jq -r '([.validators[]?|select(.name=="Agents Validator")|.errors|length]|add) // 0' \
           "$tmpd/gate.json" 2>/dev/null || echo 0)
     if [ "${e:-0}" -eq 0 ]; then GATE_OK=1; echo 100; else GATE_OK=0; echo 0; fi
