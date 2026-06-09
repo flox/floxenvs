@@ -1,0 +1,30 @@
+kind: pkg
+subkind: plain
+name: cclint
+title: cclint
+publisher: flox
+tagline: >
+  Lint Claude Code agents, commands, settings.json, and
+  CLAUDE.md.
+category: ai
+ai_role: tooling
+tags: [linting, agent, claude, settings, cli]
+stack: [typescript]
+featured: false
+combines_well_with:
+  - env:claude
+status: beta
+license: MIT
+upstream:
+  name: cclint
+  url: https://github.com/carlrannaberg/cclint
+  license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    cclint.pkg-path = "flox/cclint"
+    cclint.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/cclint
+  floxhub: https://hub.flox.dev/flox/cclint
