@@ -72,6 +72,24 @@ mark_tool_failed() { : > "$tmpd/failed.$1"; }
 # tool_failed <tool-id> : true iff <tool-id> was marked failed this run.
 tool_failed() { [ -e "$tmpd/failed.$1" ]; }
 
+# --- claudelint cache ------------------------------------------------------
+# claudelint feeds quality, the agent gate, and reliability — without caching
+# it re-stages a temp project and spawns Node 2-3x per audit. cl_run stages +
+# runs claudelint at most once per audit (file-based so it survives the
+# $(...) subshells the score helpers run in) and leaves the parsed JSON at
+# $CL_JSON. Returns nonzero iff claudelint crashed (no/garbage output).
+CL_JSON="$tmpd/cl.json"
+cl_run() {
+  if [ ! -e "$tmpd/cl.done" ]; then
+    local proj; proj="$(stage_project)"
+    claudelint check-all --format json --cwd "$proj" > "$CL_JSON" 2>/dev/null || true
+    rm -f "$tmpd/cl.ok"
+    if json_ok "$CL_JSON"; then : > "$tmpd/cl.ok"; fi
+    : > "$tmpd/cl.done"
+  fi
+  [ -e "$tmpd/cl.ok" ]
+}
+
 # --- per-tool score helpers (each echoes a 0-100; dry-run -> fixed stub) ----
 
 # skill-tools: native .score on a single skill path. skill-tools can exit
@@ -91,14 +109,13 @@ sk_validator() { [ -n "$DRY" ] && { echo 90; return; }
   normalize_errwarn "${e:-0}" "${w:-0}"; }
 
 # claudelint: check-all --format json on a staged project, scoped to the
-# relevant validator (Skills for skills, Agents for agents).
+# relevant validator (Skills for skills, Agents for agents). Cached per audit
+# via cl_run so quality/gate/reliability share one staged-project run.
 cl_score() { [ -n "$DRY" ] && { echo 70; return; }
-  local proj vname e w
-  proj="$(stage_project)"
-  claudelint check-all --format json --cwd "$proj" > "$tmpd/cl.json" 2>/dev/null || true
-  if ! json_ok "$tmpd/cl.json"; then mark_tool_failed claudelint; echo 0; return; fi
+  local vname e w
+  if ! cl_run; then mark_tool_failed claudelint; echo 0; return; fi
   if [ "$KIND" = "agent" ]; then vname="Agents Validator"; else vname="Skills Validator"; fi
-  read -r e w < <(adapt_errwarn_json "$tmpd/cl.json" \
+  read -r e w < <(adapt_errwarn_json "$CL_JSON" \
     "([.validators[]?|select(.name==\"$vname\")|.errors|length]|add)" \
     "([.validators[]?|select(.name==\"$vname\")|.warnings|length]|add)")
   normalize_errwarn "${e:-0}" "${w:-0}"; }
@@ -265,13 +282,12 @@ run_gate() { # echoes 100 (pass) or 0 (fail); sets $GATE_OK
   if [ -n "$DRY" ]; then GATE_OK=1; echo 100; return; fi
   if [ "$KIND" = "agent" ]; then
     # Agent gate: claudelint must run AND parse the agent schema cleanly
-    # (0 errors). A claudelint crash is a gate failure (fail closed).
-    local proj e
-    proj="$(stage_project)"
-    claudelint check-all --format json --cwd "$proj" > "$tmpd/gate.json" 2>/dev/null || true
-    if ! json_ok "$tmpd/gate.json"; then GATE_OK=0; echo 0; return; fi
+    # (0 errors). A claudelint crash is a gate failure (fail closed). Reuses
+    # the cached cl_run so the project is staged/linted once per audit.
+    local e
+    if ! cl_run; then GATE_OK=0; echo 0; return; fi
     e=$(jq -r '([.validators[]?|select(.name=="Agents Validator")|.errors|length]|add) // 0' \
-          "$tmpd/gate.json" 2>/dev/null || echo 0)
+          "$CL_JSON" 2>/dev/null || echo 0)
     if [ "${e:-0}" -eq 0 ]; then GATE_OK=1; echo 100; else GATE_OK=0; echo 0; fi
   else
     if quick_validate "$PATH_ARG"; then GATE_OK=1; echo 100; else GATE_OK=0; echo 0; fi
