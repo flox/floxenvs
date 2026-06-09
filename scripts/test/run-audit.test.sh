@@ -90,5 +90,47 @@ ov=$(jq -r '.overall' "$out")
 assert_eq "overall is integer" "true" \
   "$(awk -v v="$ov" 'BEGIN { print (v ~ /^[0-9]+$/ && v <= 100 && v >= 0) ? "true" : "false" }')"
 
+# ── skill kind: dispatch to the bundled skills-review runner ──────────
+# Stage the runner (+ libs) under .flox/pkgs/skills-review so the
+# fallback path in run-audit.sh resolves, plus a real SKILL.md so the
+# skill dir exists. Run in DRY_RUN so no scoring tools are required.
+REAL_RUNNER="$(cd "$SCRIPT_DIR/../../.flox/pkgs/skills-review" && pwd)"
+mkdir -p "$TMP/.flox/pkgs/skills-review/bin" \
+         "$TMP/.flox/pkgs/skills-review/lib" \
+         "$TMP/.flox/pkgs/skills-humanizer"
+cp "$REAL_RUNNER/bin/skills-review" "$TMP/.flox/pkgs/skills-review/bin/"
+cp "$REAL_RUNNER"/lib/*.sh "$TMP/.flox/pkgs/skills-review/lib/"
+cat > "$TMP/.flox/pkgs/skills-humanizer/SKILL.md" <<'EOF'
+---
+name: skills-humanizer
+description: Use when you need a tidy example skill for tests.
+---
+
+# Humanizer
+
+Do the thing. Then do the next thing.
+EOF
+
+REPO_ROOT="$TMP" SKILLS_REVIEW_DRY_RUN=1 \
+  "$TMP/scripts/run-audit.sh" skill skills-humanizer
+sk="$TMP/audit/skill/skills-humanizer/metrics.json"
+assert_eq "skill metrics.json written" "true" \
+  "$([ -f "$sk" ] && echo true || echo false)"
+
+for dim in quality reliability security impact; do
+  present=$(jq "has(\"$dim\")" "$sk" 2>/dev/null || echo false)
+  assert_eq "skill dimension $dim present" "true" "$present"
+done
+
+assert_eq "skill identity.kind == skill" "skill" \
+  "$(jq -r '.identity.kind' "$sk" 2>/dev/null)"
+
+sov=$(jq -r '.overall' "$sk" 2>/dev/null)
+assert_eq "skill overall is integer 0-100" "true" \
+  "$(awk -v v="$sov" 'BEGIN { print (v ~ /^[0-9]+$/ && v <= 100 && v >= 0) ? "true" : "false" }')"
+
+assert_eq "skill status is a pill" "true" \
+  "$(jq -r '.status' "$sk" 2>/dev/null | grep -qxE 'stable|warn|risk' && echo true || echo false)"
+
 echo "--- $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]

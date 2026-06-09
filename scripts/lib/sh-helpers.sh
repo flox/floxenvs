@@ -16,13 +16,16 @@ sh_repo_root() {
 }
 
 # Resolve the directory for an item, given <kind> <name>.
-# env  → <name>
-# pkg  → .flox/pkgs/<name>
+# env   → <name>
+# pkg   → .flox/pkgs/<name>
+# skill → .flox/pkgs/<name>   (the skill package dir; mirrors
+#                              what list-items.sh emits for skills)
+# agent → .flox/pkgs/<name>   (the agent package dir, when one exists)
 sh_item_dir() {
   local kind="$1" name="$2"
   case "$kind" in
-    env) echo "$name" ;;
-    pkg) echo ".flox/pkgs/$name" ;;
+    env)         echo "$name" ;;
+    pkg|skill|agent) echo ".flox/pkgs/$name" ;;
     *) echo "unknown kind: $kind" >&2; return 2 ;;
   esac
 }
