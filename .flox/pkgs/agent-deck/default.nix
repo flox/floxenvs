@@ -26,6 +26,22 @@ buildGoModule (finalAttrs: {
 
   subPackages = [ "cmd/agent-deck" ];
 
+  # agent-deck 1.9.49 added a test-only data-loss guard (internal/agentpaths)
+  # that, while testing.Testing() is true, refuses to resolve any agent-deck
+  # path under the OS user's *real* home -- read from the passwd database via
+  # user.Current(), independent of $HOME. In the hermetic Nix build sandbox the
+  # build user's passwd home is /build, and every temp dir (TMPDIR, t.TempDir,
+  # testutil.IsolateHome's mktemp) also lives under /build. So the guard treats
+  # every sandboxed test path as "the real home" and fails closed, breaking all
+  # ~40 cmd/agent-deck tests (path resolution, version nudge, XDG, mutations).
+  # Neutralise the guard for the build by making osUserRealHome() report no real
+  # home: there is no real user data to protect in the sandbox, and the guard is
+  # test-only so production path resolution is unaffected.
+  postPatch = ''
+    substituteInPlace internal/agentpaths/paths.go \
+      --replace-fail 'return filepath.Clean(u.HomeDir)' 'return ""'
+  '';
+
   # The OBS-01 wiring test compiles the binary, launches the full TUI
   # in a subprocess and waits for it to write debug.log. The TUI bails
   # in the sandbox (no tmux/terminal), so debug.log never appears. The
