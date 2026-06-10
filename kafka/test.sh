@@ -24,8 +24,12 @@ if [ "$MAX_ATTEMPTS" -eq 0 ]; then
   exit 1
 fi
 
-echo ">>> flox services status"
+echo ">>> Verifying Kafka service is Running"
 flox services status
+if ! flox services status | grep -qE '^kafka[[:space:]]+Running'; then
+  echo "Error: kafka service is not in Running state"
+  exit 1
+fi
 
 echo ">>> flox services logs kafka"
 flox services logs kafka
