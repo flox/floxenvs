@@ -1,0 +1,31 @@
+kind: pkg
+subkind: plain
+name: review-skills
+title: Review Skills
+publisher: flox
+tagline: >
+  Unified 0-100 quality score for Claude Code skills & agents.
+summary:
+  - "Runs an ensemble of linters/validators over a skill or agent"
+  - "Fuses quality, reliability, security, and impact into one score"
+  - "Detailed findings, --tools/--disable selection, and a doctor command"
+category: ai
+ai_role: tooling
+tags: [claude-code, skills, agents, score, lint, audit]
+stack: [go]
+featured: false
+combines_well_with:
+  - pkg:claude-code
+  - env:claude
+status: beta
+license: MIT
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    review-skills.pkg-path = "flox/review-skills"
+    review-skills.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/review-skills
+  floxhub: https://hub.flox.dev/flox/review-skills
