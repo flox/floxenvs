@@ -66,7 +66,26 @@ fi
 '''
 
 [services]
+# kafka-server-start.sh / kafka-server-stop.sh are inlined here because the
+# nixpkgs wrappers hardcode `KAFKA_LOG_DIR=/tmp/apache-kafka-logs` (shared
+# across every environment) and the stop script kills *every* kafka.Kafka
+# process on the host. Inlining keeps app logs in this env's cache and
+# scopes shutdown to this env's broker only.
 kafka.command = '''
-  exec kafka-server-start.sh "$KAFKA_CONFIG_FILE"
+  export KAFKA_CONFIG_FILE="$FLOX_ENV_CACHE/kafka/server.properties"
+  export LOG_DIR="$FLOX_ENV_CACHE/kafka/app-logs"
+  mkdir -p "$LOG_DIR"
+  export KAFKA_HEAP_OPTS="${KAFKA_HEAP_OPTS:--Xmx1G -Xms1G}"
+  KAFKA_PKG="$(dirname "$(dirname "$(readlink -f "$(command -v kafka-storage.sh)")")")"
+  export KAFKA_LOG4J_OPTS="${KAFKA_LOG4J_OPTS:--Dlog4j2.configurationFile=$KAFKA_PKG/config/log4j2.yaml}"
+  exec kafka-run-class.sh -name kafkaServer -loggc kafka.Kafka "$KAFKA_CONFIG_FILE"
 '''
-kafka.shutdown.command = "kafka-server-stop.sh"
+kafka.shutdown.command = '''
+  KAFKA_CONFIG_FILE="$FLOX_ENV_CACHE/kafka/server.properties"
+  PIDS=$(ps ax | grep " kafka\.Kafka " | grep -F "$KAFKA_CONFIG_FILE" | grep -v grep | awk '{print $1}')
+  if [ -z "$PIDS" ]; then
+    echo "No kafka server to stop"
+  else
+    kill -s TERM $PIDS
+  fi
+'''
