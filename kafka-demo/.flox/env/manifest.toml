@@ -1,0 +1,29 @@
+schema-version = "1.12.0"
+
+[include]
+environments = [
+  { dir = "../kafka" }
+]
+
+# gum is a demo-only tool for styled terminal output.
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  gum style --border double --margin '1 2' \
+    --padding '1 4' \
+    'Start Kafka in the background:' \
+    '  flox services start' \
+    '  flox activate --start-services' '' \
+    'List topics:' \
+    "  kafka-topics.sh --bootstrap-server $KAFKA_BROKERS --list" '' \
+    'Connection information:' \
+    "  host=$KAFKA_HOST" \
+    "  port=$KAFKA_PORT" \
+    "  brokers=$KAFKA_BROKERS"
+fi
+'''

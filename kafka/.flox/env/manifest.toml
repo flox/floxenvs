@@ -18,13 +18,15 @@ apacheKafka.pkg-group = "kafka"
 KAFKA_HOST = "localhost"
 KAFKA_PORT = "9092"
 KAFKA_CONTROLLER_PORT = "9093"
-KAFKA_BROKERS = "localhost:9092"
 
 [hook]
 on-activate = '''
 export KAFKA_CACHE="$FLOX_ENV_CACHE/kafka"
 export KAFKA_LOG_DIRS="$KAFKA_CACHE/logs"
 export KAFKA_CONFIG_FILE="$KAFKA_CACHE/server.properties"
+# Derive the broker list from host/port so overriding either stays
+# consistent; respects an explicit KAFKA_BROKERS override if set.
+export KAFKA_BROKERS="${KAFKA_BROKERS:-${KAFKA_HOST}:${KAFKA_PORT}}"
 
 mkdir -p "$KAFKA_LOG_DIRS"
 
@@ -59,10 +61,12 @@ fi
 
 if [ ! -f "${KAFKA_LOG_DIRS}/meta.properties" ]; then
   CLUSTER_ID="$(kafka-storage.sh random-uuid)"
-  kafka-storage.sh format -t "$CLUSTER_ID" -c "$KAFKA_CONFIG_FILE" --ignore-formatted 2>/dev/null || true
+  kafka-storage.sh format -t "$CLUSTER_ID" -c "$KAFKA_CONFIG_FILE" --ignore-formatted
 fi
 '''
 
 [services]
-kafka.command = "kafka-server-start.sh $KAFKA_CONFIG_FILE"
+kafka.command = '''
+  exec kafka-server-start.sh "$KAFKA_CONFIG_FILE"
+'''
 kafka.shutdown.command = "kafka-server-stop.sh"
