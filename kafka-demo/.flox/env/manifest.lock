@@ -2,9 +2,323 @@
   "lockfile-version": 1,
   "manifest": {
     "schema-version": "1.12.0",
-    "hook": {},
-    "profile": {},
-    "options": {}
+    "install": {
+      "apacheKafka": {
+        "pkg-path": "apacheKafka",
+        "pkg-group": "kafka"
+      },
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": "demo-tools"
+      }
+    },
+    "vars": {
+      "KAFKA_CONTROLLER_PORT": "9093",
+      "KAFKA_HOST": "localhost",
+      "KAFKA_PORT": "9092"
+    },
+    "hook": {
+      "on-activate": "export KAFKA_CACHE=\"$FLOX_ENV_CACHE/kafka\"\nexport KAFKA_LOG_DIRS=\"$KAFKA_CACHE/logs\"\nexport KAFKA_CONFIG_FILE=\"$KAFKA_CACHE/server.properties\"\n# Derive the broker list from host/port so overriding either stays\n# consistent; respects an explicit KAFKA_BROKERS override if set.\nexport KAFKA_BROKERS=\"${KAFKA_BROKERS:-${KAFKA_HOST}:${KAFKA_PORT}}\"\n\nmkdir -p \"$KAFKA_LOG_DIRS\"\n\nif [ ! -f \"$KAFKA_CONFIG_FILE\" ]; then\n  cat > \"$KAFKA_CONFIG_FILE\" <<EOF\nprocess.roles=broker,controller\nnode.id=1\ncontroller.quorum.voters=1@${KAFKA_HOST}:${KAFKA_CONTROLLER_PORT}\nlisteners=PLAINTEXT://${KAFKA_HOST}:${KAFKA_PORT},CONTROLLER://${KAFKA_HOST}:${KAFKA_CONTROLLER_PORT}\ninter.broker.listener.name=PLAINTEXT\nadvertised.listeners=PLAINTEXT://${KAFKA_HOST}:${KAFKA_PORT}\ncontroller.listener.names=CONTROLLER\nlistener.security.protocol.map=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT\nlog.dirs=${KAFKA_LOG_DIRS}\nnum.network.threads=3\nnum.io.threads=8\nsocket.send.buffer.bytes=102400\nsocket.receive.buffer.bytes=102400\nsocket.request.max.bytes=104857600\nnum.partitions=1\nnum.recovery.threads.per.data.dir=1\noffsets.topic.replication.factor=1\ntransaction.state.log.replication.factor=1\ntransaction.state.log.min.isr=1\ndefault.replication.factor=1\nmin.insync.replicas=1\nlog.retention.hours=168\nlog.segment.bytes=1073741824\nlog.retention.check.interval.ms=300000\nEOF\nfi\n\nif [ ! -f \"${KAFKA_LOG_DIRS}/meta.properties\" ]; then\n  CLUSTER_ID=\"$(kafka-storage.sh random-uuid)\"\n  kafka-storage.sh format -t \"$CLUSTER_ID\" -c \"$KAFKA_CONFIG_FILE\" --ignore-formatted\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Kafka in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'List topics:' \\\n    \"  kafka-topics.sh --bootstrap-server $KAFKA_BROKERS --list\" '' \\\n    'Connection information:' \\\n    \"  host=$KAFKA_HOST\" \\\n    \"  port=$KAFKA_PORT\" \\\n    \"  brokers=$KAFKA_BROKERS\"\nfi\n"
+    },
+    "options": {},
+    "services": {
+      "kafka": {
+        "command": "  exec kafka-server-start.sh \"$KAFKA_CONFIG_FILE\"\n",
+        "shutdown": {
+          "command": "kafka-server-stop.sh"
+        }
+      }
+    }
   },
-  "packages": []
+  "packages": [
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/jsk66asqq2wnckkllv9sm1y94mxl0asm-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a799d3e3886da994fa307f817a6bc705ae538eeb",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "a799d3e3886da994fa307f817a6bc705ae538eeb",
+      "rev_count": 1011622,
+      "rev_date": "2026-06-06T12:30:50Z",
+      "scrape_date": "2026-06-08T03:14:20.405319Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/6jb5frkadampkcmbjynch118cc4smzfj-gum-0.17.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/2nqf2anq5klv1xf66jgz1gm8xrdid4ax-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a799d3e3886da994fa307f817a6bc705ae538eeb",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "a799d3e3886da994fa307f817a6bc705ae538eeb",
+      "rev_count": 1011622,
+      "rev_date": "2026-06-06T12:30:50Z",
+      "scrape_date": "2026-06-08T03:46:53.721382Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/8p8fi8pl4lb776q2gnby3rd3mcbj5grh-gum-0.17.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/ib5kcnql661slkgn223m5c17g6b9ala3-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a799d3e3886da994fa307f817a6bc705ae538eeb",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "a799d3e3886da994fa307f817a6bc705ae538eeb",
+      "rev_count": 1011622,
+      "rev_date": "2026-06-06T12:30:50Z",
+      "scrape_date": "2026-06-08T04:17:45.183137Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/n20dhdnibsqb890jvwhyw4xd3qqkazly-gum-0.17.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/isk54hr8s4cw8z3yiksk07yi1bzfmamh-gum-0.17.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a799d3e3886da994fa307f817a6bc705ae538eeb",
+      "name": "gum-0.17.0",
+      "pname": "gum",
+      "rev": "a799d3e3886da994fa307f817a6bc705ae538eeb",
+      "rev_count": 1011622,
+      "rev_date": "2026-06-06T12:30:50Z",
+      "scrape_date": "2026-06-08T04:53:17.569765Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.17.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/2ii7sbkq44zrkv4iv6g7bqi47m4ch28b-gum-0.17.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "apacheKafka",
+      "broken": false,
+      "derivation": "/nix/store/ck9j5yxkarzb0c9v7bcjvrqbch4xix8a-apache-kafka-2.13-4.2.0.drv",
+      "description": "High-throughput distributed messaging system",
+      "install_id": "apacheKafka",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a799d3e3886da994fa307f817a6bc705ae538eeb",
+      "name": "apache-kafka-2.13-4.2.0",
+      "pname": "apacheKafka",
+      "rev": "a799d3e3886da994fa307f817a6bc705ae538eeb",
+      "rev_count": 1011622,
+      "rev_date": "2026-06-06T12:30:50Z",
+      "scrape_date": "2026-06-08T03:14:18.568100Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.13-4.2.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/3s08waf8skk5gp8d5hlxy1wfj6j5gr5l-apache-kafka-2.13-4.2.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "kafka",
+      "priority": 5
+    },
+    {
+      "attr_path": "apacheKafka",
+      "broken": false,
+      "derivation": "/nix/store/id30khagci4jymgpd4i0g8dawj4srazy-apache-kafka-2.13-4.2.0.drv",
+      "description": "High-throughput distributed messaging system",
+      "install_id": "apacheKafka",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a799d3e3886da994fa307f817a6bc705ae538eeb",
+      "name": "apache-kafka-2.13-4.2.0",
+      "pname": "apacheKafka",
+      "rev": "a799d3e3886da994fa307f817a6bc705ae538eeb",
+      "rev_count": 1011622,
+      "rev_date": "2026-06-06T12:30:50Z",
+      "scrape_date": "2026-06-08T03:46:50.687212Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.13-4.2.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/c21kyxjw6gdsqdqhrcifp8x4bffc9l8c-apache-kafka-2.13-4.2.0"
+      },
+      "system": "aarch64-linux",
+      "group": "kafka",
+      "priority": 5
+    },
+    {
+      "attr_path": "apacheKafka",
+      "broken": false,
+      "derivation": "/nix/store/939w7syhjinwr8nzikblsnp8vipldw43-apache-kafka-2.13-4.2.0.drv",
+      "description": "High-throughput distributed messaging system",
+      "install_id": "apacheKafka",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a799d3e3886da994fa307f817a6bc705ae538eeb",
+      "name": "apache-kafka-2.13-4.2.0",
+      "pname": "apacheKafka",
+      "rev": "a799d3e3886da994fa307f817a6bc705ae538eeb",
+      "rev_count": 1011622,
+      "rev_date": "2026-06-06T12:30:50Z",
+      "scrape_date": "2026-06-08T04:17:43.424297Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.13-4.2.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/vindlv625ha5rhi0mc4lkgax52za6r93-apache-kafka-2.13-4.2.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "kafka",
+      "priority": 5
+    },
+    {
+      "attr_path": "apacheKafka",
+      "broken": false,
+      "derivation": "/nix/store/r42r7dgnd1q541c691xs1v4b19ik4r2d-apache-kafka-2.13-4.2.0.drv",
+      "description": "High-throughput distributed messaging system",
+      "install_id": "apacheKafka",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=a799d3e3886da994fa307f817a6bc705ae538eeb",
+      "name": "apache-kafka-2.13-4.2.0",
+      "pname": "apacheKafka",
+      "rev": "a799d3e3886da994fa307f817a6bc705ae538eeb",
+      "rev_count": 1011622,
+      "rev_date": "2026-06-06T12:30:50Z",
+      "scrape_date": "2026-06-08T04:53:14.266917Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.13-4.2.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/fpkx5a2cz4jkl8r1dslbk3jf9jgf2mbg-apache-kafka-2.13-4.2.0"
+      },
+      "system": "x86_64-linux",
+      "group": "kafka",
+      "priority": 5
+    }
+  ],
+  "compose": {
+    "composer": {
+      "schema-version": "1.12.0",
+      "install": {
+        "gum": {
+          "pkg-path": "gum",
+          "pkg-group": "demo-tools"
+        }
+      },
+      "hook": {
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Kafka in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'List topics:' \\\n    \"  kafka-topics.sh --bootstrap-server $KAFKA_BROKERS --list\" '' \\\n    'Connection information:' \\\n    \"  host=$KAFKA_HOST\" \\\n    \"  port=$KAFKA_PORT\" \\\n    \"  brokers=$KAFKA_BROKERS\"\nfi\n"
+      },
+      "options": {},
+      "include": {
+        "environments": [
+          {
+            "dir": "../kafka"
+          }
+        ]
+      }
+    },
+    "include": [
+      {
+        "manifest": {
+          "schema-version": "1.12.0",
+          "install": {
+            "apacheKafka": {
+              "pkg-path": "apacheKafka",
+              "pkg-group": "kafka"
+            }
+          },
+          "vars": {
+            "KAFKA_CONTROLLER_PORT": "9093",
+            "KAFKA_HOST": "localhost",
+            "KAFKA_PORT": "9092"
+          },
+          "hook": {
+            "on-activate": "export KAFKA_CACHE=\"$FLOX_ENV_CACHE/kafka\"\nexport KAFKA_LOG_DIRS=\"$KAFKA_CACHE/logs\"\nexport KAFKA_CONFIG_FILE=\"$KAFKA_CACHE/server.properties\"\n# Derive the broker list from host/port so overriding either stays\n# consistent; respects an explicit KAFKA_BROKERS override if set.\nexport KAFKA_BROKERS=\"${KAFKA_BROKERS:-${KAFKA_HOST}:${KAFKA_PORT}}\"\n\nmkdir -p \"$KAFKA_LOG_DIRS\"\n\nif [ ! -f \"$KAFKA_CONFIG_FILE\" ]; then\n  cat > \"$KAFKA_CONFIG_FILE\" <<EOF\nprocess.roles=broker,controller\nnode.id=1\ncontroller.quorum.voters=1@${KAFKA_HOST}:${KAFKA_CONTROLLER_PORT}\nlisteners=PLAINTEXT://${KAFKA_HOST}:${KAFKA_PORT},CONTROLLER://${KAFKA_HOST}:${KAFKA_CONTROLLER_PORT}\ninter.broker.listener.name=PLAINTEXT\nadvertised.listeners=PLAINTEXT://${KAFKA_HOST}:${KAFKA_PORT}\ncontroller.listener.names=CONTROLLER\nlistener.security.protocol.map=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT\nlog.dirs=${KAFKA_LOG_DIRS}\nnum.network.threads=3\nnum.io.threads=8\nsocket.send.buffer.bytes=102400\nsocket.receive.buffer.bytes=102400\nsocket.request.max.bytes=104857600\nnum.partitions=1\nnum.recovery.threads.per.data.dir=1\noffsets.topic.replication.factor=1\ntransaction.state.log.replication.factor=1\ntransaction.state.log.min.isr=1\ndefault.replication.factor=1\nmin.insync.replicas=1\nlog.retention.hours=168\nlog.segment.bytes=1073741824\nlog.retention.check.interval.ms=300000\nEOF\nfi\n\nif [ ! -f \"${KAFKA_LOG_DIRS}/meta.properties\" ]; then\n  CLUSTER_ID=\"$(kafka-storage.sh random-uuid)\"\n  kafka-storage.sh format -t \"$CLUSTER_ID\" -c \"$KAFKA_CONFIG_FILE\" --ignore-formatted\nfi\n"
+          },
+          "options": {},
+          "services": {
+            "kafka": {
+              "command": "  exec kafka-server-start.sh \"$KAFKA_CONFIG_FILE\"\n",
+              "shutdown": {
+                "command": "kafka-server-stop.sh"
+              }
+            }
+          }
+        },
+        "name": "kafka",
+        "descriptor": {
+          "dir": "../kafka"
+        }
+      }
+    ],
+    "warnings": []
+  }
 }
