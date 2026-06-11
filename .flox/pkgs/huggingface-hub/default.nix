@@ -17,9 +17,16 @@ python3Packages.toPythonApplication (
       hash = data.srcHash;
     };
 
-    # huggingface_hub 1.17.0 bumped its `click>=8.4.0` floor, but nixpkgs
-    # still ships click 8.3.1. The 8.4.0 release is typing/cosmetic only, so
-    # 8.3.1 works fine at runtime — relax the constraint to unblock the build.
-    pythonRelaxDeps = (old.pythonRelaxDeps or [ ]) ++ [ "click" ];
+    # nixpkgs lags two upstream dependency floors that huggingface_hub bumped:
+    #   - click>=8.4.0 (1.17.0): nixpkgs ships 8.3.1; the 8.4.0 release is
+    #     typing/cosmetic only, so 8.3.1 works fine at runtime.
+    #   - hf-xet>=1.5.1 (1.19.0): nixpkgs ships 1.4.3; hf-xet is the optional
+    #     Xet accelerated-transfer backend and the older client is compatible
+    #     (huggingface_hub also degrades gracefully without it).
+    # Relax both constraints to unblock the pythonRuntimeDepsCheck.
+    pythonRelaxDeps = (old.pythonRelaxDeps or [ ]) ++ [
+      "click"
+      "hf-xet"
+    ];
   })
 )
