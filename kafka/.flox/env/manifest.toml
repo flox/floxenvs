@@ -1,0 +1,72 @@
+schema-version = "1.12.0"
+
+# Minimal Apache Kafka (KRaft mode) environment for use with [include].
+#
+#   [include]
+#   environments = [{ remote = "flox/kafka" }]
+#
+# Override vars in your manifest, e.g.:
+#
+#   [vars]
+#   KAFKA_PORT = "9092"
+
+[install]
+apacheKafka.pkg-path = "apacheKafka"
+apacheKafka.pkg-group = "kafka"
+
+[vars]
+KAFKA_HOST = "localhost"
+KAFKA_PORT = "9092"
+KAFKA_CONTROLLER_PORT = "9093"
+
+[hook]
+on-activate = '''
+export KAFKA_CACHE="$FLOX_ENV_CACHE/kafka"
+export KAFKA_LOG_DIRS="$KAFKA_CACHE/logs"
+export KAFKA_CONFIG_FILE="$KAFKA_CACHE/server.properties"
+# Derive the broker list from host/port so overriding either stays
+# consistent; respects an explicit KAFKA_BROKERS override if set.
+export KAFKA_BROKERS="${KAFKA_BROKERS:-${KAFKA_HOST}:${KAFKA_PORT}}"
+
+mkdir -p "$KAFKA_LOG_DIRS"
+
+if [ ! -f "$KAFKA_CONFIG_FILE" ]; then
+  cat > "$KAFKA_CONFIG_FILE" <<EOF
+process.roles=broker,controller
+node.id=1
+controller.quorum.voters=1@${KAFKA_HOST}:${KAFKA_CONTROLLER_PORT}
+listeners=PLAINTEXT://${KAFKA_HOST}:${KAFKA_PORT},CONTROLLER://${KAFKA_HOST}:${KAFKA_CONTROLLER_PORT}
+inter.broker.listener.name=PLAINTEXT
+advertised.listeners=PLAINTEXT://${KAFKA_HOST}:${KAFKA_PORT}
+controller.listener.names=CONTROLLER
+listener.security.protocol.map=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+log.dirs=${KAFKA_LOG_DIRS}
+num.network.threads=3
+num.io.threads=8
+socket.send.buffer.bytes=102400
+socket.receive.buffer.bytes=102400
+socket.request.max.bytes=104857600
+num.partitions=1
+num.recovery.threads.per.data.dir=1
+offsets.topic.replication.factor=1
+transaction.state.log.replication.factor=1
+transaction.state.log.min.isr=1
+default.replication.factor=1
+min.insync.replicas=1
+log.retention.hours=168
+log.segment.bytes=1073741824
+log.retention.check.interval.ms=300000
+EOF
+fi
+
+if [ ! -f "${KAFKA_LOG_DIRS}/meta.properties" ]; then
+  CLUSTER_ID="$(kafka-storage.sh random-uuid)"
+  kafka-storage.sh format -t "$CLUSTER_ID" -c "$KAFKA_CONFIG_FILE" --ignore-formatted
+fi
+'''
+
+[services]
+kafka.command = '''
+  exec kafka-server-start.sh "$KAFKA_CONFIG_FILE"
+'''
+kafka.shutdown.command = "kafka-server-stop.sh"

@@ -1,0 +1,54 @@
+kind: env
+name: kafka
+title: Apache Kafka
+publisher: flox
+tagline: >
+  Apache Kafka (KRaft mode) ready to include — distributed event
+  streaming, auto-configured and running as a Flox service on port 9092.
+summary:
+  - "Apache Kafka via Flox, no system install required"
+  - "KRaft mode (no ZooKeeper); storage formatted on first activation"
+  - "Broker on port 9092 (override via `KAFKA_PORT`)"
+  - "Logs and metadata under `$FLOX_ENV_CACHE/kafka`"
+  - "Boots as a Flox service with `--start-services`"
+category: messaging
+tags: [kafka, streaming, messaging, events, service]
+stack: [java]
+featured: false
+combines_well_with:
+  - env:python-pip
+  - env:python-poetry
+  - env:python-uv
+  - env:rust
+  - env:go
+  - env:javascript-node
+status: stable
+license: Apache-2.0
+upstream:
+  name: Apache Kafka
+  url: https://kafka.apache.org/
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/kafka" }]
+  activate: |
+    flox activate -r flox/kafka --start-services
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/kafka-latest
+recipes:
+  - name: kafka-demo
+    title: Quick start
+    start_services: true
+    features:
+      - "Launches Kafka as a Flox service on port 9092"
+      - "Lists and creates topics with kafka-topics.sh"
+      - "KRaft single-node broker, no extra configuration"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/kafka
+  floxhub: https://hub.flox.dev/flox/kafka
+  docker: >-
+    https://github.com/flox/floxenvs/pkgs/container/floxenvs/kafka-latest
+  issues: >-
+    https://github.com/flox/floxenvs/issues?q=label%3Akafka
