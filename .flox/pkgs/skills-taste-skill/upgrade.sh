@@ -9,6 +9,13 @@ OWNER="Leonxlnx"
 REPO="taste-skill"
 BRANCH="main"
 
+# Authenticated API calls use Actions' 5000/hr quota. The
+# unauthenticated 60/hr is shared per egress IP and gets exhausted
+# by parallel runners, surfacing as `curl exit 22`.
+auth_header=()
+[ -n "${GITHUB_TOKEN:-}" ] \
+  && auth_header=(-H "Authorization: Bearer $GITHUB_TOKEN")
+
 current_version=$(jq -r '.version // ""' "$HASHES_FILE")
 
 # Resolve current HEAD on main to a full SHA.
@@ -23,8 +30,9 @@ fi
 short_sha="${rev:0:7}"
 
 # Committer date (YYYY-MM-DD) via the GitHub commits API.
-commit_json=$(curl -sfL \
+commit_json=$(curl -sfL --retry 3 --retry-delay 5 \
   -H "Accept: application/vnd.github+json" \
+  "${auth_header[@]}" \
   "https://api.github.com/repos/$OWNER/$REPO/commits/$rev")
 commit_date=$(echo "$commit_json" \
   | jq -r '.commit.committer.date' \

@@ -5,8 +5,17 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HASHES_FILE="$SCRIPT_DIR/hashes.json"
 
+# Authenticated API calls use Actions' 5000/hr quota. The
+# unauthenticated 60/hr is shared per egress IP and gets exhausted
+# by parallel runners, surfacing as `curl exit 22`.
+auth_header=()
+[ -n "${GITHUB_TOKEN:-}" ] \
+  && auth_header=(-H "Authorization: Bearer $GITHUB_TOKEN")
+
 current_version=$(jq -r '.version' "$HASHES_FILE")
-latest_tag=$(curl -sf \
+latest_tag=$(curl -sf --retry 3 --retry-delay 5 \
+  -H "Accept: application/vnd.github+json" \
+  "${auth_header[@]}" \
   https://api.github.com/repos/asheshgoplani/agent-deck/releases/latest \
   | jq -r '.tag_name')
 latest_version="${latest_tag#v}"
@@ -20,11 +29,21 @@ fi
 
 echo "Updating agent-deck from $current_version to $latest_version"
 
-# Download and hash the new source tarball
+# Download and hash the new source tarball. default.nix strips the
+# committed `.flox/` directory in postFetch (it carries /nix/store
+# paths that a fixed-output derivation may not reference), so the
+# srcHash must be computed over the same stripped tree -- the NAR hash
+# of the unpacked source minus `.flox`, which is exactly what
+# fetchFromGitHub hashes. `nix-prefetch-url --unpack` would hash the
+# unmodified tree and mismatch.
 src_url="https://github.com/asheshgoplani/agent-deck/archive/refs/tags/v${latest_version}.tar.gz"
 echo "Fetching source from $src_url ..."
-src_hash=$(nix-prefetch-url --unpack "$src_url" 2>/dev/null)
-src_sri=$(nix hash convert --hash-algo sha256 --to sri "$src_hash")
+src_dir=$(mktemp -d)
+curl -sfL --retry 3 --retry-delay 5 "$src_url" \
+  | tar -xz -C "$src_dir" --strip-components=1
+rm -rf "$src_dir/.flox"
+src_sri=$(nix hash path --type sha256 --sri "$src_dir")
+rm -rf "$src_dir"
 echo "  srcHash: $src_sri"
 
 # Write with dummy vendorHash so flox build can compute the real one
