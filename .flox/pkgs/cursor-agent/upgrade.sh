@@ -6,9 +6,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HASHES_FILE="$SCRIPT_DIR/hashes.json"
 
 # Cursor publishes the current agent CLI version on their install page;
-# the lab download URL embeds it as <year>.<month>.<day>-<short-sha>.
+# the lab download URL embeds it after /lab/. The build suffix varies
+# (e.g. <date>-<short-sha> or <date>-<hh>-<mm>-<ss>-<short-sha>), so
+# match the whole path segment up to the next slash rather than a
+# fixed shape.
 VERSION_URL="https://cursor.com/install"
-VERSION_RE='downloads\.cursor\.com/lab/([0-9]{4}\.[0-9]{2}\.[0-9]{2}-[a-f0-9]+)'
+VERSION_RE='downloads\.cursor\.com/lab/[0-9]{4}\.[0-9]{2}\.[0-9]{2}-[0-9a-f-]+'
 
 current_version=$(jq -r '.version' "$HASHES_FILE")
 latest_version=$(curl -sfL "$VERSION_URL" \

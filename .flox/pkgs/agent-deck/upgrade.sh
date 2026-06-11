@@ -5,8 +5,17 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HASHES_FILE="$SCRIPT_DIR/hashes.json"
 
+# Authenticated API calls use Actions' 5000/hr quota. The
+# unauthenticated 60/hr is shared per egress IP and gets exhausted
+# by parallel runners, surfacing as `curl exit 22`.
+auth_header=()
+[ -n "${GITHUB_TOKEN:-}" ] \
+  && auth_header=(-H "Authorization: Bearer $GITHUB_TOKEN")
+
 current_version=$(jq -r '.version' "$HASHES_FILE")
-latest_tag=$(curl -sf \
+latest_tag=$(curl -sf --retry 3 --retry-delay 5 \
+  -H "Accept: application/vnd.github+json" \
+  "${auth_header[@]}" \
   https://api.github.com/repos/asheshgoplani/agent-deck/releases/latest \
   | jq -r '.tag_name')
 latest_version="${latest_tag#v}"
