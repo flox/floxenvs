@@ -1,17 +1,17 @@
 # Skills Review Demo
 
 <!-- codespaces-badge -->
-[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fskills-review-demo%2Fdevcontainer.json)
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Freview-skills-demo%2Fdevcontainer.json)
 
 Interactive demo of the
-[skills-review](../skills-review/) environment — a unified
+[review-skills](../review-skills/) environment — a unified
 0-100 quality score for Claude Code skills and agents, with
 a styled welcome banner and ready-to-score sample artifacts.
 
 ## Quick start
 
 ```bash
-flox activate -r flox/skills-review-demo
+flox activate -r flox/review-skills-demo
 ```
 
 On activate you get a banner and a cheat sheet. Then score
@@ -19,24 +19,24 @@ the bundled samples:
 
 ```bash
 # A clean, well-formed skill — scores well (stable-to-warn)
-skills-review audit samples/good-skill
+review-skills audit samples/good-skill
 
 # A deliberately broken skill — scores low
-skills-review audit samples/bad-skill
+review-skills audit samples/bad-skill
 
 # A clean agent — auto-detected as an agent
-skills-review audit samples/good-agent.md
+review-skills audit samples/good-agent.md
 ```
 
 Add `--json` for machine-readable output:
 
 ```bash
-skills-review audit --json samples/good-skill | jq .
+review-skills audit --json samples/good-skill | jq .
 ```
 
 ## Walkthrough
 
-1. **Score the good skill.** `skills-review audit
+1. **Score the good skill.** `review-skills audit
    samples/good-skill` runs the skill ensemble (skill-tools,
    skill-validator, claudelint), the structural gate,
    skillcheck, and an estimated impact, then fuses them into
@@ -58,7 +58,7 @@ skills-review audit --json samples/good-skill | jq .
 
 ## What it provides
 
-Everything from [skills-review](../skills-review/) plus:
+Everything from [review-skills](../review-skills/) plus:
 
 - `gum` — styled terminal UI for the welcome banner
 - `samples/good-skill/` — a clean, well-formed skill
@@ -67,5 +67,5 @@ Everything from [skills-review](../skills-review/) plus:
 
 ## See also
 
-- [skills-review](../skills-review/) — minimal environment
+- [review-skills](../review-skills/) — minimal environment
   for `[include]`

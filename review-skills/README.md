@@ -1,13 +1,13 @@
 # Skills Review
 
 <!-- codespaces-badge -->
-[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fskills-review%2Fdevcontainer.json)
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Freview-skills%2Fdevcontainer.json)
 
 Unified 0-100 quality score for
 [Claude Code](https://docs.claude.com/en/docs/claude-code)
 skills and agents.
 
-`skills-review` detects whether a path is a skill
+`review-skills` detects whether a path is a skill
 (`SKILL.md`) or an agent (`.md` with agent frontmatter),
 runs a per-kind ensemble of linters, normalizes each tool
 to 0-100, and fuses the results into four dimensions plus a
@@ -15,13 +15,20 @@ security cap and a status pill. Everything runs locally and
 offline; an optional behavioral stage uses
 [promptfoo](https://www.promptfoo.dev/).
 
+`review-skills` is a self-contained Go CLI. Alongside the
+`lint`/`review`/`audit` commands it adds `report` (raw
+per-tool output) and `doctor` (tool availability + a smoke
+test + the resolved per-kind ensemble), plus `--findings` on
+`audit` (a normalized findings array) and `--tools`/`--disable`
+to choose which quality tools run.
+
 ## Quick start
 
 Include in your manifest:
 
 ```toml
 [include]
-environments = ["flox/skills-review"]
+environments = ["flox/review-skills"]
 ```
 
 During local development, include the in-repo copy by
@@ -29,19 +36,19 @@ directory instead:
 
 ```toml
 [include]
-environments = [{ dir = "../skills-review" }]
+environments = [{ dir = "../review-skills" }]
 ```
 
 Or activate directly:
 
 ```bash
-flox activate -r flox/skills-review
-skills-review audit path/to/skill
+flox activate -r flox/review-skills
+review-skills audit path/to/skill
 ```
 
 ## What it provides
 
-- `skills-review` — the runner (skill/agent detection,
+- `review-skills` — the runner (skill/agent detection,
   ensemble scoring, `metrics.json` output)
 - `skill-tools` — ESLint + Lighthouse-style skill scorer
 - `claudelint` — whole-project Claude Code linter
@@ -55,9 +62,12 @@ skills-review audit path/to/skill
 
 | Command | Description |
 | ------- | ----------- |
-| `skills-review lint <path>` | Deterministic structural gate (exit 0/1) |
-| `skills-review review <path>` | Quality-only score |
-| `skills-review audit <path>` | Full 0-100 `metrics.json` |
+| `review-skills lint <path>` | Deterministic structural gate (exit 0/1) |
+| `review-skills review <path>` | Quality-only score |
+| `review-skills audit <path>` | Full 0-100 `metrics.json` |
+| `review-skills report <path>` | Raw per-tool output for the kind |
+| `review-skills doctor` | Tool availability + smoke + resolved ensemble |
+| `review-skills version` | Print the semver |
 
 Flags:
 
@@ -67,6 +77,13 @@ Flags:
   of auto-detecting.
 - `--threshold <n>` — exit nonzero if the overall (or
   quality, for `review`) score is below `<n>`.
+- `--findings` — on `audit`, include a normalized findings
+  array (severity / tool / rule / message / file / line)
+  fused across every tool.
+- `--tools <list>` — restrict the quality ensemble to the
+  named tools (comma-separated).
+- `--disable <list>` — drop the named tools from the quality
+  ensemble; the remaining weights re-normalize automatically.
 - `--with-behavioral` — also run a promptfoo behavioral
   eval (see below).
 
@@ -74,13 +91,24 @@ Examples:
 
 ```bash
 # Human-readable audit of a skill directory
-skills-review audit path/to/my-skill
+review-skills audit path/to/my-skill
 
 # JSON audit of an agent, gated at 70
-skills-review audit --json --threshold 70 path/to/agent.md
+review-skills audit --json --threshold 70 path/to/agent.md
+
+# Audit with the normalized findings array
+review-skills audit --json --findings path/to/my-skill
+
+# Restrict the ensemble, or drop a tool
+review-skills audit --tools skill-tools,skill-validator path/to/my-skill
+review-skills audit --disable claudelint path/to/my-skill
 
 # Just the deterministic gate (CI pre-check)
-skills-review lint path/to/my-skill
+review-skills lint path/to/my-skill
+
+# Raw per-tool output, and an environment health check
+review-skills report path/to/my-skill
+review-skills doctor
 ```
 
 ## The four dimensions
@@ -118,18 +146,18 @@ estimated and no network call is made.
 
 ## Configuration
 
-- `SKILLS_REVIEW_QUICK_VALIDATE` — path to the
+- `REVIEW_SKILLS_QUICK_VALIDATE` — path to the
   `quick_validate.py` used by the skill gate. The env sets
   this to the vendored
   [skill-creator](https://github.com/anthropics/skills/tree/main/skills/skill-creator)
   copy on activate. If unset (or PyYAML is unavailable) the
   runner falls back to a dependency-free inline frontmatter
   check.
-- `SKILLS_REVIEW_DRY_RUN=1` — make every tool adapter return
+- `REVIEW_SKILLS_DRY_RUN=1` — make every tool adapter return
   a fixed stub score instead of invoking the real CLI (used
   by the package's own tests).
 
 ## See also
 
-- [skills-review-demo](../skills-review-demo/) — interactive
+- [review-skills-demo](../review-skills-demo/) — interactive
   demo with sample skills and agents

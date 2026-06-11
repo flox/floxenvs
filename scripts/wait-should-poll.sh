@@ -64,7 +64,7 @@ for p in "${changed[@]}"; do
     .github/workflows/ci_*.yml) echo "true"; exit 0 ;;
     .flox/pkgs/basic-memory/*) echo "true"; exit 0 ;;
     .flox/pkgs/honcho/*) echo "true"; exit 0 ;;
-    .flox/pkgs/skills-review/*) echo "true"; exit 0 ;;
+    .flox/pkgs/review-skills/*) echo "true"; exit 0 ;;
     .flox/pkgs/skill-validator/*) echo "true"; exit 0 ;;
     .flox/pkgs/claudelint/*) echo "true"; exit 0 ;;
     .flox/pkgs/cclint/*) echo "true"; exit 0 ;;

@@ -1,19 +1,19 @@
 schema-version = "1.10.0"
 
-# Minimal skills-review environment for use with [include].
+# Minimal review-skills environment for use with [include].
 #
 # Include it in your own manifest:
 #
 #   [include]
-#   environments = [{ remote = "flox/skills-review" }]
+#   environments = [{ remote = "flox/review-skills" }]
 #
-# Provides `skills-review <lint|review|audit> <path>` plus the
+# Provides `review-skills <lint|review|audit> <path>` plus the
 # underlying tools (skill-tools, claudelint, cclint, skill-validator,
 # agnix, skillcheck) and promptfoo for optional behavioral evals:
 #
-#   skills-review lint   <path>   # deterministic structural gate
-#   skills-review review <path>   # quality-only score
-#   skills-review audit  <path>   # full 0-100 metrics.json
+#   review-skills lint   <path>   # deterministic structural gate
+#   review-skills review <path>   # quality-only score
+#   review-skills audit  <path>   # full 0-100 metrics.json
 #
 # Add --json for machine output, --with-behavioral to include a
 # promptfoo behavioral eval (needs an LLM provider API key).
@@ -21,26 +21,26 @@ schema-version = "1.10.0"
 [install]
 # The runner — detects skill vs agent, runs the per-kind ensemble,
 # fuses into quality/reliability/security/impact, emits a 0-100 score.
-skills-review.pkg-path = "flox/skills-review"
-skills-review.pkg-group = "skills-review"
+review-skills.pkg-path = "flox/review-skills"
+review-skills.pkg-group = "review-skills"
 
 # The six scoring tools the runner calls by bare name.
 skill-tools.pkg-path = "flox/skill-tools"
-skill-tools.pkg-group = "skills-review"
+skill-tools.pkg-group = "review-skills"
 claudelint.pkg-path = "flox/claudelint"
-claudelint.pkg-group = "skills-review"
+claudelint.pkg-group = "review-skills"
 cclint.pkg-path = "flox/cclint"
-cclint.pkg-group = "skills-review"
+cclint.pkg-group = "review-skills"
 skill-validator.pkg-path = "flox/skill-validator"
-skill-validator.pkg-group = "skills-review"
+skill-validator.pkg-group = "review-skills"
 agnix.pkg-path = "flox/agnix"
-agnix.pkg-group = "skills-review"
+agnix.pkg-group = "review-skills"
 skillcheck.pkg-path = "flox/skillcheck"
-skillcheck.pkg-group = "skills-review"
+skillcheck.pkg-group = "review-skills"
 
 # Optional behavioral stage for `audit --with-behavioral` (nixpkgs).
 promptfoo.pkg-path = "promptfoo"
-promptfoo.pkg-group = "skills-review"
+promptfoo.pkg-group = "review-skills"
 
 # The skill gate prefers the vendored skill-creator quick_validate.py
 # (full frontmatter/structure check) over the runner's inline fallback.
@@ -48,16 +48,16 @@ promptfoo.pkg-group = "skills-review"
 # validator can run; if either is unavailable the runner falls back to
 # its dependency-free inline frontmatter check.
 skills-skill-creator.pkg-path = "flox/skills-skill-creator"
-skills-skill-creator.pkg-group = "skills-review"
+skills-skill-creator.pkg-group = "review-skills"
 python313.pkg-path = "python313"
-python313.pkg-group = "skills-review"
+python313.pkg-group = "review-skills"
 pyyaml.pkg-path = "python313Packages.pyyaml"
-pyyaml.pkg-group = "skills-review"
+pyyaml.pkg-group = "review-skills"
 
 [hook]
 on-activate = '''
 # Point the skill gate at the vendored quick_validate.py so it uses the
 # full validator instead of the inline fallback. Silent per minimal-env
 # rules; the runner ignores the path if the file or PyYAML is missing.
-export SKILLS_REVIEW_QUICK_VALIDATE="$FLOX_ENV/share/claude-code/skills/skill-creator/scripts/quick_validate.py"
+export REVIEW_SKILLS_QUICK_VALIDATE="$FLOX_ENV/share/claude-code/skills/skill-creator/scripts/quick_validate.py"
 '''

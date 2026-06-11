@@ -11,7 +11,7 @@ command_exists() {
 }
 
 # ── The runner ────────────────────────────────────────
-command_exists skills-review
+command_exists review-skills
 
 # ── The six scoring tools the runner calls ────────────
 command_exists skill-tools
@@ -24,9 +24,8 @@ command_exists skillcheck
 # ── Optional behavioral stage ─────────────────────────
 command_exists promptfoo
 
-# ── Runner usage ──────────────────────────────────────
-# The runner has no --help; a no-arg call prints its usage
-# line and exits nonzero, so capture it without failing.
-echo ">>> skills-review usage: $(skills-review 2>&1 | grep -o 'usage:.*' | head -1 || true)"
+# ── Runner smoke ──────────────────────────────────────
+# The Go runner prints its semver on `version`.
+echo ">>> review-skills version: $(review-skills version 2>&1 | head -1 || true)"
 
-echo ">>> skills-review environment is working"
+echo ">>> review-skills environment is working"

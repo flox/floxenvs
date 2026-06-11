@@ -1,12 +1,12 @@
-name: "CI: skills-review"
+name: "CI: review-skills"
 
 on:
   push:
     branches: ["main"]
     paths:
-      - "skills-review/**"
-      - "skills-review-demo/**"
-      - ".flox/pkgs/skills-review/**"
+      - "review-skills/**"
+      - "review-skills-demo/**"
+      - ".flox/pkgs/review-skills/**"
       - ".flox/pkgs/skill-validator/**"
       - ".flox/pkgs/claudelint/**"
       - ".flox/pkgs/cclint/**"
@@ -17,12 +17,12 @@ on:
       - "flake.lock"
       - "scripts/**"
       - ".github/workflows/environment.yml"
-      - ".github/workflows/ci_skills-review.yml"
+      - ".github/workflows/ci_review-skills.yml"
   pull_request:
     paths:
-      - "skills-review/**"
-      - "skills-review-demo/**"
-      - ".flox/pkgs/skills-review/**"
+      - "review-skills/**"
+      - "review-skills-demo/**"
+      - ".flox/pkgs/review-skills/**"
       - ".flox/pkgs/skill-validator/**"
       - ".flox/pkgs/claudelint/**"
       - ".flox/pkgs/cclint/**"
@@ -33,7 +33,7 @@ on:
       - "flake.lock"
       - "scripts/**"
       - ".github/workflows/environment.yml"
-      - ".github/workflows/ci_skills-review.yml"
+      - ".github/workflows/ci_review-skills.yml"
   workflow_dispatch:
 
 permissions:
@@ -46,5 +46,5 @@ jobs:
   run:
     uses: "./.github/workflows/environment.yml"
     with:
-      environment: "skills-review"
+      environment: "review-skills"
     secrets: inherit

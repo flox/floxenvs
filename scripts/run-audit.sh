@@ -21,19 +21,19 @@ out_dir="$ROOT/audit/$KIND/$NAME"
 mkdir -p "$out_dir"
 out_file="$out_dir/metrics.json"
 
-# ── skill / agent: delegate to the skills-review runner ──
+# ── skill / agent: delegate to the review-skills runner ──
 # The runner fuses the per-kind linter ensemble into the same
 # Plan-B metrics.json shape (identity / overall / status /
 # quality / reliability / security / impact). Prefer the
-# `skills-review` binary on PATH; otherwise fall back to the
-# bundled runner under .flox/pkgs/skills-review.
+# `review-skills` binary on PATH; otherwise fall back to the
+# Go binary built by `flox build review-skills`.
 if [ "$KIND" = "skill" ] || [ "$KIND" = "agent" ]; then
-  if command -v skills-review >/dev/null 2>&1; then
-    runner=(skills-review)
+  if command -v review-skills >/dev/null 2>&1; then
+    runner=(review-skills)
   else
-    bundled="$ROOT/.flox/pkgs/skills-review/bin/skills-review"
-    [ -x "$bundled" ] || { echo "skills-review runner not found" >&2; exit 1; }
-    runner=(env "SKILLS_REVIEW_LIB=$ROOT/.flox/pkgs/skills-review/lib" "$bundled")
+    bundled="$ROOT/result-review-skills/bin/review-skills"
+    [ -x "$bundled" ] || { echo "review-skills runner not found" >&2; exit 1; }
+    runner=("$bundled")
   fi
   "${runner[@]}" audit --json --kind "$KIND" "$abs_dir" > "$out_file"
   echo "wrote $out_file"

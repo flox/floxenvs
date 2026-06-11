@@ -1,14 +1,14 @@
 schema-version = "1.10.0"
 
-# Interactive demo for the skills-review environment.
+# Interactive demo for the review-skills environment.
 #
-# Includes the minimal flox/skills-review env (the runner + the six
+# Includes the minimal flox/review-skills env (the runner + the six
 # scoring tools) and adds gum for a welcome banner plus sample skill
 # and agent artifacts under samples/ to score.
 
 [include]
 environments = [
-  { dir = "../skills-review" }
+  { dir = "../review-skills" }
 ]
 
 [install]
@@ -24,11 +24,11 @@ if [ "${FLOX_ENVS_TESTING:-}" != "1" ]; then
     --width 50 --margin "1 2" --padding "1 2" \
     "Skills Review" "Unified 0-100 score for skills & agents."
   echo ""
-  echo "  skills-review audit samples/good-skill   — score a clean skill"
-  echo "  skills-review audit samples/bad-skill    — score a broken skill"
-  echo "  skills-review audit samples/good-agent.md — score an agent"
-  echo "  skills-review audit --json <path>        — machine output"
-  echo "  skills-review lint <path>                — deterministic gate"
+  echo "  review-skills audit samples/good-skill   — score a clean skill"
+  echo "  review-skills audit samples/bad-skill    — score a broken skill"
+  echo "  review-skills audit samples/good-agent.md — score an agent"
+  echo "  review-skills audit --json <path>        — machine output"
+  echo "  review-skills lint <path>                — deterministic gate"
   echo ""
 fi
 '''

@@ -3,7 +3,7 @@
 // REVIEW_SKILLS_DRY_RUN, fixed stubs), runs the reliability gate, the
 // skillcheck security scan, and the optional behavioral stage, then fuses
 // the four dimensions into a single 0-100 score. It is a faithful port of
-// the bash skills-review runner.
+// the original bash runner.
 package audit
 
 import (

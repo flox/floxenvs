@@ -90,16 +90,14 @@ ov=$(jq -r '.overall' "$out")
 assert_eq "overall is integer" "true" \
   "$(awk -v v="$ov" 'BEGIN { print (v ~ /^[0-9]+$/ && v <= 100 && v >= 0) ? "true" : "false" }')"
 
-# ── skill kind: dispatch to the bundled skills-review runner ──────────
-# Stage the runner (+ libs) under .flox/pkgs/skills-review so the
+# ── skill kind: dispatch to the review-skills runner ──────────────────
+# Stage the built Go binary under result-review-skills/bin so the
 # fallback path in run-audit.sh resolves, plus a real SKILL.md so the
 # skill dir exists. Run in DRY_RUN so no scoring tools are required.
-REAL_RUNNER="$(cd "$SCRIPT_DIR/../../.flox/pkgs/skills-review" && pwd)"
-mkdir -p "$TMP/.flox/pkgs/skills-review/bin" \
-         "$TMP/.flox/pkgs/skills-review/lib" \
+REAL_RUNNER="$(cd "$SCRIPT_DIR/../../result-review-skills" && pwd)"
+mkdir -p "$TMP/result-review-skills/bin" \
          "$TMP/.flox/pkgs/skills-humanizer"
-cp "$REAL_RUNNER/bin/skills-review" "$TMP/.flox/pkgs/skills-review/bin/"
-cp "$REAL_RUNNER"/lib/*.sh "$TMP/.flox/pkgs/skills-review/lib/"
+cp "$REAL_RUNNER/bin/review-skills" "$TMP/result-review-skills/bin/"
 cat > "$TMP/.flox/pkgs/skills-humanizer/SKILL.md" <<'EOF'
 ---
 name: skills-humanizer
@@ -111,7 +109,7 @@ description: Use when you need a tidy example skill for tests.
 Do the thing. Then do the next thing.
 EOF
 
-REPO_ROOT="$TMP" SKILLS_REVIEW_DRY_RUN=1 \
+REPO_ROOT="$TMP" REVIEW_SKILLS_DRY_RUN=1 \
   "$TMP/scripts/run-audit.sh" skill skills-humanizer
 sk="$TMP/audit/skill/skills-humanizer/metrics.json"
 assert_eq "skill metrics.json written" "true" \
