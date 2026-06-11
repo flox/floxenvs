@@ -79,6 +79,16 @@ type runner struct {
 	clDone bool
 	clOut  []byte
 	clOK   bool
+
+	// outCache memoizes each tool's raw output by tool name so a tool is
+	// executed at most once per audit even when both its score and its
+	// findings are needed.
+	outCache map[string][]byte
+
+	// secDone caches the skillcheck SARIF so the security scan runs once
+	// and its findings (which explain the security cap) can be collected.
+	secDone bool
+	secOut  []byte
 }
 
 // Run executes the full pipeline and returns the fused Result.
@@ -97,7 +107,7 @@ func Run(opts Options) (Result, error) {
 		return r, err
 	}
 
-	rn := &runner{kind: kind, path: opts.Path}
+	rn := &runner{kind: kind, path: opts.Path, outCache: map[string][]byte{}}
 
 	// --- quality ensemble ---------------------------------------------
 	var members []score.Weighted
@@ -111,7 +121,7 @@ func Run(opts Options) (Result, error) {
 			Note:   note(t.Name, sc, ok),
 			Pass:   ok && sc >= 60,
 		})
-		if opts.Findings && !dry() {
+		if opts.Findings && !dry() && t.Collect != nil {
 			r.Findings = append(r.Findings, t.Collect(rn.runTool(t))...)
 		}
 	}
@@ -137,6 +147,15 @@ func Run(opts Options) (Result, error) {
 	}
 	r.Security.Severity = string(sev)
 	r.Security.Cap = score.ApplyCap(100, sev)
+
+	// Security findings (e.g. leaked secrets) explain the security cap, so
+	// include them alongside the quality findings when requested. Reuse the
+	// cached skillcheck scan — no extra tool run.
+	if opts.Findings && !dry() {
+		if sc, found := tools.Find("skillcheck"); found && sc.Collect != nil {
+			r.Findings = append(r.Findings, sc.Collect(rn.skillcheckOut())...)
+		}
+	}
 
 	// --- impact -------------------------------------------------------
 	if opts.WithBehavioral && !dry() {
@@ -190,6 +209,9 @@ func (rn *runner) runTool(t tools.Tool) []byte {
 		out, _ := rn.claudelint()
 		return out
 	}
+	if cached, ok := rn.outCache[t.Name]; ok {
+		return cached
+	}
 	args := t.RunArgs(rn.kind, rn.path)
 	cmd := exec.Command(t.Bin, args...)
 	if t.Stage {
@@ -197,6 +219,9 @@ func (rn *runner) runTool(t tools.Tool) []byte {
 		cmd.Dir = proj
 	}
 	out, _ := cmd.CombinedOutput()
+	if rn.outCache != nil {
+		rn.outCache[t.Name] = out
+	}
 	return out
 }
 
@@ -382,11 +407,22 @@ func inlineFrontmatterOK(skillDir string) bool {
 
 // --- security -------------------------------------------------------------
 
-// securitySeverity runs skillcheck and returns the highest SARIF severity.
-// A missing/garbage SARIF is treated as an empty (none) run, matching bash.
-func (rn *runner) securitySeverity() score.Severity {
+// skillcheckOut runs skillcheck once and caches its SARIF output, so the
+// security severity and the security findings share a single scan.
+func (rn *runner) skillcheckOut() []byte {
+	if rn.secDone {
+		return rn.secOut
+	}
+	rn.secDone = true
 	cmd := exec.Command("skillcheck", "--format", "sarif", rn.path)
-	out, _ := cmd.CombinedOutput()
+	rn.secOut, _ = cmd.CombinedOutput()
+	return rn.secOut
+}
+
+// securitySeverity returns the highest SARIF severity from the cached
+// skillcheck scan. A missing/garbage SARIF is treated as none, matching bash.
+func (rn *runner) securitySeverity() score.Severity {
+	out := rn.skillcheckOut()
 	if !jsonOK(out) {
 		return score.SevNone
 	}

@@ -100,6 +100,21 @@ func TestAuditExplicitKind(t *testing.T) {
 	}
 }
 
+// note: live security-findings behavior (skillcheck → findings array under
+// --findings) is exercised end-to-end in the bats e2e suite, since it needs
+// the real skillcheck binary on PATH. Here we assert the dry-run path keeps
+// findings empty (no tool runs) so the wiring is opt-in and offline-safe.
+func TestAuditDryRunNoFindings(t *testing.T) {
+	t.Setenv("REVIEW_SKILLS_DRY_RUN", "1")
+	r, err := Run(Options{Path: tmpSkill(t), Findings: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(r.Findings) != 0 {
+		t.Errorf("dry-run should collect no findings, got %d", len(r.Findings))
+	}
+}
+
 func TestLintDryRun(t *testing.T) {
 	t.Setenv("REVIEW_SKILLS_DRY_RUN", "1")
 	ok, err := Lint(Options{Path: tmpSkill(t)})
