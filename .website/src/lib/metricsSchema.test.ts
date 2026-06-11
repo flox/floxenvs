@@ -36,4 +36,34 @@ describe("MetricsSchema", () => {
     expect(d.status).toBe("missing");
     expect(d.security.scanners).toEqual([]);
   });
+
+  it.each(["skill", "agent"] as const)(
+    "accepts a metrics.json with identity.kind = %s",
+    (kind) => {
+      const parsed = MetricsSchema.parse({
+        identity: { kind, name: "humanizer", dir: ".flox/pkgs/x" },
+        overall: 80,
+        status: "stable",
+        quality: {
+          score: 81,
+          checks: [
+            { id: "skill-tools", pass: true, weight: 40, note: "82" },
+          ],
+        },
+        reliability: { score: 70 },
+        security: { score: 100, cap: 100, severity: "none" },
+        impact: { score: 70 },
+      });
+      expect(parsed.identity.kind).toBe(kind);
+    },
+  );
+
+  it("defaultMetrics works for skill and agent kinds", () => {
+    expect(defaultMetrics({ kind: "skill", name: "s" }).identity.kind).toBe(
+      "skill",
+    );
+    expect(defaultMetrics({ kind: "agent", name: "a" }).identity.kind).toBe(
+      "agent",
+    );
+  });
 });

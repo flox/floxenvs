@@ -1,0 +1,30 @@
+kind: pkg
+subkind: plain
+name: agnix
+title: agnix
+publisher: flox
+tagline: >
+  Linter and LSP for Claude Code skills, agents, CLAUDE.md,
+  MCP, and hooks configuration.
+category: ai
+ai_role: tooling
+tags: [linting, agent, skills, mcp, cli, lsp]
+stack: [rust]
+featured: false
+combines_well_with:
+  - env:claude
+status: beta
+license: MIT OR Apache-2.0
+upstream:
+  name: agnix
+  url: https://github.com/agent-sh/agnix
+  license: MIT OR Apache-2.0
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    agnix.pkg-path = "flox/agnix"
+    agnix.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/agnix
+  floxhub: https://hub.flox.dev/flox/agnix

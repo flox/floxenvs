@@ -21,6 +21,25 @@ out_dir="$ROOT/audit/$KIND/$NAME"
 mkdir -p "$out_dir"
 out_file="$out_dir/metrics.json"
 
+# ── skill / agent: delegate to the review-skills runner ──
+# The runner fuses the per-kind linter ensemble into the same
+# Plan-B metrics.json shape (identity / overall / status /
+# quality / reliability / security / impact). Prefer the
+# `review-skills` binary on PATH; otherwise fall back to the
+# Go binary built by `flox build review-skills`.
+if [ "$KIND" = "skill" ] || [ "$KIND" = "agent" ]; then
+  if command -v review-skills >/dev/null 2>&1; then
+    runner=(review-skills)
+  else
+    bundled="$ROOT/result-review-skills/bin/review-skills"
+    [ -x "$bundled" ] || { echo "review-skills runner not found" >&2; exit 1; }
+    runner=("$bundled")
+  fi
+  "${runner[@]}" audit --json --kind "$KIND" "$abs_dir" > "$out_file"
+  echo "wrote $out_file"
+  exit 0
+fi
+
 # ── 1. quality (lint-meta + lint-conventions + metrics.sh)
 meta_json=$(REPO_ROOT="$ROOT" \
   "$SCRIPT_DIR/lint-meta.sh" "$KIND" "$NAME")

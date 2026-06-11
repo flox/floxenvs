@@ -1,0 +1,10 @@
+result-*
+
+# The compiled CLI binary (built into ./review-skills by `go build`).
+# Anchored with a leading slash so it does NOT match the package source
+# directory name `review-skills/` higher in the tree.
+/review-skills
+
+# The repo-root .gitignore ignores any `audit/` directory (the Plan-B
+# metrics output). Re-include this package's internal/audit Go package.
+!internal/audit/

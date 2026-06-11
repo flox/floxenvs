@@ -22,6 +22,19 @@
 
         symphony = pkgs.callPackage ./.flox/pkgs/symphony/default.nix { };
 
+        review-skills = pkgs.callPackage ./.flox/pkgs/review-skills/default.nix { };
+
+        # The six linters review-skills orchestrates. The e2e runs the real
+        # binary against the real tools, so they must be on PATH at test time.
+        reviewSkillsTools = [
+          (pkgs.callPackage ./.flox/pkgs/skill-tools/default.nix { })
+          (pkgs.callPackage ./.flox/pkgs/skill-validator/default.nix { })
+          (pkgs.callPackage ./.flox/pkgs/claudelint/default.nix { })
+          (pkgs.callPackage ./.flox/pkgs/cclint/default.nix { })
+          (pkgs.callPackage ./.flox/pkgs/agnix/default.nix { })
+          (pkgs.callPackage ./.flox/pkgs/skillcheck/default.nix { })
+        ];
+
         batsWithLibs = pkgs.bats.withLibraries (p: [
           p.bats-support
           p.bats-assert
@@ -89,6 +102,79 @@
             flox activate -c "bats $*"
           else
             flox activate -c "bats --jobs 1 ${e2eTestDir}/*.bats"
+          fi
+        '';
+
+        e2eTestDirReviewSkills = ./.flox/pkgs/review-skills/e2e;
+
+        runTestReviewSkillsNix = pkgs.writeShellScriptBin "run-test-review-skills-with-nix" ''
+          set -euo pipefail
+          export PATH="${
+            lib.makeBinPath (
+              [
+                review-skills
+                batsWithLibs
+                pkgs.coreutils
+                pkgs.jq
+              ]
+              ++ reviewSkillsTools
+            )
+          }:$PATH"
+          export BATS_SUPPORT_LIB="${pkgs.bats.libraries.bats-support}/share/bats/bats-support"
+          export BATS_ASSERT_LIB="${pkgs.bats.libraries.bats-assert}/share/bats/bats-assert"
+          if [ $# -gt 0 ]; then
+            bats "$@"
+          else
+            bats --jobs 1 ${e2eTestDirReviewSkills}/*.bats
+          fi
+        '';
+
+        runTestReviewSkillsFlox = pkgs.writeShellScriptBin "run-test-review-skills-with-flox" ''
+          set -euo pipefail
+          export PATH="${
+            lib.makeBinPath [
+              batsWithLibs
+              pkgs.coreutils
+              pkgs.jq
+            ]
+          }:$PATH"
+          export BATS_SUPPORT_LIB="${pkgs.bats.libraries.bats-support}/share/bats/bats-support"
+          export BATS_ASSERT_LIB="${pkgs.bats.libraries.bats-assert}/share/bats/bats-assert"
+          export FLOX_DISABLE_METRICS=true
+
+          flox_bin="${
+            lib.makeBinPath [
+              flox.packages."${system}".default
+            ]
+          }"
+          export PATH="$flox_bin:$PATH"
+
+          tmpdir="$(mktemp -d)"
+          trap 'rm -rf "$tmpdir"' EXIT
+
+          binary_dir="$(nix build --no-link --print-out-paths \
+            '${inputs.self}#packages.${system}.review-skills')"
+          tools_path="${lib.makeBinPath reviewSkillsTools}"
+
+          cd "$tmpdir"
+          flox init
+
+          manifest_tpl=${pkgs.writeText "manifest-template-review-skills.toml" ''
+            schema-version = "1.10.0"
+
+            [hook]
+            on-activate = """
+            export PATH="__BINARY_DIR__/bin:__TOOLS_PATH__:$PATH"
+            """
+          ''}
+          sed -e "s|__BINARY_DIR__|$binary_dir|g" \
+              -e "s|__TOOLS_PATH__|$tools_path|g" \
+              "$manifest_tpl" > .flox/env/manifest.toml
+
+          if [ $# -gt 0 ]; then
+            flox activate -c "bats $*"
+          else
+            flox activate -c "bats --jobs 1 ${e2eTestDirReviewSkills}/*.bats"
           fi
         '';
 
@@ -416,6 +502,7 @@
       {
         packages.claude-managed = claude-managed;
         packages.symphony = symphony;
+        packages.review-skills = review-skills;
 
         apps.run-test = {
           type = "app";
@@ -440,6 +527,16 @@
         apps.run-test-claude-managed-with-flox = {
           type = "app";
           program = "${runTestCmFlox}/bin/run-test-claude-managed-with-flox";
+        };
+
+        apps.run-test-review-skills-with-nix = {
+          type = "app";
+          program = "${runTestReviewSkillsNix}/bin/run-test-review-skills-with-nix";
+        };
+
+        apps.run-test-review-skills-with-flox = {
+          type = "app";
+          program = "${runTestReviewSkillsFlox}/bin/run-test-review-skills-with-flox";
         };
 
         devShells.default = pkgs.mkShell {

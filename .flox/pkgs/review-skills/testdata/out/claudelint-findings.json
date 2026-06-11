@@ -1,0 +1,106 @@
+{
+  "valid": false,
+  "errorCount": 2,
+  "warningCount": 1,
+  "validators": [
+    {
+      "name": "CLAUDE.md Validator",
+      "valid": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "name": "Skills Validator",
+      "valid": false,
+      "errors": [
+        {
+          "message": "Skill name \"This Is A Really Long Skill Name That Is Not Kebab Case And Goes Past Sixty Four Chars Limit\" does not match directory name \"bad-skill\"",
+          "file": "/private/var/folders/8n/l_rj55fd3hng5l5_ym02yng80000gn/T/tmp.EkI3T418Vr/p2/.claude/skills/bad-skill/SKILL.md",
+          "ruleId": "skill-name-directory-mismatch",
+          "fix": "Change name from \"This Is A Really Long Skill Name That Is Not Kebab Case And Goes Past Sixty Four Chars Limit\" to \"bad-skill\"",
+          "explanation": "A name/directory mismatch causes confusion and may break skill discovery and cross-referencing.",
+          "howToFix": "Update the `name` field in SKILL.md frontmatter to exactly match the parent directory name, or rename the directory to match the desired skill name. The auto-fixer updates the frontmatter name.",
+          "autoFix": {
+            "ruleId": "skill-name-directory-mismatch",
+            "description": "Update skill name to \"bad-skill\"",
+            "filePath": "/private/var/folders/8n/l_rj55fd3hng5l5_ym02yng80000gn/T/tmp.EkI3T418Vr/p2/.claude/skills/bad-skill/SKILL.md",
+            "range": [
+              4,
+              102
+            ],
+            "text": "name: bad-skill"
+          },
+          "severity": "error"
+        },
+        {
+          "message": "Must contain only lowercase letters, numbers, and hyphens",
+          "file": "/private/var/folders/8n/l_rj55fd3hng5l5_ym02yng80000gn/T/tmp.EkI3T418Vr/p2/.claude/skills/bad-skill/SKILL.md",
+          "line": 2,
+          "ruleId": "skill-name",
+          "explanation": "Non-standard names break URL generation, directory lookups, and cross-referencing between skills.",
+          "howToFix": "Rename the skill to use only lowercase letters and hyphens. Remove any uppercase letters, spaces, underscores, or special characters. Ensure the name is under 64 characters.",
+          "severity": "error"
+        }
+      ],
+      "warnings": [
+        {
+          "message": "Missing usage/instructions section",
+          "file": "/private/var/folders/8n/l_rj55fd3hng5l5_ym02yng80000gn/T/tmp.EkI3T418Vr/p2/.claude/skills/bad-skill/SKILL.md",
+          "ruleId": "skill-body-missing-usage-section",
+          "fix": "Add a \"## Usage\", \"## Instructions\", \"## Quick Start\", or similar section",
+          "explanation": "A missing usage section leaves users and the AI model without clear invocation instructions.",
+          "howToFix": "Add a section like `## Usage`, `## Instructions`, `## Quick Start`, `## Getting Started`, `## How to Use`, or `## Examples` to the body of your SKILL.md file. Include invocation examples, expected arguments, and any flags or options the skill supports.",
+          "severity": "warning"
+        }
+      ]
+    },
+    {
+      "name": "Agents Validator",
+      "valid": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "name": "Output Styles Validator",
+      "valid": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "name": "LSP Validator",
+      "valid": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "name": "Settings Validator",
+      "valid": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "name": "Hooks Validator",
+      "valid": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "name": "MCP Validator",
+      "valid": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "name": "Plugin Validator",
+      "valid": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "name": "Commands Validator",
+      "valid": true,
+      "errors": [],
+      "warnings": []
+    }
+  ]
+}
