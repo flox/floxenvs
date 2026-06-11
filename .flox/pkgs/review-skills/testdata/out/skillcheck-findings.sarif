@@ -1,0 +1,69 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "SkillCheck",
+          "informationUri": "https://github.com/agentigy/skillcheck",
+          "version": "1.0.0",
+          "rules": [
+            {
+              "id": "SECRET_EXPOSURE_001",
+              "name": "SECRET_EXPOSURE_001",
+              "shortDescription": {
+                "text": "Potential GitHub Token detected"
+              },
+              "fullDescription": {
+                "text": "Remove hardcoded secrets and use environment variables or secure secret management"
+              },
+              "help": {
+                "text": "Remove hardcoded secrets and use environment variables or secure secret management\n\nReference: CWE-798"
+              },
+              "properties": {
+                "tags": [
+                  "security"
+                ],
+                "security-severity": "9.0"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "SECRET_EXPOSURE_001",
+          "level": "error",
+          "message": {
+            "text": "Potential GitHub Token detected"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "/var/folders/8n/l_rj55fd3hng5l5_ym02yng80000gn/T/tmp.pRH17SjsN5/secret-skill/SKILL.md"
+                },
+                "region": {
+                  "startLine": 8,
+                  "snippet": {
+                    "text": "This skill embeds a fake token for testing: ghp_0123456789012345678901234567890123456789"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "cwe": "CWE-798"
+          }
+        }
+      ],
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "endTimeUtc": "2026-06-11T00:53:57.492Z"
+        }
+      ]
+    }
+  ]
+}
