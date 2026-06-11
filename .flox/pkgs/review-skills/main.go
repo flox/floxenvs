@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
+	"text/tabwriter"
 
 	"flox.dev/review-skills/internal/audit"
 	"flox.dev/review-skills/internal/detect"
+	"flox.dev/review-skills/internal/doctor"
 	"flox.dev/review-skills/internal/report"
 )
 
@@ -57,9 +60,7 @@ func run(args []string, out, errw io.Writer) int {
 	case "report":
 		return runReport(rest, out, errw)
 	case "doctor":
-		// Wired in a later phase.
-		fmt.Fprintln(errw, red("not implemented yet: ")+cmd)
-		return 1
+		return runDoctor(rest, out, errw)
 	default:
 		fmt.Fprintln(errw, red("unknown command: ")+cmd)
 		printUsage(errw)
@@ -225,6 +226,63 @@ func runReport(args []string, out, errw io.Writer) int {
 	for _, o := range outs {
 		fmt.Fprintln(out, bold("== "+o.Tool+" =="))
 		fmt.Fprintln(out, o.Raw)
+	}
+	return 0
+}
+
+// runDoctor probes every linter for availability + a smoke test, prints the
+// table, then resolves the default quality ensemble for the requested kind (or
+// both kinds). It exits nonzero when any kind's default ensemble has a missing
+// or broken member, so doctor doubles as a CI preflight gate.
+func runDoctor(args []string, out, errw io.Writer) int {
+	fs := newFlagSet("doctor", errw)
+	kindFlag := fs.String("kind", "", "skill|agent")
+	if err := fs.Parse(args); err != nil {
+		return 2
+	}
+	kind, err := kindFromFlag(*kindFlag)
+	if err != nil {
+		fmt.Fprintln(errw, red("ERROR:")+" "+err.Error())
+		return 2
+	}
+
+	rows := doctor.Probe()
+	avail := map[string]bool{}
+	for _, row := range rows {
+		if row.State == "ok" {
+			avail[row.Tool] = true
+		}
+	}
+
+	tw := tabwriter.NewWriter(out, 0, 2, 2, ' ', 0)
+	fmt.Fprintln(tw, "TOOL\tSTATE\tVERSION\tSMOKE")
+	for _, row := range rows {
+		ver := row.Version
+		if ver == "" {
+			ver = "-"
+		}
+		fmt.Fprintf(tw, "%s\t%s\t%s\t%s\n", row.Tool, row.State, ver, row.Smoke)
+	}
+	tw.Flush()
+
+	kinds := []detect.Kind{detect.KindSkill, detect.KindAgent}
+	if kind != "" {
+		kinds = []detect.Kind{kind}
+	}
+	allOK := true
+	fmt.Fprintln(out)
+	for _, k := range kinds {
+		res := doctor.Resolve(k, avail)
+		fmt.Fprintf(out, "%s audit → uses: %s\n", k, strings.Join(res.Tools, ", "))
+		if res.Warning != "" {
+			fmt.Fprintln(errw, red("  WARNING:")+" "+res.Warning)
+		}
+		if !res.OK {
+			allOK = false
+		}
+	}
+	if !allOK {
+		return 1
 	}
 	return 0
 }

@@ -112,3 +112,15 @@ func TestUnknownTool(t *testing.T) {
 		t.Fatalf("unknown --tools should error")
 	}
 }
+
+func TestDoctorRuns(t *testing.T) {
+	// Exit code varies with tool availability in the test env, so assert only
+	// that doctor renders its table header and names a known registry tool.
+	out, _ := invoke(t, "doctor")
+	if !strings.Contains(out, "TOOL") {
+		t.Fatalf("doctor should print a table header, got %q", out)
+	}
+	if !strings.Contains(out, "skill-tools") {
+		t.Fatalf("doctor should list skill-tools, got %q", out)
+	}
+}
