@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
 type Kind string
@@ -14,11 +16,14 @@ const (
 	KindAgent Kind = "agent"
 )
 
-var agentKeys = []string{"model:", "tools:", "disallowedTools:", "permissionMode:", "color:", "maxTurns:"}
+// agentKeys are frontmatter fields only an agent definition carries.
+var agentKeys = []string{"model", "tools", "disallowedTools", "permissionMode", "color", "maxTurns"}
 
-// Detect returns KindSkill for a dir containing SKILL.md, KindAgent for a
-// .md whose frontmatter carries agent-only keys or lives under agents/.
-// Defaults to KindSkill.
+// Detect returns KindSkill for a directory containing SKILL.md, KindAgent for
+// a .md whose top-level frontmatter carries an agent-only key, or which lives
+// under an agents/ path. Defaults to KindSkill. Parsing the frontmatter as
+// YAML (rather than scanning line prefixes) avoids classifying a body or a
+// nested/indented key as an agent signal.
 func Detect(path string) Kind {
 	if fi, err := os.Stat(path); err == nil && fi.IsDir() {
 		if _, err := os.Stat(filepath.Join(path, "SKILL.md")); err == nil {
@@ -26,10 +31,10 @@ func Detect(path string) Kind {
 		}
 	}
 	if data, err := os.ReadFile(path); err == nil {
-		fm := frontmatter(string(data))
-		for _, k := range agentKeys {
-			for _, line := range strings.Split(fm, "\n") {
-				if strings.HasPrefix(strings.TrimSpace(line), k) {
+		var doc map[string]any
+		if yaml.Unmarshal([]byte(frontmatter(string(data))), &doc) == nil {
+			for _, k := range agentKeys {
+				if _, ok := doc[k]; ok {
 					return KindAgent
 				}
 			}
