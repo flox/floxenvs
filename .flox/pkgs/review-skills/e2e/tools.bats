@@ -12,13 +12,13 @@ load test_helper/common
   echo "$output" | jq -e '.quality.checks | map(.id) | index("skill-tools") != null' >/dev/null
 }
 
-@test "audit --disable claudelint changes the overall score vs default" {
+@test "audit --disable re-normalizes to a valid score (does not crash on a smaller ensemble)" {
   good="$(fixture good-skill)"
   default_overall="$(review-skills audit --json "$good" | jq -r '.overall')"
   disabled_overall="$(review-skills audit --json --disable claudelint "$good" | jq -r '.overall')"
   echo "default=$default_overall disabled=$disabled_overall"
-  # both are valid scores; disabling a tool re-normalizes the ensemble so the
-  # breakdown differs. Assert the run succeeded and produced a numeric score.
+  # dropping a tool divides the ensemble by the remaining weights, so the
+  # smaller ensemble must still yield a single valid 0-100 score.
   [ -n "$disabled_overall" ]
   [ "$disabled_overall" -ge 0 ]
   [ "$disabled_overall" -le 100 ]
