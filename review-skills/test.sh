@@ -13,13 +13,14 @@ command_exists() {
 # ── The runner ────────────────────────────────────────
 command_exists review-skills
 
-# ── The six scoring tools the runner calls ────────────
+# ── The scoring tools the runner calls (quality + security) ──
 command_exists skill-tools
 command_exists claudelint
 command_exists cclint
 command_exists skill-validator
 command_exists agnix
 command_exists skillcheck
+command_exists skillspector
 
 # ── Optional behavioral stage ─────────────────────────
 command_exists promptfoo

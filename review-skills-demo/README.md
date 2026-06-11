@@ -39,7 +39,7 @@ review-skills audit --json samples/good-skill | jq .
 1. **Score the good skill.** `review-skills audit
    samples/good-skill` runs the skill ensemble (skill-tools,
    skill-validator, claudelint), the structural gate,
-   skillcheck, and an estimated impact, then fuses them into
+   skillcheck + skillspector, and an estimated impact, then fuses them into
    one overall score with a `stable`/`warn`/`risk` pill.
 2. **Compare with the broken skill.**
    `samples/bad-skill/SKILL.md` is missing its `description`,

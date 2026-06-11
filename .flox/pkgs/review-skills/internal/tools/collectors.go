@@ -272,8 +272,10 @@ type sarifDoc struct {
 	} `json:"runs"`
 }
 
-// collectSkillcheck maps SARIF results[] to findings.
-func collectSkillcheck(b []byte) []findings.Finding {
+// collectSARIF maps a SARIF document's results[] to findings, tagged with the
+// given tool name. Shared by every security scanner that emits SARIF
+// (skillcheck, skillspector).
+func collectSARIF(tool string, b []byte) []findings.Finding {
 	var v sarifDoc
 	if json.Unmarshal(b, &v) != nil {
 		return nil
@@ -282,7 +284,7 @@ func collectSkillcheck(b []byte) []findings.Finding {
 	for _, r := range v.Runs {
 		for _, res := range r.Results {
 			f := findings.Finding{
-				Tool: "skillcheck", Severity: sevFromLevel(res.Level),
+				Tool: tool, Severity: sevFromLevel(res.Level),
 				Rule: res.RuleID, Message: res.Message.Text,
 			}
 			if len(res.Locations) > 0 {
@@ -295,9 +297,11 @@ func collectSkillcheck(b []byte) []findings.Finding {
 	return out
 }
 
-// SkillcheckSeverity returns the highest security severity across a SARIF
-// document, joining each result's ruleId to its rule's security-severity.
-func SkillcheckSeverity(b []byte) score.Severity {
+// SARIFSeverity returns the highest security severity across a SARIF
+// document, joining each result's ruleId to its rule's security-severity
+// (CVSS), and falling back to the result level when a tool's SARIF carries no
+// rule-level security-severity (e.g. skillspector).
+func SARIFSeverity(b []byte) score.Severity {
 	var v sarifDoc
 	if json.Unmarshal(b, &v) != nil {
 		return score.SevNone

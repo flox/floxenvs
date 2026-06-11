@@ -10,7 +10,7 @@ pill.
 
 The binary shells out to six scoring tools by bare name
 (`skill-tools`, `skill-validator`, `claudelint`, `cclint`,
-`agnix`, `skillcheck`) and, optionally, `promptfoo`. Those
+`agnix`, `skillcheck`, `skillspector`) and, optionally, `promptfoo`. Those
 tools are provided by the `review-skills` Flox environment;
 this package is only the runner.
 
@@ -87,7 +87,7 @@ is missing or broken. Supports `--kind`.
 - **reliability (35%)** — the deterministic gate
   (frontmatter + structure), floored by claudelint
   conformance.
-- **security (20%)** — `skillcheck` SARIF severity. The
+- **security (20%)** — `skillcheck` + `skillspector` SARIF severity (the highest across both scanners). The
   highest finding also caps the overall score: HIGH caps at
   75, CRITICAL caps at 50.
 - **impact (10%)** — behavioral signal. Estimated at 70

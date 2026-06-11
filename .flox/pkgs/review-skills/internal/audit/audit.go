@@ -84,11 +84,6 @@ type runner struct {
 	// executed at most once per audit even when both its score and its
 	// findings are needed.
 	outCache map[string][]byte
-
-	// secDone caches the skillcheck SARIF so the security scan runs once
-	// and its findings (which explain the security cap) can be collected.
-	secDone bool
-	secOut  []byte
 }
 
 // Run executes the full pipeline and returns the fused Result.
@@ -138,22 +133,24 @@ func Run(opts Options) (Result, error) {
 		r.Reliability.Score = 0
 	}
 
-	// --- security = skillcheck severity + cap -------------------------
+	// --- security = highest severity across the security scanners + cap
 	sev := score.SevNone
 	r.Security.Score = 100
 	if !dry() {
-		sev = rn.securitySeverity()
+		sev = rn.securitySeverity(kind)
 		r.Security.Score = securityScore(sev)
 	}
 	r.Security.Severity = string(sev)
 	r.Security.Cap = score.ApplyCap(100, sev)
 
-	// Security findings (e.g. leaked secrets) explain the security cap, so
-	// include them alongside the quality findings when requested. Reuse the
-	// cached skillcheck scan — no extra tool run.
+	// Security findings (leaked secrets, injection, dangerous fetches) explain
+	// the security cap, so include them alongside the quality findings when
+	// requested. Each scanner's scan is cached, so this is no extra tool run.
 	if opts.Findings && !dry() {
-		if sc, found := tools.Find("skillcheck"); found && sc.Collect != nil {
-			r.Findings = append(r.Findings, sc.Collect(rn.skillcheckOut())...)
+		for _, t := range tools.SecurityTools(kind) {
+			if t.Collect != nil {
+				r.Findings = append(r.Findings, t.Collect(rn.runTool(t))...)
+			}
 		}
 	}
 
@@ -407,26 +404,38 @@ func inlineFrontmatterOK(skillDir string) bool {
 
 // --- security -------------------------------------------------------------
 
-// skillcheckOut runs skillcheck once and caches its SARIF output, so the
-// security severity and the security findings share a single scan.
-func (rn *runner) skillcheckOut() []byte {
-	if rn.secDone {
-		return rn.secOut
+// securitySeverity runs every security scanner for the kind and returns the
+// highest severity across all of them. Each scanner's output is cached in
+// outCache (via runTool) so the findings pass reuses it — no extra run. A
+// missing/garbage SARIF from one scanner is treated as none, matching bash.
+func (rn *runner) securitySeverity(kind detect.Kind) score.Severity {
+	worst := score.SevNone
+	for _, t := range tools.SecurityTools(kind) {
+		out := rn.runTool(t)
+		if !jsonOK(out) {
+			continue
+		}
+		if s := tools.SARIFSeverity(out); sevRank(s) > sevRank(worst) {
+			worst = s
+		}
 	}
-	rn.secDone = true
-	cmd := exec.Command("skillcheck", "--format", "sarif", rn.path)
-	rn.secOut, _ = cmd.CombinedOutput()
-	return rn.secOut
+	return worst
 }
 
-// securitySeverity returns the highest SARIF severity from the cached
-// skillcheck scan. A missing/garbage SARIF is treated as none, matching bash.
-func (rn *runner) securitySeverity() score.Severity {
-	out := rn.skillcheckOut()
-	if !jsonOK(out) {
-		return score.SevNone
+// sevRank orders severities for taking a maximum.
+func sevRank(s score.Severity) int {
+	switch s {
+	case score.SevLow:
+		return 1
+	case score.SevMedium:
+		return 2
+	case score.SevHigh:
+		return 3
+	case score.SevCritical:
+		return 4
+	default:
+		return 0
 	}
-	return tools.SkillcheckSeverity(out)
 }
 
 // securityScore maps a severity to the ported 0-100 security score.

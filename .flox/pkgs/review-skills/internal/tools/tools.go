@@ -91,9 +91,34 @@ func Registry() []Tool {
 			Weight:    map[detect.Kind]int{},
 			Dimension: "security",
 			RunArgs:   func(_ detect.Kind, p string) []string { return []string{p, "--format", "sarif"} },
-			Collect:   collectSkillcheck,
+			Collect:   func(b []byte) []findings.Finding { return collectSARIF("skillcheck", b) },
+		},
+		{
+			// NVIDIA SkillSpector — static security scan. Run with --no-llm so
+			// the deterministic core stays offline (its default scan needs an
+			// LLM API key); SARIF goes to stdout.
+			Name: "skillspector", Bin: "skillspector",
+			Kinds:     both,
+			Weight:    map[detect.Kind]int{},
+			Dimension: "security",
+			RunArgs: func(_ detect.Kind, p string) []string {
+				return []string{"scan", p, "--no-llm", "--format", "sarif"}
+			},
+			Collect: func(b []byte) []findings.Finding { return collectSARIF("skillspector", b) },
 		},
 	}
+}
+
+// SecurityTools returns the registry's security-dimension tools that support
+// the kind.
+func SecurityTools(kind detect.Kind) []Tool {
+	var out []Tool
+	for _, t := range Registry() {
+		if t.Dimension == "security" && supports(t, kind) {
+			out = append(out, t)
+		}
+	}
+	return out
 }
 
 // QualityTools returns the registry's quality tools that support the kind.

@@ -56,6 +56,7 @@ review-skills audit path/to/skill
 - `skill-validator` — `SKILL.md` structure + token budgets
 - `agnix` — linter for skills, agents, CLAUDE.md, MCP, hooks
 - `skillcheck` — SAST scanner for `SKILL.md` bodies (SARIF)
+- `skillspector` — NVIDIA static security scan (run `--no-llm`)
 - `promptfoo` — optional behavioral eval harness
 
 ## Commands
@@ -122,7 +123,7 @@ review-skills doctor
 - **reliability (35%)** — the deterministic gate
   (frontmatter + structure), floored by claudelint
   conformance.
-- **security (20%)** — `skillcheck` SARIF severity. The
+- **security (20%)** — `skillcheck` + `skillspector` SARIF severity (highest of the two). The
   highest finding also caps the overall score: HIGH caps at
   75, CRITICAL caps at 50.
 - **impact (10%)** — behavioral signal. Estimated at 70

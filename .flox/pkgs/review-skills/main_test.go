@@ -33,7 +33,7 @@ func tmpSkill(t *testing.T) string {
 
 func TestVersion(t *testing.T) {
 	out, code := invoke(t, "version")
-	if code != 0 || strings.TrimSpace(out) != "0.1.0" {
+	if code != 0 || strings.TrimSpace(out) != "0.2.0" {
 		t.Fatalf("version: code=%d out=%q", code, out)
 	}
 }

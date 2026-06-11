@@ -9,7 +9,8 @@ schema-version = "1.10.0"
 #
 # Provides `review-skills <lint|review|audit> <path>` plus the
 # underlying tools (skill-tools, claudelint, cclint, skill-validator,
-# agnix, skillcheck) and promptfoo for optional behavioral evals:
+# agnix, skillcheck, skillspector) and promptfoo for optional
+# behavioral evals:
 #
 #   review-skills lint   <path>   # deterministic structural gate
 #   review-skills review <path>   # quality-only score
@@ -24,7 +25,7 @@ schema-version = "1.10.0"
 review-skills.pkg-path = "flox/review-skills"
 review-skills.pkg-group = "review-skills"
 
-# The six scoring tools the runner calls by bare name.
+# The scoring tools the runner calls by bare name (quality + security).
 skill-tools.pkg-path = "flox/skill-tools"
 skill-tools.pkg-group = "review-skills"
 claudelint.pkg-path = "flox/claudelint"
@@ -37,6 +38,9 @@ agnix.pkg-path = "flox/agnix"
 agnix.pkg-group = "review-skills"
 skillcheck.pkg-path = "flox/skillcheck"
 skillcheck.pkg-group = "review-skills"
+# NVIDIA SkillSpector — static security scan (run --no-llm by the runner).
+skillspector.pkg-path = "flox/skillspector"
+skillspector.pkg-group = "review-skills"
 
 # Optional behavioral stage for `audit --with-behavioral` (nixpkgs).
 promptfoo.pkg-path = "promptfoo"

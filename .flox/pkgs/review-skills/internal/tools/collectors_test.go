@@ -138,7 +138,7 @@ func TestSecSeverityBands(t *testing.T) {
 
 func TestCollectSkillcheckAndSeverity(t *testing.T) {
 	b := readFixture(t, "skillcheck-findings.sarif")
-	fs := collectSkillcheck(b)
+	fs := collectSARIF("skillcheck", b)
 	if len(fs) == 0 {
 		t.Fatalf("expected skillcheck findings from the secret fixture")
 	}
@@ -147,11 +147,34 @@ func TestCollectSkillcheckAndSeverity(t *testing.T) {
 			t.Fatalf("bad skillcheck finding: %+v", f)
 		}
 	}
-	if got := SkillcheckSeverity(b); got != score.SevCritical {
+	if got := SARIFSeverity(b); got != score.SevCritical {
 		t.Fatalf("expected CRITICAL from the GitHub-token fixture, got %q", got)
 	}
 	// A clean SARIF (empty results) -> no severity.
-	if got := SkillcheckSeverity(readFixture(t, "skillcheck.sarif")); got != score.SevNone {
+	if got := SARIFSeverity(readFixture(t, "skillcheck.sarif")); got != score.SevNone {
 		t.Fatalf("clean skillcheck should be SevNone, got %q", got)
+	}
+}
+
+func TestCollectSkillspectorSARIF(t *testing.T) {
+	// skillspector SARIF has no rule-level security-severity, so severity
+	// falls back to the result level. The findings fixture has an error-level
+	// "External Script Fetching" result.
+	b := readFixture(t, "skillspector-findings.sarif")
+	fs := collectSARIF("skillspector", b)
+	if len(fs) == 0 {
+		t.Fatalf("expected skillspector findings from the fixture")
+	}
+	for _, f := range fs {
+		if f.Tool != "skillspector" || !validSeverity(f.Severity) {
+			t.Fatalf("bad skillspector finding: %+v", f)
+		}
+	}
+	if got := SARIFSeverity(b); got != score.SevHigh {
+		t.Fatalf("error-level skillspector finding should map to HIGH, got %q", got)
+	}
+	// A clean skillspector SARIF -> none.
+	if got := SARIFSeverity(readFixture(t, "skillspector.sarif")); got != score.SevNone {
+		t.Fatalf("clean skillspector should be SevNone, got %q", got)
 	}
 }

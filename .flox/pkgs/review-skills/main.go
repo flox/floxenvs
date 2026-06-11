@@ -15,7 +15,7 @@ import (
 	"flox.dev/review-skills/internal/report"
 )
 
-const version = "0.1.0"
+const version = "0.2.0"
 
 func ansi(code, s string) string { return "\033[" + code + "m" + s + "\033[0m" }
 func red(s string) string        { return ansi("31", s) }
