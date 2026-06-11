@@ -2,6 +2,7 @@ package tools
 
 import (
 	"encoding/json"
+	"strconv"
 	"strings"
 
 	"flox.dev/review-skills/internal/findings"
@@ -216,16 +217,23 @@ func collectSkillTools(b []byte) []findings.Finding {
 	return out
 }
 
-// secSeverity maps a SARIF security-severity string to a score.Severity.
+// secSeverity maps a SARIF security-severity score (CVSS 0.0-10.0, as a
+// string) to a score.Severity, using the standard CVSS v3 bands. Parsing
+// the float (rather than prefix-matching) is important so 10.0 — the
+// maximum severity — does not fall through to none.
 func secSeverity(s string) score.Severity {
+	f, err := strconv.ParseFloat(strings.TrimSpace(s), 64)
+	if err != nil {
+		return score.SevNone
+	}
 	switch {
-	case strings.HasPrefix(s, "9"):
+	case f >= 9.0:
 		return score.SevCritical
-	case strings.HasPrefix(s, "7"), strings.HasPrefix(s, "8"):
+	case f >= 7.0:
 		return score.SevHigh
-	case strings.HasPrefix(s, "5"), strings.HasPrefix(s, "6"):
+	case f >= 4.0:
 		return score.SevMedium
-	case strings.HasPrefix(s, "3"), strings.HasPrefix(s, "4"):
+	case f > 0.0:
 		return score.SevLow
 	default:
 		return score.SevNone

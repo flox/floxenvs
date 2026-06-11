@@ -112,6 +112,30 @@ func TestCollectSkillToolsSuggestions(t *testing.T) {
 	}
 }
 
+func TestSecSeverityBands(t *testing.T) {
+	cases := []struct {
+		in   string
+		want score.Severity
+	}{
+		{"10.0", score.SevCritical}, // must NOT fall through to none
+		{"9.0", score.SevCritical},
+		{"8.5", score.SevHigh},
+		{"7.0", score.SevHigh},
+		{"5.0", score.SevMedium},
+		{"4.0", score.SevMedium},
+		{"3.9", score.SevLow},
+		{"0.1", score.SevLow},
+		{"0.0", score.SevNone},
+		{"", score.SevNone},
+		{"notanumber", score.SevNone},
+	}
+	for _, c := range cases {
+		if got := secSeverity(c.in); got != c.want {
+			t.Errorf("secSeverity(%q)=%q want %q", c.in, got, c.want)
+		}
+	}
+}
+
 func TestCollectSkillcheckAndSeverity(t *testing.T) {
 	b := readFixture(t, "skillcheck-findings.sarif")
 	fs := collectSkillcheck(b)
