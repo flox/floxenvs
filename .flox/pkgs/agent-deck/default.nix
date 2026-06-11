@@ -20,6 +20,17 @@ buildGoModule (finalAttrs: {
     repo = "agent-deck";
     tag = "v${finalAttrs.version}";
     hash = srcHash;
+
+    # Upstream commits its own `.flox/env/manifest.lock`, which is full
+    # of `/nix/store/...` paths. A fetched source is a fixed-output
+    # derivation, and modern Nix refuses FODs that reference store paths
+    # ("fixed-output derivations must not reference store paths"). The
+    # lockfile is irrelevant to building the Go binary, so drop it before
+    # the output is hashed. (Recompute `srcHash` in upgrade.sh after
+    # changing this.)
+    postFetch = ''
+      rm -rf "$out/.flox"
+    '';
   };
 
   inherit vendorHash;
