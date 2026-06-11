@@ -71,6 +71,7 @@ for p in "${changed[@]}"; do
     .flox/pkgs/skill-tools/*) echo "true"; exit 0 ;;
     .flox/pkgs/agnix/*) echo "true"; exit 0 ;;
     .flox/pkgs/skillcheck/*) echo "true"; exit 0 ;;
+    .flox/pkgs/skillspector/*) echo "true"; exit 0 ;;
     *)
       for env in "${envs[@]}"; do
         case "$p" in

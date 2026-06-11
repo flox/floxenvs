@@ -39,8 +39,12 @@ agnix.pkg-group = "review-skills"
 skillcheck.pkg-path = "flox/skillcheck"
 skillcheck.pkg-group = "review-skills"
 # NVIDIA SkillSpector — static security scan (run --no-llm by the runner).
+# It ships a bundled `bin/python`; lower its priority so python313 (needed
+# by the quick_validate gate) wins that slot. The `skillspector` binary is
+# a self-contained wrapper, so it still works at the lower priority.
 skillspector.pkg-path = "flox/skillspector"
 skillspector.pkg-group = "review-skills"
+skillspector.priority = 6
 
 # Optional behavioral stage for `audit --with-behavioral` (nixpkgs).
 promptfoo.pkg-path = "promptfoo"
