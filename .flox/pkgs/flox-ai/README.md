@@ -1,4 +1,4 @@
-# claude-managed
+# flox-ai
 
 A small Go binary that assembles Claude Code configuration
 from Flox package fragments and emits eval-able shell code.
@@ -10,12 +10,12 @@ Depends only on `gopkg.in/yaml.v3` for frontmatter parsing.
 # manifest.toml
 [hook]
 on-activate = '''
-eval "$(claude-managed setup-hook)"
+eval "$(flox-ai setup-hook)"
 '''
 
 [profile]
 common = '''
-eval "$(claude-managed setup-profile)"
+eval "$(flox-ai setup-profile)"
 '''
 ```
 
@@ -33,26 +33,26 @@ hooks work:
 ## Commands
 
 ```bash
-claude-managed setup-hook      # env vars, keychain, symlinks
-claude-managed setup-profile   # cleanup function + EXIT trap
-claude-managed doctor          # config status, symlink health, validation
-claude-managed rules add       # install a rule (symlink)
-claude-managed rules remove    # remove a rule by name
-claude-managed rules list      # show installed rules
-claude-managed rules clean     # remove stale managed rules
-claude-managed skills add      # install a skill (symlink)
-claude-managed skills remove   # remove a skill by name
-claude-managed skills list     # show installed skills
-claude-managed skills clean    # remove stale managed skills
-claude-managed agents add      # install an agent (symlink)
-claude-managed agents remove   # remove an agent by name
-claude-managed agents list     # show installed agents
-claude-managed agents clean    # remove stale managed agents
-claude-managed plugins add     # install plugin
-claude-managed plugins remove  # remove plugin by name
-claude-managed plugins list    # show installed plugins
-claude-managed plugins clean   # remove stale plugins
-claude-managed version         # print version
+flox-ai setup-hook      # env vars, keychain, symlinks
+flox-ai setup-profile   # cleanup function + EXIT trap
+flox-ai doctor          # config status, symlink health, validation
+flox-ai rules add       # install a rule (symlink)
+flox-ai rules remove    # remove a rule by name
+flox-ai rules list      # show installed rules
+flox-ai rules clean     # remove stale managed rules
+flox-ai skills add      # install a skill (symlink)
+flox-ai skills remove   # remove a skill by name
+flox-ai skills list     # show installed skills
+flox-ai skills clean    # remove stale managed skills
+flox-ai agents add      # install an agent (symlink)
+flox-ai agents remove   # remove an agent by name
+flox-ai agents list     # show installed agents
+flox-ai agents clean    # remove stale managed agents
+flox-ai plugins add     # install plugin
+flox-ai plugins remove  # remove plugin by name
+flox-ai plugins list    # show installed plugins
+flox-ai plugins clean   # remove stale plugins
+flox-ai version         # print version
 ```
 
 ### setup-hook
@@ -71,9 +71,9 @@ Emits shell code for the on-activate hook phase:
 
 Emits shell code for the profile phase:
 
-1. Defines the `_claude_managed_clean_symlinks` helper
-2. Defines the `_claude_managed_cleanup` function
-3. Registers `trap _claude_managed_cleanup EXIT`
+1. Defines the `_flox_ai_clean_symlinks` helper
+2. Defines the `_flox_ai_cleanup` function
+3. Registers `trap _flox_ai_cleanup EXIT`
 
 ### doctor
 
@@ -208,7 +208,7 @@ All fragment types are delivered via symlinks into
 ### Isolation via CLAUDE_CONFIG_DIR
 
 `CLAUDE_CONFIG_DIR` is set to
-`$FLOX_ENV_PROJECT/.claude-managed`, a directory next to
+`$FLOX_ENV_PROJECT/.flox-ai`, a directory next to
 the project's `.claude/`. This isolates the Claude session:
 
 - No user settings from `~/.claude/` leaking in
@@ -276,7 +276,7 @@ in the isolated config dir.
 ### Symlink lifecycle
 
 The `setup-profile` shell defines a
-`_claude_managed_clean_symlinks` helper that removes
+`_flox_ai_clean_symlinks` helper that removes
 symlinks whose targets point into
 `$FLOX_ENV/share/claude-code/`. User-created entries are never
 touched.
@@ -289,25 +289,25 @@ again, removing all managed symlinks.
 
 ## Environment variables
 
-### Read by claude-managed
+### Read by flox-ai
 
 | Variable | Purpose |
 | ------ | ------ |
 | `FLOX_ENV` | Flox environment path (fragment source) |
 | `FLOX_ENV_PROJECT` | Project root (for relative paths) |
-| `CLAUDE_MANAGED_DIR` | Override config dir location |
-| `CLAUDE_MANAGED` | Check if managed mode is active |
+| `FLOX_AI_DIR` | Override config dir location |
+| `FLOX_AI` | Check if managed mode is active |
 
-If `CLAUDE_MANAGED_DIR` is not set, defaults to
-`$FLOX_ENV_PROJECT/.claude-managed`.
+If `FLOX_AI_DIR` is not set, defaults to
+`$FLOX_ENV_PROJECT/.flox-ai`.
 
 ### Set by emitted shell code
 
 | Variable | Purpose |
 | ------ | ------ |
-| `CLAUDE_CONFIG_DIR` | `$FLOX_ENV_PROJECT/.claude-managed` |
+| `CLAUDE_CONFIG_DIR` | `$FLOX_ENV_PROJECT/.flox-ai` |
 | `CLAUDE_CODE_DISABLE_AUTO_MEMORY` | Disables memory |
-| `CLAUDE_MANAGED` | Marker that managed mode is active |
+| `FLOX_AI` | Marker that managed mode is active |
 
 ## Architecture
 
@@ -335,7 +335,7 @@ e2e/                        Bats E2E test suite
 ## Building
 
 ```bash
-flox build claude-managed
+flox build flox-ai
 ```
 
 ### Updating dependencies
@@ -358,7 +358,7 @@ Tests cover the parser and validators. Re-run
 ### Unit tests (Go)
 
 ```bash
-cd .flox/pkgs/claude-managed
+cd .flox/pkgs/flox-ai
 go test ./...
 ```
 
@@ -371,10 +371,10 @@ Two runners are available from the repo root:
 **Hermetic (no flox required):**
 
 ```bash
-nix run .#run-test-claude-managed-with-nix
+nix run .#run-test-flox-ai-with-nix
 ```
 
-Builds the binary via Nix, sets `claude-managed` on
+Builds the binary via Nix, sets `flox-ai` on
 PATH, runs bats against temp fixture trees using
 `--dir` and `--config-dir` flags. No `FLOX_*`
 variables are set.
@@ -382,7 +382,7 @@ variables are set.
 **With flox (real lifecycle):**
 
 ```bash
-nix run .#run-test-claude-managed-with-flox
+nix run .#run-test-flox-ai-with-flox
 ```
 
 Creates a throwaway flox environment, installs the

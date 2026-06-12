@@ -4,8 +4,8 @@
 }:
 
 buildGoModule {
-  pname = "claude-managed";
-  version = "0.4.1";
+  pname = "flox-ai";
+  version = "0.5.0";
 
   src = ./.;
 
@@ -15,6 +15,6 @@ buildGoModule {
     description = "Flox-native config management for Claude Code CLI";
     license = lib.licenses.mit;
     platforms = lib.platforms.unix;
-    mainProgram = "claude-managed";
+    mainProgram = "flox-ai";
   };
 }

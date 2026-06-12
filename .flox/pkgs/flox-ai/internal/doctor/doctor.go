@@ -10,7 +10,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"flox.dev/claude-managed/internal/discover"
+	"flox.dev/flox-ai/internal/discover"
 )
 
 // Severity classifies an Issue. Errors mean the fragment is broken;

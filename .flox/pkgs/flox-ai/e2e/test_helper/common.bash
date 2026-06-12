@@ -1,4 +1,4 @@
-# common.bash — shared helpers for claude-managed E2E tests
+# common.bash — shared helpers for flox-ai E2E tests
 #
 # Loaded by every .bats file via:
 #   load test_helper/common
@@ -37,7 +37,7 @@ setup_config_dir() {
   echo "$dir"
 }
 
-# Run claude-managed with appropriate flags per mode.
+# Run flox-ai with appropriate flags per mode.
 #
 # Both modes use --dir to point at test fixtures.
 # In nix mode: also passes --config-dir (no FLOX_ENV_PROJECT).
@@ -56,25 +56,25 @@ run_cm() {
     local config_dir="${CM_CONFIG_DIR:-$(setup_config_dir)}"
     case "$cmd" in
       setup-hook|setup-profile|doctor)
-        run claude-managed --dir "$dir" --config-dir "$config_dir" "$cmd" "$@"
+        run flox-ai --dir "$dir" --config-dir "$config_dir" "$cmd" "$@"
         ;;
       *)
-        run claude-managed "$cmd" "$@"
+        run flox-ai "$cmd" "$@"
         ;;
     esac
   else
     case "$cmd" in
       setup-hook|setup-profile|doctor)
-        run claude-managed --dir "$dir" "$cmd" "$@"
+        run flox-ai --dir "$dir" "$cmd" "$@"
         ;;
       *)
-        run claude-managed "$cmd" "$@"
+        run flox-ai "$cmd" "$@"
         ;;
     esac
   fi
 }
 
-# Run claude-managed and capture stdout/stderr separately.
+# Run flox-ai and capture stdout/stderr separately.
 # Sets: CM_STDOUT, CM_STDERR, CM_STATUS
 run_cm_split() {
   local cmd="$1"; shift
@@ -86,22 +86,22 @@ run_cm_split() {
     local config_dir="${CM_CONFIG_DIR:-$(setup_config_dir)}"
     case "$cmd" in
       setup-hook|setup-profile|doctor)
-        claude-managed --dir "$dir" --config-dir "$config_dir" "$cmd" "$@" \
+        flox-ai --dir "$dir" --config-dir "$config_dir" "$cmd" "$@" \
           >"$tmpout" 2>"$tmperr" || CM_STATUS=$?
         ;;
       *)
-        claude-managed "$cmd" "$@" \
+        flox-ai "$cmd" "$@" \
           >"$tmpout" 2>"$tmperr" || CM_STATUS=$?
         ;;
     esac
   else
     case "$cmd" in
       setup-hook|setup-profile|doctor)
-        claude-managed --dir "$dir" "$cmd" "$@" \
+        flox-ai --dir "$dir" "$cmd" "$@" \
           >"$tmpout" 2>"$tmperr" || CM_STATUS=$?
         ;;
       *)
-        claude-managed "$cmd" "$@" \
+        flox-ai "$cmd" "$@" \
           >"$tmpout" 2>"$tmperr" || CM_STATUS=$?
         ;;
     esac

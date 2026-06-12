@@ -6,7 +6,7 @@ load test_helper/common
   local dir config_dir
   dir="$(setup_fixtures)"
   config_dir="$(setup_config_dir)"
-  run claude-managed --config-dir "$config_dir" \
+  run flox-ai --config-dir "$config_dir" \
     rules add "$dir/rules/valid.md"
   assert_success
   [[ -L "$config_dir/rules/valid.md" ]]
@@ -16,7 +16,7 @@ load test_helper/common
   local dir config_dir
   dir="$(setup_fixtures)"
   config_dir="$(setup_config_dir)"
-  claude-managed --config-dir "$config_dir" \
+  flox-ai --config-dir "$config_dir" \
     rules add "$dir/rules/valid.md"
   local target
   target="$(readlink "$config_dir/rules/valid.md")"
@@ -27,9 +27,9 @@ load test_helper/common
   local dir config_dir
   dir="$(setup_fixtures)"
   config_dir="$(setup_config_dir)"
-  claude-managed --config-dir "$config_dir" \
+  flox-ai --config-dir "$config_dir" \
     rules add "$dir/rules/valid.md"
-  run claude-managed --config-dir "$config_dir" \
+  run flox-ai --config-dir "$config_dir" \
     rules add "$dir/rules/valid.md"
   assert_success
 }
@@ -38,9 +38,9 @@ load test_helper/common
   local dir config_dir
   dir="$(setup_fixtures)"
   config_dir="$(setup_config_dir)"
-  claude-managed --config-dir "$config_dir" \
+  flox-ai --config-dir "$config_dir" \
     rules add "$dir/rules/valid.md"
-  run claude-managed --config-dir "$config_dir" \
+  run flox-ai --config-dir "$config_dir" \
     rules remove valid.md
   assert_success
   [[ ! -L "$config_dir/rules/valid.md" ]]
@@ -50,9 +50,9 @@ load test_helper/common
   local dir config_dir
   dir="$(setup_fixtures)"
   config_dir="$(setup_config_dir)"
-  claude-managed --config-dir "$config_dir" \
+  flox-ai --config-dir "$config_dir" \
     rules add "$dir/rules/valid.md"
-  run claude-managed --config-dir "$config_dir" \
+  run flox-ai --config-dir "$config_dir" \
     rules list
   assert_success
   assert_output --partial 'valid.md'
@@ -61,7 +61,7 @@ load test_helper/common
 @test "rules list shows empty message" {
   local config_dir
   config_dir="$(setup_config_dir)"
-  run claude-managed --config-dir "$config_dir" \
+  run flox-ai --config-dir "$config_dir" \
     rules list
   assert_success
   assert_output --partial 'No rules found'
@@ -71,9 +71,9 @@ load test_helper/common
   local dir config_dir
   dir="$(setup_fixtures)"
   config_dir="$(setup_config_dir)"
-  claude-managed --config-dir "$config_dir" \
+  flox-ai --config-dir "$config_dir" \
     rules add "$dir/rules/valid.md"
-  run claude-managed --dir "$dir" \
+  run flox-ai --dir "$dir" \
     --config-dir "$config_dir" rules clean
   assert_success
   [[ ! -L "$config_dir/rules/valid.md" ]]
@@ -86,7 +86,7 @@ load test_helper/common
   echo "# User rule" > "$user_file"
   mkdir -p "$config_dir/rules"
   ln -sfn "$user_file" "$config_dir/rules/user-rule.md"
-  run claude-managed --dir /nonexistent \
+  run flox-ai --dir /nonexistent \
     --config-dir "$config_dir" rules clean
   [[ -L "$config_dir/rules/user-rule.md" ]]
 }

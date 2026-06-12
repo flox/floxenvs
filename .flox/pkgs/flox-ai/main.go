@@ -8,14 +8,14 @@ import (
 	"path/filepath"
 	"strings"
 
-	"flox.dev/claude-managed/internal/discover"
-	"flox.dev/claude-managed/internal/doctor"
-	"flox.dev/claude-managed/internal/emit"
-	"flox.dev/claude-managed/internal/plugins"
-	"flox.dev/claude-managed/internal/symlinks"
+	"flox.dev/flox-ai/internal/discover"
+	"flox.dev/flox-ai/internal/doctor"
+	"flox.dev/flox-ai/internal/emit"
+	"flox.dev/flox-ai/internal/plugins"
+	"flox.dev/flox-ai/internal/symlinks"
 )
 
-const version = "0.4.1"
+const version = "0.5.0"
 
 // ANSI color helpers
 func ansi(code, s string) string { return "\033[" + code + "m" + s + "\033[0m" }
@@ -34,7 +34,7 @@ func main() {
 
 	var flagDir, flagConfigDir string
 	flag.StringVar(&flagDir, "dir", "", "fragment source directory (default: $FLOX_ENV/share/claude-code)")
-	flag.StringVar(&flagConfigDir, "config-dir", "", "config directory (default: $FLOX_ENV_PROJECT/.claude-managed)")
+	flag.StringVar(&flagConfigDir, "config-dir", "", "config directory (default: $FLOX_ENV_PROJECT/.flox-ai)")
 	flag.Usage = printUsage
 	flag.Parse()
 
@@ -57,16 +57,16 @@ func main() {
 	}
 	configDir := flagConfigDir
 	if configDir == "" {
-		configDir = os.Getenv("CLAUDE_MANAGED_DIR")
+		configDir = os.Getenv("FLOX_AI_DIR")
 	}
 	if configDir == "" {
-		configDir = filepath.Join(projectDir, ".claude-managed")
+		configDir = filepath.Join(projectDir, ".flox-ai")
 	}
-	managed := os.Getenv("CLAUDE_MANAGED") == "1"
+	managed := os.Getenv("FLOX_AI") == "1"
 
 	requireShareDir := func() {
 		if shareDir == "" {
-			fmt.Fprintln(os.Stderr, red("ERROR:")+" --dir is required or run claude-managed inside Flox environment")
+			fmt.Fprintln(os.Stderr, red("ERROR:")+" --dir is required or run flox-ai inside Flox environment")
 			os.Exit(1)
 		}
 	}
@@ -102,7 +102,7 @@ func main() {
 		case "add":
 			pluginPath := flag.Arg(2)
 			if pluginPath == "" {
-				fmt.Fprintln(os.Stderr, red("ERROR:")+" usage: claude-managed plugins add <path>")
+				fmt.Fprintln(os.Stderr, red("ERROR:")+" usage: flox-ai plugins add <path>")
 				os.Exit(1)
 			}
 			if err := plugins.Add(pluginPath, configDir); err != nil {
@@ -112,7 +112,7 @@ func main() {
 		case "remove":
 			name := flag.Arg(2)
 			if name == "" {
-				fmt.Fprintln(os.Stderr, red("ERROR:")+" usage: claude-managed plugins remove <name>")
+				fmt.Fprintln(os.Stderr, red("ERROR:")+" usage: flox-ai plugins remove <name>")
 				os.Exit(1)
 			}
 			if err := plugins.Remove(name, configDir); err != nil {
@@ -148,7 +148,7 @@ func main() {
 }
 
 func printUsage() {
-	fmt.Fprintln(os.Stderr, `Usage: claude-managed [flags] <command>
+	fmt.Fprintln(os.Stderr, `Usage: flox-ai [flags] <command>
 
 Commands:
   setup-hook            Emit shell code for on-activate hook
@@ -165,7 +165,7 @@ Commands:
 
 Flags:
   --dir          Fragment source dir (default: $FLOX_ENV/share/claude-code)
-  --config-dir   Config dir (default: $FLOX_ENV_PROJECT/.claude-managed)`)
+  --config-dir   Config dir (default: $FLOX_ENV_PROJECT/.flox-ai)`)
 }
 
 func runSetup(shareDir, configDir, mode string, warn io.Writer) error {
@@ -349,7 +349,7 @@ func runFragmentSubcmd(typeName, subcmd, arg, configDir, shareDir string) {
 	switch subcmd {
 	case "add":
 		if arg == "" {
-			fmt.Fprintf(os.Stderr, red("ERROR:")+" usage: claude-managed %s add <path>\n", typeName)
+			fmt.Fprintf(os.Stderr, red("ERROR:")+" usage: flox-ai %s add <path>\n", typeName)
 			os.Exit(1)
 		}
 		if err := symlinks.Add(arg, filepath.Join(configDir, subdir)); err != nil {
@@ -358,7 +358,7 @@ func runFragmentSubcmd(typeName, subcmd, arg, configDir, shareDir string) {
 		}
 	case "remove":
 		if arg == "" {
-			fmt.Fprintf(os.Stderr, red("ERROR:")+" usage: claude-managed %s remove <name>\n", typeName)
+			fmt.Fprintf(os.Stderr, red("ERROR:")+" usage: flox-ai %s remove <name>\n", typeName)
 			os.Exit(1)
 		}
 		if err := symlinks.Remove(arg, filepath.Join(configDir, subdir)); err != nil {

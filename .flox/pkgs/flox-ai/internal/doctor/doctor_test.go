@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"flox.dev/claude-managed/internal/discover"
-	"flox.dev/claude-managed/internal/doctor"
+	"flox.dev/flox-ai/internal/discover"
+	"flox.dev/flox-ai/internal/doctor"
 )
 
 func TestCheck_ValidFixtures(t *testing.T) {

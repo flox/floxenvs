@@ -7,9 +7,9 @@ load test_helper/common
   assert_output --partial 'config:'
 }
 
-@test "doctor shows not activated when CLAUDE_MANAGED unset" {
+@test "doctor shows not activated when FLOX_AI unset" {
   if [[ "$TEST_MODE" == "flox" ]]; then
-    skip "CLAUDE_MANAGED may be set in flox mode"
+    skip "FLOX_AI may be set in flox mode"
   fi
   run_cm doctor
   assert_output --partial 'not activated'
@@ -61,7 +61,7 @@ EOF
   if [[ "$TEST_MODE" == "nix" ]]; then
     local cdir="$BATS_TEST_TMPDIR/clean-config"
     mkdir -p "$cdir"
-    run claude-managed --dir "$dir" --config-dir "$cdir" doctor
+    run flox-ai --dir "$dir" --config-dir "$cdir" doctor
   else
     CM_DIR="$dir" run_cm doctor
   fi
@@ -75,7 +75,7 @@ EOF
   if [[ "$TEST_MODE" == "nix" ]]; then
     local cdir="$BATS_TEST_TMPDIR/empty-config"
     mkdir -p "$cdir"
-    run claude-managed --dir "$dir" --config-dir "$cdir" doctor
+    run flox-ai --dir "$dir" --config-dir "$cdir" doctor
   else
     CM_DIR="$dir" run_cm doctor
   fi

@@ -1,4 +1,4 @@
-module flox.dev/claude-managed
+module flox.dev/flox-ai
 
 go 1.26.1
 

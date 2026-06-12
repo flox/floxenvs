@@ -8,7 +8,7 @@ load test_helper/common
   local dir
   dir="$(setup_fixtures empty)"
   if [[ "$TEST_MODE" == "nix" ]]; then
-    run claude-managed --dir "$dir" doctor
+    run flox-ai --dir "$dir" doctor
   else
     CM_DIR="$dir" run_cm doctor
   fi
@@ -19,7 +19,7 @@ load test_helper/common
   local dir
   dir="$(setup_fixtures partial)"
   if [[ "$TEST_MODE" == "nix" ]]; then
-    run claude-managed --dir "$dir" doctor
+    run flox-ai --dir "$dir" doctor
   else
     CM_DIR="$dir" run_cm doctor
   fi
@@ -31,7 +31,7 @@ load test_helper/common
   local dir
   dir="$(setup_fixtures special-chars)"
   if [[ "$TEST_MODE" == "nix" ]]; then
-    run claude-managed --dir "$dir" doctor
+    run flox-ai --dir "$dir" doctor
   else
     CM_DIR="$dir" run_cm doctor
   fi
@@ -43,7 +43,7 @@ load test_helper/common
   dir="$(setup_fixtures unreadable)"
   chmod 000 "$dir/rules/secret.md"
   if [[ "$TEST_MODE" == "nix" ]]; then
-    run claude-managed --dir "$dir" doctor
+    run flox-ai --dir "$dir" doctor
   else
     CM_DIR="$dir" run_cm doctor
   fi
@@ -59,7 +59,7 @@ load test_helper/common
   mkdir -p "$config_dir/rules"
   ln -sfn "/nonexistent/target" "$config_dir/rules/stale.md"
   if [[ "$TEST_MODE" == "nix" ]]; then
-    run claude-managed --dir "$dir" \
+    run flox-ai --dir "$dir" \
       --config-dir "$config_dir" setup-hook
   else
     run_cm setup-hook
@@ -81,11 +81,11 @@ load test_helper/common
   config_dir="$(setup_config_dir)"
   if [[ "$TEST_MODE" == "nix" ]]; then
     local code
-    code="$(claude-managed --dir "$dir" \
+    code="$(flox-ai --dir "$dir" \
       --config-dir "$config_dir" setup-hook 2>/dev/null)"
     eval "$code" 2>/dev/null || true
   else
-    eval "$(claude-managed setup-hook 2>/dev/null)" \
+    eval "$(flox-ai setup-hook 2>/dev/null)" \
       2>/dev/null || true
   fi
   [[ ! -f "$marker" ]]
@@ -102,11 +102,11 @@ load test_helper/common
   config_dir="$(setup_config_dir)"
   if [[ "$TEST_MODE" == "nix" ]]; then
     local code
-    code="$(claude-managed --dir "$dir" \
+    code="$(flox-ai --dir "$dir" \
       --config-dir "$config_dir" setup-hook 2>/dev/null)"
     eval "$code" 2>/dev/null || true
   else
-    eval "$(claude-managed setup-hook 2>/dev/null)" \
+    eval "$(flox-ai setup-hook 2>/dev/null)" \
       2>/dev/null || true
   fi
   [[ ! -f "$marker" ]]
@@ -123,11 +123,11 @@ load test_helper/common
   config_dir="$(setup_config_dir)"
   if [[ "$TEST_MODE" == "nix" ]]; then
     local code
-    code="$(claude-managed --dir "$dir" \
+    code="$(flox-ai --dir "$dir" \
       --config-dir "$config_dir" setup-hook 2>/dev/null)"
     eval "$code" 2>/dev/null || true
   else
-    eval "$(claude-managed setup-hook 2>/dev/null)" \
+    eval "$(flox-ai setup-hook 2>/dev/null)" \
       2>/dev/null || true
   fi
   [[ ! -f "$marker" ]]
@@ -141,7 +141,7 @@ load test_helper/common
   printf '%s\n' '---' 'name: test' '---' '# Agent' > "$malicious" 2>/dev/null || skip "filesystem cannot create this filename"
   config_dir="$(setup_config_dir)"
   if [[ "$TEST_MODE" == "nix" ]]; then
-    run claude-managed --dir "$dir" \
+    run flox-ai --dir "$dir" \
       --config-dir "$config_dir" setup-hook
   else
     run_cm setup-hook
@@ -158,7 +158,7 @@ load test_helper/common
   ln -sfn /etc/passwd "$dir/rules/escape.md"
   config_dir="$(setup_config_dir)"
   if [[ "$TEST_MODE" == "nix" ]]; then
-    run claude-managed --dir "$dir" doctor
+    run flox-ai --dir "$dir" doctor
   else
     CM_DIR="$dir" run_cm doctor
   fi
@@ -172,14 +172,14 @@ load test_helper/common
   dir="$(setup_fixtures)"
   config_dir="$(setup_config_dir)"
   export FLOX_ENV="$(dirname "$(dirname "$dir")")"
-  eval "$(claude-managed --dir "$dir" \
+  eval "$(flox-ai --dir "$dir" \
     --config-dir "$config_dir" setup-hook 2>/dev/null)"
-  eval "$(claude-managed --dir "$dir" \
+  eval "$(flox-ai --dir "$dir" \
     --config-dir "$config_dir" setup-profile 2>/dev/null)"
   echo "user" > "$CLAUDE_CONFIG_DIR/rules/my-custom.md"
   mkdir -p "$CLAUDE_CONFIG_DIR/rules"
   ln -sfn /tmp "$CLAUDE_CONFIG_DIR/rules/user-link"
-  _claude_managed_cleanup
+  _flox_ai_cleanup
   [[ -f "$CLAUDE_CONFIG_DIR/rules/my-custom.md" ]]
   [[ -L "$CLAUDE_CONFIG_DIR/rules/user-link" ]]
 }
@@ -189,13 +189,13 @@ load test_helper/common
   dir="$(setup_fixtures)"
   config_dir="$(setup_config_dir)"
   export FLOX_ENV="$(dirname "$(dirname "$dir")")"
-  eval "$(claude-managed --dir "$dir" \
+  eval "$(flox-ai --dir "$dir" \
     --config-dir "$config_dir" setup-hook 2>/dev/null)"
-  eval "$(claude-managed --dir "$dir" \
+  eval "$(flox-ai --dir "$dir" \
     --config-dir "$config_dir" setup-profile 2>/dev/null)"
   rm -f "$CLAUDE_CONFIG_DIR/rules/valid.md"
   echo "user override" > "$CLAUDE_CONFIG_DIR/rules/valid.md"
-  _claude_managed_cleanup
+  _flox_ai_cleanup
   [[ -f "$CLAUDE_CONFIG_DIR/rules/valid.md" ]]
   grep -q "user override" "$CLAUDE_CONFIG_DIR/rules/valid.md"
 }
@@ -209,7 +209,7 @@ load test_helper/common
   mkdir -p "$config_dir/rules"
   echo "existing" > "$config_dir/rules/existing.md"
   export FLOX_ENV="$(dirname "$(dirname "$dir")")"
-  eval "$(claude-managed --dir "$dir" \
+  eval "$(flox-ai --dir "$dir" \
     --config-dir "$config_dir" setup-hook 2>/dev/null)"
   [[ -f "$config_dir/rules/existing.md" ]]
   grep -q "existing" "$config_dir/rules/existing.md"
@@ -224,9 +224,9 @@ load test_helper/common
   ln -sfn "$dir/rules/a.md" "$dir/rules/b.md"
   ln -sfn "$dir/rules/b.md" "$dir/rules/a.md"
   if [[ "$TEST_MODE" == "nix" ]]; then
-    run timeout 10 claude-managed --dir "$dir" doctor
+    run timeout 10 flox-ai --dir "$dir" doctor
   else
-    CM_DIR="$dir" run timeout 10 claude-managed doctor
+    CM_DIR="$dir" run timeout 10 flox-ai doctor
   fi
   [[ $status -ne 124 ]]
 }
@@ -237,7 +237,7 @@ load test_helper/common
   mkdir -p "$dir/rules"
   ln -sfn "/nonexistent/file.md" "$dir/rules/broken.md"
   if [[ "$TEST_MODE" == "nix" ]]; then
-    run claude-managed --dir "$dir" doctor
+    run flox-ai --dir "$dir" doctor
   else
     CM_DIR="$dir" run_cm doctor
   fi
@@ -259,7 +259,7 @@ load test_helper/common
     echo "# Long rule"
   } > "$dir/rules/long.md"
   if [[ "$TEST_MODE" == "nix" ]]; then
-    run claude-managed --dir "$dir" doctor
+    run flox-ai --dir "$dir" doctor
   else
     CM_DIR="$dir" run_cm doctor
   fi
@@ -278,7 +278,7 @@ load test_helper/common
     echo "# Binary rule"
   } > "$dir/rules/binary.md"
   if [[ "$TEST_MODE" == "nix" ]]; then
-    run claude-managed --dir "$dir" doctor
+    run flox-ai --dir "$dir" doctor
   else
     CM_DIR="$dir" run_cm doctor
   fi
@@ -298,7 +298,7 @@ paths: lib/
 # Duplicate keys
 EOF
   if [[ "$TEST_MODE" == "nix" ]]; then
-    run claude-managed --dir "$dir" doctor
+    run flox-ai --dir "$dir" doctor
   else
     CM_DIR="$dir" run_cm doctor
   fi
@@ -320,7 +320,7 @@ hooks:
 # Nested agent
 EOF
   if [[ "$TEST_MODE" == "nix" ]]; then
-    run claude-managed --dir "$dir" doctor
+    run flox-ai --dir "$dir" doctor
   else
     CM_DIR="$dir" run_cm doctor
   fi
@@ -337,9 +337,9 @@ EOF
     echo "# Rule $i" > "$dir/rules/rule-$i.md"
   done
   if [[ "$TEST_MODE" == "nix" ]]; then
-    run timeout 30 claude-managed --dir "$dir" doctor
+    run timeout 30 flox-ai --dir "$dir" doctor
   else
-    CM_DIR="$dir" run timeout 30 claude-managed doctor
+    CM_DIR="$dir" run timeout 30 flox-ai doctor
   fi
   assert_success
   [[ $status -ne 124 ]]
@@ -358,7 +358,7 @@ description: top level skill
 # Skill A
 EOF
   if [[ "$TEST_MODE" == "nix" ]]; then
-    run claude-managed --dir "$dir" doctor
+    run flox-ai --dir "$dir" doctor
   else
     CM_DIR="$dir" run_cm doctor
   fi
@@ -376,10 +376,10 @@ EOF
   config_dir="$(setup_config_dir)"
   local code
   if [[ "$TEST_MODE" == "nix" ]]; then
-    code="$(claude-managed --dir "$dir" \
+    code="$(flox-ai --dir "$dir" \
       --config-dir "$config_dir" setup-hook 2>/dev/null)"
   else
-    code="$(claude-managed setup-hook 2>/dev/null)"
+    code="$(flox-ai setup-hook 2>/dev/null)"
   fi
   # The emitted code computes hash dynamically via shasum
   echo "$code" | grep -q 'shasum -a 256'

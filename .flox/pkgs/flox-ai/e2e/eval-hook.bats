@@ -12,7 +12,7 @@ setup() {
 }
 
 _get_hook_output() {
-  claude-managed --dir "$CM_DIR" \
+  flox-ai --dir "$CM_DIR" \
     --config-dir "$CM_CONFIG_DIR" setup-hook 2>/dev/null
 }
 
@@ -29,11 +29,11 @@ _get_hook_output() {
   [[ -n "$CLAUDE_CONFIG_DIR" ]]
 }
 
-@test "eval setup-hook sets CLAUDE_MANAGED=1" {
+@test "eval setup-hook sets FLOX_AI=1" {
   local code
   code="$(_get_hook_output)"
   eval "$code"
-  [[ "$CLAUDE_MANAGED" == "1" ]]
+  [[ "$FLOX_AI" == "1" ]]
 }
 
 @test "eval setup-hook sets CLAUDE_CODE_DISABLE_AUTO_MEMORY=1" {

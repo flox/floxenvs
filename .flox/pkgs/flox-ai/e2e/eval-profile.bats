@@ -9,12 +9,12 @@ setup() {
   # Emitted shell uses $FLOX_ENV for symlink targets
   export FLOX_ENV="$(dirname "$(dirname "$CM_DIR")")"
   # eval hook first to set up env vars and symlinks
-  eval "$(claude-managed --dir "$CM_DIR" \
+  eval "$(flox-ai --dir "$CM_DIR" \
     --config-dir "$CM_CONFIG_DIR" setup-hook 2>/dev/null)"
 }
 
 _get_profile_output() {
-  claude-managed --dir "$CM_DIR" \
+  flox-ai --dir "$CM_DIR" \
     --config-dir "$CM_CONFIG_DIR" setup-profile 2>/dev/null
 }
 
@@ -28,7 +28,7 @@ _get_profile_output() {
   local code
   code="$(_get_profile_output)"
   eval "$code"
-  declare -f _claude_managed_cleanup >/dev/null
+  declare -f _flox_ai_cleanup >/dev/null
 }
 
 
@@ -37,7 +37,7 @@ _get_profile_output() {
   code="$(_get_profile_output)"
   eval "$code"
   [[ -L "$CLAUDE_CONFIG_DIR/rules/valid.md" ]]
-  _claude_managed_cleanup
+  _flox_ai_cleanup
   [[ ! -L "$CLAUDE_CONFIG_DIR/rules/valid.md" ]]
 }
 
@@ -46,6 +46,6 @@ _get_profile_output() {
   code="$(_get_profile_output)"
   eval "$code"
   echo "user content" > "$CLAUDE_CONFIG_DIR/rules/user-rule.md"
-  _claude_managed_cleanup
+  _flox_ai_cleanup
   [[ -f "$CLAUDE_CONFIG_DIR/rules/user-rule.md" ]]
 }

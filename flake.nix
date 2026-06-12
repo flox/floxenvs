@@ -18,7 +18,7 @@
         lib = nixpkgs.lib;
         pkgs = nixpkgs.legacyPackages.${system};
 
-        claude-managed = pkgs.callPackage ./.flox/pkgs/claude-managed/default.nix { };
+        flox-ai = pkgs.callPackage ./.flox/pkgs/flox-ai/default.nix { };
 
         symphony = pkgs.callPackage ./.flox/pkgs/symphony/default.nix { };
 
@@ -40,13 +40,13 @@
           p.bats-assert
         ]);
 
-        e2eTestDir = ./.flox/pkgs/claude-managed/e2e;
+        e2eTestDir = ./.flox/pkgs/flox-ai/e2e;
 
-        runTestCmNix = pkgs.writeShellScriptBin "run-test-claude-managed-with-nix" ''
+        runTestCmNix = pkgs.writeShellScriptBin "run-test-flox-ai-with-nix" ''
           set -euo pipefail
           export PATH="${
             lib.makeBinPath [
-              claude-managed
+              flox-ai
               batsWithLibs
               pkgs.coreutils
             ]
@@ -60,7 +60,7 @@
           fi
         '';
 
-        runTestCmFlox = pkgs.writeShellScriptBin "run-test-claude-managed-with-flox" ''
+        runTestCmFlox = pkgs.writeShellScriptBin "run-test-flox-ai-with-flox" ''
           set -euo pipefail
           export PATH="${
             lib.makeBinPath [
@@ -83,7 +83,7 @@
           trap 'rm -rf "$tmpdir"' EXIT
 
           binary_dir="$(nix build --no-link --print-out-paths \
-            '${inputs.self}#packages.${system}.claude-managed')"
+            '${inputs.self}#packages.${system}.flox-ai')"
 
           cd "$tmpdir"
           flox init
@@ -500,7 +500,7 @@
         '';
       in
       {
-        packages.claude-managed = claude-managed;
+        packages.flox-ai = flox-ai;
         packages.symphony = symphony;
         packages.review-skills = review-skills;
 
@@ -519,14 +519,14 @@
           program = "${checkDevcontainersCoverageScript}/bin/check-devcontainers-coverage";
         };
 
-        apps.run-test-claude-managed-with-nix = {
+        apps.run-test-flox-ai-with-nix = {
           type = "app";
-          program = "${runTestCmNix}/bin/run-test-claude-managed-with-nix";
+          program = "${runTestCmNix}/bin/run-test-flox-ai-with-nix";
         };
 
-        apps.run-test-claude-managed-with-flox = {
+        apps.run-test-flox-ai-with-flox = {
           type = "app";
-          program = "${runTestCmFlox}/bin/run-test-claude-managed-with-flox";
+          program = "${runTestCmFlox}/bin/run-test-flox-ai-with-flox";
         };
 
         apps.run-test-review-skills-with-nix = {

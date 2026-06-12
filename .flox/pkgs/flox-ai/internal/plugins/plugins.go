@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"flox.dev/claude-managed/internal/symlinks"
+	"flox.dev/flox-ai/internal/symlinks"
 )
 
 // timestampFormat matches Claude Code's installed_plugins.json schema
