@@ -1,0 +1,265 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.10.0",
+    "install": {
+      "firecrawl-cli": {
+        "pkg-path": "flox/firecrawl-cli",
+        "pkg-group": "firecrawl"
+      },
+      "skills-firecrawl-cli": {
+        "pkg-path": "flox/skills-firecrawl-cli",
+        "pkg-group": "firecrawl"
+      }
+    },
+    "vars": {
+      "FIRECRAWL_API_KEY": ""
+    },
+    "hook": {
+      "on-activate": "dir=\"$FLOX_ENV_CACHE/firecrawl\"\nmkdir -p \"$dir\"\nexport FIRECRAWL_DATA_DIR=\"$dir\"\n\n# Persist the key across activations: if it isn't set in the\n# environment but was saved to the cache before, load it back.\nkey_file=\"$dir/api-key\"\nif [ -z \"${FIRECRAWL_API_KEY:-}\" ] && [ -f \"$key_file\" ]; then\n  FIRECRAWL_API_KEY=\"$(cat \"$key_file\")\"\n  export FIRECRAWL_API_KEY\nfi\n"
+    },
+    "options": {}
+  },
+  "packages": [
+    {
+      "attr_path": "firecrawl-cli",
+      "broken": false,
+      "derivation": "/nix/store/ghy3pbyilzkgdbhwpv7q0sypv5m50wrl-firecrawl-cli-1.19.6.drv",
+      "description": "Official Firecrawl CLI — scrape, crawl, search, and extract data from any website directly from the terminal.",
+      "install_id": "firecrawl-cli",
+      "license": "ISC",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=538ab527ca30c80d01aa3c9babfcab812440d184",
+      "name": "firecrawl-cli-1.19.6",
+      "pname": "firecrawl-cli",
+      "rev": "538ab527ca30c80d01aa3c9babfcab812440d184",
+      "rev_count": 7716,
+      "rev_date": "2026-06-13T23:40:16Z",
+      "scrape_date": "2026-06-13T23:43:23.280493Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.19.6",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/3cmg6b7bzs6jpp73nq44xvr5hssbrz3a-firecrawl-cli-1.19.6"
+      },
+      "system": "aarch64-darwin",
+      "group": "firecrawl",
+      "priority": 5
+    },
+    {
+      "attr_path": "firecrawl-cli",
+      "broken": false,
+      "derivation": "/nix/store/w1yv9fdxa268qv4j2b6z6fqh13gbanlf-firecrawl-cli-1.19.6.drv",
+      "description": "Official Firecrawl CLI — scrape, crawl, search, and extract data from any website directly from the terminal.",
+      "install_id": "firecrawl-cli",
+      "license": "ISC",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=538ab527ca30c80d01aa3c9babfcab812440d184",
+      "name": "firecrawl-cli-1.19.6",
+      "pname": "firecrawl-cli",
+      "rev": "538ab527ca30c80d01aa3c9babfcab812440d184",
+      "rev_count": 7716,
+      "rev_date": "2026-06-13T23:40:16Z",
+      "scrape_date": "2026-06-13T23:43:23.280496Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.19.6",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/d3sw05mx52br4p79jadb9drj5xsngpax-firecrawl-cli-1.19.6"
+      },
+      "system": "aarch64-linux",
+      "group": "firecrawl",
+      "priority": 5
+    },
+    {
+      "attr_path": "firecrawl-cli",
+      "broken": false,
+      "derivation": "/nix/store/f80126pmqd3lqyw0jw7bvwdywcvjrrar-firecrawl-cli-1.19.6.drv",
+      "description": "Official Firecrawl CLI — scrape, crawl, search, and extract data from any website directly from the terminal.",
+      "install_id": "firecrawl-cli",
+      "license": "ISC",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=538ab527ca30c80d01aa3c9babfcab812440d184",
+      "name": "firecrawl-cli-1.19.6",
+      "pname": "firecrawl-cli",
+      "rev": "538ab527ca30c80d01aa3c9babfcab812440d184",
+      "rev_count": 7716,
+      "rev_date": "2026-06-13T23:40:16Z",
+      "scrape_date": "2026-06-13T23:43:23.280496Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.19.6",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/d6hmhkqz6zlirxxd0v36fi5nmv9higyl-firecrawl-cli-1.19.6"
+      },
+      "system": "x86_64-darwin",
+      "group": "firecrawl",
+      "priority": 5
+    },
+    {
+      "attr_path": "firecrawl-cli",
+      "broken": false,
+      "derivation": "/nix/store/gh6vv3n9wf6kjvknh99bjbvvw3wvasw5-firecrawl-cli-1.19.6.drv",
+      "description": "Official Firecrawl CLI — scrape, crawl, search, and extract data from any website directly from the terminal.",
+      "install_id": "firecrawl-cli",
+      "license": "ISC",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=538ab527ca30c80d01aa3c9babfcab812440d184",
+      "name": "firecrawl-cli-1.19.6",
+      "pname": "firecrawl-cli",
+      "rev": "538ab527ca30c80d01aa3c9babfcab812440d184",
+      "rev_count": 7716,
+      "rev_date": "2026-06-13T23:40:16Z",
+      "scrape_date": "2026-06-13T23:43:23.280497Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.19.6",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/3ph1yxg8y51xkn23psx4pvss92dnvljn-firecrawl-cli-1.19.6"
+      },
+      "system": "x86_64-linux",
+      "group": "firecrawl",
+      "priority": 5
+    },
+    {
+      "attr_path": "skills-firecrawl-cli",
+      "broken": false,
+      "derivation": "/nix/store/3wrrmkjzig91civxj7x10fxv5xhvvbvi-skills-firecrawl-cli-0+unstable-2026-06-09.48a341a.drv",
+      "description": "Firecrawl CLI skill bundle for Claude Code and OpenCode — search, scrape, crawl, and interact with the web by driving firecrawl-cli from an agent.",
+      "install_id": "skills-firecrawl-cli",
+      "license": "ISC",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=538ab527ca30c80d01aa3c9babfcab812440d184",
+      "name": "skills-firecrawl-cli-0+unstable-2026-06-09.48a341a",
+      "pname": "skills-firecrawl-cli",
+      "rev": "538ab527ca30c80d01aa3c9babfcab812440d184",
+      "rev_count": 7716,
+      "rev_date": "2026-06-13T23:40:16Z",
+      "scrape_date": "2026-06-13T23:43:23.280497Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0+unstable-2026-06-09.48a341a",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/r9hrcpfgyijcskd01xsbk7p11qz3j38w-skills-firecrawl-cli-0+unstable-2026-06-09.48a341a"
+      },
+      "system": "aarch64-darwin",
+      "group": "firecrawl",
+      "priority": 5
+    },
+    {
+      "attr_path": "skills-firecrawl-cli",
+      "broken": false,
+      "derivation": "/nix/store/d386m5xp4fvbmxpxrskdcfz1h3h4ydkc-skills-firecrawl-cli-0+unstable-2026-06-09.48a341a.drv",
+      "description": "Firecrawl CLI skill bundle for Claude Code and OpenCode — search, scrape, crawl, and interact with the web by driving firecrawl-cli from an agent.",
+      "install_id": "skills-firecrawl-cli",
+      "license": "ISC",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=538ab527ca30c80d01aa3c9babfcab812440d184",
+      "name": "skills-firecrawl-cli-0+unstable-2026-06-09.48a341a",
+      "pname": "skills-firecrawl-cli",
+      "rev": "538ab527ca30c80d01aa3c9babfcab812440d184",
+      "rev_count": 7716,
+      "rev_date": "2026-06-13T23:40:16Z",
+      "scrape_date": "2026-06-13T23:43:23.280498Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0+unstable-2026-06-09.48a341a",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/yiq3z77cxf8mskfcj82pqh2mc4a2qpkc-skills-firecrawl-cli-0+unstable-2026-06-09.48a341a"
+      },
+      "system": "aarch64-linux",
+      "group": "firecrawl",
+      "priority": 5
+    },
+    {
+      "attr_path": "skills-firecrawl-cli",
+      "broken": false,
+      "derivation": "/nix/store/vapk1gl9y3wxyajb5h795aqv67mbnayn-skills-firecrawl-cli-0+unstable-2026-06-09.48a341a.drv",
+      "description": "Firecrawl CLI skill bundle for Claude Code and OpenCode — search, scrape, crawl, and interact with the web by driving firecrawl-cli from an agent.",
+      "install_id": "skills-firecrawl-cli",
+      "license": "ISC",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=538ab527ca30c80d01aa3c9babfcab812440d184",
+      "name": "skills-firecrawl-cli-0+unstable-2026-06-09.48a341a",
+      "pname": "skills-firecrawl-cli",
+      "rev": "538ab527ca30c80d01aa3c9babfcab812440d184",
+      "rev_count": 7716,
+      "rev_date": "2026-06-13T23:40:16Z",
+      "scrape_date": "2026-06-13T23:43:23.280499Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0+unstable-2026-06-09.48a341a",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/9zngcrq83y7i55rq8dh4yzn827iv0nv4-skills-firecrawl-cli-0+unstable-2026-06-09.48a341a"
+      },
+      "system": "x86_64-darwin",
+      "group": "firecrawl",
+      "priority": 5
+    },
+    {
+      "attr_path": "skills-firecrawl-cli",
+      "broken": false,
+      "derivation": "/nix/store/gx43b8050j3sl5x6iscilb2hk2zxkxms-skills-firecrawl-cli-0+unstable-2026-06-09.48a341a.drv",
+      "description": "Firecrawl CLI skill bundle for Claude Code and OpenCode — search, scrape, crawl, and interact with the web by driving firecrawl-cli from an agent.",
+      "install_id": "skills-firecrawl-cli",
+      "license": "ISC",
+      "locked_url": "https://github.com/flox/floxenvs.git?rev=538ab527ca30c80d01aa3c9babfcab812440d184",
+      "name": "skills-firecrawl-cli-0+unstable-2026-06-09.48a341a",
+      "pname": "skills-firecrawl-cli",
+      "rev": "538ab527ca30c80d01aa3c9babfcab812440d184",
+      "rev_count": 7716,
+      "rev_date": "2026-06-13T23:40:16Z",
+      "scrape_date": "2026-06-13T23:43:23.280499Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0+unstable-2026-06-09.48a341a",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/4845ldv5848n24798bi5s37gcc5jydgc-skills-firecrawl-cli-0+unstable-2026-06-09.48a341a"
+      },
+      "system": "x86_64-linux",
+      "group": "firecrawl",
+      "priority": 5
+    }
+  ]
+}
