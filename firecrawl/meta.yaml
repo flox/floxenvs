@@ -1,0 +1,45 @@
+kind: env
+name: firecrawl
+title: Firecrawl
+publisher: flox
+tagline: >
+  Official Firecrawl CLI plus a Claude Code skill bundle for
+  scraping, crawling, searching, and extracting web data.
+summary:
+  - "One-line include — firecrawl CLI and skills ready in any env"
+  - "Scrape any URL to clean, LLM-ready markdown"
+  - "Crawl whole sites, map links, and search the web from the shell"
+  - "Claude Code / OpenCode skills drive the CLI from an agent"
+  - "Authenticates via FIRECRAWL_API_KEY or `firecrawl login`"
+category: ai
+ai_role: tooling
+tags: [firecrawl, scraping, crawling, web, search, claude-code]
+stack: [nodejs, claude-code]
+featured: false
+combines_well_with:
+  - env:claude
+  - pkg:claude-code
+  - pkg:firecrawl-cli
+status: stable
+license: ISC
+upstream:
+  name: firecrawl-cli
+  url: https://github.com/firecrawl/cli
+  license: ISC
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/firecrawl" }]
+  activate: |
+    flox activate -r flox/firecrawl
+recipes:
+  - name: firecrawl-demo
+    start_services: false
+    features:
+      - "Interactive first-run prompt for your firecrawl.dev API key"
+      - "Key persisted to the env cache and reused on later activations"
+      - "Styled banner with quick-start scrape, search, and status commands"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/firecrawl
+  floxhub: https://hub.flox.dev/flox/firecrawl

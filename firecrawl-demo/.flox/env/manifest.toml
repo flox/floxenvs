@@ -1,0 +1,55 @@
+schema-version = "1.11.0"
+
+[include]
+environments = [
+  { dir = "../firecrawl" }
+]
+
+# gum is a demo-only tool for styled terminal output and
+# the interactive API-key prompt.
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
+  dir="${FIRECRAWL_DATA_DIR:-$FLOX_ENV_CACHE/firecrawl}"
+  mkdir -p "$dir"
+  key_file="$dir/api-key"
+
+  # Ask for the Firecrawl API key on first run. Only prompt
+  # when running interactively and the key isn't already set.
+  if [[ -z "${FIRECRAWL_API_KEY:-}" && -t 0 ]]; then
+    gum style --border double --margin '1 2' --padding '1 4' \
+      'Firecrawl demo — scrape, crawl, and search the web' '' \
+      'A Firecrawl API key is required.' \
+      'Grab one (free tier available) at:' \
+      '  https://firecrawl.dev/app/api-keys'
+    key="$(gum input --password \
+      --placeholder 'fc-...' \
+      --prompt 'FIRECRAWL_API_KEY > ')"
+    if [[ -n "$key" ]]; then
+      printf '%s' "$key" > "$key_file"
+      chmod 600 "$key_file"
+      FIRECRAWL_API_KEY="$key"
+      export FIRECRAWL_API_KEY
+      gum style --foreground 42 'Key saved to the env cache. ✓'
+    else
+      gum style --foreground 214 \
+        'No key entered — set FIRECRAWL_API_KEY later or run `firecrawl login`.'
+    fi
+  fi
+
+  gum style --border double --margin '1 2' --padding '1 4' \
+    'Firecrawl CLI' '' \
+    'Check auth + credits:' \
+    '  firecrawl --status' '' \
+    'Scrape a page to clean markdown:' \
+    '  firecrawl scrape "https://firecrawl.dev" -o page.md' '' \
+    'Search the web:' \
+    '  firecrawl search "flox dev environments"' '' \
+    'Drive it from Claude Code / OpenCode via the bundled skill.'
+fi
+'''
