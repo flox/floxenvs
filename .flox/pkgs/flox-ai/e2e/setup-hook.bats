@@ -8,10 +8,10 @@ load test_helper/common
   assert_output --partial 'export CLAUDE_CONFIG_DIR='
 }
 
-@test "setup-hook exports CLAUDE_MANAGED=1" {
+@test "setup-hook exports FLOX_AI=1" {
   run_cm setup-hook
   assert_success
-  assert_output --partial 'export CLAUDE_MANAGED=1'
+  assert_output --partial 'export FLOX_AI=1'
 }
 
 @test "setup-hook exports CLAUDE_CODE_DISABLE_AUTO_MEMORY=1" {
@@ -94,7 +94,7 @@ load test_helper/common
     skip "FLOX_ENV is always set in flox mode"
   fi
   unset FLOX_ENV
-  run claude-managed setup-hook
+  run flox-ai setup-hook
   assert_failure
   assert_output --partial "ERROR:"
   assert_output --partial "--dir is required"

@@ -6,7 +6,7 @@ load test_helper/common
   local dir config_dir
   dir="$(setup_fixtures)"
   config_dir="$(setup_config_dir)"
-  run claude-managed --config-dir "$config_dir" \
+  run flox-ai --config-dir "$config_dir" \
     plugins add "$dir/plugins/valid-plugin"
   assert_success
   [[ -L "$config_dir/plugins/valid-plugin" ]]
@@ -16,7 +16,7 @@ load test_helper/common
   local dir config_dir
   dir="$(setup_fixtures)"
   config_dir="$(setup_config_dir)"
-  claude-managed --config-dir "$config_dir" \
+  flox-ai --config-dir "$config_dir" \
     plugins add "$dir/plugins/valid-plugin"
   [[ -f "$config_dir/plugins/installed_plugins.json" ]]
   run grep "valid-plugin@flox" \
@@ -28,7 +28,7 @@ load test_helper/common
   local dir config_dir ip
   dir="$(setup_fixtures)"
   config_dir="$(setup_config_dir)"
-  claude-managed --config-dir "$config_dir" \
+  flox-ai --config-dir "$config_dir" \
     plugins add "$dir/plugins/valid-plugin"
   ip="$config_dir/plugins/installed_plugins.json"
   # The fixture's placeholder (2026-01-01) must be overwritten.
@@ -47,7 +47,7 @@ load test_helper/common
   local dir config_dir
   dir="$(setup_fixtures)"
   config_dir="$(setup_config_dir)"
-  claude-managed --config-dir "$config_dir" \
+  flox-ai --config-dir "$config_dir" \
     plugins add "$dir/plugins/valid-plugin"
   [[ -f "$config_dir/plugins/known_marketplaces.json" ]]
   run grep "flox" \
@@ -59,9 +59,9 @@ load test_helper/common
   local dir config_dir
   dir="$(setup_fixtures)"
   config_dir="$(setup_config_dir)"
-  claude-managed --config-dir "$config_dir" \
+  flox-ai --config-dir "$config_dir" \
     plugins add "$dir/plugins/valid-plugin"
-  run claude-managed --config-dir "$config_dir" \
+  run flox-ai --config-dir "$config_dir" \
     plugins remove valid-plugin
   assert_success
   [[ ! -L "$config_dir/plugins/valid-plugin" ]]
@@ -71,9 +71,9 @@ load test_helper/common
   local dir config_dir
   dir="$(setup_fixtures)"
   config_dir="$(setup_config_dir)"
-  claude-managed --config-dir "$config_dir" \
+  flox-ai --config-dir "$config_dir" \
     plugins add "$dir/plugins/valid-plugin"
-  claude-managed --config-dir "$config_dir" \
+  flox-ai --config-dir "$config_dir" \
     plugins remove valid-plugin
   [[ ! -f "$config_dir/plugins/installed_plugins.json" ]]
 }
@@ -82,9 +82,9 @@ load test_helper/common
   local dir config_dir
   dir="$(setup_fixtures)"
   config_dir="$(setup_config_dir)"
-  claude-managed --config-dir "$config_dir" \
+  flox-ai --config-dir "$config_dir" \
     plugins add "$dir/plugins/valid-plugin"
-  run claude-managed --config-dir "$config_dir" \
+  run flox-ai --config-dir "$config_dir" \
     plugins list
   assert_success
   assert_output --partial 'valid-plugin'
@@ -93,7 +93,7 @@ load test_helper/common
 @test "plugins list shows empty message" {
   local config_dir
   config_dir="$(setup_config_dir)"
-  run claude-managed --config-dir "$config_dir" \
+  run flox-ai --config-dir "$config_dir" \
     plugins list
   assert_success
   assert_output --partial 'No plugins found'
@@ -103,9 +103,9 @@ load test_helper/common
   local dir config_dir
   dir="$(setup_fixtures)"
   config_dir="$(setup_config_dir)"
-  claude-managed --config-dir "$config_dir" \
+  flox-ai --config-dir "$config_dir" \
     plugins add "$dir/plugins/valid-plugin"
-  run claude-managed --dir "$dir" \
+  run flox-ai --dir "$dir" \
     --config-dir "$config_dir" plugins clean
   assert_success
   [[ ! -L "$config_dir/plugins/valid-plugin" ]]
@@ -117,7 +117,7 @@ load test_helper/common
   user_dir="$BATS_TEST_TMPDIR/user-plugin"
   mkdir -p "$user_dir" "$config_dir/plugins"
   ln -sfn "$user_dir" "$config_dir/plugins/user-plugin"
-  run claude-managed --dir /nonexistent \
+  run flox-ai --dir /nonexistent \
     --config-dir "$config_dir" plugins clean
   [[ -L "$config_dir/plugins/user-plugin" ]]
 }
@@ -126,9 +126,9 @@ load test_helper/common
   local dir config_dir
   dir="$(setup_fixtures)"
   config_dir="$(setup_config_dir)"
-  claude-managed --config-dir "$config_dir" \
+  flox-ai --config-dir "$config_dir" \
     plugins add "$dir/plugins/valid-plugin"
-  claude-managed --config-dir "$config_dir" \
+  flox-ai --config-dir "$config_dir" \
     plugins add "$dir/plugins/valid-plugin"
   local count
   count="$(grep -c 'valid-plugin@flox' \
@@ -146,9 +146,9 @@ load test_helper/common
   local dir config_dir ip
   dir="$(setup_fixtures)"
   config_dir="$(setup_config_dir)"
-  claude-managed --config-dir "$config_dir" \
+  flox-ai --config-dir "$config_dir" \
     plugins add "$dir/plugins/v2-plugin-a"
-  claude-managed --config-dir "$config_dir" \
+  flox-ai --config-dir "$config_dir" \
     plugins add "$dir/plugins/v2-plugin-b"
   ip="$config_dir/plugins/installed_plugins.json"
   [[ -f "$ip" ]]

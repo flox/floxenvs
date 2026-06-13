@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"flox.dev/claude-managed/internal/discover"
+	"flox.dev/flox-ai/internal/discover"
 )
 
 // Params holds everything needed to emit shell code.
@@ -21,7 +21,7 @@ func HookCode(p *Params) string {
 
 	fmt.Fprintf(&sb, "export CLAUDE_CONFIG_DIR=%q\n", p.ConfigDir)
 	sb.WriteString("export CLAUDE_CODE_DISABLE_AUTO_MEMORY=1\n")
-	sb.WriteString("export CLAUDE_MANAGED=1\n")
+	sb.WriteString("export FLOX_AI=1\n")
 	sb.WriteString("mkdir -p \"$CLAUDE_CONFIG_DIR/bin\"\n")
 	sb.WriteString("export PATH=\"$CLAUDE_CONFIG_DIR/bin:$PATH\"\n")
 
@@ -40,7 +40,7 @@ func ProfileCode(p *Params) string {
 	var sb strings.Builder
 	sb.WriteString("export PATH=\"$CLAUDE_CONFIG_DIR/bin:$PATH\"\n")
 	emitCleanupFunc(&sb)
-	sb.WriteString("trap _claude_managed_cleanup EXIT\n")
+	sb.WriteString("trap _flox_ai_cleanup EXIT\n")
 	return sb.String()
 }
 
@@ -50,11 +50,11 @@ func ProfileCodeFish(p *Params) string {
 	var sb strings.Builder
 	sb.WriteString("set -gx PATH \"$CLAUDE_CONFIG_DIR/bin\" $PATH\n")
 	sb.WriteString(`
-function _claude_managed_cleanup --on-event fish_exit
-  claude-managed --config-dir "$CLAUDE_CONFIG_DIR" rules clean
-  claude-managed --config-dir "$CLAUDE_CONFIG_DIR" skills clean
-  claude-managed --config-dir "$CLAUDE_CONFIG_DIR" agents clean
-  claude-managed --config-dir "$CLAUDE_CONFIG_DIR" plugins clean
+function _flox_ai_cleanup --on-event fish_exit
+  flox-ai --config-dir "$CLAUDE_CONFIG_DIR" rules clean
+  flox-ai --config-dir "$CLAUDE_CONFIG_DIR" skills clean
+  flox-ai --config-dir "$CLAUDE_CONFIG_DIR" agents clean
+  flox-ai --config-dir "$CLAUDE_CONFIG_DIR" plugins clean
   if test (uname -s) = Darwin
     set _cm_user (test -n "$USER"; and echo $USER; or echo claude-code-user)
     set _cm_hash (printf '%s' "$CLAUDE_CONFIG_DIR" | shasum -a 256 | cut -c1-8)
@@ -115,17 +115,17 @@ func emitFragments(sb *strings.Builder, p *Params) {
 	}
 
 	for _, g := range groups {
-		fmt.Fprintf(sb, "\nclaude-managed --config-dir \"$CLAUDE_CONFIG_DIR\" %s clean\n", g.label)
+		fmt.Fprintf(sb, "\nflox-ai --config-dir \"$CLAUDE_CONFIG_DIR\" %s clean\n", g.label)
 		for _, f := range g.items {
-			fmt.Fprintf(sb, "claude-managed --config-dir \"$CLAUDE_CONFIG_DIR\" %s add \"$FLOX_ENV/share/claude-code/%s/%s\"\n",
+			fmt.Fprintf(sb, "flox-ai --config-dir \"$CLAUDE_CONFIG_DIR\" %s add \"$FLOX_ENV/share/claude-code/%s/%s\"\n",
 				g.label, g.label, nameForFragment(g.label, f))
 		}
 	}
 
 	// plugins (always clean, even if none discovered)
-	sb.WriteString("\nclaude-managed --config-dir \"$CLAUDE_CONFIG_DIR\" plugins clean\n")
+	sb.WriteString("\nflox-ai --config-dir \"$CLAUDE_CONFIG_DIR\" plugins clean\n")
 	for _, f := range p.Frags.Plugins {
-		fmt.Fprintf(sb, "claude-managed --config-dir \"$CLAUDE_CONFIG_DIR\" plugins add \"$FLOX_ENV/share/claude-code/plugins/%s\"\n", f.Name)
+		fmt.Fprintf(sb, "flox-ai --config-dir \"$CLAUDE_CONFIG_DIR\" plugins add \"$FLOX_ENV/share/claude-code/plugins/%s\"\n", f.Name)
 	}
 }
 
@@ -141,11 +141,11 @@ func nameForFragment(typeName string, f discover.Fragment) string {
 // emitPluginWrapper writes a thin claude wrapper at
 // $CLAUDE_CONFIG_DIR/bin/claude that discovers plugins at exec time
 // from symlinks in $CLAUDE_CONFIG_DIR/plugins/. This means plugins
-// added later (e.g. via `claude-managed plugins add <abspath>` for a
+// added later (e.g. via `flox-ai plugins add <abspath>` for a
 // locally-built package not yet in the env's share dir) are picked up
 // without regenerating the wrapper.
 //
-// Only symlinks are passed as --plugin-dir args. claude-managed
+// Only symlinks are passed as --plugin-dir args. flox-ai
 // always installs plugins as symlinks (see symlinks.Add), so this
 // reliably excludes Claude Code's own runtime directories that get
 // created inside plugins/ at runtime — data/, cache/, marketplaces/.
@@ -178,11 +178,11 @@ func emitPluginWrapper(sb *strings.Builder) {
 func emitCleanupFunc(sb *strings.Builder) {
 	sb.WriteString(`
 # cleanup function (trap registered in profile, not here)
-_claude_managed_cleanup() {
-  claude-managed --config-dir "$CLAUDE_CONFIG_DIR" rules clean
-  claude-managed --config-dir "$CLAUDE_CONFIG_DIR" skills clean
-  claude-managed --config-dir "$CLAUDE_CONFIG_DIR" agents clean
-  claude-managed --config-dir "$CLAUDE_CONFIG_DIR" plugins clean
+_flox_ai_cleanup() {
+  flox-ai --config-dir "$CLAUDE_CONFIG_DIR" rules clean
+  flox-ai --config-dir "$CLAUDE_CONFIG_DIR" skills clean
+  flox-ai --config-dir "$CLAUDE_CONFIG_DIR" agents clean
+  flox-ai --config-dir "$CLAUDE_CONFIG_DIR" plugins clean
   # remove bridged keychain entry (macOS only)
   if [ "$(uname -s)" = "Darwin" ]; then
     _cm_user="${USER:-claude-code-user}"
