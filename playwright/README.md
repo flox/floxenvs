@@ -75,7 +75,7 @@ the service if the browser binary isn't cached yet.
 
 When activated alongside `flox/claude`, the bundled
 `SKILL.md` at `$FLOX_ENV/share/claude-code/skills/playwright-cli/`
-is discovered by `claude-managed` and surfaced to
+is discovered by `flox-ai` and surfaced to
 Claude Code. Same for OpenCode under
 `$FLOX_ENV/share/opencode/skills/playwright-cli/`.
 

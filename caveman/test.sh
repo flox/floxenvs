@@ -12,17 +12,17 @@ command_exists() {
 
 # ── Required commands (inherited from flox/claude) ────
 command_exists claude
-command_exists claude-managed
+command_exists flox-ai
 
 echo ">>> claude version: $(claude --version)"
-echo ">>> claude-managed version: $(claude-managed version)"
+echo ">>> flox-ai version: $(flox-ai version)"
 
 # ── Managed mode ──────────────────────────────────────
-if [ "${CLAUDE_MANAGED:-}" != "1" ]; then
-  echo "Error: CLAUDE_MANAGED not set."
+if [ "${FLOX_AI:-}" != "1" ]; then
+  echo "Error: FLOX_AI not set."
   exit 1
 fi
-echo ">>> CLAUDE_MANAGED=1"
+echo ">>> FLOX_AI=1"
 
 if [ -z "${CLAUDE_CONFIG_DIR:-}" ]; then
   echo "Error: CLAUDE_CONFIG_DIR not set."
@@ -75,7 +75,7 @@ fi
 echo ">>> bundled python3: $("$plugin_dir/bin/python3" --version)"
 
 # ── Doctor check ──────────────────────────────────────
-echo ">>> claude-managed doctor"
-claude-managed doctor
+echo ">>> flox-ai doctor"
+flox-ai doctor
 
 echo ">>> caveman environment is working"

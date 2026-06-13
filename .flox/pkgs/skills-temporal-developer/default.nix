@@ -31,7 +31,7 @@ stdenvNoCC.mkDerivation {
     # ruby/). SKILL.md's links are relative, so the references/
     # tree must travel with it or every reference breaks. Install
     # the whole thing under skills/temporal-developer/ for both
-    # Claude Code and OpenCode, where claude-managed (pulled in via
+    # Claude Code and OpenCode, where flox-ai (pulled in via
     # flox/claude) auto-discovers it on activate.
     if [ ! -f "$src/SKILL.md" ]; then
       echo "error: SKILL.md not found in skill-temporal-developer" >&2

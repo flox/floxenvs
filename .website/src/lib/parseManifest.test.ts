@@ -7,9 +7,9 @@ schema-version = "1.10.0"
 [install]
 claude-code.pkg-path = "flox/claude-code"
 claude-code.pkg-group = "claude-code"
-claude-managed.pkg-path = "flox/claude-managed"
-claude-managed.pkg-group = "claude-managed"
-claude-managed.version = "^0.4.1"
+flox-ai.pkg-path = "flox/flox-ai"
+flox-ai.pkg-group = "flox-ai"
+flox-ai.version = "^0.4.1"
 `;
 
 describe("parseInstalledPackages", () => {
@@ -17,7 +17,7 @@ describe("parseInstalledPackages", () => {
     const pkgs = parseInstalledPackages(SAMPLE);
     expect(pkgs).toEqual([
       { name: "claude-code", path: "flox/claude-code" },
-      { name: "claude-managed", path: "flox/claude-managed" },
+      { name: "flox-ai", path: "flox/flox-ai" },
     ]);
   });
 

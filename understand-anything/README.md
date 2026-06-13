@@ -2,7 +2,7 @@
 
 Claude Code environment with the
 [Understand-Anything](https://github.com/Lum1104/Understand-Anything)
-plugin pre-wired through `claude-managed`.
+plugin pre-wired through `flox-ai`.
 
 Understand-Anything turns any codebase into an interactive
 knowledge graph you can explore, search, and ask questions
@@ -56,13 +56,13 @@ Everything from [claude](../claude/) plus:
 | `pnpm_10`   | Builds `@understand-anything/core`         |
 | `python3`   | Runs the `.py` skill scripts (merge graphs) |
 | `git`       | Clones the plugin source on first activate |
-| `jq`        | Used by claude-managed and the skill setup |
+| `jq`        | Used by flox-ai and the skill setup |
 
 The upstream repo is cloned into
 `$FLOX_ENV_CACHE/understand-anything/repo` on first
 activation and pinned to `UA_VERSION`. The plugin's
 `understand-anything-plugin/` subdir is registered with
-`claude-managed` so the `claude` wrapper picks it up via
+`flox-ai` so the `claude` wrapper picks it up via
 `--plugin-dir` automatically.
 
 ## Configuration variables

@@ -85,7 +85,7 @@ stdenv.mkDerivation {
     done
 
     # Generate installed_plugins.json per plugin dir so
-    # claude-managed registers and Claude Code trusts each one.
+    # flox-ai registers and Claude Code trusts each one.
     UPSTREAM_REV="${data.rev}"
     for plugin_dir in "$PLUGINS_OUT"/*/; do
       name="$(basename "$plugin_dir")"

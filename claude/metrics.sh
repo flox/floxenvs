@@ -30,20 +30,20 @@ defaults=$(default_env_checks "$NAME" "$dir")
   echo "$defaults" | jq -c '.checks[]'
 
   # Claude-specific checks.
-  # claude-managed pinned to semver
+  # flox-ai pinned to semver
   pinned=true note=""
-  if grep -q '^claude-managed.version' "$manifest"; then
-    v=$(grep '^claude-managed.version' "$manifest" \
+  if grep -q '^flox-ai.version' "$manifest"; then
+    v=$(grep '^flox-ai.version' "$manifest" \
           | head -1 | awk -F'"' '{print $2}')
     if [[ ! "$v" =~ ^\^?[0-9]+\.[0-9]+\.[0-9]+ ]]; then
       pinned=false
-      note="claude-managed.version=$v is not semver"
+      note="flox-ai.version=$v is not semver"
     fi
   else
     pinned=false
-    note="claude-managed.version missing"
+    note="flox-ai.version missing"
   fi
-  sh_check_json "claude-managed-pinned" "$pinned" 10 "$note"
+  sh_check_json "flox-ai-pinned" "$pinned" 10 "$note"
 
   # MCP fragment example present in README
   mcp_doc=false

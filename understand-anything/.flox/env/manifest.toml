@@ -3,7 +3,7 @@ schema-version = "1.10.0"
 # Minimal Understand-Anything environment for use with
 # [include]. Wires the upstream Claude Code plugin from
 # https://github.com/Lum1104/Understand-Anything into
-# claude-managed so the /understand, /understand-chat,
+# flox-ai so the /understand, /understand-chat,
 # /understand-diff, /understand-domain, /understand-explain,
 # /understand-knowledge, /understand-onboard, and
 # /understand-dashboard slash commands are available on
@@ -81,7 +81,7 @@ if [ ! -e "$HOME/.understand-anything-plugin" ]; then
   ln -s "$ua_plugin" "$HOME/.understand-anything-plugin"
 fi
 
-# claude-managed `plugins add` reads installed_plugins.json
+# flox-ai `plugins add` reads installed_plugins.json
 # from the plugin dir and merges it into the config's
 # trusted-plugins list. Without it Claude Code lists the
 # plugin but treats it as untrusted, suppressing hook
@@ -119,15 +119,15 @@ if [ "$UA_PREBUILD" = "1" ] \
   ) || echo "understand-anything: pre-build failed; /understand will retry on first use"
 fi
 
-# Register the plugin with claude-managed. The flox/claude
+# Register the plugin with flox-ai. The flox/claude
 # hook above already ran `plugins clean`, so this just adds
 # a symlink under $CLAUDE_CONFIG_DIR/plugins/ that the
 # generated `claude` wrapper picks up at exec time via
 # --plugin-dir. Idempotent: re-running it on a subsequent
 # activation is harmless.
-if command -v claude-managed >/dev/null 2>&1; then
-  cmd_dir="${CLAUDE_CONFIG_DIR:-$FLOX_ENV_PROJECT/.claude-managed}"
-  claude-managed --config-dir "$cmd_dir" plugins add \
+if command -v flox-ai >/dev/null 2>&1; then
+  cmd_dir="${CLAUDE_CONFIG_DIR:-$FLOX_ENV_PROJECT/.flox-ai}"
+  flox-ai --config-dir "$cmd_dir" plugins add \
     "$ua_plugin" >/dev/null 2>&1 || true
 fi
 '''

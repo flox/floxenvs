@@ -13,7 +13,7 @@ MCP tools.
 
 - `basic-memory` and `bm` from the
   [basic-memory](../basic-memory/) env
-- `claude` and `claude-managed` from the
+- `claude` and `flox-ai` from the
   [claude](../claude/) env
 - A pre-written `.mcp.json` wiring basic-memory into Claude Code
 

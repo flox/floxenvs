@@ -8,7 +8,7 @@ schema-version = "1.10.0"
 #   environments = ["flox/agentmemory"]
 #
 # Provides Claude Code with the agentmemory plugin
-# wired up via claude-managed, plus a background
+# wired up via flox-ai, plus a background
 # `agentmemory` service running the REST/MCP backend
 # on port 3111 (configurable via AGENTMEMORY_URL).
 #
@@ -18,9 +18,9 @@ schema-version = "1.10.0"
 [install]
 claude-code.pkg-path = "flox/claude-code"
 claude-code.pkg-group = "claude-code"
-claude-managed.pkg-path = "flox/claude-managed"
-claude-managed.pkg-group = "claude-managed"
-claude-managed.version = "^0.4.1"
+flox-ai.pkg-path = "flox/flox-ai"
+flox-ai.pkg-group = "flox-ai"
+flox-ai.version = "^0.5.0"
 claude-code-plugin-agentmemory.pkg-path = "flox/claude-code-plugin-agentmemory"
 claude-code-plugin-agentmemory.pkg-group = "claude-code-plugin-agentmemory"
 nodejs.pkg-path = "nodejs_20"
@@ -45,18 +45,18 @@ on-activate = '''
 export AGENTMEMORY_CACHE="$FLOX_ENV_CACHE/agentmemory"
 export npm_config_cache="$AGENTMEMORY_CACHE/npm"
 mkdir -p "$npm_config_cache"
-eval "$(claude-managed setup-hook)"
+eval "$(flox-ai setup-hook)"
 '''
 
 [profile]
 bash = '''
-eval "$(claude-managed setup-profile-bash)"
+eval "$(flox-ai setup-profile-bash)"
 '''
 zsh = '''
-eval "$(claude-managed setup-profile-zsh)"
+eval "$(flox-ai setup-profile-zsh)"
 '''
 fish = '''
-claude-managed setup-profile-fish | source
+flox-ai setup-profile-fish | source
 '''
 
 [services]

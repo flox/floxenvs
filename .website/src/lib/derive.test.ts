@@ -7,7 +7,7 @@ const envs = [
     bundles_pkgs: [],
     manifest_install: [
       { name: "claude-code", path: "flox/claude-code" },
-      { name: "claude-managed", path: "flox/claude-managed" },
+      { name: "flox-ai", path: "flox/flox-ai" },
     ],
   },
   {
@@ -19,7 +19,7 @@ const envs = [
 
 const pkgs = [
   { name: "claude-code" },
-  { name: "claude-managed" },
+  { name: "flox-ai" },
   { name: "ollama" },
 ];
 
@@ -27,7 +27,7 @@ describe("deriveBundling", () => {
   it("populates bundles_pkgs from manifest.toml [install]", () => {
     const r = deriveBundling(envs, pkgs);
     const claude = r.envs.find(e => e.name === "claude")!;
-    expect(claude.bundles_pkgs).toEqual(["claude-code", "claude-managed"]);
+    expect(claude.bundles_pkgs).toEqual(["claude-code", "flox-ai"]);
   });
 
   it("preserves explicit bundles_pkgs in meta.yaml", () => {
