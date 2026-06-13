@@ -87,13 +87,34 @@ stdenv.mkDerivation {
       chmod +x "$f"
     done < <(find "$PLUGIN_DIR" -name '*.py' -type f)
 
-    # hooks.json invokes 'python path/to/script' which would resolve
-    # python from the caller's PATH. Drop the explicit interpreter
-    # so the patched shebang on validate-schema.py is honored.
-    # (Upstream switched 'python3' → 'python' in v1.9.8.)
-    substituteInPlace "$PLUGIN_DIR/hooks/hooks.json" --replace-fail \
-      'python \"''${CLAUDE_PLUGIN_ROOT}/hooks/validate-schema.py\"' \
-      '\"''${CLAUDE_PLUGIN_ROOT}/hooks/validate-schema.py\"'
+    # Hook launchers have changed across upstream versions:
+    #
+    # - v1.9.8 used: python "''${CLAUDE_PLUGIN_ROOT}/hooks/validate-schema.py"
+    #   That would resolve python from the caller's PATH. Drop the
+    #   explicit interpreter so the patched shebang on validate-schema.py
+    #   is honored.
+    #
+    # - v2.2.0 uses: node run-python-hook.js validate-schema.py ...
+    #   That JS helper probes python from the caller's PATH. Force it to
+    #   try our wrapped python first, and make the hook invoke Nix's node.
+    if grep -Fq 'python \"''${CLAUDE_PLUGIN_ROOT}/hooks/validate-schema.py\"' \
+        "$PLUGIN_DIR/hooks/hooks.json"; then
+      substituteInPlace "$PLUGIN_DIR/hooks/hooks.json" --replace-fail \
+        'python \"''${CLAUDE_PLUGIN_ROOT}/hooks/validate-schema.py\"' \
+        '\"''${CLAUDE_PLUGIN_ROOT}/hooks/validate-schema.py\"'
+    fi
+
+    if grep -q '"command": "node"' "$PLUGIN_DIR/hooks/hooks.json"; then
+      substituteInPlace "$PLUGIN_DIR/hooks/hooks.json" --replace-fail \
+        '"command": "node"' \
+        '"command": "${nodejs}/bin/node"'
+    fi
+
+    if [ -f "$PLUGIN_DIR/hooks/run-python-hook.js" ]; then
+      substituteInPlace "$PLUGIN_DIR/hooks/run-python-hook.js" --replace-fail \
+        'const candidates = [];' \
+        'const candidates = [{ label: "bundled python3", exe: "'$out'/bin/python3", args: [] }];'
+    fi
 
     # Wrap each extension install/uninstall script so 'node', 'npx',
     # 'python3', 'jq', etc. resolve from Nix when a user runs them.
