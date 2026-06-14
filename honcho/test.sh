@@ -27,6 +27,25 @@ echo ">>> honcho-ai SDK importable"
 python -c "import src.main; print('src.main loaded')"
 echo ">>> honcho server module loads"
 
+# Config plumbing: honcho must parse our documented nested env-var
+# names. The `__` delimiter spelling is the riskiest assumption in
+# this env, so set overrides inline and read them back from the
+# resolved settings object (a fresh python process picks up the env).
+DERIVER_MODEL_CONFIG__MODEL="probe-deriver-model" \
+EMBEDDING_MODEL_CONFIG__MODEL="probe-embed-model" \
+LLM_OPENAI_BASE_URL="http://probe.invalid/v1" \
+python - <<'PY'
+from src.config import settings
+assert settings.DERIVER.MODEL_CONFIG.model == "probe-deriver-model", \
+    settings.DERIVER.MODEL_CONFIG.model
+assert settings.EMBEDDING.MODEL_CONFIG.model == "probe-embed-model", \
+    settings.EMBEDDING.MODEL_CONFIG.model
+assert settings.LLM.OPENAI_BASE_URL == "http://probe.invalid/v1", \
+    settings.LLM.OPENAI_BASE_URL
+print("config plumbing ok")
+PY
+echo ">>> honcho parses nested config env vars"
+
 # On first activate the hook ran initdb, createdb, the
 # pgvector CREATE EXTENSION, and `honcho-migrate upgrade head`
 # while postgres was up briefly. Bring it back up now to
