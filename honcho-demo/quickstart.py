@@ -4,14 +4,13 @@ Run against the local Honcho server (the honcho-api service):
 
     flox activate --start-services
     export LLM_OPENAI_API_KEY=sk-...   # optional, enables peer.chat
+    python quickstart.py
 
-For local inference (LM Studio / vLLM / OpenRouter), set a base URL
-instead of a real key, e.g.:
+For a local or OpenAI-compatible endpoint (LM Studio, vLLM,
+OpenRouter), set a base URL instead of a real key:
 
     export LLM_OPENAI_BASE_URL=http://127.0.0.1:1234/v1
     export LLM_OPENAI_API_KEY=not-needed
-
-    python quickstart.py
 
 Mirrors the README's Store -> Reason -> Query -> Inject loop:
 https://github.com/plastic-labs/honcho#quickstart
