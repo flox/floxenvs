@@ -1,0 +1,25 @@
+kind: pkg
+subkind: skill
+name: skills-avoid-ai-writing
+title: Avoid AI Writing
+skill_for: claude-code
+publisher: flox
+tagline: >
+  Audit and rewrite content to strip AI writing patterns
+  ("AI-isms") — detect-only, edit-in-place, and voice profiles.
+category: ai
+ai_role: tooling
+tags: [claude-code, skill, writing, editing, humanize]
+status: beta
+license: MIT
+featured: false
+install:
+  pkg: |
+    [install]
+    claude-code.pkg-path = "flox/claude-code"
+    claude-code.publisher = "flox"
+    skills-avoid-ai-writing.pkg-path = "flox/skills-avoid-ai-writing"
+    skills-avoid-ai-writing.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/skills-avoid-ai-writing
+  floxhub: https://hub.flox.dev/flox/skills-avoid-ai-writing
