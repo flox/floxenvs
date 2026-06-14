@@ -3,6 +3,15 @@
   "manifest": {
     "schema-version": "1.10.0",
     "install": {
+      "claude-code": {
+        "pkg-path": "flox/claude-code",
+        "pkg-group": "claude-code"
+      },
+      "claude-managed": {
+        "pkg-path": "flox/claude-managed",
+        "pkg-group": "claude-managed",
+        "version": "^0.4.1"
+      },
       "firecrawl-cli": {
         "pkg-path": "flox/firecrawl-cli",
         "pkg-group": "firecrawl"
@@ -16,7 +25,12 @@
       "FIRECRAWL_API_KEY": ""
     },
     "hook": {
-      "on-activate": "dir=\"$FLOX_ENV_CACHE/firecrawl\"\nmkdir -p \"$dir\"\nexport FIRECRAWL_DATA_DIR=\"$dir\"\n\n# Persist the key across activations: if it isn't set in the\n# environment but was saved to the cache before, load it back.\nkey_file=\"$dir/api-key\"\nif [ -z \"${FIRECRAWL_API_KEY:-}\" ] && [ -f \"$key_file\" ]; then\n  FIRECRAWL_API_KEY=\"$(cat \"$key_file\")\"\n  export FIRECRAWL_API_KEY\nfi\n"
+      "on-activate": "eval \"$(claude-managed setup-hook)\"\n\ndir=\"$FLOX_ENV_CACHE/firecrawl\"\nmkdir -p \"$dir\"\nexport FIRECRAWL_DATA_DIR=\"$dir\"\n\n# Persist the key across activations: if it isn't set in the\n# environment but was saved to the cache before, load it back.\nkey_file=\"$dir/api-key\"\nif [ -z \"${FIRECRAWL_API_KEY:-}\" ] && [ -f \"$key_file\" ]; then\n  FIRECRAWL_API_KEY=\"$(cat \"$key_file\")\"\n  export FIRECRAWL_API_KEY\nfi\n"
+    },
+    "profile": {
+      "bash": "eval \"$(claude-managed setup-profile-bash)\"\n",
+      "zsh": "eval \"$(claude-managed setup-profile-zsh)\"\n",
+      "fish": "claude-managed setup-profile-fish | source\n"
     },
     "options": {}
   },
@@ -260,6 +274,307 @@
       "system": "x86_64-linux",
       "group": "firecrawl",
       "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/aaw2jy201c9sw7056ky5c1ndxzddyjqm-claude-code-2.1.177.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=228f0e0269249caee61dcdcf468b11a82d3fe4dd",
+      "name": "claude-code-2.1.177",
+      "pname": "claude-code",
+      "rev": "228f0e0269249caee61dcdcf468b11a82d3fe4dd",
+      "rev_count": 7616,
+      "rev_date": "2026-06-13T02:01:00Z",
+      "scrape_date": "2026-06-14T00:24:34.577303Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "2.1.177",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ngjqdjfimjgkcpi26p659d64nvlpg9rm-claude-code-2.1.177"
+      },
+      "system": "aarch64-darwin",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/jz0q1am16pn1kxr8c9kcqqaav3ryaw6c-claude-code-2.1.177.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=228f0e0269249caee61dcdcf468b11a82d3fe4dd",
+      "name": "claude-code-2.1.177",
+      "pname": "claude-code",
+      "rev": "228f0e0269249caee61dcdcf468b11a82d3fe4dd",
+      "rev_count": 7616,
+      "rev_date": "2026-06-13T02:01:00Z",
+      "scrape_date": "2026-06-14T00:24:34.577305Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "2.1.177",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ya4a9x8hwi3j6p2bbjnkj4ikin83nj78-claude-code-2.1.177"
+      },
+      "system": "aarch64-linux",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/mqh2p49abc5b4kmg380b3ij0ca8ypjar-claude-code-2.1.177.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=228f0e0269249caee61dcdcf468b11a82d3fe4dd",
+      "name": "claude-code-2.1.177",
+      "pname": "claude-code",
+      "rev": "228f0e0269249caee61dcdcf468b11a82d3fe4dd",
+      "rev_count": 7616,
+      "rev_date": "2026-06-13T02:01:00Z",
+      "scrape_date": "2026-06-14T00:24:34.577305Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "2.1.177",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/m8vjjxzpk6zw5n172gn2cmnw375c8z2d-claude-code-2.1.177"
+      },
+      "system": "x86_64-darwin",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/bjpndg68kznk1fvws3v7pm756czqf1yn-claude-code-2.1.177.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=228f0e0269249caee61dcdcf468b11a82d3fe4dd",
+      "name": "claude-code-2.1.177",
+      "pname": "claude-code",
+      "rev": "228f0e0269249caee61dcdcf468b11a82d3fe4dd",
+      "rev_count": 7616,
+      "rev_date": "2026-06-13T02:01:00Z",
+      "scrape_date": "2026-06-14T00:24:34.577306Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": true,
+      "version": "2.1.177",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/b9h9yc4zjjsqry1iqclpbz2cp08ncf2w-claude-code-2.1.177"
+      },
+      "system": "x86_64-linux",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/jrvmawn988xs2da7mg9dzfg3h3jf5gm3-claude-managed-0.4.1.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
+      "name": "claude-managed-0.4.1",
+      "pname": "claude-managed",
+      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
+      "rev_count": 3677,
+      "rev_date": "2026-05-20T12:30:23Z",
+      "scrape_date": "2026-06-14T00:24:34.577310Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/c4caj5rhq2l7p7j5p569a1f08pz5s41v-claude-managed-0.4.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "claude-managed",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/b0iga9ysmq5jga9xmnqf5884qhl7idjp-claude-managed-0.4.1.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
+      "name": "claude-managed-0.4.1",
+      "pname": "claude-managed",
+      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
+      "rev_count": 3677,
+      "rev_date": "2026-05-20T12:30:23Z",
+      "scrape_date": "2026-06-14T00:24:34.577314Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ikmmb7a0zfdwsyzcgczv7sam426n7y82-claude-managed-0.4.1"
+      },
+      "system": "aarch64-linux",
+      "group": "claude-managed",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/nv6viy7wixxv9f92jh5pbzss4ipkmsaz-claude-managed-0.4.1.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
+      "name": "claude-managed-0.4.1",
+      "pname": "claude-managed",
+      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
+      "rev_count": 3677,
+      "rev_date": "2026-05-20T12:30:23Z",
+      "scrape_date": "2026-06-14T00:24:34.577315Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/6mavy5l8gbcq21qxnlxip78dqdr960lm-claude-managed-0.4.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "claude-managed",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-managed",
+      "broken": false,
+      "derivation": "/nix/store/xql8a4pin3z899a09rs9hbc5axcnbi93-claude-managed-0.4.1.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "claude-managed",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
+      "name": "claude-managed-0.4.1",
+      "pname": "claude-managed",
+      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
+      "rev_count": 3677,
+      "rev_date": "2026-05-20T12:30:23Z",
+      "scrape_date": "2026-06-14T00:24:34.577316Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.4.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ak71ws4lbp04ik1cvqws4drjbiaw5cin-claude-managed-0.4.1"
+      },
+      "system": "x86_64-linux",
+      "group": "claude-managed",
+      "priority": 5
     }
-  ]
+  ],
+  "compose": {
+    "composer": {
+      "schema-version": "1.10.0",
+      "install": {
+        "firecrawl-cli": {
+          "pkg-path": "flox/firecrawl-cli",
+          "pkg-group": "firecrawl"
+        },
+        "skills-firecrawl-cli": {
+          "pkg-path": "flox/skills-firecrawl-cli",
+          "pkg-group": "firecrawl"
+        }
+      },
+      "vars": {
+        "FIRECRAWL_API_KEY": ""
+      },
+      "hook": {
+        "on-activate": "dir=\"$FLOX_ENV_CACHE/firecrawl\"\nmkdir -p \"$dir\"\nexport FIRECRAWL_DATA_DIR=\"$dir\"\n\n# Persist the key across activations: if it isn't set in the\n# environment but was saved to the cache before, load it back.\nkey_file=\"$dir/api-key\"\nif [ -z \"${FIRECRAWL_API_KEY:-}\" ] && [ -f \"$key_file\" ]; then\n  FIRECRAWL_API_KEY=\"$(cat \"$key_file\")\"\n  export FIRECRAWL_API_KEY\nfi\n"
+      },
+      "options": {},
+      "include": {
+        "environments": [
+          {
+            "remote": "flox/claude"
+          }
+        ]
+      }
+    },
+    "include": [
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "claude-code": {
+              "pkg-path": "flox/claude-code",
+              "pkg-group": "claude-code"
+            },
+            "claude-managed": {
+              "pkg-path": "flox/claude-managed",
+              "pkg-group": "claude-managed",
+              "version": "^0.4.1"
+            }
+          },
+          "hook": {
+            "on-activate": "eval \"$(claude-managed setup-hook)\"\n"
+          },
+          "profile": {
+            "bash": "eval \"$(claude-managed setup-profile-bash)\"\n",
+            "zsh": "eval \"$(claude-managed setup-profile-zsh)\"\n",
+            "fish": "claude-managed setup-profile-fish | source\n"
+          },
+          "options": {}
+        },
+        "name": "claude",
+        "descriptor": {
+          "remote": "flox/claude"
+        }
+      }
+    ],
+    "warnings": []
+  }
 }
