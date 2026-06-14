@@ -46,6 +46,22 @@ print("config plumbing ok")
 PY
 echo ">>> honcho parses nested config env vars"
 
+# The manifest must export the embedding config vars (valid,
+# non-empty defaults). Blank base_url / model / transport vars are
+# intentionally NOT exported — empty strings would override honcho's
+# None/Literal defaults and break provider calls — so they are not
+# asserted here.
+_assert_eq() {
+  if [ "${!1-}" != "$2" ]; then
+    echo "Error: \$$1='${!1-}' expected '$2'"; exit 1
+  fi
+  echo ">>> \$$1=${!1}"
+}
+_assert_eq EMBEDDING_MODEL_CONFIG__MODEL text-embedding-3-small
+_assert_eq EMBEDDING_MODEL_CONFIG__TRANSPORT openai
+_assert_eq EMBEDDING_VECTOR_DIMENSIONS 1536
+echo ">>> config-flexibility vars exported"
+
 # On first activate the hook ran initdb, createdb, the
 # pgvector CREATE EXTENSION, and `honcho-migrate upgrade head`
 # while postgres was up briefly. Bring it back up now to
