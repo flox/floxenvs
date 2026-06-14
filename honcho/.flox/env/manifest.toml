@@ -142,10 +142,11 @@ fi
 # One-shot reminder: honcho's reasoning paths need an LLM key.
 # /health and the storage API work without one, so this is a
 # soft warning, not a hard failure.
-if [ -z "${LLM_OPENAI_API_KEY:-}${LLM_ANTHROPIC_API_KEY:-}${LLM_GEMINI_API_KEY:-}" ] \
+if [ -z "${LLM_OPENAI_API_KEY:-}${LLM_ANTHROPIC_API_KEY:-}${LLM_GEMINI_API_KEY:-}${LLM_OPENAI_BASE_URL:-}${LLM_ANTHROPIC_BASE_URL:-}${LLM_GEMINI_BASE_URL:-}" ] \
     && [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
   echo "honcho: no LLM_*_API_KEY set — chat/reasoning endpoints will fail." >&2
-  echo "        set LLM_OPENAI_API_KEY (or _ANTHROPIC_, _GEMINI_) before using them." >&2
+  echo "        set LLM_OPENAI_API_KEY (or _ANTHROPIC_, _GEMINI_), or an" >&2
+  echo "        LLM_*_BASE_URL for a local/compatible endpoint, first." >&2
 fi
 '''
 
