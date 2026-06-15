@@ -65,28 +65,13 @@ load test_helper/common
   assert_output --partial 'security add-generic-password'
 }
 
-@test "setup-hook warns on bad frontmatter" {
+# Fragment validation moved to `flox-ai doctor`; the hook stays silent so it
+# does not spam warnings on every environment activation. See doctor.bats for
+# the frontmatter validation coverage.
+@test "setup-hook does not validate fragments (no warnings)" {
   run_cm_split setup-hook
-  [[ "$CM_STDERR" == *"WARN:"* ]]
-  [[ "$CM_STDERR" == *"unknown frontmatter key"* ]]
-}
-
-@test "setup-hook warns on forbidden agent key" {
-  run_cm_split setup-hook
-  [[ "$CM_STDERR" == *"WARN:"* ]]
-  [[ "$CM_STDERR" == *"forbidden frontmatter key"* ]]
-}
-
-@test "setup-hook warns on invalid skill name" {
-  run_cm_split setup-hook
-  [[ "$CM_STDERR" == *"WARN:"* ]]
-  [[ "$CM_STDERR" == *"must be kebab-case"* ]]
-}
-
-@test "setup-hook warns on invalid effort" {
-  run_cm_split setup-hook
-  [[ "$CM_STDERR" == *"WARN:"* ]]
-  [[ "$CM_STDERR" == *"must be low|medium|high|max"* ]]
+  [[ "$CM_STDERR" != *"WARN:"* ]]
+  [[ "$CM_STDERR" != *"frontmatter"* ]]
 }
 
 @test "setup-hook without --dir or FLOX_ENV fails" {

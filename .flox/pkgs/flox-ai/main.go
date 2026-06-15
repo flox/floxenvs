@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -74,19 +73,19 @@ func main() {
 	switch cmd {
 	case "setup-hook":
 		requireShareDir()
-		if err := runSetup(shareDir, configDir, "hook", os.Stderr); err != nil {
+		if err := runSetup(shareDir, configDir, "hook"); err != nil {
 			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
 			os.Exit(1)
 		}
 	case "setup-profile", "setup-profile-bash", "setup-profile-zsh":
 		requireShareDir()
-		if err := runSetup(shareDir, configDir, "profile", os.Stderr); err != nil {
+		if err := runSetup(shareDir, configDir, "profile"); err != nil {
 			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
 			os.Exit(1)
 		}
 	case "setup-profile-fish":
 		requireShareDir()
-		if err := runSetup(shareDir, configDir, "profile-fish", os.Stderr); err != nil {
+		if err := runSetup(shareDir, configDir, "profile-fish"); err != nil {
 			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
 			os.Exit(1)
 		}
@@ -168,22 +167,14 @@ Flags:
   --config-dir   Config dir (default: $FLOX_ENV_PROJECT/.flox-ai)`)
 }
 
-func runSetup(shareDir, configDir, mode string, warn io.Writer) error {
+// runSetup emits the shell code for the requested setup phase. Fragment
+// validation is intentionally NOT performed here: surfacing frontmatter
+// warnings on every environment activation is noisy. Those checks now live
+// solely in `flox-ai doctor`, which users run on demand.
+func runSetup(shareDir, configDir, mode string) error {
 	frags, err := discover.Scan(shareDir)
 	if err != nil {
 		return fmt.Errorf("discover: %w", err)
-	}
-
-	// validate fragments and warn (don't block activation)
-	if mode == "hook" {
-		result := doctor.Check(frags)
-		for _, issue := range result.Issues {
-			label := yellow("WARN:")
-			if issue.IsError() {
-				label = red("ERROR:")
-			}
-			fmt.Fprintf(warn, "%s %s\n", label, issue)
-		}
 	}
 
 	params := &emit.Params{
