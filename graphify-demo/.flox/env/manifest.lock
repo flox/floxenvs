@@ -20,14 +20,14 @@
         "pkg-path": "flox/claude-code",
         "pkg-group": "claude-code"
       },
-      "claude-managed": {
-        "pkg-path": "flox/claude-managed",
-        "pkg-group": "claude-managed",
-        "version": "^0.4.1"
-      },
       "curl": {
         "pkg-path": "curl",
         "pkg-group": "graphify-tools"
+      },
+      "flox-ai": {
+        "pkg-path": "flox/flox-ai",
+        "pkg-group": "flox-ai",
+        "version": "^0.5.0"
       },
       "gcc-unwrapped": {
         "pkg-path": "gcc-unwrapped",
@@ -69,12 +69,12 @@
       "VIRTUAL_ENV_DISABLE_PROMPT": "1"
     },
     "hook": {
-      "on-activate": "export PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$PYTHON_DIR/.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$PYTHON_DIR\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  python3 -m venv --upgrade-deps \"$PYTHON_DIR\"\n  echo \"$CURRENT_INTERP\" > \"$PYTHON_DIR/.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$PYTHON_DIR/bin/activate\"\n\nHASH=$(echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5sum 2>/dev/null \\\n  || echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5 -q)\nHASH=$(echo \"$HASH\" | cut -d\" \" -f1)\nLAST=$(cat \"$PYTHON_DIR/.deps_hash\" 2>/dev/null)\nif [ \"$HASH\" != \"$LAST\" ]; then\n  pip install -q \"$GRAPHIFY_INSTALL_PACKAGE\"\n  echo \"$HASH\" > \"$PYTHON_DIR/.deps_hash\"\nfi\n\neval \"$(claude-managed setup-hook)\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'graphify — knowledge graphs for Claude Code' '' \\\n    'The /graphify skill is pre-installed via' \\\n    'flox/skill-graphify and discovered by' \\\n    'claude-managed. Just open Claude Code:' \\\n    '  /graphify .' '' \\\n    'Or use the CLI directly:' \\\n    '  graphify .' \\\n    '  graphify ./raw --mode deep' \\\n    '  graphify ./raw --update' '' \\\n    'Query the graph:' \\\n    '  graphify query \"what connects X to Y?\"' \\\n    '  graphify path \"Module\" \"Database\"' \\\n    '  graphify explain \"Concept\"'\nfi\n"
+      "on-activate": "export PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$PYTHON_DIR/.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$PYTHON_DIR\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  python3 -m venv --upgrade-deps \"$PYTHON_DIR\"\n  echo \"$CURRENT_INTERP\" > \"$PYTHON_DIR/.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$PYTHON_DIR/bin/activate\"\n\nHASH=$(echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5sum 2>/dev/null \\\n  || echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5 -q)\nHASH=$(echo \"$HASH\" | cut -d\" \" -f1)\nLAST=$(cat \"$PYTHON_DIR/.deps_hash\" 2>/dev/null)\nif [ \"$HASH\" != \"$LAST\" ]; then\n  pip install -q \"$GRAPHIFY_INSTALL_PACKAGE\"\n  echo \"$HASH\" > \"$PYTHON_DIR/.deps_hash\"\nfi\n\neval \"$(flox-ai setup-hook)\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'graphify — knowledge graphs for Claude Code' '' \\\n    'The /graphify skill is pre-installed via' \\\n    'flox/skill-graphify and discovered by' \\\n    'flox-ai. Just open Claude Code:' \\\n    '  /graphify .' '' \\\n    'Or use the CLI directly:' \\\n    '  graphify .' \\\n    '  graphify ./raw --mode deep' \\\n    '  graphify ./raw --update' '' \\\n    'Query the graph:' \\\n    '  graphify query \"what connects X to Y?\"' \\\n    '  graphify path \"Module\" \"Database\"' \\\n    '  graphify explain \"Concept\"'\nfi\n"
     },
     "profile": {
-      "bash": "source \"$PYTHON_DIR/bin/activate\"\n\neval \"$(claude-managed setup-profile-bash)\"\n",
-      "zsh": "source \"$PYTHON_DIR/bin/activate\"\n\neval \"$(claude-managed setup-profile-zsh)\"\n",
-      "fish": "source \"$PYTHON_DIR/bin/activate.fish\"\n\nclaude-managed setup-profile-fish | source\n",
+      "bash": "source \"$PYTHON_DIR/bin/activate\"\n\neval \"$(flox-ai setup-profile-bash)\"\n",
+      "zsh": "source \"$PYTHON_DIR/bin/activate\"\n\neval \"$(flox-ai setup-profile-zsh)\"\n",
+      "fish": "source \"$PYTHON_DIR/bin/activate.fish\"\n\nflox-ai setup-profile-fish | source\n",
       "tcsh": "source \"$PYTHON_DIR/bin/activate.csh\"\n"
     },
     "options": {},
@@ -209,126 +209,6 @@
       "priority": 5
     },
     {
-      "attr_path": "claude-managed",
-      "broken": false,
-      "derivation": "/nix/store/jrvmawn988xs2da7mg9dzfg3h3jf5gm3-claude-managed-0.4.1.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "claude-managed",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "name": "claude-managed-0.4.1",
-      "pname": "claude-managed",
-      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "rev_count": 3677,
-      "rev_date": "2026-05-20T12:30:23Z",
-      "scrape_date": "2026-06-15T02:16:32.550373161Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/c4caj5rhq2l7p7j5p569a1f08pz5s41v-claude-managed-0.4.1"
-      },
-      "system": "aarch64-darwin",
-      "group": "claude-managed",
-      "priority": 5
-    },
-    {
-      "attr_path": "claude-managed",
-      "broken": false,
-      "derivation": "/nix/store/b0iga9ysmq5jga9xmnqf5884qhl7idjp-claude-managed-0.4.1.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "claude-managed",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "name": "claude-managed-0.4.1",
-      "pname": "claude-managed",
-      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "rev_count": 3677,
-      "rev_date": "2026-05-20T12:30:23Z",
-      "scrape_date": "2026-06-15T02:16:32.550374924Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/ikmmb7a0zfdwsyzcgczv7sam426n7y82-claude-managed-0.4.1"
-      },
-      "system": "aarch64-linux",
-      "group": "claude-managed",
-      "priority": 5
-    },
-    {
-      "attr_path": "claude-managed",
-      "broken": false,
-      "derivation": "/nix/store/nv6viy7wixxv9f92jh5pbzss4ipkmsaz-claude-managed-0.4.1.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "claude-managed",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "name": "claude-managed-0.4.1",
-      "pname": "claude-managed",
-      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "rev_count": 3677,
-      "rev_date": "2026-05-20T12:30:23Z",
-      "scrape_date": "2026-06-15T02:16:32.550375485Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/6mavy5l8gbcq21qxnlxip78dqdr960lm-claude-managed-0.4.1"
-      },
-      "system": "x86_64-darwin",
-      "group": "claude-managed",
-      "priority": 5
-    },
-    {
-      "attr_path": "claude-managed",
-      "broken": false,
-      "derivation": "/nix/store/xql8a4pin3z899a09rs9hbc5axcnbi93-claude-managed-0.4.1.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "claude-managed",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "name": "claude-managed-0.4.1",
-      "pname": "claude-managed",
-      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "rev_count": 3677,
-      "rev_date": "2026-05-20T12:30:23Z",
-      "scrape_date": "2026-06-15T02:16:32.550375896Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/ak71ws4lbp04ik1cvqws4drjbiaw5cin-claude-managed-0.4.1"
-      },
-      "system": "x86_64-linux",
-      "group": "claude-managed",
-      "priority": 5
-    },
-    {
       "attr_path": "gum",
       "broken": false,
       "derivation": "/nix/store/jsk66asqq2wnckkllv9sm1y94mxl0asm-gum-0.17.0.drv",
@@ -446,6 +326,126 @@
       },
       "system": "x86_64-linux",
       "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-ai",
+      "broken": false,
+      "derivation": "/nix/store/3c69hqd40j8kpxjhc6qcz7ij502c9l10-flox-ai-0.5.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "flox-ai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=b70958050f38ef6f333914e083379ad6b2c201f0",
+      "name": "flox-ai-0.5.0",
+      "pname": "flox-ai",
+      "rev": "b70958050f38ef6f333914e083379ad6b2c201f0",
+      "rev_count": 7638,
+      "rev_date": "2026-06-13T13:06:59Z",
+      "scrape_date": "2026-06-15T16:50:32.942640Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.5.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/yjn7g3y8a1zhrjzih6ycd00pban7bijm-flox-ai-0.5.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "flox-ai",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-ai",
+      "broken": false,
+      "derivation": "/nix/store/8ck474yn2l0dic0srxvml5l6szmlv0xf-flox-ai-0.5.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "flox-ai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=b70958050f38ef6f333914e083379ad6b2c201f0",
+      "name": "flox-ai-0.5.0",
+      "pname": "flox-ai",
+      "rev": "b70958050f38ef6f333914e083379ad6b2c201f0",
+      "rev_count": 7638,
+      "rev_date": "2026-06-13T13:06:59Z",
+      "scrape_date": "2026-06-15T16:50:32.942643Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.5.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/l1wxijmjnmx66i7f15qkplpr5j2jsd2y-flox-ai-0.5.0"
+      },
+      "system": "aarch64-linux",
+      "group": "flox-ai",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-ai",
+      "broken": false,
+      "derivation": "/nix/store/pzgvpxjipsxjmqbdjjsyvmb3v14h178a-flox-ai-0.5.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "flox-ai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=b70958050f38ef6f333914e083379ad6b2c201f0",
+      "name": "flox-ai-0.5.0",
+      "pname": "flox-ai",
+      "rev": "b70958050f38ef6f333914e083379ad6b2c201f0",
+      "rev_count": 7638,
+      "rev_date": "2026-06-13T13:06:59Z",
+      "scrape_date": "2026-06-15T16:50:32.942644Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.5.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/minnw6ndg1g8bi4s1khyi2r9a1p2ggp5-flox-ai-0.5.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "flox-ai",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-ai",
+      "broken": false,
+      "derivation": "/nix/store/rqx8dk2f34057zvlxp4518hh5jz390yz-flox-ai-0.5.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "flox-ai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=b70958050f38ef6f333914e083379ad6b2c201f0",
+      "name": "flox-ai-0.5.0",
+      "pname": "flox-ai",
+      "rev": "b70958050f38ef6f333914e083379ad6b2c201f0",
+      "rev_count": 7638,
+      "rev_date": "2026-06-13T13:06:59Z",
+      "scrape_date": "2026-06-15T16:50:32.942645Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.5.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/hwnzrnlas0knhcjxd3imscx71dygj0cg-flox-ai-0.5.0"
+      },
+      "system": "x86_64-linux",
+      "group": "flox-ai",
       "priority": 5
     },
     {
@@ -1559,7 +1559,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'graphify — knowledge graphs for Claude Code' '' \\\n    'The /graphify skill is pre-installed via' \\\n    'flox/skill-graphify and discovered by' \\\n    'claude-managed. Just open Claude Code:' \\\n    '  /graphify .' '' \\\n    'Or use the CLI directly:' \\\n    '  graphify .' \\\n    '  graphify ./raw --mode deep' \\\n    '  graphify ./raw --update' '' \\\n    'Query the graph:' \\\n    '  graphify query \"what connects X to Y?\"' \\\n    '  graphify path \"Module\" \"Database\"' \\\n    '  graphify explain \"Concept\"'\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'graphify — knowledge graphs for Claude Code' '' \\\n    'The /graphify skill is pre-installed via' \\\n    'flox/skill-graphify and discovered by' \\\n    'flox-ai. Just open Claude Code:' \\\n    '  /graphify .' '' \\\n    'Or use the CLI directly:' \\\n    '  graphify .' \\\n    '  graphify ./raw --mode deep' \\\n    '  graphify ./raw --update' '' \\\n    'Query the graph:' \\\n    '  graphify query \"what connects X to Y?\"' \\\n    '  graphify path \"Module\" \"Database\"' \\\n    '  graphify explain \"Concept\"'\nfi\n"
       },
       "options": {},
       "include": {
@@ -1662,19 +1662,19 @@
               "pkg-path": "flox/claude-code",
               "pkg-group": "claude-code"
             },
-            "claude-managed": {
-              "pkg-path": "flox/claude-managed",
-              "pkg-group": "claude-managed",
-              "version": "^0.4.1"
+            "flox-ai": {
+              "pkg-path": "flox/flox-ai",
+              "pkg-group": "flox-ai",
+              "version": "^0.5.0"
             }
           },
           "hook": {
-            "on-activate": "eval \"$(claude-managed setup-hook)\"\n"
+            "on-activate": "eval \"$(flox-ai setup-hook)\"\n"
           },
           "profile": {
-            "bash": "eval \"$(claude-managed setup-profile-bash)\"\n",
-            "zsh": "eval \"$(claude-managed setup-profile-zsh)\"\n",
-            "fish": "claude-managed setup-profile-fish | source\n"
+            "bash": "eval \"$(flox-ai setup-profile-bash)\"\n",
+            "zsh": "eval \"$(flox-ai setup-profile-zsh)\"\n",
+            "fish": "flox-ai setup-profile-fish | source\n"
           },
           "options": {}
         },

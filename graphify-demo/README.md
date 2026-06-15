@@ -19,7 +19,7 @@ flox activate -r flox/graphify-demo
 
 The `/graphify` skill is pre-installed via
 `flox/skills-graphify` and auto-discovered by
-`claude-managed` — no `graphify install` step needed.
+`flox-ai` — no `graphify install` step needed.
 
 Open Claude Code in any directory and type:
 
@@ -38,7 +38,7 @@ graphify .
 - Everything from the `graphify` base environment
   (Python 3.11, `graphify` CLI, Claude Code)
 - The `flox/claude` env via `[include]` for
-  `claude-managed` (which auto-discovers skills under
+  `flox-ai` (which auto-discovers skills under
   `$FLOX_ENV/share/claude-code/skills/`)
 - `flox/skills-graphify` — ships the `/graphify` SKILL.md
   so Claude Code finds it on activate
