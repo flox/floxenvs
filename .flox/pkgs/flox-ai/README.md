@@ -60,12 +60,15 @@ flox-ai version         # print version
 Emits shell code for the on-activate hook phase:
 
 1. Exports env vars (`CLAUDE_CONFIG_DIR`, etc.)
-2. Validates fragments and prints warnings to stderr
-3. Bridges macOS Keychain credentials for the isolated
+2. Bridges macOS Keychain credentials for the isolated
    config dir
-4. Copies `~/.claude.json` for OAuth account metadata
-5. Cleans stale symlinks and creates fresh ones in
+3. Copies `~/.claude.json` for OAuth account metadata
+4. Cleans stale symlinks and creates fresh ones in
    `$CLAUDE_CONFIG_DIR/{rules,skills,agents}/`
+
+The hook does not validate fragments: surfacing frontmatter
+warnings on every activation is noisy. Run `flox-ai doctor`
+to see frontmatter and structure validation on demand.
 
 ### setup-profile
 
@@ -318,7 +321,7 @@ internal/
   discover/                 Scan $FLOX_ENV/share/claude-code/
   emit/                     Generate shell code
                             hook: env vars, keychain,
-                                  symlinks, validation
+                                  symlinks
                             profile: cleanup function,
                                      trap
   doctor/                   Fragment validation
