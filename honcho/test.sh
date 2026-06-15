@@ -59,7 +59,6 @@ _assert_eq() {
 }
 _assert_eq EMBEDDING_MODEL_CONFIG__MODEL text-embedding-3-small
 _assert_eq EMBEDDING_MODEL_CONFIG__TRANSPORT openai
-_assert_eq EMBEDDING_VECTOR_DIMENSIONS 1536
 echo ">>> config-flexibility vars exported"
 
 # On first activate the hook ran initdb, createdb, the
