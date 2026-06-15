@@ -45,7 +45,7 @@ environments = ["flox/agentmemory"]
 | Package | Description |
 | ------- | ----------- |
 | `flox/claude-code` | Claude Code CLI |
-| `flox/claude-managed` | Plugin discovery + config assembly |
+| `flox/flox-ai` | Plugin discovery + config assembly |
 | `flox/claude-code-plugin-agentmemory` | Plugin (13 hooks, 8 skills, MCP) |
 | `nodejs_20` | Runtime for the REST backend |
 

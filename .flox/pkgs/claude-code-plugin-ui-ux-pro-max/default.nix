@@ -101,10 +101,10 @@ stdenv.mkDerivation {
     done < <(find "$PLUGIN_DIR" -type f -name '*.md')
     echo "rewrote python invocations in $rewritten markdown file(s)"
 
-    # Drop an installed_plugins.json next to the plugin so claude-managed
+    # Drop an installed_plugins.json next to the plugin so flox-ai
     # registers it in $CLAUDE_CONFIG_DIR/plugins/installed_plugins.json
     # — without that file Claude Code lists the plugin but won't trust it.
-    # Schema follows the v2 (`plugins` wrapper) format claude-managed uses;
+    # Schema follows the v2 (`plugins` wrapper) format flox-ai uses;
     # installPath is patched to the real symlink target by `plugins add`.
     cat > "$PLUGIN_DIR/installed_plugins.json" <<JSON
     {

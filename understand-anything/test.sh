@@ -12,9 +12,9 @@ command_exists() {
 
 # ── Inherited from flox/claude ────────────────────────
 command_exists claude
-command_exists claude-managed
+command_exists flox-ai
 echo ">>> claude version: $(claude --version)"
-echo ">>> claude-managed version: $(claude-managed version)"
+echo ">>> flox-ai version: $(flox-ai version)"
 
 # ── Runtime deps the plugin's skills shell out to ─────
 command_exists node
@@ -65,13 +65,13 @@ if [ "$checked_out" != "$UA_VERSION" ]; then
 fi
 echo ">>> checkout pinned to $UA_VERSION"
 
-# ── claude-managed sees the plugin ────────────────────
-if ! claude-managed plugins list 2>&1 \
+# ── flox-ai sees the plugin ────────────────────
+if ! flox-ai plugins list 2>&1 \
      | grep -q "understand-anything"; then
-  echo "Error: claude-managed plugins list does not show understand-anything"
-  claude-managed plugins list
+  echo "Error: flox-ai plugins list does not show understand-anything"
+  flox-ai plugins list
   exit 1
 fi
-echo ">>> claude-managed plugins list shows understand-anything"
+echo ">>> flox-ai plugins list shows understand-anything"
 
 echo ">>> understand-anything environment is working"

@@ -11,7 +11,7 @@ command_exists() {
 }
 
 command_exists claude
-command_exists claude-managed
+command_exists flox-ai
 command_exists node
 command_exists npx
 command_exists gum
@@ -24,12 +24,12 @@ if [ ! -d "$plugin_dir" ]; then
 fi
 echo ">>> plugin installed at $plugin_dir"
 
-if ! claude-managed doctor 2>&1 | grep -q agentmemory; then
-  echo "Error: claude-managed doctor did not surface agentmemory"
-  claude-managed doctor 2>&1 | head -40
+if ! flox-ai doctor 2>&1 | grep -q agentmemory; then
+  echo "Error: flox-ai doctor did not surface agentmemory"
+  flox-ai doctor 2>&1 | head -40
   exit 1
 fi
-echo ">>> claude-managed sees the agentmemory plugin"
+echo ">>> flox-ai sees the agentmemory plugin"
 
 status="$(flox services status 2>&1)"
 if ! echo "$status" | grep -q agentmemory; then

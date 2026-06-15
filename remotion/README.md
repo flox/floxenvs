@@ -49,7 +49,7 @@ environments = ["flox/remotion"]
 ## What is included
 
 - `claude-code` — the Claude Code CLI
-- `claude-managed` — auto-registers the bundled plugin
+- `flox-ai` — auto-registers the bundled plugin
 - `claude-code-plugin-remotion` — Remotion best-practices
   skill (1 SKILL.md + 36 topic rules) installed under
   `share/claude-code/plugins/remotion/`

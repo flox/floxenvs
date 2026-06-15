@@ -22,7 +22,7 @@ environments = [{ remote = "flox/claude" }]
 financial-services.pkg-path = "claude-code-plugin-financial-services"
 ```
 
-On `flox activate`, `claude-managed setup-hook` (provided by
+On `flox activate`, `flox-ai setup-hook` (provided by
 the included `flox/claude` env) discovers all 19 plugins under
 `$FLOX_ENV/share/claude-code/plugins/`, symlinks them into
 `$CLAUDE_CONFIG_DIR/plugins/<name>/`, and merges every

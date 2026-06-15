@@ -39,7 +39,7 @@ stdenvNoCC.mkDerivation {
     fi
 
     # Upstream frontmatter has a top-level `trigger:` key
-    # which isn't in the agentskills.io spec — claude-managed
+    # which isn't in the agentskills.io spec — flox-ai
     # warns on every activate. Nest it under `metadata:` as
     # the spec (and the warning text) recommends. The slash
     # command itself is derived from the skill directory

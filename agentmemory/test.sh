@@ -11,14 +11,14 @@ command_exists() {
 }
 
 command_exists claude
-command_exists claude-managed
+command_exists flox-ai
 command_exists node
 command_exists npx
 
 echo ">>> node version: $(node --version)"
 echo ">>> claude version: $(claude --version 2>&1 | head -1)"
 
-# Plugin tree must land where claude-managed discovers it.
+# Plugin tree must land where flox-ai discovers it.
 plugin_dir="$FLOX_ENV/share/claude-code/plugins/agentmemory"
 if [ ! -d "$plugin_dir" ]; then
   echo "Error: plugin dir missing: $plugin_dir"
@@ -91,13 +91,13 @@ if [ -z "${AGENTMEMORY_CACHE:-}" ] || [ ! -d "$AGENTMEMORY_CACHE" ]; then
 fi
 echo ">>> AGENTMEMORY_CACHE=$AGENTMEMORY_CACHE"
 
-# claude-managed must report the plugin as discovered.
-if ! claude-managed doctor 2>&1 | grep -q agentmemory; then
-  echo "Error: claude-managed doctor did not surface agentmemory"
-  claude-managed doctor 2>&1 | head -40
+# flox-ai must report the plugin as discovered.
+if ! flox-ai doctor 2>&1 | grep -q agentmemory; then
+  echo "Error: flox-ai doctor did not surface agentmemory"
+  flox-ai doctor 2>&1 | head -40
   exit 1
 fi
-echo ">>> claude-managed sees the agentmemory plugin"
+echo ">>> flox-ai sees the agentmemory plugin"
 
 # Service must be defined.
 status="$(flox services status 2>&1)"

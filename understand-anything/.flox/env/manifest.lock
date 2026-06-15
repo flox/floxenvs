@@ -7,10 +7,10 @@
         "pkg-path": "flox/claude-code",
         "pkg-group": "claude-code"
       },
-      "claude-managed": {
-        "pkg-path": "flox/claude-managed",
-        "pkg-group": "claude-managed",
-        "version": "^0.4.1"
+      "flox-ai": {
+        "pkg-path": "flox/flox-ai",
+        "pkg-group": "flox-ai",
+        "version": "^0.5.0"
       },
       "git": {
         "pkg-path": "git",
@@ -39,12 +39,12 @@
       "UA_VERSION": "v2.7.3"
     },
     "hook": {
-      "on-activate": "eval \"$(claude-managed setup-hook)\"\n\nua_cache=\"$FLOX_ENV_CACHE/understand-anything\"\nua_repo=\"$ua_cache/repo\"\nua_plugin=\"$ua_repo/understand-anything-plugin\"\nmkdir -p \"$ua_cache\"\n\n# Clone if missing, otherwise fast-forward to UA_VERSION.\n# Shallow clone keeps the cache small; we re-fetch the tag\n# whenever the pinned version changes.\nif [ ! -d \"$ua_repo/.git\" ]; then\n  rm -rf \"$ua_repo\"\n  git clone --quiet --depth 1 --branch \"$UA_VERSION\" \\\n    \"$UA_REPO_URL\" \"$ua_repo\" 2>/dev/null \\\n    || git clone --quiet \"$UA_REPO_URL\" \"$ua_repo\"\n  git -C \"$ua_repo\" checkout --quiet \"$UA_VERSION\" 2>/dev/null || true\nelif [ \"$(git -C \"$ua_repo\" describe --tags --exact-match \\\n            2>/dev/null)\" != \"$UA_VERSION\" ]; then\n  git -C \"$ua_repo\" fetch --quiet --tags --depth 1 \\\n    origin \"refs/tags/$UA_VERSION:refs/tags/$UA_VERSION\" \\\n    2>/dev/null || git -C \"$ua_repo\" fetch --quiet --tags\n  git -C \"$ua_repo\" checkout --quiet \"$UA_VERSION\"\nfi\n\n# Expose the plugin root at the path SKILL.md falls back to\n# when CLAUDE_PLUGIN_ROOT is unset (e.g. when scripts are\n# invoked outside Claude Code's hook context). Leave any\n# pre-existing user link alone.\nif [ ! -e \"$HOME/.understand-anything-plugin\" ]; then\n  ln -s \"$ua_plugin\" \"$HOME/.understand-anything-plugin\"\nfi\n\n# claude-managed `plugins add` reads installed_plugins.json\n# from the plugin dir and merges it into the config's\n# trusted-plugins list. Without it Claude Code lists the\n# plugin but treats it as untrusted, suppressing hook\n# execution. Generate it from the pinned commit each time\n# so version + sha stay in sync with the checked-out tree.\nua_version=\"$(git -C \"$ua_repo\" describe --tags \\\n  --always 2>/dev/null | sed 's/^v//')\"\nua_sha=\"$(git -C \"$ua_repo\" rev-parse HEAD 2>/dev/null)\"\ncat > \"$ua_plugin/installed_plugins.json\" <<JSON\n{\n  \"plugins\": {\n    \"understand-anything@flox\": [\n      {\n        \"installPath\": \"\",\n        \"scope\": \"project\",\n        \"version\": \"$ua_version\",\n        \"gitCommitSha\": \"$ua_sha\"\n      }\n    ]\n  },\n  \"version\": 2\n}\nJSON\n\n# Optional eager build. The /understand skill itself runs\n# the same commands the first time it is invoked, so this\n# is a UX nicety, not a correctness requirement.\nif [ \"$UA_PREBUILD\" = \"1\" ] \\\n   && [ ! -f \"$ua_plugin/packages/core/dist/index.js\" ]; then\n  (\n    cd \"$ua_plugin\" \\\n      && pnpm install --frozen-lockfile >/dev/null 2>&1 \\\n      && pnpm --filter @understand-anything/core build \\\n           >/dev/null 2>&1\n  ) || echo \"understand-anything: pre-build failed; /understand will retry on first use\"\nfi\n\n# Register the plugin with claude-managed. The flox/claude\n# hook above already ran `plugins clean`, so this just adds\n# a symlink under $CLAUDE_CONFIG_DIR/plugins/ that the\n# generated `claude` wrapper picks up at exec time via\n# --plugin-dir. Idempotent: re-running it on a subsequent\n# activation is harmless.\nif command -v claude-managed >/dev/null 2>&1; then\n  cmd_dir=\"${CLAUDE_CONFIG_DIR:-$FLOX_ENV_PROJECT/.claude-managed}\"\n  claude-managed --config-dir \"$cmd_dir\" plugins add \\\n    \"$ua_plugin\" >/dev/null 2>&1 || true\nfi\n"
+      "on-activate": "eval \"$(flox-ai setup-hook)\"\n\nua_cache=\"$FLOX_ENV_CACHE/understand-anything\"\nua_repo=\"$ua_cache/repo\"\nua_plugin=\"$ua_repo/understand-anything-plugin\"\nmkdir -p \"$ua_cache\"\n\n# Clone if missing, otherwise fast-forward to UA_VERSION.\n# Shallow clone keeps the cache small; we re-fetch the tag\n# whenever the pinned version changes.\nif [ ! -d \"$ua_repo/.git\" ]; then\n  rm -rf \"$ua_repo\"\n  git clone --quiet --depth 1 --branch \"$UA_VERSION\" \\\n    \"$UA_REPO_URL\" \"$ua_repo\" 2>/dev/null \\\n    || git clone --quiet \"$UA_REPO_URL\" \"$ua_repo\"\n  git -C \"$ua_repo\" checkout --quiet \"$UA_VERSION\" 2>/dev/null || true\nelif [ \"$(git -C \"$ua_repo\" describe --tags --exact-match \\\n            2>/dev/null)\" != \"$UA_VERSION\" ]; then\n  git -C \"$ua_repo\" fetch --quiet --tags --depth 1 \\\n    origin \"refs/tags/$UA_VERSION:refs/tags/$UA_VERSION\" \\\n    2>/dev/null || git -C \"$ua_repo\" fetch --quiet --tags\n  git -C \"$ua_repo\" checkout --quiet \"$UA_VERSION\"\nfi\n\n# Expose the plugin root at the path SKILL.md falls back to\n# when CLAUDE_PLUGIN_ROOT is unset (e.g. when scripts are\n# invoked outside Claude Code's hook context). Leave any\n# pre-existing user link alone.\nif [ ! -e \"$HOME/.understand-anything-plugin\" ]; then\n  ln -s \"$ua_plugin\" \"$HOME/.understand-anything-plugin\"\nfi\n\n# flox-ai `plugins add` reads installed_plugins.json\n# from the plugin dir and merges it into the config's\n# trusted-plugins list. Without it Claude Code lists the\n# plugin but treats it as untrusted, suppressing hook\n# execution. Generate it from the pinned commit each time\n# so version + sha stay in sync with the checked-out tree.\nua_version=\"$(git -C \"$ua_repo\" describe --tags \\\n  --always 2>/dev/null | sed 's/^v//')\"\nua_sha=\"$(git -C \"$ua_repo\" rev-parse HEAD 2>/dev/null)\"\ncat > \"$ua_plugin/installed_plugins.json\" <<JSON\n{\n  \"plugins\": {\n    \"understand-anything@flox\": [\n      {\n        \"installPath\": \"\",\n        \"scope\": \"project\",\n        \"version\": \"$ua_version\",\n        \"gitCommitSha\": \"$ua_sha\"\n      }\n    ]\n  },\n  \"version\": 2\n}\nJSON\n\n# Optional eager build. The /understand skill itself runs\n# the same commands the first time it is invoked, so this\n# is a UX nicety, not a correctness requirement.\nif [ \"$UA_PREBUILD\" = \"1\" ] \\\n   && [ ! -f \"$ua_plugin/packages/core/dist/index.js\" ]; then\n  (\n    cd \"$ua_plugin\" \\\n      && pnpm install --frozen-lockfile >/dev/null 2>&1 \\\n      && pnpm --filter @understand-anything/core build \\\n           >/dev/null 2>&1\n  ) || echo \"understand-anything: pre-build failed; /understand will retry on first use\"\nfi\n\n# Register the plugin with flox-ai. The flox/claude\n# hook above already ran `plugins clean`, so this just adds\n# a symlink under $CLAUDE_CONFIG_DIR/plugins/ that the\n# generated `claude` wrapper picks up at exec time via\n# --plugin-dir. Idempotent: re-running it on a subsequent\n# activation is harmless.\nif command -v flox-ai >/dev/null 2>&1; then\n  cmd_dir=\"${CLAUDE_CONFIG_DIR:-$FLOX_ENV_PROJECT/.flox-ai}\"\n  flox-ai --config-dir \"$cmd_dir\" plugins add \\\n    \"$ua_plugin\" >/dev/null 2>&1 || true\nfi\n"
     },
     "profile": {
-      "bash": "eval \"$(claude-managed setup-profile-bash)\"\n",
-      "zsh": "eval \"$(claude-managed setup-profile-zsh)\"\n",
-      "fish": "claude-managed setup-profile-fish | source\n"
+      "bash": "eval \"$(flox-ai setup-profile-bash)\"\n",
+      "zsh": "eval \"$(flox-ai setup-profile-zsh)\"\n",
+      "fish": "flox-ai setup-profile-fish | source\n"
     },
     "options": {}
   },
@@ -52,28 +52,28 @@
     {
       "attr_path": "claude-code",
       "broken": false,
-      "derivation": "/nix/store/aaw2jy201c9sw7056ky5c1ndxzddyjqm-claude-code-2.1.177.drv",
+      "derivation": "/nix/store/zp1p4p9z4k0fc1a4nk6ji3w3m3rzwzq3-claude-code-2.1.167.drv",
       "description": "Agentic coding tool from Anthropic",
       "install_id": "claude-code",
       "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=228f0e0269249caee61dcdcf468b11a82d3fe4dd",
-      "name": "claude-code-2.1.177",
+      "locked_url": "https://github.com/flox/floxenvs?rev=e9778d06d4ca4bec6582507e5f1a03bc38507715",
+      "name": "claude-code-2.1.167",
       "pname": "claude-code",
-      "rev": "228f0e0269249caee61dcdcf468b11a82d3fe4dd",
-      "rev_count": 7616,
-      "rev_date": "2026-06-13T02:01:00Z",
-      "scrape_date": "2026-06-15T04:16:21.800852966Z",
+      "rev": "e9778d06d4ca4bec6582507e5f1a03bc38507715",
+      "rev_count": 6463,
+      "rev_date": "2026-06-06T07:34:06Z",
+      "scrape_date": "2026-06-08T04:02:40.114209494Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": true,
-      "version": "2.1.177",
+      "version": "2.1.167",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/ngjqdjfimjgkcpi26p659d64nvlpg9rm-claude-code-2.1.177"
+        "out": "/nix/store/jabyk07ihbzs22dq58hyvdxvffspykcf-claude-code-2.1.167"
       },
       "system": "aarch64-darwin",
       "group": "claude-code",
@@ -82,28 +82,28 @@
     {
       "attr_path": "claude-code",
       "broken": false,
-      "derivation": "/nix/store/jz0q1am16pn1kxr8c9kcqqaav3ryaw6c-claude-code-2.1.177.drv",
+      "derivation": "/nix/store/hzqrbsaysmxlp9qgkwf19r5fnspgl90z-claude-code-2.1.167.drv",
       "description": "Agentic coding tool from Anthropic",
       "install_id": "claude-code",
       "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=228f0e0269249caee61dcdcf468b11a82d3fe4dd",
-      "name": "claude-code-2.1.177",
+      "locked_url": "https://github.com/flox/floxenvs?rev=e9778d06d4ca4bec6582507e5f1a03bc38507715",
+      "name": "claude-code-2.1.167",
       "pname": "claude-code",
-      "rev": "228f0e0269249caee61dcdcf468b11a82d3fe4dd",
-      "rev_count": 7616,
-      "rev_date": "2026-06-13T02:01:00Z",
-      "scrape_date": "2026-06-15T04:16:21.800857565Z",
+      "rev": "e9778d06d4ca4bec6582507e5f1a03bc38507715",
+      "rev_count": 6463,
+      "rev_date": "2026-06-06T07:34:06Z",
+      "scrape_date": "2026-06-08T04:02:40.114213651Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": true,
-      "version": "2.1.177",
+      "version": "2.1.167",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/ya4a9x8hwi3j6p2bbjnkj4ikin83nj78-claude-code-2.1.177"
+        "out": "/nix/store/h8rakfxgsh5zpdq7wkif9kbij5ixaq97-claude-code-2.1.167"
       },
       "system": "aarch64-linux",
       "group": "claude-code",
@@ -112,28 +112,28 @@
     {
       "attr_path": "claude-code",
       "broken": false,
-      "derivation": "/nix/store/mqh2p49abc5b4kmg380b3ij0ca8ypjar-claude-code-2.1.177.drv",
+      "derivation": "/nix/store/p3rjkzdzp88r0x4hdi6b5kgir9q8pkrd-claude-code-2.1.167.drv",
       "description": "Agentic coding tool from Anthropic",
       "install_id": "claude-code",
       "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=228f0e0269249caee61dcdcf468b11a82d3fe4dd",
-      "name": "claude-code-2.1.177",
+      "locked_url": "https://github.com/flox/floxenvs?rev=e9778d06d4ca4bec6582507e5f1a03bc38507715",
+      "name": "claude-code-2.1.167",
       "pname": "claude-code",
-      "rev": "228f0e0269249caee61dcdcf468b11a82d3fe4dd",
-      "rev_count": 7616,
-      "rev_date": "2026-06-13T02:01:00Z",
-      "scrape_date": "2026-06-15T04:16:21.800858426Z",
+      "rev": "e9778d06d4ca4bec6582507e5f1a03bc38507715",
+      "rev_count": 6463,
+      "rev_date": "2026-06-06T07:34:06Z",
+      "scrape_date": "2026-06-08T04:02:40.114214482Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": true,
-      "version": "2.1.177",
+      "version": "2.1.167",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/m8vjjxzpk6zw5n172gn2cmnw375c8z2d-claude-code-2.1.177"
+        "out": "/nix/store/yiv4i4x7j27w8srbrgvj1z9ggwg1aa47-claude-code-2.1.167"
       },
       "system": "x86_64-darwin",
       "group": "claude-code",
@@ -142,151 +142,31 @@
     {
       "attr_path": "claude-code",
       "broken": false,
-      "derivation": "/nix/store/bjpndg68kznk1fvws3v7pm756czqf1yn-claude-code-2.1.177.drv",
+      "derivation": "/nix/store/c09hn9ix183bdyy3acd50vrkjnihrcs7-claude-code-2.1.167.drv",
       "description": "Agentic coding tool from Anthropic",
       "install_id": "claude-code",
       "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=228f0e0269249caee61dcdcf468b11a82d3fe4dd",
-      "name": "claude-code-2.1.177",
+      "locked_url": "https://github.com/flox/floxenvs?rev=e9778d06d4ca4bec6582507e5f1a03bc38507715",
+      "name": "claude-code-2.1.167",
       "pname": "claude-code",
-      "rev": "228f0e0269249caee61dcdcf468b11a82d3fe4dd",
-      "rev_count": 7616,
-      "rev_date": "2026-06-13T02:01:00Z",
-      "scrape_date": "2026-06-15T04:16:21.800859268Z",
+      "rev": "e9778d06d4ca4bec6582507e5f1a03bc38507715",
+      "rev_count": 6463,
+      "rev_date": "2026-06-06T07:34:06Z",
+      "scrape_date": "2026-06-08T04:02:40.114215073Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": true,
-      "version": "2.1.177",
+      "version": "2.1.167",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/b9h9yc4zjjsqry1iqclpbz2cp08ncf2w-claude-code-2.1.177"
+        "out": "/nix/store/qvmcympx9nb3gn509ndh735g05r23s78-claude-code-2.1.167"
       },
       "system": "x86_64-linux",
       "group": "claude-code",
-      "priority": 5
-    },
-    {
-      "attr_path": "claude-managed",
-      "broken": false,
-      "derivation": "/nix/store/jrvmawn988xs2da7mg9dzfg3h3jf5gm3-claude-managed-0.4.1.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "claude-managed",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "name": "claude-managed-0.4.1",
-      "pname": "claude-managed",
-      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "rev_count": 3677,
-      "rev_date": "2026-05-20T12:30:23Z",
-      "scrape_date": "2026-06-15T04:16:21.800867734Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/c4caj5rhq2l7p7j5p569a1f08pz5s41v-claude-managed-0.4.1"
-      },
-      "system": "aarch64-darwin",
-      "group": "claude-managed",
-      "priority": 5
-    },
-    {
-      "attr_path": "claude-managed",
-      "broken": false,
-      "derivation": "/nix/store/b0iga9ysmq5jga9xmnqf5884qhl7idjp-claude-managed-0.4.1.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "claude-managed",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "name": "claude-managed-0.4.1",
-      "pname": "claude-managed",
-      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "rev_count": 3677,
-      "rev_date": "2026-05-20T12:30:23Z",
-      "scrape_date": "2026-06-15T04:16:21.800870649Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/ikmmb7a0zfdwsyzcgczv7sam426n7y82-claude-managed-0.4.1"
-      },
-      "system": "aarch64-linux",
-      "group": "claude-managed",
-      "priority": 5
-    },
-    {
-      "attr_path": "claude-managed",
-      "broken": false,
-      "derivation": "/nix/store/nv6viy7wixxv9f92jh5pbzss4ipkmsaz-claude-managed-0.4.1.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "claude-managed",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "name": "claude-managed-0.4.1",
-      "pname": "claude-managed",
-      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "rev_count": 3677,
-      "rev_date": "2026-05-20T12:30:23Z",
-      "scrape_date": "2026-06-15T04:16:21.800871491Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/6mavy5l8gbcq21qxnlxip78dqdr960lm-claude-managed-0.4.1"
-      },
-      "system": "x86_64-darwin",
-      "group": "claude-managed",
-      "priority": 5
-    },
-    {
-      "attr_path": "claude-managed",
-      "broken": false,
-      "derivation": "/nix/store/xql8a4pin3z899a09rs9hbc5axcnbi93-claude-managed-0.4.1.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "claude-managed",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "name": "claude-managed-0.4.1",
-      "pname": "claude-managed",
-      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "rev_count": 3677,
-      "rev_date": "2026-05-20T12:30:23Z",
-      "scrape_date": "2026-06-15T04:16:21.800872262Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/ak71ws4lbp04ik1cvqws4drjbiaw5cin-claude-managed-0.4.1"
-      },
-      "system": "x86_64-linux",
-      "group": "claude-managed",
       "priority": 5
     },
     {
@@ -296,13 +176,13 @@
       "description": "Event-driven I/O framework for the V8 JavaScript engine",
       "install_id": "nodejs",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
       "name": "nodejs-22.22.3",
       "pname": "nodejs_22",
-      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "rev_count": 1014179,
-      "rev_date": "2026-06-10T06:56:03Z",
-      "scrape_date": "2026-06-12T03:14:10.767323Z",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T08:56:05.114999Z",
       "stabilities": [
         "staging",
         "unstable"
@@ -326,13 +206,13 @@
       "description": "Event-driven I/O framework for the V8 JavaScript engine",
       "install_id": "nodejs",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
       "name": "nodejs-22.22.3",
       "pname": "nodejs_22",
-      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "rev_count": 1014179,
-      "rev_date": "2026-06-10T06:56:03Z",
-      "scrape_date": "2026-06-12T03:45:13.958174Z",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T09:40:59.221763Z",
       "stabilities": [
         "staging",
         "unstable"
@@ -356,13 +236,13 @@
       "description": "Event-driven I/O framework for the V8 JavaScript engine",
       "install_id": "nodejs",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
       "name": "nodejs-22.22.3",
       "pname": "nodejs_22",
-      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "rev_count": 1014179,
-      "rev_date": "2026-06-10T06:56:03Z",
-      "scrape_date": "2026-06-12T04:15:02.661889Z",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T10:25:13.037132Z",
       "stabilities": [
         "staging",
         "unstable"
@@ -386,13 +266,13 @@
       "description": "Event-driven I/O framework for the V8 JavaScript engine",
       "install_id": "nodejs",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
       "name": "nodejs-22.22.3",
       "pname": "nodejs_22",
-      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "rev_count": 1014179,
-      "rev_date": "2026-06-10T06:56:03Z",
-      "scrape_date": "2026-06-12T04:48:17.990870Z",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T11:07:24.674620Z",
       "stabilities": [
         "staging",
         "unstable"
@@ -400,7 +280,6 @@
       "unfree": false,
       "version": "22.22.3",
       "outputs_to_install": [
-        "out",
         "out",
         "out",
         "out"
@@ -415,28 +294,28 @@
     {
       "attr_path": "pnpm_10",
       "broken": false,
-      "derivation": "/nix/store/16jqmx7pjm7nbppx08kx2hrnff002v91-pnpm-10.34.0.drv",
+      "derivation": "/nix/store/9zsgcxcr1gk4dzzd8s9jlm0i8yjqsycg-pnpm-10.33.4.drv",
       "description": "Fast, disk space efficient package manager for JavaScript",
       "install_id": "pnpm",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "name": "pnpm-10.34.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "pnpm-10.33.4",
       "pname": "pnpm_10",
-      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "rev_count": 1014179,
-      "rev_date": "2026-06-10T06:56:03Z",
-      "scrape_date": "2026-06-12T03:14:25.862677Z",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T08:56:18.996804Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "10.34.0",
+      "version": "10.33.4",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/9bpd89nchhbp6880k91ki0qs33zmcjdn-pnpm-10.34.0"
+        "out": "/nix/store/3ygfga6470hpqzxkid2jnh50ikzr4b26-pnpm-10.33.4"
       },
       "system": "aarch64-darwin",
       "group": "understand-anything",
@@ -445,28 +324,28 @@
     {
       "attr_path": "pnpm_10",
       "broken": false,
-      "derivation": "/nix/store/bi5d0lrwrz6axd71zvg718g0qm0j930g-pnpm-10.34.0.drv",
+      "derivation": "/nix/store/0yrw6z1xys7ncrms4rzw0xxf4fyj8s1j-pnpm-10.33.4.drv",
       "description": "Fast, disk space efficient package manager for JavaScript",
       "install_id": "pnpm",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "name": "pnpm-10.34.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "pnpm-10.33.4",
       "pname": "pnpm_10",
-      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "rev_count": 1014179,
-      "rev_date": "2026-06-10T06:56:03Z",
-      "scrape_date": "2026-06-12T03:45:35.493Z",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T09:41:18.323517Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "10.34.0",
+      "version": "10.33.4",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/qm485nhs1axwji9a2i5fgliy60bgm4b3-pnpm-10.34.0"
+        "out": "/nix/store/q9xyykxj197qi9aqpbwr3p2azrdfl4g2-pnpm-10.33.4"
       },
       "system": "aarch64-linux",
       "group": "understand-anything",
@@ -475,28 +354,28 @@
     {
       "attr_path": "pnpm_10",
       "broken": false,
-      "derivation": "/nix/store/dbi3n4yns6hqs3dnzzrlpcpyh0nhw3r5-pnpm-10.34.0.drv",
+      "derivation": "/nix/store/y0vmnjmyby7siw9bibkk4m2qsz34hlls-pnpm-10.33.4.drv",
       "description": "Fast, disk space efficient package manager for JavaScript",
       "install_id": "pnpm",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "name": "pnpm-10.34.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "pnpm-10.33.4",
       "pname": "pnpm_10",
-      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "rev_count": 1014179,
-      "rev_date": "2026-06-10T06:56:03Z",
-      "scrape_date": "2026-06-12T04:15:18.635617Z",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T10:25:27.089363Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "10.34.0",
+      "version": "10.33.4",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/4zhj7bdvyln11bjk5lkg1a553a6cz9gj-pnpm-10.34.0"
+        "out": "/nix/store/1gd9q2hpcbdy58n21r8h1k6rzprpwcqb-pnpm-10.33.4"
       },
       "system": "x86_64-darwin",
       "group": "understand-anything",
@@ -505,28 +384,28 @@
     {
       "attr_path": "pnpm_10",
       "broken": false,
-      "derivation": "/nix/store/6l9xg408jj0qxchvnx4yh1wigmm1xj5c-pnpm-10.34.0.drv",
+      "derivation": "/nix/store/b01vgd0gyxxqb0l75svw9bffsz7r89sc-pnpm-10.33.4.drv",
       "description": "Fast, disk space efficient package manager for JavaScript",
       "install_id": "pnpm",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "name": "pnpm-10.34.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "name": "pnpm-10.33.4",
       "pname": "pnpm_10",
-      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "rev_count": 1014179,
-      "rev_date": "2026-06-10T06:56:03Z",
-      "scrape_date": "2026-06-12T04:48:38.157346Z",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T11:07:44.546676Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "10.34.0",
+      "version": "10.33.4",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/h0hlmif7bvy479g3rzka74vf9gzn1rg6-pnpm-10.34.0"
+        "out": "/nix/store/xys5zgl9dnfljrxc8d7v45vrjrb4hgx7-pnpm-10.33.4"
       },
       "system": "x86_64-linux",
       "group": "understand-anything",
@@ -539,13 +418,13 @@
       "description": "High-level dynamically-typed programming language",
       "install_id": "python",
       "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
       "name": "python3-3.13.13",
       "pname": "python3",
-      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "rev_count": 1014179,
-      "rev_date": "2026-06-10T06:56:03Z",
-      "scrape_date": "2026-06-12T03:14:27.814071Z",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T08:56:20.811537Z",
       "stabilities": [
         "staging",
         "unstable"
@@ -570,13 +449,13 @@
       "description": "High-level dynamically-typed programming language",
       "install_id": "python",
       "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
       "name": "python3-3.13.13",
       "pname": "python3",
-      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "rev_count": 1014179,
-      "rev_date": "2026-06-10T06:56:03Z",
-      "scrape_date": "2026-06-12T03:45:38.592692Z",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T09:41:20.997411Z",
       "stabilities": [
         "staging",
         "unstable"
@@ -603,13 +482,13 @@
       "description": "High-level dynamically-typed programming language",
       "install_id": "python",
       "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
       "name": "python3-3.13.13",
       "pname": "python3",
-      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "rev_count": 1014179,
-      "rev_date": "2026-06-10T06:56:03Z",
-      "scrape_date": "2026-06-12T04:15:20.916035Z",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T10:25:28.887675Z",
       "stabilities": [
         "staging",
         "unstable"
@@ -634,13 +513,13 @@
       "description": "High-level dynamically-typed programming language",
       "install_id": "python",
       "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
       "name": "python3-3.13.13",
       "pname": "python3",
-      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "rev_count": 1014179,
-      "rev_date": "2026-06-10T06:56:03Z",
-      "scrape_date": "2026-06-12T04:48:40.918714Z",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T11:07:47.309359Z",
       "stabilities": [
         "staging",
         "unstable"
@@ -648,7 +527,6 @@
       "unfree": false,
       "version": "3.13.13",
       "outputs_to_install": [
-        "out",
         "out",
         "out",
         "out",
@@ -666,17 +544,17 @@
     {
       "attr_path": "git",
       "broken": false,
-      "derivation": "/nix/store/p8rrsh13lk5m9igwj65l48b7kvvnk74w-git-2.54.0.drv",
+      "derivation": "/nix/store/cb1l04jhs3ykmidc54crdpy4x59p38c0-git-2.54.0.drv",
       "description": "Distributed version control system",
       "install_id": "git",
       "license": "GPL-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
       "name": "git-2.54.0",
       "pname": "git",
-      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "rev_count": 1014179,
-      "rev_date": "2026-06-10T06:56:03Z",
-      "scrape_date": "2026-06-12T03:13:44.956900Z",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T08:55:41.164896Z",
       "stabilities": [
         "staging",
         "unstable"
@@ -697,17 +575,17 @@
     {
       "attr_path": "git",
       "broken": false,
-      "derivation": "/nix/store/inaziczccgjxvsij7y7ndqxhr48fwv2l-git-2.54.0.drv",
+      "derivation": "/nix/store/wbhnknkdqvlxbb2vqhnylydagm03da5g-git-2.54.0.drv",
       "description": "Distributed version control system",
       "install_id": "git",
       "license": "GPL-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
       "name": "git-2.54.0",
       "pname": "git",
-      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "rev_count": 1014179,
-      "rev_date": "2026-06-10T06:56:03Z",
-      "scrape_date": "2026-06-12T03:44:34.150259Z",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T09:40:20.832239Z",
       "stabilities": [
         "staging",
         "unstable"
@@ -729,17 +607,17 @@
     {
       "attr_path": "git",
       "broken": false,
-      "derivation": "/nix/store/jnw4slgx6jzkmxfydb57cvmrdkwbg47k-git-2.54.0.drv",
+      "derivation": "/nix/store/fxy7636kfcbnv94jc7a1mcambx3045h3-git-2.54.0.drv",
       "description": "Distributed version control system",
       "install_id": "git",
       "license": "GPL-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
       "name": "git-2.54.0",
       "pname": "git",
-      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "rev_count": 1014179,
-      "rev_date": "2026-06-10T06:56:03Z",
-      "scrape_date": "2026-06-12T04:14:37.601154Z",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T10:24:48.307415Z",
       "stabilities": [
         "staging",
         "unstable"
@@ -760,17 +638,17 @@
     {
       "attr_path": "git",
       "broken": false,
-      "derivation": "/nix/store/4cj9yvavrj3052nk4kyzzqvy5562dz04-git-2.54.0.drv",
+      "derivation": "/nix/store/0yd4pbrk443w8lbvsssipnckxmpaa6j3-git-2.54.0.drv",
       "description": "Distributed version control system",
       "install_id": "git",
       "license": "GPL-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
       "name": "git-2.54.0",
       "pname": "git",
-      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "rev_count": 1014179,
-      "rev_date": "2026-06-10T06:56:03Z",
-      "scrape_date": "2026-06-12T04:47:37.378330Z",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T11:06:44.582080Z",
       "stabilities": [
         "staging",
         "unstable"
@@ -778,7 +656,6 @@
       "unfree": false,
       "version": "2.54.0",
       "outputs_to_install": [
-        "out",
         "out",
         "out",
         "out"
@@ -799,13 +676,13 @@
       "description": "Lightweight and flexible command-line JSON processor",
       "install_id": "jq",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
       "name": "jq-1.8.1",
       "pname": "jq",
-      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "rev_count": 1014179,
-      "rev_date": "2026-06-10T06:56:03Z",
-      "scrape_date": "2026-06-12T03:14:02.165546Z",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T08:55:57.247522Z",
       "stabilities": [
         "staging",
         "unstable"
@@ -834,13 +711,13 @@
       "description": "Lightweight and flexible command-line JSON processor",
       "install_id": "jq",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
       "name": "jq-1.8.1",
       "pname": "jq",
-      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "rev_count": 1014179,
-      "rev_date": "2026-06-10T06:56:03Z",
-      "scrape_date": "2026-06-12T03:44:55.861521Z",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T09:40:42.822271Z",
       "stabilities": [
         "staging",
         "unstable"
@@ -870,13 +747,13 @@
       "description": "Lightweight and flexible command-line JSON processor",
       "install_id": "jq",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
       "name": "jq-1.8.1",
       "pname": "jq",
-      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "rev_count": 1014179,
-      "rev_date": "2026-06-10T06:56:03Z",
-      "scrape_date": "2026-06-12T04:14:54.372082Z",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T10:25:04.750555Z",
       "stabilities": [
         "staging",
         "unstable"
@@ -905,13 +782,13 @@
       "description": "Lightweight and flexible command-line JSON processor",
       "install_id": "jq",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=9ae611a455b90cf061d8f332b977e387bda8e1ca",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=331800de5053fcebacf6813adb5db9c9dca22a0c",
       "name": "jq-1.8.1",
       "pname": "jq",
-      "rev": "9ae611a455b90cf061d8f332b977e387bda8e1ca",
-      "rev_count": 1014179,
-      "rev_date": "2026-06-10T06:56:03Z",
-      "scrape_date": "2026-06-12T04:47:59.629960Z",
+      "rev": "331800de5053fcebacf6813adb5db9c9dca22a0c",
+      "rev_count": 1008282,
+      "rev_date": "2026-05-31T16:09:29Z",
+      "scrape_date": "2026-06-02T11:07:06.767637Z",
       "stabilities": [
         "staging",
         "unstable"
@@ -934,6 +811,126 @@
       },
       "system": "x86_64-linux",
       "group": "understand-anything-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-ai",
+      "broken": false,
+      "derivation": "/nix/store/3c69hqd40j8kpxjhc6qcz7ij502c9l10-flox-ai-0.5.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "flox-ai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=b70958050f38ef6f333914e083379ad6b2c201f0",
+      "name": "flox-ai-0.5.0",
+      "pname": "flox-ai",
+      "rev": "b70958050f38ef6f333914e083379ad6b2c201f0",
+      "rev_count": 7638,
+      "rev_date": "2026-06-13T13:06:59Z",
+      "scrape_date": "2026-06-13T22:55:32.422273498Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.5.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/yjn7g3y8a1zhrjzih6ycd00pban7bijm-flox-ai-0.5.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "flox-ai",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-ai",
+      "broken": false,
+      "derivation": "/nix/store/8ck474yn2l0dic0srxvml5l6szmlv0xf-flox-ai-0.5.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "flox-ai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=b70958050f38ef6f333914e083379ad6b2c201f0",
+      "name": "flox-ai-0.5.0",
+      "pname": "flox-ai",
+      "rev": "b70958050f38ef6f333914e083379ad6b2c201f0",
+      "rev_count": 7638,
+      "rev_date": "2026-06-13T13:06:59Z",
+      "scrape_date": "2026-06-13T22:55:32.422281987Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.5.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/l1wxijmjnmx66i7f15qkplpr5j2jsd2y-flox-ai-0.5.0"
+      },
+      "system": "aarch64-linux",
+      "group": "flox-ai",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-ai",
+      "broken": false,
+      "derivation": "/nix/store/pzgvpxjipsxjmqbdjjsyvmb3v14h178a-flox-ai-0.5.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "flox-ai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=b70958050f38ef6f333914e083379ad6b2c201f0",
+      "name": "flox-ai-0.5.0",
+      "pname": "flox-ai",
+      "rev": "b70958050f38ef6f333914e083379ad6b2c201f0",
+      "rev_count": 7638,
+      "rev_date": "2026-06-13T13:06:59Z",
+      "scrape_date": "2026-06-13T22:55:32.422283990Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.5.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/minnw6ndg1g8bi4s1khyi2r9a1p2ggp5-flox-ai-0.5.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "flox-ai",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-ai",
+      "broken": false,
+      "derivation": "/nix/store/rqx8dk2f34057zvlxp4518hh5jz390yz-flox-ai-0.5.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "flox-ai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=b70958050f38ef6f333914e083379ad6b2c201f0",
+      "name": "flox-ai-0.5.0",
+      "pname": "flox-ai",
+      "rev": "b70958050f38ef6f333914e083379ad6b2c201f0",
+      "rev_count": 7638,
+      "rev_date": "2026-06-13T13:06:59Z",
+      "scrape_date": "2026-06-13T22:55:32.422286164Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.5.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/hwnzrnlas0knhcjxd3imscx71dygj0cg-flox-ai-0.5.0"
+      },
+      "system": "x86_64-linux",
+      "group": "flox-ai",
       "priority": 5
     }
   ],
@@ -968,7 +965,7 @@
         "UA_VERSION": "v2.7.3"
       },
       "hook": {
-        "on-activate": "ua_cache=\"$FLOX_ENV_CACHE/understand-anything\"\nua_repo=\"$ua_cache/repo\"\nua_plugin=\"$ua_repo/understand-anything-plugin\"\nmkdir -p \"$ua_cache\"\n\n# Clone if missing, otherwise fast-forward to UA_VERSION.\n# Shallow clone keeps the cache small; we re-fetch the tag\n# whenever the pinned version changes.\nif [ ! -d \"$ua_repo/.git\" ]; then\n  rm -rf \"$ua_repo\"\n  git clone --quiet --depth 1 --branch \"$UA_VERSION\" \\\n    \"$UA_REPO_URL\" \"$ua_repo\" 2>/dev/null \\\n    || git clone --quiet \"$UA_REPO_URL\" \"$ua_repo\"\n  git -C \"$ua_repo\" checkout --quiet \"$UA_VERSION\" 2>/dev/null || true\nelif [ \"$(git -C \"$ua_repo\" describe --tags --exact-match \\\n            2>/dev/null)\" != \"$UA_VERSION\" ]; then\n  git -C \"$ua_repo\" fetch --quiet --tags --depth 1 \\\n    origin \"refs/tags/$UA_VERSION:refs/tags/$UA_VERSION\" \\\n    2>/dev/null || git -C \"$ua_repo\" fetch --quiet --tags\n  git -C \"$ua_repo\" checkout --quiet \"$UA_VERSION\"\nfi\n\n# Expose the plugin root at the path SKILL.md falls back to\n# when CLAUDE_PLUGIN_ROOT is unset (e.g. when scripts are\n# invoked outside Claude Code's hook context). Leave any\n# pre-existing user link alone.\nif [ ! -e \"$HOME/.understand-anything-plugin\" ]; then\n  ln -s \"$ua_plugin\" \"$HOME/.understand-anything-plugin\"\nfi\n\n# claude-managed `plugins add` reads installed_plugins.json\n# from the plugin dir and merges it into the config's\n# trusted-plugins list. Without it Claude Code lists the\n# plugin but treats it as untrusted, suppressing hook\n# execution. Generate it from the pinned commit each time\n# so version + sha stay in sync with the checked-out tree.\nua_version=\"$(git -C \"$ua_repo\" describe --tags \\\n  --always 2>/dev/null | sed 's/^v//')\"\nua_sha=\"$(git -C \"$ua_repo\" rev-parse HEAD 2>/dev/null)\"\ncat > \"$ua_plugin/installed_plugins.json\" <<JSON\n{\n  \"plugins\": {\n    \"understand-anything@flox\": [\n      {\n        \"installPath\": \"\",\n        \"scope\": \"project\",\n        \"version\": \"$ua_version\",\n        \"gitCommitSha\": \"$ua_sha\"\n      }\n    ]\n  },\n  \"version\": 2\n}\nJSON\n\n# Optional eager build. The /understand skill itself runs\n# the same commands the first time it is invoked, so this\n# is a UX nicety, not a correctness requirement.\nif [ \"$UA_PREBUILD\" = \"1\" ] \\\n   && [ ! -f \"$ua_plugin/packages/core/dist/index.js\" ]; then\n  (\n    cd \"$ua_plugin\" \\\n      && pnpm install --frozen-lockfile >/dev/null 2>&1 \\\n      && pnpm --filter @understand-anything/core build \\\n           >/dev/null 2>&1\n  ) || echo \"understand-anything: pre-build failed; /understand will retry on first use\"\nfi\n\n# Register the plugin with claude-managed. The flox/claude\n# hook above already ran `plugins clean`, so this just adds\n# a symlink under $CLAUDE_CONFIG_DIR/plugins/ that the\n# generated `claude` wrapper picks up at exec time via\n# --plugin-dir. Idempotent: re-running it on a subsequent\n# activation is harmless.\nif command -v claude-managed >/dev/null 2>&1; then\n  cmd_dir=\"${CLAUDE_CONFIG_DIR:-$FLOX_ENV_PROJECT/.claude-managed}\"\n  claude-managed --config-dir \"$cmd_dir\" plugins add \\\n    \"$ua_plugin\" >/dev/null 2>&1 || true\nfi\n"
+        "on-activate": "ua_cache=\"$FLOX_ENV_CACHE/understand-anything\"\nua_repo=\"$ua_cache/repo\"\nua_plugin=\"$ua_repo/understand-anything-plugin\"\nmkdir -p \"$ua_cache\"\n\n# Clone if missing, otherwise fast-forward to UA_VERSION.\n# Shallow clone keeps the cache small; we re-fetch the tag\n# whenever the pinned version changes.\nif [ ! -d \"$ua_repo/.git\" ]; then\n  rm -rf \"$ua_repo\"\n  git clone --quiet --depth 1 --branch \"$UA_VERSION\" \\\n    \"$UA_REPO_URL\" \"$ua_repo\" 2>/dev/null \\\n    || git clone --quiet \"$UA_REPO_URL\" \"$ua_repo\"\n  git -C \"$ua_repo\" checkout --quiet \"$UA_VERSION\" 2>/dev/null || true\nelif [ \"$(git -C \"$ua_repo\" describe --tags --exact-match \\\n            2>/dev/null)\" != \"$UA_VERSION\" ]; then\n  git -C \"$ua_repo\" fetch --quiet --tags --depth 1 \\\n    origin \"refs/tags/$UA_VERSION:refs/tags/$UA_VERSION\" \\\n    2>/dev/null || git -C \"$ua_repo\" fetch --quiet --tags\n  git -C \"$ua_repo\" checkout --quiet \"$UA_VERSION\"\nfi\n\n# Expose the plugin root at the path SKILL.md falls back to\n# when CLAUDE_PLUGIN_ROOT is unset (e.g. when scripts are\n# invoked outside Claude Code's hook context). Leave any\n# pre-existing user link alone.\nif [ ! -e \"$HOME/.understand-anything-plugin\" ]; then\n  ln -s \"$ua_plugin\" \"$HOME/.understand-anything-plugin\"\nfi\n\n# flox-ai `plugins add` reads installed_plugins.json\n# from the plugin dir and merges it into the config's\n# trusted-plugins list. Without it Claude Code lists the\n# plugin but treats it as untrusted, suppressing hook\n# execution. Generate it from the pinned commit each time\n# so version + sha stay in sync with the checked-out tree.\nua_version=\"$(git -C \"$ua_repo\" describe --tags \\\n  --always 2>/dev/null | sed 's/^v//')\"\nua_sha=\"$(git -C \"$ua_repo\" rev-parse HEAD 2>/dev/null)\"\ncat > \"$ua_plugin/installed_plugins.json\" <<JSON\n{\n  \"plugins\": {\n    \"understand-anything@flox\": [\n      {\n        \"installPath\": \"\",\n        \"scope\": \"project\",\n        \"version\": \"$ua_version\",\n        \"gitCommitSha\": \"$ua_sha\"\n      }\n    ]\n  },\n  \"version\": 2\n}\nJSON\n\n# Optional eager build. The /understand skill itself runs\n# the same commands the first time it is invoked, so this\n# is a UX nicety, not a correctness requirement.\nif [ \"$UA_PREBUILD\" = \"1\" ] \\\n   && [ ! -f \"$ua_plugin/packages/core/dist/index.js\" ]; then\n  (\n    cd \"$ua_plugin\" \\\n      && pnpm install --frozen-lockfile >/dev/null 2>&1 \\\n      && pnpm --filter @understand-anything/core build \\\n           >/dev/null 2>&1\n  ) || echo \"understand-anything: pre-build failed; /understand will retry on first use\"\nfi\n\n# Register the plugin with flox-ai. The flox/claude\n# hook above already ran `plugins clean`, so this just adds\n# a symlink under $CLAUDE_CONFIG_DIR/plugins/ that the\n# generated `claude` wrapper picks up at exec time via\n# --plugin-dir. Idempotent: re-running it on a subsequent\n# activation is harmless.\nif command -v flox-ai >/dev/null 2>&1; then\n  cmd_dir=\"${CLAUDE_CONFIG_DIR:-$FLOX_ENV_PROJECT/.flox-ai}\"\n  flox-ai --config-dir \"$cmd_dir\" plugins add \\\n    \"$ua_plugin\" >/dev/null 2>&1 || true\nfi\n"
       },
       "options": {},
       "include": {
@@ -988,19 +985,19 @@
               "pkg-path": "flox/claude-code",
               "pkg-group": "claude-code"
             },
-            "claude-managed": {
-              "pkg-path": "flox/claude-managed",
-              "pkg-group": "claude-managed",
-              "version": "^0.4.1"
+            "flox-ai": {
+              "pkg-path": "flox/flox-ai",
+              "pkg-group": "flox-ai",
+              "version": "^0.5.0"
             }
           },
           "hook": {
-            "on-activate": "eval \"$(claude-managed setup-hook)\"\n"
+            "on-activate": "eval \"$(flox-ai setup-hook)\"\n"
           },
           "profile": {
-            "bash": "eval \"$(claude-managed setup-profile-bash)\"\n",
-            "zsh": "eval \"$(claude-managed setup-profile-zsh)\"\n",
-            "fish": "claude-managed setup-profile-fish | source\n"
+            "bash": "eval \"$(flox-ai setup-profile-bash)\"\n",
+            "zsh": "eval \"$(flox-ai setup-profile-zsh)\"\n",
+            "fish": "flox-ai setup-profile-fish | source\n"
           },
           "options": {}
         },

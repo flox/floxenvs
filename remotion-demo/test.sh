@@ -14,7 +14,7 @@ command_exists() {
 command_exists node
 command_exists npx
 command_exists claude
-command_exists claude-managed
+command_exists flox-ai
 
 # ── Demo-only ──────────────────────────────────────────
 command_exists gum
@@ -36,12 +36,12 @@ if [ ! -f "$plugin_dir/skills/remotion/SKILL.md" ]; then
 fi
 echo ">>> remotion plugin tree present"
 
-# ── claude-managed registered the plugin ───────────────
-if ! claude-managed plugins list 2>&1 | grep -q remotion; then
-  echo "Error: claude-managed did not register the remotion plugin"
-  claude-managed doctor || true
+# ── flox-ai registered the plugin ───────────────
+if ! flox-ai plugins list 2>&1 | grep -q remotion; then
+  echo "Error: flox-ai did not register the remotion plugin"
+  flox-ai doctor || true
   exit 1
 fi
-echo ">>> claude-managed registered the remotion plugin"
+echo ">>> flox-ai registered the remotion plugin"
 
 echo ">>> remotion-demo environment is working"

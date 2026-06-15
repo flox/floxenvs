@@ -7,7 +7,7 @@
 load "${BATS_SUPPORT_LIB}/load.bash"
 load "${BATS_ASSERT_LIB}/load.bash"
 
-# Detect execution mode (kept for parity with claude-managed; the
+# Detect execution mode (kept for parity with flox-ai; the
 # review-skills binary behaves identically in either mode).
 if [[ -n "${FLOX_ENV:-}" ]]; then
   TEST_MODE="flox"

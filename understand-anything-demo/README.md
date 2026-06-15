@@ -26,7 +26,7 @@ Start Claude Code and run:
 
 - Everything from the `understand-anything` base
   environment (Node 22, pnpm, Python 3, git, the cloned
-  plugin checkout, and `claude-managed` registration)
+  plugin checkout, and `flox-ai` registration)
 - `UA_PREBUILD = "1"` so the activation hook compiles
   `packages/core` upfront — `/understand` is then ready
   the first time you invoke it

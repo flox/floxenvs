@@ -3,7 +3,7 @@
 set -eo pipefail
 
 # Inherited from the understand-anything base env.
-for cmd in claude claude-managed node pnpm python3 git; do
+for cmd in claude flox-ai node pnpm python3 git; do
   if ! command -v "$cmd" >/dev/null 2>&1; then
     echo "Error: '$cmd' command not found."
     exit 1
