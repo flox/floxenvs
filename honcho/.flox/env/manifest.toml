@@ -52,6 +52,39 @@ REDIS_PORT = "16379"
 AUTH_USE_AUTH = "false"
 CACHE_ENABLED = "true"
 
+
+# --- LLM provider flexibility (OpenAI-compatible / local) ---
+# Override any of these from YOUR manifest [vars]. They are shown
+# commented because honcho passes base_url straight through with no
+# empty-string coalescing: exporting "" here would override honcho's
+# None default and break cloud provider calls. Set a real value to
+# point a provider at a custom endpoint (vLLM, LM Studio, OpenRouter,
+# Together, ...).
+#
+#   LLM_OPENAI_BASE_URL = "http://127.0.0.1:1234/v1"
+#   LLM_ANTHROPIC_BASE_URL = "https://..."
+#   LLM_GEMINI_BASE_URL = "https://..."
+
+# Embedding model. Leave EMBEDDING_VECTOR_DIMENSIONS UNSET (see
+# README "Gotchas"): setting it bakes the pgvector column size at
+# first migration AND forces a `dimensions=` param that some local
+# OpenAI-compatible servers reject.
+EMBEDDING_MODEL_CONFIG__MODEL = "text-embedding-3-small"
+EMBEDDING_MODEL_CONFIG__TRANSPORT = "openai"
+#   EMBEDDING_MODEL_CONFIG__OVERRIDES__BASE_URL = "http://..."
+#   EMBEDDING_VECTOR_DIMENSIONS = "1536"
+
+# Per-component models. Blank is NOT a valid value (transport is a
+# Literal; empty base_url breaks the SDK), so these are commented —
+# uncomment and set real values to override honcho's defaults. Nested
+# keys use the `__` delimiter. See README for the full set (dialectic
+# levels, dream, fallback providers).
+#
+#   DERIVER_MODEL_CONFIG__MODEL = "qwen2.5:14b"
+#   DERIVER_MODEL_CONFIG__TRANSPORT = "openai"
+#   DERIVER_MODEL_CONFIG__OVERRIDES__BASE_URL = "http://127.0.0.1:1234/v1"
+#   SUMMARY_MODEL_CONFIG__MODEL = "gpt-5.4-mini"
+
 [hook]
 on-activate = '''
 export HONCHO_CACHE="$FLOX_ENV_CACHE/honcho"
@@ -110,10 +143,11 @@ fi
 # One-shot reminder: honcho's reasoning paths need an LLM key.
 # /health and the storage API work without one, so this is a
 # soft warning, not a hard failure.
-if [ -z "${LLM_OPENAI_API_KEY:-}${LLM_ANTHROPIC_API_KEY:-}${LLM_GEMINI_API_KEY:-}" ] \
+if [ -z "${LLM_OPENAI_API_KEY:-}${LLM_ANTHROPIC_API_KEY:-}${LLM_GEMINI_API_KEY:-}${LLM_OPENAI_BASE_URL:-}${LLM_ANTHROPIC_BASE_URL:-}${LLM_GEMINI_BASE_URL:-}" ] \
     && [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
-  echo "honcho: no LLM_*_API_KEY set — chat/reasoning endpoints will fail." >&2
-  echo "        set LLM_OPENAI_API_KEY (or _ANTHROPIC_, _GEMINI_) before using them." >&2
+  echo "honcho: no LLM provider configured — chat/reasoning endpoints will fail." >&2
+  echo "        set LLM_OPENAI_API_KEY (or _ANTHROPIC_, _GEMINI_), or an" >&2
+  echo "        LLM_*_BASE_URL for a local/compatible endpoint, first." >&2
 fi
 '''
 

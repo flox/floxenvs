@@ -93,6 +93,83 @@ of env vars and TOML sections.
 
 [cfg]: https://github.com/plastic-labs/honcho#configuration
 
+## Custom providers & models
+
+Every setting below is overridable from your own manifest `[vars]`
+(env vars win over honcho's defaults). Nested keys use the `__`
+delimiter, matching honcho's pydantic-settings config.
+
+Point any provider at an OpenAI-compatible endpoint (vLLM, LM Studio,
+OpenRouter, Together, self-hosted):
+
+| Variable                 | Purpose                              |
+| ------------------------ | ------------------------------------ |
+| `LLM_OPENAI_BASE_URL`    | OpenAI-compatible base URL           |
+| `LLM_ANTHROPIC_BASE_URL` | Anthropic base URL                   |
+| `LLM_GEMINI_BASE_URL`    | Gemini base URL                      |
+
+Choose per-component models. OMIT a variable to keep honcho's
+built-in default — an empty value is not the default, it overrides
+with an empty string:
+
+| Variable                        | Component        |
+| ------------------------------- | ---------------- |
+| `DERIVER_MODEL_CONFIG__MODEL`   | Deriver worker   |
+| `SUMMARY_MODEL_CONFIG__MODEL`   | Summarizer       |
+| `EMBEDDING_MODEL_CONFIG__MODEL` | Embeddings       |
+
+Each component also accepts `__TRANSPORT` (`openai`, `anthropic`,
+`gemini`) and `__OVERRIDES__BASE_URL` / `__OVERRIDES__API_KEY`.
+
+Embeddings support only the `openai` and `gemini` transports.
+
+Dialectic levels and dream models are not pre-listed in the manifest;
+add them as needed:
+
+```toml
+DIALECTIC_LEVELS__high__MODEL_CONFIG__MODEL = "gpt-5.4"
+DREAM_DEDUCTION_MODEL_CONFIG__MODEL         = "gpt-5.4-mini"
+DREAM_INDUCTION_MODEL_CONFIG__MODEL         = "gpt-5.4-mini"
+```
+
+### Local inference example
+
+LM Studio / vLLM on `127.0.0.1:1234` (no real key needed):
+
+```toml
+[vars]
+LLM_OPENAI_BASE_URL          = "http://127.0.0.1:1234/v1"
+LLM_OPENAI_API_KEY           = "not-needed"
+DERIVER_MODEL_CONFIG__MODEL  = "qwen2.5:14b"
+```
+
+### Fallback / backup provider
+
+Each component takes a `FALLBACK` sub-config used when the primary
+errors:
+
+```toml
+DERIVER_MODEL_CONFIG__FALLBACK__MODEL               = "gpt-5.4-mini"
+DERIVER_MODEL_CONFIG__FALLBACK__TRANSPORT           = "openai"
+DERIVER_MODEL_CONFIG__FALLBACK__OVERRIDES__BASE_URL = "https://..."
+```
+
+### Gotchas
+
+- `EMBEDDING_VECTOR_DIMENSIONS` is best left unset. If you set it:
+  (1) the value is baked into the pgvector column at the first
+  migration — changing it later makes inserts fail, so to switch you
+  must wipe `$FLOX_ENV_CACHE/honcho/pgdata` (or run `flox delete`)
+  and re-activate to re-init; and (2) honcho then sends an explicit
+  `dimensions=` on every embedding request, which some local
+  OpenAI-compatible servers reject.
+- Embedding fallback silently reuses the backup provider's
+  credentials when the embedding overrides are blank. Set embedding
+  credentials explicitly if you want a dedicated embedding provider.
+- Chat models under ~14B parameters often miss tool calls. Honcho's
+  deriver and dialectic paths rely on function calling, so prefer a
+  14B+ model for those components.
+
 ## How data is stored
 
 All state lives under `$FLOX_ENV_CACHE/honcho/`:

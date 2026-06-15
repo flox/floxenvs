@@ -6,6 +6,12 @@ Run against the local Honcho server (the honcho-api service):
     export LLM_OPENAI_API_KEY=sk-...   # optional, enables peer.chat
     python quickstart.py
 
+For a local OpenAI-compatible endpoint (LM Studio, vLLM), set a
+base URL instead of a real key:
+
+    export LLM_OPENAI_BASE_URL=http://127.0.0.1:1234/v1
+    export LLM_OPENAI_API_KEY=not-needed
+
 Mirrors the README's Store -> Reason -> Query -> Inject loop:
 https://github.com/plastic-labs/honcho#quickstart
 """
