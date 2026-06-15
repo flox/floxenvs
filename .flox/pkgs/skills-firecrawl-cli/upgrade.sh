@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+HASHES_FILE="$SCRIPT_DIR/hashes.json"
+
+OWNER="firecrawl"
+REPO="cli"
+BRANCH="main"
+
+current_version=$(jq -r '.version // ""' "$HASHES_FILE")
+
+rev=$(git ls-remote "https://github.com/$OWNER/$REPO.git" \
+  "refs/heads/$BRANCH" | awk '{print $1}')
+
+if [ -z "$rev" ]; then
+  echo "Failed to resolve $BRANCH on $OWNER/$REPO" >&2
+  exit 1
+fi
+
+short_sha="${rev:0:7}"
+
+commit_json=$(curl -sfL \
+  -H "Accept: application/vnd.github+json" \
+  "https://api.github.com/repos/$OWNER/$REPO/commits/$rev")
+commit_date=$(echo "$commit_json" \
+  | jq -r '.commit.committer.date' | cut -c1-10)
+
+new_version="0+unstable-${commit_date}.${short_sha}"
+
+echo "Current: $current_version"
+echo "Latest:  $new_version"
+
+if [ "$current_version" = "$new_version" ]; then
+  echo "Already up to date"
+  exit 0
+fi
+
+echo "Updating skills-firecrawl-cli to $new_version"
+
+sha256_base32=$(nix-prefetch-url --unpack \
+  "https://github.com/$OWNER/$REPO/archive/$rev.tar.gz")
+sri_hash=$(nix --extra-experimental-features nix-command \
+  hash convert --hash-algo sha256 --to sri "$sha256_base32")
+
+jq -n \
+  --arg v "$new_version" \
+  --arg r "$rev" \
+  --arg h "$sri_hash" \
+  '{version: $v, rev: $r, srcHash: $h}' \
+  > "$HASHES_FILE"
+
+echo "Wrote $HASHES_FILE:"
+cat "$HASHES_FILE"

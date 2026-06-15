@@ -1,0 +1,37 @@
+kind: pkg
+subkind: plain
+name: firecrawl-cli
+title: Firecrawl CLI
+publisher: flox
+tagline: >
+  Official Firecrawl CLI for scraping, crawling, searching, and
+  extracting web data from the terminal.
+summary:
+  - "Scrape any URL to clean, LLM-ready markdown"
+  - "Crawl entire sites and search the web from the shell"
+  - "Authenticates via FIRECRAWL_API_KEY or `firecrawl login`"
+category: ai
+ai_role: tooling
+tags: [firecrawl, scraping, crawling, web, search, nodejs]
+stack: [nodejs, typescript]
+featured: false
+combines_well_with:
+  - env:firecrawl
+  - pkg:skills-firecrawl-cli
+  - pkg:claude-code
+status: stable
+license: ISC
+upstream:
+  name: firecrawl-cli
+  url: https://github.com/firecrawl/cli
+  license: ISC
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    firecrawl-cli.pkg-path = "flox/firecrawl-cli"
+    firecrawl-cli.publisher = "flox"
+links:
+  source: >-
+    https://github.com/flox/floxenvs/tree/main/.flox/pkgs/firecrawl-cli
+  floxhub: https://hub.flox.dev/flox/firecrawl-cli

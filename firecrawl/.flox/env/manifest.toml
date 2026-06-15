@@ -1,0 +1,46 @@
+schema-version = "1.10.0"
+
+# Minimal Firecrawl environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = [{ remote = "flox/firecrawl" }]
+#
+# Provides the official Firecrawl CLI (`firecrawl`) and a
+# Claude Code / OpenCode skill bundle for driving it, layered
+# onto the flox/claude managed Claude Code config so the
+# bundled skills are auto-discovered. Authenticate with a key
+# from https://firecrawl.dev by exporting FIRECRAWL_API_KEY
+# (or running `firecrawl login`).
+
+[include]
+environments = [
+  { dir = "../claude" }
+]
+
+[install]
+firecrawl-cli.pkg-path = "flox/firecrawl-cli"
+firecrawl-cli.pkg-group = "firecrawl"
+skills-firecrawl-cli.pkg-path = "flox/skills-firecrawl-cli"
+skills-firecrawl-cli.pkg-group = "firecrawl"
+
+[vars]
+# Set your Firecrawl API key here, export it before
+# activating, or persist it once to the env cache (see hook).
+FIRECRAWL_API_KEY = ""
+
+[hook]
+on-activate = '''
+dir="$FLOX_ENV_CACHE/firecrawl"
+mkdir -p "$dir"
+export FIRECRAWL_DATA_DIR="$dir"
+
+# Persist the key across activations: if it isn't set in the
+# environment but was saved to the cache before, load it back.
+key_file="$dir/api-key"
+if [ -z "${FIRECRAWL_API_KEY:-}" ] && [ -f "$key_file" ]; then
+  FIRECRAWL_API_KEY="$(cat "$key_file")"
+  export FIRECRAWL_API_KEY
+fi
+'''
