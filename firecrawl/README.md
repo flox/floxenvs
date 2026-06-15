@@ -67,7 +67,7 @@ Override either in your own manifest before
 
 This env includes `flox/claude`, so the bundled skills
 under `$FLOX_ENV/share/claude-code/skills/` are
-discovered by `claude-managed` and surfaced to Claude
+discovered by `flox-ai` and surfaced to Claude
 Code automatically. The same files are installed for
 OpenCode under
 `$FLOX_ENV/share/opencode/skills/`. The bundle covers

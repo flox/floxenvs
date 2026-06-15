@@ -31,7 +31,7 @@ Everything from [`claude`](../claude/) plus the
 gstack plugin tree at
 `$FLOX_ENV/share/claude-code/plugins/gstack/`.
 
-`claude-managed` discovers the plugin and symlinks it
+`flox-ai` discovers the plugin and symlinks it
 into the project-local `$CLAUDE_CONFIG_DIR/plugins/`,
 so all 45 skills become available without touching
 `~/.claude/`.
@@ -107,7 +107,7 @@ dir, not into the nix store.
 If you already have gstack cloned at
 `~/.claude/skills/gstack/` (the upstream-recommended
 install), the plugin install is independent and
-non-conflicting — `claude-managed` only touches its
+non-conflicting — `flox-ai` only touches its
 own config dir. Both can coexist, though Claude Code
 may surface duplicate skill names.
 
