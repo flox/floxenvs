@@ -257,3 +257,33 @@ func TestUserPluginDirs_SkipsBroken(t *testing.T) {
 		t.Fatalf("got %v want %v", got, want)
 	}
 }
+
+func TestRun_UnknownAgent(t *testing.T) {
+	err := Run(Options{AgentName: "bogus"})
+	if err == nil {
+		t.Fatal("want error for unknown agent")
+	}
+	if !strings.Contains(err.Error(), "unknown agent") ||
+		!strings.Contains(err.Error(), "claude") {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestRun_BinaryMissingInEnv(t *testing.T) {
+	floxEnv := t.TempDir() // has no bin/claude
+	err := Run(Options{
+		AgentName: "claude",
+		FloxEnv:   floxEnv,
+		ShareDir:  filepath.Join(floxEnv, "share", "claude-code"),
+		ConfigDir: filepath.Join(t.TempDir(), ".flox-ai"),
+	})
+	if err == nil {
+		t.Fatal("want error for missing binary")
+	}
+	if !strings.Contains(err.Error(), "claude not found in this Flox environment") {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(err.Error(), `remote = "flox/claude"`) {
+		t.Fatalf("error missing fix-it hint: %v", err)
+	}
+}

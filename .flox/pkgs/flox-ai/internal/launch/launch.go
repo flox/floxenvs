@@ -5,9 +5,11 @@ package launch
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
+	"syscall"
 
 	"flox.dev/flox-ai/internal/discover"
 	"flox.dev/flox-ai/internal/symlinks"
@@ -178,4 +180,83 @@ func (p Plan) Argv() []string {
 		argv = append(argv, "--append-system-prompt-file", p.RulesFile)
 	}
 	return append(argv, p.Passthrough...)
+}
+
+// Options are the resolved inputs for Run.
+type Options struct {
+	AgentName   string
+	FloxEnv     string // $FLOX_ENV
+	ShareDir    string // $FLOX_ENV/share/claude-code (or --dir)
+	ConfigDir   string // $FLOX_ENV_PROJECT/.flox-ai (or --config-dir)
+	Passthrough []string
+}
+
+// Run resolves the agent, verifies its binary, prepares the flox
+// fragments, and execs the agent process (replacing the current process).
+// It only returns when something fails before exec.
+func Run(opts Options) error {
+	agent, ok := Supported[opts.AgentName]
+	if !ok {
+		return fmt.Errorf("unknown agent %q (supported: %s)", opts.AgentName, SupportedNames())
+	}
+
+	bin, err := resolveBinary(agent, opts.FloxEnv)
+	if err != nil {
+		return err
+	}
+
+	frags, err := discover.Scan(opts.ShareDir)
+	if err != nil {
+		return fmt.Errorf("discover: %w", err)
+	}
+
+	launchDir := filepath.Join(opts.ConfigDir, "launch")
+	synth, rulesFile, err := Prepare(launchDir, frags)
+	if err != nil {
+		return err
+	}
+
+	userPlugins, err := UserPluginDirs(opts.ConfigDir)
+	if err != nil {
+		return err
+	}
+
+	plugins := make([]string, 0, len(frags.Plugins)+len(userPlugins))
+	for _, p := range frags.Plugins {
+		plugins = append(plugins, p.Path)
+	}
+	plugins = append(plugins, userPlugins...)
+
+	plan := Plan{
+		Bin:         bin,
+		SynthPlugin: synth,
+		Plugins:     plugins,
+		RulesFile:   rulesFile,
+		Passthrough: opts.Passthrough,
+	}
+
+	env := append(os.Environ(), "FLOX_AI=1")
+	return syscall.Exec(bin, plan.Argv(), env)
+}
+
+// resolveBinary returns the agent binary path. It prefers
+// $FLOX_ENV/<BinSubpath> and falls back to PATH only when FLOX_ENV is
+// unset (e.g. when invoked with --dir outside an activation).
+func resolveBinary(agent Agent, floxEnv string) (string, error) {
+	if floxEnv != "" {
+		bin := filepath.Join(floxEnv, agent.BinSubpath)
+		if _, err := os.Stat(bin); err == nil {
+			return bin, nil
+		}
+		return "", fmt.Errorf(`%s not found in this Flox environment.
+Add it to your manifest:
+  [include]
+  environments = [{ remote = "flox/%s" }]
+then re-activate`, agent.Name, agent.Name)
+	}
+	bin, err := exec.LookPath(agent.Name)
+	if err != nil {
+		return "", fmt.Errorf("%s not found on PATH", agent.Name)
+	}
+	return bin, nil
 }
