@@ -10,6 +10,7 @@ import (
 	"flox.dev/flox-ai/internal/discover"
 	"flox.dev/flox-ai/internal/doctor"
 	"flox.dev/flox-ai/internal/emit"
+	"flox.dev/flox-ai/internal/launch"
 	"flox.dev/flox-ai/internal/plugins"
 	"flox.dev/flox-ai/internal/symlinks"
 )
@@ -140,6 +141,27 @@ func main() {
 		runFragmentSubcmd("skills", flag.Arg(1), flag.Arg(2), configDir, shareDir)
 	case "agents":
 		runFragmentSubcmd("agents", flag.Arg(1), flag.Arg(2), configDir, shareDir)
+	case "launch":
+		agentName := flag.Arg(1)
+		if agentName == "" {
+			fmt.Fprintln(os.Stderr, red("ERROR:")+" usage: flox-ai launch <agent> [-- <agent args>]")
+			os.Exit(1)
+		}
+		requireShareDir()
+		var passthrough []string
+		if flag.NArg() > 2 {
+			passthrough = flag.Args()[2:]
+		}
+		if err := launch.Run(launch.Options{
+			AgentName:   agentName,
+			FloxEnv:     floxEnv,
+			ShareDir:    shareDir,
+			ConfigDir:   configDir,
+			Passthrough: passthrough,
+		}); err != nil {
+			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
+			os.Exit(1)
+		}
 	default:
 		printUsage()
 		os.Exit(1)
@@ -160,6 +182,7 @@ Commands:
   skills add|remove|list|clean   Manage skill symlinks
   agents add|remove|list|clean   Manage agent symlinks
   plugins add|remove|list|clean  Manage plugins (symlinks + JSON)
+  launch <agent> [-- <args>]     Run an AI agent with flox fragments injected
   version          Print version
 
 Flags:
