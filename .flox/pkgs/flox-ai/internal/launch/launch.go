@@ -3,9 +3,13 @@
 package launch
 
 import (
+	"fmt"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"flox.dev/flox-ai/internal/discover"
 )
 
 // Agent describes how to launch a specific AI agent binary.
@@ -37,6 +41,36 @@ type Plan struct {
 	Plugins     []string // additional plugin dirs (env + user)
 	RulesFile   string   // merged rules file; "" if no rules
 	Passthrough []string // verbatim args after the agent name
+}
+
+// MergeRules concatenates all rule fragments into launchDir/rules.md and
+// returns its path. Each rule is preceded by an HTML comment naming its
+// source. Returns "" (and writes nothing) when there are no rules.
+func MergeRules(launchDir string, rules []discover.Fragment) (string, error) {
+	if len(rules) == 0 {
+		return "", nil
+	}
+	if err := os.MkdirAll(launchDir, 0755); err != nil {
+		return "", err
+	}
+	var sb strings.Builder
+	for _, r := range rules {
+		content, err := os.ReadFile(r.Path)
+		if err != nil {
+			return "", fmt.Errorf("read rule %s: %w", r.Name, err)
+		}
+		fmt.Fprintf(&sb, "<!-- source: %s -->\n", r.Name)
+		sb.Write(content)
+		if !strings.HasSuffix(string(content), "\n") {
+			sb.WriteString("\n")
+		}
+		sb.WriteString("\n")
+	}
+	out := filepath.Join(launchDir, "rules.md")
+	if err := os.WriteFile(out, []byte(sb.String()), 0644); err != nil {
+		return "", err
+	}
+	return out, nil
 }
 
 // Argv builds the full argv (argv[0] = Bin) for the agent process.
