@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 
 	"flox.dev/flox-ai/internal/discover"
@@ -89,5 +90,72 @@ func TestMergeRules_ConcatOrderAndHeaders(t *testing.T) {
 	want := "<!-- source: a -->\nAAA\n\n<!-- source: b -->\nBBB\n\n"
 	if string(got) != want {
 		t.Fatalf("got %q want %q", got, want)
+	}
+}
+
+func TestBuildSynthPlugin_None(t *testing.T) {
+	got, err := BuildSynthPlugin(t.TempDir(), nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got != "" {
+		t.Fatalf("want empty path, got %q", got)
+	}
+}
+
+func TestBuildSynthPlugin_SkillsAndAgents(t *testing.T) {
+	src := t.TempDir()
+
+	skillDir := filepath.Join(src, "skills", "demo")
+	if err := os.MkdirAll(skillDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	skillFile := filepath.Join(skillDir, "SKILL.md")
+	if err := os.WriteFile(skillFile, []byte("x"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	agentFile := filepath.Join(src, "agents", "rev.md")
+	if err := os.MkdirAll(filepath.Dir(agentFile), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(agentFile, []byte("y"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	launchDir := t.TempDir()
+	plugin, err := BuildSynthPlugin(launchDir,
+		[]discover.Fragment{{Name: "demo", Path: skillFile}},
+		[]discover.Fragment{{Name: "rev", Path: agentFile}},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if plugin != filepath.Join(launchDir, "plugin") {
+		t.Fatalf("unexpected plugin path %q", plugin)
+	}
+
+	meta, err := os.ReadFile(filepath.Join(plugin, ".claude-plugin", "plugin.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(meta), `"name":"flox"`) {
+		t.Fatalf("bad plugin.json: %s", meta)
+	}
+
+	gotSkill, err := os.Readlink(filepath.Join(plugin, "skills", "demo"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if gotSkill != skillDir {
+		t.Fatalf("skill link %q want %q", gotSkill, skillDir)
+	}
+
+	gotAgent, err := os.Readlink(filepath.Join(plugin, "agents", "rev.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if gotAgent != agentFile {
+		t.Fatalf("agent link %q want %q", gotAgent, agentFile)
 	}
 }

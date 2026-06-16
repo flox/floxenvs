@@ -73,6 +73,54 @@ func MergeRules(launchDir string, rules []discover.Fragment) (string, error) {
 	return out, nil
 }
 
+// BuildSynthPlugin creates a Claude Code plugin under launchDir/plugin
+// containing the given skills and agents as symlinks, and returns the
+// plugin path. Skills are linked as directories (the skill dir holding
+// SKILL.md); agents are linked as <name>.md files. Returns "" (and writes
+// nothing) when there are no skills or agents.
+func BuildSynthPlugin(launchDir string, skills, agents []discover.Fragment) (string, error) {
+	if len(skills) == 0 && len(agents) == 0 {
+		return "", nil
+	}
+	pluginDir := filepath.Join(launchDir, "plugin")
+	metaDir := filepath.Join(pluginDir, ".claude-plugin")
+	if err := os.MkdirAll(metaDir, 0755); err != nil {
+		return "", err
+	}
+	meta := `{"name":"flox","description":"Flox-managed skills and agents"}` + "\n"
+	if err := os.WriteFile(filepath.Join(metaDir, "plugin.json"), []byte(meta), 0644); err != nil {
+		return "", err
+	}
+
+	if len(skills) > 0 {
+		skillsDir := filepath.Join(pluginDir, "skills")
+		if err := os.MkdirAll(skillsDir, 0755); err != nil {
+			return "", err
+		}
+		for _, s := range skills {
+			// s.Path is the SKILL.md file; link its directory.
+			target := filepath.Dir(s.Path)
+			if err := os.Symlink(target, filepath.Join(skillsDir, s.Name)); err != nil {
+				return "", err
+			}
+		}
+	}
+
+	if len(agents) > 0 {
+		agentsDir := filepath.Join(pluginDir, "agents")
+		if err := os.MkdirAll(agentsDir, 0755); err != nil {
+			return "", err
+		}
+		for _, a := range agents {
+			if err := os.Symlink(a.Path, filepath.Join(agentsDir, a.Name+".md")); err != nil {
+				return "", err
+			}
+		}
+	}
+
+	return pluginDir, nil
+}
+
 // Argv builds the full argv (argv[0] = Bin) for the agent process.
 func (p Plan) Argv() []string {
 	argv := []string{p.Bin}
