@@ -154,7 +154,6 @@ func main() {
 		}
 		if err := launch.Run(launch.Options{
 			AgentName:   agentName,
-			FloxEnv:     floxEnv,
 			ShareDir:    shareDir,
 			ConfigDir:   configDir,
 			Passthrough: passthrough,

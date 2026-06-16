@@ -323,21 +323,34 @@ func TestRun_UnknownAgent(t *testing.T) {
 	}
 }
 
-func TestRun_BinaryMissingInEnv(t *testing.T) {
-	floxEnv := t.TempDir() // has no bin/claude
-	err := Run(Options{
-		AgentName: "claude",
-		FloxEnv:   floxEnv,
-		ShareDir:  filepath.Join(floxEnv, "share", "claude-code"),
-		ConfigDir: filepath.Join(t.TempDir(), ".flox-ai"),
-	})
-	if err == nil {
-		t.Fatal("want error for missing binary")
+func TestResolveBinary_FoundOnPath(t *testing.T) {
+	dir := t.TempDir()
+	bin := filepath.Join(dir, "claude")
+	if err := os.WriteFile(bin, []byte("#!/bin/sh\n"), 0755); err != nil {
+		t.Fatal(err)
 	}
-	if !strings.Contains(err.Error(), "claude not found in this Flox environment") {
+	t.Setenv("PATH", dir)
+
+	got, err := resolveBinary(Supported["claude"])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got != bin {
+		t.Fatalf("got %q want %q", got, bin)
+	}
+}
+
+func TestResolveBinary_NotFoundSuggestsFloxInstall(t *testing.T) {
+	t.Setenv("PATH", t.TempDir()) // empty dir: claude not present
+
+	_, err := resolveBinary(Supported["claude"])
+	if err == nil {
+		t.Fatal("want error when binary missing")
+	}
+	if !strings.Contains(err.Error(), "not found on PATH") {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if !strings.Contains(err.Error(), `remote = "flox/claude"`) {
-		t.Fatalf("error missing fix-it hint: %v", err)
+	if !strings.Contains(err.Error(), "flox install flox/claude-code") {
+		t.Fatalf("error missing flox install hint: %v", err)
 	}
 }

@@ -17,13 +17,13 @@ import (
 
 // Agent describes how to launch a specific AI agent binary.
 type Agent struct {
-	Name       string // agent name as typed on the CLI, e.g. "claude"
-	BinSubpath string // binary path relative to $FLOX_ENV
+	Name       string // agent name as typed on the CLI / PATH lookup, e.g. "claude"
+	InstallPkg string // flox package to suggest installing, e.g. "claude-code"
 }
 
 // Supported lists the agents launch knows how to run.
 var Supported = map[string]Agent{
-	"claude": {Name: "claude", BinSubpath: filepath.Join("bin", "claude")},
+	"claude": {Name: "claude", InstallPkg: "claude-code"},
 }
 
 // SupportedNames returns the supported agent names, sorted and
@@ -185,7 +185,6 @@ func (p Plan) Argv() []string {
 // Options are the resolved inputs for Run.
 type Options struct {
 	AgentName   string
-	FloxEnv     string // $FLOX_ENV
 	ShareDir    string // $FLOX_ENV/share/claude-code (or --dir)
 	ConfigDir   string // $FLOX_ENV_PROJECT/.flox-ai (or --config-dir)
 	Passthrough []string
@@ -200,7 +199,7 @@ func Run(opts Options) error {
 		return fmt.Errorf("unknown agent %q (supported: %s)", opts.AgentName, SupportedNames())
 	}
 
-	bin, err := resolveBinary(agent, opts.FloxEnv)
+	bin, err := resolveBinary(agent)
 	if err != nil {
 		return err
 	}
@@ -269,24 +268,16 @@ func childEnv() []string {
 	return append(os.Environ(), "FLOX_AI=1")
 }
 
-// resolveBinary returns the agent binary path. It prefers
-// $FLOX_ENV/<BinSubpath> and falls back to PATH only when FLOX_ENV is
-// unset (e.g. when invoked with --dir outside an activation).
-func resolveBinary(agent Agent, floxEnv string) (string, error) {
-	if floxEnv != "" {
-		bin := filepath.Join(floxEnv, agent.BinSubpath)
-		if _, err := os.Stat(bin); err == nil {
-			return bin, nil
-		}
-		return "", fmt.Errorf(`%s not found in this Flox environment.
-Add it to your manifest:
-  [include]
-  environments = [{ remote = "flox/%s" }]
-then re-activate`, agent.Name, agent.Name)
-	}
+// resolveBinary finds the agent binary on PATH. The Flox environment only
+// supplies the fragments (skills/agents/rules/plugins); the agent binary
+// itself comes from PATH — which, inside an activated env that ships it,
+// already includes the env's bin. When the binary is missing it suggests
+// installing it via flox.
+func resolveBinary(agent Agent) (string, error) {
 	bin, err := exec.LookPath(agent.Name)
 	if err != nil {
-		return "", fmt.Errorf("%s not found on PATH", agent.Name)
+		return "", fmt.Errorf(`%s not found on PATH.
+Install it with: flox install flox/%s`, agent.Name, agent.InstallPkg)
 	}
 	return bin, nil
 }
