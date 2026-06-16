@@ -159,3 +159,45 @@ func TestBuildSynthPlugin_SkillsAndAgents(t *testing.T) {
 		t.Fatalf("agent link %q want %q", gotAgent, agentFile)
 	}
 }
+
+func TestUserPluginDirs_AbsentDir(t *testing.T) {
+	got, err := UserPluginDirs(t.TempDir()) // no plugins/ subdir
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 0 {
+		t.Fatalf("want none, got %v", got)
+	}
+}
+
+func TestUserPluginDirs_SkipsBroken(t *testing.T) {
+	configDir := t.TempDir()
+	pluginsDir := filepath.Join(configDir, "plugins")
+	if err := os.MkdirAll(pluginsDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	// good: symlink to an existing dir
+	realPlugin := filepath.Join(t.TempDir(), "good-plugin")
+	if err := os.MkdirAll(realPlugin, 0755); err != nil {
+		t.Fatal(err)
+	}
+	goodLink := filepath.Join(pluginsDir, "good")
+	if err := os.Symlink(realPlugin, goodLink); err != nil {
+		t.Fatal(err)
+	}
+
+	// broken: symlink to a missing target
+	if err := os.Symlink(filepath.Join(t.TempDir(), "missing"), filepath.Join(pluginsDir, "bad")); err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := UserPluginDirs(configDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []string{goodLink}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("got %v want %v", got, want)
+	}
+}

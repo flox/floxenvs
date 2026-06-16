@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"flox.dev/flox-ai/internal/discover"
+	"flox.dev/flox-ai/internal/symlinks"
 )
 
 // Agent describes how to launch a specific AI agent binary.
@@ -119,6 +120,26 @@ func BuildSynthPlugin(launchDir string, skills, agents []discover.Fragment) (str
 	}
 
 	return pluginDir, nil
+}
+
+// UserPluginDirs returns the plugin symlink paths added via
+// `flox-ai plugins add` (configDir/plugins/*). Only non-broken symlinks
+// are returned, matching how the existing claude wrapper filters out
+// Claude Code's own runtime state directories. Returns nil when the
+// plugins dir is absent.
+func UserPluginDirs(configDir string) ([]string, error) {
+	entries, err := symlinks.List(filepath.Join(configDir, "plugins"))
+	if err != nil {
+		return nil, err
+	}
+	var dirs []string
+	for _, e := range entries {
+		if e.Broken {
+			continue
+		}
+		dirs = append(dirs, e.Path)
+	}
+	return dirs, nil
 }
 
 // Argv builds the full argv (argv[0] = Bin) for the agent process.
