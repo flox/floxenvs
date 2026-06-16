@@ -1,0 +1,416 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Flox AI on Flox — Flox-native config management helper for Claude Code CLI</title><meta name="description" content="Flox-native config management helper for Claude Code CLI."><link rel="canonical" href="https://flox.github.io/floxenvs/packages/flox-ai/"><link rel="icon" href="/floxenvs/favicon.svg"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"><meta name="referrer" content="strict-origin-when-cross-origin"><meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), interest-cohort=()"><meta property="og:title" content="Flox AI on Flox — Flox-native config management helper for Claude Code CLI"><meta property="og:description" content="Flox-native config management helper for Claude Code CLI."><meta property="og:image" content="https://flox.github.io/floxenvs/og/pkg/flox-ai.png"><meta property="og:url" content="https://flox.github.io/floxenvs/packages/flox-ai/"><meta property="og:type" content="product"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://flox.github.io/floxenvs/og/pkg/flox-ai.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Flox AI","description":"Flox-native config management helper for Claude Code CLI.\n","applicationCategory":"DeveloperApplication","operatingSystem":["Linux","macOS"],"license":"https://spdx.org/licenses/MIT.html","url":"https://flox.github.io/floxenvs/packages/flox-ai/","codeRepository":"https://github.com/flox/floxenvs/tree/main/.flox/pkgs/flox-ai","dateModified":"2026-06-16T17:54:18+02:00","offers":{"@type":"Offer","price":"0","priceCurrency":"USD","availability":"https://schema.org/InStock","description":"Free and open source — install via the Flox package manager."},"publisher":{"@type":"Organization","@id":"https://flox.dev/#organization","name":"Flox","url":"https://flox.dev"},"author":{"@type":"Person","name":"Rok Garbas","identifier":"@rok","url":"https://github.com/rok"}}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"flox / envs","item":"https://flox.github.io/floxenvs/"},{"@type":"ListItem","position":2,"name":"Packages","item":"https://flox.github.io/floxenvs/packages/"},{"@type":"ListItem","position":3,"name":"Flox AI","item":"https://flox.github.io/floxenvs/packages/flox-ai/"}]}</script><script>
+      // Apply theme before paint to avoid FOUC. Honors the
+      // stored choice, otherwise falls back to system pref.
+      (function () {
+        try {
+          var stored = localStorage.getItem("theme");
+          var dark = stored === "dark"
+            || (!stored && window.matchMedia(
+              "(prefers-color-scheme: dark)").matches);
+          if (dark) document.documentElement.classList.add("dark");
+        } catch (e) {}
+      })();
+    </script><link rel="stylesheet" href="/floxenvs/_astro/_slug_.BYNwMe91.css">
+<style>.clip-hexagon[data-astro-cid-exkfadj5]{clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)}
+</style></head> <body class="font-sans antialiased min-h-dvh bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100"> <header class="border-b border-slate-200 dark:border-slate-800"> <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center gap-6"> <a href="/floxenvs/" class="font-bold tracking-tight">flox / envs</a> <a href="/floxenvs/envs/" class="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">Envs</a> <a href="/floxenvs/packages/" class="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">Packages</a> <a href="/floxenvs/search/" class="ml-auto inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white" aria-label="Search"> <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"> <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd"></path> </svg> <span>Search</span> </a> <button id="theme-toggle" type="button" class="inline-flex items-center justify-center w-8 h-8 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800" aria-label="Toggle dark mode" title="Toggle dark mode"> <svg class="w-4 h-4 dark:hidden" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"> <path d="M10 2a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 2zM10 15a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 15zM10 7a3 3 0 100 6 3 3 0 000-6zM15.657 5.404a.75.75 0 10-1.06-1.06l-1.061 1.06a.75.75 0 001.06 1.06l1.06-1.06zM6.464 14.596a.75.75 0 10-1.06-1.06l-1.06 1.06a.75.75 0 001.06 1.06l1.06-1.06zM18 10a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0118 10zM5 10a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 015 10zM14.596 15.657a.75.75 0 001.06-1.06l-1.06-1.061a.75.75 0 10-1.06 1.06l1.06 1.06zM5.404 6.464a.75.75 0 001.06-1.06l-1.06-1.06a.75.75 0 10-1.061 1.06l1.06 1.06z"></path> </svg> <svg class="w-4 h-4 hidden dark:block" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"> <path fill-rule="evenodd" d="M7.455 2.004a.75.75 0 01.26.77 7 7 0 009.958 7.967.75.75 0 011.067.853A8.5 8.5 0 116.647 1.921a.75.75 0 01.808.083z" clip-rule="evenodd"></path> </svg> </button> <a href="https://github.com/flox/floxenvs" class="inline-flex items-center justify-center w-8 h-8 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800" aria-label="GitHub repository" title="GitHub repository"> <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"> <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path> </svg> </a> </nav> </header> <main class="max-w-6xl mx-auto px-6 py-10">  <nav class="text-sm text-slate-500 mb-4"> <a href="/floxenvs/packages/" class="underline">Packages</a>    / flox-ai </nav> <div class="flex items-center gap-3 mb-2"> <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono uppercase tracking-wide ring-1 bg-kind-pkg/15 text-kind-pkg ring-kind-pkg/30" data-kind="plain"> PKG </span> <span class="text-xs font-mono text-slate-500">stable</span> </div> <h1 class="text-3xl font-bold">Flox AI</h1> <p class="mt-2 text-slate-600 dark:text-slate-300">Flox-native config management helper for Claude Code CLI.
+</p> <p class="mt-4 text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-3xl">  <strong>flox/flox-ai</strong> is a Flox package for Flox environments. Add it to a manifest via <code class="font-mono text-sm">flox-ai.pkg-path = &quot;flox/flox-ai&quot;</code> in any <code class="font-mono text-sm">[install]</code> block. Published by Flox under MIT license, maintained by @rok. </p> <ul class="mt-5 list-disc list-inside text-sm space-y-1"> <li>Assembles Claude Code config from per-package fragments on activate</li><li>Manages rules, skills, agents, and plugins via isolated CLAUDE_CONFIG_DIR</li><li>Bridges macOS Keychain credentials so isolated sessions authenticate</li> </ul><aside class="mt-6 max-w-3xl rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 px-4 py-3 text-sm"> <strong>New to Flox?</strong> Install it in 30 seconds:  <code class="font-mono text-xs">curl -L https://downloads.flox.dev/by-env/stable/install.sh | bash</code> 
+— then add this package to a Flox manifest's <code class="font-mono text-xs">[install]</code> block.  <a href="https://flox.dev/docs/install-flox/" class="underline">Docs →</a> </aside> <div class="grid lg:grid-cols-[1fr_280px] gap-10 mt-10"> <div> <section aria-label="Score panel" class="mt-8 p-6 rounded-xl border border-slate-200 dark:border-slate-800" data-astro-cid-exkfadj5> <div class="grid gap-6 md:grid-cols-[120px_1fr_1fr_1.2fr]" data-astro-cid-exkfadj5> <!-- Hex overall score --> <div class="flex md:block items-center gap-4" data-astro-cid-exkfadj5> <div class="w-24 h-28 flex flex-col items-center justify-center
+               clip-hexagon bg-slate-50 dark:bg-slate-900" aria-label="Overall score —" data-astro-cid-exkfadj5> <div class="text-3xl font-bold leading-none font-mono" data-astro-cid-exkfadj5> — </div> <div class="mt-1 px-2 py-0.5 text-[10px] font-mono uppercase rounded ring-1 bg-status-missing/15 text-status-missing ring-status-missing/30" data-astro-cid-exkfadj5> no data </div> </div> </div> <!-- Quality --> <div class="space-y-1"> <div class="flex items-baseline gap-2 text-sm"> <span class="font-medium text-slate-700 dark:text-slate-200"> Quality </span> <span class="font-mono text-score-red"> 0%
+</span> </div> <div class="h-2 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Quality"> <div class="h-full bg-score-red" style="width:0%"></div> </div> <p class="text-xs text-slate-500 leading-tight">0/0 checks pass</p> </div> <!-- Reliability --> <div class="space-y-1"> <div class="flex items-baseline gap-2 text-sm"> <span class="font-medium text-slate-700 dark:text-slate-200"> Reliability </span> <span class="font-mono text-score-red"> 0%
+</span> </div> <div class="h-2 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Reliability"> <div class="h-full bg-score-red" style="width:0%"></div> </div> <p class="text-xs text-slate-500 leading-tight">no recent CI data</p> </div> <!-- Security --> <div data-astro-cid-exkfadj5> <p class="text-sm font-medium text-slate-700 dark:text-slate-200 mb-1" data-astro-cid-exkfadj5>
+Security
+</p> <div class="space-y-0.5" data-astro-cid-exkfadj5>  </div>  </div> </div> <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-900
+              text-sm text-slate-600 dark:text-slate-300" data-astro-cid-exkfadj5> <span class="font-medium" data-astro-cid-exkfadj5>Impact</span> <span class="ml-2 font-mono" data-astro-cid-exkfadj5>no evals.yaml</span> </div> </section>  <section class="mt-8"> <h2 class="text-xl font-semibold mb-3">Install</h2> <div class="rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden"> <div role="tablist" class="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"> <button role="tab" aria-selected="true" aria-controls="bxw0yxygoyt-panel-0" data-tab-target="bxw0yxygoyt-panel-0" class="px-4 py-2 text-sm font-mono data-[active=true]:bg-white dark:data-[active=true]:bg-slate-950 data-[active=true]:font-semibold" data-active="true"> Manifest </button> </div> <pre id="bxw0yxygoyt-panel-0" role="tabpanel" data-tab-panel class="text-sm font-mono p-4 m-0 overflow-x-auto"><code>[install]
+flox-ai.pkg-path = &quot;flox/flox-ai&quot;
+flox-ai.publisher = &quot;flox&quot;
+</code></pre> </div> <script type="module">for(const a of document.querySelectorAll('[role="tablist"]')){const r=a.querySelectorAll('[role="tab"]');r.forEach(e=>{e.addEventListener("click",()=>{const c=e.getAttribute("data-tab-target");a.parentElement.querySelectorAll("[data-tab-panel]").forEach(t=>t.toggleAttribute("hidden",t.id!==c)),r.forEach(t=>{const l=t===e;t.setAttribute("aria-selected",String(l)),t.setAttribute("data-active",String(l))})})})}</script> </section> <section class="mt-12"> <h2 class="text-xl font-semibold">Use with these environments</h2> <div class="mt-4 grid sm:grid-cols-2 gap-3"> <a href="/floxenvs/envs/agentmemory/" class="block p-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-slate-400"> <div class="flex items-center gap-2"> <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono uppercase tracking-wide ring-1 bg-kind-env/15 text-kind-env ring-kind-env/30" data-kind="env"> ENV </span> <span class="font-semibold">AgentMemory</span> </div> <p class="mt-1 text-sm text-slate-600 dark:text-slate-300"> Persistent memory for Claude Code — hooks, skills, and a REST/MCP backend service in one include line.
+ </p> </a><a href="/floxenvs/envs/claude/" class="block p-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-slate-400"> <div class="flex items-center gap-2"> <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono uppercase tracking-wide ring-1 bg-kind-env/15 text-kind-env ring-kind-env/30" data-kind="env"> ENV </span> <span class="font-semibold">Claude Code</span> </div> <p class="mt-1 text-sm text-slate-600 dark:text-slate-300"> Claude Code CLI with managed config assembly and MCP fragments.
+ </p> </a><a href="/floxenvs/envs/remotion/" class="block p-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-slate-400"> <div class="flex items-center gap-2"> <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono uppercase tracking-wide ring-1 bg-kind-env/15 text-kind-env ring-kind-env/30" data-kind="env"> ENV </span> <span class="font-semibold">Remotion</span> </div> <p class="mt-1 text-sm text-slate-600 dark:text-slate-300"> React-based programmatic video toolkit with the Remotion best-practices skill pre-wired into Claude Code.
+ </p> </a> </div> </section> <section class="mt-12"> <h2 class="text-xl font-semibold">Combines with these packages</h2> <div class="mt-4 grid sm:grid-cols-2 gap-3"> <a href="/floxenvs/packages/claude-code/" class="block p-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-slate-400"> <div class="flex items-center gap-2"> <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono uppercase tracking-wide ring-1 bg-kind-pkg/15 text-kind-pkg ring-kind-pkg/30" data-kind="plain"> PKG </span> <span class="font-semibold">Claude Code</span> </div> <p class="mt-1 text-sm text-slate-600 dark:text-slate-300"> Anthropic&#39;s Claude Code agent CLI.
+ </p> </a> </div> </section> <section class="mt-12"> <h2 class="text-xl font-semibold">Documentation</h2> <div class="prose prose-sm dark:prose-invert max-w-none mt-3"><h1 id="flox-ai">flox-ai</h1>
+<p>A small Go binary that assembles Claude Code configuration
+from Flox package fragments and emits eval-able shell code.
+Depends only on <code>gopkg.in/yaml.v3</code> for frontmatter parsing.</p>
+<h2 id="usage">Usage</h2>
+<pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="toml"><code><span class="line"><span style="color:#768390"># manifest.toml</span></span>
+<span class="line"><span style="color:#ADBAC7">[</span><span style="color:#F69D50">hook</span><span style="color:#ADBAC7">]</span></span>
+<span class="line"><span style="color:#ADBAC7">on-activate = </span><span style="color:#96D0FF">'''</span></span>
+<span class="line"><span style="color:#96D0FF">eval "$(flox-ai setup-hook)"</span></span>
+<span class="line"><span style="color:#96D0FF">'''</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ADBAC7">[</span><span style="color:#F69D50">profile</span><span style="color:#ADBAC7">]</span></span>
+<span class="line"><span style="color:#ADBAC7">common = </span><span style="color:#96D0FF">'''</span></span>
+<span class="line"><span style="color:#96D0FF">eval "$(flox-ai setup-profile)"</span></span>
+<span class="line"><span style="color:#96D0FF">'''</span></span></code></pre>
+<p>The setup is split into two phases because of how flox
+hooks work:</p>
+<ul>
+<li><strong><code>on-activate</code></strong> runs in a context where only env vars
+persist to the user’s shell. Filesystem side effects
+(mkdir, cp, symlinks) persist, but function definitions
+and traps do not.</li>
+<li><strong><code>[profile]</code></strong> runs in the user’s actual shell, so
+function definitions and EXIT traps survive for the
+lifetime of the session.</li>
+</ul>
+<h2 id="commands">Commands</h2>
+<pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#F69D50">flox-ai</span><span style="color:#96D0FF"> setup-hook</span><span style="color:#768390">      # env vars, keychain, symlinks</span></span>
+<span class="line"><span style="color:#F69D50">flox-ai</span><span style="color:#96D0FF"> setup-profile</span><span style="color:#768390">   # cleanup function + EXIT trap</span></span>
+<span class="line"><span style="color:#F69D50">flox-ai</span><span style="color:#96D0FF"> doctor</span><span style="color:#768390">          # config status, symlink health, validation</span></span>
+<span class="line"><span style="color:#F69D50">flox-ai</span><span style="color:#96D0FF"> rules</span><span style="color:#96D0FF"> add</span><span style="color:#768390">       # install a rule (symlink)</span></span>
+<span class="line"><span style="color:#F69D50">flox-ai</span><span style="color:#96D0FF"> rules</span><span style="color:#96D0FF"> remove</span><span style="color:#768390">    # remove a rule by name</span></span>
+<span class="line"><span style="color:#F69D50">flox-ai</span><span style="color:#96D0FF"> rules</span><span style="color:#96D0FF"> list</span><span style="color:#768390">      # show installed rules</span></span>
+<span class="line"><span style="color:#F69D50">flox-ai</span><span style="color:#96D0FF"> rules</span><span style="color:#96D0FF"> clean</span><span style="color:#768390">     # remove stale managed rules</span></span>
+<span class="line"><span style="color:#F69D50">flox-ai</span><span style="color:#96D0FF"> skills</span><span style="color:#96D0FF"> add</span><span style="color:#768390">      # install a skill (symlink)</span></span>
+<span class="line"><span style="color:#F69D50">flox-ai</span><span style="color:#96D0FF"> skills</span><span style="color:#96D0FF"> remove</span><span style="color:#768390">   # remove a skill by name</span></span>
+<span class="line"><span style="color:#F69D50">flox-ai</span><span style="color:#96D0FF"> skills</span><span style="color:#96D0FF"> list</span><span style="color:#768390">     # show installed skills</span></span>
+<span class="line"><span style="color:#F69D50">flox-ai</span><span style="color:#96D0FF"> skills</span><span style="color:#96D0FF"> clean</span><span style="color:#768390">    # remove stale managed skills</span></span>
+<span class="line"><span style="color:#F69D50">flox-ai</span><span style="color:#96D0FF"> agents</span><span style="color:#96D0FF"> add</span><span style="color:#768390">      # install an agent (symlink)</span></span>
+<span class="line"><span style="color:#F69D50">flox-ai</span><span style="color:#96D0FF"> agents</span><span style="color:#96D0FF"> remove</span><span style="color:#768390">   # remove an agent by name</span></span>
+<span class="line"><span style="color:#F69D50">flox-ai</span><span style="color:#96D0FF"> agents</span><span style="color:#96D0FF"> list</span><span style="color:#768390">     # show installed agents</span></span>
+<span class="line"><span style="color:#F69D50">flox-ai</span><span style="color:#96D0FF"> agents</span><span style="color:#96D0FF"> clean</span><span style="color:#768390">    # remove stale managed agents</span></span>
+<span class="line"><span style="color:#F69D50">flox-ai</span><span style="color:#96D0FF"> plugins</span><span style="color:#96D0FF"> add</span><span style="color:#768390">     # install plugin</span></span>
+<span class="line"><span style="color:#F69D50">flox-ai</span><span style="color:#96D0FF"> plugins</span><span style="color:#96D0FF"> remove</span><span style="color:#768390">  # remove plugin by name</span></span>
+<span class="line"><span style="color:#F69D50">flox-ai</span><span style="color:#96D0FF"> plugins</span><span style="color:#96D0FF"> list</span><span style="color:#768390">    # show installed plugins</span></span>
+<span class="line"><span style="color:#F69D50">flox-ai</span><span style="color:#96D0FF"> plugins</span><span style="color:#96D0FF"> clean</span><span style="color:#768390">   # remove stale plugins</span></span>
+<span class="line"><span style="color:#F69D50">flox-ai</span><span style="color:#96D0FF"> version</span><span style="color:#768390">         # print version</span></span></code></pre>
+<h3 id="setup-hook">setup-hook</h3>
+<p>Emits shell code for the on-activate hook phase:</p>
+<ol>
+<li>Exports env vars (<code>CLAUDE_CONFIG_DIR</code>, etc.)</li>
+<li>Bridges macOS Keychain credentials for the isolated
+config dir</li>
+<li>Copies <code>~/.claude.json</code> for OAuth account metadata</li>
+<li>Cleans stale symlinks and creates fresh ones in
+<code>$CLAUDE_CONFIG_DIR/{rules,skills,agents}/</code></li>
+</ol>
+<p>The hook does not validate fragments: surfacing frontmatter
+warnings on every activation is noisy. Run <code>flox-ai doctor</code>
+to see frontmatter and structure validation on demand.</p>
+<h3 id="setup-profile">setup-profile</h3>
+<p>Emits shell code for the profile phase:</p>
+<ol>
+<li>Defines the <code>_flox_ai_clean_symlinks</code> helper</li>
+<li>Defines the <code>_flox_ai_cleanup</code> function</li>
+<li>Registers <code>trap _flox_ai_cleanup EXIT</code></li>
+</ol>
+<h3 id="doctor">doctor</h3>
+<p>Single diagnostic view combining:</p>
+<ul>
+<li>Config dir + activation marker</li>
+<li>Auth bridge status</li>
+<li>Per-fragment symlink health (<code>✓</code> installed, <code>→ broken</code>
+if the link target is missing, <code>·</code> available but not
+installed)</li>
+<li>Frontmatter and structure validation, with errors
+(broken) and warnings (unusual but works) reported
+inline per fragment</li>
+</ul>
+<p>Exits non-zero only on errors.</p>
+<p><strong>Rules</strong> (<code>rules/*.md</code>):</p>
+<ul>
+<li>File is readable (error if not)</li>
+<li>Unknown frontmatter keys produce a warning
+(only <code>paths</code> is recognized)</li>
+</ul>
+<p><strong>Skills</strong> (<code>skills/*/SKILL.md</code>):</p>
+<ul>
+<li>SKILL.md exists and is readable (error if not)</li>
+<li>If frontmatter is present, <code>name</code> and <code>description</code>
+are required (error if missing)</li>
+<li><code>name</code> is kebab-case, ≤64 characters (error)</li>
+<li><code>description</code> ≤1024 characters (warning if exceeded)</li>
+<li><code>compatibility</code> ≤500 characters (warning if exceeded)</li>
+<li><code>effort</code> is one of: low, medium, high, max (error)</li>
+<li>Frontmatter keys are recognized as either
+agentskills.io spec keys or Claude Code extensions
+(warning otherwise; the <code>metadata:</code> mapping is the
+spec-recommended home for non-standard fields)</li>
+</ul>
+<p><strong>Agents</strong> (<code>agents/*.md</code>):</p>
+<ul>
+<li>File is readable (error if not)</li>
+<li>No forbidden keys (<code>hooks</code>, <code>mcpServers</code>,
+<code>permissionMode</code> — security restriction, error)</li>
+<li><code>effort</code> is one of: low, medium, high, max (error)</li>
+<li><code>isolation</code> is <code>worktree</code> (only valid value, error)</li>
+<li>Unknown frontmatter keys produce a warning</li>
+</ul>
+<h3 id="rulesskillsagents-add">rules/skills/agents add</h3>
+<p>Installs a rule, skill, or agent by creating a
+relative symlink in <code>$CLAUDE_CONFIG_DIR/&#x3C;type>/&#x3C;name></code>.</p>
+<h3 id="rulesskillsagents-remove">rules/skills/agents remove</h3>
+<p>Removes the symlink by name.</p>
+<h3 id="rulesskillsagents-list">rules/skills/agents list</h3>
+<p>Shows entries in <code>$CLAUDE_CONFIG_DIR/&#x3C;type>/</code> with
+symlink health status.</p>
+<h3 id="rulesskillsagents-clean">rules/skills/agents clean</h3>
+<p>Removes symlinks whose targets point into
+<code>$FLOX_ENV/share/claude-code/&#x3C;type>/</code>. User-created
+symlinks are preserved.</p>
+<h3 id="plugins-add">plugins add</h3>
+<p>Installs a plugin by creating a symlink in
+<code>$CLAUDE_CONFIG_DIR/plugins/</code> and merging the
+plugin’s <code>installed_plugins.json</code> and
+<code>known_marketplaces.json</code> into the config dir’s
+accumulated files.</p>
+<h3 id="plugins-remove">plugins remove</h3>
+<p>Removes a plugin symlink by name and regenerates
+the JSON config files from remaining plugins.</p>
+<h3 id="plugins-list">plugins list</h3>
+<p>Shows all installed plugins in the config dir with
+symlink health status.</p>
+<h3 id="plugins-clean">plugins clean</h3>
+<p>Removes all plugin symlinks whose targets point
+into <code>$FLOX_ENV/share/claude-code/</code>. Regenerates JSON
+config files from remaining plugins. User-managed
+plugins are never touched.</p>
+<p>Rules, skills, and agents <code>clean</code> works identically
+but without JSON regeneration.</p>
+<h2 id="how-it-works">How it works</h2>
+<p>Flox packages drop config fragments into
+<code>$FLOX_ENV/share/claude-code/</code>. On <code>flox activate</code>:</p>
+<p>The Go binary handles discovery and validation.
+Everything else (symlinks, keychain, cleanup) is emitted
+as shell code — visible and debuggable.</p>
+<h3 id="why-two-phases">Why two phases?</h3>
+<p>Flox <code>on-activate</code> hooks run in a subshell-like context.
+Env var exports and filesystem side effects persist, but
+shell function definitions and <code>trap</code> registrations do not
+survive to the user’s interactive shell. An EXIT trap
+registered in <code>on-activate</code> fires immediately when the
+hook context exits — deleting files that were just created.</p>
+<p>The <code>[profile]</code> section runs in the user’s actual shell,
+so functions and traps defined there persist for the
+session.</p>
+<h3 id="fragment-types">Fragment types</h3>
+<p>Packages install fragments under
+<code>$FLOX_ENV/share/claude-code/</code>:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Directory</th><th>Format</th><th>Delivery</th></tr></thead><tbody><tr><td><code>rules/*.md</code></td><td>Rule files</td><td>Symlink</td></tr><tr><td><code>skills/*/SKILL.md</code></td><td>Skill directories</td><td>Symlink</td></tr><tr><td><code>agents/*.md</code></td><td>Agent files</td><td>Symlink</td></tr><tr><td><code>plugins/*/</code></td><td>Plugin directories</td><td>Symlink + JSON</td></tr><tr><td></td><td></td><td>merge</td></tr></tbody></table>
+<p>All fragment types are delivered via symlinks into
+<code>$CLAUDE_CONFIG_DIR/</code>.</p>
+<h3 id="isolation-via-claude_config_dir">Isolation via CLAUDE_CONFIG_DIR</h3>
+<p><code>CLAUDE_CONFIG_DIR</code> is set to
+<code>$FLOX_ENV_PROJECT/.flox-ai</code>, a directory next to
+the project’s <code>.claude/</code>. This isolates the Claude session:</p>
+<ul>
+<li>No user settings from <code>~/.claude/</code> leaking in</li>
+<li>No user <code>CLAUDE.md</code> leaking in</li>
+<li>No user memory files leaking in</li>
+<li>Session transcripts stay in the managed dir</li>
+<li>Auto-memory disabled via
+<code>CLAUDE_CODE_DISABLE_AUTO_MEMORY=1</code></li>
+</ul>
+<h2 id="authentication">Authentication</h2>
+<p>Claude Code stores OAuth credentials in the macOS Keychain
+(or platform equivalent). The service name is derived from
+<code>CLAUDE_CONFIG_DIR</code>:</p>
+<ul>
+<li>Default (no env var): <code>Claude Code-credentials</code></li>
+<li>With custom dir: <code>Claude Code-credentials-&#x3C;sha256[:8]></code></li>
+</ul>
+<p>Since we set <code>CLAUDE_CONFIG_DIR</code> for isolation, Claude
+looks for credentials under a hashed service name that
+doesn’t exist yet. The emitted shell code bridges this gap
+automatically.</p>
+<h3 id="how-the-keychain-bridge-works">How the keychain bridge works</h3>
+<p>At activate time, the <code>setup-hook</code> shell code:</p>
+<ol>
+<li>Computes the SHA-256 hash of <code>$CLAUDE_CONFIG_DIR</code>
+(first 8 hex chars) to derive the isolated service name</li>
+<li>Checks if the isolated keychain entry already exists
+(idempotent — skips if present)</li>
+<li>Reads the default entry (<code>Claude Code-credentials</code>) via
+<code>security find-generic-password -w</code> (returns plaintext)</li>
+<li>Re-encodes the plaintext with <code>xxd -p</code> (hex) and writes
+it under the isolated service name using
+<code>security add-generic-password -X</code></li>
+<li>Copies <code>~/.claude.json</code> into <code>$CLAUDE_CONFIG_DIR/</code> for
+<code>oauthAccount</code> metadata</li>
+</ol>
+<p>All <code>security</code> commands use <code>|| true</code> to guard against
+<code>set -e</code> in flox hooks.</p>
+<h3 id="token-refresh">Token refresh</h3>
+<p>OAuth tokens expire after ~1 hour with a ~5-minute refresh
+buffer. When Claude refreshes a token, it writes back to
+the same service name it read from — the isolated one.
+This is self-consistent: the bridge is only needed once at
+activate time.</p>
+<h3 id="cleanup">Cleanup</h3>
+<p>The EXIT trap (registered in <code>setup-profile</code>) removes the
+bridged keychain entry and the copied <code>.claude.json</code> when
+the shell exits. Each new <code>flox activate</code> creates a fresh
+bridge.</p>
+<h3 id="linux">Linux</h3>
+<p>On Linux, Claude Code uses a file-based credential store
+at <code>$CLAUDE_CONFIG_DIR/.credentials.json</code>. No bridging is
+needed since Claude creates and manages this file directly
+in the isolated config dir.</p>
+<h3 id="symlink-lifecycle">Symlink lifecycle</h3>
+<p>The <code>setup-profile</code> shell defines a
+<code>_flox_ai_clean_symlinks</code> helper that removes
+symlinks whose targets point into
+<code>$FLOX_ENV/share/claude-code/</code>. User-created entries are never
+touched.</p>
+<p><strong>On activate:</strong> <code>setup-hook</code> cleans stale symlinks, then
+<code>ln -sfn</code> creates fresh ones.</p>
+<p><strong>On exit (trap):</strong> cleanup function runs the helper
+again, removing all managed symlinks.</p>
+<h2 id="environment-variables">Environment variables</h2>
+<h3 id="read-by-flox-ai">Read by flox-ai</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Variable</th><th>Purpose</th></tr></thead><tbody><tr><td><code>FLOX_ENV</code></td><td>Flox environment path (fragment source)</td></tr><tr><td><code>FLOX_ENV_PROJECT</code></td><td>Project root (for relative paths)</td></tr><tr><td><code>FLOX_AI_DIR</code></td><td>Override config dir location</td></tr><tr><td><code>FLOX_AI</code></td><td>Check if managed mode is active</td></tr></tbody></table>
+<p>If <code>FLOX_AI_DIR</code> is not set, defaults to
+<code>$FLOX_ENV_PROJECT/.flox-ai</code>.</p>
+<h3 id="set-by-emitted-shell-code">Set by emitted shell code</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Variable</th><th>Purpose</th></tr></thead><tbody><tr><td><code>CLAUDE_CONFIG_DIR</code></td><td><code>$FLOX_ENV_PROJECT/.flox-ai</code></td></tr><tr><td><code>CLAUDE_CODE_DISABLE_AUTO_MEMORY</code></td><td>Disables memory</td></tr><tr><td><code>FLOX_AI</code></td><td>Marker that managed mode is active</td></tr></tbody></table>
+<h2 id="architecture">Architecture</h2>
+<pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>main.go                     CLI entry point, env var</span></span>
+<span class="line"><span>                            resolution, command dispatch</span></span>
+<span class="line"><span>internal/</span></span>
+<span class="line"><span>  discover/                 Scan $FLOX_ENV/share/claude-code/</span></span>
+<span class="line"><span>  emit/                     Generate shell code</span></span>
+<span class="line"><span>                            hook: env vars, keychain,</span></span>
+<span class="line"><span>                                  symlinks</span></span>
+<span class="line"><span>                            profile: cleanup function,</span></span>
+<span class="line"><span>                                     trap</span></span>
+<span class="line"><span>  doctor/                   Fragment validation</span></span>
+<span class="line"><span>                            (frontmatter, structure)</span></span>
+<span class="line"><span>  symlinks/                 Shared symlink operations</span></span>
+<span class="line"><span>                            (Add, Remove, List, Clean)</span></span>
+<span class="line"><span>  plugins/                  JSON merge, add/remove/list/</span></span>
+<span class="line"><span>                            clean</span></span>
+<span class="line"><span>e2e/                        Bats E2E test suite</span></span>
+<span class="line"><span>  test_helper/common.bash   Shared helpers, mode detection</span></span>
+<span class="line"><span>  fixtures/                 Static test fragments</span></span></code></pre>
+<h2 id="building">Building</h2>
+<pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#F69D50">flox</span><span style="color:#96D0FF"> build</span><span style="color:#96D0FF"> flox-ai</span></span></code></pre>
+<h3 id="updating-dependencies">Updating dependencies</h3>
+<p>Bumping or adding a Go dependency requires regenerating
+the <code>vendorHash</code> in <code>default.nix</code>:</p>
+<ol>
+<li>Edit <code>go.mod</code> (e.g. <code>go get example.com/pkg@vX.Y.Z</code>)</li>
+<li>Run <code>go mod tidy</code> to refresh <code>go.sum</code></li>
+<li>Set <code>vendorHash</code> to a placeholder
+(<code>sha256-AAAA...AAA=</code>) and run <code>nix-build</code></li>
+<li>Copy the <code>got: sha256-...</code> line from the failure into
+<code>vendorHash</code> and rebuild</li>
+</ol>
+<p>Tests cover the parser and validators. Re-run
+<code>go test ./...</code> after touching <code>internal/doctor/</code>.</p>
+<h2 id="testing">Testing</h2>
+<h3 id="unit-tests-go">Unit tests (Go)</h3>
+<pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6CB6FF">cd</span><span style="color:#96D0FF"> .flox/pkgs/flox-ai</span></span>
+<span class="line"><span style="color:#F69D50">go</span><span style="color:#96D0FF"> test</span><span style="color:#96D0FF"> ./...</span></span></code></pre>
+<h3 id="e2e-tests">E2E tests</h3>
+<p>70 bats tests covering command output, shell eval,
+validation, security edge cases, and cleanup safety.
+Two runners are available from the repo root:</p>
+<p><strong>Hermetic (no flox required):</strong></p>
+<pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#F69D50">nix</span><span style="color:#96D0FF"> run</span><span style="color:#96D0FF"> .#run-test-flox-ai-with-nix</span></span></code></pre>
+<p>Builds the binary via Nix, sets <code>flox-ai</code> on
+PATH, runs bats against temp fixture trees using
+<code>--dir</code> and <code>--config-dir</code> flags. No <code>FLOX_*</code>
+variables are set.</p>
+<p><strong>With flox (real lifecycle):</strong></p>
+<pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#F69D50">nix</span><span style="color:#96D0FF"> run</span><span style="color:#96D0FF"> .#run-test-flox-ai-with-flox</span></span></code></pre>
+<p>Creates a throwaway flox environment, installs the
+built binary via <code>on-activate</code>, and runs the same bats
+tests inside <code>flox activate</code>. Tests <code>FLOX_ENV</code> and
+<code>FLOX_ENV_PROJECT</code> integration.</p>
+<h3 id="test-structure">Test structure</h3>
+<pre class="astro-code github-dark-dimmed" style="background-color:#22272e;color:#adbac7; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>e2e/</span></span>
+<span class="line"><span>  test_helper/</span></span>
+<span class="line"><span>    common.bash          mode detection, fixture helpers</span></span>
+<span class="line"><span>  version.bats           version command</span></span>
+<span class="line"><span>  setup-hook.bats        setup-hook output</span></span>
+<span class="line"><span>  setup-profile.bats     setup-profile output</span></span>
+<span class="line"><span>  doctor.bats            diagnostics: status + validation</span></span>
+<span class="line"><span>  eval-hook.bats         eval shell output, side effects</span></span>
+<span class="line"><span>  eval-profile.bats      eval profile, cleanup</span></span>
+<span class="line"><span>  edge-cases.bats        robustness + security</span></span>
+<span class="line"><span>  fixtures/              static test fragments</span></span></code></pre>
+<p><code>common.bash</code> detects the execution mode via <code>FLOX_ENV</code>
+and adapts flag usage. Both runners execute the same
+bats files.</p></div> </section> </div> <aside class="space-y-1"> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Status</span> <span class="flex-1 break-words">stable</span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Publisher</span> <span class="flex-1 break-words">flox</span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">License</span> <span class="flex-1 break-words">MIT</span> </div>  <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Maintainer</span> <span class="flex-1 break-words">@rok</span> </div>   <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Bundled by envs</span> <span class="flex-1 break-words"> <span class="inline-flex flex-wrap gap-x-1.5 gap-y-1"> <a href="/floxenvs/envs/agentmemory/" class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300">agentmemory</a><a href="/floxenvs/envs/claude/" class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300">claude</a><a href="/floxenvs/envs/remotion/" class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300">remotion</a> </span> </span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">Last updated</span> <span class="flex-1 break-words"> <time datetime="2026-06-16T17:54:18+02:00"> 2026-06-16 </time> </span> </div> <div class="flex gap-3 text-sm py-1 border-b border-slate-100 dark:border-slate-900"> <span class="w-28 text-slate-500 shrink-0">FloxHub</span> <span class="flex-1 break-words"> <a href="https://hub.flox.dev/flox/flox-ai" class="underline">link</a> </span> </div> </aside> </div>  </main> <footer class="border-t border-slate-200 dark:border-slate-800 mt-20"> <div class="max-w-6xl mx-auto px-6 py-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-8 text-sm"> <div> <p class="font-bold tracking-tight text-slate-900 dark:text-slate-100">flox / envs</p> <p class="mt-1 text-slate-500">Ready-to-use Flox envs and packages for AI and dev tooling.</p> </div> <div> <p class="font-semibold text-slate-700 dark:text-slate-300">Flox</p> <ul class="mt-1 space-y-1 text-slate-500"> <li><a class="hover:underline" href="https://flox.dev">flox.dev</a></li> <li><a class="hover:underline" href="https://flox.dev/docs">Documentation</a></li> <li><a class="hover:underline" href="https://hub.flox.dev/flox">FloxHub catalog</a></li> </ul> </div> <div> <p class="font-semibold text-slate-700 dark:text-slate-300">Catalog</p> <ul class="mt-1 space-y-1 text-slate-500"> <li><a class="hover:underline" href="/floxenvs/envs/">All environments</a></li> <li><a class="hover:underline" href="/floxenvs/packages/">All packages</a></li> <li><a class="hover:underline" href="/floxenvs/search/">Search</a></li> <li><a class="hover:underline" href="/floxenvs/sitemap-index.xml">Sitemap</a></li> </ul> </div> <div> <p class="font-semibold text-slate-700 dark:text-slate-300">Project</p> <ul class="mt-1 space-y-1 text-slate-500"> <li><a class="hover:underline" href="https://github.com/flox/floxenvs">Source on GitHub</a></li> <li><a class="hover:underline" href="https://github.com/flox/floxenvs/discussions">Discussions</a></li> <li><a class="hover:underline" href="https://github.com/flox/floxenvs/issues">Issues</a></li> <li><a class="hover:underline" href="https://github.com/flox/floxenvs/blob/main/LICENSE">MIT license</a></li> </ul> </div> </div> <div class="border-t border-slate-100 dark:border-slate-900"> <div class="max-w-6xl mx-auto px-6 py-4 text-xs text-slate-400 dark:text-slate-500 flex flex-wrap items-center gap-x-4 gap-y-1"> <span>© Flox, Inc.</span> <span aria-hidden="true">·</span> <span>Catalog source: <a class="underline" href="https://github.com/flox/floxenvs">flox/floxenvs</a></span> <span aria-hidden="true">·</span> <span>
+Built <time datetime="2026-06-16T15:57:04.715Z">2026-06-16</time> </span> </div> </div> </footer> <script type="module">const e=document.getElementById("theme-toggle");e&&e.addEventListener("click",()=>{const t=document.documentElement.classList.toggle("dark");try{localStorage.setItem("theme",t?"dark":"light")}catch{}});</script> </body> </html>
