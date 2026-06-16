@@ -226,6 +226,7 @@ func Run(opts Options) error {
 		plugins = append(plugins, p.Path)
 	}
 	plugins = append(plugins, userPlugins...)
+	plugins = dedupPluginDirs(plugins)
 
 	plan := Plan{
 		Bin:         bin,
@@ -235,8 +236,37 @@ func Run(opts Options) error {
 		Passthrough: opts.Passthrough,
 	}
 
-	env := append(os.Environ(), "FLOX_AI=1")
+	env := childEnv()
 	return syscall.Exec(bin, plan.Argv(), env)
+}
+
+// dedupPluginDirs removes duplicate plugin directories, comparing by
+// resolved (symlink-followed) path and keeping the first occurrence. This
+// matters because an activated env mirrors share-dir plugins into
+// configDir/plugins as symlinks, so the same plugin can arrive both as a
+// share-dir path and as a configDir symlink.
+func dedupPluginDirs(dirs []string) []string {
+	seen := make(map[string]bool, len(dirs))
+	var out []string
+	for _, d := range dirs {
+		key := d
+		if resolved, err := filepath.EvalSymlinks(d); err == nil {
+			key = resolved
+		}
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		out = append(out, d)
+	}
+	return out
+}
+
+// childEnv returns the environment for the agent process: the parent
+// environment plus FLOX_AI=1. It deliberately does NOT set
+// CLAUDE_CONFIG_DIR — launch reuses the user's real config and login.
+func childEnv() []string {
+	return append(os.Environ(), "FLOX_AI=1")
 }
 
 // resolveBinary returns the agent binary path. It prefers

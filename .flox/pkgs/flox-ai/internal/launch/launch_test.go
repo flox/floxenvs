@@ -258,6 +258,60 @@ func TestUserPluginDirs_SkipsBroken(t *testing.T) {
 	}
 }
 
+func TestDedupPluginDirs_SamePluginTwice(t *testing.T) {
+	real := t.TempDir() // the actual plugin dir (e.g. share/.../plugins/p)
+	link := filepath.Join(t.TempDir(), "p-link")
+	if err := os.Symlink(real, link); err != nil {
+		t.Fatal(err)
+	}
+	// env path first (real), user symlink second (resolves to same real)
+	got := dedupPluginDirs([]string{real, link})
+	want := []string{real}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("got %v want %v", got, want)
+	}
+}
+
+func TestDedupPluginDirs_DistinctKept(t *testing.T) {
+	a := t.TempDir()
+	b := t.TempDir()
+	got := dedupPluginDirs([]string{a, b})
+	want := []string{a, b}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("got %v want %v", got, want)
+	}
+}
+
+func TestChildEnv_AddsFloxAINotConfigDir(t *testing.T) {
+	env := childEnv()
+
+	var hasFloxAI bool
+	for _, kv := range env {
+		if kv == "FLOX_AI=1" {
+			hasFloxAI = true
+		}
+	}
+	if !hasFloxAI {
+		t.Fatal("childEnv missing FLOX_AI=1")
+	}
+
+	// childEnv must NOT introduce a CLAUDE_CONFIG_DIR entry that the
+	// parent environment didn't already have.
+	count := func(list []string) int {
+		n := 0
+		for _, kv := range list {
+			if strings.HasPrefix(kv, "CLAUDE_CONFIG_DIR=") {
+				n++
+			}
+		}
+		return n
+	}
+	if count(env) != count(os.Environ()) {
+		t.Fatalf("childEnv changed CLAUDE_CONFIG_DIR entries: parent=%d child=%d",
+			count(os.Environ()), count(env))
+	}
+}
+
 func TestRun_UnknownAgent(t *testing.T) {
 	err := Run(Options{AgentName: "bogus"})
 	if err == nil {
