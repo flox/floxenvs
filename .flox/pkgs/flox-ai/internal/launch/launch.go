@@ -142,6 +142,29 @@ func UserPluginDirs(configDir string) ([]string, error) {
 	return dirs, nil
 }
 
+// Prepare wipes launchDir and rebuilds the synth plugin and merged rules
+// file from the discovered fragments. Wiping each run keeps the tree free
+// of stale entries and lets newly added fragments be picked up
+// automatically. Returns the synth plugin path ("" if none) and the rules
+// file path ("" if none).
+func Prepare(launchDir string, frags *discover.Result) (synthPlugin, rulesFile string, err error) {
+	if err := os.RemoveAll(launchDir); err != nil {
+		return "", "", err
+	}
+	if err := os.MkdirAll(launchDir, 0755); err != nil {
+		return "", "", err
+	}
+	synthPlugin, err = BuildSynthPlugin(launchDir, frags.Skills, frags.Agents)
+	if err != nil {
+		return "", "", err
+	}
+	rulesFile, err = MergeRules(launchDir, frags.Rules)
+	if err != nil {
+		return "", "", err
+	}
+	return synthPlugin, rulesFile, nil
+}
+
 // Argv builds the full argv (argv[0] = Bin) for the agent process.
 func (p Plan) Argv() []string {
 	argv := []string{p.Bin}

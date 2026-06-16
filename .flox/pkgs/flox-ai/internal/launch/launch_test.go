@@ -160,6 +160,62 @@ func TestBuildSynthPlugin_SkillsAndAgents(t *testing.T) {
 	}
 }
 
+func TestPrepare_BuildsArtifactsAndIsIdempotent(t *testing.T) {
+	src := t.TempDir()
+
+	// one rule
+	rulesSrc := filepath.Join(src, "rules")
+	if err := os.MkdirAll(rulesSrc, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(rulesSrc, "r.md"), []byte("R"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	// one skill
+	skillDir := filepath.Join(src, "skills", "s")
+	if err := os.MkdirAll(skillDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(skillDir, "SKILL.md"), []byte("x"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	frags := &discover.Result{
+		Rules:  []discover.Fragment{{Name: "r", Path: filepath.Join(rulesSrc, "r.md")}},
+		Skills: []discover.Fragment{{Name: "s", Path: filepath.Join(skillDir, "SKILL.md")}},
+	}
+
+	launchDir := filepath.Join(t.TempDir(), "launch")
+
+	// stale file that must be wiped on Prepare
+	if err := os.MkdirAll(launchDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(launchDir, "stale.txt"), []byte("old"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	synth, rules, err := Prepare(launchDir, frags)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if synth != filepath.Join(launchDir, "plugin") {
+		t.Fatalf("synth %q", synth)
+	}
+	if rules != filepath.Join(launchDir, "rules.md") {
+		t.Fatalf("rules %q", rules)
+	}
+	if _, err := os.Stat(filepath.Join(launchDir, "stale.txt")); !os.IsNotExist(err) {
+		t.Fatalf("stale file not wiped")
+	}
+
+	// second run: still succeeds (symlinks don't collide because of wipe)
+	if _, _, err := Prepare(launchDir, frags); err != nil {
+		t.Fatalf("second Prepare failed: %v", err)
+	}
+}
+
 func TestUserPluginDirs_AbsentDir(t *testing.T) {
 	got, err := UserPluginDirs(t.TempDir()) // no plugins/ subdir
 	if err != nil {
