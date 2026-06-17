@@ -124,7 +124,6 @@ stdenv.mkDerivation (finalAttrs: {
 
     pushd $libdir
     rm -rf \
-      src \
       test \
       apps \
       Swabble \
@@ -144,6 +143,15 @@ stdenv.mkDerivation (finalAttrs: {
     find . -name "__screenshots__" -type d -exec rm -rf {} + 2>/dev/null || true
     find . -name "*.test.ts" -delete
     find . -name "*.test.js" -delete
+
+    # src/ carries runtime assets (agent + HTML templates, TUI themes,
+    # SQL schemas, bundled hooks, security policies) that openclaw loads
+    # by path relative to the package root. The bundled openclaw.mjs needs
+    # none of the .ts/.js under src/, so strip only those and drop the
+    # emptied directories, keeping the data files.
+    find src -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' \
+      -o -name '*.jsx' -o -name '*.mjs' -o -name '*.cjs' -o -name '*.map' \) -delete
+    find src -type d -empty -delete
     popd
 
     rm -f $libdir/node_modules/.pnpm/node_modules/clawdbot \
