@@ -40,3 +40,23 @@ func TestRunSetup_ProfileSkipsValidation(t *testing.T) {
 		t.Fatalf("runSetup failed: %v", err)
 	}
 }
+
+func TestResolveConfigDir(t *testing.T) {
+	cases := []struct {
+		name      string
+		flag, env string
+		project   string
+		want      string
+	}{
+		{"flag wins", "/explicit", "/envdir", "/proj", "/explicit"},
+		{"env over default", "", "/envdir", "/proj", "/envdir"},
+		{"default", "", "", "/proj", "/proj/.flox/cache/flox-ai"},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			if got := resolveConfigDir(c.flag, c.env, c.project); got != c.want {
+				t.Fatalf("got %q want %q", got, c.want)
+			}
+		})
+	}
+}

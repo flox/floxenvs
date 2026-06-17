@@ -15,7 +15,7 @@ import (
 	"flox.dev/flox-ai/internal/symlinks"
 )
 
-const version = "0.5.0"
+const version = "0.6.0"
 
 // ANSI color helpers
 func ansi(code, s string) string { return "\033[" + code + "m" + s + "\033[0m" }
@@ -34,7 +34,7 @@ func main() {
 
 	var flagDir, flagConfigDir string
 	flag.StringVar(&flagDir, "dir", "", "fragment source directory (default: $FLOX_ENV/share/claude-code)")
-	flag.StringVar(&flagConfigDir, "config-dir", "", "config directory (default: $FLOX_ENV_PROJECT/.flox-ai)")
+	flag.StringVar(&flagConfigDir, "config-dir", "", "config directory (default: $FLOX_ENV_PROJECT/.flox/cache/flox-ai)")
 	flag.Usage = printUsage
 	flag.Parse()
 
@@ -55,13 +55,7 @@ func main() {
 	if projectDir == "" {
 		projectDir, _ = os.Getwd()
 	}
-	configDir := flagConfigDir
-	if configDir == "" {
-		configDir = os.Getenv("FLOX_AI_DIR")
-	}
-	if configDir == "" {
-		configDir = filepath.Join(projectDir, ".flox-ai")
-	}
+	configDir := resolveConfigDir(flagConfigDir, os.Getenv("FLOX_AI_DIR"), projectDir)
 	managed := os.Getenv("FLOX_AI") == "1"
 
 	requireShareDir := func() {
@@ -167,6 +161,19 @@ func main() {
 	}
 }
 
+// resolveConfigDir picks the flox-ai config directory: an explicit
+// --config-dir flag wins, then FLOX_AI_DIR, then the default under the
+// project's flox cache.
+func resolveConfigDir(flagConfigDir, floxAIDir, projectDir string) string {
+	if flagConfigDir != "" {
+		return flagConfigDir
+	}
+	if floxAIDir != "" {
+		return floxAIDir
+	}
+	return filepath.Join(projectDir, ".flox", "cache", "flox-ai")
+}
+
 func printUsage() {
 	fmt.Fprintln(os.Stderr, `Usage: flox-ai [flags] <command>
 
@@ -186,7 +193,7 @@ Commands:
 
 Flags:
   --dir          Fragment source dir (default: $FLOX_ENV/share/claude-code)
-  --config-dir   Config dir (default: $FLOX_ENV_PROJECT/.flox-ai)`)
+  --config-dir   Config dir (default: $FLOX_ENV_PROJECT/.flox/cache/flox-ai)`)
 }
 
 // runSetup emits the shell code for the requested setup phase. Fragment
