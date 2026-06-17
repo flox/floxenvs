@@ -43,8 +43,11 @@ torch-darwin.pkg-group = "sana"
 torch-darwin.systems = ["aarch64-darwin"]
 
 # Transformers: CUDA-built on Linux, nixpkgs on Darwin.
-# Pin to 5.x: 4.x caps huggingface-hub<1.0, conflicting
-# with flox/huggingface-hub 1.16 from the included env.
+# Pinned to 5.3.0 on purpose: transformers 4.x caps
+# huggingface-hub<1.0, which conflicts with flox/huggingface-hub
+# 1.16 pulled in by the included flox/huggingface env. Leaving
+# this unpinned lets the catalog resolve a 4.x build and break
+# the lock. Bump deliberately, in lockstep with huggingface-hub.
 transformers.pkg-path = "flox-cuda/python3Packages.transformers"
 transformers.version = "5.3.0"
 transformers.pkg-group = "sana"
