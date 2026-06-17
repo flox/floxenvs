@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/pelletier/go-toml/v2"
 )
@@ -82,4 +83,47 @@ func SeedDeckConfig(deckDir, sourcePath string) error {
 		return err
 	}
 	return os.WriteFile(filepath.Join(deckDir, "config.toml"), out, 0644)
+}
+
+// DeckHome derives the agent-deck XDG layout from the flox-ai configDir.
+// agent-deck resolves ConfigDir as $XDG_CONFIG_HOME/agent-deck, so the
+// XDG_CONFIG_HOME we hand it is <configDir>/agents and the deck config
+// home is <configDir>/agents/agent-deck.
+func DeckHome(configDir string) (xdgConfigHome, deckDir string) {
+	xdgConfigHome = filepath.Join(configDir, "agents")
+	deckDir = filepath.Join(xdgConfigHome, "agent-deck")
+	return
+}
+
+// setEnvVar returns env with key=val, replacing any existing assignment
+// rather than appending a duplicate.
+func setEnvVar(env []string, key, val string) []string {
+	prefix := key + "="
+	out := make([]string, 0, len(env)+1)
+	replaced := false
+	for _, e := range env {
+		if strings.HasPrefix(e, prefix) {
+			out = append(out, prefix+val)
+			replaced = true
+			continue
+		}
+		out = append(out, e)
+	}
+	if !replaced {
+		out = append(out, prefix+val)
+	}
+	return out
+}
+
+// deckChildEnv builds the environment for the agent-deck process: the
+// parent env with XDG_CONFIG_HOME pointed at the flox deck home,
+// FLOX_AI=1, and FLOX_AI_DIR pinned to configDir so the nested
+// `flox-ai launch claude` resolves this env's fragments. XDG_DATA_HOME
+// and XDG_CACHE_HOME are intentionally left untouched so deck sessions
+// persist in the user's global agent-deck data.
+func deckChildEnv(base []string, xdgConfigHome, configDir string) []string {
+	env := setEnvVar(base, "XDG_CONFIG_HOME", xdgConfigHome)
+	env = setEnvVar(env, "FLOX_AI", "1")
+	env = setEnvVar(env, "FLOX_AI_DIR", configDir)
+	return env
 }
