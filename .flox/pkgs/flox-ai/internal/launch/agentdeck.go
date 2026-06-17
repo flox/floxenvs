@@ -4,6 +4,7 @@ package launch
 
 import (
 	"fmt"
+	"hash/fnv"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,23 +17,40 @@ import (
 // agent-deck config so deck-spawned claude sessions run through flox-ai.
 const DeckClaudeCommand = "flox-ai launch claude --"
 
-// injectClaudeCommand parses src (TOML; may be empty), forces
-// claude.command = DeckClaudeCommand while preserving every other table
-// and key, and returns the re-marshaled document.
-func injectClaudeCommand(src []byte) ([]byte, error) {
+// setTableKey forces doc[table][key] = value, creating the table when
+// absent and preserving its other keys. It errors when table exists but
+// is not a TOML table (e.g. a scalar), which would otherwise be silently
+// discarded.
+func setTableKey(doc map[string]any, table, key string, value any) error {
+	switch existing := doc[table].(type) {
+	case map[string]any:
+		existing[key] = value
+	case nil:
+		doc[table] = map[string]any{key: value}
+	default:
+		return fmt.Errorf("agent-deck config: [%s] is not a table (got %T)", table, doc[table])
+	}
+	return nil
+}
+
+// injectDeckConfig parses src (TOML; may be empty) and forces the flox
+// overrides — claude.command = DeckClaudeCommand and, when socketName is
+// non-empty, tmux.socket_name = socketName — preserving every other table
+// and key, then returns the re-marshaled document.
+func injectDeckConfig(src []byte, socketName string) ([]byte, error) {
 	doc := map[string]any{}
 	if len(src) > 0 {
 		if err := toml.Unmarshal(src, &doc); err != nil {
 			return nil, fmt.Errorf("parse agent-deck config: %w", err)
 		}
 	}
-	switch existing := doc["claude"].(type) {
-	case map[string]any:
-		existing["command"] = DeckClaudeCommand
-	case nil:
-		doc["claude"] = map[string]any{"command": DeckClaudeCommand}
-	default:
-		return nil, fmt.Errorf("agent-deck config: [claude] is not a table (got %T)", doc["claude"])
+	if err := setTableKey(doc, "claude", "command", DeckClaudeCommand); err != nil {
+		return nil, err
+	}
+	if socketName != "" {
+		if err := setTableKey(doc, "tmux", "socket_name", socketName); err != nil {
+			return nil, err
+		}
 	}
 	out, err := toml.Marshal(doc)
 	if err != nil {
@@ -65,9 +83,10 @@ func findUserDeckConfig(xdgConfigHome, home string) string {
 }
 
 // SeedDeckConfig writes <deckDir>/config.toml from sourcePath (when
-// non-empty) with claude.command forced to DeckClaudeCommand, creating
-// deckDir as needed. Overwrites any existing file.
-func SeedDeckConfig(deckDir, sourcePath string) error {
+// non-empty) with the flox overrides applied (claude.command and, when
+// socketName is non-empty, tmux.socket_name), creating deckDir as needed.
+// Overwrites any existing file.
+func SeedDeckConfig(deckDir, sourcePath, socketName string) error {
 	var src []byte
 	if sourcePath != "" {
 		data, err := os.ReadFile(sourcePath)
@@ -76,7 +95,7 @@ func SeedDeckConfig(deckDir, sourcePath string) error {
 		}
 		src = data
 	}
-	out, err := injectClaudeCommand(src)
+	out, err := injectDeckConfig(src, socketName)
 	if err != nil {
 		return err
 	}
@@ -94,6 +113,17 @@ func DeckHome(configDir string) (xdgConfigHome, deckDir string) {
 	xdgConfigHome = filepath.Join(configDir, "agents")
 	deckDir = filepath.Join(xdgConfigHome, "agent-deck")
 	return
+}
+
+// DeckSocketName returns a stable, per-environment tmux socket name
+// derived from configDir. Distinct flox environments get distinct tmux
+// servers — isolating each deck's shell environment and running panes —
+// while relaunching the same environment reuses its server. The name is
+// filesystem-safe (it becomes a tmux `-L <name>` socket file).
+func DeckSocketName(configDir string) string {
+	h := fnv.New32a()
+	_, _ = h.Write([]byte(configDir))
+	return fmt.Sprintf("flox-ai-%08x", h.Sum32())
 }
 
 // setEnvVar returns env with key=val, replacing any existing assignment
@@ -117,22 +147,24 @@ func setEnvVar(env []string, key, val string) []string {
 }
 
 // deckChildEnv builds the environment for the agent-deck process: the
-// parent env with XDG_CONFIG_HOME pointed at the flox deck home,
-// FLOX_AI=1, and FLOX_AI_DIR pinned to configDir so the nested
-// `flox-ai launch claude` resolves this env's fragments. XDG_DATA_HOME
-// and XDG_CACHE_HOME are intentionally left untouched so deck sessions
-// persist in the user's global agent-deck data.
+// parent env with XDG_CONFIG_HOME and XDG_DATA_HOME both pointed at the
+// flox deck home (so config and per-env session state live together under
+// one isolated home), FLOX_AI=1, and FLOX_AI_DIR pinned to configDir so
+// the nested `flox-ai launch claude` resolves this env's fragments.
+// XDG_CACHE_HOME is intentionally left untouched.
 func deckChildEnv(base []string, xdgConfigHome, configDir string) []string {
 	env := setEnvVar(base, "XDG_CONFIG_HOME", xdgConfigHome)
+	env = setEnvVar(env, "XDG_DATA_HOME", xdgConfigHome)
 	env = setEnvVar(env, "FLOX_AI", "1")
 	env = setEnvVar(env, "FLOX_AI_DIR", configDir)
 	return env
 }
 
 // RunDeck seeds the flox-managed agent-deck config (forcing the claude
-// command to route through flox-ai), points agent-deck at it via
-// XDG_CONFIG_HOME, exports FLOX_AI_DIR for nested flox-ai invocations,
-// and execs agent-deck (replacing this process).
+// command to route through flox-ai and a per-env tmux socket), points
+// agent-deck at it via XDG_CONFIG_HOME/XDG_DATA_HOME, exports FLOX_AI_DIR
+// for nested flox-ai invocations, and execs agent-deck (replacing this
+// process).
 func RunDeck(opts Options) error {
 	agent := Supported[opts.AgentName] // caller guarantees agent-deck
 	bin, err := resolveBinary(agent)
@@ -141,9 +173,10 @@ func RunDeck(opts Options) error {
 	}
 
 	xdgConfigHome, deckDir := DeckHome(opts.ConfigDir)
+	socketName := DeckSocketName(opts.ConfigDir)
 
 	source := findUserDeckConfig(os.Getenv("XDG_CONFIG_HOME"), os.Getenv("HOME"))
-	if err := SeedDeckConfig(deckDir, source); err != nil {
+	if err := SeedDeckConfig(deckDir, source, socketName); err != nil {
 		return err
 	}
 
