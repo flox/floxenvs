@@ -7,14 +7,13 @@
         "pkg-path": "flox/claude-code",
         "pkg-group": "claude-code"
       },
-      "claude-managed": {
-        "pkg-path": "flox/claude-managed",
-        "pkg-group": "claude-managed",
-        "version": "^0.4.1"
-      },
       "firecrawl-cli": {
         "pkg-path": "flox/firecrawl-cli",
         "pkg-group": "firecrawl"
+      },
+      "flox-ai": {
+        "pkg-path": "flox/flox-ai",
+        "pkg-group": "flox-ai"
       },
       "skills-firecrawl-cli": {
         "pkg-path": "flox/skills-firecrawl-cli",
@@ -25,12 +24,12 @@
       "FIRECRAWL_API_KEY": ""
     },
     "hook": {
-      "on-activate": "eval \"$(claude-managed setup-hook)\"\n\ndir=\"$FLOX_ENV_CACHE/firecrawl\"\nmkdir -p \"$dir\"\nexport FIRECRAWL_DATA_DIR=\"$dir\"\n\n# Persist the key across activations: if it isn't set in the\n# environment but was saved to the cache before, load it back.\nkey_file=\"$dir/api-key\"\nif [ -z \"${FIRECRAWL_API_KEY:-}\" ] && [ -f \"$key_file\" ]; then\n  FIRECRAWL_API_KEY=\"$(cat \"$key_file\")\"\n  export FIRECRAWL_API_KEY\nfi\n"
+      "on-activate": "eval \"$(flox-ai setup-hook)\"\n\ndir=\"$FLOX_ENV_CACHE/firecrawl\"\nmkdir -p \"$dir\"\nexport FIRECRAWL_DATA_DIR=\"$dir\"\n\n# Persist the key across activations: if it isn't set in the\n# environment but was saved to the cache before, load it back.\nkey_file=\"$dir/api-key\"\nif [ -z \"${FIRECRAWL_API_KEY:-}\" ] && [ -f \"$key_file\" ]; then\n  FIRECRAWL_API_KEY=\"$(cat \"$key_file\")\"\n  export FIRECRAWL_API_KEY\nfi\n"
     },
     "profile": {
-      "bash": "eval \"$(claude-managed setup-profile-bash)\"\n",
-      "zsh": "eval \"$(claude-managed setup-profile-zsh)\"\n",
-      "fish": "claude-managed setup-profile-fish | source\n"
+      "bash": "eval \"$(flox-ai setup-profile-bash)\"\n",
+      "zsh": "eval \"$(flox-ai setup-profile-zsh)\"\n",
+      "fish": "flox-ai setup-profile-fish | source\n"
     },
     "options": {}
   },
@@ -38,28 +37,28 @@
     {
       "attr_path": "claude-code",
       "broken": false,
-      "derivation": "/nix/store/aaw2jy201c9sw7056ky5c1ndxzddyjqm-claude-code-2.1.177.drv",
+      "derivation": "/nix/store/s60sfmc257g6vrhkbi0cfh056zicnars-claude-code-2.1.178.drv",
       "description": "Agentic coding tool from Anthropic",
       "install_id": "claude-code",
       "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=228f0e0269249caee61dcdcf468b11a82d3fe4dd",
-      "name": "claude-code-2.1.177",
+      "locked_url": "https://github.com/flox/floxenvs?rev=28c4df3f17fbeea14a13c0559404515b9252ada9",
+      "name": "claude-code-2.1.178",
       "pname": "claude-code",
-      "rev": "228f0e0269249caee61dcdcf468b11a82d3fe4dd",
-      "rev_count": 7616,
-      "rev_date": "2026-06-13T02:01:00Z",
-      "scrape_date": "2026-06-14T00:24:34.577303Z",
+      "rev": "28c4df3f17fbeea14a13c0559404515b9252ada9",
+      "rev_count": 8342,
+      "rev_date": "2026-06-16T02:00:35Z",
+      "scrape_date": "2026-06-17T13:37:00.469158Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": true,
-      "version": "2.1.177",
+      "version": "2.1.178",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/ngjqdjfimjgkcpi26p659d64nvlpg9rm-claude-code-2.1.177"
+        "out": "/nix/store/7vxkjx9d0wad3y6wr0pwz7s308yxvk31-claude-code-2.1.178"
       },
       "system": "aarch64-darwin",
       "group": "claude-code",
@@ -68,28 +67,28 @@
     {
       "attr_path": "claude-code",
       "broken": false,
-      "derivation": "/nix/store/jz0q1am16pn1kxr8c9kcqqaav3ryaw6c-claude-code-2.1.177.drv",
+      "derivation": "/nix/store/4a0cvzfnkb5vgrmrx3i0njk3rk59jg2x-claude-code-2.1.178.drv",
       "description": "Agentic coding tool from Anthropic",
       "install_id": "claude-code",
       "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=228f0e0269249caee61dcdcf468b11a82d3fe4dd",
-      "name": "claude-code-2.1.177",
+      "locked_url": "https://github.com/flox/floxenvs?rev=28c4df3f17fbeea14a13c0559404515b9252ada9",
+      "name": "claude-code-2.1.178",
       "pname": "claude-code",
-      "rev": "228f0e0269249caee61dcdcf468b11a82d3fe4dd",
-      "rev_count": 7616,
-      "rev_date": "2026-06-13T02:01:00Z",
-      "scrape_date": "2026-06-14T00:24:34.577305Z",
+      "rev": "28c4df3f17fbeea14a13c0559404515b9252ada9",
+      "rev_count": 8342,
+      "rev_date": "2026-06-16T02:00:35Z",
+      "scrape_date": "2026-06-17T13:37:00.469161Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": true,
-      "version": "2.1.177",
+      "version": "2.1.178",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/ya4a9x8hwi3j6p2bbjnkj4ikin83nj78-claude-code-2.1.177"
+        "out": "/nix/store/havqh9mhrvv5pgsj8r0qk8fn0m8a7vq3-claude-code-2.1.178"
       },
       "system": "aarch64-linux",
       "group": "claude-code",
@@ -98,28 +97,28 @@
     {
       "attr_path": "claude-code",
       "broken": false,
-      "derivation": "/nix/store/mqh2p49abc5b4kmg380b3ij0ca8ypjar-claude-code-2.1.177.drv",
+      "derivation": "/nix/store/43sbk1jjkz4gzxrci723qrvbfrzcj8f0-claude-code-2.1.178.drv",
       "description": "Agentic coding tool from Anthropic",
       "install_id": "claude-code",
       "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=228f0e0269249caee61dcdcf468b11a82d3fe4dd",
-      "name": "claude-code-2.1.177",
+      "locked_url": "https://github.com/flox/floxenvs?rev=28c4df3f17fbeea14a13c0559404515b9252ada9",
+      "name": "claude-code-2.1.178",
       "pname": "claude-code",
-      "rev": "228f0e0269249caee61dcdcf468b11a82d3fe4dd",
-      "rev_count": 7616,
-      "rev_date": "2026-06-13T02:01:00Z",
-      "scrape_date": "2026-06-14T00:24:34.577305Z",
+      "rev": "28c4df3f17fbeea14a13c0559404515b9252ada9",
+      "rev_count": 8342,
+      "rev_date": "2026-06-16T02:00:35Z",
+      "scrape_date": "2026-06-17T13:37:00.469162Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": true,
-      "version": "2.1.177",
+      "version": "2.1.178",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/m8vjjxzpk6zw5n172gn2cmnw375c8z2d-claude-code-2.1.177"
+        "out": "/nix/store/7lz44fnsmkrf9mgn8yiq4vmk0b0pxkjs-claude-code-2.1.178"
       },
       "system": "x86_64-darwin",
       "group": "claude-code",
@@ -128,178 +127,58 @@
     {
       "attr_path": "claude-code",
       "broken": false,
-      "derivation": "/nix/store/bjpndg68kznk1fvws3v7pm756czqf1yn-claude-code-2.1.177.drv",
+      "derivation": "/nix/store/3rlmgcrx0g29mqfrvz2pzw9w4xqp79ns-claude-code-2.1.178.drv",
       "description": "Agentic coding tool from Anthropic",
       "install_id": "claude-code",
       "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=228f0e0269249caee61dcdcf468b11a82d3fe4dd",
-      "name": "claude-code-2.1.177",
+      "locked_url": "https://github.com/flox/floxenvs?rev=28c4df3f17fbeea14a13c0559404515b9252ada9",
+      "name": "claude-code-2.1.178",
       "pname": "claude-code",
-      "rev": "228f0e0269249caee61dcdcf468b11a82d3fe4dd",
-      "rev_count": 7616,
-      "rev_date": "2026-06-13T02:01:00Z",
-      "scrape_date": "2026-06-14T00:24:34.577306Z",
+      "rev": "28c4df3f17fbeea14a13c0559404515b9252ada9",
+      "rev_count": 8342,
+      "rev_date": "2026-06-16T02:00:35Z",
+      "scrape_date": "2026-06-17T13:37:00.469163Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": true,
-      "version": "2.1.177",
+      "version": "2.1.178",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/b9h9yc4zjjsqry1iqclpbz2cp08ncf2w-claude-code-2.1.177"
+        "out": "/nix/store/lyknrxiw867l131m4iq4ppr1qmbvylcf-claude-code-2.1.178"
       },
       "system": "x86_64-linux",
       "group": "claude-code",
       "priority": 5
     },
     {
-      "attr_path": "claude-managed",
-      "broken": false,
-      "derivation": "/nix/store/jrvmawn988xs2da7mg9dzfg3h3jf5gm3-claude-managed-0.4.1.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "claude-managed",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "name": "claude-managed-0.4.1",
-      "pname": "claude-managed",
-      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "rev_count": 3677,
-      "rev_date": "2026-05-20T12:30:23Z",
-      "scrape_date": "2026-06-14T00:24:34.577310Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/c4caj5rhq2l7p7j5p569a1f08pz5s41v-claude-managed-0.4.1"
-      },
-      "system": "aarch64-darwin",
-      "group": "claude-managed",
-      "priority": 5
-    },
-    {
-      "attr_path": "claude-managed",
-      "broken": false,
-      "derivation": "/nix/store/b0iga9ysmq5jga9xmnqf5884qhl7idjp-claude-managed-0.4.1.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "claude-managed",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "name": "claude-managed-0.4.1",
-      "pname": "claude-managed",
-      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "rev_count": 3677,
-      "rev_date": "2026-05-20T12:30:23Z",
-      "scrape_date": "2026-06-14T00:24:34.577314Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/ikmmb7a0zfdwsyzcgczv7sam426n7y82-claude-managed-0.4.1"
-      },
-      "system": "aarch64-linux",
-      "group": "claude-managed",
-      "priority": 5
-    },
-    {
-      "attr_path": "claude-managed",
-      "broken": false,
-      "derivation": "/nix/store/nv6viy7wixxv9f92jh5pbzss4ipkmsaz-claude-managed-0.4.1.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "claude-managed",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "name": "claude-managed-0.4.1",
-      "pname": "claude-managed",
-      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "rev_count": 3677,
-      "rev_date": "2026-05-20T12:30:23Z",
-      "scrape_date": "2026-06-14T00:24:34.577315Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/6mavy5l8gbcq21qxnlxip78dqdr960lm-claude-managed-0.4.1"
-      },
-      "system": "x86_64-darwin",
-      "group": "claude-managed",
-      "priority": 5
-    },
-    {
-      "attr_path": "claude-managed",
-      "broken": false,
-      "derivation": "/nix/store/xql8a4pin3z899a09rs9hbc5axcnbi93-claude-managed-0.4.1.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "claude-managed",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "name": "claude-managed-0.4.1",
-      "pname": "claude-managed",
-      "rev": "ec0dd4c37eabe9042c0d7dccbe550d407b51a28b",
-      "rev_count": 3677,
-      "rev_date": "2026-05-20T12:30:23Z",
-      "scrape_date": "2026-06-14T00:24:34.577316Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/ak71ws4lbp04ik1cvqws4drjbiaw5cin-claude-managed-0.4.1"
-      },
-      "system": "x86_64-linux",
-      "group": "claude-managed",
-      "priority": 5
-    },
-    {
       "attr_path": "firecrawl-cli",
       "broken": false,
-      "derivation": "/nix/store/ghy3pbyilzkgdbhwpv7q0sypv5m50wrl-firecrawl-cli-1.19.6.drv",
+      "derivation": "/nix/store/a71rmvzvhgbaim68s8vlbpvfhmq0cnpc-firecrawl-cli-1.19.13.drv",
       "description": "Official Firecrawl CLI — scrape, crawl, search, and extract data from any website directly from the terminal.",
       "install_id": "firecrawl-cli",
       "license": "ISC",
-      "locked_url": "https://github.com/flox/floxenvs.git?rev=538ab527ca30c80d01aa3c9babfcab812440d184",
-      "name": "firecrawl-cli-1.19.6",
+      "locked_url": "https://github.com/flox/floxenvs?rev=a17e895ee66f2bf32dbd92e064439ca33fcb5fb7",
+      "name": "firecrawl-cli-1.19.13",
       "pname": "firecrawl-cli",
-      "rev": "538ab527ca30c80d01aa3c9babfcab812440d184",
-      "rev_count": 7716,
-      "rev_date": "2026-06-13T23:40:16Z",
-      "scrape_date": "2026-06-13T23:43:23.280493Z",
+      "rev": "a17e895ee66f2bf32dbd92e064439ca33fcb5fb7",
+      "rev_count": 8598,
+      "rev_date": "2026-06-16T21:00:10Z",
+      "scrape_date": "2026-06-17T13:37:00.469186Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "1.19.6",
+      "version": "1.19.13",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/3cmg6b7bzs6jpp73nq44xvr5hssbrz3a-firecrawl-cli-1.19.6"
+        "out": "/nix/store/cgzgfzckz31nr9kgjcxdba6wgndx2460-firecrawl-cli-1.19.13"
       },
       "system": "aarch64-darwin",
       "group": "firecrawl",
@@ -308,28 +187,28 @@
     {
       "attr_path": "firecrawl-cli",
       "broken": false,
-      "derivation": "/nix/store/w1yv9fdxa268qv4j2b6z6fqh13gbanlf-firecrawl-cli-1.19.6.drv",
+      "derivation": "/nix/store/ik4qqx1hl59824gnrfjhimwd7cm4x7nr-firecrawl-cli-1.19.13.drv",
       "description": "Official Firecrawl CLI — scrape, crawl, search, and extract data from any website directly from the terminal.",
       "install_id": "firecrawl-cli",
       "license": "ISC",
-      "locked_url": "https://github.com/flox/floxenvs.git?rev=538ab527ca30c80d01aa3c9babfcab812440d184",
-      "name": "firecrawl-cli-1.19.6",
+      "locked_url": "https://github.com/flox/floxenvs?rev=a17e895ee66f2bf32dbd92e064439ca33fcb5fb7",
+      "name": "firecrawl-cli-1.19.13",
       "pname": "firecrawl-cli",
-      "rev": "538ab527ca30c80d01aa3c9babfcab812440d184",
-      "rev_count": 7716,
-      "rev_date": "2026-06-13T23:40:16Z",
-      "scrape_date": "2026-06-13T23:43:23.280496Z",
+      "rev": "a17e895ee66f2bf32dbd92e064439ca33fcb5fb7",
+      "rev_count": 8598,
+      "rev_date": "2026-06-16T21:00:10Z",
+      "scrape_date": "2026-06-17T13:37:00.469191Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "1.19.6",
+      "version": "1.19.13",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/d3sw05mx52br4p79jadb9drj5xsngpax-firecrawl-cli-1.19.6"
+        "out": "/nix/store/b47lnkphy5fai0ivqjs16yvgn2qy1g8d-firecrawl-cli-1.19.13"
       },
       "system": "aarch64-linux",
       "group": "firecrawl",
@@ -338,28 +217,28 @@
     {
       "attr_path": "firecrawl-cli",
       "broken": false,
-      "derivation": "/nix/store/f80126pmqd3lqyw0jw7bvwdywcvjrrar-firecrawl-cli-1.19.6.drv",
+      "derivation": "/nix/store/kqyg06kyyi4lv6j6092ap6gsxggawr0y-firecrawl-cli-1.19.13.drv",
       "description": "Official Firecrawl CLI — scrape, crawl, search, and extract data from any website directly from the terminal.",
       "install_id": "firecrawl-cli",
       "license": "ISC",
-      "locked_url": "https://github.com/flox/floxenvs.git?rev=538ab527ca30c80d01aa3c9babfcab812440d184",
-      "name": "firecrawl-cli-1.19.6",
+      "locked_url": "https://github.com/flox/floxenvs?rev=a17e895ee66f2bf32dbd92e064439ca33fcb5fb7",
+      "name": "firecrawl-cli-1.19.13",
       "pname": "firecrawl-cli",
-      "rev": "538ab527ca30c80d01aa3c9babfcab812440d184",
-      "rev_count": 7716,
-      "rev_date": "2026-06-13T23:40:16Z",
-      "scrape_date": "2026-06-13T23:43:23.280496Z",
+      "rev": "a17e895ee66f2bf32dbd92e064439ca33fcb5fb7",
+      "rev_count": 8598,
+      "rev_date": "2026-06-16T21:00:10Z",
+      "scrape_date": "2026-06-17T13:37:00.469192Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "1.19.6",
+      "version": "1.19.13",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/d6hmhkqz6zlirxxd0v36fi5nmv9higyl-firecrawl-cli-1.19.6"
+        "out": "/nix/store/m7908i63cg2pmb7yv1mi2j5gn8nqas1l-firecrawl-cli-1.19.13"
       },
       "system": "x86_64-darwin",
       "group": "firecrawl",
@@ -368,28 +247,28 @@
     {
       "attr_path": "firecrawl-cli",
       "broken": false,
-      "derivation": "/nix/store/gh6vv3n9wf6kjvknh99bjbvvw3wvasw5-firecrawl-cli-1.19.6.drv",
+      "derivation": "/nix/store/pgffrn7zp2shcfiz9jpcvd4h4j62agbb-firecrawl-cli-1.19.13.drv",
       "description": "Official Firecrawl CLI — scrape, crawl, search, and extract data from any website directly from the terminal.",
       "install_id": "firecrawl-cli",
       "license": "ISC",
-      "locked_url": "https://github.com/flox/floxenvs.git?rev=538ab527ca30c80d01aa3c9babfcab812440d184",
-      "name": "firecrawl-cli-1.19.6",
+      "locked_url": "https://github.com/flox/floxenvs?rev=a17e895ee66f2bf32dbd92e064439ca33fcb5fb7",
+      "name": "firecrawl-cli-1.19.13",
       "pname": "firecrawl-cli",
-      "rev": "538ab527ca30c80d01aa3c9babfcab812440d184",
-      "rev_count": 7716,
-      "rev_date": "2026-06-13T23:40:16Z",
-      "scrape_date": "2026-06-13T23:43:23.280497Z",
+      "rev": "a17e895ee66f2bf32dbd92e064439ca33fcb5fb7",
+      "rev_count": 8598,
+      "rev_date": "2026-06-16T21:00:10Z",
+      "scrape_date": "2026-06-17T13:37:00.469193Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "1.19.6",
+      "version": "1.19.13",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/3ph1yxg8y51xkn23psx4pvss92dnvljn-firecrawl-cli-1.19.6"
+        "out": "/nix/store/0vl8dyxd63xhbyan7g9ah0yaci60mxj1-firecrawl-cli-1.19.13"
       },
       "system": "x86_64-linux",
       "group": "firecrawl",
@@ -398,28 +277,28 @@
     {
       "attr_path": "skills-firecrawl-cli",
       "broken": false,
-      "derivation": "/nix/store/3wrrmkjzig91civxj7x10fxv5xhvvbvi-skills-firecrawl-cli-0+unstable-2026-06-09.48a341a.drv",
+      "derivation": "/nix/store/f3azgnzr05ihh8y6x63817ng2skawh2n-skills-firecrawl-cli-0+unstable-2026-06-16.ac63035.drv",
       "description": "Firecrawl CLI skill bundle for Claude Code and OpenCode — search, scrape, crawl, and interact with the web by driving firecrawl-cli from an agent.",
       "install_id": "skills-firecrawl-cli",
       "license": "ISC",
-      "locked_url": "https://github.com/flox/floxenvs.git?rev=538ab527ca30c80d01aa3c9babfcab812440d184",
-      "name": "skills-firecrawl-cli-0+unstable-2026-06-09.48a341a",
+      "locked_url": "https://github.com/flox/floxenvs?rev=8522c2db85219212a55145ab6d5d031b88e71f7f",
+      "name": "skills-firecrawl-cli-0+unstable-2026-06-16.ac63035",
       "pname": "skills-firecrawl-cli",
-      "rev": "538ab527ca30c80d01aa3c9babfcab812440d184",
-      "rev_count": 7716,
-      "rev_date": "2026-06-13T23:40:16Z",
-      "scrape_date": "2026-06-13T23:43:23.280497Z",
+      "rev": "8522c2db85219212a55145ab6d5d031b88e71f7f",
+      "rev_count": 8594,
+      "rev_date": "2026-06-16T21:00:06Z",
+      "scrape_date": "2026-06-17T13:37:00.469194Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0+unstable-2026-06-09.48a341a",
+      "version": "0+unstable-2026-06-16.ac63035",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/r9hrcpfgyijcskd01xsbk7p11qz3j38w-skills-firecrawl-cli-0+unstable-2026-06-09.48a341a"
+        "out": "/nix/store/wydmgqfrvr7c6gmmvycjfwa88vb03jd8-skills-firecrawl-cli-0+unstable-2026-06-16.ac63035"
       },
       "system": "aarch64-darwin",
       "group": "firecrawl",
@@ -428,28 +307,28 @@
     {
       "attr_path": "skills-firecrawl-cli",
       "broken": false,
-      "derivation": "/nix/store/d386m5xp4fvbmxpxrskdcfz1h3h4ydkc-skills-firecrawl-cli-0+unstable-2026-06-09.48a341a.drv",
+      "derivation": "/nix/store/aa6c164jbyy2p0gh6b4lsggfnmrcvhj3-skills-firecrawl-cli-0+unstable-2026-06-16.ac63035.drv",
       "description": "Firecrawl CLI skill bundle for Claude Code and OpenCode — search, scrape, crawl, and interact with the web by driving firecrawl-cli from an agent.",
       "install_id": "skills-firecrawl-cli",
       "license": "ISC",
-      "locked_url": "https://github.com/flox/floxenvs.git?rev=538ab527ca30c80d01aa3c9babfcab812440d184",
-      "name": "skills-firecrawl-cli-0+unstable-2026-06-09.48a341a",
+      "locked_url": "https://github.com/flox/floxenvs?rev=8522c2db85219212a55145ab6d5d031b88e71f7f",
+      "name": "skills-firecrawl-cli-0+unstable-2026-06-16.ac63035",
       "pname": "skills-firecrawl-cli",
-      "rev": "538ab527ca30c80d01aa3c9babfcab812440d184",
-      "rev_count": 7716,
-      "rev_date": "2026-06-13T23:40:16Z",
-      "scrape_date": "2026-06-13T23:43:23.280498Z",
+      "rev": "8522c2db85219212a55145ab6d5d031b88e71f7f",
+      "rev_count": 8594,
+      "rev_date": "2026-06-16T21:00:06Z",
+      "scrape_date": "2026-06-17T13:37:00.469196Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0+unstable-2026-06-09.48a341a",
+      "version": "0+unstable-2026-06-16.ac63035",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/yiq3z77cxf8mskfcj82pqh2mc4a2qpkc-skills-firecrawl-cli-0+unstable-2026-06-09.48a341a"
+        "out": "/nix/store/vmhhp3kpfwg8sq4qmza1p2mnkrsny53w-skills-firecrawl-cli-0+unstable-2026-06-16.ac63035"
       },
       "system": "aarch64-linux",
       "group": "firecrawl",
@@ -458,28 +337,28 @@
     {
       "attr_path": "skills-firecrawl-cli",
       "broken": false,
-      "derivation": "/nix/store/vapk1gl9y3wxyajb5h795aqv67mbnayn-skills-firecrawl-cli-0+unstable-2026-06-09.48a341a.drv",
+      "derivation": "/nix/store/0b885s1pqc2asb7n2bnxxraipbavcvmz-skills-firecrawl-cli-0+unstable-2026-06-16.ac63035.drv",
       "description": "Firecrawl CLI skill bundle for Claude Code and OpenCode — search, scrape, crawl, and interact with the web by driving firecrawl-cli from an agent.",
       "install_id": "skills-firecrawl-cli",
       "license": "ISC",
-      "locked_url": "https://github.com/flox/floxenvs.git?rev=538ab527ca30c80d01aa3c9babfcab812440d184",
-      "name": "skills-firecrawl-cli-0+unstable-2026-06-09.48a341a",
+      "locked_url": "https://github.com/flox/floxenvs?rev=8522c2db85219212a55145ab6d5d031b88e71f7f",
+      "name": "skills-firecrawl-cli-0+unstable-2026-06-16.ac63035",
       "pname": "skills-firecrawl-cli",
-      "rev": "538ab527ca30c80d01aa3c9babfcab812440d184",
-      "rev_count": 7716,
-      "rev_date": "2026-06-13T23:40:16Z",
-      "scrape_date": "2026-06-13T23:43:23.280499Z",
+      "rev": "8522c2db85219212a55145ab6d5d031b88e71f7f",
+      "rev_count": 8594,
+      "rev_date": "2026-06-16T21:00:06Z",
+      "scrape_date": "2026-06-17T13:37:00.469197Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0+unstable-2026-06-09.48a341a",
+      "version": "0+unstable-2026-06-16.ac63035",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/9zngcrq83y7i55rq8dh4yzn827iv0nv4-skills-firecrawl-cli-0+unstable-2026-06-09.48a341a"
+        "out": "/nix/store/yil1ilmzc3r10lsms6qr813wg8dik6ji-skills-firecrawl-cli-0+unstable-2026-06-16.ac63035"
       },
       "system": "x86_64-darwin",
       "group": "firecrawl",
@@ -488,31 +367,151 @@
     {
       "attr_path": "skills-firecrawl-cli",
       "broken": false,
-      "derivation": "/nix/store/gx43b8050j3sl5x6iscilb2hk2zxkxms-skills-firecrawl-cli-0+unstable-2026-06-09.48a341a.drv",
+      "derivation": "/nix/store/kgagrpszmr1cw5mrv8447jplgsgs2k97-skills-firecrawl-cli-0+unstable-2026-06-16.ac63035.drv",
       "description": "Firecrawl CLI skill bundle for Claude Code and OpenCode — search, scrape, crawl, and interact with the web by driving firecrawl-cli from an agent.",
       "install_id": "skills-firecrawl-cli",
       "license": "ISC",
-      "locked_url": "https://github.com/flox/floxenvs.git?rev=538ab527ca30c80d01aa3c9babfcab812440d184",
-      "name": "skills-firecrawl-cli-0+unstable-2026-06-09.48a341a",
+      "locked_url": "https://github.com/flox/floxenvs?rev=8522c2db85219212a55145ab6d5d031b88e71f7f",
+      "name": "skills-firecrawl-cli-0+unstable-2026-06-16.ac63035",
       "pname": "skills-firecrawl-cli",
-      "rev": "538ab527ca30c80d01aa3c9babfcab812440d184",
-      "rev_count": 7716,
-      "rev_date": "2026-06-13T23:40:16Z",
-      "scrape_date": "2026-06-13T23:43:23.280499Z",
+      "rev": "8522c2db85219212a55145ab6d5d031b88e71f7f",
+      "rev_count": 8594,
+      "rev_date": "2026-06-16T21:00:06Z",
+      "scrape_date": "2026-06-17T13:37:00.469198Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0+unstable-2026-06-09.48a341a",
+      "version": "0+unstable-2026-06-16.ac63035",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/4845ldv5848n24798bi5s37gcc5jydgc-skills-firecrawl-cli-0+unstable-2026-06-09.48a341a"
+        "out": "/nix/store/14i99ha1ygcrnbxlp85g24bak5fyjy07-skills-firecrawl-cli-0+unstable-2026-06-16.ac63035"
       },
       "system": "x86_64-linux",
       "group": "firecrawl",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-ai",
+      "broken": false,
+      "derivation": "/nix/store/q62yk1ikgff617clcg20i2wjwsvs66ys-flox-ai-0.5.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "flox-ai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=b1115bec21184442d1f3631065700535e2849098",
+      "name": "flox-ai-0.5.0",
+      "pname": "flox-ai",
+      "rev": "b1115bec21184442d1f3631065700535e2849098",
+      "rev_count": 8610,
+      "rev_date": "2026-06-16T22:16:51Z",
+      "scrape_date": "2026-06-17T13:37:00.469207Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.5.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/8rgd7c99l5c95mhw7x059a2b5hh8y3ap-flox-ai-0.5.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "flox-ai",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-ai",
+      "broken": false,
+      "derivation": "/nix/store/cf2z8i3742ja1cbi87g8305k6k807bq1-flox-ai-0.5.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "flox-ai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=b1115bec21184442d1f3631065700535e2849098",
+      "name": "flox-ai-0.5.0",
+      "pname": "flox-ai",
+      "rev": "b1115bec21184442d1f3631065700535e2849098",
+      "rev_count": 8610,
+      "rev_date": "2026-06-16T22:16:51Z",
+      "scrape_date": "2026-06-17T13:37:00.469208Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.5.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/5hjp1z8ynrid787h3j71zb86rcg0l6w2-flox-ai-0.5.0"
+      },
+      "system": "aarch64-linux",
+      "group": "flox-ai",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-ai",
+      "broken": false,
+      "derivation": "/nix/store/vdjrm2sv0f9b3nwb6x86glkhc1xggv77-flox-ai-0.5.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "flox-ai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=b1115bec21184442d1f3631065700535e2849098",
+      "name": "flox-ai-0.5.0",
+      "pname": "flox-ai",
+      "rev": "b1115bec21184442d1f3631065700535e2849098",
+      "rev_count": 8610,
+      "rev_date": "2026-06-16T22:16:51Z",
+      "scrape_date": "2026-06-17T13:37:00.469209Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.5.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ynijxdhzmcq1i2f4aaxmmdxxj88zbmqs-flox-ai-0.5.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "flox-ai",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-ai",
+      "broken": false,
+      "derivation": "/nix/store/0x7vj2vqdpb7bzlk0mpmr138mdjs2vy4-flox-ai-0.5.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "flox-ai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=b1115bec21184442d1f3631065700535e2849098",
+      "name": "flox-ai-0.5.0",
+      "pname": "flox-ai",
+      "rev": "b1115bec21184442d1f3631065700535e2849098",
+      "rev_count": 8610,
+      "rev_date": "2026-06-16T22:16:51Z",
+      "scrape_date": "2026-06-17T13:37:00.469210Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.5.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ch894jmsd1mqk5nrdshc5i5njk4mb872-flox-ai-0.5.0"
+      },
+      "system": "x86_64-linux",
+      "group": "flox-ai",
       "priority": 5
     }
   ],
@@ -553,19 +552,18 @@
               "pkg-path": "flox/claude-code",
               "pkg-group": "claude-code"
             },
-            "claude-managed": {
-              "pkg-path": "flox/claude-managed",
-              "pkg-group": "claude-managed",
-              "version": "^0.4.1"
+            "flox-ai": {
+              "pkg-path": "flox/flox-ai",
+              "pkg-group": "flox-ai"
             }
           },
           "hook": {
-            "on-activate": "eval \"$(claude-managed setup-hook)\"\n"
+            "on-activate": "eval \"$(flox-ai setup-hook)\"\n"
           },
           "profile": {
-            "bash": "eval \"$(claude-managed setup-profile-bash)\"\n",
-            "zsh": "eval \"$(claude-managed setup-profile-zsh)\"\n",
-            "fish": "claude-managed setup-profile-fish | source\n"
+            "bash": "eval \"$(flox-ai setup-profile-bash)\"\n",
+            "zsh": "eval \"$(flox-ai setup-profile-zsh)\"\n",
+            "fish": "flox-ai setup-profile-fish | source\n"
           },
           "options": {}
         },
