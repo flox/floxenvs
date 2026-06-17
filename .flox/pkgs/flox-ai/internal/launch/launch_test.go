@@ -48,8 +48,8 @@ func TestPlanArgv_NoSynthNoRules(t *testing.T) {
 }
 
 func TestSupportedNames(t *testing.T) {
-	if got := SupportedNames(); got != "claude" {
-		t.Fatalf("got %q want %q", got, "claude")
+	if got := SupportedNames(); got != "agent-deck, claude" {
+		t.Fatalf("got %q want %q", got, "agent-deck, claude")
 	}
 }
 
