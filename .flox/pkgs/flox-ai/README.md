@@ -192,12 +192,21 @@ themselves launched through `flox-ai launch claude`, so they
 inherit this environment's flox-managed skills, rules,
 agents, and plugins.
 
-agent-deck is pointed at the seeded config via
-`XDG_CONFIG_HOME`, and `FLOX_AI_DIR` is exported so the
-nested `flox-ai launch claude` resolves this environment's
-fragments. `XDG_DATA_HOME` / `XDG_CACHE_HOME` are left
-untouched, so agent-deck sessions persist in the user's
-normal data location.
+agent-deck is pointed at the seeded home via
+`XDG_CONFIG_HOME` and `XDG_DATA_HOME` (both the deck home, so
+config and session state live together per environment), and
+`FLOX_AI_DIR` is exported so the nested `flox-ai launch
+claude` resolves this environment's fragments. The seeded
+config also forces a per-environment `[tmux].socket_name`
+derived from the config dir, so each environment's deck runs
+on its own tmux server — distinct environments do not share
+session state or shell environment, while relaunching the
+same environment reuses its server. `XDG_CACHE_HOME` is left
+untouched.
+
+Because session state lives under `.flox/cache`, it is
+ephemeral: a flox cache clear or env rebuild resets the
+deck's sessions.
 
 ```bash
 flox-ai launch agent-deck            # launch the TUI
