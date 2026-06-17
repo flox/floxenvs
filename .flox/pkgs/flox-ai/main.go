@@ -142,10 +142,7 @@ func main() {
 			os.Exit(1)
 		}
 		requireShareDir()
-		var passthrough []string
-		if flag.NArg() > 2 {
-			passthrough = flag.Args()[2:]
-		}
+		passthrough := agentPassthrough(flag.Args())
 		if err := launch.Run(launch.Options{
 			AgentName:   agentName,
 			ShareDir:    shareDir,
@@ -159,6 +156,25 @@ func main() {
 		printUsage()
 		os.Exit(1)
 	}
+}
+
+// agentPassthrough returns the args after `flox-ai launch <agent>` that
+// should be forwarded verbatim to the agent. A single leading "--" is
+// dropped: it is the conventional delimiter between the flox-ai launch
+// command and the agent's own args (and is baked into agent-deck's
+// `command = "flox-ai launch claude --"`). flox-ai's flag parser already
+// stops at the subcommand, so the "--" is purely a delimiter — forwarding
+// it would make the agent treat its own flags (e.g. --session-id) as
+// positional args.
+func agentPassthrough(args []string) []string {
+	if len(args) <= 2 {
+		return nil
+	}
+	rest := args[2:]
+	if len(rest) > 0 && rest[0] == "--" {
+		rest = rest[1:]
+	}
+	return rest
 }
 
 // resolveConfigDir picks the flox-ai config directory: an explicit
