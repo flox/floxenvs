@@ -1,6 +1,7 @@
 package launch
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/pelletier/go-toml/v2"
@@ -41,6 +42,17 @@ func TestInjectClaudeCommand_OverridesExisting(t *testing.T) {
 	claude := doc["claude"].(map[string]any)
 	if claude["dangerous_mode"] != true {
 		t.Fatalf("sibling key lost: %v", claude["dangerous_mode"])
+	}
+}
+
+func TestInjectClaudeCommand_RejectsScalarClaude(t *testing.T) {
+	src := []byte("claude = \"oops\"\n")
+	_, err := injectClaudeCommand(src)
+	if err == nil {
+		t.Fatal("expected error for scalar [claude], got nil")
+	}
+	if !strings.Contains(err.Error(), "not a table") {
+		t.Fatalf("unexpected error: %v", err)
 	}
 }
 

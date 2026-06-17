@@ -22,12 +22,14 @@ func injectClaudeCommand(src []byte) ([]byte, error) {
 			return nil, fmt.Errorf("parse agent-deck config: %w", err)
 		}
 	}
-	claude, ok := doc["claude"].(map[string]any)
-	if !ok {
-		claude = map[string]any{}
-		doc["claude"] = claude
+	switch existing := doc["claude"].(type) {
+	case map[string]any:
+		existing["command"] = DeckClaudeCommand
+	case nil:
+		doc["claude"] = map[string]any{"command": DeckClaudeCommand}
+	default:
+		return nil, fmt.Errorf("agent-deck config: [claude] is not a table (got %T)", doc["claude"])
 	}
-	claude["command"] = DeckClaudeCommand
 	out, err := toml.Marshal(doc)
 	if err != nil {
 		return nil, fmt.Errorf("marshal agent-deck config: %w", err)
