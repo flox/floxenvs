@@ -4,6 +4,8 @@ package launch
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/pelletier/go-toml/v2"
 )
@@ -35,4 +37,49 @@ func injectClaudeCommand(src []byte) ([]byte, error) {
 		return nil, fmt.Errorf("marshal agent-deck config: %w", err)
 	}
 	return out, nil
+}
+
+// findUserDeckConfig returns the path of the user's existing agent-deck
+// config.toml, searching agent-deck's own order: $XDG_CONFIG_HOME, then
+// ~/.config, then legacy ~/.agent-deck. Returns "" when none exists.
+func findUserDeckConfig(xdgConfigHome, home string) string {
+	var candidates []string
+	if xdgConfigHome != "" {
+		candidates = append(candidates,
+			filepath.Join(xdgConfigHome, "agent-deck", "config.toml"))
+	}
+	if home != "" {
+		candidates = append(candidates,
+			filepath.Join(home, ".config", "agent-deck", "config.toml"),
+			filepath.Join(home, ".agent-deck", "config.toml"),
+		)
+	}
+	for _, c := range candidates {
+		if fi, err := os.Stat(c); err == nil && !fi.IsDir() {
+			return c
+		}
+	}
+	return ""
+}
+
+// SeedDeckConfig writes <deckDir>/config.toml from sourcePath (when
+// non-empty) with claude.command forced to DeckClaudeCommand, creating
+// deckDir as needed. Overwrites any existing file.
+func SeedDeckConfig(deckDir, sourcePath string) error {
+	var src []byte
+	if sourcePath != "" {
+		data, err := os.ReadFile(sourcePath)
+		if err != nil {
+			return fmt.Errorf("read source config %s: %w", sourcePath, err)
+		}
+		src = data
+	}
+	out, err := injectClaudeCommand(src)
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(deckDir, 0755); err != nil {
+		return err
+	}
+	return os.WriteFile(filepath.Join(deckDir, "config.toml"), out, 0644)
 }

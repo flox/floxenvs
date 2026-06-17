@@ -1,6 +1,8 @@
 package launch
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -72,5 +74,61 @@ func TestInjectClaudeCommand_PreservesOtherTables(t *testing.T) {
 	}
 	if _, ok := mcps["exa"]; !ok {
 		t.Fatalf("mcps.exa lost: %#v", mcps)
+	}
+}
+
+func TestFindUserDeckConfig(t *testing.T) {
+	home := t.TempDir()
+	// none present
+	if got := findUserDeckConfig("", home); got != "" {
+		t.Fatalf("expected empty, got %q", got)
+	}
+	// legacy present
+	legacy := filepath.Join(home, ".agent-deck")
+	os.MkdirAll(legacy, 0755)
+	legacyCfg := filepath.Join(legacy, "config.toml")
+	os.WriteFile(legacyCfg, []byte("[claude]\n"), 0644)
+	if got := findUserDeckConfig("", home); got != legacyCfg {
+		t.Fatalf("legacy not found: %q", got)
+	}
+	// xdg present takes precedence
+	xdg := t.TempDir()
+	xdgCfgDir := filepath.Join(xdg, "agent-deck")
+	os.MkdirAll(xdgCfgDir, 0755)
+	xdgCfg := filepath.Join(xdgCfgDir, "config.toml")
+	os.WriteFile(xdgCfg, []byte("[claude]\n"), 0644)
+	if got := findUserDeckConfig(xdg, home); got != xdgCfg {
+		t.Fatalf("xdg should win: %q", got)
+	}
+}
+
+func TestSeedDeckConfig(t *testing.T) {
+	src := filepath.Join(t.TempDir(), "config.toml")
+	os.WriteFile(src, []byte("[mcps.exa]\ncommand = \"npx\"\n"), 0644)
+	deckDir := filepath.Join(t.TempDir(), "agents", "agent-deck")
+	if err := SeedDeckConfig(deckDir, src); err != nil {
+		t.Fatal(err)
+	}
+	out, err := os.ReadFile(filepath.Join(deckDir, "config.toml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	cmd, doc := parseClaudeCmd(t, out)
+	if cmd != DeckClaudeCommand {
+		t.Fatalf("command not seeded: %q", cmd)
+	}
+	if _, ok := doc["mcps"].(map[string]any); !ok {
+		t.Fatalf("mcps not preserved: %#v", doc)
+	}
+}
+
+func TestSeedDeckConfig_NoSource(t *testing.T) {
+	deckDir := filepath.Join(t.TempDir(), "agents", "agent-deck")
+	if err := SeedDeckConfig(deckDir, ""); err != nil {
+		t.Fatal(err)
+	}
+	out, _ := os.ReadFile(filepath.Join(deckDir, "config.toml"))
+	if cmd, _ := parseClaudeCmd(t, out); cmd != DeckClaudeCommand {
+		t.Fatalf("command not seeded: %q", cmd)
 	}
 }
