@@ -187,7 +187,7 @@ func (p Plan) Argv() []string {
 type Options struct {
 	AgentName   string
 	ShareDir    string // $FLOX_ENV/share/claude-code (or --dir)
-	ConfigDir   string // $FLOX_ENV_PROJECT/.flox-ai (or --config-dir)
+	ConfigDir   string // $FLOX_ENV_PROJECT/.flox/cache/flox-ai (or --config-dir)
 	Passthrough []string
 }
 

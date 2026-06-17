@@ -211,7 +211,7 @@ All fragment types are delivered via symlinks into
 ### Isolation via CLAUDE_CONFIG_DIR
 
 `CLAUDE_CONFIG_DIR` is set to
-`$FLOX_ENV_PROJECT/.flox-ai`, a directory next to
+`$FLOX_ENV_PROJECT/.flox/cache/flox-ai`, a directory next to
 the project's `.claude/`. This isolates the Claude session:
 
 - No user settings from `~/.claude/` leaking in
@@ -302,13 +302,13 @@ again, removing all managed symlinks.
 | `FLOX_AI` | Check if managed mode is active |
 
 If `FLOX_AI_DIR` is not set, defaults to
-`$FLOX_ENV_PROJECT/.flox-ai`.
+`$FLOX_ENV_PROJECT/.flox/cache/flox-ai`.
 
 ### Set by emitted shell code
 
 | Variable | Purpose |
 | ------ | ------ |
-| `CLAUDE_CONFIG_DIR` | `$FLOX_ENV_PROJECT/.flox-ai` |
+| `CLAUDE_CONFIG_DIR` | `$FLOX_ENV_PROJECT/.flox/cache/flox-ai` |
 | `CLAUDE_CODE_DISABLE_AUTO_MEMORY` | Disables memory |
 | `FLOX_AI` | Marker that managed mode is active |
 

@@ -126,7 +126,7 @@ fi
 # --plugin-dir. Idempotent: re-running it on a subsequent
 # activation is harmless.
 if command -v flox-ai >/dev/null 2>&1; then
-  cmd_dir="${CLAUDE_CONFIG_DIR:-$FLOX_ENV_PROJECT/.flox-ai}"
+  cmd_dir="${CLAUDE_CONFIG_DIR:-$FLOX_ENV_PROJECT/.flox/cache/flox-ai}"
   flox-ai --config-dir "$cmd_dir" plugins add \
     "$ua_plugin" >/dev/null 2>&1 || true
 fi
