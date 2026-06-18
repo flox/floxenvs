@@ -7,9 +7,9 @@ Minimal Firecrawl environment. Provides the official
 [Firecrawl CLI](https://github.com/firecrawl/cli)
 (`firecrawl`) for scraping, crawling, searching, and
 extracting web data, plus a Claude Code / OpenCode skill
-bundle for driving it from an agent. It includes the
-[`flox/claude`](../claude/) managed Claude Code config, so
-the bundled skills are auto-discovered out of the box.
+bundle for driving it from an agent. It installs the
+`flox-ai` launcher, which injects the bundled skills into
+your assistant when you launch it.
 
 ## Quick start
 
@@ -37,7 +37,7 @@ environments = [{ remote = "flox/firecrawl" }]
 | ------- | ----------- |
 | `firecrawl-cli` | Official Firecrawl CLI (`firecrawl`) |
 | `skills-firecrawl-cli` | Claude Code / OpenCode skill bundle |
-| `flox/claude` | Managed Claude Code config (via `[include]`) |
+| `flox-ai` | Launcher that injects skills into your assistant |
 
 ## Authentication
 
@@ -63,13 +63,15 @@ prompts for the key interactively and saves it there.
 Override either in your own manifest before
 `[include]`-ing this environment.
 
-## Skill auto-pickup
+## Launching your assistant with the skills
 
-This env includes `flox/claude`, so the bundled skills
-under `$FLOX_ENV/share/claude-code/skills/` are
-discovered by `flox-ai` and surfaced to Claude
-Code automatically. The same files are installed for
-OpenCode under
+This env does not ship Claude Code itself. First install
+Claude Code (e.g. `flox install flox/claude-code`) or use
+your own install, then run `flox-ai launch claude` to
+start it with this environment's skills injected. The
+bundled skills live under
+`$FLOX_ENV/share/claude-code/skills/`; the same files are
+installed for OpenCode under
 `$FLOX_ENV/share/opencode/skills/`. The bundle covers
 search, scrape, crawl, map, interact, parse, download,
 and monitor.

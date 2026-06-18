@@ -21,7 +21,11 @@ The `/graphify` skill is pre-installed via
 `flox/skills-graphify` and auto-discovered by
 `flox-ai` — no `graphify install` step needed.
 
-Open Claude Code in any directory and type:
+First install Claude Code (e.g.
+`flox install flox/claude-code`) or use your own
+install, then run `flox-ai launch claude` to start it
+with this environment's skills and rules injected. In
+any directory, type:
 
 ```text
 /graphify .
@@ -36,12 +40,13 @@ graphify .
 ## What this demo includes
 
 - Everything from the `graphify` base environment
-  (Python 3.11, `graphify` CLI, Claude Code)
-- The `flox/claude` env via `[include]` for
-  `flox-ai` (which auto-discovers skills under
-  `$FLOX_ENV/share/claude-code/skills/`)
+  (Python 3.11, `graphify` CLI)
+- The `flox-ai` launcher, which discovers skills under
+  `$FLOX_ENV/share/claude-code/skills/` and injects them
+  when you run `flox-ai launch claude` (you bring your
+  own Claude Code install)
 - `flox/skills-graphify` — ships the `/graphify` SKILL.md
-  so Claude Code finds it on activate
+  so Claude Code finds it once launched via `flox-ai`
 - `gum` for the styled terminal banner
 
 ## Commands cheat sheet
@@ -78,6 +83,7 @@ minimal environment in your own manifest:
 environments = [{ remote = "flox/graphify" }]
 ```
 
-This gives you Python, `graphify`, and Claude Code with
-sane defaults. Override vars in your own manifest as
-needed.
+This gives you Python, `graphify`, and the `flox-ai`
+launcher with sane defaults. Install Claude Code
+yourself, then run `flox-ai launch claude` to use it.
+Override vars in your own manifest as needed.

@@ -5,8 +5,8 @@
 
 Minimal [graphify](https://github.com/safishamsi/graphify)
 environment. Include it in your own manifest to get
-Python 3.11, the `graphify` CLI, and Claude Code with
-sane defaults.
+Python 3.11, the `graphify` CLI, and the `flox-ai`
+launcher with sane defaults.
 
 graphify is a Claude Code skill that turns any folder of
 code, docs, papers, or images into a queryable knowledge
@@ -26,7 +26,16 @@ Then register the Claude Code skill (one-time setup):
 graphify install
 ```
 
-Open Claude Code in any directory and type:
+First install Claude Code (e.g.
+`flox install flox/claude-code`) or use your own install,
+then start it with this environment's skills and rules
+injected:
+
+```bash
+flox-ai launch claude
+```
+
+In any directory, type:
 
 ```text
 /graphify .
@@ -47,7 +56,8 @@ defaults.
 ## What is included
 
 - Python 3.11 with `graphifyy` installed in a venv
-- Claude Code CLI (the skill host)
+- The `flox-ai` launcher (bring your own Claude Code, the
+  skill host)
 - Git, curl, and build tools for tree-sitter native deps
 
 ## Usage

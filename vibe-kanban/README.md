@@ -51,15 +51,13 @@ spawns work for coding agents.
 | `VIBE_KANBAN_CACHE` | `$FLOX_ENV_CACHE/vibe-kanban` | Cache root |
 | `XDG_DATA_HOME` | `$VIBE_KANBAN_CACHE/data` | App data dir (sqlite + config) |
 
-To bring your own coding agent (e.g. Claude Code), include
-its environment alongside this one:
+To use a coding agent like Claude Code, first install it
+(e.g. `flox install flox/claude-code`) or bring your own
+install, then start it with this environment's skills and
+rules injected:
 
-```toml
-[include]
-environments = [
-  "flox/vibe-kanban",
-  "flox/claude",
-]
+```bash
+flox-ai launch claude
 ```
 
 ## See also

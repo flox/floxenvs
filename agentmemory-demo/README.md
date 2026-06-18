@@ -16,10 +16,15 @@ flox activate -r flox/agentmemory-demo --start-services
 ```
 
 The activation hook prints the banner, the
-`agentmemory` service runs in the background, and
-`claude` is on PATH with the plugin wired up.
+`agentmemory` service runs in the background, and the
+`flox-ai` launcher is on PATH with the plugin wired up.
 
-Try the plugin's skills inside Claude Code:
+First install Claude Code (e.g.
+`flox install flox/claude-code`) or use your own install,
+then run `flox-ai launch claude` to start it with this
+environment's skills and rules injected.
+
+Once Claude Code is running, try the plugin's skills:
 
 | Command | What it does |
 | ------- | ------------ |

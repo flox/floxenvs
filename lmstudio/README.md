@@ -98,17 +98,16 @@ lms ls
 
 `lms-launch` runs claude / codex / opencode against the
 local model. The agent CLI itself isn't bundled here —
-compose with another env:
+install one first. For Claude Code, install it yourself
+(e.g. `flox install flox/claude-code`) or bring your own
+install:
 
-```toml
-[include]
-environments = [
-  "flox/lmstudio",
-  "flox/claude-code"
-]
+```bash
+flox install flox/claude-code
 ```
 
-Then:
+Then start the services and launch the agent against the
+local API:
 
 ```bash
 flox activate --start-services
