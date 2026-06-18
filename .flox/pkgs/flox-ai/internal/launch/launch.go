@@ -23,7 +23,8 @@ type Agent struct {
 
 // Supported lists the agents launch knows how to run.
 var Supported = map[string]Agent{
-	"claude": {Name: "claude", InstallPkg: "claude-code"},
+	"claude":     {Name: "claude", InstallPkg: "claude-code"},
+	"agent-deck": {Name: "agent-deck", InstallPkg: "agent-deck"},
 }
 
 // SupportedNames returns the supported agent names, sorted and
@@ -186,7 +187,7 @@ func (p Plan) Argv() []string {
 type Options struct {
 	AgentName   string
 	ShareDir    string // $FLOX_ENV/share/claude-code (or --dir)
-	ConfigDir   string // $FLOX_ENV_PROJECT/.flox-ai (or --config-dir)
+	ConfigDir   string // $FLOX_ENV_PROJECT/.flox/cache/flox-ai (or --config-dir)
 	Passthrough []string
 }
 
@@ -197,6 +198,10 @@ func Run(opts Options) error {
 	agent, ok := Supported[opts.AgentName]
 	if !ok {
 		return fmt.Errorf("unknown agent %q (supported: %s)", opts.AgentName, SupportedNames())
+	}
+
+	if opts.AgentName == "agent-deck" {
+		return RunDeck(opts)
 	}
 
 	bin, err := resolveBinary(agent)

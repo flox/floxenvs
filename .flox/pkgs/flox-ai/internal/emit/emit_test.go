@@ -17,7 +17,7 @@ func TestHookCode_Full(t *testing.T) {
 			Plugins: []discover.Fragment{{Name: "typescript-lsp", Path: "/share/claude-code/plugins/typescript-lsp"}},
 		},
 		ShareDir:  "/share/claude-code",
-		ConfigDir: "/project/.flox-ai",
+		ConfigDir: "/project/.flox/cache/flox-ai",
 	})
 
 	// plugin wrapper must reference env vars, not baked-in absolute paths
@@ -42,7 +42,7 @@ func TestHookCode_Full(t *testing.T) {
 	}
 
 	checks := []string{
-		`CLAUDE_CONFIG_DIR="/project/.flox-ai"`,
+		`CLAUDE_CONFIG_DIR="/project/.flox/cache/flox-ai"`,
 		"export CLAUDE_CODE_DISABLE_AUTO_MEMORY=1",
 		"export FLOX_AI=1",
 		`mkdir -p "$CLAUDE_CONFIG_DIR/bin"`,
@@ -89,10 +89,10 @@ func TestHookCode_NoFragments(t *testing.T) {
 	result := emit.HookCode(&emit.Params{
 		Frags:     &discover.Result{},
 		ShareDir:  "/share/claude-code",
-		ConfigDir: "/project/.flox-ai",
+		ConfigDir: "/project/.flox/cache/flox-ai",
 	})
 
-	if !strings.Contains(result, `CLAUDE_CONFIG_DIR="/project/.flox-ai"`) {
+	if !strings.Contains(result, `CLAUDE_CONFIG_DIR="/project/.flox/cache/flox-ai"`) {
 		t.Errorf("missing CLAUDE_CONFIG_DIR")
 	}
 	if !strings.Contains(result, `export PATH="$CLAUDE_CONFIG_DIR/bin:$PATH"`) {
@@ -123,7 +123,7 @@ func TestProfileCode(t *testing.T) {
 	result := emit.ProfileCode(&emit.Params{
 		Frags:     &discover.Result{},
 		ShareDir:  "/share/claude-code",
-		ConfigDir: "/project/.flox-ai",
+		ConfigDir: "/project/.flox/cache/flox-ai",
 	})
 
 	if !strings.Contains(result, `export PATH="$CLAUDE_CONFIG_DIR/bin:$PATH"`) {
@@ -144,7 +144,7 @@ func TestProfileCodeFish(t *testing.T) {
 	result := emit.ProfileCodeFish(&emit.Params{
 		Frags:     &discover.Result{},
 		ShareDir:  "/share/claude-code",
-		ConfigDir: "/project/.flox-ai",
+		ConfigDir: "/project/.flox/cache/flox-ai",
 	})
 
 	checks := []string{
@@ -175,7 +175,7 @@ func TestHookCode_NoShellHelpers(t *testing.T) {
 	result := emit.HookCode(&emit.Params{
 		Frags:     &discover.Result{},
 		ShareDir:  "/share/claude-code",
-		ConfigDir: "/project/.flox-ai",
+		ConfigDir: "/project/.flox/cache/flox-ai",
 	})
 
 	unwanted := []string{

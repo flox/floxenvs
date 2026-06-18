@@ -170,6 +170,54 @@ plugins are never touched.
 Rules, skills, and agents `clean` works identically
 but without JSON regeneration.
 
+### launch
+
+Runs an AI agent with this environment's flox-managed
+fragments injected. `flox-ai launch claude` is the common
+case; it merges the env's rules, skills, agents, and a synth
+plugin into the agent invocation.
+
+#### launch agent-deck
+
+`flox-ai launch agent-deck` runs the agent-deck TUI with a
+flox-managed config home. On every launch it seeds an
+agent-deck `config.toml` under
+`$FLOX_ENV_PROJECT/.flox/cache/flox-ai/agents/agent-deck/`,
+copying the user's existing agent-deck config (from
+`$XDG_CONFIG_HOME/agent-deck`, `~/.config/agent-deck`, or
+legacy `~/.agent-deck`) when present, and forcing
+`[claude].command = "flox-ai launch claude --"`. The effect
+is that claude sessions started inside agent-deck are
+themselves launched through `flox-ai launch claude`, so they
+inherit this environment's flox-managed skills, rules,
+agents, and plugins.
+
+agent-deck is pointed at the seeded home via
+`XDG_CONFIG_HOME` and `XDG_DATA_HOME` (both the deck home, so
+config and session state live together per environment), and
+`FLOX_AI_DIR` is exported so the nested `flox-ai launch
+claude` resolves this environment's fragments. The seeded
+config also forces a per-environment `[tmux].socket_name`
+derived from the config dir, so each environment's deck runs
+on its own tmux server — distinct environments do not share
+session state or shell environment, while relaunching the
+same environment reuses its server. `XDG_CACHE_HOME` is left
+untouched.
+
+Because session state lives under `.flox/cache`, it is
+ephemeral: a flox cache clear or env rebuild resets the
+deck's sessions.
+
+```bash
+flox-ai launch agent-deck            # launch the TUI
+flox-ai launch agent-deck -- --help  # pass args to agent-deck
+```
+
+Known limitation: because agent-deck uses a custom
+`command`, its per-profile `CLAUDE_CONFIG_DIR` injection does
+not apply to flox-wrapped claude sessions (they use the
+ambient `~/.claude`).
+
 ## How it works
 
 Flox packages drop config fragments into
@@ -211,7 +259,7 @@ All fragment types are delivered via symlinks into
 ### Isolation via CLAUDE_CONFIG_DIR
 
 `CLAUDE_CONFIG_DIR` is set to
-`$FLOX_ENV_PROJECT/.flox-ai`, a directory next to
+`$FLOX_ENV_PROJECT/.flox/cache/flox-ai`, a directory next to
 the project's `.claude/`. This isolates the Claude session:
 
 - No user settings from `~/.claude/` leaking in
@@ -302,13 +350,13 @@ again, removing all managed symlinks.
 | `FLOX_AI` | Check if managed mode is active |
 
 If `FLOX_AI_DIR` is not set, defaults to
-`$FLOX_ENV_PROJECT/.flox-ai`.
+`$FLOX_ENV_PROJECT/.flox/cache/flox-ai`.
 
 ### Set by emitted shell code
 
 | Variable | Purpose |
 | ------ | ------ |
-| `CLAUDE_CONFIG_DIR` | `$FLOX_ENV_PROJECT/.flox-ai` |
+| `CLAUDE_CONFIG_DIR` | `$FLOX_ENV_PROJECT/.flox/cache/flox-ai` |
 | `CLAUDE_CODE_DISABLE_AUTO_MEMORY` | Disables memory |
 | `FLOX_AI` | Marker that managed mode is active |
 
