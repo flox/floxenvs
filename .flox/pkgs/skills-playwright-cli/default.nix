@@ -2,7 +2,6 @@
   lib,
   stdenvNoCC,
   fetchFromGitHub,
-  flox-agent-layout,
 }:
 
 let
@@ -26,8 +25,6 @@ stdenvNoCC.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
-  nativeBuildInputs = [ flox-agent-layout ];
-
   installPhase = ''
     runHook preInstall
 
@@ -42,7 +39,8 @@ stdenvNoCC.mkDerivation {
   '';
 
   postInstall = ''
-    flox-agent-layout --plugin playwright-cli --share "$out/share"
+    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    flox_agent_layout "playwright-cli" "$out/share"
   '';
 
   meta = {

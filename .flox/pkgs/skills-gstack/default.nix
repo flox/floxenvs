@@ -7,7 +7,6 @@
   git,
   jq,
   curl,
-  flox-agent-layout,
 }:
 
 let
@@ -48,8 +47,6 @@ stdenv.mkDerivation {
 
   dontConfigure = true;
   dontBuild = true;
-
-  nativeBuildInputs = [ flox-agent-layout ];
 
   # ─── Substitution tokens ──────────────────────────────────────────
   # Available as @TOKEN@ in installPhase via stdenv's substitute helpers,
@@ -186,7 +183,8 @@ stdenv.mkDerivation {
   '';
 
   postInstall = ''
-    flox-agent-layout --plugin gstack --share "$out/share"
+    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    flox_agent_layout "gstack" "$out/share"
   '';
 
   meta = {

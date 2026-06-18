@@ -4,7 +4,6 @@
   fetchFromGitHub,
   makeBinaryWrapper,
   python3,
-  flox-agent-layout,
 }:
 
 let
@@ -33,7 +32,6 @@ stdenv.mkDerivation {
   # under stripped environments.
   nativeBuildInputs = [
     makeBinaryWrapper
-    flox-agent-layout
   ];
 
   installPhase = ''
@@ -130,7 +128,8 @@ stdenv.mkDerivation {
   '';
 
   postInstall = ''
-    flox-agent-layout --plugin ui-ux-pro-max --share "$out/share"
+    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    flox_agent_layout "ui-ux-pro-max" "$out/share"
   '';
 
   meta = {

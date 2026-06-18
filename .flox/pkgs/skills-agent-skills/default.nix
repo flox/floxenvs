@@ -5,7 +5,6 @@
   jq,
   curl,
   coreutils,
-  flox-agent-layout,
 }:
 
 let
@@ -26,8 +25,6 @@ stdenv.mkDerivation {
 
   dontConfigure = true;
   dontBuild = true;
-
-  nativeBuildInputs = [ flox-agent-layout ];
 
   installPhase = ''
     runHook preInstall
@@ -110,7 +107,8 @@ $pathLine"
       chmod +x "$f"
     done
 
-    flox-agent-layout --plugin agent-skills --share "$out/share"
+    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    flox_agent_layout "agent-skills" "$out/share"
 
     runHook postInstall
   '';

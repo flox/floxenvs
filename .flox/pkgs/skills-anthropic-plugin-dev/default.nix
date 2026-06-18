@@ -1,4 +1,4 @@
-{ stdenvNoCC, lib, fetchFromGitHub, flox-agent-layout }:
+{ stdenvNoCC, lib, fetchFromGitHub }:
 
 let
   data = builtins.fromJSON (builtins.readFile ./hashes.json);
@@ -17,8 +17,6 @@ stdenvNoCC.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
-  nativeBuildInputs = [ flox-agent-layout ];
-
   installPhase = ''
     runHook preInstall
     PLUGIN_DIR="$out/share/claude-code/plugins/plugin-dev"
@@ -28,7 +26,8 @@ stdenvNoCC.mkDerivation {
   '';
 
   postInstall = ''
-    flox-agent-layout --plugin plugin-dev --share "$out/share"
+    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    flox_agent_layout "plugin-dev" "$out/share"
   '';
 
   meta = {

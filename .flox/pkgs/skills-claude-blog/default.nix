@@ -3,7 +3,6 @@
   lib,
   fetchFromGitHub,
   makeBinaryWrapper,
-  flox-agent-layout,
   python3,
   curl,
   gh,
@@ -51,7 +50,7 @@ stdenv.mkDerivation {
   # is exec'd directly by the kernel via shebang on Darwin, where
   # shebang chains through a shell script wrapper are unreliable
   # under stripped environments.
-  nativeBuildInputs = [ makeBinaryWrapper flox-agent-layout ];
+  nativeBuildInputs = [ makeBinaryWrapper ];
 
   installPhase = ''
     runHook preInstall
@@ -106,7 +105,8 @@ stdenv.mkDerivation {
   '';
 
   postInstall = ''
-    flox-agent-layout --plugin claude-blog --share "$out/share"
+    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    flox_agent_layout "claude-blog" "$out/share"
   '';
 
   meta = {

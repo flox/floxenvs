@@ -2,7 +2,6 @@
   lib,
   stdenvNoCC,
   fetchFromGitHub,
-  flox-agent-layout,
   makeWrapper,
   python3,
   ffmpeg,
@@ -64,7 +63,7 @@ stdenvNoCC.mkDerivation {
   version = data.version;
   inherit src;
 
-  nativeBuildInputs = [ makeWrapper flox-agent-layout ];
+  nativeBuildInputs = [ makeWrapper ];
 
   dontConfigure = true;
   dontBuild = true;
@@ -183,7 +182,8 @@ MD
           ${lib.escapeShellArg manimNote}
     done
 
-    flox-agent-layout --plugin video-use --share "$out/share"
+    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    flox_agent_layout "video-use" "$out/share"
   '';
 
   meta = {

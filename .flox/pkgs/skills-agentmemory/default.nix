@@ -4,7 +4,6 @@
   fetchFromGitHub,
   makeBinaryWrapper,
   nodejs,
-  flox-agent-layout,
 }:
 
 let
@@ -33,7 +32,6 @@ stdenv.mkDerivation {
   # under stripped environments.
   nativeBuildInputs = [
     makeBinaryWrapper
-    flox-agent-layout
   ];
 
   installPhase = ''
@@ -105,7 +103,8 @@ stdenv.mkDerivation {
   '';
 
   postInstall = ''
-    flox-agent-layout --plugin agentmemory --share "$out/share"
+    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    flox_agent_layout "agentmemory" "$out/share"
   '';
 
   meta = {

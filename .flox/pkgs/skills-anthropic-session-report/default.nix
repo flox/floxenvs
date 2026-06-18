@@ -1,4 +1,4 @@
-{ stdenvNoCC, lib, fetchFromGitHub, jq, flox-agent-layout }:
+{ stdenvNoCC, lib, fetchFromGitHub, jq }:
 
 let
   data = builtins.fromJSON (builtins.readFile ./hashes.json);
@@ -17,7 +17,7 @@ stdenvNoCC.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
-  nativeBuildInputs = [ jq flox-agent-layout ];
+  nativeBuildInputs = [ jq ];
 
   installPhase = ''
     runHook preInstall
@@ -41,7 +41,8 @@ stdenvNoCC.mkDerivation {
   '';
 
   postInstall = ''
-    flox-agent-layout --plugin session-report --share "$out/share"
+    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    flox_agent_layout "session-report" "$out/share"
   '';
 
   meta = {

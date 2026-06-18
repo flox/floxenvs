@@ -2,7 +2,6 @@
   lib,
   stdenvNoCC,
   fetchFromGitHub,
-  flox-agent-layout,
 }:
 
 let
@@ -22,8 +21,6 @@ stdenvNoCC.mkDerivation {
 
   dontConfigure = true;
   dontBuild = true;
-
-  nativeBuildInputs = [ flox-agent-layout ];
 
   installPhase = ''
     runHook preInstall
@@ -58,7 +55,8 @@ stdenvNoCC.mkDerivation {
       mv "$skill_md.new" "$skill_md"
     done
 
-    flox-agent-layout --plugin humanizer --share "$out/share"
+    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    flox_agent_layout "humanizer" "$out/share"
   '';
 
   meta = {

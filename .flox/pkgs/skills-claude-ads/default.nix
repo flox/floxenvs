@@ -3,7 +3,6 @@
   lib,
   fetchFromGitHub,
   makeBinaryWrapper,
-  flox-agent-layout,
   python3,
   curl,
   git,
@@ -49,7 +48,6 @@ stdenv.mkDerivation {
   # under stripped environments.
   nativeBuildInputs = [
     makeBinaryWrapper
-    flox-agent-layout
   ];
 
   installPhase = ''
@@ -111,7 +109,8 @@ stdenv.mkDerivation {
   '';
 
   postInstall = ''
-    flox-agent-layout --plugin claude-ads --share "$out/share"
+    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    flox_agent_layout "claude-ads" "$out/share"
   '';
 
   meta = {

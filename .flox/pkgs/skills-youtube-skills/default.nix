@@ -3,7 +3,6 @@
   stdenvNoCC,
   fetchFromGitHub,
   curl,
-  flox-agent-layout,
 }:
 
 let
@@ -23,8 +22,6 @@ stdenvNoCC.mkDerivation {
 
   dontConfigure = true;
   dontBuild = true;
-
-  nativeBuildInputs = [ flox-agent-layout ];
 
   installPhase = ''
     runHook preInstall
@@ -54,7 +51,8 @@ stdenvNoCC.mkDerivation {
   '';
 
   postInstall = ''
-    flox-agent-layout --plugin youtube-skills --share "$out/share"
+    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    flox_agent_layout "youtube-skills" "$out/share"
   '';
 
   meta = {

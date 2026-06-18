@@ -10,7 +10,6 @@
   git,
   jq,
   nodejs,
-  flox-agent-layout,
 }:
 
 let
@@ -54,7 +53,7 @@ stdenv.mkDerivation {
   # shebang chains through a shell script wrapper are unreliable
   # under stripped environments. makeWrapper is still needed for the
   # bash extension scripts (wrapProgram).
-  nativeBuildInputs = [ makeBinaryWrapper makeWrapper flox-agent-layout ];
+  nativeBuildInputs = [ makeBinaryWrapper makeWrapper ];
 
   installPhase = ''
     runHook preInstall
@@ -139,7 +138,8 @@ stdenv.mkDerivation {
   '';
 
   postInstall = ''
-    flox-agent-layout --plugin claude-seo --share "$out/share"
+    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    flox_agent_layout "claude-seo" "$out/share"
   '';
 
   meta = {

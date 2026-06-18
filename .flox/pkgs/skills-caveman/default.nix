@@ -4,7 +4,6 @@
   fetchFromGitHub,
   nodejs,
   python3,
-  flox-agent-layout,
 }:
 
 let
@@ -30,12 +29,13 @@ stdenv.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
-  nativeBuildInputs = [ flox-agent-layout ];
-
   # Emit the per-agent launch layout (share/flox/<agent>/caveman) from the
-  # share/claude-code content installed above. Runs via runHook postInstall.
+  # share/claude-code content. The helper is sourced inline (no build-input
+  # derivation) so postInstall runs on the native builder — cross-system
+  # publish works. Runs via runHook postInstall.
   postInstall = ''
-    flox-agent-layout --plugin caveman --share "$out/share"
+    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    flox_agent_layout "caveman" "$out/share"
   '';
 
   installPhase = ''

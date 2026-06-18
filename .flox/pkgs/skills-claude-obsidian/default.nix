@@ -4,7 +4,6 @@
   fetchFromGitHub,
   makeBinaryWrapper,
   python3,
-  flox-agent-layout,
 }:
 
 let
@@ -28,7 +27,6 @@ stdenv.mkDerivation {
   # under stripped environments.
   nativeBuildInputs = [
     makeBinaryWrapper
-    flox-agent-layout
   ];
 
   dontConfigure = true;
@@ -121,7 +119,8 @@ stdenv.mkDerivation {
   '';
 
   postInstall = ''
-    flox-agent-layout --plugin claude-obsidian --share "$out/share"
+    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    flox_agent_layout "claude-obsidian" "$out/share"
   '';
 
   meta = {

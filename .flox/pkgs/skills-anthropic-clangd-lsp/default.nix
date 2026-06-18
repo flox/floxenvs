@@ -1,4 +1,4 @@
-{ stdenv, lib, fetchFromGitHub, jq, clang-tools, flox-agent-layout }:
+{ stdenv, lib, fetchFromGitHub, jq, clang-tools }:
 
 let
   data = builtins.fromJSON (builtins.readFile ./hashes.json);
@@ -17,7 +17,7 @@ stdenv.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
-  nativeBuildInputs = [ jq flox-agent-layout ];
+  nativeBuildInputs = [ jq ];
 
   installPhase = ''
     runHook preInstall
@@ -42,7 +42,8 @@ stdenv.mkDerivation {
     ln -s ${clang-tools}/bin/clangd \
       "$out/bin/clangd"
 
-    flox-agent-layout --plugin clangd-lsp --share "$out/share"
+    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    flox_agent_layout "clangd-lsp" "$out/share"
 
     runHook postInstall
   '';
