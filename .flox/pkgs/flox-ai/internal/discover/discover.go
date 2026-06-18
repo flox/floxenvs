@@ -159,3 +159,47 @@ func scanSkills(skillsDir string) ([]Fragment, error) {
 
 	return fragments, nil
 }
+
+// FloxResult holds the build-time layout for one agent: the prebuilt
+// per-agent plugin dirs to point the agent at, and the shared rule files.
+type FloxResult struct {
+	AgentDirs []string   // <share>/flox/<agent>/* (sorted)
+	Rules     []Fragment // <share>/flox/common/*/rules/*.md (sorted by name)
+}
+
+// ScanFlox enumerates the build-time layout under <shareDir>/flox for the
+// given agent. Returns an empty result (no error) when the tree is absent.
+func ScanFlox(shareDir, agent string) (*FloxResult, error) {
+	res := &FloxResult{}
+
+	agentRoot := filepath.Join(shareDir, "flox", agent)
+	if entries, err := os.ReadDir(agentRoot); err == nil {
+		for _, e := range entries {
+			if e.IsDir() {
+				res.AgentDirs = append(res.AgentDirs, filepath.Join(agentRoot, e.Name()))
+			}
+		}
+		sort.Strings(res.AgentDirs)
+	} else if !os.IsNotExist(err) {
+		return nil, err
+	}
+
+	commonRoot := filepath.Join(shareDir, "flox", "common")
+	plugins, err := os.ReadDir(commonRoot)
+	if err != nil && !os.IsNotExist(err) {
+		return nil, err
+	}
+	for _, p := range plugins {
+		if !p.IsDir() {
+			continue
+		}
+		rules, err := globFragments(filepath.Join(commonRoot, p.Name(), "rules"), "*.md")
+		if err != nil {
+			return nil, err
+		}
+		res.Rules = append(res.Rules, rules...)
+	}
+	sort.Slice(res.Rules, func(i, j int) bool { return res.Rules[i].Name < res.Rules[j].Name })
+
+	return res, nil
+}

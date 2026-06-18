@@ -128,3 +128,34 @@ func TestDiscover_Missing(t *testing.T) {
 		t.Error("IsEmpty() should be true for nonexistent dir")
 	}
 }
+
+func TestScanFlox(t *testing.T) {
+	share := t.TempDir()
+	// codex plugin dir with one skill
+	cdir := filepath.Join(share, "flox", "codex", "demo")
+	if err := os.MkdirAll(filepath.Join(cdir, "s1"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(cdir, "s1", "SKILL.md"), []byte("x"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	// shared rule
+	rdir := filepath.Join(share, "flox", "common", "demo", "rules")
+	if err := os.MkdirAll(rdir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(rdir, "r.md"), []byte("R"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := ScanFlox(share, "codex")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got.AgentDirs) != 1 || got.AgentDirs[0] != cdir {
+		t.Fatalf("AgentDirs=%v want [%s]", got.AgentDirs, cdir)
+	}
+	if len(got.Rules) != 1 || filepath.Base(got.Rules[0].Path) != "r.md" {
+		t.Fatalf("Rules=%v", got.Rules)
+	}
+}
