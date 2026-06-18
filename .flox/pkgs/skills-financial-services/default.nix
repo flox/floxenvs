@@ -151,7 +151,7 @@ stdenv.mkDerivation {
   # Emit the per-agent launch layout once per plugin so each gets its
   # share/flox/<agent>/<plugin> entries.
   postInstall = ''
-    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
     for plugin_dir in "$out/share/claude-code/plugins"/*/; do
       plugin_name="$(basename "$plugin_dir")"
       flox_agent_layout "$plugin_name" "$out/share"

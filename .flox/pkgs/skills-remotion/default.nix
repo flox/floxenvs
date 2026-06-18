@@ -69,7 +69,7 @@ stdenv.mkDerivation {
   '';
 
   postInstall = ''
-    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
     flox_agent_layout "remotion" "$out/share"
   '';
 

@@ -34,7 +34,7 @@ stdenv.mkDerivation {
   # derivation) so postInstall runs on the native builder — cross-system
   # publish works. Runs via runHook postInstall.
   postInstall = ''
-    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
     flox_agent_layout "caveman" "$out/share"
   '';
 

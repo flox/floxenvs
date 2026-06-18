@@ -42,7 +42,7 @@ stdenv.mkDerivation {
     ln -s ${rust-analyzer}/bin/rust-analyzer \
       "$out/bin/rust-analyzer"
 
-    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
     flox_agent_layout "rust-analyzer-lsp" "$out/share"
 
     runHook postInstall

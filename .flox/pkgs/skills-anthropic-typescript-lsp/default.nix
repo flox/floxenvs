@@ -42,7 +42,7 @@ stdenv.mkDerivation {
     ln -s ${typescript-language-server}/bin/typescript-language-server \
       "$out/bin/typescript-language-server"
 
-    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
     flox_agent_layout "typescript-lsp" "$out/share"
 
     runHook postInstall

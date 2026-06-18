@@ -8,7 +8,7 @@
 # (native) builder builds the package, so cross-system publish works.
 #
 # Usage in a package's postInstall:
-#   ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+#   ${builtins.readFile ../../nix/flox-agent-layout.sh}
 #   flox_agent_layout "<plugin-name>" "$out/share"
 #
 # Two source shapes are handled:

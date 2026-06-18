@@ -59,7 +59,7 @@ stdenv.mkDerivation {
           s{\bffprobe(?=[\s",)])}{${ffmpeg-headless}/bin/ffprobe}g;
         '
 
-    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
     flox_agent_layout "hyperframes" "$out/share"
 
     runHook postInstall

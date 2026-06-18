@@ -42,7 +42,7 @@ stdenv.mkDerivation {
     ln -s ${clang-tools}/bin/clangd \
       "$out/bin/clangd"
 
-    ${builtins.readFile ../flox-agent-layout/flox-agent-layout.sh}
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
     flox_agent_layout "clangd-lsp" "$out/share"
 
     runHook postInstall
