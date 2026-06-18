@@ -166,6 +166,14 @@ func newModel(items []catalogItem, installed map[string]bool,
 	m.showDetail = cfg.Preview
 	m.themeUserSet = cfg.Theme != "" // respect a saved choice
 	m.upgrader = FloxUpgrader{ProjectDir: projectDir}
+	// Default to claude when available; the agent list is sorted, so index 0
+	// would otherwise land on agent-deck.
+	for i, a := range agents {
+		if a == "claude" {
+			m.agentIdx = i
+			break
+		}
+	}
 	return m
 }
 

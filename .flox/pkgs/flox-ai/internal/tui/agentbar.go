@@ -18,6 +18,8 @@ func agentDisplay(name string) string {
 	switch name {
 	case "claude":
 		return "Claude"
+	case "agent-deck":
+		return "Agent Deck"
 	case "":
 		return ""
 	default:
@@ -34,6 +36,11 @@ func agentInfo(name string) (title, desc string) {
 			"Anthropic's Claude Code CLI. Injects the fragments present in " +
 				"this environment — rules, skills, agents and plugins — then " +
 				"launches claude."
+	case "agent-deck":
+		return "Agent Deck",
+			"Terminal session manager for AI coding agents. Spawns Claude " +
+				"Code sessions through flox-ai, so this environment's " +
+				"fragments are injected into every session it manages."
 	default:
 		return name, "AI coding agent."
 	}
@@ -46,7 +53,13 @@ func agentLaunch(name string) string {
 	case "claude":
 		return "Starts Claude Code with this environment's plugins, skills, " +
 			"agents and rules injected into its config.\n\n" +
-			"Only Claude Code is supported for now — more agents are planned.\n\n" +
+			"You can install or remove fragments and relaunch any time."
+	case "agent-deck":
+		return "Starts the Agent Deck session manager. The Claude sessions it " +
+			"spawns run through flox-ai, so this environment's plugins, " +
+			"skills, agents and rules are injected into each one.\n\n" +
+			"Agent Deck keeps its config and tmux socket isolated per " +
+			"environment.\n\n" +
 			"You can install or remove fragments and relaunch any time."
 	default:
 		return "Starts the agent with the installed plugins, skills, agents and rules."
