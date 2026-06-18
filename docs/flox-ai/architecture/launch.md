@@ -5,7 +5,7 @@ fragments injected, then gets out of the way. It is the endpoint the TUI's
 launch action calls, and a CLI command in its own right.
 
 `internal/launch` holds a small registry (`launch.Supported`) and dispatches
-by agent name. Two agents are registered.
+by agent name. Three agents are registered.
 
 ## claude
 
@@ -40,6 +40,29 @@ a flox-managed, per-environment configuration. On every launch it:
 
 `RunDeck` (in `internal/launch/agentdeck.go`) implements this; `go-toml/v2`
 parses and rewrites the config.
+
+## codex
+
+`flox-ai launch codex` execs OpenAI Codex with the environment's skills and
+rules injected. Codex takes none of Claude Code's flags; it discovers skills
+from skill-root directories and rules from project instructions. A downstream
+patch to codex (`.flox/pkgs/codex/flox-fragments.patch`) adds two env-var
+seams that flox-ai sets:
+
+- `CODEX_FLOX_SKILL_ROOTS` — a colon-separated list of extra skill roots.
+  flox-ai stages a skill root under
+  `$FLOX_ENV_PROJECT/.flox/cache/flox-ai/codex/skills/`, symlinking each
+  skill's `SKILL.md` directory and wrapping each standalone agent as
+  `<name>/SKILL.md`;
+- `CODEX_FLOX_INSTRUCTIONS_FILE` — a merged rules file
+  (`.../codex/rules.md`) appended to Codex's loaded instructions.
+
+Nothing in `~/.codex` or the working tree is mutated. Claude-format plugins
+are not injected — codex's plugin format differs. `RunCodex` (in
+`internal/launch/codex.go`) implements this; the patch decision and its
+maintenance cost are recorded in
+[decisions/0011-codex-env-var-patch.md](
+../decisions/0011-codex-env-var-patch.md).
 
 ## Why launch matters here
 

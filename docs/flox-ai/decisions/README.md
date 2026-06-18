@@ -21,3 +21,4 @@ Format and process live in [template.md](template.md).
 | [0008](0008-squash-then-rebase.md) | Integrate main by squash-then-rebase | Accepted |
 | [0009](0009-charm-v1-to-v2-migration.md) | Migrate the TUI from Charm v1 to v2 | Accepted |
 | [0010](0010-per-agent-fragment-injection.md) | Inject fragments per-agent via each agent's native seam | Proposed |
+| [0011](0011-codex-env-var-patch.md) | Inject codex fragments via a downstream env-var patch | Accepted |
