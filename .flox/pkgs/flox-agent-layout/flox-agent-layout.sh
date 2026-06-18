@@ -1,67 +1,87 @@
 #!/usr/bin/env bash
-# flox-agent-layout --plugin <name> --root <share/flox dir>
-# Emits per-agent views under <root>/<agent>/<plugin> from the canonical
-# content in <root>/common/<plugin>. Relative symlinks keep content stored
-# once. Run at package build time (read-only at runtime afterward).
+# flox-agent-layout --plugin <name> --share <out/share>
+#
+# Derives the per-agent launch layout <share>/flox/<agent>/<plugin> from a
+# package's already-installed <share>/claude-code content, using relative
+# symlinks so nothing is duplicated and the tree is store-relocatable. Run
+# at package build time, after the package has populated share/claude-code.
+#
+# Two source shapes are handled:
+#   - plugin-shaped: <share>/claude-code/plugins/<plugin>/ (a full Claude
+#     plugin with skills/ and agents/);
+#   - flat-skills:   <share>/claude-code/skills/*/SKILL.md (no plugin dir).
+#
+# Per agent it emits:
+#   claude/<plugin>     -> the whole plugin (plugin-shaped), or a synthesized
+#                          plugin (manifest + skills symlinks) for flat-skills
+#   codex/<plugin>/<s>  -> each skill dir
+#   pi/<plugin>/<s>     -> each skill dir
+#   opencode/<plugin>/skills/<s> -> each skill dir
+# Rules (<share>/claude-code/rules/*.md) are linked under
+#   common/<plugin>/rules/ for the launch-time merge.
 set -euo pipefail
 
 plugin=""
-root=""
+share=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --plugin) plugin="$2"; shift 2 ;;
-    --root)   root="$2";   shift 2 ;;
+    --share)  share="$2";  shift 2 ;;
     *) echo "flox-agent-layout: unknown arg $1" >&2; exit 2 ;;
   esac
 done
 [ -n "$plugin" ] || { echo "flox-agent-layout: --plugin required" >&2; exit 2; }
-[ -n "$root" ]   || { echo "flox-agent-layout: --root required" >&2; exit 2; }
+[ -n "$share" ]  || { echo "flox-agent-layout: --share required" >&2; exit 2; }
 
-common="$root/common/$plugin"
-[ -d "$common" ] || { echo "flox-agent-layout: $common not found" >&2; exit 2; }
+cc="$share/claude-code"
+flox="$share/flox"
+[ -d "$cc" ] || { echo "flox-agent-layout: $cc not found" >&2; exit 2; }
 
-# claude: a Claude Code plugin (manifest + skills/ + agents/).
-cdir="$root/claude/$plugin"
-mkdir -p "$cdir/.claude-plugin"
-printf '{"name":"%s","description":"Flox-managed: %s"}\n' "$plugin" "$plugin" \
-  > "$cdir/.claude-plugin/plugin.json"
-if [ -d "$common/skills" ]; then
-  mkdir -p "$cdir/skills"
-  for s in "$common/skills"/*/; do
-    [ -e "$s" ] || continue
-    name="$(basename "$s")"
-    ln -sfn "../../../common/$plugin/skills/$name" "$cdir/skills/$name"
-  done
-fi
-if [ -d "$common/agents" ]; then
-  mkdir -p "$cdir/agents"
-  for a in "$common/agents"/*.md; do
-    [ -e "$a" ] || continue
-    name="$(basename "$a")"
-    ln -sfn "../../../common/$plugin/agents/$name" "$cdir/agents/$name"
-  done
-fi
+# mklink <linkpath> <target-abs>: create a relative symlink at linkpath
+# pointing at target, creating parent dirs.
+mklink() {
+  local lp="$1" tgt="$2" dir rel
+  dir="$(dirname "$lp")"
+  mkdir -p "$dir"
+  rel="$(realpath -m --relative-to="$dir" "$tgt")"
+  ln -sfn "$rel" "$lp"
+}
 
-# codex + pi: bare skill roots — <plugin>/<name> -> common skill dir.
-for agent in codex pi; do
-  adir="$root/$agent/$plugin"
-  if [ -d "$common/skills" ]; then
-    mkdir -p "$adir"
-    for s in "$common/skills"/*/; do
+pdir="$cc/plugins/$plugin"
+if [ -d "$pdir" ]; then
+  # plugin-shaped: claude gets the whole valid plugin; skills live under it.
+  mklink "$flox/claude/$plugin" "$pdir"
+  skillsrc="$pdir/skills"
+else
+  # flat-skills: synthesize a Claude plugin from <cc>/skills.
+  skillsrc="$cc/skills"
+  cdir="$flox/claude/$plugin"
+  mkdir -p "$cdir/.claude-plugin"
+  printf '{"name":"%s","description":"Flox-managed: %s"}\n' "$plugin" "$plugin" \
+    > "$cdir/.claude-plugin/plugin.json"
+  if [ -d "$skillsrc" ]; then
+    for s in "$skillsrc"/*/; do
       [ -e "$s" ] || continue
-      name="$(basename "$s")"
-      ln -sfn "../../common/$plugin/skills/$name" "$adir/$name"
+      mklink "$cdir/skills/$(basename "$s")" "$skillsrc/$(basename "$s")"
     done
   fi
-done
+fi
 
-# opencode: skills/<name> under the plugin folder (scanned by **/SKILL.md).
-odir="$root/opencode/$plugin"
-if [ -d "$common/skills" ]; then
-  mkdir -p "$odir/skills"
-  for s in "$common/skills"/*/; do
+# codex + pi (bare skill roots) and opencode (skills/ subdir).
+if [ -d "$skillsrc" ]; then
+  for s in "$skillsrc"/*/; do
     [ -e "$s" ] || continue
-    name="$(basename "$s")"
-    ln -sfn "../../../common/$plugin/skills/$name" "$odir/skills/$name"
+    n="$(basename "$s")"
+    mklink "$flox/codex/$plugin/$n" "$skillsrc/$n"
+    mklink "$flox/pi/$plugin/$n" "$skillsrc/$n"
+    mklink "$flox/opencode/$plugin/skills/$n" "$skillsrc/$n"
+  done
+fi
+
+# rules: link flat claude-code rules under common/<plugin>/rules.
+if [ -d "$cc/rules" ]; then
+  for r in "$cc/rules"/*.md; do
+    [ -e "$r" ] || continue
+    mklink "$flox/common/$plugin/rules/$(basename "$r")" "$cc/rules/$(basename "$r")"
   done
 fi
