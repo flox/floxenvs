@@ -14,3 +14,11 @@ func TestStatusZeroValueIsOK(t *testing.T) {
 		t.Fatalf("zero-value Status.Level = %d, want OK(%d)", s.Level, OK)
 	}
 }
+
+func TestRegistryHasExpectedAgents(t *testing.T) {
+	for _, name := range []string{"claude", "agent-deck", "codex"} {
+		if _, ok := registry[name]; !ok {
+			t.Fatalf("registry missing %q", name)
+		}
+	}
+}

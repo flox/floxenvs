@@ -15,13 +15,13 @@ func (deckAdapter) InstallPkg() string { return "agent-deck" }
 func (deckAdapter) Check(string) Status { return Status{Level: OK} }
 
 func (deckAdapter) Build(ctx Context) (Spec, error) {
-	xdgConfigHome, deckDir := DeckHome(ctx.ConfigDir)
+	deckHome := DeckHome(ctx.ConfigDir)
 	socketName := DeckSocketName(ctx.ConfigDir)
 	source := findUserDeckConfig(os.Getenv("XDG_CONFIG_HOME"), os.Getenv("HOME"))
-	if err := SeedDeckConfig(deckDir, source, socketName); err != nil {
+	if err := SeedDeckConfig(deckHome, source, socketName); err != nil {
 		return Spec{}, err
 	}
 	argv := append([]string{ctx.Bin}, ctx.Passthrough...)
-	env := deckChildEnv(ctx.BaseEnv, xdgConfigHome, ctx.ConfigDir)
+	env := deckChildEnv(ctx.BaseEnv, deckHome, ctx.ConfigDir)
 	return Spec{Argv: argv, Env: env}, nil
 }

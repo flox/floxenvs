@@ -2,7 +2,6 @@ package tui
 
 import (
 	"fmt"
-	"sort"
 	"time"
 
 	tea "charm.land/bubbletea/v2"
@@ -22,12 +21,7 @@ type Options struct {
 
 // agentNames returns the supported launch agents, sorted.
 func agentNames() []string {
-	names := make([]string, 0, len(launch.Supported))
-	for n := range launch.Supported {
-		names = append(names, n)
-	}
-	sort.Strings(names)
-	return names
+	return launch.RegisteredNames()
 }
 
 // Run loads the catalog + installed set, runs the TUI, and (on user

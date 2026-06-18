@@ -323,27 +323,10 @@ func TestRun_UnknownAgent(t *testing.T) {
 	}
 }
 
-func TestResolveBinary_FoundOnPath(t *testing.T) {
-	dir := t.TempDir()
-	bin := filepath.Join(dir, "claude")
-	if err := os.WriteFile(bin, []byte("#!/bin/sh\n"), 0755); err != nil {
-		t.Fatal(err)
-	}
-	t.Setenv("PATH", dir)
-
-	got, err := resolveBinary(Supported["claude"])
-	if err != nil {
-		t.Fatal(err)
-	}
-	if got != bin {
-		t.Fatalf("got %q want %q", got, bin)
-	}
-}
-
-func TestResolveBinary_NotFoundSuggestsFloxInstall(t *testing.T) {
+func TestRun_BinaryNotFoundSuggestsFloxInstall(t *testing.T) {
 	t.Setenv("PATH", t.TempDir()) // empty dir: claude not present
 
-	_, err := resolveBinary(Supported["claude"])
+	err := Run(Options{AgentName: "claude"})
 	if err == nil {
 		t.Fatal("want error when binary missing")
 	}

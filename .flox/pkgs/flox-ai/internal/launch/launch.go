@@ -5,39 +5,12 @@ package launch
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"sort"
 	"strings"
-	"syscall"
 
 	"flox.dev/flox-ai/internal/discover"
 	"flox.dev/flox-ai/internal/symlinks"
 )
-
-// Agent describes how to launch a specific AI agent binary.
-type Agent struct {
-	Name       string // agent name as typed on the CLI / PATH lookup, e.g. "claude"
-	InstallPkg string // flox package to suggest installing, e.g. "claude-code"
-}
-
-// Supported lists the agents launch knows how to run.
-var Supported = map[string]Agent{
-	"claude":     {Name: "claude", InstallPkg: "claude-code"},
-	"agent-deck": {Name: "agent-deck", InstallPkg: "agent-deck"},
-	"codex":      {Name: "codex", InstallPkg: "codex"},
-}
-
-// SupportedNames returns the supported agent names, sorted and
-// comma-joined, for error messages.
-func SupportedNames() string {
-	names := make([]string, 0, len(Supported))
-	for n := range Supported {
-		names = append(names, n)
-	}
-	sort.Strings(names)
-	return strings.Join(names, ", ")
-}
 
 // Plan is the fully-resolved set of inputs to launch an agent.
 type Plan struct {
@@ -192,63 +165,6 @@ type Options struct {
 	Passthrough []string
 }
 
-// Run resolves the agent, verifies its binary, prepares the flox
-// fragments, and execs the agent process (replacing the current process).
-// It only returns when something fails before exec.
-func Run(opts Options) error {
-	agent, ok := Supported[opts.AgentName]
-	if !ok {
-		return fmt.Errorf("unknown agent %q (supported: %s)", opts.AgentName, SupportedNames())
-	}
-
-	if opts.AgentName == "agent-deck" {
-		return RunDeck(opts)
-	}
-
-	if opts.AgentName == "codex" {
-		return RunCodex(opts)
-	}
-
-	bin, err := resolveBinary(agent)
-	if err != nil {
-		return err
-	}
-
-	frags, err := discover.Scan(opts.ShareDir)
-	if err != nil {
-		return fmt.Errorf("discover: %w", err)
-	}
-
-	launchDir := filepath.Join(opts.ConfigDir, "launch")
-	synth, rulesFile, err := Prepare(launchDir, frags)
-	if err != nil {
-		return err
-	}
-
-	userPlugins, err := UserPluginDirs(opts.ConfigDir)
-	if err != nil {
-		return err
-	}
-
-	plugins := make([]string, 0, len(frags.Plugins)+len(userPlugins))
-	for _, p := range frags.Plugins {
-		plugins = append(plugins, p.Path)
-	}
-	plugins = append(plugins, userPlugins...)
-	plugins = dedupPluginDirs(plugins)
-
-	plan := Plan{
-		Bin:         bin,
-		SynthPlugin: synth,
-		Plugins:     plugins,
-		RulesFile:   rulesFile,
-		Passthrough: opts.Passthrough,
-	}
-
-	env := childEnv()
-	return syscall.Exec(bin, plan.Argv(), env)
-}
-
 // dedupPluginDirs removes duplicate plugin directories, comparing by
 // resolved (symlink-followed) path and keeping the first occurrence. This
 // matters because an activated env mirrors share-dir plugins into
@@ -276,18 +192,4 @@ func dedupPluginDirs(dirs []string) []string {
 // CLAUDE_CONFIG_DIR — launch reuses the user's real config and login.
 func childEnv() []string {
 	return append(os.Environ(), "FLOX_AI=1")
-}
-
-// resolveBinary finds the agent binary on PATH. The Flox environment only
-// supplies the fragments (skills/agents/rules/plugins); the agent binary
-// itself comes from PATH — which, inside an activated env that ships it,
-// already includes the env's bin. When the binary is missing it suggests
-// installing it via flox.
-func resolveBinary(agent Agent) (string, error) {
-	bin, err := exec.LookPath(agent.Name)
-	if err != nil {
-		return "", fmt.Errorf(`%s not found on PATH.
-Install it with: flox install flox/%s`, agent.Name, agent.InstallPkg)
-	}
-	return bin, nil
 }

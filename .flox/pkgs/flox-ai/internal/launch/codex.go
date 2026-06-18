@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"syscall"
 
 	"flox.dev/flox-ai/internal/discover"
 )
@@ -116,39 +115,4 @@ func PrepareCodex(launchDir string, frags *discover.Result) (skillRoot, rulesFil
 		return "", "", err
 	}
 	return skillRoot, rulesFile, nil
-}
-
-// RunCodex resolves the codex binary, stages this environment's skills and
-// rules under the flox config dir, points Codex at them via the patch env
-// vars, and execs codex (replacing this process). Codex plugins are not
-// mapped: the flox/Claude plugin format differs from Codex's. It only
-// returns when something fails before exec.
-func RunCodex(opts Options) error {
-	agent := Supported[opts.AgentName] // caller guarantees codex
-	bin, err := resolveBinary(agent)
-	if err != nil {
-		return err
-	}
-
-	frags, err := discover.Scan(opts.ShareDir)
-	if err != nil {
-		return fmt.Errorf("discover: %w", err)
-	}
-
-	launchDir := filepath.Join(opts.ConfigDir, "codex")
-	skillRoot, rulesFile, err := PrepareCodex(launchDir, frags)
-	if err != nil {
-		return err
-	}
-
-	env := setEnvVar(os.Environ(), "FLOX_AI", "1")
-	if skillRoot != "" {
-		env = setEnvVar(env, EnvCodexSkillRoots, skillRoot)
-	}
-	if rulesFile != "" {
-		env = setEnvVar(env, EnvCodexInstructionsFile, rulesFile)
-	}
-
-	argv := append([]string{bin}, opts.Passthrough...)
-	return syscall.Exec(bin, argv, env)
 }

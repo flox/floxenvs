@@ -44,8 +44,8 @@ func TestDeckAdapter_Build(t *testing.T) {
 		t.Fatalf("argv=%v", spec.Argv)
 	}
 
-	xdgConfigHome, deckDir := DeckHome(configDir)
-	data, err := os.ReadFile(filepath.Join(deckDir, "config.toml"))
+	deckHome := DeckHome(configDir)
+	data, err := os.ReadFile(filepath.Join(deckHome, "config.toml"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -53,14 +53,14 @@ func TestDeckAdapter_Build(t *testing.T) {
 		t.Fatalf("config.toml missing claude command %q: %s", DeckClaudeCommand, data)
 	}
 
-	wantXDG := "XDG_CONFIG_HOME=" + xdgConfigHome
+	wantHome := "AGENT_DECK_HOME=" + deckHome
 	found := false
 	for _, e := range spec.Env {
-		if e == wantXDG {
+		if e == wantHome {
 			found = true
 		}
 	}
 	if !found {
-		t.Fatalf("env missing %q: %v", wantXDG, spec.Env)
+		t.Fatalf("env missing %q: %v", wantHome, spec.Env)
 	}
 }
