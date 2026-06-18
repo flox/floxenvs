@@ -150,9 +150,12 @@ func main() {
 		}
 		requireShareDir()
 		passthrough := agentPassthrough(flag.Args())
+		// Launch reads the per-agent build-time layout under
+		// <share>/flox/<agent>; pass the share root (parent of
+		// share/claude-code) so ScanFlox can find it.
 		if err := launch.Run(launch.Options{
 			AgentName:   agentName,
-			ShareDir:    shareDir,
+			ShareDir:    filepath.Dir(shareDir),
 			ConfigDir:   configDir,
 			Passthrough: passthrough,
 		}); err != nil {

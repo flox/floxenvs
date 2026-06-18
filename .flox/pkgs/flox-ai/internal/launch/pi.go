@@ -7,8 +7,6 @@ package launch
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 
 	"flox.dev/flox-ai/internal/discover"
 )
@@ -22,22 +20,17 @@ func (piAdapter) InstallPkg() string  { return "pi" }
 func (piAdapter) Check(string) Status { return Status{Level: OK} }
 
 func (piAdapter) Build(ctx Context) (Spec, error) {
-	frags, err := discover.Scan(ctx.ShareDir)
+	frags, err := discover.ScanFlox(ctx.ShareDir, "pi")
 	if err != nil {
 		return Spec{}, fmt.Errorf("discover: %w", err)
 	}
 
 	argv := []string{ctx.Bin}
-	for _, s := range frags.Skills {
-		argv = append(argv, "--skill", filepath.Dir(s.Path))
+	for _, dir := range frags.AgentDirs {
+		argv = append(argv, "--skill", dir)
 	}
 	for _, r := range frags.Rules {
 		argv = append(argv, "--append-system-prompt", r.Path)
-	}
-	if len(frags.Agents) > 0 || len(frags.Plugins) > 0 {
-		fmt.Fprintf(os.Stderr,
-			"pi: injected %d skills, %d rules; skipped %d agents, %d plugins (no pi seam)\n",
-			len(frags.Skills), len(frags.Rules), len(frags.Agents), len(frags.Plugins))
 	}
 	argv = append(argv, ctx.Passthrough...)
 

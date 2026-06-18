@@ -14,6 +14,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"flox.dev/flox-ai/internal/discover"
 )
@@ -88,20 +89,18 @@ func codexIsPatched(bin string) bool {
 }
 
 func (codexAdapter) Build(ctx Context) (Spec, error) {
-	frags, err := discover.Scan(ctx.ShareDir)
+	frags, err := discover.ScanFlox(ctx.ShareDir, "codex")
 	if err != nil {
 		return Spec{}, fmt.Errorf("discover: %w", err)
 	}
-	skillRoot, rulesFile, err := PrepareCodex(ctx.LaunchDir, frags)
-	if err != nil {
-		return Spec{}, err
-	}
 	env := setEnvVar(ctx.BaseEnv, "FLOX_AI", "1")
-	if skillRoot != "" {
-		env = setEnvVar(env, EnvCodexSkillRoots, skillRoot)
+	if len(frags.AgentDirs) > 0 {
+		env = setEnvVar(env, EnvCodexSkillRoots, strings.Join(frags.AgentDirs, ":"))
 	}
-	if rulesFile != "" {
-		env = setEnvVar(env, EnvCodexInstructionsFile, rulesFile)
+	if rules, err := MergeRules(ctx.LaunchDir, frags.Rules); err != nil {
+		return Spec{}, err
+	} else if rules != "" {
+		env = setEnvVar(env, EnvCodexInstructionsFile, rules)
 	}
 	argv := append([]string{ctx.Bin}, ctx.Passthrough...)
 	return Spec{Argv: argv, Env: env}, nil

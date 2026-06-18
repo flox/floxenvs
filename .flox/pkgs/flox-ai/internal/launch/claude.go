@@ -20,31 +20,27 @@ func (claudeAdapter) InstallPkg() string { return "claude-code" }
 func (claudeAdapter) Check(string) Status { return Status{Level: OK} }
 
 func (claudeAdapter) Build(ctx Context) (Spec, error) {
-	frags, err := discover.Scan(ctx.ShareDir)
+	frags, err := discover.ScanFlox(ctx.ShareDir, "claude")
 	if err != nil {
 		return Spec{}, fmt.Errorf("discover: %w", err)
-	}
-	synth, rulesFile, err := Prepare(ctx.LaunchDir, frags)
-	if err != nil {
-		return Spec{}, err
 	}
 	userPlugins, err := UserPluginDirs(ctx.ConfigDir)
 	if err != nil {
 		return Spec{}, err
 	}
-	plugins := make([]string, 0, len(frags.Plugins)+len(userPlugins))
-	for _, p := range frags.Plugins {
-		plugins = append(plugins, p.Path)
-	}
-	plugins = append(plugins, userPlugins...)
-	plugins = dedupPluginDirs(plugins)
+	// Each share/flox/claude/<plugin> dir is already a valid Claude plugin
+	// (manifest + skills/ + agents/), so it goes straight to --plugin-dir.
+	plugins := dedupPluginDirs(append(append([]string{}, frags.AgentDirs...), userPlugins...))
 
-	plan := Plan{
-		Bin:         ctx.Bin,
-		SynthPlugin: synth,
-		Plugins:     plugins,
-		RulesFile:   rulesFile,
-		Passthrough: ctx.Passthrough,
+	argv := []string{ctx.Bin}
+	for _, dir := range plugins {
+		argv = append(argv, "--plugin-dir", dir)
 	}
-	return Spec{Argv: plan.Argv(), Env: childEnv()}, nil
+	if rules, err := MergeRules(ctx.LaunchDir, frags.Rules); err != nil {
+		return Spec{}, err
+	} else if rules != "" {
+		argv = append(argv, "--append-system-prompt-file", rules)
+	}
+	argv = append(argv, ctx.Passthrough...)
+	return Spec{Argv: argv, Env: childEnv()}, nil
 }

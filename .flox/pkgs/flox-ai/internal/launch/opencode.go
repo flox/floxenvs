@@ -26,20 +26,16 @@ func (opencodeAdapter) InstallPkg() string  { return "opencode" }
 func (opencodeAdapter) Check(string) Status { return Status{Level: OK} }
 
 func (opencodeAdapter) Build(ctx Context) (Spec, error) {
-	frags, err := discover.Scan(ctx.ShareDir)
+	frags, err := discover.ScanFlox(ctx.ShareDir, "opencode")
 	if err != nil {
 		return Spec{}, fmt.Errorf("discover: %w", err)
 	}
-	// Reuse the codex skill-root staging: a dir of <name>/SKILL.md, which
-	// opencode discovers via its **/SKILL.md glob (it follows symlinks).
-	skillRoot, _, err := PrepareCodex(ctx.LaunchDir, frags)
-	if err != nil {
-		return Spec{}, err
-	}
 
 	cfg := map[string]any{}
-	if skillRoot != "" {
-		cfg["skills"] = map[string]any{"paths": []string{skillRoot}}
+	if len(frags.AgentDirs) > 0 {
+		// Each dir holds skills/<name>/SKILL.md, matched by opencode's
+		// **/SKILL.md glob (it follows symlinks).
+		cfg["skills"] = map[string]any{"paths": frags.AgentDirs}
 	}
 	if len(frags.Rules) > 0 {
 		paths := make([]string, 0, len(frags.Rules))
@@ -47,13 +43,6 @@ func (opencodeAdapter) Build(ctx Context) (Spec, error) {
 			paths = append(paths, r.Path)
 		}
 		cfg["instructions"] = paths
-	}
-	if len(frags.Plugins) > 0 {
-		specs := make([]string, 0, len(frags.Plugins))
-		for _, p := range frags.Plugins {
-			specs = append(specs, p.Path)
-		}
-		cfg["plugin"] = specs
 	}
 
 	blob, err := json.Marshal(cfg)

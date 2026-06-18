@@ -23,15 +23,13 @@ func TestClaudeAdapter_Identity(t *testing.T) {
 func TestClaudeAdapter_Build(t *testing.T) {
 	share := t.TempDir()
 
-	skillDir := filepath.Join(share, "skills", "demo")
-	if err := os.MkdirAll(skillDir, 0o755); err != nil {
+	// a prebuilt claude plugin dir: share/flox/claude/demo
+	pluginDir := filepath.Join(share, "flox", "claude", "demo")
+	if err := os.MkdirAll(pluginDir, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(skillDir, "SKILL.md"), []byte("x"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-
-	rulesDir := filepath.Join(share, "rules")
+	// a shared rule: share/flox/common/demo/rules/r.md
+	rulesDir := filepath.Join(share, "flox", "common", "demo", "rules")
 	if err := os.MkdirAll(rulesDir, 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -58,7 +56,7 @@ func TestClaudeAdapter_Build(t *testing.T) {
 		t.Fatalf("argv[0]=%v", spec.Argv)
 	}
 	joined := strings.Join(spec.Argv, " ")
-	wantPlugin := "--plugin-dir " + filepath.Join(launchDir, "plugin")
+	wantPlugin := "--plugin-dir " + pluginDir
 	if !strings.Contains(joined, wantPlugin) {
 		t.Fatalf("argv missing %q: %v", wantPlugin, spec.Argv)
 	}

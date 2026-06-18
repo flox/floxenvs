@@ -19,14 +19,11 @@ func TestPiAdapter_Identity(t *testing.T) {
 
 func TestPiAdapter_Build(t *testing.T) {
 	share := t.TempDir()
-	skillDir := filepath.Join(share, "skills", "demo")
-	if err := os.MkdirAll(skillDir, 0o755); err != nil {
+	skillRoot := filepath.Join(share, "flox", "pi", "demo")
+	if err := os.MkdirAll(skillRoot, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(skillDir, "SKILL.md"), []byte("x"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	rulesDir := filepath.Join(share, "rules")
+	rulesDir := filepath.Join(share, "flox", "common", "demo", "rules")
 	if err := os.MkdirAll(rulesDir, 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -53,8 +50,8 @@ func TestPiAdapter_Build(t *testing.T) {
 	if spec.Argv[0] != "/env/bin/pi" {
 		t.Fatalf("argv[0]=%v", spec.Argv)
 	}
-	if !strings.Contains(joined, "--skill "+skillDir) {
-		t.Fatalf("argv missing --skill %s: %v", skillDir, spec.Argv)
+	if !strings.Contains(joined, "--skill "+skillRoot) {
+		t.Fatalf("argv missing --skill %s: %v", skillRoot, spec.Argv)
 	}
 	if !strings.Contains(joined, "--append-system-prompt "+rulePath) {
 		t.Fatalf("argv missing rule: %v", spec.Argv)

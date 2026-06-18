@@ -21,15 +21,11 @@ func TestCodexAdapter_Identity(t *testing.T) {
 func TestCodexAdapter_Build(t *testing.T) {
 	share := t.TempDir()
 
-	skillDir := filepath.Join(share, "skills", "demo")
-	if err := os.MkdirAll(skillDir, 0o755); err != nil {
+	skillRoot := filepath.Join(share, "flox", "codex", "demo")
+	if err := os.MkdirAll(skillRoot, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(skillDir, "SKILL.md"), []byte("x"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-
-	rulesDir := filepath.Join(share, "rules")
+	rulesDir := filepath.Join(share, "flox", "common", "demo", "rules")
 	if err := os.MkdirAll(rulesDir, 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -56,7 +52,7 @@ func TestCodexAdapter_Build(t *testing.T) {
 		t.Fatalf("argv[0]=%v", spec.Argv)
 	}
 
-	wantRoots := EnvCodexSkillRoots + "=" + filepath.Join(launchDir, "skills")
+	wantRoots := EnvCodexSkillRoots + "=" + skillRoot
 	wantRules := EnvCodexInstructionsFile + "=" + filepath.Join(launchDir, "rules.md")
 	var gotRoots, gotRules, gotFloxAI bool
 	for _, e := range spec.Env {

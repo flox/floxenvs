@@ -20,14 +20,11 @@ func TestOpencodeAdapter_Identity(t *testing.T) {
 
 func TestOpencodeAdapter_Build(t *testing.T) {
 	share := t.TempDir()
-	skillDir := filepath.Join(share, "skills", "demo")
-	if err := os.MkdirAll(skillDir, 0o755); err != nil {
+	skillRoot := filepath.Join(share, "flox", "opencode", "demo")
+	if err := os.MkdirAll(skillRoot, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(skillDir, "SKILL.md"), []byte("x"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	rulesDir := filepath.Join(share, "rules")
+	rulesDir := filepath.Join(share, "flox", "common", "demo", "rules")
 	if err := os.MkdirAll(rulesDir, 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -73,7 +70,7 @@ func TestOpencodeAdapter_Build(t *testing.T) {
 	if err := json.Unmarshal([]byte(content), &cfg); err != nil {
 		t.Fatalf("config not valid JSON: %v", err)
 	}
-	if len(cfg.Skills.Paths) != 1 || cfg.Skills.Paths[0] != filepath.Join(launchDir, "skills") {
+	if len(cfg.Skills.Paths) != 1 || cfg.Skills.Paths[0] != skillRoot {
 		t.Fatalf("skills.paths=%v", cfg.Skills.Paths)
 	}
 	if len(cfg.Instructions) != 1 || cfg.Instructions[0] != rulePath {
