@@ -9,7 +9,7 @@ buildGoModule {
 
   src = ./.;
 
-  vendorHash = "sha256-jFYAXgwsWwTEeY1xHW/gtwF1KaJc7Vx5GTKEl12Zah4=";
+  vendorHash = "sha256-o/vXAZ8/yCNgjtpYkIoW07QsFsENSRP8I4xIJoGs470=";
 
   meta = {
     description = "Flox-native config management for Claude Code CLI";
