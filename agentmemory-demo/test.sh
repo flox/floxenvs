@@ -10,7 +10,6 @@ command_exists() {
   echo ">>> '$1' command exists"
 }
 
-command_exists claude
 command_exists flox-ai
 command_exists node
 command_exists npx

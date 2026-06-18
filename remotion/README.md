@@ -4,10 +4,13 @@
 [![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fremotion%2Fdevcontainer.json)
 
 Minimal [Remotion](https://remotion.dev) environment. Include
-it in your own manifest to get Claude Code with the Remotion
-best-practices skill pre-registered as a plugin, plus Node.js
-22 so `npx create-video`, `npx remotion studio`, and
-`npx remotion render` work out of the box.
+it in your own manifest to get the `flox-ai` launcher with the
+Remotion best-practices skill bundled, plus Node.js 22 so
+`npx create-video`, `npx remotion studio`, and
+`npx remotion render` work out of the box. Bring your own
+Claude Code (or install it with `flox install flox/claude-code`)
+and launch it via `flox-ai launch claude` to get the skill
+injected.
 
 `ffmpeg`/`ffprobe` are intentionally not installed — Remotion
 ships its own via `npx remotion ffmpeg`, which is what the
@@ -33,9 +36,11 @@ cd my-video
 npx remotion studio
 ```
 
-Open Claude Code in the project and the `remotion-best-practices`
-skill is already registered — Claude will automatically load
-it whenever you work with Remotion code.
+First install Claude Code (e.g. `flox install flox/claude-code`)
+or use your own install, then run `flox-ai launch claude` to
+start it with the `remotion-best-practices` skill injected —
+Claude will automatically load it whenever you work with
+Remotion code.
 
 ## Include in your project
 
@@ -48,9 +53,11 @@ environments = ["flox/remotion"]
 
 ## What is included
 
-- `claude-code` — the Claude Code CLI
-- `flox-ai` — auto-registers the bundled plugin
-- `claude-code-plugin-remotion` — Remotion best-practices
+- `flox-ai` — launcher that injects the bundled skill into
+  your Claude Code via `flox-ai launch claude` (install Claude
+  Code yourself with `flox install flox/claude-code` or bring
+  your own)
+- `skills-remotion` — Remotion best-practices
   skill (1 SKILL.md + 36 topic rules) installed under
   `share/claude-code/plugins/remotion/`
 - `nodejs_22` — for `npx remotion …` and

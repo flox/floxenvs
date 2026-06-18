@@ -54,6 +54,9 @@ stdenvNoCC.mkDerivation {
       ' "$skill_md" > "$skill_md.new"
       mv "$skill_md.new" "$skill_md"
     done
+
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
+    flox_agent_layout "humanizer" "$out/share"
   '';
 
   meta = {

@@ -44,6 +44,11 @@ stdenvNoCC.mkDerivation {
     runHook postInstall
   '';
 
+  postInstall = ''
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
+    flox_agent_layout "shipshit" "$out/share"
+  '';
+
   meta = {
     description =
       "Ship Shit Dev skills bundle for Claude Code and OpenCode "

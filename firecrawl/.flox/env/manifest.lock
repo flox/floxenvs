@@ -3,10 +3,6 @@
   "manifest": {
     "schema-version": "1.10.0",
     "install": {
-      "claude-code": {
-        "pkg-path": "flox/claude-code",
-        "pkg-group": "claude-code"
-      },
       "firecrawl-cli": {
         "pkg-path": "flox/firecrawl-cli",
         "pkg-group": "firecrawl"
@@ -24,136 +20,11 @@
       "FIRECRAWL_API_KEY": ""
     },
     "hook": {
-      "on-activate": "eval \"$(flox-ai setup-hook)\"\n\ndir=\"$FLOX_ENV_CACHE/firecrawl\"\nmkdir -p \"$dir\"\nexport FIRECRAWL_DATA_DIR=\"$dir\"\n\n# Persist the key across activations: if it isn't set in the\n# environment but was saved to the cache before, load it back.\nkey_file=\"$dir/api-key\"\nif [ -z \"${FIRECRAWL_API_KEY:-}\" ] && [ -f \"$key_file\" ]; then\n  FIRECRAWL_API_KEY=\"$(cat \"$key_file\")\"\n  export FIRECRAWL_API_KEY\nfi\n"
-    },
-    "profile": {
-      "bash": "eval \"$(flox-ai setup-profile-bash)\"\n",
-      "zsh": "eval \"$(flox-ai setup-profile-zsh)\"\n",
-      "fish": "flox-ai setup-profile-fish | source\n"
+      "on-activate": "dir=\"$FLOX_ENV_CACHE/firecrawl\"\nmkdir -p \"$dir\"\nexport FIRECRAWL_DATA_DIR=\"$dir\"\n\n# Persist the key across activations: if it isn't set in the\n# environment but was saved to the cache before, load it back.\nkey_file=\"$dir/api-key\"\nif [ -z \"${FIRECRAWL_API_KEY:-}\" ] && [ -f \"$key_file\" ]; then\n  FIRECRAWL_API_KEY=\"$(cat \"$key_file\")\"\n  export FIRECRAWL_API_KEY\nfi\n"
     },
     "options": {}
   },
   "packages": [
-    {
-      "attr_path": "claude-code",
-      "broken": false,
-      "derivation": "/nix/store/s60sfmc257g6vrhkbi0cfh056zicnars-claude-code-2.1.178.drv",
-      "description": "Agentic coding tool from Anthropic",
-      "install_id": "claude-code",
-      "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=28c4df3f17fbeea14a13c0559404515b9252ada9",
-      "name": "claude-code-2.1.178",
-      "pname": "claude-code",
-      "rev": "28c4df3f17fbeea14a13c0559404515b9252ada9",
-      "rev_count": 8342,
-      "rev_date": "2026-06-16T02:00:35Z",
-      "scrape_date": "2026-06-17T13:37:00.469158Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": true,
-      "version": "2.1.178",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/7vxkjx9d0wad3y6wr0pwz7s308yxvk31-claude-code-2.1.178"
-      },
-      "system": "aarch64-darwin",
-      "group": "claude-code",
-      "priority": 5
-    },
-    {
-      "attr_path": "claude-code",
-      "broken": false,
-      "derivation": "/nix/store/4a0cvzfnkb5vgrmrx3i0njk3rk59jg2x-claude-code-2.1.178.drv",
-      "description": "Agentic coding tool from Anthropic",
-      "install_id": "claude-code",
-      "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=28c4df3f17fbeea14a13c0559404515b9252ada9",
-      "name": "claude-code-2.1.178",
-      "pname": "claude-code",
-      "rev": "28c4df3f17fbeea14a13c0559404515b9252ada9",
-      "rev_count": 8342,
-      "rev_date": "2026-06-16T02:00:35Z",
-      "scrape_date": "2026-06-17T13:37:00.469161Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": true,
-      "version": "2.1.178",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/havqh9mhrvv5pgsj8r0qk8fn0m8a7vq3-claude-code-2.1.178"
-      },
-      "system": "aarch64-linux",
-      "group": "claude-code",
-      "priority": 5
-    },
-    {
-      "attr_path": "claude-code",
-      "broken": false,
-      "derivation": "/nix/store/43sbk1jjkz4gzxrci723qrvbfrzcj8f0-claude-code-2.1.178.drv",
-      "description": "Agentic coding tool from Anthropic",
-      "install_id": "claude-code",
-      "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=28c4df3f17fbeea14a13c0559404515b9252ada9",
-      "name": "claude-code-2.1.178",
-      "pname": "claude-code",
-      "rev": "28c4df3f17fbeea14a13c0559404515b9252ada9",
-      "rev_count": 8342,
-      "rev_date": "2026-06-16T02:00:35Z",
-      "scrape_date": "2026-06-17T13:37:00.469162Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": true,
-      "version": "2.1.178",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/7lz44fnsmkrf9mgn8yiq4vmk0b0pxkjs-claude-code-2.1.178"
-      },
-      "system": "x86_64-darwin",
-      "group": "claude-code",
-      "priority": 5
-    },
-    {
-      "attr_path": "claude-code",
-      "broken": false,
-      "derivation": "/nix/store/3rlmgcrx0g29mqfrvz2pzw9w4xqp79ns-claude-code-2.1.178.drv",
-      "description": "Agentic coding tool from Anthropic",
-      "install_id": "claude-code",
-      "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=28c4df3f17fbeea14a13c0559404515b9252ada9",
-      "name": "claude-code-2.1.178",
-      "pname": "claude-code",
-      "rev": "28c4df3f17fbeea14a13c0559404515b9252ada9",
-      "rev_count": 8342,
-      "rev_date": "2026-06-16T02:00:35Z",
-      "scrape_date": "2026-06-17T13:37:00.469163Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": true,
-      "version": "2.1.178",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/lyknrxiw867l131m4iq4ppr1qmbvylcf-claude-code-2.1.178"
-      },
-      "system": "x86_64-linux",
-      "group": "claude-code",
-      "priority": 5
-    },
     {
       "attr_path": "firecrawl-cli",
       "broken": false,
@@ -514,65 +385,5 @@
       "group": "flox-ai",
       "priority": 5
     }
-  ],
-  "compose": {
-    "composer": {
-      "schema-version": "1.10.0",
-      "install": {
-        "firecrawl-cli": {
-          "pkg-path": "flox/firecrawl-cli",
-          "pkg-group": "firecrawl"
-        },
-        "skills-firecrawl-cli": {
-          "pkg-path": "flox/skills-firecrawl-cli",
-          "pkg-group": "firecrawl"
-        }
-      },
-      "vars": {
-        "FIRECRAWL_API_KEY": ""
-      },
-      "hook": {
-        "on-activate": "dir=\"$FLOX_ENV_CACHE/firecrawl\"\nmkdir -p \"$dir\"\nexport FIRECRAWL_DATA_DIR=\"$dir\"\n\n# Persist the key across activations: if it isn't set in the\n# environment but was saved to the cache before, load it back.\nkey_file=\"$dir/api-key\"\nif [ -z \"${FIRECRAWL_API_KEY:-}\" ] && [ -f \"$key_file\" ]; then\n  FIRECRAWL_API_KEY=\"$(cat \"$key_file\")\"\n  export FIRECRAWL_API_KEY\nfi\n"
-      },
-      "options": {},
-      "include": {
-        "environments": [
-          {
-            "dir": "../claude"
-          }
-        ]
-      }
-    },
-    "include": [
-      {
-        "manifest": {
-          "schema-version": "1.10.0",
-          "install": {
-            "claude-code": {
-              "pkg-path": "flox/claude-code",
-              "pkg-group": "claude-code"
-            },
-            "flox-ai": {
-              "pkg-path": "flox/flox-ai",
-              "pkg-group": "flox-ai"
-            }
-          },
-          "hook": {
-            "on-activate": "eval \"$(flox-ai setup-hook)\"\n"
-          },
-          "profile": {
-            "bash": "eval \"$(flox-ai setup-profile-bash)\"\n",
-            "zsh": "eval \"$(flox-ai setup-profile-zsh)\"\n",
-            "fish": "flox-ai setup-profile-fish | source\n"
-          },
-          "options": {}
-        },
-        "name": "claude",
-        "descriptor": {
-          "dir": "../claude"
-        }
-      }
-    ],
-    "warnings": []
-  }
+  ]
 }

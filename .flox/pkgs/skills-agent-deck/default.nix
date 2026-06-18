@@ -24,6 +24,11 @@ stdenvNoCC.mkDerivation {
     runHook postInstall
   '';
 
+  postInstall = ''
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
+    flox_agent_layout "agent-deck" "$out/share"
+  '';
+
   meta = {
     description =
       "Skills bundled with agent-deck (agent-deck, session-share) "

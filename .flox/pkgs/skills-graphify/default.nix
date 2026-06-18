@@ -63,6 +63,11 @@ stdenvNoCC.mkDerivation {
     runHook postInstall
   '';
 
+  postInstall = ''
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
+    flox_agent_layout "graphify" "$out/share"
+  '';
+
   meta = {
     description =
       "graphify skill for Claude Code and OpenCode "

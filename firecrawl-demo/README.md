@@ -45,11 +45,16 @@ for the full option set.
 
 ## Driving it from an agent
 
-The bundled skill lets Claude Code or OpenCode call
+The bundled skill lets an AI coding agent call
 `firecrawl` for you — just ask it to "search the web for
 …" or "scrape this page …" and it picks the right
-command. The skill files come from the included
-`flox/firecrawl` environment.
+command.
+
+To use Claude Code, first install it (e.g. `flox install
+flox/claude-code`) or bring your own install, then run
+`flox-ai launch claude` to start it with this
+environment's skills and rules injected. The skill files
+come from the included `flox/firecrawl` environment.
 
 ## See also
 

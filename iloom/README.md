@@ -39,16 +39,16 @@ environment.
 
 ## Bring your own coding agent
 
-iloom drives Claude Code by default. Include the
-[`flox/claude`](../claude/) environment alongside this one
-to get a managed Claude CLI:
+iloom drives Claude Code by default. This environment ships
+the `flox-ai` launcher but does not bundle Claude Code. First
+install Claude Code (for example
+`flox install flox/claude-code`) or use your own install,
+then run `flox-ai launch claude` to start it with this
+environment's skills and rules injected:
 
-```toml
-[include]
-environments = [
-  "flox/iloom",
-  "flox/claude",
-]
+```bash
+flox install flox/claude-code
+flox-ai launch claude
 ```
 
 Other agents are supported by upstream — see the iloom

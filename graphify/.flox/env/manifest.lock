@@ -24,6 +24,10 @@
         "pkg-path": "curl",
         "pkg-group": "graphify-tools"
       },
+      "flox-ai": {
+        "pkg-path": "flox/flox-ai",
+        "pkg-group": "flox-ai"
+      },
       "gcc-unwrapped": {
         "pkg-path": "gcc-unwrapped",
         "pkg-group": "graphify-build"
@@ -56,7 +60,7 @@
       "VIRTUAL_ENV_DISABLE_PROMPT": "1"
     },
     "hook": {
-      "on-activate": "export PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$PYTHON_DIR/.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$PYTHON_DIR\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  python3 -m venv --upgrade-deps \"$PYTHON_DIR\"\n  echo \"$CURRENT_INTERP\" > \"$PYTHON_DIR/.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$PYTHON_DIR/bin/activate\"\n\nHASH=$(echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5sum 2>/dev/null \\\n  || echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5 -q)\nHASH=$(echo \"$HASH\" | cut -d\" \" -f1)\nLAST=$(cat \"$PYTHON_DIR/.deps_hash\" 2>/dev/null)\nif [ \"$HASH\" != \"$LAST\" ]; then\n  pip install -q \"$GRAPHIFY_INSTALL_PACKAGE\"\n  echo \"$HASH\" > \"$PYTHON_DIR/.deps_hash\"\nfi\n"
+      "on-activate": "# flox-ai sets up Claude Code config + discovers the bundled skill\n# (was previously provided via the flox/claude include).\neval \"$(flox-ai setup-hook)\"\n\nexport PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$PYTHON_DIR/.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$PYTHON_DIR\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  python3 -m venv --upgrade-deps \"$PYTHON_DIR\"\n  echo \"$CURRENT_INTERP\" > \"$PYTHON_DIR/.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$PYTHON_DIR/bin/activate\"\n\nHASH=$(echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5sum 2>/dev/null \\\n  || echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5 -q)\nHASH=$(echo \"$HASH\" | cut -d\" \" -f1)\nLAST=$(cat \"$PYTHON_DIR/.deps_hash\" 2>/dev/null)\nif [ \"$HASH\" != \"$LAST\" ]; then\n  pip install -q \"$GRAPHIFY_INSTALL_PACKAGE\"\n  echo \"$HASH\" > \"$PYTHON_DIR/.deps_hash\"\nfi\n"
     },
     "profile": {
       "bash": "source \"$PYTHON_DIR/bin/activate\"\n",
@@ -193,6 +197,126 @@
       },
       "system": "x86_64-linux",
       "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-ai",
+      "broken": false,
+      "derivation": "/nix/store/4p5nhwxw7f9925sdakxrhbrq68a1ws5l-flox-ai-0.7.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "flox-ai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=6feea216ecdd2381b602f35cfbb1df844c593183",
+      "name": "flox-ai-0.7.0",
+      "pname": "flox-ai",
+      "rev": "6feea216ecdd2381b602f35cfbb1df844c593183",
+      "rev_count": 9065,
+      "rev_date": "2026-06-18T09:15:35Z",
+      "scrape_date": "2026-06-18T12:53:02.478219Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.7.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ax3c5vgqvkjvijf01r783kznk2v8ym40-flox-ai-0.7.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "flox-ai",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-ai",
+      "broken": false,
+      "derivation": "/nix/store/4axlimcb7vdc0lljjadjq6zj29vm8jf8-flox-ai-0.7.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "flox-ai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=6feea216ecdd2381b602f35cfbb1df844c593183",
+      "name": "flox-ai-0.7.0",
+      "pname": "flox-ai",
+      "rev": "6feea216ecdd2381b602f35cfbb1df844c593183",
+      "rev_count": 9065,
+      "rev_date": "2026-06-18T09:15:35Z",
+      "scrape_date": "2026-06-18T12:53:02.478222Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.7.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/0rfacazmnslpx4ycvvzfw2ikqg38c5ml-flox-ai-0.7.0"
+      },
+      "system": "aarch64-linux",
+      "group": "flox-ai",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-ai",
+      "broken": false,
+      "derivation": "/nix/store/r3gkdmflcx1ccxqqvc1wvs9ysys22dyb-flox-ai-0.7.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "flox-ai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=6feea216ecdd2381b602f35cfbb1df844c593183",
+      "name": "flox-ai-0.7.0",
+      "pname": "flox-ai",
+      "rev": "6feea216ecdd2381b602f35cfbb1df844c593183",
+      "rev_count": 9065,
+      "rev_date": "2026-06-18T09:15:35Z",
+      "scrape_date": "2026-06-18T12:53:02.478222Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.7.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/sjr3fh94isyanpaacrr695ys9sp84ip5-flox-ai-0.7.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "flox-ai",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-ai",
+      "broken": false,
+      "derivation": "/nix/store/3la34s3z73djlsvriv1zybar3dr05fnk-flox-ai-0.7.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "flox-ai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/floxenvs?rev=6feea216ecdd2381b602f35cfbb1df844c593183",
+      "name": "flox-ai-0.7.0",
+      "pname": "flox-ai",
+      "rev": "6feea216ecdd2381b602f35cfbb1df844c593183",
+      "rev_count": 9065,
+      "rev_date": "2026-06-18T09:15:35Z",
+      "scrape_date": "2026-06-18T12:53:02.478223Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.7.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/a25brgy9gcq87imq28rxdw4ikx4m2wam-flox-ai-0.7.0"
+      },
+      "system": "x86_64-linux",
+      "group": "flox-ai",
       "priority": 5
     },
     {

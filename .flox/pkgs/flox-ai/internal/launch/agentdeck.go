@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"syscall"
 
 	"github.com/pelletier/go-toml/v2"
 )
@@ -160,28 +159,4 @@ func deckChildEnv(base []string, deckHome, configDir string) []string {
 	env = setEnvVar(env, "FLOX_AI", "1")
 	env = setEnvVar(env, "FLOX_AI_DIR", configDir)
 	return env
-}
-
-// RunDeck seeds the flox-managed agent-deck config (forcing the claude
-// command to route through flox-ai and a per-env tmux socket), points
-// agent-deck at it via AGENT_DECK_HOME, exports FLOX_AI_DIR for nested
-// flox-ai invocations, and execs agent-deck (replacing this process).
-func RunDeck(opts Options) error {
-	agent := Supported[opts.AgentName] // caller guarantees agent-deck
-	bin, err := resolveBinary(agent)
-	if err != nil {
-		return err
-	}
-
-	deckHome := DeckHome(opts.ConfigDir)
-	socketName := DeckSocketName(opts.ConfigDir)
-
-	source := findUserDeckConfig(os.Getenv("XDG_CONFIG_HOME"), os.Getenv("HOME"))
-	if err := SeedDeckConfig(deckHome, source, socketName); err != nil {
-		return err
-	}
-
-	argv := append([]string{bin}, opts.Passthrough...)
-	env := deckChildEnv(os.Environ(), deckHome, opts.ConfigDir)
-	return syscall.Exec(bin, argv, env)
 }

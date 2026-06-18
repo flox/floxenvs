@@ -43,6 +43,11 @@ stdenvNoCC.mkDerivation {
     runHook postInstall
   '';
 
+  postInstall = ''
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
+    flox_agent_layout "avoid-ai-writing" "$out/share"
+  '';
+
   meta = {
     description =
       "Avoid AI Writing skill for Claude Code and OpenCode — audits and "

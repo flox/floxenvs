@@ -127,6 +127,9 @@ stdenvNoCC.mkDerivation {
         mv "$md.new" "$md"
       done
     done
+
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
+    flox_agent_layout "cybersecurity" "$out/share"
   '';
 
   meta = {

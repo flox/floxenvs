@@ -150,9 +150,12 @@ func main() {
 		}
 		requireShareDir()
 		passthrough := agentPassthrough(flag.Args())
+		// Launch reads the per-agent build-time layout under
+		// <share>/flox/<agent>; pass the share root (parent of
+		// share/claude-code) so ScanFlox can find it.
 		if err := launch.Run(launch.Options{
 			AgentName:   agentName,
-			ShareDir:    shareDir,
+			ShareDir:    filepath.Dir(shareDir),
 			ConfigDir:   configDir,
 			Passthrough: passthrough,
 		}); err != nil {
@@ -383,6 +386,27 @@ func runDoctor(shareDir, configDir, projectDir string, managed bool) error {
 		if res.Warning != "" {
 			fmt.Fprintln(os.Stdout, red("  WARNING:")+" "+res.Warning)
 		}
+	}
+
+	// Launch readiness: can each registered agent be launched, and will
+	// fragments inject? Same Check the launch path runs.
+	fmt.Println()
+	fmt.Println(bold("Launch readiness"))
+	for _, r := range launch.CheckAll() {
+		var mark string
+		switch r.Status.Level {
+		case launch.OK:
+			mark = green("ok")
+		case launch.Degraded:
+			mark = yellow("degraded")
+		default:
+			mark = red("fail")
+		}
+		line := fmt.Sprintf("  %-12s %s", r.Name, mark)
+		if r.Status.Reason != "" {
+			line += " — " + r.Status.Reason
+		}
+		fmt.Println(line)
 	}
 
 	errCount := len(result.Errors())

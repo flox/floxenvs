@@ -24,6 +24,11 @@ stdenvNoCC.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
+  postInstall = ''
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
+    flox_agent_layout "skill-creator" "$out/share"
+  '';
+
   installPhase = ''
     runHook preInstall
 

@@ -1,0 +1,56 @@
+diff --git a/core-skills/src/loader.rs b/core-skills/src/loader.rs
+index 3b59e90..c52b93a 100644
+--- a/core-skills/src/loader.rs
++++ b/core-skills/src/loader.rs
+@@ -275,6 +275,25 @@ async fn skill_roots_with_home_dir(
+         plugin_id: None,
+         plugin_root: None,
+     }));
++    // flox-ai: extra skill roots injected via the CODEX_FLOX_SKILL_ROOTS env
++    // var (colon-separated absolute paths). Added by the flox downstream
++    // patch so `flox-ai launch codex` can surface environment-managed skills
++    // without mutating ~/.codex or the working tree.
++    if let Ok(raw) = std::env::var("CODEX_FLOX_SKILL_ROOTS") {
++        for entry in raw.split(':').filter(|s| !s.is_empty()) {
++            if let Ok(path) =
++                AbsolutePathBuf::from_absolute_path_checked(std::path::PathBuf::from(entry))
++            {
++                roots.push(SkillRoot {
++                    path,
++                    scope: SkillScope::User,
++                    file_system: Arc::clone(&LOCAL_FS),
++                    plugin_id: None,
++                    plugin_root: None,
++                });
++            }
++        }
++    }
+     roots.extend(repo_agents_skill_roots(fs, config_layer_stack, cwd).await);
+     dedupe_skill_roots_by_path(&mut roots);
+     roots
+diff --git a/core/src/agents_md.rs b/core/src/agents_md.rs
+index d63342b..3dd345d 100644
+--- a/core/src/agents_md.rs
++++ b/core/src/agents_md.rs
+@@ -72,6 +72,21 @@ pub(crate) async fn load_project_instructions(
+         }
+     }
+ 
++    // flox-ai: extra project instructions injected via the
++    // CODEX_FLOX_INSTRUCTIONS_FILE env var pointing at a file. Added by the
++    // flox downstream patch so `flox-ai launch codex` can inject
++    // environment-managed rules without writing AGENTS.md into the user's
++    // repo or ~/.codex.
++    if let Ok(path) = std::env::var("CODEX_FLOX_INSTRUCTIONS_FILE")
++        && let Ok(contents) = tokio::fs::read_to_string(&path).await
++        && !contents.trim().is_empty()
++    {
++        loaded.entries.push(InstructionEntry {
++            contents,
++            provenance: InstructionProvenance::Internal,
++        });
++    }
++
+     if config.features.enabled(Feature::ChildAgentsMd) {
+         loaded.entries.push(InstructionEntry {
+             contents: HIERARCHICAL_AGENTS_MESSAGE.to_string(),

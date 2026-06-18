@@ -38,6 +38,11 @@ stdenvNoCC.mkDerivation {
     runHook postInstall
   '';
 
+  postInstall = ''
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
+    flox_agent_layout "playwright-cli" "$out/share"
+  '';
+
   meta = {
     description =
       "Playwright CLI skill bundle for Claude Code "

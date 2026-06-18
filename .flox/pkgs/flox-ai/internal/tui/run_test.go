@@ -8,8 +8,8 @@ import (
 
 func TestAgentNamesFromLaunch(t *testing.T) {
 	got := agentNames()
-	if len(got) != len(launch.Supported) {
-		t.Fatalf("agentNames count = %d, want %d", len(got), len(launch.Supported))
+	if len(got) != len(launch.RegisteredNames()) {
+		t.Fatalf("agentNames count = %d, want %d", len(got), len(launch.RegisteredNames()))
 	}
 	for i := 1; i < len(got); i++ {
 		if got[i-1] > got[i] {

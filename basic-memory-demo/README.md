@@ -6,23 +6,27 @@
 Interactive demo combining
 [Basic Memory](https://github.com/basicmachines-co/basic-memory)
 with Claude Code. Activating this env writes a project-scope
-`.mcp.json` so `claude` automatically discovers basic-memory's
+`.mcp.json` so Claude Code automatically discovers basic-memory's
 MCP tools.
 
 ## What you get
 
 - `basic-memory` and `bm` from the
   [basic-memory](../basic-memory/) env
-- `claude` and `flox-ai` from the
-  [claude](../claude/) env
+- The `flox-ai` launcher from the [claude](../claude/) env
 - A pre-written `.mcp.json` wiring basic-memory into Claude Code
 
 ## Try it
 
+This env ships the `flox-ai` launcher but not Claude Code itself.
+First install Claude Code (e.g. `flox install flox/claude-code`)
+or use your own install, then launch it with this env's skills and
+rules injected:
+
 ```bash
 cd basic-memory-demo
 flox activate
-claude
+flox-ai launch claude
 ```
 
 Once Claude Code is running, ask it to:
@@ -32,7 +36,7 @@ Once Claude Code is running, ask it to:
 - "Add a new observation: ..." — `write_note` tool
 
 Twenty-three MCP tools are exposed in total. See
-`basic-memory --help` and `claude --help` for the full surface.
+`basic-memory --help` for the full surface.
 
 ## How the MCP wiring works
 
@@ -51,8 +55,9 @@ On activate the demo writes:
 
 Claude Code reads `.mcp.json` from the current working directory.
 Because `basic-memory` is on PATH from the included env, the
-command resolves without any global config. Run `claude` from a
-different directory and basic-memory won't be wired — by design.
+command resolves without any global config. Run
+`flox-ai launch claude` from a different directory and
+basic-memory won't be wired — by design.
 
 ## Manual MCP smoke test
 

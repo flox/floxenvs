@@ -73,10 +73,14 @@ the service if the browser binary isn't cached yet.
 
 ## Skill auto-pickup
 
-When activated alongside `flox/claude`, the bundled
-`SKILL.md` at `$FLOX_ENV/share/claude-code/skills/playwright-cli/`
-is discovered by `flox-ai` and surfaced to
-Claude Code. Same for OpenCode under
+First install Claude Code (e.g.
+`flox install flox/claude-code`) or use your own
+install, then run `flox-ai launch claude` to start it
+with this environment's skills and rules injected. The
+bundled `SKILL.md` at
+`$FLOX_ENV/share/claude-code/skills/playwright-cli/`
+is discovered by `flox-ai` and surfaced to Claude Code.
+Same for OpenCode under
 `$FLOX_ENV/share/opencode/skills/playwright-cli/`.
 
 ## See also

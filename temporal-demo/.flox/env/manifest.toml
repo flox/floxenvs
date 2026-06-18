@@ -2,11 +2,7 @@ schema-version = "1.10.0"
 
 [include]
 environments = [
-  { dir = "../temporal" },
-  # Brings flox-ai, which auto-discovers the
-  # temporal-developer skill installed below from
-  # $FLOX_ENV/share/claude-code/skills/temporal-developer/.
-  { dir = "../claude" }
+  { dir = "../temporal" }
 ]
 
 # Go toolchain for the sample workflow + worker.
@@ -27,6 +23,9 @@ gum.pkg-group = "demo-tools"
 # Temporal Developer skill, auto-discovered by flox-ai.
 skills-temporal-developer.pkg-path = "flox/skills-temporal-developer"
 skills-temporal-developer.pkg-group = "skills-temporal-developer"
+# flox-ai launcher (was previously pulled in via ../claude).
+flox-ai.pkg-path = "flox/flox-ai"
+flox-ai.pkg-group = "flox-ai"
 
 [hook]
 on-activate = '''

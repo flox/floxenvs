@@ -39,6 +39,9 @@ stdenvNoCC.mkDerivation {
       cp -r "$src/${skillsSubdir}"/. "$root/"
     done
 
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
+    flox_agent_layout "ponytail" "$out/share"
+
     runHook postInstall
   '';
 

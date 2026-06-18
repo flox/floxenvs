@@ -44,8 +44,11 @@ The minimal env exposes the CLI. To wire it as an MCP server for
 Claude Code, either:
 
 1. Use the demo env (`flox/basic-memory-demo`), which composes
-   this env with `flox/claude` and writes a project-scope
-   `.mcp.json`.
+   this env, installs the `flox-ai` launcher, and writes a
+   project-scope `.mcp.json`. First install Claude Code (e.g.
+   `flox install flox/claude-code`) or use your own install,
+   then run `flox-ai launch claude` to start it with this
+   environment's skills and rules injected.
 2. Or wire manually: `claude mcp add basic-memory -- basic-memory mcp`.
 
 ## See also

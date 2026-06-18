@@ -114,6 +114,9 @@ stdenvNoCC.mkDerivation {
           'for py in python3.14 python3.13 python3.12 python3 python; do' \
           'for py in "${py}"; do'
     done
+
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
+    flox_agent_layout "last30days" "$out/share"
   '';
 
   meta = {

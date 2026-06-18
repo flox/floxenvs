@@ -42,6 +42,11 @@ stdenvNoCC.mkDerivation {
     runHook postInstall
   '';
 
+  postInstall = ''
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
+    flox_agent_layout "firecrawl-cli" "$out/share"
+  '';
+
   meta = {
     description =
       "Firecrawl CLI skill bundle for Claude Code and "

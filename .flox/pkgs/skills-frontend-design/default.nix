@@ -37,6 +37,11 @@ stdenvNoCC.mkDerivation {
     runHook postInstall
   '';
 
+  postInstall = ''
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
+    flox_agent_layout "frontend-design" "$out/share"
+  '';
+
   meta = {
     description =
       "Frontend-design skill for Claude Code and OpenCode "

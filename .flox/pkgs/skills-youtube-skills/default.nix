@@ -50,6 +50,11 @@ stdenvNoCC.mkDerivation {
     runHook postInstall
   '';
 
+  postInstall = ''
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
+    flox_agent_layout "youtube-skills" "$out/share"
+  '';
+
   meta = {
     description =
       "youtube-skills for Claude Code and OpenCode — 12 skills for "

@@ -44,6 +44,11 @@ stdenvNoCC.mkDerivation {
     runHook postInstall
   '';
 
+  postInstall = ''
+    ${builtins.readFile ../../nix/flox-agent-layout.sh}
+    flox_agent_layout "taste-skill" "$out/share"
+  '';
+
   meta = {
     description =
       "Taste-Skill bundle for Claude Code and OpenCode "
