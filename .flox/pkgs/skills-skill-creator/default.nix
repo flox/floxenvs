@@ -2,6 +2,7 @@
   lib,
   stdenvNoCC,
   fetchFromGitHub,
+  flox-agent-layout,
 }:
 
 let
@@ -23,6 +24,12 @@ stdenvNoCC.mkDerivation {
 
   dontConfigure = true;
   dontBuild = true;
+
+  nativeBuildInputs = [ flox-agent-layout ];
+
+  postInstall = ''
+    flox-agent-layout --plugin skill-creator --share "$out/share"
+  '';
 
   installPhase = ''
     runHook preInstall

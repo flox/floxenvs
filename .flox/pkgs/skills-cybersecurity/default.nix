@@ -3,6 +3,7 @@
   stdenvNoCC,
   fetchFromGitHub,
   python3,
+  flox-agent-layout,
 }:
 
 let
@@ -56,6 +57,8 @@ stdenvNoCC.mkDerivation {
 
   dontConfigure = true;
   dontBuild = true;
+
+  nativeBuildInputs = [ flox-agent-layout ];
 
   installPhase = ''
     runHook preInstall
@@ -127,6 +130,8 @@ stdenvNoCC.mkDerivation {
         mv "$md.new" "$md"
       done
     done
+
+    flox-agent-layout --plugin cybersecurity --share "$out/share"
   '';
 
   meta = {

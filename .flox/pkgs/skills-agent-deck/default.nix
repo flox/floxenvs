@@ -2,6 +2,7 @@
   lib,
   stdenvNoCC,
   agent-deck,
+  flox-agent-layout,
 }:
 stdenvNoCC.mkDerivation {
   pname = "skills-agent-deck";
@@ -10,6 +11,8 @@ stdenvNoCC.mkDerivation {
 
   dontConfigure = true;
   dontBuild = true;
+
+  nativeBuildInputs = [ flox-agent-layout ];
 
   installPhase = ''
     runHook preInstall
@@ -22,6 +25,10 @@ stdenvNoCC.mkDerivation {
     done
 
     runHook postInstall
+  '';
+
+  postInstall = ''
+    flox-agent-layout --plugin agent-deck --share "$out/share"
   '';
 
   meta = {

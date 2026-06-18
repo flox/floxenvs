@@ -2,6 +2,7 @@
   lib,
   stdenvNoCC,
   fetchFromGitHub,
+  flox-agent-layout,
   makeWrapper,
   python3,
   ffmpeg,
@@ -63,7 +64,7 @@ stdenvNoCC.mkDerivation {
   version = data.version;
   inherit src;
 
-  nativeBuildInputs = [ makeWrapper ];
+  nativeBuildInputs = [ makeWrapper flox-agent-layout ];
 
   dontConfigure = true;
   dontBuild = true;
@@ -181,6 +182,8 @@ MD
           'Run `scripts/setup.sh` to verify all dependencies. Requires: Python 3.10+, Manim Community Edition v0.20+ (`pip install manim`), LaTeX (`texlive-full` on Linux, `mactex` on macOS), and ffmpeg. Reference docs tested against Manim CE v0.20.1.' \
           ${lib.escapeShellArg manimNote}
     done
+
+    flox-agent-layout --plugin video-use --share "$out/share"
   '';
 
   meta = {

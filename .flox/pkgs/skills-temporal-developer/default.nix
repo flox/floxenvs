@@ -2,6 +2,7 @@
   lib,
   stdenvNoCC,
   fetchFromGitHub,
+  flox-agent-layout,
 }:
 
 let
@@ -21,6 +22,8 @@ stdenvNoCC.mkDerivation {
 
   dontConfigure = true;
   dontBuild = true;
+
+  nativeBuildInputs = [ flox-agent-layout ];
 
   installPhase = ''
     runHook preInstall
@@ -49,6 +52,10 @@ stdenvNoCC.mkDerivation {
     done
 
     runHook postInstall
+  '';
+
+  postInstall = ''
+    flox-agent-layout --plugin temporal-developer --share "$out/share"
   '';
 
   meta = {

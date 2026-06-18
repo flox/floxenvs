@@ -4,6 +4,7 @@
   fetchFromGitHub,
   python3,
   nodejs_22,
+  flox-agent-layout,
 }:
 
 let
@@ -37,6 +38,8 @@ stdenvNoCC.mkDerivation {
 
   dontConfigure = true;
   dontBuild = true;
+
+  nativeBuildInputs = [ flox-agent-layout ];
 
   installPhase = ''
     runHook preInstall
@@ -114,6 +117,8 @@ stdenvNoCC.mkDerivation {
           'for py in python3.14 python3.13 python3.12 python3 python; do' \
           'for py in "${py}"; do'
     done
+
+    flox-agent-layout --plugin last30days --share "$out/share"
   '';
 
   meta = {

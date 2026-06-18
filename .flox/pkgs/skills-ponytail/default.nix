@@ -2,6 +2,7 @@
   lib,
   stdenvNoCC,
   fetchFromGitHub,
+  flox-agent-layout,
 }:
 
 let
@@ -29,6 +30,8 @@ stdenvNoCC.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
+  nativeBuildInputs = [ flox-agent-layout ];
+
   installPhase = ''
     runHook preInstall
 
@@ -38,6 +41,8 @@ stdenvNoCC.mkDerivation {
       mkdir -p "$root"
       cp -r "$src/${skillsSubdir}"/. "$root/"
     done
+
+    flox-agent-layout --plugin ponytail --share "$out/share"
 
     runHook postInstall
   '';
