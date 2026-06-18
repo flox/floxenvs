@@ -9,3 +9,4 @@ build.
 | [workflow.md](workflow.md) | Branching, commits, and the brainstorm → plan → execute loop |
 | [testing.md](testing.md) | Unit tests, the bats e2e suite, and the dry-run mode |
 | [build.md](build.md) | The Nix build, `vendorHash`, and the untracked-file gotcha |
+| [history.md](history.md) | How the TUI and audit evolved across the design specs (distilled from `.plans/`) |

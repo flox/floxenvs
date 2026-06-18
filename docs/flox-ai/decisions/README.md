@@ -19,3 +19,4 @@ Format and process live in [template.md](template.md).
 | [0006](0006-four-pane-review-report.md) | Render the review report as a sliding four-pane miller view | Accepted |
 | [0007](0007-require-flox-environment.md) | Require a Flox environment to run the TUI | Accepted |
 | [0008](0008-squash-then-rebase.md) | Integrate main by squash-then-rebase | Accepted |
+| [0009](0009-charm-v1-to-v2-migration.md) | Migrate the TUI from Charm v1 to v2 | Accepted |
