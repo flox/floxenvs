@@ -36,6 +36,7 @@
               flox-ai
               batsWithLibs
               pkgs.coreutils
+              pkgs.tmux # launch.bats: agent-deck XDG-leak test spawns tmux
             ]
           }:$PATH"
           export BATS_SUPPORT_LIB="${pkgs.bats.libraries.bats-support}/share/bats/bats-support"
@@ -53,6 +54,7 @@
             lib.makeBinPath [
               batsWithLibs
               pkgs.coreutils
+              pkgs.tmux # launch.bats: agent-deck XDG-leak test spawns tmux
             ]
           }:$PATH"
           export BATS_SUPPORT_LIB="${pkgs.bats.libraries.bats-support}/share/bats/bats-support"
