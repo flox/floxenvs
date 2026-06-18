@@ -15,7 +15,7 @@ on:
       package:
         description: >
           Package to build. Leave empty to build all
-          changed packages.
+          packages.
         required: false
         default: ""
         type: string
@@ -58,6 +58,15 @@ jobs:
           # Collect package names
           if [ -n "$SINGLE_PKG" ]; then
             pkgs="[\"$SINGLE_PKG\"]"
+          elif [ "$EVENT" = "workflow_dispatch" ]; then
+            # Manual dispatch with no package input: build every
+            # package, regardless of what the last commit changed.
+            pkgs="[]"
+            for dir in .flox/pkgs/*/; do
+              name="$(basename "$dir")"
+              pkgs=$(echo "$pkgs" | jq -c \
+                ". + [\"$name\"]")
+            done
           else
             if [ "$EVENT" = "pull_request" ]; then
               DIFF_BASE="$BASE_SHA"
@@ -83,16 +92,6 @@ jobs:
                   ". + [\"$name\"]")
               fi
             done
-
-            # On workflow_dispatch with no input, build all
-            if [ "$EVENT" = "workflow_dispatch" ] \
-                && [ "$pkgs" = "[]" ]; then
-              for dir in .flox/pkgs/*/; do
-                name="$(basename "$dir")"
-                pkgs=$(echo "$pkgs" | jq -c \
-                  ". + [\"$name\"]")
-              done
-            fi
           fi
 
           echo "packages=$pkgs" >> "$GITHUB_OUTPUT"
