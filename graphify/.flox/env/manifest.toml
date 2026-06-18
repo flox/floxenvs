@@ -50,6 +50,10 @@ VIRTUAL_ENV_DISABLE_PROMPT = "1"
 
 [hook]
 on-activate = '''
+# flox-ai sets up Claude Code config + discovers the bundled skill
+# (was previously provided via the flox/claude include).
+eval "$(flox-ai setup-hook)"
+
 export PYTHON_DIR="$FLOX_ENV_CACHE/python"
 
 CURRENT_INTERP="$(realpath "$(which python3)")"
