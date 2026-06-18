@@ -60,6 +60,8 @@ var registry = map[string]Adapter{
 	"claude":     claudeAdapter{},
 	"agent-deck": deckAdapter{},
 	"codex":      codexAdapter{},
+	"opencode":   opencodeAdapter{},
+	"pi":         piAdapter{},
 }
 
 // RegisteredNames returns the registered agent names, sorted. It is the

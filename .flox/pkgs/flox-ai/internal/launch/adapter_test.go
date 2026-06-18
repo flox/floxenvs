@@ -16,7 +16,7 @@ func TestStatusZeroValueIsOK(t *testing.T) {
 }
 
 func TestRegistryHasExpectedAgents(t *testing.T) {
-	for _, name := range []string{"claude", "agent-deck", "codex"} {
+	for _, name := range []string{"claude", "agent-deck", "codex", "opencode", "pi"} {
 		if _, ok := registry[name]; !ok {
 			t.Fatalf("registry missing %q", name)
 		}
