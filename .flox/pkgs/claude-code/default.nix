@@ -86,7 +86,11 @@ stdenvNoCC.mkDerivation {
       }
   '';
 
-  doInstallCheck = true;
+  # CI builds x86_64-darwin on an aarch64-darwin runner under Rosetta, where
+  # executing the emulated bun binary for the `claude --version` check hangs
+  # past the 1800s no-output builder timeout. Skip the check on that one
+  # platform; the other three run it natively.
+  doInstallCheck = stdenv.hostPlatform.system != "x86_64-darwin";
   nativeInstallCheckInputs = [
     writableTmpDirAsHomeHook
     versionCheckHook
