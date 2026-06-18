@@ -199,13 +199,13 @@ EOF
   # Codex takes no --plugin-dir / --append-system-prompt-file flags: the
   # fragments are injected through the patch env vars, pointing at staged
   # copies under the per-env codex launch dir.
-  grep -qx "CODEX_FLOX_SKILL_ROOTS=$config_dir/codex/skills" "$REC_ENV"
-  grep -qx "CODEX_FLOX_INSTRUCTIONS_FILE=$config_dir/codex/rules.md" "$REC_ENV"
+  grep -qx "CODEX_FLOX_SKILL_ROOTS=$config_dir/launch/codex/skills" "$REC_ENV"
+  grep -qx "CODEX_FLOX_INSTRUCTIONS_FILE=$config_dir/launch/codex/rules.md" "$REC_ENV"
   grep -qx 'FLOX_AI=1' "$REC_ENV"
 
   # the staged skill root and rules file exist on disk
-  [[ -d "$config_dir/codex/skills" ]]
-  [[ -f "$config_dir/codex/rules.md" ]]
+  [[ -d "$config_dir/launch/codex/skills" ]]
+  [[ -f "$config_dir/launch/codex/rules.md" ]]
 
   # passthrough reaches codex without the -- delimiter
   grep -qx -- 'exec' "$REC_ARGV"
