@@ -25,6 +25,7 @@ type Agent struct {
 var Supported = map[string]Agent{
 	"claude":     {Name: "claude", InstallPkg: "claude-code"},
 	"agent-deck": {Name: "agent-deck", InstallPkg: "agent-deck"},
+	"codex":      {Name: "codex", InstallPkg: "codex"},
 }
 
 // SupportedNames returns the supported agent names, sorted and
@@ -202,6 +203,10 @@ func Run(opts Options) error {
 
 	if opts.AgentName == "agent-deck" {
 		return RunDeck(opts)
+	}
+
+	if opts.AgentName == "codex" {
+		return RunCodex(opts)
 	}
 
 	bin, err := resolveBinary(agent)

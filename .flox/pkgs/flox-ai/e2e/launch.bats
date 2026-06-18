@@ -24,6 +24,8 @@ printf '%s\n' "$@" > "$REC_ARGV"
   echo "FLOX_AI_DIR=$FLOX_AI_DIR"
   echo "XDG_CONFIG_HOME=$XDG_CONFIG_HOME"
   echo "XDG_DATA_HOME=$XDG_DATA_HOME"
+  echo "CODEX_FLOX_SKILL_ROOTS=$CODEX_FLOX_SKILL_ROOTS"
+  echo "CODEX_FLOX_INSTRUCTIONS_FILE=$CODEX_FLOX_INSTRUCTIONS_FILE"
 } > "$REC_ENV"
 exit 0
 EOF
@@ -117,6 +119,36 @@ EOF
 
   [[ "$first" == "$second" ]]
   [[ -n "$first" ]]
+}
+
+# ---- codex agent ---------------------------------------------------------
+
+@test "launch codex execs codex with fragments injected via env vars" {
+  local dir config_dir
+  dir="$(setup_fixtures)"
+  config_dir="$(setup_config_dir)"
+  make_fake_agent codex
+
+  run flox-ai --dir "$dir" --config-dir "$config_dir" \
+    launch codex -- exec "hello"
+  assert_success
+
+  # Codex takes no --plugin-dir / --append-system-prompt-file flags: the
+  # fragments are injected through the patch env vars, pointing at staged
+  # copies under the per-env codex launch dir.
+  grep -qx "CODEX_FLOX_SKILL_ROOTS=$config_dir/codex/skills" "$REC_ENV"
+  grep -qx "CODEX_FLOX_INSTRUCTIONS_FILE=$config_dir/codex/rules.md" "$REC_ENV"
+  grep -qx 'FLOX_AI=1' "$REC_ENV"
+
+  # the staged skill root and rules file exist on disk
+  [[ -d "$config_dir/codex/skills" ]]
+  [[ -f "$config_dir/codex/rules.md" ]]
+
+  # passthrough reaches codex without the -- delimiter
+  grep -qx -- 'exec' "$REC_ARGV"
+  grep -qx -- 'hello' "$REC_ARGV"
+  run grep -cx -- '--' "$REC_ARGV"
+  assert_output '0'
 }
 
 # ---- errors --------------------------------------------------------------
