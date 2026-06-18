@@ -14,6 +14,7 @@ what you need; each tree has its own index.
 | Product | [product/index.md](product/index.md) | What we build and why (PRDs, goals, success metrics) |
 | Architecture | [architecture/index.md](architecture/index.md) | What the system is and why (system context, components, the audit engine, the TUI) |
 | Decisions | [decisions/README.md](decisions/README.md) | The significant choices and their trade-offs (ADRs) |
+| Reference | [reference/index.md](reference/index.md) | Precise interface contracts (the `audit` CLI) |
 | Development | [development/index.md](development/index.md) | How to develop: environment, workflow, testing, build |
 
 ## What flox-ai is, in one paragraph

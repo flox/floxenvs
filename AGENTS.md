@@ -342,6 +342,8 @@ organised by genre:
   package overview, the audit engine, the TUI.
 - [Decisions](docs/flox-ai/decisions/README.md) — the significant
   choices and their trade-offs (ADRs).
+- [Reference](docs/flox-ai/reference/index.md) — interface contracts
+  (the `flox-ai audit` CLI).
 - [Development](docs/flox-ai/development/index.md) — environment,
   workflow, testing, build.
 

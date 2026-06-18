@@ -9,6 +9,7 @@ package internals.
 | [system-context.md](system-context.md) | Why flox-ai is "everywhere": the binary in every env, activation wiring, fragments, the catalog, the website, the TUI, launch, and the audit engine |
 | [overview.md](overview.md) | The Go package layout: commands, internal packages, and how they relate |
 | [audit-engine.md](audit-engine.md) | The absorbed scoring engine: dimensions, the tool ensemble, findings, and raw output |
+| [audit-tools.md](audit-tools.md) | The six external quality/security tools, the per-kind ensembles, weights, and the score fusion |
 | [tui.md](tui.md) | The Bubble Tea TUI: model/update/view, the catalog browser, theming, the splash, and the four-pane review report |
 
 For the significant choices behind this architecture, see the

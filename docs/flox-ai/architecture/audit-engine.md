@@ -64,5 +64,8 @@ hermetic.
 - `doctor.Probe() []Row` / `doctor.Resolve(kind, avail) ResolveResult`
   — tool availability and the resolved ensemble.
 
-The CLI shape and flags are in [ADR 0005](
+The full tool reference (each tool, the per-kind ensembles, and the score
+fusion) is in [audit-tools.md](audit-tools.md). The CLI reference is in
+[reference/audit-command.md](../reference/audit-command.md); the rationale for
+the single-command shape is [ADR 0005](
 ../decisions/0005-single-audit-command.md).
