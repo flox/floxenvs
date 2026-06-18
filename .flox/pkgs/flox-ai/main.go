@@ -1,21 +1,28 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
+	"text/tabwriter"
 
+	"flox.dev/flox-ai/internal/audit/audit"
+	"flox.dev/flox-ai/internal/audit/detect"
 	"flox.dev/flox-ai/internal/discover"
 	"flox.dev/flox-ai/internal/doctor"
 	"flox.dev/flox-ai/internal/emit"
 	"flox.dev/flox-ai/internal/launch"
 	"flox.dev/flox-ai/internal/plugins"
 	"flox.dev/flox-ai/internal/symlinks"
+	"flox.dev/flox-ai/internal/tui"
 )
 
-const version = "0.6.0"
+const version = "0.9.0"
 
 // ANSI color helpers
 func ansi(code, s string) string { return "\033[" + code + "m" + s + "\033[0m" }
@@ -152,6 +159,29 @@ func main() {
 			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
 			os.Exit(1)
 		}
+	case "audit":
+		os.Exit(runAudit(flag.Args()[1:], os.Stdout, os.Stderr))
+	case "tui":
+		if floxEnv == "" {
+			fmt.Fprintln(os.Stderr, red("ERROR:")+" flox-ai tui must run inside a Flox environment.")
+			fmt.Fprintln(os.Stderr)
+			fmt.Fprintln(os.Stderr, "It installs plugins, skills, agents & rules into the active")
+			fmt.Fprintln(os.Stderr, "environment's manifest, so a Flox environment must be active.")
+			fmt.Fprintln(os.Stderr)
+			fmt.Fprintln(os.Stderr, "  Activate one, then run it again:")
+			fmt.Fprintln(os.Stderr, "    flox activate")
+			fmt.Fprintln(os.Stderr, "    flox-ai tui")
+			os.Exit(1)
+		}
+		requireShareDir()
+		if err := tui.Run(tui.Options{
+			ShareDir:   shareDir,
+			ConfigDir:  configDir,
+			ProjectDir: projectDir,
+		}); err != nil {
+			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
+			os.Exit(1)
+		}
 	default:
 		printUsage()
 		os.Exit(1)
@@ -205,6 +235,8 @@ Commands:
   agents add|remove|list|clean   Manage agent symlinks
   plugins add|remove|list|clean  Manage plugins (symlinks + JSON)
   launch <agent> [-- <args>]     Run an AI agent with flox fragments injected
+  audit <path>                   Score a skill/agent (--json --findings --report --threshold N --kind)
+  tui                            Browse, install, and launch fragments
   version          Print version
 
 Flags:
@@ -328,6 +360,31 @@ func runDoctor(shareDir, configDir, projectDir string, managed bool) error {
 
 	fmt.Println()
 
+	// Audit tools: availability of the external quality/security binaries.
+	fmt.Fprintln(os.Stdout, bold("Audit tools"))
+	rows := doctor.Probe()
+	tw := tabwriter.NewWriter(os.Stdout, 0, 2, 2, ' ', 0)
+	fmt.Fprintln(tw, "TOOL\tSTATE\tVERSION\tSMOKE")
+	for _, r := range rows {
+		v := r.Version
+		if v == "" {
+			v = "-"
+		}
+		fmt.Fprintf(tw, "%s\t%s\t%s\t%s\n", r.Tool, r.State, v, r.Smoke)
+	}
+	tw.Flush()
+	avail := map[string]bool{}
+	for _, r := range rows {
+		avail[r.Tool] = r.State == "ok"
+	}
+	for _, kind := range []detect.Kind{detect.KindSkill, detect.KindAgent} {
+		res := doctor.Resolve(kind, avail)
+		fmt.Fprintf(os.Stdout, "%s audit → uses: %s\n", kind, strings.Join(res.Tools, ", "))
+		if res.Warning != "" {
+			fmt.Fprintln(os.Stdout, red("  WARNING:")+" "+res.Warning)
+		}
+	}
+
 	errCount := len(result.Errors())
 	warnCount := len(result.Warnings())
 
@@ -340,6 +397,104 @@ func runDoctor(shareDir, configDir, projectDir string, managed bool) error {
 		return nil
 	default:
 		return fmt.Errorf("%d error(s), %d warning(s)", errCount, warnCount)
+	}
+}
+
+// runAudit implements `flox-ai audit <path> [--json --findings --report
+// --threshold N --kind skill|agent --tools list --disable list]`.
+func runAudit(args []string, out, errw io.Writer) int {
+	fs := flag.NewFlagSet("audit", flag.ContinueOnError)
+	fs.SetOutput(errw)
+	jsonOut := fs.Bool("json", false, "machine-readable JSON")
+	withFindings := fs.Bool("findings", false, "include findings")
+	withReport := fs.Bool("report", false, "include raw per-tool output")
+	threshold := fs.Int("threshold", -1, "exit nonzero if overall < N")
+	kindFlag := fs.String("kind", "", "skill|agent")
+	toolsFlag := fs.String("tools", "", "comma list: use exactly these tools")
+	disableFlag := fs.String("disable", "", "comma list: drop these tools")
+	// Go's flag package stops at the first positional, so parse in a loop to
+	// allow flags on either side of the <path> argument.
+	var positionals []string
+	rest := args
+	for {
+		if err := fs.Parse(rest); err != nil {
+			return 2
+		}
+		if fs.NArg() == 0 {
+			break
+		}
+		positionals = append(positionals, fs.Arg(0))
+		rest = fs.Args()[1:]
+	}
+	if len(positionals) < 1 {
+		fmt.Fprintln(errw, red("ERROR:")+" usage: flox-ai audit <path> [flags]")
+		return 1
+	}
+	path := positionals[0]
+	var kind detect.Kind
+	switch *kindFlag {
+	case "", "skill", "agent":
+		kind = detect.Kind(*kindFlag)
+	default:
+		fmt.Fprintln(errw, red("ERROR:")+" --kind must be skill or agent")
+		return 1
+	}
+	res, err := audit.Run(audit.Options{
+		Path:       path,
+		Kind:       kind,
+		Tools:      *toolsFlag,
+		Disable:    *disableFlag,
+		Findings:   *withFindings || *withReport,
+		IncludeRaw: *withReport,
+	})
+	if err != nil {
+		fmt.Fprintln(errw, red("ERROR:")+" "+err.Error())
+		return 1
+	}
+	if *jsonOut {
+		enc := json.NewEncoder(out)
+		enc.SetIndent("", "  ")
+		_ = enc.Encode(res)
+	} else {
+		printAuditText(out, res, *withFindings, *withReport)
+	}
+	if *threshold >= 0 && res.Overall < *threshold {
+		return 1
+	}
+	return 0
+}
+
+// printAuditText renders the human summary.
+func printAuditText(out io.Writer, res audit.Result, withFindings, withReport bool) {
+	fmt.Fprintf(out, "%s  %s  overall %d (%s)\n",
+		res.Identity.Kind, res.Identity.Name, res.Overall, res.Status)
+	fmt.Fprintf(out, "  quality %d  reliability %d  security %d  impact %d\n",
+		res.Quality.Score, res.Reliability.Score, res.Security.Score, res.Impact.Score)
+	for _, c := range res.Quality.Checks {
+		mark := "pass"
+		if !c.Pass {
+			mark = "FAIL"
+		}
+		fmt.Fprintf(out, "    %-16s w%-3d %s  %s\n", c.ID, c.Weight, mark, c.Note)
+	}
+	if withFindings || withReport {
+		for _, f := range res.Findings {
+			loc := f.File
+			if f.Line > 0 {
+				loc = fmt.Sprintf("%s:%d", f.File, f.Line)
+			}
+			fmt.Fprintf(out, "  [%s] %s %s — %s (%s)\n", f.Severity, f.Tool, f.Rule, f.Message, loc)
+		}
+	}
+	if withReport {
+		toolNames := make([]string, 0, len(res.RawByTool))
+		for tool := range res.RawByTool {
+			toolNames = append(toolNames, tool)
+		}
+		sort.Strings(toolNames)
+		for _, tool := range toolNames {
+			fmt.Fprintf(out, "\n=== %s ===\n%s\n", tool, res.RawByTool[tool])
+		}
 	}
 }
 
