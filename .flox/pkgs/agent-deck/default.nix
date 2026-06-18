@@ -37,6 +37,17 @@ buildGoModule (finalAttrs: {
 
   subPackages = [ "cmd/agent-deck" ];
 
+  # Downstream patch: add an AGENT_DECK_HOME env var that overrides XDG_*
+  # path resolution, so flox-ai can isolate a per-project agent-deck home
+  # without hijacking XDG_CONFIG_HOME/XDG_DATA_HOME (which would otherwise
+  # leak into agent-deck's tmux panes and break unrelated programs). The
+  # override is added in internal/agentpaths, the single funnel every config,
+  # data, and cache path resolves through. Applied in patchPhase, before the
+  # postPatch surgery below; affects neither srcHash (fixed-output fetch) nor
+  # vendorHash (Go module graph unchanged). Upstream PR pending; drop this
+  # once merged.
+  patches = [ ./agent-deck-home.patch ];
+
   # agent-deck 1.9.49 added a test-only data-loss guard (internal/agentpaths)
   # that, while testing.Testing() is true, refuses to resolve any agent-deck
   # path under the OS user's *real* home -- read from the passwd database via

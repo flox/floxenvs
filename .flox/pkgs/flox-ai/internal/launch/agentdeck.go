@@ -105,14 +105,12 @@ func SeedDeckConfig(deckDir, sourcePath, socketName string) error {
 	return os.WriteFile(filepath.Join(deckDir, "config.toml"), out, 0644)
 }
 
-// DeckHome derives the agent-deck XDG layout from the flox-ai configDir.
-// agent-deck resolves ConfigDir as $XDG_CONFIG_HOME/agent-deck, so the
-// XDG_CONFIG_HOME we hand it is <configDir>/agents and the deck config
-// home is <configDir>/agents/agent-deck.
-func DeckHome(configDir string) (xdgConfigHome, deckDir string) {
-	xdgConfigHome = filepath.Join(configDir, "agents")
-	deckDir = filepath.Join(xdgConfigHome, "agent-deck")
-	return
+// DeckHome derives the agent-deck home from the flox-ai configDir. The
+// patched agent-deck reads config, data, and cache directly from the
+// directory named by AGENT_DECK_HOME, so this single path is both where we
+// seed config.toml and what we export to the deck.
+func DeckHome(configDir string) string {
+	return filepath.Join(configDir, "agents", "agent-deck")
 }
 
 // DeckSocketName returns a stable, per-environment tmux socket name
@@ -147,14 +145,18 @@ func setEnvVar(env []string, key, val string) []string {
 }
 
 // deckChildEnv builds the environment for the agent-deck process: the
-// parent env with XDG_CONFIG_HOME and XDG_DATA_HOME both pointed at the
-// flox deck home (so config and per-env session state live together under
-// one isolated home), FLOX_AI=1, and FLOX_AI_DIR pinned to configDir so
-// the nested `flox-ai launch claude` resolves this env's fragments.
-// XDG_CACHE_HOME is intentionally left untouched.
-func deckChildEnv(base []string, xdgConfigHome, configDir string) []string {
-	env := setEnvVar(base, "XDG_CONFIG_HOME", xdgConfigHome)
-	env = setEnvVar(env, "XDG_DATA_HOME", xdgConfigHome)
+// parent env with AGENT_DECK_HOME pointed at the flox deck home (so the
+// deck's config, data, and cache live together under one isolated, per-env
+// home), FLOX_AI=1, and FLOX_AI_DIR pinned to configDir so the nested
+// `flox-ai launch claude` resolves this env's fragments.
+//
+// Crucially it leaves XDG_CONFIG_HOME/XDG_DATA_HOME untouched. agent-deck
+// spawns a tmux server that inherits this env, and every pane inherits the
+// server's env; overriding XDG here would leak the deck home into those
+// panes and break unrelated programs that read XDG to find their own config.
+// AGENT_DECK_HOME isolates the deck without that side effect.
+func deckChildEnv(base []string, deckHome, configDir string) []string {
+	env := setEnvVar(base, "AGENT_DECK_HOME", deckHome)
 	env = setEnvVar(env, "FLOX_AI", "1")
 	env = setEnvVar(env, "FLOX_AI_DIR", configDir)
 	return env
@@ -162,9 +164,8 @@ func deckChildEnv(base []string, xdgConfigHome, configDir string) []string {
 
 // RunDeck seeds the flox-managed agent-deck config (forcing the claude
 // command to route through flox-ai and a per-env tmux socket), points
-// agent-deck at it via XDG_CONFIG_HOME/XDG_DATA_HOME, exports FLOX_AI_DIR
-// for nested flox-ai invocations, and execs agent-deck (replacing this
-// process).
+// agent-deck at it via AGENT_DECK_HOME, exports FLOX_AI_DIR for nested
+// flox-ai invocations, and execs agent-deck (replacing this process).
 func RunDeck(opts Options) error {
 	agent := Supported[opts.AgentName] // caller guarantees agent-deck
 	bin, err := resolveBinary(agent)
@@ -172,15 +173,15 @@ func RunDeck(opts Options) error {
 		return err
 	}
 
-	xdgConfigHome, deckDir := DeckHome(opts.ConfigDir)
+	deckHome := DeckHome(opts.ConfigDir)
 	socketName := DeckSocketName(opts.ConfigDir)
 
 	source := findUserDeckConfig(os.Getenv("XDG_CONFIG_HOME"), os.Getenv("HOME"))
-	if err := SeedDeckConfig(deckDir, source, socketName); err != nil {
+	if err := SeedDeckConfig(deckHome, source, socketName); err != nil {
 		return err
 	}
 
 	argv := append([]string{bin}, opts.Passthrough...)
-	env := deckChildEnv(os.Environ(), xdgConfigHome, opts.ConfigDir)
+	env := deckChildEnv(os.Environ(), deckHome, opts.ConfigDir)
 	return syscall.Exec(bin, argv, env)
 }

@@ -22,6 +22,7 @@ printf '%s\n' "$@" > "$REC_ARGV"
 {
   echo "FLOX_AI=$FLOX_AI"
   echo "FLOX_AI_DIR=$FLOX_AI_DIR"
+  echo "AGENT_DECK_HOME=$AGENT_DECK_HOME"
   echo "XDG_CONFIG_HOME=$XDG_CONFIG_HOME"
   echo "XDG_DATA_HOME=$XDG_DATA_HOME"
 } > "$REC_ENV"
@@ -89,11 +90,16 @@ EOF
   grep -q '\[tmux\]' "$cfg"
   grep -q "socket_name = 'flox-ai-" "$cfg"
 
-  # isolated env: config + data home co-located, FLOX_AI_DIR pinned
-  grep -qx "XDG_CONFIG_HOME=$config_dir/agents" "$REC_ENV"
-  grep -qx "XDG_DATA_HOME=$config_dir/agents" "$REC_ENV"
+  # isolated env: the deck home is pinned via AGENT_DECK_HOME, FLOX_AI_DIR set
+  grep -qx "AGENT_DECK_HOME=$config_dir/agents/agent-deck" "$REC_ENV"
   grep -qx "FLOX_AI_DIR=$config_dir" "$REC_ENV"
   grep -qx 'FLOX_AI=1' "$REC_ENV"
+
+  # XDG must NOT be hijacked -- overriding it would leak the deck home into
+  # agent-deck's tmux panes and break unrelated programs. Assert neither XDG
+  # var was repointed at the deck home.
+  ! grep -qx "XDG_CONFIG_HOME=$config_dir/agents" "$REC_ENV"
+  ! grep -qx "XDG_DATA_HOME=$config_dir/agents" "$REC_ENV"
 
   # passthrough reaches agent-deck without the -- delimiter
   run cat "$REC_ARGV"

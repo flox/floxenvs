@@ -221,18 +221,14 @@ func TestSeedDeckConfig_NoSource(t *testing.T) {
 }
 
 func TestDeckHome(t *testing.T) {
-	xdg, deck := DeckHome("/proj/.flox/cache/flox-ai")
-	if xdg != "/proj/.flox/cache/flox-ai/agents" {
-		t.Fatalf("xdg: %q", xdg)
-	}
-	if deck != "/proj/.flox/cache/flox-ai/agents/agent-deck" {
-		t.Fatalf("deck: %q", deck)
+	if got := DeckHome("/proj/.flox/cache/flox-ai"); got != "/proj/.flox/cache/flox-ai/agents/agent-deck" {
+		t.Fatalf("deck home: %q", got)
 	}
 }
 
 func TestDeckChildEnv(t *testing.T) {
-	base := []string{"PATH=/bin", "XDG_CONFIG_HOME=/old", "FLOX_ENV=/env"}
-	env := deckChildEnv(base, "/new/agents", "/cfg")
+	base := []string{"PATH=/bin", "XDG_CONFIG_HOME=/old", "XDG_DATA_HOME=/olddata", "FLOX_ENV=/env"}
+	env := deckChildEnv(base, "/deck/home", "/cfg")
 	has := func(want string) bool {
 		for _, e := range env {
 			if e == want {
@@ -241,30 +237,26 @@ func TestDeckChildEnv(t *testing.T) {
 		}
 		return false
 	}
-	if !has("XDG_CONFIG_HOME=/new/agents") {
-		t.Fatalf("XDG_CONFIG_HOME not overridden: %v", env)
+	if !has("AGENT_DECK_HOME=/deck/home") {
+		t.Fatalf("AGENT_DECK_HOME not set: %v", env)
 	}
 	if !has("FLOX_AI=1") || !has("FLOX_AI_DIR=/cfg") {
 		t.Fatalf("flox vars missing: %v", env)
 	}
-	// data home co-located with config home (per-env session isolation)
-	if !has("XDG_DATA_HOME=/new/agents") {
-		t.Fatalf("XDG_DATA_HOME not set to deck home: %v", env)
+	// XDG must be left exactly as the parent had it -- the whole point is to
+	// not hijack XDG, which would leak the deck home into agent-deck's tmux
+	// panes and break unrelated programs there.
+	if !has("XDG_CONFIG_HOME=/old") || !has("XDG_DATA_HOME=/olddata") {
+		t.Fatalf("XDG vars must be untouched: %v", env)
 	}
-	// no duplicate XDG_CONFIG_HOME
+	// no duplicate AGENT_DECK_HOME
 	n := 0
 	for _, e := range env {
-		if strings.HasPrefix(e, "XDG_CONFIG_HOME=") {
+		if strings.HasPrefix(e, "AGENT_DECK_HOME=") {
 			n++
 		}
 	}
 	if n != 1 {
-		t.Fatalf("duplicate XDG_CONFIG_HOME: %v", env)
-	}
-	// cache left untouched
-	for _, e := range env {
-		if strings.HasPrefix(e, "XDG_CACHE_HOME=") {
-			t.Fatalf("XDG_CACHE_HOME must not be set: %v", env)
-		}
+		t.Fatalf("duplicate AGENT_DECK_HOME: %v", env)
 	}
 }
