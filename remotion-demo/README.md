@@ -38,7 +38,7 @@ claude
 - `gum` — styled banner during `on-activate`
 
 Everything else (Node.js 22, ffmpeg, Claude Code, and the
-`claude-code-plugin-remotion` plugin) comes from the
+`skills-remotion` plugin) comes from the
 included [remotion](../remotion) environment.
 
 ## See also

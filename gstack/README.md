@@ -27,7 +27,7 @@ from Claude Code (`/qa`, `/review`, `/ship`,
 ## What it provides
 
 Everything from [`claude`](../claude/) plus the
-`claude-code-plugin-gstack` package, which installs the
+`skills-gstack` package, which installs the
 gstack plugin tree at
 `$FLOX_ENV/share/claude-code/plugins/gstack/`.
 

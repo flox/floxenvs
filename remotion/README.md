@@ -50,7 +50,7 @@ environments = ["flox/remotion"]
 
 - `claude-code` — the Claude Code CLI
 - `flox-ai` — auto-registers the bundled plugin
-- `claude-code-plugin-remotion` — Remotion best-practices
+- `skills-remotion` — Remotion best-practices
   skill (1 SKILL.md + 36 topic rules) installed under
   `share/claude-code/plugins/remotion/`
 - `nodejs_22` — for `npx remotion …` and

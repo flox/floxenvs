@@ -23,7 +23,7 @@ environments = ["flox/caveman"]
 
 Everything from [claude](../claude/) plus:
 
-- `claude-code-plugin-caveman` -- the caveman plugin
+- `skills-caveman` -- the caveman plugin
   with 7 skills:
   - `caveman` -- the headline compression mode
   - `caveman-commit` -- terse commit messages
