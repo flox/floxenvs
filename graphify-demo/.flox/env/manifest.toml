@@ -3,13 +3,13 @@ schema-version = "1.10.0"
 [include]
 environments = [
   { dir = "../graphify" },
-  { remote = "flox/claude" }
+  { dir = "../claude" }
 ]
 
 # gum is a demo-only tool for styled terminal output.
 # skills-graphify ships the /graphify SKILL.md into
 # $FLOX_ENV/share/claude-code/skills/graphify/ where
-# flox-ai (pulled in via flox/claude) auto-discovers
+# flox-ai (pulled in via ../claude) auto-discovers
 # it on activate — no `graphify install` step needed.
 
 [install]

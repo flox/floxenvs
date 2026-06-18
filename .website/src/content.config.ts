@@ -41,7 +41,7 @@ const baseFields = {
   seo_description: z.string().optional(),
   intro: z.string().optional(),
   summary: z.array(z.string()).default([]),
-  category: z.enum(["ai","language","database","service","tool","runtime"]),
+  category: z.enum(["ai","language","database","service","tool","runtime","messaging"]),
   ai_role: z
     .enum(["agent","llm-runtime","rag","memory","orchestrator","tooling","ide"])
     .optional(),
@@ -101,7 +101,7 @@ const envSchema = z.object({
 
 const pkgSchema = z.object({
   kind: z.literal("pkg"),
-  subkind: z.enum(["plain","plugin","skill"]).default("plain"),
+  subkind: z.enum(["plain","plugin","skill","agent","rule"]).default("plain"),
   ...baseFields,
   install: z.object({ pkg: z.string() }).optional(),
   plugin_for: z.string().nullable().optional(),

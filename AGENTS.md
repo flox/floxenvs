@@ -326,6 +326,38 @@ publishes to FloxHub on main. `upgrade_pkgs.yml`
 runs `upgrade.sh` every 6 hours and creates a PR
 if a new version is found.
 
+## flox-ai
+
+`flox-ai` (`.flox/pkgs/flox-ai/`) is the bridge between a Flox
+environment and AI coding agents: it injects an environment's
+rules/skills/agents/plugins into Claude Code (and Agent Deck), ships a
+Bubble Tea TUI for browsing/installing/launching them, and audits
+skill/agent quality in-process.
+
+Its documentation lives under [`docs/flox-ai/`](docs/flox-ai/index.md),
+organised by genre:
+
+- [Product](docs/flox-ai/product/index.md) — what it builds and why.
+- [Architecture](docs/flox-ai/architecture/index.md) — system context,
+  package overview, the audit engine, the TUI.
+- [Decisions](docs/flox-ai/decisions/README.md) — the significant
+  choices and their trade-offs (ADRs).
+- [Reference](docs/flox-ai/reference/index.md) — interface contracts
+  (the `flox-ai audit` CLI).
+- [Development](docs/flox-ai/development/index.md) — environment,
+  workflow, testing, build.
+
+Run flox-ai's Go and git commands inside the dev shell + Flox env:
+`nix develop --command flox activate -- bash -c '…'`.
+
+### Keep these docs current
+
+Treat `docs/flox-ai/` as part of the work, not an afterthought. When you
+change flox-ai's behavior, update the matching tree and add a decision
+record (`docs/flox-ai/decisions/template.md`) for any significant,
+hard-to-reverse choice. Finishing a flox-ai task includes leaving these
+docs true.
+
 ## ADR summary
 
 | ADR | Decision |

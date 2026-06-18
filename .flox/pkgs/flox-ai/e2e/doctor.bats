@@ -92,3 +92,9 @@ EOF
   assert_output --partial 'Agents'
   assert_output --partial 'Plugins'
 }
+
+@test "doctor reports the audit tools section" {
+  run_cm doctor
+  assert_output --partial 'Audit tools'
+  assert_output --partial 'audit → uses:'
+}
