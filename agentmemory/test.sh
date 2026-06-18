@@ -10,13 +10,11 @@ command_exists() {
   echo ">>> '$1' command exists"
 }
 
-command_exists claude
 command_exists flox-ai
 command_exists node
 command_exists npx
 
 echo ">>> node version: $(node --version)"
-echo ">>> claude version: $(claude --version 2>&1 | head -1)"
 
 # Plugin tree must land where flox-ai discovers it.
 plugin_dir="$FLOX_ENV/share/claude-code/plugins/agentmemory"

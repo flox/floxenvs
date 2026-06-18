@@ -6,17 +6,12 @@ if ! command -v node >/dev/null 2>&1; then
   echo "Error: 'node' command not found."
   exit 1
 fi
-if ! command -v claude >/dev/null 2>&1; then
-  echo "Error: 'claude' command not found."
-  exit 1
-fi
 if ! command -v flox-ai >/dev/null 2>&1; then
   echo "Error: 'flox-ai' command not found."
   exit 1
 fi
 
 echo ">>> node version: $(node --version)"
-echo ">>> claude version: $(claude --version 2>&1 | head -1)"
 
 # The plugin ships its skill tree under
 # $FLOX_ENV/share/claude-code/plugins/remotion/. Verify the

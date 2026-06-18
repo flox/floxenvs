@@ -13,7 +13,6 @@ command_exists() {
 # ── Required commands (inherited from ../remotion) ─────
 command_exists node
 command_exists npx
-command_exists claude
 command_exists flox-ai
 
 # ── Demo-only ──────────────────────────────────────────
@@ -21,7 +20,6 @@ command_exists gum
 
 echo ">>> node version:    $(node --version)"
 echo ">>> npm version:     $(npm --version)"
-echo ">>> claude version:  $(claude --version 2>&1 | head -1)"
 echo ">>> gum version:     $(gum --version)"
 
 # ── Plugin tree present ────────────────────────────────

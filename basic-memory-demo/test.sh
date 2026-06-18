@@ -13,12 +13,10 @@ command_exists() {
 # Required commands (composed from basic-memory + claude + demo-tools)
 command_exists basic-memory
 command_exists bm
-command_exists claude
 command_exists flox-ai
 command_exists gum
 
 echo ">>> basic-memory version: $(basic-memory --version)"
-echo ">>> claude version: $(claude --version)"
 echo ">>> flox-ai version: $(flox-ai version)"
 echo ">>> gum version: $(gum --version)"
 
