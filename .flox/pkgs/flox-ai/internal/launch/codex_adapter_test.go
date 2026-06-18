@@ -14,9 +14,8 @@ func TestCodexAdapter_Identity(t *testing.T) {
 	if a.InstallPkg() != "codex" {
 		t.Fatalf("InstallPkg=%q", a.InstallPkg())
 	}
-	if a.Check("/bin/codex").Level != OK {
-		t.Fatalf("Check not OK")
-	}
+	// Check behavior (patched vs unpatched) is covered by
+	// TestCodexCheck_PatchedAndUnpatched.
 }
 
 func TestCodexAdapter_Build(t *testing.T) {

@@ -9,7 +9,9 @@
 package launch
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -35,9 +37,55 @@ var _ Adapter = codexAdapter{}
 func (codexAdapter) Name() string       { return "codex" }
 func (codexAdapter) InstallPkg() string { return "codex" }
 
-// Check passes on binary presence. Detecting the flox-patched build
-// (Degraded when unpatched) is deferred to a later plan.
-func (codexAdapter) Check(string) Status { return Status{Level: OK} }
+// Check reports OK when the codex binary carries the flox patch, and
+// Degraded otherwise: an unpatched codex still runs but ignores the
+// CODEX_FLOX_* env vars, so no fragments are injected.
+func (codexAdapter) Check(bin string) Status {
+	if codexIsPatched(bin) {
+		return Status{Level: OK}
+	}
+	return Status{
+		Level:  Degraded,
+		Reason: "codex is not the flox-patched build; skills and rules will not be injected",
+	}
+}
+
+// codexIsPatched reports whether the codex binary carries the flox patch,
+// detected by the presence of the patch's env-var symbol. It streams the
+// file in chunks (the binary is large) with an overlap so a match across
+// a chunk boundary is still found.
+func codexIsPatched(bin string) bool {
+	f, err := os.Open(bin)
+	if err != nil {
+		return false
+	}
+	defer f.Close()
+
+	needle := []byte(EnvCodexSkillRoots)
+	overlap := len(needle) - 1
+	buf := make([]byte, 1<<20)
+	var tail []byte
+	for {
+		n, err := f.Read(buf)
+		if n > 0 {
+			chunk := append(tail, buf[:n]...)
+			if bytes.Contains(chunk, needle) {
+				return true
+			}
+			if len(chunk) > overlap {
+				tail = append([]byte(nil), chunk[len(chunk)-overlap:]...)
+			} else {
+				tail = chunk
+			}
+		}
+		if err == io.EOF {
+			return false
+		}
+		if err != nil {
+			return false
+		}
+	}
+}
 
 func (codexAdapter) Build(ctx Context) (Spec, error) {
 	frags, err := discover.Scan(ctx.ShareDir)

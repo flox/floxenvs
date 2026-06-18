@@ -112,3 +112,34 @@ func Run(opts Options) error {
 	}
 	return syscall.Exec(spec.Argv[0], spec.Argv, spec.Env)
 }
+
+// Readiness is the launch-readiness of one agent.
+type Readiness struct {
+	Name   string
+	Bin    string // resolved binary, "" if not on PATH
+	Status Status
+}
+
+// CheckAll runs every registered agent's preflight: it resolves the
+// binary and, if found, runs the adapter's Check. A missing binary is
+// reported as Fail. Results are in RegisteredNames order.
+func CheckAll() []Readiness {
+	names := RegisteredNames()
+	out := make([]Readiness, 0, len(names))
+	for _, name := range names {
+		ad := registry[name]
+		bin, err := exec.LookPath(ad.Name())
+		if err != nil {
+			out = append(out, Readiness{
+				Name: name,
+				Status: Status{
+					Level:  Fail,
+					Reason: ad.Name() + " not on PATH; install with: flox install flox/" + ad.InstallPkg(),
+				},
+			})
+			continue
+		}
+		out = append(out, Readiness{Name: name, Bin: bin, Status: ad.Check(bin)})
+	}
+	return out
+}
