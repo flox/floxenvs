@@ -26,6 +26,40 @@ const (
 	EnvCodexInstructionsFile = "CODEX_FLOX_INSTRUCTIONS_FILE"
 )
 
+// codexAdapter launches OpenAI Codex with skills and rules injected via
+// the env-var seams added by the flox codex patch. Plugins are not
+// mapped (Codex's plugin format differs from Claude's).
+type codexAdapter struct{}
+
+var _ Adapter = codexAdapter{}
+
+func (codexAdapter) Name() string       { return "codex" }
+func (codexAdapter) InstallPkg() string { return "codex" }
+
+// Check passes on binary presence. Detecting the flox-patched build
+// (Degraded when unpatched) is deferred to a later plan.
+func (codexAdapter) Check(string) Status { return Status{Level: OK} }
+
+func (codexAdapter) Build(ctx Context) (Spec, error) {
+	frags, err := discover.Scan(ctx.ShareDir)
+	if err != nil {
+		return Spec{}, fmt.Errorf("discover: %w", err)
+	}
+	skillRoot, rulesFile, err := PrepareCodex(ctx.LaunchDir, frags)
+	if err != nil {
+		return Spec{}, err
+	}
+	env := setEnvVar(ctx.BaseEnv, "FLOX_AI", "1")
+	if skillRoot != "" {
+		env = setEnvVar(env, EnvCodexSkillRoots, skillRoot)
+	}
+	if rulesFile != "" {
+		env = setEnvVar(env, EnvCodexInstructionsFile, rulesFile)
+	}
+	argv := append([]string{ctx.Bin}, ctx.Passthrough...)
+	return Spec{Argv: argv, Env: env}, nil
+}
+
 // BuildCodexSkillRoot creates a Codex skill-root directory under
 // launchDir/skills containing the given skills and agents as skill
 // subdirectories, and returns the root path. Each skill is linked as its
