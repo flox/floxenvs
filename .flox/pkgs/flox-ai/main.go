@@ -22,7 +22,7 @@ import (
 	"flox.dev/flox-ai/internal/tui"
 )
 
-const version = "0.9.0"
+const version = "0.7.0"
 
 // ANSI color helpers
 func ansi(code, s string) string { return "\033[" + code + "m" + s + "\033[0m" }
