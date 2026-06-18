@@ -1,0 +1,125 @@
+Add AGENT_DECK_HOME override for embedders (e.g. flox-ai).
+
+agent-deck resolves its config, data, and cache directories from the
+generic XDG_* base directories. An embedding tool that wants a private,
+per-project agent-deck home has no choice but to override XDG_CONFIG_HOME
+and XDG_DATA_HOME -- which are then inherited by the tmux server agent-deck
+spawns and leak into every pane, so unrelated programs in those panes read
+their own config from the wrong place and break.
+
+Add a dedicated AGENT_DECK_HOME environment variable. When set to an
+absolute path it becomes the agent-deck home directly (config, data, and
+cache all resolve under it), taking precedence over XDG_* and the legacy
+~/.agent-deck fallback, and leaving the XDG_* variables untouched so they
+no longer have to be hijacked.
+
+All path resolution already funnels through agentpaths.xdgDir (ConfigDir,
+DataDir, CacheDir), and the internal/tmux helpers go through
+agentpaths.Effective{Config,Data}Path, so a single override point covers
+config.toml, logs, ack-signal, and badge-updates alike.
+
+--- a/internal/agentpaths/paths.go
++++ b/internal/agentpaths/paths.go
+@@ -13,6 +13,18 @@ import (
+
+ const AppDirName = "agent-deck"
+
++// AgentDeckHomeEnv, when set to an absolute path, is the agent-deck home:
++// ConfigDir, DataDir, and CacheDir all resolve directly to it, taking
++// precedence over the XDG_* base directories and the legacy ~/.agent-deck
++// fallback.
++//
++// It lets an embedding tool (e.g. flox-ai, which runs a per-project
++// agent-deck) isolate agent-deck's state WITHOUT hijacking the generic
++// XDG_CONFIG_HOME / XDG_DATA_HOME variables. Those would otherwise be
++// inherited by the tmux server agent-deck spawns and leak into every pane,
++// breaking unrelated programs that read XDG_* to locate their own config.
++const AgentDeckHomeEnv = "AGENT_DECK_HOME"
++
+ // S4 data-loss safeguard (2026-06-04 incident).
+ //
+ // Path resolution uses $HOME and XDG_* env vars. Under go test, a package that
+@@ -118,6 +130,17 @@ func LegacyDir() (string, error) {
+ }
+
+ func xdgDir(envName string, fallbackParts ...string) (string, error) {
++	// A dedicated agent-deck home overrides every other source. Only an
++	// absolute path is honored; a relative value is ignored so a stray
++	// export cannot silently anchor agent-deck state at the cwd.
++	if home := strings.TrimSpace(os.Getenv(AgentDeckHomeEnv)); home != "" && filepath.IsAbs(home) {
++		dir := filepath.Clean(home)
++		if err := ensureSafeForTest(dir); err != nil {
++			return "", err
++		}
++		return dir, nil
++	}
++
+ 	if value := strings.TrimSpace(os.Getenv(envName)); value != "" {
+ 		if filepath.IsAbs(value) {
+ 			dir := filepath.Join(value, AppDirName)
+--- /dev/null
++++ b/internal/agentpaths/agentdeckhome_test.go
+@@ -0,0 +1,63 @@
++package agentpaths
++
++import (
++	"path/filepath"
++	"testing"
++)
++
++// AGENT_DECK_HOME, when absolute, is the agent-deck home for config, data,
++// and cache alike -- overriding XDG_* entirely.
++func TestAgentDeckHomeOverridesXDG(t *testing.T) {
++	root := t.TempDir()
++	t.Setenv("XDG_CONFIG_HOME", filepath.Join(root, "xdg-config"))
++	t.Setenv("XDG_DATA_HOME", filepath.Join(root, "xdg-data"))
++	t.Setenv("XDG_CACHE_HOME", filepath.Join(root, "xdg-cache"))
++
++	deck := filepath.Join(root, "deck")
++	t.Setenv(AgentDeckHomeEnv, deck)
++
++	cases := map[string]func() (string, error){
++		"config": ConfigDir,
++		"data":   DataDir,
++		"cache":  CacheDir,
++	}
++	for name, fn := range cases {
++		got, err := fn()
++		if err != nil {
++			t.Fatalf("%s: %v", name, err)
++		}
++		if got != deck {
++			t.Fatalf("%s: got %q want %q", name, got, deck)
++		}
++	}
++}
++
++// A relative AGENT_DECK_HOME is ignored; resolution falls back to XDG.
++func TestAgentDeckHomeIgnoredWhenRelative(t *testing.T) {
++	xdg := t.TempDir()
++	t.Setenv("XDG_CONFIG_HOME", xdg)
++	t.Setenv(AgentDeckHomeEnv, filepath.Join("relative", "path"))
++
++	got, err := ConfigDir()
++	if err != nil {
++		t.Fatal(err)
++	}
++	if want := filepath.Join(xdg, AppDirName); got != want {
++		t.Fatalf("relative AGENT_DECK_HOME must be ignored: got %q want %q", got, want)
++	}
++}
++
++// An unset AGENT_DECK_HOME leaves XDG resolution unchanged.
++func TestAgentDeckHomeUnsetUsesXDG(t *testing.T) {
++	xdg := t.TempDir()
++	t.Setenv("XDG_DATA_HOME", xdg)
++	t.Setenv(AgentDeckHomeEnv, "")
++
++	got, err := DataDir()
++	if err != nil {
++		t.Fatal(err)
++	}
++	if want := filepath.Join(xdg, AppDirName); got != want {
++		t.Fatalf("got %q want %q", got, want)
++	}
++}

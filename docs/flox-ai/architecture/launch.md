@@ -30,9 +30,13 @@ a flox-managed, per-environment configuration. On every launch it:
 - forces the deck's claude command to `flox-ai launch claude --`, so every
   session Agent Deck spawns runs back through flox-ai and inherits this
   environment's fragments;
-- isolates the deck per environment with its own data home and a stable,
+- isolates the deck per environment via `AGENT_DECK_HOME` (a flox patch to
+  agent-deck makes it override the `XDG_*` base dirs) plus a stable,
   per-config-dir tmux socket, so decks in different environments do not share
-  state or collide.
+  state or collide. `AGENT_DECK_HOME` is used instead of overriding
+  `XDG_CONFIG_HOME`/`XDG_DATA_HOME` because the deck's tmux server propagates
+  its environment to every pane; hijacking `XDG_*` would leak the deck home
+  into those panes and break unrelated programs.
 
 `RunDeck` (in `internal/launch/agentdeck.go`) implements this; `go-toml/v2`
 parses and rewrites the config.
