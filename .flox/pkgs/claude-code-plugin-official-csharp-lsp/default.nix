@@ -1,4 +1,4 @@
-{ stdenv, lib, fetchFromGitHub, jq, csharp-ls }:
+{ stdenv, lib, fetchFromGitHub, jq, csharp-ls, flox-agent-layout }:
 
 let
   data = builtins.fromJSON (builtins.readFile ./hashes.json);
@@ -17,7 +17,7 @@ stdenv.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
-  nativeBuildInputs = [ jq ];
+  nativeBuildInputs = [ jq flox-agent-layout ];
 
   installPhase = ''
     runHook preInstall
@@ -43,6 +43,10 @@ stdenv.mkDerivation {
       "$out/bin/csharp-ls"
 
     runHook postInstall
+  '';
+
+  postInstall = ''
+    flox-agent-layout --plugin csharp-lsp --share "$out/share"
   '';
 
   meta = {

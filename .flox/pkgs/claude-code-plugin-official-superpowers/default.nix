@@ -3,6 +3,7 @@
   lib,
   fetchFromGitHub,
   nodejs,
+  flox-agent-layout,
 }:
 
 let
@@ -22,6 +23,12 @@ stdenv.mkDerivation {
 
   dontConfigure = true;
   dontBuild = true;
+
+  nativeBuildInputs = [ flox-agent-layout ];
+
+  postInstall = ''
+    flox-agent-layout --plugin superpowers --share "$out/share"
+  '';
 
   installPhase = ''
     runHook preInstall

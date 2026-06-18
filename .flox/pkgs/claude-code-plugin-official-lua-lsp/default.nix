@@ -1,4 +1,4 @@
-{ stdenv, lib, fetchFromGitHub, jq, lua-language-server }:
+{ stdenv, lib, fetchFromGitHub, jq, lua-language-server, flox-agent-layout }:
 
 let
   data = builtins.fromJSON (builtins.readFile ./hashes.json);
@@ -17,7 +17,7 @@ stdenv.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
-  nativeBuildInputs = [ jq ];
+  nativeBuildInputs = [ jq flox-agent-layout ];
 
   installPhase = ''
     runHook preInstall
@@ -43,6 +43,10 @@ stdenv.mkDerivation {
       "$out/bin/lua-language-server"
 
     runHook postInstall
+  '';
+
+  postInstall = ''
+    flox-agent-layout --plugin lua-lsp --share "$out/share"
   '';
 
   meta = {

@@ -1,4 +1,4 @@
-{ stdenv, lib, fetchFromGitHub, jq, typescript-language-server }:
+{ stdenv, lib, fetchFromGitHub, jq, typescript-language-server, flox-agent-layout }:
 
 let
   data = builtins.fromJSON (builtins.readFile ./hashes.json);
@@ -17,7 +17,7 @@ stdenv.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
-  nativeBuildInputs = [ jq ];
+  nativeBuildInputs = [ jq flox-agent-layout ];
 
   installPhase = ''
     runHook preInstall
@@ -41,6 +41,8 @@ stdenv.mkDerivation {
     mkdir -p "$out/bin"
     ln -s ${typescript-language-server}/bin/typescript-language-server \
       "$out/bin/typescript-language-server"
+
+    flox-agent-layout --plugin typescript-lsp --share "$out/share"
 
     runHook postInstall
   '';

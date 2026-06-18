@@ -3,6 +3,7 @@
   lib,
   fetchFromGitHub,
   makeBinaryWrapper,
+  flox-agent-layout,
   python3,
   curl,
   git,
@@ -46,7 +47,10 @@ stdenv.mkDerivation {
   # is exec'd directly by the kernel via shebang on Darwin, where
   # shebang chains through a shell script wrapper are unreliable
   # under stripped environments.
-  nativeBuildInputs = [ makeBinaryWrapper ];
+  nativeBuildInputs = [
+    makeBinaryWrapper
+    flox-agent-layout
+  ];
 
   installPhase = ''
     runHook preInstall
@@ -104,6 +108,10 @@ stdenv.mkDerivation {
     "$out/bin/python3" ${./fix_md_paths.py} "$PLUGIN_DIR"
 
     runHook postInstall
+  '';
+
+  postInstall = ''
+    flox-agent-layout --plugin claude-ads --share "$out/share"
   '';
 
   meta = {

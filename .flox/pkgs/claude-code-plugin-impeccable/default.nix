@@ -5,6 +5,7 @@
   makeBinaryWrapper,
   nodejs,
   git,
+  flox-agent-layout,
 }:
 
 let
@@ -31,7 +32,7 @@ stdenv.mkDerivation {
   # is exec'd directly by the kernel via shebang on Darwin, where
   # shebang chains through a shell-script wrapper are unreliable
   # under stripped environments.
-  nativeBuildInputs = [ makeBinaryWrapper ];
+  nativeBuildInputs = [ makeBinaryWrapper flox-agent-layout ];
 
   installPhase = ''
     runHook preInstall
@@ -108,6 +109,10 @@ stdenv.mkDerivation {
     echo "fix_md_paths: rewrote refs in $rewritten markdown file(s)"
 
     runHook postInstall
+  '';
+
+  postInstall = ''
+    flox-agent-layout --plugin impeccable --share "$out/share"
   '';
 
   meta = {

@@ -2,6 +2,7 @@
   stdenv,
   lib,
   fetchFromGitHub,
+  flox-agent-layout,
 }:
 
 let
@@ -21,6 +22,8 @@ stdenv.mkDerivation {
 
   dontConfigure = true;
   dontBuild = true;
+
+  nativeBuildInputs = [ flox-agent-layout ];
 
   installPhase = ''
     runHook preInstall
@@ -66,6 +69,10 @@ stdenv.mkDerivation {
     JSON
 
     runHook postInstall
+  '';
+
+  postInstall = ''
+    flox-agent-layout --plugin remotion --share "$out/share"
   '';
 
   meta = {

@@ -1,4 +1,4 @@
-{ stdenvNoCC, lib, fetchFromGitHub }:
+{ stdenvNoCC, lib, fetchFromGitHub, flox-agent-layout }:
 
 let
   data = builtins.fromJSON (builtins.readFile ./hashes.json);
@@ -17,12 +17,18 @@ stdenvNoCC.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
+  nativeBuildInputs = [ flox-agent-layout ];
+
   installPhase = ''
     runHook preInstall
     PLUGIN_DIR="$out/share/claude-code/plugins/code-simplifier"
     mkdir -p "$PLUGIN_DIR"
     cp -r "$src/plugins/code-simplifier/." "$PLUGIN_DIR/"
     runHook postInstall
+  '';
+
+  postInstall = ''
+    flox-agent-layout --plugin code-simplifier --share "$out/share"
   '';
 
   meta = {

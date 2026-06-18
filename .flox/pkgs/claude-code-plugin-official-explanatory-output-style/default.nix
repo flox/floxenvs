@@ -1,4 +1,4 @@
-{ stdenvNoCC, lib, fetchFromGitHub }:
+{ stdenvNoCC, lib, fetchFromGitHub, flox-agent-layout }:
 
 let
   data = builtins.fromJSON (builtins.readFile ./hashes.json);
@@ -17,12 +17,18 @@ stdenvNoCC.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
+  nativeBuildInputs = [ flox-agent-layout ];
+
   installPhase = ''
     runHook preInstall
     PLUGIN_DIR="$out/share/claude-code/plugins/explanatory-output-style"
     mkdir -p "$PLUGIN_DIR"
     cp -r "$src/plugins/explanatory-output-style/." "$PLUGIN_DIR/"
     runHook postInstall
+  '';
+
+  postInstall = ''
+    flox-agent-layout --plugin explanatory-output-style --share "$out/share"
   '';
 
   meta = {

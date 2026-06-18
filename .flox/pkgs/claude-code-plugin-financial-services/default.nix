@@ -4,6 +4,7 @@
   fetchFromGitHub,
   makeBinaryWrapper,
   makeWrapper,
+  flox-agent-layout,
   python3,
   curl,
   gh,
@@ -41,7 +42,7 @@ stdenv.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
-  nativeBuildInputs = [ makeBinaryWrapper makeWrapper jq ];
+  nativeBuildInputs = [ makeBinaryWrapper makeWrapper jq flox-agent-layout ];
 
   installPhase = ''
     runHook preInstall
@@ -145,6 +146,16 @@ stdenv.mkDerivation {
     done
 
     runHook postInstall
+  '';
+
+  # This package ships 19 plugins flat under share/claude-code/plugins/.
+  # Emit the per-agent launch layout once per plugin so each gets its
+  # share/flox/<agent>/<plugin> entries.
+  postInstall = ''
+    for plugin_dir in "$out/share/claude-code/plugins"/*/; do
+      plugin_name="$(basename "$plugin_dir")"
+      flox-agent-layout --plugin "$plugin_name" --share "$out/share"
+    done
   '';
 
   meta = {

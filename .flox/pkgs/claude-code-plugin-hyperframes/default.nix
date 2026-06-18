@@ -4,6 +4,7 @@
   fetchFromGitHub,
   ffmpeg-headless,
   perl,
+  flox-agent-layout,
 }:
 
 let
@@ -21,7 +22,10 @@ stdenv.mkDerivation {
     hash = srcHash;
   };
 
-  nativeBuildInputs = [ perl ];
+  nativeBuildInputs = [
+    perl
+    flox-agent-layout
+  ];
 
   dontConfigure = true;
   dontBuild = true;
@@ -56,6 +60,8 @@ stdenv.mkDerivation {
           s{\bffmpeg(?=[\s",)])}{${ffmpeg-headless}/bin/ffmpeg}g;
           s{\bffprobe(?=[\s",)])}{${ffmpeg-headless}/bin/ffprobe}g;
         '
+
+    flox-agent-layout --plugin hyperframes --share "$out/share"
 
     runHook postInstall
   '';

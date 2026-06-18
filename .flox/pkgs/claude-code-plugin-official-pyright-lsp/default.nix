@@ -1,4 +1,4 @@
-{ stdenv, lib, fetchFromGitHub, jq, pyright }:
+{ stdenv, lib, fetchFromGitHub, jq, pyright, flox-agent-layout }:
 
 let
   data = builtins.fromJSON (builtins.readFile ./hashes.json);
@@ -17,7 +17,7 @@ stdenv.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
-  nativeBuildInputs = [ jq ];
+  nativeBuildInputs = [ jq flox-agent-layout ];
 
   installPhase = ''
     runHook preInstall
@@ -43,6 +43,10 @@ stdenv.mkDerivation {
       "$out/bin/pyright-langserver"
 
     runHook postInstall
+  '';
+
+  postInstall = ''
+    flox-agent-layout --plugin pyright-lsp --share "$out/share"
   '';
 
   meta = {

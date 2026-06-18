@@ -4,6 +4,7 @@
   fetchFromGitHub,
   makeBinaryWrapper,
   python3,
+  flox-agent-layout,
 }:
 
 let
@@ -25,7 +26,10 @@ stdenv.mkDerivation {
   # is exec'd directly by the kernel via shebang on Darwin, where
   # shebang chains through a shell-script wrapper are unreliable
   # under stripped environments.
-  nativeBuildInputs = [ makeBinaryWrapper ];
+  nativeBuildInputs = [
+    makeBinaryWrapper
+    flox-agent-layout
+  ];
 
   dontConfigure = true;
   dontBuild = true;
@@ -114,6 +118,10 @@ stdenv.mkDerivation {
     JSON
 
     runHook postInstall
+  '';
+
+  postInstall = ''
+    flox-agent-layout --plugin claude-obsidian --share "$out/share"
   '';
 
   meta = {

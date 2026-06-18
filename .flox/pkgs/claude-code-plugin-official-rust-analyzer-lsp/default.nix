@@ -1,4 +1,4 @@
-{ stdenv, lib, fetchFromGitHub, jq, rust-analyzer }:
+{ stdenv, lib, fetchFromGitHub, jq, rust-analyzer, flox-agent-layout }:
 
 let
   data = builtins.fromJSON (builtins.readFile ./hashes.json);
@@ -17,7 +17,7 @@ stdenv.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
-  nativeBuildInputs = [ jq ];
+  nativeBuildInputs = [ jq flox-agent-layout ];
 
   installPhase = ''
     runHook preInstall
@@ -41,6 +41,8 @@ stdenv.mkDerivation {
     mkdir -p "$out/bin"
     ln -s ${rust-analyzer}/bin/rust-analyzer \
       "$out/bin/rust-analyzer"
+
+    flox-agent-layout --plugin rust-analyzer-lsp --share "$out/share"
 
     runHook postInstall
   '';
