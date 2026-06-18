@@ -111,7 +111,7 @@ stdenvNoCC.mkDerivation {
       # own `command -v` + version check still validate the path.
       substituteInPlace "$skill/SKILL.md" \
         --replace-fail \
-          'for py in python3.14 python3.13 python3.12 python3; do' \
+          'for py in python3.14 python3.13 python3.12 python3 python; do' \
           'for py in "${py}"; do'
     done
   '';
