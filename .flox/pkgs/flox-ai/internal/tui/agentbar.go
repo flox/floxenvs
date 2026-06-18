@@ -22,6 +22,10 @@ func agentDisplay(name string) string {
 		return "Agent Deck"
 	case "codex":
 		return "Codex"
+	case "opencode":
+		return "opencode"
+	case "pi":
+		return "pi"
 	case "":
 		return ""
 	default:
@@ -49,6 +53,16 @@ func agentInfo(name string) (title, desc string) {
 				"and rules via Codex's skill roots and project " +
 				"instructions. Plugins are not injected (Codex uses a " +
 				"different plugin format)."
+	case "opencode":
+		return "opencode",
+			"The opencode CLI. Injects this environment's skills and rules " +
+				"via a merged opencode config — your own config is not " +
+				"overwritten. Claude-format plugins map as local plugins."
+	case "pi":
+		return "pi",
+			"The pi CLI. Injects this environment's skills and rules via " +
+				"session-scoped flags. Standalone agents and Claude-format " +
+				"plugins are not injected."
 	default:
 		return name, "AI coding agent."
 	}
@@ -76,6 +90,16 @@ func agentLaunch(name string) string {
 			"untouched.\n\n" +
 			"Plugins are not injected: Codex uses a different plugin " +
 			"format.\n\n" +
+			"You can install or remove fragments and relaunch any time."
+	case "opencode":
+		return "Starts opencode with this environment's skills and rules " +
+			"injected through a merged config — your own opencode config " +
+			"is left intact.\n\n" +
+			"You can install or remove fragments and relaunch any time."
+	case "pi":
+		return "Starts pi with this environment's skills and rules injected " +
+			"as session-scoped flags.\n\n" +
+			"Standalone agents and Claude-format plugins are not injected.\n\n" +
 			"You can install or remove fragments and relaunch any time."
 	default:
 		return "Starts the agent with the installed plugins, skills, agents and rules."
