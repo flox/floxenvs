@@ -1,0 +1,120 @@
+// codex.go: runs OpenAI Codex with flox-managed fragments injected via the
+// env-var hooks added by the flox codex patch (flox-fragments.patch). Unlike
+// the claude path, Codex takes no --plugin-dir / --append-system-prompt-file
+// flags: it discovers skills from skill-root directories and rules from
+// project instructions. The patch lets us point Codex at flox-staged copies
+// through CODEX_FLOX_SKILL_ROOTS and CODEX_FLOX_INSTRUCTIONS_FILE, so nothing
+// in ~/.codex or the working tree is mutated.
+
+package launch
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"syscall"
+
+	"flox.dev/flox-ai/internal/discover"
+)
+
+const (
+	// EnvCodexSkillRoots is the colon-separated list of extra skill-root
+	// directories the flox codex patch appends to Codex's skill discovery.
+	EnvCodexSkillRoots = "CODEX_FLOX_SKILL_ROOTS"
+	// EnvCodexInstructionsFile is the extra project-instructions file the
+	// flox codex patch appends to Codex's loaded instructions.
+	EnvCodexInstructionsFile = "CODEX_FLOX_INSTRUCTIONS_FILE"
+)
+
+// BuildCodexSkillRoot creates a Codex skill-root directory under
+// launchDir/skills containing the given skills and agents as skill
+// subdirectories, and returns the root path. Each skill is linked as its
+// SKILL.md-holding directory; each standalone agent is wrapped as
+// <name>/SKILL.md (Codex discovers it as a skill). Codex follows symlinked
+// skill folders when scanning. Returns "" (and writes nothing) when there
+// are no skills or agents.
+func BuildCodexSkillRoot(launchDir string, skills, agents []discover.Fragment) (string, error) {
+	if len(skills) == 0 && len(agents) == 0 {
+		return "", nil
+	}
+	root := filepath.Join(launchDir, "skills")
+	if err := os.MkdirAll(root, 0755); err != nil {
+		return "", err
+	}
+	for _, s := range skills {
+		// s.Path is the SKILL.md file; link its directory as a skill.
+		target := filepath.Dir(s.Path)
+		if err := os.Symlink(target, filepath.Join(root, s.Name)); err != nil {
+			return "", err
+		}
+	}
+	for _, a := range agents {
+		// Standalone agents have no skill directory; synthesize one whose
+		// SKILL.md is the agent file so Codex surfaces it as a skill.
+		dir := filepath.Join(root, a.Name)
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return "", err
+		}
+		if err := os.Symlink(a.Path, filepath.Join(dir, "SKILL.md")); err != nil {
+			return "", err
+		}
+	}
+	return root, nil
+}
+
+// PrepareCodex wipes launchDir and rebuilds the synth skill root and merged
+// rules file from the discovered fragments. Like Prepare, wiping each run
+// keeps the tree free of stale entries. Returns the skill-root path ("" if
+// none) and the rules file path ("" if none).
+func PrepareCodex(launchDir string, frags *discover.Result) (skillRoot, rulesFile string, err error) {
+	if err := os.RemoveAll(launchDir); err != nil {
+		return "", "", err
+	}
+	if err := os.MkdirAll(launchDir, 0755); err != nil {
+		return "", "", err
+	}
+	skillRoot, err = BuildCodexSkillRoot(launchDir, frags.Skills, frags.Agents)
+	if err != nil {
+		return "", "", err
+	}
+	rulesFile, err = MergeRules(launchDir, frags.Rules)
+	if err != nil {
+		return "", "", err
+	}
+	return skillRoot, rulesFile, nil
+}
+
+// RunCodex resolves the codex binary, stages this environment's skills and
+// rules under the flox config dir, points Codex at them via the patch env
+// vars, and execs codex (replacing this process). Codex plugins are not
+// mapped: the flox/Claude plugin format differs from Codex's. It only
+// returns when something fails before exec.
+func RunCodex(opts Options) error {
+	agent := Supported[opts.AgentName] // caller guarantees codex
+	bin, err := resolveBinary(agent)
+	if err != nil {
+		return err
+	}
+
+	frags, err := discover.Scan(opts.ShareDir)
+	if err != nil {
+		return fmt.Errorf("discover: %w", err)
+	}
+
+	launchDir := filepath.Join(opts.ConfigDir, "codex")
+	skillRoot, rulesFile, err := PrepareCodex(launchDir, frags)
+	if err != nil {
+		return err
+	}
+
+	env := setEnvVar(os.Environ(), "FLOX_AI", "1")
+	if skillRoot != "" {
+		env = setEnvVar(env, EnvCodexSkillRoots, skillRoot)
+	}
+	if rulesFile != "" {
+		env = setEnvVar(env, EnvCodexInstructionsFile, rulesFile)
+	}
+
+	argv := append([]string{bin}, opts.Passthrough...)
+	return syscall.Exec(bin, argv, env)
+}

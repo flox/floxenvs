@@ -20,6 +20,8 @@ func agentDisplay(name string) string {
 		return "Claude"
 	case "agent-deck":
 		return "Agent Deck"
+	case "codex":
+		return "Codex"
 	case "":
 		return ""
 	default:
@@ -41,6 +43,12 @@ func agentInfo(name string) (title, desc string) {
 			"Terminal session manager for AI coding agents. Spawns Claude " +
 				"Code sessions through flox-ai, so this environment's " +
 				"fragments are injected into every session it manages."
+	case "codex":
+		return "Codex",
+			"OpenAI's Codex CLI. Injects this environment's skills, agents " +
+				"and rules via Codex's skill roots and project " +
+				"instructions. Plugins are not injected (Codex uses a " +
+				"different plugin format)."
 	default:
 		return name, "AI coding agent."
 	}
@@ -60,6 +68,14 @@ func agentLaunch(name string) string {
 			"skills, agents and rules are injected into each one.\n\n" +
 			"Agent Deck keeps its config and tmux socket isolated per " +
 			"environment.\n\n" +
+			"You can install or remove fragments and relaunch any time."
+	case "codex":
+		return "Starts Codex with this environment's skills, agents and " +
+			"rules injected via Codex's skill roots and project " +
+			"instructions — your ~/.codex and working tree are left " +
+			"untouched.\n\n" +
+			"Plugins are not injected: Codex uses a different plugin " +
+			"format.\n\n" +
 			"You can install or remove fragments and relaunch any time."
 	default:
 		return "Starts the agent with the installed plugins, skills, agents and rules."

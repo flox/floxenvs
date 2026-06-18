@@ -97,3 +97,7 @@ trap - EXIT
 echo "Updated to $latest_version"
 echo "NOTE: librusty_v8 and livekit_webrtc hashes were kept as-is."
 echo "      If the build fails, check if those deps changed upstream."
+echo "WARNING: flox-fragments.patch must be re-verified against the new"
+echo "         version. It targets core-skills/src/loader.rs and"
+echo "         core/src/agents_md.rs. If 'flox build codex' fails on the"
+echo "         patchPhase, regenerate it (see default.nix for details)."

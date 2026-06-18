@@ -64,6 +64,15 @@ rustPlatform.buildRustPackage {
 
   sourceRoot = "source/codex-rs";
 
+  # flox-fragments.patch teaches Codex to read two env vars set by
+  # `flox-ai launch codex`: CODEX_FLOX_SKILL_ROOTS (extra skill-root dirs)
+  # and CODEX_FLOX_INSTRUCTIONS_FILE (extra project instructions). This lets
+  # flox inject environment-managed skills and rules without mutating
+  # ~/.codex or the working tree. Re-verify on every version bump
+  # (see upgrade.sh) — the patch targets core-skills/loader.rs and
+  # core/agents_md.rs. Paths are relative to codex-rs (the sourceRoot).
+  patches = [ ./flox-fragments.patch ];
+
   cargoBuildFlags = [
     "--package"
     "codex-cli"
