@@ -385,6 +385,27 @@ func runDoctor(shareDir, configDir, projectDir string, managed bool) error {
 		}
 	}
 
+	// Launch readiness: can each registered agent be launched, and will
+	// fragments inject? Same Check the launch path runs.
+	fmt.Println()
+	fmt.Println(bold("Launch readiness"))
+	for _, r := range launch.CheckAll() {
+		var mark string
+		switch r.Status.Level {
+		case launch.OK:
+			mark = green("ok")
+		case launch.Degraded:
+			mark = yellow("degraded")
+		default:
+			mark = red("fail")
+		}
+		line := fmt.Sprintf("  %-12s %s", r.Name, mark)
+		if r.Status.Reason != "" {
+			line += " — " + r.Status.Reason
+		}
+		fmt.Println(line)
+	}
+
 	errCount := len(result.Errors())
 	warnCount := len(result.Warnings())
 
