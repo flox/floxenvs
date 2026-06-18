@@ -22,6 +22,11 @@ on:
 
 env:
   FLOX_DISABLE_METRICS: "true"
+  # Build from source when a binary-cache substitute fails — cache.nixos.org
+  # currently serves a hash-mismatched texlive path (lpform-36918-tex) that
+  # breaks skills-video-use's native x86_64-linux build. Augments nix.conf;
+  # substituters unchanged.
+  NIX_CONFIG: "fallback = true"
 
 jobs:
 
