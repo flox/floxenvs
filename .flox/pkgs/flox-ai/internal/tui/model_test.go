@@ -4,9 +4,9 @@ import "testing"
 
 func testItems() []catalogItem {
 	return []catalogItem{
-		{ID: "claude-code-plugin-caveman", Name: "Caveman", Type: "plugin",
+		{ID: "skills-caveman", Name: "Caveman", Type: "plugin",
 			For: "claude-code", Tags: []string{"compression", "ai"},
-			InstallPkg: "flox/claude-code-plugin-caveman"},
+			InstallPkg: "flox/skills-caveman"},
 		{ID: "skills-graphify", Name: "Graphify", Type: "skill",
 			For: "claude-code", Tags: []string{"knowledge", "ai"},
 			InstallPkg: "flox/skills-graphify"},
@@ -46,7 +46,7 @@ func TestTopPicksUntilQuery(t *testing.T) {
 	if m.isTopPicks() {
 		t.Error("a query must leave top-picks mode")
 	}
-	if !has(m.visibleItems(), "claude-code-plugin-caveman") {
+	if !has(m.visibleItems(), "skills-caveman") {
 		t.Error("query should surface caveman")
 	}
 }
@@ -62,7 +62,7 @@ func TestResultsTagFilter(t *testing.T) {
 	m := newTestModel(nil)
 	m.query = "#ai"
 	got := m.results()
-	if !has(got, "claude-code-plugin-caveman") || !has(got, "skills-graphify") {
+	if !has(got, "skills-caveman") || !has(got, "skills-graphify") {
 		t.Errorf("#ai tag should match caveman+graphify: %v", got)
 	}
 	if has(got, "skills-foo") {
@@ -87,7 +87,7 @@ func TestResultsFreeTextPlusTag(t *testing.T) {
 	if !has(got, "skills-graphify") {
 		t.Errorf("graph #ai should match graphify: %v", got)
 	}
-	if has(got, "claude-code-plugin-caveman") {
+	if has(got, "skills-caveman") {
 		t.Error("caveman has #ai but not the text 'graph'")
 	}
 }
@@ -102,9 +102,9 @@ func TestResultsAgentFilter(t *testing.T) {
 
 func TestPanelShowsInstalledAndStaged(t *testing.T) {
 	m := newTestModel(map[string]bool{"skills-graphify": true})
-	m.stageInstall("claude-code-plugin-caveman")
+	m.stageInstall("skills-caveman")
 	p := m.panelItems()
-	if !has(p, "skills-graphify") || !has(p, "claude-code-plugin-caveman") {
+	if !has(p, "skills-graphify") || !has(p, "skills-caveman") {
 		t.Errorf("panel = %v", p)
 	}
 }
@@ -140,11 +140,11 @@ func TestStageInstallSkipsInstalled(t *testing.T) {
 func TestPendingOps(t *testing.T) {
 	m := newTestModel(map[string]bool{"skills-graphify": true})
 	m.pending = map[string]action{
-		"claude-code-plugin-caveman": actionInstall,
+		"skills-caveman": actionInstall,
 		"skills-graphify":            actionUninstall,
 	}
 	ins, uns := m.pendingOps()
-	if len(ins) != 1 || ins[0] != "flox/claude-code-plugin-caveman" {
+	if len(ins) != 1 || ins[0] != "flox/skills-caveman" {
 		t.Fatalf("installs %v", ins)
 	}
 	if len(uns) != 1 || uns[0] != "skills-graphify" {

@@ -93,7 +93,7 @@ func TestViewFooterInstallCTA(t *testing.T) {
 }
 
 func TestViewFooterUninstallCTA(t *testing.T) {
-	m := newTestModel(map[string]bool{"claude-code-plugin-caveman": true})
+	m := newTestModel(map[string]bool{"skills-caveman": true})
 	m.width, m.height = 100, 30
 	m.query = "cave"
 	m.mode = modeNormal

@@ -11,12 +11,12 @@ const lockSample = `{
   "manifest": {
     "install": {
       "claude-code": {"pkg-path": "flox/claude-code"},
-      "claude-code-plugin-caveman": {"pkg-path": "flox/claude-code-plugin-caveman"}
+      "skills-caveman": {"pkg-path": "flox/skills-caveman"}
     }
   },
   "packages": [
     {"install_id": "claude-code", "attr_path": "claude-code"},
-    {"install_id": "claude-code-plugin-caveman", "attr_path": "x"}
+    {"install_id": "skills-caveman", "attr_path": "x"}
   ]
 }`
 
@@ -39,7 +39,7 @@ func TestInstalledReadsIds(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !got["claude-code"] || !got["claude-code-plugin-caveman"] {
+	if !got["claude-code"] || !got["skills-caveman"] {
 		t.Fatalf("missing ids: %v", got)
 	}
 }

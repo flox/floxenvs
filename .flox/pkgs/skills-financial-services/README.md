@@ -10,25 +10,35 @@ and scripts need.
 
 ## Install
 
-Add to a `flox/claude`-based environment:
+Add `flox-ai` and this package to an environment:
 
 ```toml
 schema-version = "1.10.0"
 
-[include]
-environments = [{ remote = "flox/claude" }]
-
 [install]
-financial-services.pkg-path = "skills-financial-services"
+flox-ai.pkg-path = "flox/flox-ai"
+financial-services.pkg-path = "flox/skills-financial-services"
+
+[hook]
+on-activate = '''
+eval "$(flox-ai setup-hook)"
+'''
 ```
 
-On `flox activate`, `flox-ai setup-hook` (provided by
-the included `flox/claude` env) discovers all 19 plugins under
-`$FLOX_ENV/share/claude-code/plugins/`, symlinks them into
+On `flox activate`, `flox-ai setup-hook` discovers all 19 plugins
+under `$FLOX_ENV/share/claude-code/plugins/`, symlinks them into
 `$CLAUDE_CONFIG_DIR/plugins/<name>/`, and merges every
-`installed_plugins.json` so Claude Code trusts each one. The
-plugins, their slash commands, hooks, and MCP wiring are
-available in the next Claude Code session.
+`installed_plugins.json` so Claude Code trusts each one.
+
+Install Claude Code (`flox install flox/claude-code`, or bring your
+own), then launch it through flox-ai so the plugins load:
+
+```bash
+flox-ai launch claude
+```
+
+The plugins, their slash commands, hooks, and MCP wiring are
+available in the Claude Code session.
 
 ## Plugins (19)
 
