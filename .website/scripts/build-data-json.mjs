@@ -48,7 +48,10 @@ for (const name of names) {
     const pkg = { name, ...meta };
     if (!isFragmentPkg(pkg)) continue;
     const item = toCatalogItem(pkg);
-    const kind = pkg.subkind === "agent" ? "agent" : "skill";
+    // Fragment packages live under .flox/pkgs, so the audit pipeline
+    // stages their metrics under the "pkg" kind (not subkind-derived
+    // skill/agent dirs).
+    const kind = "pkg";
     const metricsPath = join(
       REPO,
       ".website",
