@@ -9,7 +9,7 @@ import {
 } from "./aiCatalog";
 
 const caveman: PkgData = {
-  name: "claude-code-plugin-caveman",
+  name: "skills-caveman",
   title: "Caveman",
   subkind: "plugin",
   plugin_for: "claude-code",
@@ -25,15 +25,15 @@ const caveman: PkgData = {
   featured: false,
   links: {
     source: "https://github.com/flox/floxenvs/tree/main/x",
-    floxhub: "https://hub.flox.dev/flox/claude-code-plugin-caveman",
+    floxhub: "https://hub.flox.dev/flox/skills-caveman",
   },
   install: {
     pkg: [
       "[install]",
       'claude-code.pkg-path = "flox/claude-code"',
       'claude-code.publisher = "flox"',
-      'claude-code-plugin-caveman.pkg-path = "flox/claude-code-plugin-caveman"',
-      'claude-code-plugin-caveman.publisher = "flox"',
+      'skills-caveman.pkg-path = "flox/skills-caveman"',
+      'skills-caveman.publisher = "flox"',
     ].join("\n"),
   },
 };
@@ -42,7 +42,7 @@ describe("toCatalogItem", () => {
   it("maps a plugin package to a catalog item", () => {
     const item = toCatalogItem(caveman);
     expect(item).toEqual({
-      id: "claude-code-plugin-caveman",
+      id: "skills-caveman",
       name: "Caveman",
       type: "plugin",
       for: "claude-code",
@@ -52,7 +52,7 @@ describe("toCatalogItem", () => {
       status: "beta",
       featured: false,
       link: "https://github.com/flox/floxenvs/tree/main/x",
-      installPkg: "flox/claude-code-plugin-caveman",
+      installPkg: "flox/skills-caveman",
       intro: "Caveman intro.",
       summary: ["one", "two"],
       stack: ["bash"],
@@ -63,7 +63,7 @@ describe("toCatalogItem", () => {
 
   it("extracts installPkg matching the package name, not the dep", () => {
     expect(toCatalogItem(caveman).installPkg).toBe(
-      "flox/claude-code-plugin-caveman",
+      "flox/skills-caveman",
     );
   });
 });

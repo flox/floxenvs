@@ -53,7 +53,7 @@ export function isFragmentPkg(p: PkgData): boolean {
 // Extract the package's own pkg-path from the install.pkg TOML block.
 // The block lists the claude-code dependency plus the fragment itself;
 // we want the line keyed by the package name, e.g.
-//   claude-code-plugin-caveman.pkg-path = "flox/claude-code-plugin-caveman"
+//   skills-caveman.pkg-path = "flox/skills-caveman"
 export function extractInstallPkg(p: PkgData): string {
   const block = p.install?.pkg ?? "";
   const re = new RegExp(
