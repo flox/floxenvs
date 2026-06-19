@@ -3,6 +3,8 @@ package tui
 import (
 	"strings"
 	"testing"
+
+	"flox.dev/flox-ai/internal/catalog"
 )
 
 func TestViewStartScreenTopPicks(t *testing.T) {
@@ -114,5 +116,49 @@ func TestViewWideShowsDivider(t *testing.T) {
 	out := m.View().Content
 	if !strings.Contains(out, ruleV) {
 		t.Error("wide layout must render the detail divider")
+	}
+}
+
+func TestAuditScoreBadgeContainsScore(t *testing.T) {
+	m := newTestModel(nil)
+	badge := m.auditScoreBadge(89, "stable")
+	if !strings.Contains(badge, "89") {
+		t.Errorf("audit score badge must contain the score; got %q", badge)
+	}
+	if !strings.Contains(badge, "●") {
+		t.Errorf("audit score badge must contain the status dot; got %q", badge)
+	}
+}
+
+func TestRowLinesWithAuditContainsScore(t *testing.T) {
+	m := newTestModel(nil)
+	a := &catalog.Audit{}
+	a.Overall = 89
+	a.Status = "stable"
+	it := catalogItem{
+		ID: "test-pkg", Name: "TestPkg", Type: "skill",
+		For: "claude-code", InstallPkg: "flox/test-pkg",
+		Audit: a,
+	}
+	lines := m.rowLines(it, 80, false)
+	head := lines[0]
+	if !strings.Contains(head, "89") {
+		t.Errorf("row head with audit must contain score 89; got %q", head)
+	}
+}
+
+func TestRowLinesWithoutAuditHasNoScore(t *testing.T) {
+	m := newTestModel(nil)
+	it := catalogItem{
+		ID: "test-pkg-no-audit", Name: "TestPkgNoAudit", Type: "skill",
+		For: "claude-code", InstallPkg: "flox/test-pkg-no-audit",
+		Audit: nil,
+	}
+	lines := m.rowLines(it, 80, false)
+	head := lines[0]
+	// No audit → no score number should appear in the head line
+	// (it's possible scores appear elsewhere, but this item has no audit at all)
+	if strings.Contains(head, "●") {
+		t.Errorf("row without audit must not contain score dot; got %q", head)
 	}
 }

@@ -431,6 +431,9 @@ func (m model) rowLines(it catalogItem, w int, focused bool) []string {
 	st := m.rowStyle(it.ID)
 
 	head := "  " + typeIcon(it.Type) + " " + it.Name
+	if it.Audit != nil {
+		head += "  " + m.auditScoreBadge(it.Audit.Overall, it.Audit.Status)
+	}
 	if status != "" {
 		head = m.spread(head, status, w-2) // gap before the divider
 	}
@@ -589,6 +592,28 @@ func (m model) statusStyle(status string) lipgloss.Style {
 	default:
 		return m.styles.Danger
 	}
+}
+
+// auditStatusStyle maps catalog audit statuses (stable|warn|risk|missing) to
+// a display style.
+func (m model) auditStatusStyle(status string) lipgloss.Style {
+	switch status {
+	case "stable":
+		return m.styles.Installed
+	case "warn":
+		return m.styles.Warning
+	case "risk", "missing":
+		return m.styles.Danger
+	default:
+		return m.styles.Muted
+	}
+}
+
+// auditScoreBadge returns a compact "89 ●" badge colored by audit status for
+// use in catalog row headers.
+func (m model) auditScoreBadge(overall int, status string) string {
+	st := m.auditStatusStyle(status)
+	return m.styles.Muted.Render(fmt.Sprintf("%d", overall)) + " " + st.Render("●")
 }
 
 // viewReviewModal shows the review-skills report: scores on the left, the

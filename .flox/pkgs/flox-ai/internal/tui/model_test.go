@@ -1,6 +1,10 @@
 package tui
 
-import "testing"
+import (
+	"testing"
+
+	"flox.dev/flox-ai/internal/catalog"
+)
 
 func testItems() []catalogItem {
 	return []catalogItem{
@@ -162,5 +166,36 @@ func TestHasAllTags(t *testing.T) {
 	}
 	if hasAllTags(it, []string{"ai", "missing"}) {
 		t.Error("must require all tags present")
+	}
+}
+
+func TestTopPicksSortsByAuditOverall(t *testing.T) {
+	auditOf := func(score int) *catalog.Audit {
+		a := &catalog.Audit{}
+		a.Overall = score
+		a.Status = "stable"
+		return a
+	}
+	items := []catalogItem{
+		{ID: "a-low", Name: "ALow", Type: "skill", For: "claude-code",
+			InstallPkg: "flox/a-low", Audit: auditOf(40)},
+		{ID: "b-high", Name: "BHigh", Type: "skill", For: "claude-code",
+			InstallPkg: "flox/b-high", Audit: auditOf(90)},
+		{ID: "c-none", Name: "CNone", Type: "skill", For: "claude-code",
+			InstallPkg: "flox/c-none", Audit: nil},
+		{ID: "d-mid", Name: "DMid", Type: "skill", For: "claude-code",
+			InstallPkg: "flox/d-mid", Audit: auditOf(70)},
+	}
+	m := newModel(items, nil, []string{"claude"}, nil, nil, nil, nil, "s", "c", "p")
+	picks := m.topPicks()
+	// Expected order: BHigh(90) > DMid(70) > ALow(40) > CNone(nil)
+	wantOrder := []string{"b-high", "d-mid", "a-low", "c-none"}
+	for i, want := range wantOrder {
+		if i >= len(picks) {
+			t.Fatalf("picks too short: got %d, want at least %d", len(picks), i+1)
+		}
+		if picks[i].ID != want {
+			t.Errorf("picks[%d] = %q, want %q", i, picks[i].ID, want)
+		}
 	}
 }

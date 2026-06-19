@@ -308,6 +308,18 @@ func (m model) topPicks() []catalogItem {
 		if a.Featured != b.Featured {
 			return a.Featured
 		}
+		// Secondary: higher audit score first; items without an audit sort
+		// after those that have one (treated as score -1).
+		aScore, bScore := -1, -1
+		if a.Audit != nil {
+			aScore = a.Audit.Overall
+		}
+		if b.Audit != nil {
+			bScore = b.Audit.Overall
+		}
+		if aScore != bScore {
+			return aScore > bScore
+		}
 		return a.Name < b.Name
 	})
 	if len(out) > topPicksLimit {
