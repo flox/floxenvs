@@ -8,7 +8,7 @@ on:
           Comma-separated <kind>:<name> entries
           (e.g. `env:claude,pkg:ollama`), or `changed`, or `all`.
         type: string
-        default: "changed"
+        default: "all"
       force_rescan:
         description: "Ignore audit cache and re-run all scanners."
         type: boolean
@@ -214,6 +214,19 @@ jobs:
         with:
           name: "site-metrics-staged"
           path: ".website/src/content/metrics"
+      - name: "Build data.json"
+        working-directory: ".website"
+        env:
+          ITEMS: ${{ inputs.items }}
+        run: |
+          set -euo pipefail
+          if [ "${ITEMS:-all}" = "all" ] || [ -z "${ITEMS:-}" ]; then
+            node --experimental-strip-types scripts/build-data-json.mjs --full
+          else
+            # ITEMS is csv of <kind>:<name>; pass just the names
+            only=$(echo "$ITEMS" | tr ',' '\n' | sed 's/^[^:]*://' | paste -sd, -)
+            node --experimental-strip-types scripts/build-data-json.mjs --only="$only"
+          fi
       - name: "Surface metrics.json into dist for next deploy"
         run: |
           set -euo pipefail
