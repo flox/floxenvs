@@ -294,23 +294,8 @@ func (m model) installedPicks() []catalogItem {
 
 const topPicksLimit = 8
 
-func statusRank(s string) int {
-	switch s {
-	case "stable":
-		return 0
-	case "beta":
-		return 1
-	case "experimental":
-		return 2
-	case "deprecated":
-		return 3
-	default:
-		return 9
-	}
-}
-
 // topPicks returns a curated default set for the current agent: featured
-// first, then by status, then title.
+// first, then by title.
 func (m model) topPicks() []catalogItem {
 	var out []catalogItem
 	for _, it := range m.items {
@@ -322,9 +307,6 @@ func (m model) topPicks() []catalogItem {
 		a, b := out[i], out[j]
 		if a.Featured != b.Featured {
 			return a.Featured
-		}
-		if ra, rb := statusRank(a.Status), statusRank(b.Status); ra != rb {
-			return ra < rb
 		}
 		return a.Name < b.Name
 	})
