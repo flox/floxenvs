@@ -48,18 +48,12 @@ jobs:
       - uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
         with:
           fetch-depth: 0
-      - name: "Install yq, jq, gh"
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq jq
-          # mikefarah/yq (Go). Ubuntu's apt `yq` is the python jq-wrapper,
-          # which is incompatible with the mikefarah syntax the audit
-          # scripts use (e.g. `yq -o=json`).
-          sudo curl -sSL -o /usr/local/bin/yq \
-            https://github.com/mikefarah/yq/releases/download/v4.44.6/yq_linux_amd64
-          sudo chmod +x /usr/local/bin/yq
+      - name: "Install flox"
+        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
       - name: "Compute matrix"
         id: matrix
+        # jq + yq-go come from the repo-root Flox env.
+        shell: "flox activate -- bash -e {0}"
         env:
           TRIGGER: ${{ github.event_name == 'workflow_dispatch' && 'workflow_dispatch' || 'workflow_call' }}
           SHA: ${{ inputs.sha || github.sha }}
@@ -85,19 +79,8 @@ jobs:
       - uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
         with:
           fetch-depth: 0
-      - name: "Install tools"
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq jq shellcheck
-          # mikefarah/yq (Go). Ubuntu's apt `yq` is the python jq-wrapper,
-          # which is incompatible with the mikefarah syntax the audit
-          # scripts use (e.g. `yq -o=json`).
-          sudo curl -sSL -o /usr/local/bin/yq \
-            https://github.com/mikefarah/yq/releases/download/v4.44.6/yq_linux_amd64
-          sudo chmod +x /usr/local/bin/yq
-          curl -sSL -o /tmp/gitleaks.tgz \
-            https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz
-          sudo tar -xzf /tmp/gitleaks.tgz -C /usr/local/bin gitleaks
+      - name: "Install flox"
+        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
       - name: "Resolve item directory"
         id: dir
         run: |
@@ -125,6 +108,8 @@ jobs:
           key: ${{ steps.hash.outputs.key }}
       - name: "Run audit"
         if: steps.cache.outputs.cache-hit != 'true' || inputs.force_rescan
+        # jq, yq-go, shellcheck, gitleaks come from the repo-root Flox env.
+        shell: "flox activate -- bash -e {0}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -147,8 +132,8 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
-      - name: "Install jq"
-        run: sudo apt-get install -y -qq jq
+      - name: "Install flox"
+        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
       - name: "Stage directory"
         run: |
           mkdir -p .website/src/content/metrics/env
@@ -172,6 +157,8 @@ jobs:
                ".website/src/content/metrics/$kind/$name.json"
           done
       - name: "Fetch prior metrics for unchanged items"
+        # jq, yq-go, curl come from the repo-root Flox env.
+        shell: "flox activate -- bash -e {0}"
         env:
           DEPLOY_URL: "https://flox.github.io/floxenvs"
         run: |
