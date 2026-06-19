@@ -74,7 +74,7 @@ func (k keyMap) shortHelp(m model) []key.Binding {
 	default:
 		if m.focus == focusDetail {
 			return []key.Binding{k.Up, k.Down, k.PageDown, k.FocusList,
-				k.Install, k.Remove, k.Help, k.Quit}
+				k.Install, k.Remove, k.AuditDetail, k.Help, k.Quit}
 		}
 		return []key.Binding{k.Down, k.Up, k.Search, k.Detail, k.Install,
 			k.Remove, k.Apply, k.Launch, k.Preview, k.Help, k.Quit}

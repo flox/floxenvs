@@ -549,17 +549,39 @@ func (m model) detailBody(it catalogItem) string {
 	return b.String()
 }
 
-// scoreBlock renders the scores as colored bars. Real metrics are not yet
-// in the catalog, so this shows a clearly-labeled deterministic sample.
+// scoreBlock renders the scores as colored bars. Uses real audit data from
+// data.json when available; falls back to a deterministic sample otherwise.
 func (m model) scoreBlock(it catalogItem) string {
 	if it.ID == "" {
 		return m.styles.Muted.Render("No score data for this package.\n")
 	}
+	if it.Audit != nil {
+		a := it.Audit
+		scores := []struct {
+			label string
+			value int
+		}{
+			{"quality", a.Quality.Score},
+			{"reliability", a.Reliability.Score},
+			{"security", a.Security.Score},
+		}
+		var b strings.Builder
+		for _, sc := range scores {
+			st := m.scoreStyle(sc.value)
+			fmt.Fprintf(&b, "  %s %s %s\n",
+				m.styles.Muted.Render(fmt.Sprintf("%-11s", sc.label)),
+				m.scoreBar(sc.value, st),
+				st.Render(fmt.Sprintf("%3d", sc.value)))
+		}
+		return b.String()
+	}
+	// No audit data: show sample scores clearly labeled as estimates.
 	metrics := []struct {
 		label string
 		salt  int
 	}{{"quality", 7}, {"reliability", 13}, {"security", 29}}
 	var b strings.Builder
+	b.WriteString(m.styles.Muted.Render("  (estimated — no audit yet)\n"))
 	for _, mt := range metrics {
 		v := sampleScore(it.ID, mt.salt)
 		st := m.scoreStyle(v)

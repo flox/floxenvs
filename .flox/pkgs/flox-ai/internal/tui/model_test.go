@@ -144,8 +144,8 @@ func TestStageInstallSkipsInstalled(t *testing.T) {
 func TestPendingOps(t *testing.T) {
 	m := newTestModel(map[string]bool{"skills-graphify": true})
 	m.pending = map[string]action{
-		"skills-caveman": actionInstall,
-		"skills-graphify":            actionUninstall,
+		"skills-caveman":  actionInstall,
+		"skills-graphify": actionUninstall,
 	}
 	ins, uns := m.pendingOps()
 	if len(ins) != 1 || ins[0] != "flox/skills-caveman" {
