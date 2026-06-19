@@ -1,24 +1,53 @@
 name: "CI Packages"
 
+# One workflow owns the whole per-package lifecycle: build (PRs) /
+# publish (main), audit, and the audit-driven website (data.json +
+# deploy). Fragments are BUILT ONCE here and that same build output is
+# audited — no second build in a separate website workflow.
+
 on:
   push:
     branches: ["main"]
     paths:
       - ".flox/**"
+      - "scripts/**"
+      - ".website/**"
       - ".github/workflows/ci_pkgs.yml"
   pull_request:
     paths:
       - ".flox/**"
+      - "scripts/**"
+      - ".website/**"
       - ".github/workflows/ci_pkgs.yml"
   workflow_dispatch:
     inputs:
       package:
         description: >
-          Package to build. Leave empty to build all
-          packages.
+          Single package to build/audit. Leave empty to do all.
         required: false
         default: ""
         type: string
+      items:
+        description: >
+          Audit scope for envs/site: "all" | "changed" |
+          "<kind>:<name>,...".
+        required: false
+        default: "all"
+        type: string
+      force_rescan:
+        description: "Ignore the audit cache and re-run scanners."
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+permissions:
+  contents: "write"
+  pages: "write"
+  id-token: "write"
 
 env:
   FLOX_DISABLE_METRICS: "true"
@@ -41,6 +70,7 @@ jobs:
       aarch64-linux: "${{ steps.discover.outputs.aarch64-linux }}"
       x86_64-darwin: "${{ steps.discover.outputs.x86_64-darwin }}"
       x86_64-linux: "${{ steps.discover.outputs.x86_64-linux }}"
+      envs: "${{ steps.discover.outputs.envs }}"
 
     steps:
       - name: "Checkout"
@@ -54,22 +84,20 @@ jobs:
           SINGLE_PKG: "${{ inputs.package }}"
           EVENT: "${{ github.event_name }}"
           BASE_SHA: "${{ github.event.pull_request.base.sha }}"
+          ITEMS: "${{ inputs.items }}"
         run: |
           set -euo pipefail
 
           ALL_SYSTEMS="aarch64-darwin aarch64-linux x86_64-darwin x86_64-linux"
 
-          # Collect package names
+          # ── Packages to build/publish ──
           if [ -n "$SINGLE_PKG" ]; then
             pkgs="[\"$SINGLE_PKG\"]"
           elif [ "$EVENT" = "workflow_dispatch" ]; then
-            # Manual dispatch with no package input: build every
-            # package, regardless of what the last commit changed.
             pkgs="[]"
             for dir in .flox/pkgs/*/; do
               name="$(basename "$dir")"
-              pkgs=$(echo "$pkgs" | jq -c \
-                ". + [\"$name\"]")
+              pkgs=$(echo "$pkgs" | jq -c ". + [\"$name\"]")
             done
           else
             if [ "$EVENT" = "pull_request" ]; then
@@ -77,71 +105,70 @@ jobs:
             else
               DIFF_BASE="HEAD~1"
             fi
-
-            # upgrade.sh isn't part of the build — a PR that touches
-            # only it produces a byte-identical package, so skip the
-            # matrix to avoid rebuilding (and re-hitting flaky cross
-            # builds like openclaw x86_64-darwin).
+            # upgrade.sh isn't part of the build — skip rebuilds when only
+            # it changed.
             pkgs="[]"
             for dir in .flox/pkgs/*/; do
               name="$(basename "$dir")"
-              build_changes=$(git diff --name-only \
-                  "$DIFF_BASE" HEAD \
+              build_changes=$(git diff --name-only "$DIFF_BASE" HEAD \
                 | grep -E "^\.flox/pkgs/$name/" \
-                | grep -vE \
-                  "^\.flox/pkgs/$name/upgrade\.sh$" \
-                || true)
+                | grep -vE "^\.flox/pkgs/$name/upgrade\.sh$" || true)
               if [ -n "$build_changes" ]; then
-                pkgs=$(echo "$pkgs" | jq -c \
-                  ". + [\"$name\"]")
+                pkgs=$(echo "$pkgs" | jq -c ". + [\"$name\"]")
               fi
             done
           fi
-
           echo "packages=$pkgs" >> "$GITHUB_OUTPUT"
           echo "Packages: $pkgs"
 
-          # Per-system package lists from publish.json. A package
-          # builds (and, on main, publishes) only on the systems it
-          # declares; missing publish.json or no "systems" field
-          # means all four.
+          # Per-system package lists from publish.json. A package builds
+          # (and, on main, publishes) only on the systems it declares.
           for sys in $ALL_SYSTEMS; do
             sys_pkgs="[]"
             for pkg in $(echo "$pkgs" | jq -r '.[]'); do
               PJ=".flox/pkgs/$pkg/publish.json"
               if [ -f "$PJ" ]; then
-                has_field=$(jq -r \
-                  'has("systems")' "$PJ")
-                if [ "$has_field" = "false" ]; then
-                  sys_pkgs=$(echo "$sys_pkgs" | jq -c \
-                    ". + [\"$pkg\"]")
-                else
-                  has=$(jq -r \
-                    --arg s "$sys" \
-                    '.systems | index($s) != null' \
-                    "$PJ")
-                  if [ "$has" = "true" ]; then
-                    sys_pkgs=$(echo "$sys_pkgs" | jq -c \
-                      ". + [\"$pkg\"]")
-                  fi
+                if [ "$(jq -r 'has("systems")' "$PJ")" = "false" ]; then
+                  sys_pkgs=$(echo "$sys_pkgs" | jq -c ". + [\"$pkg\"]")
+                elif [ "$(jq -r --arg s "$sys" '.systems | index($s) != null' "$PJ")" = "true" ]; then
+                  sys_pkgs=$(echo "$sys_pkgs" | jq -c ". + [\"$pkg\"]")
                 fi
               else
-                sys_pkgs=$(echo "$sys_pkgs" | jq -c \
-                  ". + [\"$pkg\"]")
+                sys_pkgs=$(echo "$sys_pkgs" | jq -c ". + [\"$pkg\"]")
               fi
             done
             echo "$sys=$sys_pkgs" >> "$GITHUB_OUTPUT"
             echo "  $sys: $sys_pkgs"
           done
 
+          # ── Envs to audit (top-level dirs with meta.yaml) ──
+          # Dispatch "all"/"changed" or any push/PR → all envs (the site
+          # re-aggregates anyway); explicit env:NAME dispatch → just those.
+          all_envs() {
+            for d in */; do
+              n="${d%/}"
+              case "$n" in .*|site|scripts|node_modules) continue ;; esac
+              case "$n" in *-demo) continue ;; esac
+              [ -f "$n/meta.yaml" ] && echo "$n"
+            done
+          }
+          envs="[]"
+          if [ "$EVENT" = "workflow_dispatch" ] && [ -n "${ITEMS:-}" ] \
+               && [ "${ITEMS:-}" != "all" ] && [ "${ITEMS:-}" != "changed" ]; then
+            for e in $(echo "$ITEMS" | tr ',' '\n' | sed -n 's/^env://p'); do
+              [ -f "$e/meta.yaml" ] && envs=$(echo "$envs" | jq -c ". + [\"$e\"]")
+            done
+          else
+            for e in $(all_envs); do
+              envs=$(echo "$envs" | jq -c ". + [\"$e\"]")
+            done
+          fi
+          echo "envs=$envs" >> "$GITHUB_OUTPUT"
+          echo "Envs: $envs"
+
   # ── Build (PRs) or publish (main): one job per (package, system) ──
-  #
-  # Each (package, system) leg is independent — fail-fast is off, so
-  # one package failing on one system fails only that leg and leaves
-  # every other publish intact. On a push to main or a manual
-  # dispatch the leg's "Publish" step runs; otherwise its "Build"
-  # step runs. There is no separate aggregate publish job, so no
-  # single failure can gate the whole catalog.
+  # The x86_64-linux leg additionally audits fragment CONTENT from the
+  # build it just produced — no second build.
 
   aarch64-darwin:
     name: "Package '${{ matrix.package }}' (aarch64-darwin)"
@@ -149,13 +176,11 @@ jobs:
     timeout-minutes: 90
     needs: ["discover"]
     if: needs.discover.outputs.aarch64-darwin != '[]'
-
     strategy:
       fail-fast: false
       max-parallel: 2
       matrix:
         package: ${{ fromJSON(needs.discover.outputs.aarch64-darwin) }}
-
     steps:
       - name: "Checkout"
         uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
@@ -196,13 +221,11 @@ jobs:
     timeout-minutes: 90
     needs: ["discover"]
     if: needs.discover.outputs.aarch64-linux != '[]'
-
     strategy:
       fail-fast: false
       max-parallel: 2
       matrix:
         package: ${{ fromJSON(needs.discover.outputs.aarch64-linux) }}
-
     steps:
       - name: "Checkout"
         uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
@@ -243,13 +266,11 @@ jobs:
     timeout-minutes: 90
     needs: ["discover"]
     if: needs.discover.outputs.x86_64-darwin != '[]'
-
     strategy:
       fail-fast: false
       max-parallel: 2
       matrix:
         package: ${{ fromJSON(needs.discover.outputs.x86_64-darwin) }}
-
     steps:
       - name: "Checkout"
         uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
@@ -290,13 +311,11 @@ jobs:
     timeout-minutes: 90
     needs: ["discover"]
     if: needs.discover.outputs.x86_64-linux != '[]'
-
     strategy:
       fail-fast: false
       max-parallel: 2
       matrix:
         package: ${{ fromJSON(needs.discover.outputs.x86_64-linux) }}
-
     steps:
       - name: "Checkout"
         uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
@@ -317,8 +336,9 @@ jobs:
         with:
           ssh-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
           remote-builders: "${{ vars.MANAGED_REMOTE_BUILDERS }}"
+      # Always build x86_64-linux so the audit has a build output (and,
+      # on main, so publish has its artifact).
       - name: "Build"
-        if: ${{ !(github.ref_name == 'main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')) }}
         run: |
           set -euo pipefail
           flox build "${{ matrix.package }}" --system x86_64-linux
@@ -330,3 +350,171 @@ jobs:
           set -euo pipefail
           ORG="$(jq -r '.org // "flox"' ".flox/pkgs/${{ matrix.package }}/publish.json" 2>/dev/null || echo flox)"
           flox publish -o "$ORG" "${{ matrix.package }}" --system x86_64-linux
+      - name: "Audit fragment content"
+        id: "audit"
+        # Fragments (skill/plugin/agent) are content-audited from the
+        # build above; run-audit.sh reuses result-<pkg> and runs the
+        # flox-ai audit engine (tools come from the repo-root Flox env).
+        shell: "flox activate -- bash -e {0}"
+        run: |
+          set -euo pipefail
+          PKG="${{ matrix.package }}"
+          sub=$(grep -E '^subkind:' ".flox/pkgs/$PKG/meta.yaml" 2>/dev/null \
+                | head -1 | awk '{print $2}')
+          case "$sub" in
+            skill|plugin) kind=skill ;;
+            agent) kind=agent ;;
+            *) echo "kind=" >> "$GITHUB_OUTPUT"; echo "not a fragment"; exit 0 ;;
+          esac
+          echo "kind=$kind" >> "$GITHUB_OUTPUT"
+          REPO_ROOT="$PWD" bash scripts/run-audit.sh "$kind" "$PKG"
+      - name: "Upload fragment metrics"
+        if: steps.audit.outputs.kind != ''
+        uses: "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" # v7
+        with:
+          name: "metrics-${{ steps.audit.outputs.kind }}-${{ matrix.package }}"
+          path: "audit/${{ steps.audit.outputs.kind }}/${{ matrix.package }}/metrics.json"
+          if-no-files-found: "error"
+
+  # ── Env audits (no build; score the env dir directly) ──
+  audit-env:
+    name: "Audit env '${{ matrix.env }}'"
+    needs: ["discover"]
+    if: needs.discover.outputs.envs != '[]'
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        env: ${{ fromJSON(needs.discover.outputs.envs) }}
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
+        with:
+          fetch-depth: 0
+      - name: "Install flox"
+        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
+      - name: "Run audit"
+        shell: "flox activate -- bash -e {0}"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          SNYK_TOKEN: "${{ secrets.SNYK_TOKEN }}"
+          REPO_ROOT: "${{ github.workspace }}"
+        run: |
+          set -euo pipefail
+          bash scripts/run-audit.sh env "${{ matrix.env }}"
+      - name: "Upload env metrics"
+        uses: "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" # v7
+        with:
+          name: "metrics-env-${{ matrix.env }}"
+          path: "audit/env/${{ matrix.env }}/metrics.json"
+          if-no-files-found: "error"
+
+  # ── Site: collect metrics, build data.json, deploy (main only) ──
+  site:
+    name: "Build + deploy site"
+    needs: ["discover", "x86_64-linux", "audit-env"]
+    if: always() && needs.discover.result == 'success'
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
+        with:
+          fetch-depth: 0
+      - uses: "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e" # v6
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: ".website/package-lock.json"
+      - name: "Download fresh metrics"
+        uses: "actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c" # v8
+        with:
+          pattern: "metrics-*"
+          path: "_metrics_in"
+          merge-multiple: false
+      - name: "Stage fresh metrics"
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          mkdir -p .website/src/content/metrics
+          for d in _metrics_in/metrics-*; do
+            base=$(basename "$d")        # metrics-<kind>-<name>
+            kind=$(echo "$base" | cut -d- -f2)
+            name=$(echo "$base" | cut -d- -f3-)
+            mkdir -p ".website/src/content/metrics/$kind"
+            cp "$d/metrics.json" \
+               ".website/src/content/metrics/$kind/$name.json"
+          done
+      - name: "Fetch prior metrics for unchanged items"
+        shell: "flox activate -- bash -e {0}"
+        env:
+          DEPLOY_URL: "https://flox.github.io/floxenvs"
+        run: |
+          set -euo pipefail
+          export REPO_ROOT="$PWD"
+          mapfile -t items < <(bash scripts/list-items.sh)
+          for item in "${items[@]}"; do
+            kind="${item%%:*}"; name="${item##*:}"
+            target=".website/src/content/metrics/$kind/$name.json"
+            [ -f "$target" ] && continue
+            mkdir -p "$(dirname "$target")"
+            # env metrics under /envs/, everything else under /packages/.
+            case "$kind" in
+              env) url="$DEPLOY_URL/envs/$name/metrics.json" ;;
+              *)   url="$DEPLOY_URL/packages/$name/metrics.json" ;;
+            esac
+            if curl -sfL --max-time 10 -o "$target" "$url"; then
+              echo "fetched prior metrics for $item"
+            else
+              rm -f "$target"
+              echo "no prior metrics for $item"
+            fi
+          done
+      - name: "Surface metrics.json into dist for next deploy"
+        run: |
+          set -euo pipefail
+          while IFS= read -r f; do
+            rel="${f#.website/src/content/metrics/}"
+            kind="${rel%%/*}"
+            name="$(basename "${rel#"$kind"/}" .json)"
+            case "$kind" in
+              env) dest=".website/public/envs/$name/metrics.json" ;;
+              *)   dest=".website/public/packages/$name/metrics.json" ;;
+            esac
+            mkdir -p "$(dirname "$dest")"
+            cp "$f" "$dest"
+          done < <(find .website/src/content/metrics -name '*.json')
+      - name: "Install"
+        working-directory: ".website"
+        run: "npm ci"
+      - name: "Build data.json"
+        working-directory: ".website"
+        run: |
+          set -euo pipefail
+          node --experimental-strip-types scripts/build-data-json.mjs --full
+      - name: "Provide a font for OG image rendering"
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fontconfig
+          sudo apt-get install -y -qq fonts-inter \
+            || echo "fonts-inter unavailable; falling back to default font"
+          echo "OG_FONT_PATH=$(fc-match -f '%{file}' Inter)" >> "$GITHUB_ENV"
+      - name: "Build"
+        working-directory: ".website"
+        env:
+          SITE_URL: "${{ vars.SITE_URL || 'https://envs.flox.dev' }}"
+          BASE_PATH: "${{ vars.BASE_PATH || '/' }}"
+        run: "npm run build"
+      - name: "Publish to gh-pages branch"
+        if: ${{ github.ref_name == 'main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+        uses: "peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453" # v4
+        with:
+          github_token: "${{ secrets.GITHUB_TOKEN }}"
+          publish_dir: ".website/dist"
+          publish_branch: "gh-pages"
+          enable_jekyll: false
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
+          commit_message: "deploy: ${{ github.sha }}"

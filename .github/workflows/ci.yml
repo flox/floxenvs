@@ -626,21 +626,7 @@ jobs:
           docker tag "$tag:latest" "ghcr.io/flox/floxenvs:$tag-latest"
           docker push "ghcr.io/flox/floxenvs:$tag-latest"
 
-  trigger-website:
-    name: "Website"
-    needs: ["result", "containerize"]
-    if: |
-      always()
-      && github.ref == 'refs/heads/main'
-      && github.event_name == 'push'
-      && needs.result.result == 'success'
-      && needs.containerize.result != 'failure'
-    permissions:
-      contents: "write"
-      pages: "write"
-      id-token: "write"
-    uses: "./.github/workflows/website.yml"
-    with:
-      sha: ${{ github.sha }}
-      triggered_by: "ci"
-    secrets: inherit
+  # The website (data.json + gh-pages deploy) is built inside the
+  # "CI Packages" workflow's `site` job — fragments are built once there
+  # and audited from that same build — so ci.yml no longer triggers a
+  # separate Website workflow.
