@@ -203,19 +203,6 @@ jobs:
         with:
           name: "site-metrics-staged"
           path: ".website/src/content/metrics"
-      - name: "Build data.json"
-        working-directory: ".website"
-        env:
-          ITEMS: ${{ inputs.items }}
-        run: |
-          set -euo pipefail
-          if [ "${ITEMS:-all}" = "all" ] || [ -z "${ITEMS:-}" ]; then
-            node --experimental-strip-types scripts/build-data-json.mjs --full
-          else
-            # ITEMS is csv of <kind>:<name>; pass just the names
-            only=$(echo "$ITEMS" | tr ',' '\n' | sed 's/^[^:]*://' | paste -sd, -)
-            node --experimental-strip-types scripts/build-data-json.mjs --only="$only"
-          fi
       - name: "Surface metrics.json into dist for next deploy"
         run: |
           set -euo pipefail
@@ -236,6 +223,22 @@ jobs:
       - name: "Install"
         working-directory: ".website"
         run: "npm ci"
+      - name: "Build data.json"
+        # Runs after `npm ci` so the script can import yaml/zod and the
+        # .ts catalog libs; writes .website/public/data.json which the
+        # astro build copies into dist/ for deploy.
+        working-directory: ".website"
+        env:
+          ITEMS: ${{ inputs.items }}
+        run: |
+          set -euo pipefail
+          if [ "${ITEMS:-all}" = "all" ] || [ -z "${ITEMS:-}" ]; then
+            node --experimental-strip-types scripts/build-data-json.mjs --full
+          else
+            # ITEMS is csv of <kind>:<name>; pass just the names
+            only=$(echo "$ITEMS" | tr ',' '\n' | sed 's/^[^:]*://' | paste -sd, -)
+            node --experimental-strip-types scripts/build-data-json.mjs --only="$only"
+          fi
       - name: "Provide a font for OG image rendering"
         run: |
           # The OG image route (src/pages/og/[kind]/[name].png.ts) needs
