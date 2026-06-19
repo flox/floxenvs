@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// Item is one catalog entry. Mirrors the website ai-catalog.json schema.
+// Item is one catalog entry. Mirrors the website data.json schema.
 type Item struct {
 	ID          string   `json:"id"`
 	Name        string   `json:"name"`
@@ -16,7 +16,6 @@ type Item struct {
 	Description string   `json:"description"`
 	Tags        []string `json:"tags"`
 	Categories  []string `json:"categories"`
-	Status      string   `json:"status"`
 	Featured    bool     `json:"featured"`
 	Link        string   `json:"link"`
 	Homepage    string   `json:"homepage,omitempty"`
@@ -26,6 +25,15 @@ type Item struct {
 	Stack       []string `json:"stack,omitempty"`
 	License     string   `json:"license,omitempty"`
 	Maintainer  string   `json:"maintainer,omitempty"`
+	Audit       *Audit   `json:"audit,omitempty"`
+}
+
+// Envelope is the top-level data.json document.
+type Envelope struct {
+	SchemaVersion int    `json:"schema_version"`
+	GeneratedAt   string `json:"generated_at"`
+	Commit        string `json:"commit"`
+	Items         []Item `json:"items"`
 }
 
 // Title returns the display title (Name field of the catalog), falling
@@ -59,13 +67,13 @@ func (it Item) Match(query string) bool {
 	return strings.Contains(hay, q)
 }
 
-// Parse decodes the catalog JSON.
+// Parse decodes the data.json envelope into its items.
 func Parse(data []byte) ([]Item, error) {
-	var items []Item
-	if err := json.Unmarshal(data, &items); err != nil {
+	var env Envelope
+	if err := json.Unmarshal(data, &env); err != nil {
 		return nil, err
 	}
-	return items, nil
+	return env.Items, nil
 }
 
 // Filter returns items matching the given type (empty = any) and query

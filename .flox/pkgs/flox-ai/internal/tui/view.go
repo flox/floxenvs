@@ -431,6 +431,9 @@ func (m model) rowLines(it catalogItem, w int, focused bool) []string {
 	st := m.rowStyle(it.ID)
 
 	head := "  " + typeIcon(it.Type) + " " + it.Name
+	if it.Audit != nil {
+		head += "  " + m.auditScoreBadge(it.Audit.Overall, it.Audit.Status)
+	}
 	if status != "" {
 		head = m.spread(head, status, w-2) // gap before the divider
 	}
@@ -589,6 +592,148 @@ func (m model) statusStyle(status string) lipgloss.Style {
 	default:
 		return m.styles.Danger
 	}
+}
+
+// auditStatusStyle maps catalog audit statuses (stable|warn|risk|missing) to
+// a display style.
+func (m model) auditStatusStyle(status string) lipgloss.Style {
+	switch status {
+	case "stable":
+		return m.styles.Installed
+	case "warn":
+		return m.styles.Warning
+	case "risk", "missing":
+		return m.styles.Danger
+	default:
+		return m.styles.Muted
+	}
+}
+
+// auditScoreBadge returns a compact "89 ●" badge colored by audit status for
+// use in catalog row headers.
+func (m model) auditScoreBadge(overall int, status string) string {
+	st := m.auditStatusStyle(status)
+	return m.styles.Muted.Render(fmt.Sprintf("%d", overall)) + " " + st.Render("●")
+}
+
+// viewAuditDetailModal shows the pre-computed audit from data.json for the
+// currently selected catalog item.
+func (m model) viewAuditDetailModal() string {
+	it := m.selected()
+	footer := m.dimKeys([2]string{"esc", "close"})
+	if it == nil {
+		return m.modalBox("audit detail",
+			m.styles.Muted.Render("No item selected."), footer)
+	}
+	if it.Audit == nil {
+		hint := m.styles.Muted.Render("Press ") +
+			m.styles.Strong.Render("R") +
+			m.styles.Muted.Render(" to run a live review instead.")
+		return m.modalBox("audit detail",
+			m.styles.Muted.Render("Not audited yet — no pre-computed audit for this item.")+
+				"\n\n"+hint, footer)
+	}
+	a := it.Audit
+	var b strings.Builder
+
+	// Header: name + overall score badge + status.
+	b.WriteString(m.styles.Title.Render(it.Name) + "  " +
+		m.auditScoreBadge(a.Overall, a.Status) + "  " +
+		m.auditStatusStyle(a.Status).Render(a.Status) + "\n\n")
+
+	// Four dimension scores.
+	b.WriteString(m.styles.Primary.Render("Dimensions") + "\n")
+	dims := []struct {
+		label string
+		score int
+	}{
+		{"Quality", a.Quality.Score},
+		{"Reliability", a.Reliability.Score},
+		{"Security", a.Security.Score},
+	}
+	for _, d := range dims {
+		ds := m.auditStatusStyle("")
+		if d.score >= 80 {
+			ds = m.styles.Installed
+		} else if d.score >= 50 {
+			ds = m.styles.Warning
+		} else {
+			ds = m.styles.Danger
+		}
+		b.WriteString("  " + m.styles.Muted.Render(fmt.Sprintf("%-12s", d.label)) +
+			" " + ds.Render(fmt.Sprintf("%3d", d.score)) + "\n")
+	}
+	// Impact: Pass/Total + optional score.
+	impactLine := fmt.Sprintf("%d/%d", a.Impact.Pass, a.Impact.Total)
+	if a.Impact.Score != nil {
+		impactLine += fmt.Sprintf("  score %d", *a.Impact.Score)
+	}
+	b.WriteString("  " + m.styles.Muted.Render(fmt.Sprintf("%-12s", "Impact")) +
+		" " + m.styles.Text.Render(impactLine) + "\n")
+
+	// Security scanners.
+	if len(a.Security.Scanners) > 0 {
+		b.WriteString("\n" + m.styles.Primary.Render("Security scanners") + "\n")
+		for _, sc := range a.Security.Scanners {
+			var st lipgloss.Style
+			switch sc.Status {
+			case "pass", "clean":
+				st = m.styles.Installed
+			case "skip", "warn":
+				st = m.styles.Warning
+			default:
+				st = m.styles.Danger
+			}
+			b.WriteString("  " + m.styles.Muted.Render(sc.Tool) +
+				"  " + m.styles.Muted.Render(sc.Level) +
+				"  " + st.Render(sc.Status) + "\n")
+		}
+	}
+
+	// Security findings (the "why").
+	if len(a.Security.Findings) > 0 {
+		b.WriteString("\n" + m.styles.Primary.Render("Security findings") + "\n")
+		for _, f := range a.Security.Findings {
+			var st lipgloss.Style
+			switch f.Status {
+			case "pass", "clean":
+				st = m.styles.Installed
+			case "warn":
+				st = m.styles.Warning
+			default:
+				st = m.styles.Danger
+			}
+			line := m.styles.Muted.Render(f.Tool) +
+				"  " + st.Render(f.Level)
+			if f.Count > 0 {
+				line += m.styles.Muted.Render(fmt.Sprintf(" ×%d", f.Count))
+			}
+			if f.Note != "" {
+				line += "  " + m.styles.Text.Render(f.Note)
+			}
+			b.WriteString("  " + line + "\n")
+		}
+	}
+
+	// Failed quality checks.
+	var failedChecks []string
+	for _, ch := range a.Quality.Checks {
+		if !ch.Pass {
+			entry := m.styles.Muted.Render(ch.ID)
+			if ch.Note != "" {
+				entry += "  " + m.styles.Text.Render(ch.Note)
+			}
+			failedChecks = append(failedChecks, entry)
+		}
+	}
+	if len(failedChecks) > 0 {
+		b.WriteString("\n" + m.styles.Primary.Render("Failed quality checks") + "\n")
+		for _, fc := range failedChecks {
+			b.WriteString("  " + fc + "\n")
+		}
+	}
+
+	return m.modalBox("audit detail", strings.TrimRight(b.String(), "\n"), footer)
 }
 
 // viewReviewModal shows the review-skills report: scores on the left, the
@@ -996,6 +1141,8 @@ func (m model) viewModal() string {
 		return m.viewLaunchModal()
 	case modalReview:
 		return m.viewReviewModal()
+	case modalAuditDetail:
+		return m.viewAuditDetailModal()
 	}
 	// stream modal: title carries a live status glyph, body is the viewport.
 	status := " " + m.spin.View()

@@ -2,16 +2,16 @@ package catalog
 
 import "testing"
 
-const sample = `[
+const sample = `{"schema_version":1,"generated_at":"t","commit":"c","items":[
   {"id":"a-plugin","name":"Alpha","type":"plugin",
    "description":"alpha tool","tags":["x","compression"],
-   "categories":["ai"],"status":"stable","featured":true,
+   "categories":["ai"],"featured":true,
    "link":"https://e/a","installPkg":"flox/a-plugin"},
   {"id":"b-skill","name":"Bravo","type":"skill",
    "description":"bravo","tags":["y"],"categories":["ai"],
-   "status":"beta","featured":false,
+   "featured":false,
    "link":"https://e/b","installPkg":"flox/b-skill"}
-]`
+]}`
 
 func TestParse(t *testing.T) {
 	items, err := Parse([]byte(sample))
@@ -59,9 +59,10 @@ func TestFilterByQuery(t *testing.T) {
 }
 
 func TestParseFor(t *testing.T) {
-	const withFor = `[{"id":"x","name":"X","type":"skill","for":"claude-code",
-	  "description":"d","tags":[],"categories":[],"status":"beta",
-	  "featured":false,"link":"","installPkg":"flox/x"}]`
+	const withFor = `{"schema_version":1,"generated_at":"t","commit":"c","items":[
+	  {"id":"x","name":"X","type":"skill","for":"claude-code",
+	   "description":"d","tags":[],"categories":[],
+	   "featured":false,"link":"","installPkg":"flox/x"}]}`
 	items, err := Parse([]byte(withFor))
 	if err != nil {
 		t.Fatal(err)
@@ -72,11 +73,12 @@ func TestParseFor(t *testing.T) {
 }
 
 func TestParseEnriched(t *testing.T) {
-	const s = `[{"id":"x","name":"X","type":"skill","for":"claude-code",
-	  "description":"d","tags":[],"categories":[],"status":"beta",
-	  "featured":false,"link":"","installPkg":"flox/x",
-	  "intro":"hello","summary":["a","b"],"stack":["go"],
-	  "license":"MIT","maintainer":"@rok"}]`
+	const s = `{"schema_version":1,"generated_at":"t","commit":"c","items":[
+	  {"id":"x","name":"X","type":"skill","for":"claude-code",
+	   "description":"d","tags":[],"categories":[],
+	   "featured":false,"link":"","installPkg":"flox/x",
+	   "intro":"hello","summary":["a","b"],"stack":["go"],
+	   "license":"MIT","maintainer":"@rok"}]}`
 	items, err := Parse([]byte(s))
 	if err != nil {
 		t.Fatal(err)
@@ -87,5 +89,21 @@ func TestParseEnriched(t *testing.T) {
 	}
 	if len(it.Summary) != 2 || len(it.Stack) != 1 {
 		t.Errorf("slices wrong: %+v", it)
+	}
+}
+
+func TestParseEnvelope(t *testing.T) {
+	data := []byte(`{"schema_version":1,"generated_at":"t","commit":"c",
+	  "items":[{"id":"skills-x","name":"X","type":"skill","installPkg":"flox/skills-x",
+	    "audit":{"overall":80,"status":"stable"}}]}`)
+	items, err := Parse(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(items) != 1 || items[0].ID != "skills-x" {
+		t.Fatalf("items: %+v", items)
+	}
+	if items[0].Audit == nil || items[0].Audit.Overall != 80 {
+		t.Fatalf("audit: %+v", items[0].Audit)
 	}
 }
