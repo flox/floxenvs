@@ -48,24 +48,19 @@ for (const name of names) {
     const pkg = { name, ...meta };
     if (!isFragmentPkg(pkg)) continue;
     const item = toCatalogItem(pkg);
-    // Fragment packages live under .flox/pkgs, so the audit pipeline
-    // stages their metrics under the "pkg" kind (not subkind-derived
-    // skill/agent dirs).
-    const kind = "pkg";
-    const metricsPath = join(
-      REPO,
-      ".website",
-      "src",
-      "content",
-      "metrics",
-      kind,
-      `${name}.json`,
-    );
+    // Prefer the CONTENT audit (skill/agent kind — run-audit builds the
+    // package and scores the SKILL.md/plugin content) over the packaging
+    // audit (pkg kind). Fall back to pkg if no content audit was staged.
+    const contentKind = pkg.subkind === "agent" ? "agent" : "skill";
     let audit = null;
-    if (existsSync(metricsPath)) {
-      audit = MetricsSchema.parse(
-        JSON.parse(readFileSync(metricsPath, "utf8")),
+    for (const k of [contentKind, "pkg"]) {
+      const mp = join(
+        REPO, ".website", "src", "content", "metrics", k, `${name}.json`,
       );
+      if (existsSync(mp)) {
+        audit = MetricsSchema.parse(JSON.parse(readFileSync(mp, "utf8")));
+        break;
+      }
     }
     fresh.push({ ...item, audit });
   } catch (e) {

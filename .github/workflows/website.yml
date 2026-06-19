@@ -86,7 +86,7 @@ jobs:
         run: |
           case "${{ matrix.kind }}" in
             env) echo "dir=${{ matrix.name }}" >> "$GITHUB_OUTPUT" ;;
-            pkg) echo "dir=.flox/pkgs/${{ matrix.name }}" >> "$GITHUB_OUTPUT" ;;
+            pkg|skill|agent) echo "dir=.flox/pkgs/${{ matrix.name }}" >> "$GITHUB_OUTPUT" ;;
           esac
       - name: "Content hash"
         id: hash
@@ -106,9 +106,19 @@ jobs:
         with:
           path: "audit/${{ matrix.kind }}/${{ matrix.name }}/metrics.json"
           key: ${{ steps.hash.outputs.key }}
+      - name: "Build fragment content"
+        # skill/agent audits score BUILT content (the SKILL.md/plugin the
+        # package ships), so the package must be built first. `flox build`
+        # must NOT run inside `flox activate` (the Run audit step), so it
+        # runs here in a clean shell; run-audit.sh then reuses result-*.
+        if: (matrix.kind == 'skill' || matrix.kind == 'agent') && (steps.cache.outputs.cache-hit != 'true' || inputs.force_rescan)
+        env:
+          NIX_CONFIG: "fallback = true"
+        run: flox build "${{ matrix.name }}"
       - name: "Run audit"
         if: steps.cache.outputs.cache-hit != 'true' || inputs.force_rescan
-        # jq, yq-go, shellcheck, gitleaks come from the repo-root Flox env.
+        # jq, yq-go, shellcheck, gitleaks, flox-ai + skill-audit tools
+        # come from the repo-root Flox env.
         shell: "flox activate -- bash -e {0}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

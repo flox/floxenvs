@@ -14,3 +14,13 @@ yq-go.pkg-path = "yq-go"
 # .github/workflows/website.yml instead of apt/curl installs).
 shellcheck.pkg-path = "shellcheck"
 gitleaks.pkg-path = "gitleaks"
+# Skill/agent content-audit engine + its tool ensemble. run-audit.sh
+# builds a fragment package and runs `flox-ai audit` (quality:
+# skill-tools/skill-validator/claudelint; security: skillcheck/
+# skillspector) over the built skill/plugin content.
+flox-ai.pkg-path = "flox/flox-ai"
+skill-tools.pkg-path = "flox/skill-tools"
+skill-validator.pkg-path = "flox/skill-validator"
+claudelint.pkg-path = "flox/claudelint"
+skillcheck.pkg-path = "flox/skillcheck"
+skillspector.pkg-path = "flox/skillspector"

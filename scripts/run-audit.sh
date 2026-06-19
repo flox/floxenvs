@@ -21,22 +21,47 @@ out_dir="$ROOT/audit/$KIND/$NAME"
 mkdir -p "$out_dir"
 out_file="$out_dir/metrics.json"
 
-# ── skill / agent: delegate to the review-skills runner ──
-# The runner fuses the per-kind linter ensemble into the same
-# Plan-B metrics.json shape (identity / overall / status /
-# quality / reliability / security / impact). Prefer the
-# `review-skills` binary on PATH; otherwise fall back to the
-# Go binary built by `flox build review-skills`.
+# ── skill / agent: audit the BUILT content, not the source dir ──
+# $abs_dir (.flox/pkgs/<name>) holds only packaging files — the actual
+# skill/plugin content (SKILL.md, agents, .claude-plugin) is produced
+# by the build, fetched from upstream. So build the package and run the
+# flox-ai audit engine (review-skills lineage) over the built plugin
+# dir, fusing the per-kind linter ensemble into the metrics.json shape
+# (identity / overall / status / quality / reliability / security /
+# impact).
 if [ "$KIND" = "skill" ] || [ "$KIND" = "agent" ]; then
-  if command -v review-skills >/dev/null 2>&1; then
-    runner=(review-skills)
-  else
-    bundled="$ROOT/result-review-skills/bin/review-skills"
-    [ -x "$bundled" ] || { echo "review-skills runner not found" >&2; exit 1; }
-    runner=("$bundled")
+  built="$ROOT/result-$NAME"
+  # Build the package to materialize its content — but only if it isn't
+  # already built. `flox build` must NOT run inside an activated env
+  # (it breaks with "attribute 'lib' missing"), so CI pre-builds in a
+  # separate, non-activated step and run-audit.sh just consumes the
+  # result here; standalone/local use builds on demand.
+  if [ ! -d "$built" ]; then
+    ( cd "$ROOT" && flox build "$NAME" ) \
+      || { echo "build failed for $NAME" >&2; exit 1; }
   fi
-  "${runner[@]}" audit --json --kind "$KIND" "$abs_dir" > "$out_file"
-  echo "wrote $out_file"
+  # The auditable unit is the package's Claude Code content dir: a
+  # plugin under share/claude-code/plugins/<x>/ (plugin bundles) or a
+  # single skill under share/claude-code/skills/<x>/. Probe each base
+  # that exists (a missing base would make `find` fail under set -e).
+  content=""
+  for sub in plugins skills; do
+    base="$built/share/claude-code/$sub"
+    [ -d "$base" ] || continue
+    content="$(find "$base" -mindepth 1 -maxdepth 1 -type d | head -1)"
+    [ -n "$content" ] && break
+  done
+  [ -n "$content" ] || content="$built"
+  # Runner: flox-ai (the audit engine) from PATH, else a local build.
+  if command -v flox-ai >/dev/null 2>&1; then
+    runner=(flox-ai)
+  elif [ -x "$ROOT/result-flox-ai/bin/flox-ai" ]; then
+    runner=("$ROOT/result-flox-ai/bin/flox-ai")
+  else
+    echo "flox-ai audit runner not found" >&2; exit 1
+  fi
+  "${runner[@]}" audit --json --kind "$KIND" "$content" > "$out_file"
+  echo "wrote $out_file (content: ${content#"$ROOT"/})"
   exit 0
 fi
 
