@@ -169,9 +169,11 @@ jobs:
             kind="${item%%:*}"; name="${item##*:}"
             target=".website/src/content/metrics/$kind/$name.json"
             [ -f "$target" ] && continue
+            # env metrics live under /envs/; everything else (pkg,
+            # skill, agent, rule) is a package under /packages/.
             case "$kind" in
               env) url="$DEPLOY_URL/envs/$name/metrics.json" ;;
-              pkg) url="$DEPLOY_URL/packages/$name/metrics.json" ;;
+              *) url="$DEPLOY_URL/packages/$name/metrics.json" ;;
             esac
             if curl -sfL --max-time 10 -o "$target" "$url"; then
               echo "fetched prior metrics for $item"
@@ -226,7 +228,7 @@ jobs:
             name="$(basename "${rel#"$kind"/}" .json)"
             case "$kind" in
               env) dest=".website/public/envs/$name/metrics.json" ;;
-              pkg) dest=".website/public/packages/$name/metrics.json" ;;
+              *) dest=".website/public/packages/$name/metrics.json" ;;
             esac
             mkdir -p "$(dirname "$dest")"
             cp "$f" "$dest"
