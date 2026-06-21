@@ -320,31 +320,26 @@ jobs:
           set -euo pipefail
           ORG="$(jq -r '.org // "flox"' ".flox/pkgs/${{ matrix.package }}/publish.json" 2>/dev/null || echo flox)"
           flox publish -o "$ORG" "${{ matrix.package }}" --system x86_64-linux
+      # Audit only skills-* packages (the Claude Code skill/plugin
+      # fragments) — gated here at the step level since matrix.package is
+      # known. Everything else is built/published, not audited.
       - name: "Audit fragment content"
-        id: "audit"
-        # Fragments (skill/plugin/agent) are content-audited from the
-        # build above; run-audit.sh reuses result-<pkg> and runs the
-        # flox-ai audit engine. The flox-ai + skill-audit tools live in
-        # the .website env (NOT the root env — they're floxenvs-flake-
-        # sourced and would poison `flox build`'s nixpkgs resolution).
+        if: ${{ startsWith(matrix.package, 'skills-') }}
+        # Fragments are content-audited from the build above; run-audit.sh
+        # reuses result-<pkg> and runs the flox-ai audit engine. The
+        # flox-ai + skill-audit tools live in the .website env (NOT the
+        # root env — they're floxenvs-flake-sourced and would poison
+        # `flox build`'s nixpkgs resolution).
         shell: "flox activate -d .website -- bash -e {0}"
         run: |
           set -euo pipefail
-          PKG="${{ matrix.package }}"
-          # Audit only skills-* packages (the Claude Code skill/plugin
-          # fragments). Everything else is built/published, not audited.
-          case "$PKG" in
-            skills-*) kind=skill ;;
-            *) echo "kind=" >> "$GITHUB_OUTPUT"; echo "$PKG is not a skill"; exit 0 ;;
-          esac
-          echo "kind=$kind" >> "$GITHUB_OUTPUT"
-          REPO_ROOT="$PWD" bash scripts/run-audit.sh "$kind" "$PKG"
+          REPO_ROOT="$PWD" bash scripts/run-audit.sh skill "${{ matrix.package }}"
       - name: "Upload fragment metrics"
-        if: steps.audit.outputs.kind != ''
+        if: ${{ startsWith(matrix.package, 'skills-') }}
         uses: "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" # v7
         with:
-          name: "metrics-${{ steps.audit.outputs.kind }}-${{ matrix.package }}"
-          path: "audit/${{ steps.audit.outputs.kind }}/${{ matrix.package }}/metrics.json"
+          name: "metrics-skill-${{ matrix.package }}"
+          path: "audit/skill/${{ matrix.package }}/metrics.json"
           if-no-files-found: "error"
 
   # ── Site: collect metrics, build data.json, deploy (main only) ──
@@ -359,20 +354,20 @@ jobs:
     concurrency:
       group: "pages"
       cancel-in-progress: false
+    # Every run step executes inside the .website flox env (node, jq, …).
+    # Absolute -d path so steps with `working-directory: .website` still
+    # resolve the env relative to the repo root, not their cwd.
+    defaults:
+      run:
+        shell: "flox activate -d ${{ github.workspace }}/.website -- bash -e {0}"
     steps:
       - name: "Checkout"
         uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
         with:
           fetch-depth: 0
       - name: "Install flox"
-        # The "Fetch prior metrics" step runs in `flox activate` (jq, yq,
-        # curl from the root env).
+        # Required so the run steps' `flox activate -d .website` works.
         uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
-      - uses: "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e" # v6
-        with:
-          node-version: "22"
-          cache: "npm"
-          cache-dependency-path: ".website/package-lock.json"
       - name: "Download fresh metrics"
         uses: "actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c" # v8
         with:
@@ -393,7 +388,6 @@ jobs:
                ".website/src/content/metrics/$kind/$name.json"
           done
       - name: "Fetch prior metrics for unchanged items"
-        shell: "flox activate -- bash -e {0}"
         env:
           DEPLOY_URL: "https://flox.github.io/floxenvs"
         run: |
