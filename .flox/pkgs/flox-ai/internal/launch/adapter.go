@@ -33,7 +33,7 @@ type Status struct {
 // Context is everything an adapter needs to stage and launch.
 type Context struct {
 	Bin         string   // resolved absolute binary path (argv[0])
-	ShareDir    string   // $FLOX_ENV/share/claude-code (fragment source)
+	ShareDir    string   // share root ($FLOX_ENV/share); ScanFlox appends flox/<agent>
 	LaunchDir   string   // per-agent writable cache (ConfigDir/launch/<agent>)
 	ConfigDir   string   // $FLOX_ENV_PROJECT/.flox/cache/flox-ai
 	Passthrough []string // verbatim args after the agent name
