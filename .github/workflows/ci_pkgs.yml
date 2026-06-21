@@ -40,10 +40,6 @@ on:
         default: false
         type: boolean
 
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
 permissions:
   contents: "write"
   pages: "write"
@@ -428,6 +424,11 @@ jobs:
     if: always() && needs.discover.result == 'success'
     runs-on: "ubuntu-latest"
     timeout-minutes: 30
+    # Serialize only the site/deploy half (gh-pages) — the build legs
+    # must NOT share a concurrency group or runs cancel each other.
+    concurrency:
+      group: "pages"
+      cancel-in-progress: false
     steps:
       - name: "Checkout"
         uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
