@@ -40,16 +40,12 @@ if [ ! -d "$built" ]; then
     || { echo "build failed for $NAME" >&2; exit 1; }
 fi
 
-# A fragment build emits the same skill under several agent layouts
-# (Claude, opencode, codex, pi, and the flox launcher variants). We audit
-# ONE copy, preferring Claude. Probe these bases in this fixed order and
-# use the first that exists and holds a content dir — each base is checked
-# exactly once. Claude comes first.
+# A fragment build emits the same skill under one dir per agent launcher.
+# We audit ONE copy, preferring Claude. Probe these bases in this fixed
+# order and use the first that exists and holds a content dir — each base
+# is checked exactly once. Claude comes first.
 content=""
 for base in \
-  "share/claude-code/plugins" \
-  "share/claude-code/skills" \
-  "share/opencode/skills" \
   "share/flox/claude" \
   "share/flox/opencode" \
   "share/flox/codex" \

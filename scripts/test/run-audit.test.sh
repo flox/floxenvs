@@ -59,10 +59,10 @@ EOF
 chmod +x "$TMP/bin/flox-ai"
 
 mkdir -p "$TMP/.flox/pkgs/skills-humanizer"
-# Same skill present under Claude AND a non-Claude agent layout.
-mkdir -p "$TMP/result-skills-humanizer/share/claude-code/skills/humanizer"
-mkdir -p "$TMP/result-skills-humanizer/share/opencode/skills/humanizer"
-cat > "$TMP/result-skills-humanizer/share/claude-code/skills/humanizer/SKILL.md" <<'EOF'
+# Same skill present under the Claude AND a non-Claude launcher layout.
+mkdir -p "$TMP/result-skills-humanizer/share/flox/claude/humanizer"
+mkdir -p "$TMP/result-skills-humanizer/share/flox/opencode/humanizer"
+cat > "$TMP/result-skills-humanizer/share/flox/claude/humanizer/SKILL.md" <<'EOF'
 ---
 name: humanizer
 description: Use when you need a tidy example skill for tests.
@@ -79,9 +79,9 @@ sk="$TMP/audit/skill/skills-humanizer/metrics.json"
 assert_eq "skill metrics.json written" "true" \
   "$([ -f "$sk" ] && echo true || echo false)"
 
-# Claude folder is preferred over the opencode copy.
+# Claude launcher folder is preferred over the opencode copy.
 assert_eq "audited the Claude content dir" "true" \
-  "$(grep -q 'share/claude-code/skills/humanizer$' "$TMP/audited-dir.txt" \
+  "$(grep -q 'share/flox/claude/humanizer$' "$TMP/audited-dir.txt" \
        && echo true || echo false)"
 
 for dim in quality reliability security impact identity; do
