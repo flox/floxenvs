@@ -66,6 +66,9 @@ jobs:
       aarch64-linux: "${{ steps.discover.outputs.aarch64-linux }}"
       x86_64-darwin: "${{ steps.discover.outputs.x86_64-darwin }}"
       x86_64-linux: "${{ steps.discover.outputs.x86_64-linux }}"
+      # Single source of truth: does this run publish (main + push/dispatch)
+      # or just build (PRs)? Drives job names and the Build/Publish gates.
+      is_publish: "${{ steps.discover.outputs.is_publish }}"
 
     steps:
       - name: "Checkout"
@@ -136,12 +139,22 @@ jobs:
             echo "  $sys: $sys_pkgs"
           done
 
+          # ── is_publish: publish on main (push/dispatch), else just build ──
+          if [ "${{ github.ref_name }}" = "main" ] \
+             && { [ "$EVENT" = "push" ] || [ "$EVENT" = "workflow_dispatch" ]; }; then
+            is_publish=true
+          else
+            is_publish=false
+          fi
+          echo "is_publish=$is_publish" >> "$GITHUB_OUTPUT"
+          echo "is_publish: $is_publish"
+
   # ── Build (PRs) or publish (main): one job per (package, system) ──
   # The x86_64-linux leg additionally audits fragment CONTENT from the
   # build it just produced — no second build.
 
   aarch64-darwin:
-    name: "Package '${{ matrix.package }}' (aarch64-darwin)"
+    name: "${{ needs.discover.outputs.is_publish == 'true' && 'Publish' || 'Build' }} '${{ matrix.package }}' (aarch64-darwin)"
     runs-on: "ubuntu-latest"
     timeout-minutes: 90
     needs: ["discover"]
@@ -172,12 +185,12 @@ jobs:
           ssh-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
           remote-builders: "${{ vars.MANAGED_REMOTE_BUILDERS }}"
       - name: "Build"
-        if: ${{ !(github.ref_name == 'main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')) }}
+        if: ${{ needs.discover.outputs.is_publish != 'true' }}
         run: |
           set -euo pipefail
           flox build "${{ matrix.package }}" --system aarch64-darwin
       - name: "Publish"
-        if: ${{ github.ref_name == 'main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+        if: ${{ needs.discover.outputs.is_publish == 'true' }}
         env:
           FLOX_FLOXHUB_TOKEN: "${{ secrets.FLOX_FLOXHUB_TOKEN }}"
         run: |
@@ -186,7 +199,7 @@ jobs:
           flox publish -o "$ORG" "${{ matrix.package }}" --system aarch64-darwin
 
   aarch64-linux:
-    name: "Package '${{ matrix.package }}' (aarch64-linux)"
+    name: "${{ needs.discover.outputs.is_publish == 'true' && 'Publish' || 'Build' }} '${{ matrix.package }}' (aarch64-linux)"
     runs-on: "ubuntu-latest"
     timeout-minutes: 90
     needs: ["discover"]
@@ -217,12 +230,12 @@ jobs:
           ssh-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
           remote-builders: "${{ vars.MANAGED_REMOTE_BUILDERS }}"
       - name: "Build"
-        if: ${{ !(github.ref_name == 'main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')) }}
+        if: ${{ needs.discover.outputs.is_publish != 'true' }}
         run: |
           set -euo pipefail
           flox build "${{ matrix.package }}" --system aarch64-linux
       - name: "Publish"
-        if: ${{ github.ref_name == 'main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+        if: ${{ needs.discover.outputs.is_publish == 'true' }}
         env:
           FLOX_FLOXHUB_TOKEN: "${{ secrets.FLOX_FLOXHUB_TOKEN }}"
         run: |
@@ -231,7 +244,7 @@ jobs:
           flox publish -o "$ORG" "${{ matrix.package }}" --system aarch64-linux
 
   x86_64-darwin:
-    name: "Package '${{ matrix.package }}' (x86_64-darwin)"
+    name: "${{ needs.discover.outputs.is_publish == 'true' && 'Publish' || 'Build' }} '${{ matrix.package }}' (x86_64-darwin)"
     runs-on: "ubuntu-latest"
     timeout-minutes: 90
     needs: ["discover"]
@@ -262,12 +275,12 @@ jobs:
           ssh-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
           remote-builders: "${{ vars.MANAGED_REMOTE_BUILDERS }}"
       - name: "Build"
-        if: ${{ !(github.ref_name == 'main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')) }}
+        if: ${{ needs.discover.outputs.is_publish != 'true' }}
         run: |
           set -euo pipefail
           flox build "${{ matrix.package }}" --system x86_64-darwin
       - name: "Publish"
-        if: ${{ github.ref_name == 'main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+        if: ${{ needs.discover.outputs.is_publish == 'true' }}
         env:
           FLOX_FLOXHUB_TOKEN: "${{ secrets.FLOX_FLOXHUB_TOKEN }}"
         run: |
@@ -276,7 +289,7 @@ jobs:
           flox publish -o "$ORG" "${{ matrix.package }}" --system x86_64-darwin
 
   x86_64-linux:
-    name: "Package '${{ matrix.package }}' (x86_64-linux)"
+    name: "${{ needs.discover.outputs.is_publish == 'true' && 'Publish' || 'Build' }} '${{ matrix.package }}' (x86_64-linux)"
     runs-on: "ubuntu-latest"
     timeout-minutes: 90
     needs: ["discover"]
@@ -313,7 +326,7 @@ jobs:
           set -euo pipefail
           flox build "${{ matrix.package }}" --system x86_64-linux
       - name: "Publish"
-        if: ${{ github.ref_name == 'main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+        if: ${{ needs.discover.outputs.is_publish == 'true' }}
         env:
           FLOX_FLOXHUB_TOKEN: "${{ secrets.FLOX_FLOXHUB_TOKEN }}"
         run: |
@@ -450,7 +463,7 @@ jobs:
           BASE_PATH: "${{ vars.BASE_PATH || '/' }}"
         run: "npm run build"
       - name: "Publish to gh-pages branch"
-        if: ${{ github.ref_name == 'main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+        if: ${{ needs.discover.outputs.is_publish == 'true' }}
         uses: "peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453" # v4
         with:
           github_token: "${{ secrets.GITHUB_TOKEN }}"
