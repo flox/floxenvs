@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-19T12:22:53.151Z",
-  "commit": "40a5079addc375b264acaa012addf9a6de9cbc22",
+  "generated_at": "2026-06-21T19:32:46.297Z",
+  "commit": "e5cedb962ebf276bbac5c58291c29b7a3f50fc12",
   "items": [
     {
       "id": "skills-agent-deck",
@@ -23,92 +23,53 @@
       "license": "MIT",
       "audit": {
         "identity": {
-          "kind": "pkg",
-          "name": "skills-agent-deck",
-          "dir": ".flox/pkgs/skills-agent-deck"
+          "kind": "skill",
+          "name": "agent-deck",
+          "dir": "/home/runner/work/floxenvs/floxenvs/result-skills-agent-deck/share/flox/claude/agent-deck"
         },
-        "overall": 74,
-        "status": "warn",
+        "overall": 38,
+        "status": "risk",
         "quality": {
-          "score": 56,
+          "score": 30,
           "checks": [
             {
-              "id": "has-default-nix",
-              "pass": true,
-              "weight": 10
-            },
-            {
-              "id": "has-publish-json",
-              "pass": true,
-              "weight": 10
-            },
-            {
-              "id": "publish-json-valid",
+              "id": "skill-tools",
               "pass": false,
-              "weight": 5
+              "weight": 40,
+              "note": "skill-tools failed to run"
             },
             {
-              "id": "default-nix-parses",
-              "pass": true,
-              "weight": 10
-            },
-            {
-              "id": "meta-yaml-complete",
-              "pass": true,
-              "weight": 15
-            },
-            {
-              "id": "meta-yaml-exists",
+              "id": "skill-validator",
               "pass": false,
               "weight": 30,
-              "note": "no meta.yaml"
+              "note": "skill-validator failed to run"
+            },
+            {
+              "id": "claudelint",
+              "pass": true,
+              "weight": 30,
+              "note": "100"
             }
           ]
         },
         "reliability": {
-          "ci_green_streak_days": 9,
-          "last_test_at": "2026-06-19",
+          "ci_green_streak_days": 0,
+          "last_test_at": "",
           "lockfile_fresh": false,
-          "test_duration_s": 946,
-          "score": 85,
+          "test_duration_s": 0,
+          "score": 0,
           "note": ""
         },
         "security": {
           "score": 100,
           "cap": 100,
-          "scanners": [
-            {
-              "tool": "gitleaks",
-              "level": "INFO",
-              "status": "Passed"
-            },
-            {
-              "tool": "shellcheck",
-              "level": "INFO",
-              "status": "Passed"
-            },
-            {
-              "tool": "semgrep",
-              "level": "INFO",
-              "status": "Passed"
-            },
-            {
-              "tool": "trivy",
-              "level": "INFO",
-              "status": "Passed"
-            },
-            {
-              "tool": "snyk",
-              "level": "INFO",
-              "status": "Passed"
-            }
-          ],
+          "scanners": [],
           "findings": []
         },
         "impact": {
           "pass": 0,
           "total": 0,
-          "score": null,
+          "score": 70,
           "cases": []
         }
       }
@@ -135,112 +96,53 @@
       "license": "MIT",
       "audit": {
         "identity": {
-          "kind": "pkg",
-          "name": "skills-agent-skills",
-          "dir": ".flox/pkgs/skills-agent-skills"
+          "kind": "skill",
+          "name": "agent-skills",
+          "dir": "/home/runner/work/floxenvs/floxenvs/result-skills-agent-skills/share/flox/opencode/agent-skills"
         },
-        "overall": 82,
-        "status": "stable",
+        "overall": 38,
+        "status": "risk",
         "quality": {
-          "score": 70,
+          "score": 30,
           "checks": [
             {
-              "id": "has-default-nix",
-              "pass": true,
-              "weight": 10
+              "id": "skill-tools",
+              "pass": false,
+              "weight": 40,
+              "note": "skill-tools failed to run"
             },
             {
-              "id": "has-publish-json",
-              "pass": true,
-              "weight": 10
-            },
-            {
-              "id": "publish-json-valid",
-              "pass": true,
-              "weight": 5
-            },
-            {
-              "id": "default-nix-parses",
-              "pass": true,
-              "weight": 10
-            },
-            {
-              "id": "meta-yaml-complete",
-              "pass": true,
-              "weight": 15
-            },
-            {
-              "id": "has-upgrade-sh",
-              "pass": true,
-              "weight": 5
-            },
-            {
-              "id": "upgrade-sh-shellchecked",
-              "pass": true,
-              "weight": 5
-            },
-            {
-              "id": "has-hashes-json",
-              "pass": true,
-              "weight": 5
-            },
-            {
-              "id": "hashes-json-fresh",
-              "pass": true,
-              "weight": 5
-            },
-            {
-              "id": "meta-yaml-exists",
+              "id": "skill-validator",
               "pass": false,
               "weight": 30,
-              "note": "no meta.yaml"
+              "note": "skill-validator failed to run"
+            },
+            {
+              "id": "claudelint",
+              "pass": true,
+              "weight": 30,
+              "note": "100"
             }
           ]
         },
         "reliability": {
-          "ci_green_streak_days": 9,
-          "last_test_at": "2026-06-19",
-          "lockfile_fresh": true,
-          "test_duration_s": 946,
-          "score": 95,
+          "ci_green_streak_days": 0,
+          "last_test_at": "",
+          "lockfile_fresh": false,
+          "test_duration_s": 0,
+          "score": 0,
           "note": ""
         },
         "security": {
           "score": 100,
           "cap": 100,
-          "scanners": [
-            {
-              "tool": "gitleaks",
-              "level": "INFO",
-              "status": "Passed"
-            },
-            {
-              "tool": "shellcheck",
-              "level": "INFO",
-              "status": "Passed"
-            },
-            {
-              "tool": "semgrep",
-              "level": "INFO",
-              "status": "Passed"
-            },
-            {
-              "tool": "trivy",
-              "level": "INFO",
-              "status": "Passed"
-            },
-            {
-              "tool": "snyk",
-              "level": "INFO",
-              "status": "Passed"
-            }
-          ],
+          "scanners": [],
           "findings": []
         },
         "impact": {
           "pass": 0,
           "total": 0,
-          "score": null,
+          "score": 70,
           "cases": []
         }
       }
@@ -267,112 +169,53 @@
       "license": "Apache-2.0",
       "audit": {
         "identity": {
-          "kind": "pkg",
-          "name": "skills-agentmemory",
-          "dir": ".flox/pkgs/skills-agentmemory"
+          "kind": "skill",
+          "name": "agentmemory",
+          "dir": "/home/runner/work/floxenvs/floxenvs/result-skills-agentmemory/share/flox/opencode/agentmemory"
         },
-        "overall": 82,
-        "status": "stable",
+        "overall": 38,
+        "status": "risk",
         "quality": {
-          "score": 70,
+          "score": 30,
           "checks": [
             {
-              "id": "has-default-nix",
-              "pass": true,
-              "weight": 10
+              "id": "skill-tools",
+              "pass": false,
+              "weight": 40,
+              "note": "skill-tools failed to run"
             },
             {
-              "id": "has-publish-json",
-              "pass": true,
-              "weight": 10
-            },
-            {
-              "id": "publish-json-valid",
-              "pass": true,
-              "weight": 5
-            },
-            {
-              "id": "default-nix-parses",
-              "pass": true,
-              "weight": 10
-            },
-            {
-              "id": "meta-yaml-complete",
-              "pass": true,
-              "weight": 15
-            },
-            {
-              "id": "has-upgrade-sh",
-              "pass": true,
-              "weight": 5
-            },
-            {
-              "id": "upgrade-sh-shellchecked",
-              "pass": true,
-              "weight": 5
-            },
-            {
-              "id": "has-hashes-json",
-              "pass": true,
-              "weight": 5
-            },
-            {
-              "id": "hashes-json-fresh",
-              "pass": true,
-              "weight": 5
-            },
-            {
-              "id": "meta-yaml-exists",
+              "id": "skill-validator",
               "pass": false,
               "weight": 30,
-              "note": "no meta.yaml"
+              "note": "skill-validator failed to run"
+            },
+            {
+              "id": "claudelint",
+              "pass": true,
+              "weight": 30,
+              "note": "100"
             }
           ]
         },
         "reliability": {
-          "ci_green_streak_days": 9,
-          "last_test_at": "2026-06-19",
-          "lockfile_fresh": true,
-          "test_duration_s": 946,
-          "score": 95,
+          "ci_green_streak_days": 0,
+          "last_test_at": "",
+          "lockfile_fresh": false,
+          "test_duration_s": 0,
+          "score": 0,
           "note": ""
         },
         "security": {
           "score": 100,
           "cap": 100,
-          "scanners": [
-            {
-              "tool": "gitleaks",
-              "level": "INFO",
-              "status": "Passed"
-            },
-            {
-              "tool": "shellcheck",
-              "level": "INFO",
-              "status": "Passed"
-            },
-            {
-              "tool": "semgrep",
-              "level": "INFO",
-              "status": "Passed"
-            },
-            {
-              "tool": "trivy",
-              "level": "INFO",
-              "status": "Passed"
-            },
-            {
-              "tool": "snyk",
-              "level": "INFO",
-              "status": "Passed"
-            }
-          ],
+          "scanners": [],
           "findings": []
         },
         "impact": {
           "pass": 0,
           "total": 0,
-          "score": null,
+          "score": 70,
           "cases": []
         }
       }
