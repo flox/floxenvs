@@ -66,7 +66,6 @@ jobs:
       aarch64-linux: "${{ steps.discover.outputs.aarch64-linux }}"
       x86_64-darwin: "${{ steps.discover.outputs.x86_64-darwin }}"
       x86_64-linux: "${{ steps.discover.outputs.x86_64-linux }}"
-      envs: "${{ steps.discover.outputs.envs }}"
 
     steps:
       - name: "Checkout"
@@ -136,31 +135,6 @@ jobs:
             echo "$sys=$sys_pkgs" >> "$GITHUB_OUTPUT"
             echo "  $sys: $sys_pkgs"
           done
-
-          # ── Envs to audit (top-level dirs with meta.yaml) ──
-          # Dispatch "all"/"changed" or any push/PR → all envs (the site
-          # re-aggregates anyway); explicit env:NAME dispatch → just those.
-          all_envs() {
-            for d in */; do
-              n="${d%/}"
-              case "$n" in .*|site|scripts|node_modules) continue ;; esac
-              case "$n" in *-demo) continue ;; esac
-              [ -f "$n/meta.yaml" ] && echo "$n"
-            done
-          }
-          envs="[]"
-          if [ "$EVENT" = "workflow_dispatch" ] && [ -n "${ITEMS:-}" ] \
-               && [ "${ITEMS:-}" != "all" ] && [ "${ITEMS:-}" != "changed" ]; then
-            for e in $(echo "$ITEMS" | tr ',' '\n' | sed -n 's/^env://p'); do
-              [ -f "$e/meta.yaml" ] && envs=$(echo "$envs" | jq -c ". + [\"$e\"]")
-            done
-          else
-            for e in $(all_envs); do
-              envs=$(echo "$envs" | jq -c ". + [\"$e\"]")
-            done
-          fi
-          echo "envs=$envs" >> "$GITHUB_OUTPUT"
-          echo "Envs: $envs"
 
   # ── Build (PRs) or publish (main): one job per (package, system) ──
   # The x86_64-linux leg additionally audits fragment CONTENT from the
@@ -357,12 +331,11 @@ jobs:
         run: |
           set -euo pipefail
           PKG="${{ matrix.package }}"
-          sub=$(grep -E '^subkind:' ".flox/pkgs/$PKG/meta.yaml" 2>/dev/null \
-                | head -1 | awk '{print $2}')
-          case "$sub" in
-            skill|plugin) kind=skill ;;
-            agent) kind=agent ;;
-            *) echo "kind=" >> "$GITHUB_OUTPUT"; echo "not a fragment"; exit 0 ;;
+          # Audit only skills-* packages (the Claude Code skill/plugin
+          # fragments). Everything else is built/published, not audited.
+          case "$PKG" in
+            skills-*) kind=skill ;;
+            *) echo "kind=" >> "$GITHUB_OUTPUT"; echo "$PKG is not a skill"; exit 0 ;;
           esac
           echo "kind=$kind" >> "$GITHUB_OUTPUT"
           REPO_ROOT="$PWD" bash scripts/run-audit.sh "$kind" "$PKG"
@@ -374,45 +347,10 @@ jobs:
           path: "audit/${{ steps.audit.outputs.kind }}/${{ matrix.package }}/metrics.json"
           if-no-files-found: "error"
 
-  # ── Env audits (no build; score the env dir directly) ──
-  audit-env:
-    name: "Audit env '${{ matrix.env }}'"
-    needs: ["discover"]
-    if: needs.discover.outputs.envs != '[]'
-    runs-on: "ubuntu-latest"
-    timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      max-parallel: 6
-      matrix:
-        env: ${{ fromJSON(needs.discover.outputs.envs) }}
-    steps:
-      - name: "Checkout"
-        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
-        with:
-          fetch-depth: 0
-      - name: "Install flox"
-        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
-      - name: "Run audit"
-        shell: "flox activate -- bash -e {0}"
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          SNYK_TOKEN: "${{ secrets.SNYK_TOKEN }}"
-          REPO_ROOT: "${{ github.workspace }}"
-        run: |
-          set -euo pipefail
-          bash scripts/run-audit.sh env "${{ matrix.env }}"
-      - name: "Upload env metrics"
-        uses: "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" # v7
-        with:
-          name: "metrics-env-${{ matrix.env }}"
-          path: "audit/env/${{ matrix.env }}/metrics.json"
-          if-no-files-found: "error"
-
   # ── Site: collect metrics, build data.json, deploy (main only) ──
   site:
     name: "Build + deploy site"
-    needs: ["discover", "x86_64-linux", "audit-env"]
+    needs: ["discover", "x86_64-linux"]
     if: always() && needs.discover.result == 'success'
     runs-on: "ubuntu-latest"
     timeout-minutes: 30
