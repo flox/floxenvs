@@ -27,7 +27,7 @@ const collectionPage = {
   "@type": "CollectionPage",
   name: "Flox packages",
   description:
-    "Curated catalog of Flox packages — AI coding agents, Claude Code plugins and skills, CLI tools, and runtimes.",
+    "Curated catalog of Flox packages — AI coding agents, Claude Code skills, CLI tools, and runtimes.",
   url: pageUrl,
   isPartOf: { "@type": "WebSite", "@id": `${origin}${base}#website` },
   mainEntity: { "@id": `${pageUrl}#items` },
@@ -53,7 +53,7 @@ const breadcrumb = {
 const jsonLd = [collectionPage, { ...itemList, "@id": `${pageUrl}#items` }, breadcrumb];
 ---
 <Layout
-  title="Flox packages — AI coding agents, Claude Code plugins, and CLI tools"
+  title="Flox packages — AI coding agents, Claude Code skills, and CLI tools"
   description="Browse every Flox package — Claude Code, Ollama, Codex, Crush, LangChain, and dozens more. Each one ships as a Nix-pinned binary with a one-line manifest install."
   jsonLd={jsonLd}
 >
@@ -62,7 +62,6 @@ const jsonLd = [collectionPage, { ...itemList, "@id": `${pageUrl}#items` }, brea
     {pkgs.length} packages
   </p>
   <div class="mt-4 flex gap-2 text-sm">
-    <a href={`${base}packages/plugins/`} class="underline">Plugins</a>
     <a href={`${base}packages/skills/`} class="underline">Skills</a>
   </div>
   <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

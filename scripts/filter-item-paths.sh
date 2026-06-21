@@ -45,6 +45,12 @@ while IFS= read -r line; do
     .flox/pkgs/*/*)
       pkg=$(echo "$line" | cut -d/ -f3)
       items["pkg:$pkg"]=1
+      # A changed fragment (skill/plugin subkind) also needs its
+      # content re-audited under the skill: kind.
+      if grep -qE '^subkind:[[:space:]]*(skill|plugin)[[:space:]]*$' \
+           "$ROOT/.flox/pkgs/$pkg/meta.yaml" 2>/dev/null; then
+        items["skill:$pkg"]=1
+      fi
       ;;
     .website/*|.github/*|scripts/*|.plans/*|.worktrees/*|.gitignore)
       ;;
@@ -60,7 +66,7 @@ if $emit_all_envs || $emit_all_pkgs; then
   while IFS= read -r item; do
     case "$item" in
       env:*) $emit_all_envs && items["$item"]=1 ;;
-      pkg:*) $emit_all_pkgs && items["$item"]=1 ;;
+      pkg:*|skill:*|agent:*) $emit_all_pkgs && items["$item"]=1 ;;
     esac
   done < <( ( cd "$ROOT" && REPO_ROOT="$ROOT" \
               "$SELF_DIR/list-items.sh" ) )

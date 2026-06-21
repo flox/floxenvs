@@ -14,7 +14,7 @@ import (
 var embedded []byte
 
 // DefaultURL is the published catalog endpoint.
-const DefaultURL = "https://flox.github.io/floxenvs/ai-catalog.json"
+const DefaultURL = "https://flox.github.io/floxenvs/data.json"
 
 // Source records where a loaded catalog came from.
 type Source int

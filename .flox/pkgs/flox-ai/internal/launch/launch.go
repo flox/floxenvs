@@ -160,7 +160,7 @@ func (p Plan) Argv() []string {
 // Options are the resolved inputs for Run.
 type Options struct {
 	AgentName   string
-	ShareDir    string // $FLOX_ENV/share/claude-code (or --dir)
+	ShareDir    string // share root ($FLOX_ENV/share); ScanFlox appends flox/<agent>
 	ConfigDir   string // $FLOX_ENV_PROJECT/.flox/cache/flox-ai (or --config-dir)
 	Passthrough []string
 }

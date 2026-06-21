@@ -9,7 +9,7 @@ import {
 } from "./aiCatalog";
 
 const caveman: PkgData = {
-  name: "claude-code-plugin-caveman",
+  name: "skills-caveman",
   title: "Caveman",
   subkind: "plugin",
   plugin_for: "claude-code",
@@ -21,19 +21,18 @@ const caveman: PkgData = {
   tagline: "Ultra-compressed agent communication plugin.\n",
   tags: ["claude-code", "plugin", "compression"],
   category: "ai",
-  status: "beta",
   featured: false,
   links: {
     source: "https://github.com/flox/floxenvs/tree/main/x",
-    floxhub: "https://hub.flox.dev/flox/claude-code-plugin-caveman",
+    floxhub: "https://hub.flox.dev/flox/skills-caveman",
   },
   install: {
     pkg: [
       "[install]",
       'claude-code.pkg-path = "flox/claude-code"',
       'claude-code.publisher = "flox"',
-      'claude-code-plugin-caveman.pkg-path = "flox/claude-code-plugin-caveman"',
-      'claude-code-plugin-caveman.publisher = "flox"',
+      'skills-caveman.pkg-path = "flox/skills-caveman"',
+      'skills-caveman.publisher = "flox"',
     ].join("\n"),
   },
 };
@@ -42,17 +41,16 @@ describe("toCatalogItem", () => {
   it("maps a plugin package to a catalog item", () => {
     const item = toCatalogItem(caveman);
     expect(item).toEqual({
-      id: "claude-code-plugin-caveman",
+      id: "skills-caveman",
       name: "Caveman",
       type: "plugin",
       for: "claude-code",
       description: "Ultra-compressed agent communication plugin.",
       tags: ["claude-code", "plugin", "compression"],
       categories: ["ai"],
-      status: "beta",
       featured: false,
       link: "https://github.com/flox/floxenvs/tree/main/x",
-      installPkg: "flox/claude-code-plugin-caveman",
+      installPkg: "flox/skills-caveman",
       intro: "Caveman intro.",
       summary: ["one", "two"],
       stack: ["bash"],
@@ -63,20 +61,19 @@ describe("toCatalogItem", () => {
 
   it("extracts installPkg matching the package name, not the dep", () => {
     expect(toCatalogItem(caveman).installPkg).toBe(
-      "flox/claude-code-plugin-caveman",
+      "flox/skills-caveman",
     );
   });
 });
 
 describe("rankItems", () => {
-  it("sorts featured first, then by status rank, then title", () => {
-    const items = [
-      { ...toCatalogItem(caveman), name: "B", featured: false, status: "beta" },
-      { ...toCatalogItem(caveman), name: "A", featured: true, status: "stable" },
-      { ...toCatalogItem(caveman), name: "C", featured: false, status: "stable" },
-    ];
-    const ranked = rankItems(items);
-    expect(ranked.map((i) => i.name)).toEqual(["A", "C", "B"]);
+  it("ranks featured first, then by name", () => {
+    const mk = (name: string, featured: boolean): PkgData => ({
+      name, title: name, subkind: "skill", tagline: "", category: "ai",
+      featured, install: { pkg: "" },
+    });
+    const out = buildCatalog([mk("b", false), mk("a", false), mk("c", true)]);
+    expect(out.map((i) => i.id)).toEqual(["c", "a", "b"]);
   });
 });
 
@@ -127,14 +124,14 @@ describe("buildCatalog", () => {
   it("filters non-fragment pkgs, maps, and ranks", () => {
     const pkgs: PkgData[] = [
       { name: "claude-code", title: "Claude Code", subkind: "plain",
-        tagline: "agent", category: "ai", featured: true, status: "stable" },
+        tagline: "agent", category: "ai", featured: true },
       { name: "a-skill", title: "Zeta", subkind: "skill",
-        tagline: "z", category: "ai", featured: false, status: "beta" },
+        tagline: "z", category: "ai", featured: false },
       { name: "b-plugin", title: "Alpha", subkind: "plugin",
-        tagline: "a", category: "ai", featured: true, status: "stable" },
+        tagline: "a", category: "ai", featured: true },
     ];
     const out = buildCatalog(pkgs);
-    // plain excluded; featured plugin first, then the beta skill
+    // plain excluded; featured plugin first, then by name
     expect(out.map((i) => i.id)).toEqual(["b-plugin", "a-skill"]);
   });
 });

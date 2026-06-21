@@ -88,13 +88,17 @@ ollama.overrideAttrs (prevAttrs: {
 
   buildInputs = (prevAttrs.buildInputs or [ ]) ++ cudaLibs;
 
-  preBuild = ''
-    cmake -B build \
-      -DCMAKE_SKIP_BUILD_RPATH=ON \
-      -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON \
-      -DCMAKE_CUDA_ARCHITECTURES='${cudaArchitectures}'
-    cmake --build build -j $NIX_BUILD_CORES
-  '';
+  # Reuse ollama's own preBuild rather than replacing it: the base prefetches
+  # llama.cpp and hands it to CMake via -DFETCHCONTENT_SOURCE_DIR_LLAMA_CPP.
+  # Without that, CMake git-clones llama.cpp at build time and the Nix sandbox
+  # blocks it ("Failed to clone repository"). We only need to add the CUDA
+  # target architectures to the same configure step, so inject the flag right
+  # after `cmake -B build` and keep everything else (llama.cpp source, compat
+  # patches, MLX-disable, rpath flags) intact.
+  preBuild = builtins.replaceStrings
+    [ "cmake -B build \\\n" ]
+    [ "cmake -B build \\\n      -DCMAKE_CUDA_ARCHITECTURES='${cudaArchitectures}' \\\n" ]
+    prevAttrs.preBuild;
 
   postFixup = ''
     wrapProgram "$out/bin/ollama" ${wrapperArgs}

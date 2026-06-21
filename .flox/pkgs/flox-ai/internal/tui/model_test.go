@@ -1,12 +1,16 @@
 package tui
 
-import "testing"
+import (
+	"testing"
+
+	"flox.dev/flox-ai/internal/catalog"
+)
 
 func testItems() []catalogItem {
 	return []catalogItem{
-		{ID: "claude-code-plugin-caveman", Name: "Caveman", Type: "plugin",
+		{ID: "skills-caveman", Name: "Caveman", Type: "plugin",
 			For: "claude-code", Tags: []string{"compression", "ai"},
-			InstallPkg: "flox/claude-code-plugin-caveman"},
+			InstallPkg: "flox/skills-caveman"},
 		{ID: "skills-graphify", Name: "Graphify", Type: "skill",
 			For: "claude-code", Tags: []string{"knowledge", "ai"},
 			InstallPkg: "flox/skills-graphify"},
@@ -46,7 +50,7 @@ func TestTopPicksUntilQuery(t *testing.T) {
 	if m.isTopPicks() {
 		t.Error("a query must leave top-picks mode")
 	}
-	if !has(m.visibleItems(), "claude-code-plugin-caveman") {
+	if !has(m.visibleItems(), "skills-caveman") {
 		t.Error("query should surface caveman")
 	}
 }
@@ -62,7 +66,7 @@ func TestResultsTagFilter(t *testing.T) {
 	m := newTestModel(nil)
 	m.query = "#ai"
 	got := m.results()
-	if !has(got, "claude-code-plugin-caveman") || !has(got, "skills-graphify") {
+	if !has(got, "skills-caveman") || !has(got, "skills-graphify") {
 		t.Errorf("#ai tag should match caveman+graphify: %v", got)
 	}
 	if has(got, "skills-foo") {
@@ -87,7 +91,7 @@ func TestResultsFreeTextPlusTag(t *testing.T) {
 	if !has(got, "skills-graphify") {
 		t.Errorf("graph #ai should match graphify: %v", got)
 	}
-	if has(got, "claude-code-plugin-caveman") {
+	if has(got, "skills-caveman") {
 		t.Error("caveman has #ai but not the text 'graph'")
 	}
 }
@@ -102,9 +106,9 @@ func TestResultsAgentFilter(t *testing.T) {
 
 func TestPanelShowsInstalledAndStaged(t *testing.T) {
 	m := newTestModel(map[string]bool{"skills-graphify": true})
-	m.stageInstall("claude-code-plugin-caveman")
+	m.stageInstall("skills-caveman")
 	p := m.panelItems()
-	if !has(p, "skills-graphify") || !has(p, "claude-code-plugin-caveman") {
+	if !has(p, "skills-graphify") || !has(p, "skills-caveman") {
 		t.Errorf("panel = %v", p)
 	}
 }
@@ -140,11 +144,11 @@ func TestStageInstallSkipsInstalled(t *testing.T) {
 func TestPendingOps(t *testing.T) {
 	m := newTestModel(map[string]bool{"skills-graphify": true})
 	m.pending = map[string]action{
-		"claude-code-plugin-caveman": actionInstall,
-		"skills-graphify":            actionUninstall,
+		"skills-caveman":  actionInstall,
+		"skills-graphify": actionUninstall,
 	}
 	ins, uns := m.pendingOps()
-	if len(ins) != 1 || ins[0] != "flox/claude-code-plugin-caveman" {
+	if len(ins) != 1 || ins[0] != "flox/skills-caveman" {
 		t.Fatalf("installs %v", ins)
 	}
 	if len(uns) != 1 || uns[0] != "skills-graphify" {
@@ -162,5 +166,36 @@ func TestHasAllTags(t *testing.T) {
 	}
 	if hasAllTags(it, []string{"ai", "missing"}) {
 		t.Error("must require all tags present")
+	}
+}
+
+func TestTopPicksSortsByAuditOverall(t *testing.T) {
+	auditOf := func(score int) *catalog.Audit {
+		a := &catalog.Audit{}
+		a.Overall = score
+		a.Status = "stable"
+		return a
+	}
+	items := []catalogItem{
+		{ID: "a-low", Name: "ALow", Type: "skill", For: "claude-code",
+			InstallPkg: "flox/a-low", Audit: auditOf(40)},
+		{ID: "b-high", Name: "BHigh", Type: "skill", For: "claude-code",
+			InstallPkg: "flox/b-high", Audit: auditOf(90)},
+		{ID: "c-none", Name: "CNone", Type: "skill", For: "claude-code",
+			InstallPkg: "flox/c-none", Audit: nil},
+		{ID: "d-mid", Name: "DMid", Type: "skill", For: "claude-code",
+			InstallPkg: "flox/d-mid", Audit: auditOf(70)},
+	}
+	m := newModel(items, nil, []string{"claude"}, nil, nil, nil, nil, "s", "c", "p")
+	picks := m.topPicks()
+	// Expected order: BHigh(90) > DMid(70) > ALow(40) > CNone(nil)
+	wantOrder := []string{"b-high", "d-mid", "a-low", "c-none"}
+	for i, want := range wantOrder {
+		if i >= len(picks) {
+			t.Fatalf("picks too short: got %d, want at least %d", len(picks), i+1)
+		}
+		if picks[i].ID != want {
+			t.Errorf("picks[%d] = %q, want %q", i, picks[i].ID, want)
+		}
 	}
 }
