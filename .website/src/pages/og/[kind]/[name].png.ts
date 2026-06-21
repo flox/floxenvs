@@ -34,15 +34,14 @@ export const getStaticPaths: GetStaticPaths = async () => {
 // Inter font shipped with satori examples; for now read
 // it from node_modules.
 async function loadFont(): Promise<ArrayBuffer> {
-  // Most distros of `satori` ship without bundled fonts.
-  // We rely on the system Inter; fall back to a tiny
-  // Roboto bundled by `@fontsource/roboto` if needed.
-  // To keep deps light, require Inter via Nix CI image.
+  // Inter ships from the `.website` flox env (the `inter` package).
+  // Prefer it via $FLOX_ENV so local builds inside the env Just Work;
+  // CI sets OG_FONT_PATH explicitly (handled by the caller below).
+  const floxEnv = process.env.FLOX_ENV;
   const candidates = [
-    "/usr/share/fonts/inter/Inter-Regular.ttf",
-    "/usr/share/fonts/truetype/inter/Inter-Regular.ttf",
+    floxEnv && `${floxEnv}/share/fonts/truetype/InterVariable.ttf`,
     "/System/Library/Fonts/Supplemental/Arial.ttf",
-  ];
+  ].filter((c): c is string => Boolean(c));
   for (const c of candidates) {
     try {
       const buf = await fs.readFile(c);

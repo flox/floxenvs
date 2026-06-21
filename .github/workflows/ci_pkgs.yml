@@ -433,13 +433,16 @@ jobs:
         run: |
           set -euo pipefail
           node --experimental-strip-types scripts/build-data-json.mjs --full
-      - name: "Provide a font for OG image rendering"
+      - name: "Resolve OG font from the .website env"
+        # Inter ships from the .website flox env (the `inter` package), not
+        # apt. $FLOX_ENV resolves to the per-system run dir at activation.
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq fontconfig
-          sudo apt-get install -y -qq fonts-inter \
-            || echo "fonts-inter unavailable; falling back to default font"
-          echo "OG_FONT_PATH=$(fc-match -f '%{file}' Inter)" >> "$GITHUB_ENV"
+          set -euo pipefail
+          font="$(find "$FLOX_ENV/share/fonts" -iname 'InterVariable.ttf' | head -1)"
+          [ -n "$font" ] || font="$(find "$FLOX_ENV/share/fonts" -iname '*.ttf' | head -1)"
+          [ -n "$font" ] || { echo "no Inter font found in .website env"; exit 1; }
+          echo "OG_FONT_PATH=$font" >> "$GITHUB_ENV"
+          echo "OG font: $font"
       - name: "Build"
         working-directory: ".website"
         env:
