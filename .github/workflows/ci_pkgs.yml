@@ -174,7 +174,7 @@ jobs:
     if: needs.discover.outputs.aarch64-darwin != '[]'
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 6
       matrix:
         package: ${{ fromJSON(needs.discover.outputs.aarch64-darwin) }}
     steps:
@@ -219,7 +219,7 @@ jobs:
     if: needs.discover.outputs.aarch64-linux != '[]'
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 6
       matrix:
         package: ${{ fromJSON(needs.discover.outputs.aarch64-linux) }}
     steps:
@@ -264,7 +264,7 @@ jobs:
     if: needs.discover.outputs.x86_64-darwin != '[]'
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 6
       matrix:
         package: ${{ fromJSON(needs.discover.outputs.x86_64-darwin) }}
     steps:
@@ -309,7 +309,7 @@ jobs:
     if: needs.discover.outputs.x86_64-linux != '[]'
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 6
       matrix:
         package: ${{ fromJSON(needs.discover.outputs.x86_64-linux) }}
     steps:
