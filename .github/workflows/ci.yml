@@ -590,6 +590,8 @@ jobs:
       - name: "Install flox"
         if: steps.linux_support.outputs.env_linux == 'true' || steps.linux_support.outputs.demo_linux == 'true'
         uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # main
+        with:
+          version: "1.12.2"
 
       - name: "Login to GHCR"
         if: steps.linux_support.outputs.env_linux == 'true' || steps.linux_support.outputs.demo_linux == 'true'
