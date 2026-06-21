@@ -10,17 +10,7 @@ prefetch-npm-deps.pkg-path = "prefetch-npm-deps"
 just.pkg-path = "just"
 uv.pkg-path = "uv"
 yq-go.pkg-path = "yq-go"
-# Website audit tooling (used via `flox activate` in
-# .github/workflows/website.yml instead of apt/curl installs).
+# Website audit tooling (nixpkgs-sourced — safe to keep in the
+# build env; floxenvs-sourced skill-audit tools live in audit-tools/).
 shellcheck.pkg-path = "shellcheck"
 gitleaks.pkg-path = "gitleaks"
-# Skill/agent content-audit engine + its tool ensemble. run-audit.sh
-# builds a fragment package and runs `flox-ai audit` (quality:
-# skill-tools/skill-validator/claudelint; security: skillcheck/
-# skillspector) over the built skill/plugin content.
-flox-ai.pkg-path = "flox/flox-ai"
-skill-tools.pkg-path = "flox/skill-tools"
-skill-validator.pkg-path = "flox/skill-validator"
-claudelint.pkg-path = "flox/claudelint"
-skillcheck.pkg-path = "flox/skillcheck"
-skillspector.pkg-path = "flox/skillspector"

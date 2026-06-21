@@ -358,8 +358,10 @@ jobs:
         id: "audit"
         # Fragments (skill/plugin/agent) are content-audited from the
         # build above; run-audit.sh reuses result-<pkg> and runs the
-        # flox-ai audit engine (tools come from the repo-root Flox env).
-        shell: "flox activate -- bash -e {0}"
+        # flox-ai audit engine. The flox-ai + skill-audit tools live in
+        # the .website env (NOT the root env — they're floxenvs-flake-
+        # sourced and would poison `flox build`'s nixpkgs resolution).
+        shell: "flox activate -d .website -- bash -e {0}"
         run: |
           set -euo pipefail
           PKG="${{ matrix.package }}"
