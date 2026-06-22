@@ -63,12 +63,6 @@ stdenv.mkDerivation {
     hash = srcHash;
   };
 
-  # makeBinaryWrapper produces a compiled C wrapper for python3 so it
-  # is exec'd directly by the kernel via shebang on Darwin, where
-  # shebang chains through a shell script wrapper are unreliable
-  # under stripped environments.
-  nativeBuildInputs = [ makeBinaryWrapper ];
-
   installPhase = ''
     runHook preInstall
 
