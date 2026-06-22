@@ -237,6 +237,7 @@ python.pkgs.buildPythonApplication {
     "charset-normalizer"
     "click"
     "cryptography"
+    "eval-type-backport"
     "gitpython"
     "giturlparse"
     "google-auth"

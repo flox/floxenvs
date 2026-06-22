@@ -10,14 +10,12 @@ schema-version = "1.10.0"
 # Provides the `iloom` (and `il` alias) CLI plus the GitHub
 # CLI (`gh`) it uses for issue-tracker authentication.
 #
-# iloom drives a coding agent (Claude Code by default). Pull
-# in the agent of your choice alongside this env:
+# iloom drives a coding agent (Claude Code by default). This env
+# bundles flox-ai; install the agent CLI and launch it through
+# flox-ai:
 #
-#   [include]
-#   environments = [
-#     "flox/iloom",
-#     "flox/claude",
-#   ]
+#   flox install flox/claude-code
+#   flox-ai launch claude
 
 [install]
 flox-ai.pkg-path = "flox/flox-ai"

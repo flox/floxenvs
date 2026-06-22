@@ -159,3 +159,30 @@ func TestScanFlox(t *testing.T) {
 		t.Fatalf("Rules=%v", got.Rules)
 	}
 }
+
+// TestScanFloxAgentPaths locks the per-agent install layout: each agent's
+// content lives under <share>/flox/<agent>, so the claude agent resolves
+// to share/flox/claude and the opencode agent to share/flox/opencode.
+func TestScanFloxAgentPaths(t *testing.T) {
+	share := t.TempDir()
+	agents := []string{"claude", "opencode", "codex", "pi"}
+	// Stage one plugin dir per agent under its own share/flox/<agent>.
+	for _, a := range agents {
+		dir := filepath.Join(share, "flox", a, "demo")
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	for _, a := range agents {
+		want := filepath.Join(share, "flox", a, "demo")
+		got, err := ScanFlox(share, a)
+		if err != nil {
+			t.Fatalf("%s: %v", a, err)
+		}
+		// Exactly its own dir — no other agent's tree leaks in.
+		if len(got.AgentDirs) != 1 || got.AgentDirs[0] != want {
+			t.Fatalf("agent %s: AgentDirs=%v want [%s]", a, got.AgentDirs, want)
+		}
+	}
+}

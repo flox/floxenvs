@@ -37,7 +37,11 @@ ROOT="${REPO_ROOT:-$(pwd)}"
       name="$(basename "$d")"
       [ -f "$d/meta.yaml" ] || continue
       echo "pkg:$name"
-      if grep -qE '^subkind:[[:space:]]*skill[[:space:]]*$' "$d/meta.yaml"; then
+      # Fragments (skill + plugin subkinds) also get a content audit:
+      # run-audit builds the package and scores the built SKILL.md /
+      # plugin content, not just the packaging hygiene of pkg:.
+      if grep -qE '^subkind:[[:space:]]*(skill|plugin)[[:space:]]*$' \
+           "$d/meta.yaml"; then
         echo "skill:$name"
       fi
     done

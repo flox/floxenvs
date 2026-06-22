@@ -11,7 +11,7 @@ import (
 type LineFunc func(string)
 
 // Installer installs a flox package by pkg-path (e.g.
-// "flox/claude-code-plugin-caveman"), streaming output lines to out.
+// "flox/skills-caveman"), streaming output lines to out.
 type Installer interface {
 	Install(pkg string, out LineFunc) error
 }
@@ -29,7 +29,7 @@ func (FloxInstaller) Install(pkg string, out LineFunc) error {
 }
 
 // Uninstaller removes a flox package by its install id (the manifest
-// key, e.g. "claude-code-plugin-caveman"), streaming output lines.
+// key, e.g. "skills-caveman"), streaming output lines.
 type Uninstaller interface {
 	Uninstall(id string, out LineFunc) error
 }
