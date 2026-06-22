@@ -38,9 +38,10 @@ stdenv.mkDerivation {
       | jq '.lspServers' \
       > "$PLUGIN_DIR/.lsp.json"
 
-    mkdir -p "$out/bin"
-    ln -s ${gopls}/bin/gopls \
-      "$out/bin/gopls"
+    cmd_tmp=$(mktemp)
+    jq --arg c "${gopls}/bin/gopls" \
+      '.gopls.command = $c' "$PLUGIN_DIR/.lsp.json" > "$cmd_tmp"
+    mv "$cmd_tmp" "$PLUGIN_DIR/.lsp.json"
 
     runHook postInstall
   '';

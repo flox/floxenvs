@@ -38,9 +38,10 @@ stdenv.mkDerivation {
       | jq '.lspServers' \
       > "$PLUGIN_DIR/.lsp.json"
 
-    mkdir -p "$out/bin"
-    ln -s ${lua-language-server}/bin/lua-language-server \
-      "$out/bin/lua-language-server"
+    cmd_tmp=$(mktemp)
+    jq --arg c "${lua-language-server}/bin/lua-language-server" \
+      '.lua.command = $c' "$PLUGIN_DIR/.lsp.json" > "$cmd_tmp"
+    mv "$cmd_tmp" "$PLUGIN_DIR/.lsp.json"
 
     runHook postInstall
   '';

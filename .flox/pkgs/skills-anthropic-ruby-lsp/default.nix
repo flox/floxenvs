@@ -38,9 +38,10 @@ stdenv.mkDerivation {
       | jq '.lspServers' \
       > "$PLUGIN_DIR/.lsp.json"
 
-    mkdir -p "$out/bin"
-    ln -s ${rubyPackages.ruby-lsp}/bin/ruby-lsp \
-      "$out/bin/ruby-lsp"
+    cmd_tmp=$(mktemp)
+    jq --arg c "${rubyPackages.ruby-lsp}/bin/ruby-lsp" \
+      '."ruby-lsp".command = $c' "$PLUGIN_DIR/.lsp.json" > "$cmd_tmp"
+    mv "$cmd_tmp" "$PLUGIN_DIR/.lsp.json"
 
     runHook postInstall
   '';

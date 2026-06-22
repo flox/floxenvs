@@ -38,9 +38,10 @@ stdenv.mkDerivation {
       | jq '.lspServers' \
       > "$PLUGIN_DIR/.lsp.json"
 
-    mkdir -p "$out/bin"
-    ln -s ${typescript-language-server}/bin/typescript-language-server \
-      "$out/bin/typescript-language-server"
+    cmd_tmp=$(mktemp)
+    jq --arg c "${typescript-language-server}/bin/typescript-language-server" \
+      '.typescript.command = $c' "$PLUGIN_DIR/.lsp.json" > "$cmd_tmp"
+    mv "$cmd_tmp" "$PLUGIN_DIR/.lsp.json"
 
     ${builtins.readFile ../../nix/flox-agent-layout.sh}
     flox_agent_layout "typescript-lsp" "$out/share"

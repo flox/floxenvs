@@ -38,9 +38,10 @@ stdenv.mkDerivation {
       | jq '.lspServers' \
       > "$PLUGIN_DIR/.lsp.json"
 
-    mkdir -p "$out/bin"
-    ln -s ${clang-tools}/bin/clangd \
-      "$out/bin/clangd"
+    cmd_tmp=$(mktemp)
+    jq --arg c "${clang-tools}/bin/clangd" \
+      '.clangd.command = $c' "$PLUGIN_DIR/.lsp.json" > "$cmd_tmp"
+    mv "$cmd_tmp" "$PLUGIN_DIR/.lsp.json"
 
     ${builtins.readFile ../../nix/flox-agent-layout.sh}
     flox_agent_layout "clangd-lsp" "$out/share"

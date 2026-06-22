@@ -38,9 +38,10 @@ stdenv.mkDerivation {
       | jq '.lspServers' \
       > "$PLUGIN_DIR/.lsp.json"
 
-    mkdir -p "$out/bin"
-    ln -s ${csharp-ls}/bin/csharp-ls \
-      "$out/bin/csharp-ls"
+    cmd_tmp=$(mktemp)
+    jq --arg c "${csharp-ls}/bin/csharp-ls" \
+      '."csharp-ls".command = $c' "$PLUGIN_DIR/.lsp.json" > "$cmd_tmp"
+    mv "$cmd_tmp" "$PLUGIN_DIR/.lsp.json"
 
     runHook postInstall
   '';

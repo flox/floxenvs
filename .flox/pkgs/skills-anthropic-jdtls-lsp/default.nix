@@ -38,9 +38,10 @@ stdenv.mkDerivation {
       | jq '.lspServers' \
       > "$PLUGIN_DIR/.lsp.json"
 
-    mkdir -p "$out/bin"
-    ln -s ${jdt-language-server}/bin/jdtls \
-      "$out/bin/jdtls"
+    cmd_tmp=$(mktemp)
+    jq --arg c "${jdt-language-server}/bin/jdtls" \
+      '.jdtls.command = $c' "$PLUGIN_DIR/.lsp.json" > "$cmd_tmp"
+    mv "$cmd_tmp" "$PLUGIN_DIR/.lsp.json"
 
     runHook postInstall
   '';

@@ -38,9 +38,10 @@ stdenv.mkDerivation {
       | jq '.lspServers' \
       > "$PLUGIN_DIR/.lsp.json"
 
-    mkdir -p "$out/bin"
-    ln -s ${kotlin-language-server}/bin/kotlin-language-server \
-      "$out/bin/kotlin-lsp"
+    cmd_tmp=$(mktemp)
+    jq --arg c "${kotlin-language-server}/bin/kotlin-language-server" \
+      '."kotlin-lsp".command = $c' "$PLUGIN_DIR/.lsp.json" > "$cmd_tmp"
+    mv "$cmd_tmp" "$PLUGIN_DIR/.lsp.json"
 
     runHook postInstall
   '';
