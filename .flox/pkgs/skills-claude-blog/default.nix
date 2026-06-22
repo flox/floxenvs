@@ -3,6 +3,7 @@
   lib,
   fetchFromGitHub,
   makeBinaryWrapper,
+  runCommandLocal,
   python3,
   curl,
   gh,
@@ -34,6 +35,22 @@ let
     requests
     textstat
   ]);
+
+  # Runtime tools the wrapped python3 must find on PATH so the
+  # blog-flow sync script (gh auth token) and the Google skills
+  # (curl OAuth, gh token fallback) keep working regardless of the
+  # caller's PATH.
+  runtimeBinPath = lib.makeBinPath [ curl gh git jq ];
+
+  # The wrapped interpreter lives at its OWN store path (not in the
+  # shared $out/bin) so multiple skill packages can be installed
+  # together without colliding on bin/python3, and so the plugin tree
+  # never pollutes the consumer's PATH. Script shebangs point here.
+  pythonWrapped = runCommandLocal "python3-skills-claude-blog"
+    { nativeBuildInputs = [ makeBinaryWrapper ]; } ''
+      makeBinaryWrapper ${pythonEnv}/bin/python3 $out/bin/python3 \
+        --prefix PATH : ${runtimeBinPath}
+    '';
 in
 stdenv.mkDerivation {
   pname = "skills-claude-blog";
@@ -76,22 +93,14 @@ stdenv.mkDerivation {
            "$PLUGIN_DIR/uninstall.ps1" \
            "$PLUGIN_DIR/tests"
 
-    # Wrap python3 so subprocess.run() inside plugin scripts finds
-    # gh/curl/jq/git without depending on the caller's PATH. The
-    # blog-flow sync script shells to `gh auth token`; the Google
-    # skills shell to `curl` for OAuth and `gh` for token fallback.
-    runtimeBins=${lib.makeBinPath [ curl gh git jq ]}
-    mkdir -p "$out/bin"
-    makeBinaryWrapper "${pythonEnv}/bin/python3" "$out/bin/python3" \
-      --prefix PATH : "$runtimeBins"
-
     # Repoint every #!/usr/bin/env python3 shebang at the wrapped
-    # python3. Marks files executable so the kernel honors the
-    # shebang when Claude Code invokes the script.
+    # python3 (its own store path, ${pythonWrapped}). Marks files
+    # executable so the kernel honors the shebang when Claude Code
+    # invokes the script.
     while IFS= read -r f; do
       head -1 "$f" | grep -q '/usr/bin/env python3' || continue
       substituteInPlace "$f" --replace-fail \
-        '#!/usr/bin/env python3' "#!$out/bin/python3"
+        '#!/usr/bin/env python3' "#!${pythonWrapped}/bin/python3"
       chmod +x "$f"
     done < <(find "$PLUGIN_DIR" -name '*.py' -type f)
 
@@ -99,7 +108,7 @@ stdenv.mkDerivation {
     # the ''${CLAUDE_PLUGIN_ROOT}/... form that Claude Code uses for
     # plugins. Same helper as skills-claude-seo (same
     # author, same `~/.claude/skills/<name>/...` reference style).
-    "$out/bin/python3" ${./fix_md_paths.py} "$PLUGIN_DIR"
+    ${pythonWrapped}/bin/python3 ${./fix_md_paths.py} "$PLUGIN_DIR"
 
     runHook postInstall
   '';
