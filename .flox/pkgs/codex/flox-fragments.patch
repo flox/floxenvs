@@ -2,8 +2,8 @@ diff --git a/core-skills/src/loader.rs b/core-skills/src/loader.rs
 index 3b59e90..c52b93a 100644
 --- a/core-skills/src/loader.rs
 +++ b/core-skills/src/loader.rs
-@@ -275,6 +275,25 @@ async fn skill_roots_with_home_dir(
-         plugin_id: None,
+@@ -252,6 +252,26 @@ async fn skill_roots_with_home_dir(
+         plugin_namespace: None,
          plugin_root: None,
      }));
 +    // flox-ai: extra skill roots injected via the CODEX_FLOX_SKILL_ROOTS env
@@ -20,6 +20,7 @@ index 3b59e90..c52b93a 100644
 +                    scope: SkillScope::User,
 +                    file_system: Arc::clone(&LOCAL_FS),
 +                    plugin_id: None,
++                    plugin_namespace: None,
 +                    plugin_root: None,
 +                });
 +            }
@@ -32,7 +33,7 @@ diff --git a/core/src/agents_md.rs b/core/src/agents_md.rs
 index d63342b..3dd345d 100644
 --- a/core/src/agents_md.rs
 +++ b/core/src/agents_md.rs
-@@ -72,6 +72,21 @@ pub(crate) async fn load_project_instructions(
+@@ -70,6 +70,21 @@ pub(crate) async fn load_project_instructions(
          }
      }
  
@@ -51,6 +52,6 @@ index d63342b..3dd345d 100644
 +        });
 +    }
 +
-     if config.features.enabled(Feature::ChildAgentsMd) {
-         loaded.entries.push(InstructionEntry {
-             contents: HIERARCHICAL_AGENTS_MESSAGE.to_string(),
+     (!loaded.is_empty()).then_some(loaded)
+ }
+ 
