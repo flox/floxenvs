@@ -119,7 +119,7 @@ func TestSearchStageThenView(t *testing.T) {
 		t.Fatalf("expected caveman staged install; pending=%v", m.pending)
 	}
 	view := m.View().Content
-	if !strings.Contains(view, "staged") || !strings.Contains(view, "Caveman") {
+	if !strings.Contains(view, "staged") || !strings.Contains(view, "skills-caveman") {
 		t.Errorf("view should show the staged item; got:\n%s", view)
 	}
 }
