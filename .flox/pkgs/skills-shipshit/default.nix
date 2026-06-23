@@ -29,8 +29,7 @@ stdenvNoCC.mkDerivation {
     # `skills/<name>/SKILL.md`. Install each one as its own
     # discoverable skill for both Claude Code and OpenCode.
     for base in \
-      "$out/share/claude-code/skills" \
-      "$out/share/opencode/skills"; do
+      "$out/share/claude-code/skills"; do
       mkdir -p "$base"
       for sub in "$src"/skills/*/; do
         name="$(basename "$sub")"
