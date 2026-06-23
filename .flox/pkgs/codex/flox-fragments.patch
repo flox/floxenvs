@@ -32,7 +32,7 @@ diff --git a/core/src/agents_md.rs b/core/src/agents_md.rs
 index d63342b..3dd345d 100644
 --- a/core/src/agents_md.rs
 +++ b/core/src/agents_md.rs
-@@ -72,6 +72,21 @@ pub(crate) async fn load_project_instructions(
+@@ -70,6 +70,21 @@ pub(crate) async fn load_project_instructions(
          }
      }
  
@@ -51,6 +51,6 @@ index d63342b..3dd345d 100644
 +        });
 +    }
 +
-     if config.features.enabled(Feature::ChildAgentsMd) {
-         loaded.entries.push(InstructionEntry {
-             contents: HIERARCHICAL_AGENTS_MESSAGE.to_string(),
+     (!loaded.is_empty()).then_some(loaded)
+ }
+ 
