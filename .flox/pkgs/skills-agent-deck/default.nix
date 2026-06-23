@@ -15,8 +15,7 @@ stdenvNoCC.mkDerivation {
     runHook preInstall
 
     for dest in \
-      "$out/share/claude-code/skills" \
-      "$out/share/opencode/skills"; do
+      "$out/share/claude-code/skills"; do
       mkdir -p "$dest"
       cp -r "$src/skills/." "$dest/"
     done
