@@ -26,8 +26,7 @@ stdenvNoCC.mkDerivation {
     runHook preInstall
 
     for dest in \
-      "$out/share/claude-code/skills/humanizer" \
-      "$out/share/opencode/skills/humanizer"; do
+      "$out/share/claude-code/skills/humanizer"; do
       mkdir -p "$dest"
       cp -r "$src"/. "$dest/"
     done
@@ -40,8 +39,7 @@ stdenvNoCC.mkDerivation {
   # under `metadata:` so the loader stops warning on every session start.
   postInstall = ''
     for skill_md in \
-      "$out/share/claude-code/skills/humanizer/SKILL.md" \
-      "$out/share/opencode/skills/humanizer/SKILL.md"; do
+      "$out/share/claude-code/skills/humanizer/SKILL.md"; do
       awk '
         BEGIN { fm = 0 }
         /^---[[:space:]]*$/ { fm++; print; next }

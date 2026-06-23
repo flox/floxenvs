@@ -43,7 +43,7 @@ func TestViewShowsResultsAfterQuery(t *testing.T) {
 	m.query = "graph"
 	m.mode = modeNormal
 	out := m.View().Content
-	if !strings.Contains(out, "Graphify") {
+	if !strings.Contains(out, "skills-graphify") {
 		t.Error("result row must show the title")
 	}
 }
@@ -66,7 +66,7 @@ func TestViewDetailPane(t *testing.T) {
 	m.cursor = 0
 	m.syncDetail()
 	out := m.View().Content
-	if !strings.Contains(out, "Caveman") || !strings.Contains(out, "Scores") {
+	if !strings.Contains(out, "skills-caveman") || !strings.Contains(out, "Scores") {
 		t.Errorf("detail pane must show title and scores; got:\n%s", out)
 	}
 }
@@ -77,7 +77,7 @@ func TestViewNarrowHidesDetail(t *testing.T) {
 	m.query = "skill"
 	m.mode = modeNormal
 	out := m.View().Content
-	if !strings.Contains(out, "Graphify") && !strings.Contains(out, "Foo") {
+	if !strings.Contains(out, "skills-graphify") && !strings.Contains(out, "skills-foo") {
 		t.Error("narrow layout must still render matching results")
 	}
 }
@@ -121,7 +121,10 @@ func TestViewWideShowsDivider(t *testing.T) {
 
 func TestAuditScoreBadgeContainsScore(t *testing.T) {
 	m := newTestModel(nil)
-	badge := m.auditScoreBadge(89, "stable")
+	badge := m.auditScoreBadge(89, "stable", false)
+	if !strings.Contains(badge, "score:") {
+		t.Errorf("audit score badge must contain the 'score:' label; got %q", badge)
+	}
 	if !strings.Contains(badge, "89") {
 		t.Errorf("audit score badge must contain the score; got %q", badge)
 	}
@@ -165,8 +168,8 @@ func TestRowLinesWithoutAuditHasNoScore(t *testing.T) {
 
 func auditDetailModel(a *catalog.Audit) model {
 	it := catalogItem{
-		ID: "test-detail", Name: "DetailPkg", Type: "skill",
-		For: "claude-code", InstallPkg: "flox/test-detail",
+		ID: "skills-detail", Name: "skills-detail", Type: "skill",
+		For: "claude-code", InstallPkg: "flox/skills-detail",
 		Audit: a,
 	}
 	items := append(testItems(), it)
