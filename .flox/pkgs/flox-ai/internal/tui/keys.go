@@ -45,7 +45,7 @@ func defaultKeyMap() keyMap {
 		Install:     key.NewBinding(key.WithKeys("i"), key.WithHelp("i", "install")),
 		Remove:      key.NewBinding(key.WithKeys("x"), key.WithHelp("x", "remove")),
 		Apply:       key.NewBinding(key.WithKeys("A"), key.WithHelp("A", "apply")),
-		Review:      key.NewBinding(key.WithKeys("R"), key.WithHelp("R", "review skills")),
+		Review:      key.NewBinding(key.WithKeys("R"), key.WithHelp("R", "audit")),
 		Doctor:      key.NewBinding(key.WithKeys("D"), key.WithHelp("D", "doctor")),
 		Launch:      key.NewBinding(key.WithKeys("L"), key.WithHelp("L", "launch")),
 		Agents:      key.NewBinding(key.WithKeys("a"), key.WithHelp("a", "agents")),
@@ -77,7 +77,7 @@ func (k keyMap) shortHelp(m model) []key.Binding {
 				k.Install, k.Remove, k.AuditDetail, k.Help, k.Quit}
 		}
 		return []key.Binding{k.Down, k.Up, k.Search, k.Detail, k.Install,
-			k.Remove, k.Apply, k.Launch, k.Preview, k.Help, k.Quit}
+			k.Remove, k.Apply, k.Launch, k.Help, k.Quit}
 	}
 }
 
