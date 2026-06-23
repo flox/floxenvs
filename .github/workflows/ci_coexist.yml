@@ -1,0 +1,56 @@
+name: "CI Coexist"
+
+# Prove that ALL skill packages + every agent runtime + every audit tool can
+# be installed into ONE Flox environment. scripts/coexist-check.sh creates a
+# throwaway Flox environment and runs `flox install` for every package; Flox
+# rejects a package that conflicts with one already installed (e.g. two skills
+# both providing bin/python3), so a clean run means the whole set coexists.
+#
+# `flox install` resolves from the CATALOG, so this validates the PUBLISHED
+# packages — it must run AFTER the packages are (re)published, not as a
+# pre-merge gate on the PR that changes them. Hence schedule + manual dispatch.
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+
+env:
+  FLOX_DISABLE_METRICS: "true"
+  # Build from source when a binary-cache substitute fails — matches
+  # ci_pkgs.yml. Augments nix.conf; substituters unchanged.
+  NIX_CONFIG: "fallback = true"
+
+jobs:
+
+  coexist:
+    name: "coexist"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 90
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
+        with:
+          fetch-depth: 0
+          filter: "blob:none"
+      - name: "Install flox"
+        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
+      - name: "Setup Tailscale"
+        uses: "tailscale/github-action@306e68a486fd2350f2bfc3b19fcd143891a4a2d8" # v4
+        with:
+          oauth-secret: "${{ secrets.MANAGED_TAILSCALE_AUTH_KEY }}"
+          tags: "tag:ci"
+          timeout: "30s"
+          use-cache: true
+      - name: "Configure Nix remote builders"
+        uses: "flox/configure-nix-action@1ee58d63463cb1870ab73d9df0acfd9d8ba671f8" # main
+        with:
+          ssh-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
+          remote-builders: "${{ vars.MANAGED_REMOTE_BUILDERS }}"
+      - name: "Assert coexistence"
+        run: |
+          set -euo pipefail
+          bash scripts/coexist-check.sh
