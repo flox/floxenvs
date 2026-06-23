@@ -111,6 +111,9 @@ $pathLine"
     flox_agent_layout "agent-skills" "$out/share"
 
     runHook postInstall
+
+    ${builtins.readFile ../../nix/flox-skill-check.sh}
+    flox_skill_check "$out"
   '';
 
   meta = {

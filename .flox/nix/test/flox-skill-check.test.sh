@@ -30,9 +30,15 @@ t=$(mktemp -d); mkdir -p "$t/share/flox/claude/x"
 printf '{"clangd":{"command":"/nix/store/z/bin/clangd"}}' > "$t/share/flox/claude/x/.lsp.json"
 flox_skill_check "$t" >/dev/null 2>&1; ok "abs lsp command passes" "$?" "0"
 
-# env-shebang script fails
+# executable env-shebang script fails
 t=$(mktemp -d); mkdir -p "$t/share/flox/claude/x/scripts"
 printf '#!/usr/bin/env python3\n' > "$t/share/flox/claude/x/scripts/a.py"
-flox_skill_check "$t" >/dev/null 2>&1; ok "env shebang fails" "$?" "1"
+chmod +x "$t/share/flox/claude/x/scripts/a.py"
+flox_skill_check "$t" >/dev/null 2>&1; ok "executable env shebang fails" "$?" "1"
+
+# non-executable env-shebang script passes (shebang is inert)
+t=$(mktemp -d); mkdir -p "$t/share/flox/claude/x/scripts"
+printf '#!/usr/bin/env python3\n' > "$t/share/flox/claude/x/scripts/a.py"
+flox_skill_check "$t" >/dev/null 2>&1; ok "non-exec env shebang passes" "$?" "0"
 
 echo "--- $P passed, $F failed"; [ "$F" -eq 0 ]

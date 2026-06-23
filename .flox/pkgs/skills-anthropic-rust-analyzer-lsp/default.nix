@@ -47,6 +47,9 @@ stdenv.mkDerivation {
     flox_agent_layout "rust-analyzer-lsp" "$out/share"
 
     runHook postInstall
+
+    ${builtins.readFile ../../nix/flox-skill-check.sh}
+    flox_skill_check "$out"
   '';
 
   meta = {

@@ -24,8 +24,12 @@
 #      violation.
 #   3. LSP command absolute: every .lsp.json server .command is an absolute
 #      path (starts with /), never a bare PATH-resolved name.
-#   4. No PATH-dependent shebangs: shipped *.py / *.sh scripts must use an
-#      absolute store-path shebang, not "#!/usr/bin/env x" or a bare "#!name".
+#   4. No PATH-dependent shebangs: shipped EXECUTABLE *.py / *.sh scripts must
+#      use an absolute store-path shebang, not "#!/usr/bin/env x" or a bare
+#      "#!name". Only executable files are checked — a non-executable file's
+#      shebang is inert (it is read, imported, or run via an explicit
+#      interpreter like `python3 foo.py`), so its shebang never resolves a
+#      PATH and flagging it would be a false positive.
 flox_skill_check() {
   local out="$1" fail=0
   [ -n "$out" ] || { echo "flox_skill_check: out dir required" >&2; return 2; }
@@ -56,14 +60,15 @@ flox_skill_check() {
     fi
   done < <(find "$out/share/flox" -name '.lsp.json' 2>/dev/null)
 
-  # 4. No PATH-dependent interpreter shebangs in shipped scripts.
+  # 4. No PATH-dependent interpreter shebangs in shipped EXECUTABLE scripts.
+  #    Non-executable files are skipped: their shebang never runs.
   local s
   while IFS= read -r s; do
     if head -1 "$s" 2>/dev/null | grep -qE '^#!/usr/bin/env |^#![a-zA-Z]'; then
       echo "flox_skill_check: $s — shebang must be an absolute store path" >&2
       fail=1
     fi
-  done < <(find "$out/share/flox" -type f \( -name '*.py' -o -name '*.sh' \) 2>/dev/null)
+  done < <(find "$out/share/flox" -type f -perm -u+x \( -name '*.py' -o -name '*.sh' \) 2>/dev/null)
 
   return $fail
 }

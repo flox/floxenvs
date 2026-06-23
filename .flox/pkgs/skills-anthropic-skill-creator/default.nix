@@ -1,4 +1,4 @@
-{ stdenvNoCC, lib, fetchFromGitHub }:
+{ stdenvNoCC, lib, fetchFromGitHub, python3 }:
 
 let
   data = builtins.fromJSON (builtins.readFile ./hashes.json);
@@ -17,6 +17,8 @@ stdenvNoCC.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
+  nativeBuildInputs = [ python3 ];
+
   installPhase = ''
     runHook preInstall
     PLUGIN_DIR="$out/share/claude-code/plugins/skill-creator"
@@ -28,6 +30,9 @@ stdenvNoCC.mkDerivation {
   postInstall = ''
     ${builtins.readFile ../../nix/flox-agent-layout.sh}
     flox_agent_layout "skill-creator" "$out/share"
+    patchShebangs "$out/share/flox"
+    ${builtins.readFile ../../nix/flox-skill-check.sh}
+    flox_skill_check "$out"
   '';
 
   meta = {

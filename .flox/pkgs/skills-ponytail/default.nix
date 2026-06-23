@@ -42,6 +42,9 @@ stdenvNoCC.mkDerivation {
     flox_agent_layout "ponytail" "$out/share"
 
     runHook postInstall
+
+    ${builtins.readFile ../../nix/flox-skill-check.sh}
+    flox_skill_check "$out"
   '';
 
   meta = {

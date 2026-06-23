@@ -28,6 +28,9 @@ stdenvNoCC.mkDerivation {
   postInstall = ''
     ${builtins.readFile ../../nix/flox-agent-layout.sh}
     flox_agent_layout "explanatory-output-style" "$out/share"
+    patchShebangs "$out/share/flox"
+    ${builtins.readFile ../../nix/flox-skill-check.sh}
+    flox_skill_check "$out"
   '';
 
   meta = {

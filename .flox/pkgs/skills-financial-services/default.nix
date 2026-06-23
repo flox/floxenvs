@@ -165,6 +165,8 @@ stdenv.mkDerivation {
       plugin_name="$(basename "$plugin_dir")"
       flox_agent_layout "$plugin_name" "$out/share"
     done
+    ${builtins.readFile ../../nix/flox-skill-check.sh}
+    flox_skill_check "$out"
   '';
 
   meta = {
