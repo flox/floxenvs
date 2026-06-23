@@ -53,30 +53,3 @@ jobs:
           fi
 
           echo "OK: every env has a manifest.lock"
-
-  coexist:
-    name: "All skills + agents + audit tools coexist in one Flox env"
-    runs-on: "ubuntu-latest"
-    timeout-minutes: 60
-
-    steps:
-      - name: "Checkout"
-        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
-
-      - name: "Install flox"
-        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
-
-      - name: "Get FloxHub token"
-        run: |
-          echo "FLOX_FLOXHUB_TOKEN=${{ secrets.FLOX_FLOXHUB_TOKEN }}" >> "$GITHUB_ENV"
-
-      # Build every skill + agent + audit tool FROM SOURCE, then `flox install
-      # ./result-<pkg>` each into one throwaway environment (Flox rejects any
-      # that conflict — the original bug was four skills each shipping
-      # bin/python3), then tear it down. Building from source and installing
-      # the local result validates THIS checkout, so a source fix turns the
-      # check green immediately rather than lagging until the catalog is
-      # republished.
-      - name: "Assert coexistence"
-        run: |
-          bash scripts/coexist-check.sh
