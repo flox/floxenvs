@@ -1,5 +1,6 @@
 ---
 // .website/src/pages/index.astro
+import type { RawDataJson } from "../lib/wizardItems";
 import Layout from "../layouts/Layout.astro";
 import AiEnvBuilder from "../components/builder/AiEnvBuilder.tsx";
 import { readFileSync } from "node:fs";
@@ -7,11 +8,11 @@ import { join } from "node:path";
 
 // Bundle the current data.json as an offline-first snapshot; the island
 // refreshes from the live URL on load.
-let snapshot: unknown = { items: [] };
+let snapshot: RawDataJson = { items: [] };
 try {
   snapshot = JSON.parse(
     readFileSync(join(import.meta.dirname, "..", "..", "public", "data.json"), "utf8"),
-  );
+  ) as RawDataJson;
 } catch {
   /* data.json not built yet; island fetches live */
 }
