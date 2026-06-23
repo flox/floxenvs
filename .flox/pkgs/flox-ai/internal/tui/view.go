@@ -318,11 +318,7 @@ func (m model) viewSearch(uw int) string {
 func (m model) viewStatus(uw int) string {
 	var left string
 	if m.isTopPicks() {
-		label := "TOP PICKS"
-		if len(m.installedPicks()) > 0 {
-			label = "INSTALLED"
-		}
-		left = m.styles.Title.Render(label)
+		left = m.styles.Title.Render("TOP PICKS")
 		if tags := m.popularTags(6); len(tags) > 0 {
 			chips := make([]string, len(tags))
 			for i, t := range tags {
@@ -432,7 +428,7 @@ func (m model) rowLines(it catalogItem, w int, focused bool) []string {
 
 	head := "  " + typeIcon(it.Type) + " " + it.Name
 	if it.Audit != nil {
-		head += "  " + m.auditScoreBadge(it.Audit.Overall, it.Audit.Status)
+		head += "  " + m.auditScoreBadge(it.Audit.Overall, it.Audit.Status, focused)
 	}
 	if status != "" {
 		head = m.spread(head, status, w-2) // gap before the divider
@@ -631,11 +627,22 @@ func (m model) auditStatusStyle(status string) lipgloss.Style {
 	}
 }
 
-// auditScoreBadge returns a compact "89 ●" badge colored by audit status for
-// use in catalog row headers.
-func (m model) auditScoreBadge(overall int, status string) string {
+// auditScoreBadge returns a "score: 89 ●" badge. The number and the indicator
+// share the audit-status color; the "score:" label is muted. When selected,
+// the inner spans take the selection background so the row highlight stays
+// unbroken around the badge.
+func (m model) auditScoreBadge(overall int, status string, selected bool) string {
 	st := m.auditStatusStyle(status)
-	return m.styles.Muted.Render(fmt.Sprintf("%d", overall)) + " " + st.Render("●")
+	label := m.styles.Muted
+	if selected {
+		// On a selected row, plain Muted has no contrast against the
+		// selection bg (the "score:" label vanishes). Use SelDesc — the same
+		// readable muted the selected-row description uses — and put the
+		// number/dot on the selection bg too.
+		st = st.Background(m.theme.SelectedBg)
+		label = m.styles.SelDesc
+	}
+	return label.Render("score: ") + st.Render(fmt.Sprintf("%d ●", overall))
 }
 
 // viewAuditDetailModal shows the pre-computed audit from data.json for the
@@ -660,7 +667,7 @@ func (m model) viewAuditDetailModal() string {
 
 	// Header: name + overall score badge + status.
 	b.WriteString(m.styles.Title.Render(it.Name) + "  " +
-		m.auditScoreBadge(a.Overall, a.Status) + "  " +
+		m.auditScoreBadge(a.Overall, a.Status, false) + "  " +
 		m.auditStatusStyle(a.Status).Render(a.Status) + "\n\n")
 
 	// Four dimension scores.
@@ -975,8 +982,7 @@ func (m model) viewFooter(uw int) string {
 		{"i", "install", installable},
 		{"x", "uninstall", removable},
 		{"A", "apply", len(m.pending) > 0},
-		{"R", "review skills", false},
-		{"p", "preview", false},
+		{"R", "audit", false},
 		{"?", "help", false},
 		{"q", "quit", false},
 	}
@@ -1094,7 +1100,7 @@ func (m model) viewHelp() string {
 			{"x / -", "uninstall", "Stage an uninstall, or unstage a change"},
 			{"A", "apply", "Apply all staged installs / removals"},
 			{"U", "upgrade", "Upgrade packages in the environment"},
-			{"R", "review skills", "Audit present skills & agents"},
+			{"R", "audit", "Audit present skills & agents"},
 			{"D", "doctor", "Run flox-ai doctor diagnostics"},
 			{"L", "launch", "Launch the agent with installed fragments"},
 		}},
