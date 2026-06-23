@@ -46,8 +46,7 @@ stdenvNoCC.mkDerivation {
     # so the whole skills/last30days tree must ship together with SKILL.md
     # at the root. Ship into every agent skills dir we support.
     for share in \
-      "$out/share/claude-code/skills" \
-      "$out/share/opencode/skills"; do
+      "$out/share/claude-code/skills"; do
       mkdir -p "$share"
       cp -r "$src/skills/last30days" "$share/last30days"
       chmod -R u+w "$share/last30days"

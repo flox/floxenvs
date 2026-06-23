@@ -29,46 +29,6 @@ func (r *Result) IsEmpty() bool {
 		len(r.Plugins) == 0
 }
 
-// Scan walks baseDir and classifies fragments.
-// Returns empty result (no error) if baseDir does not exist.
-func Scan(baseDir string) (*Result, error) {
-	result := &Result{}
-
-	if _, err := os.Stat(baseDir); os.IsNotExist(err) {
-		return result, nil
-	}
-
-	// rules/*.md
-	rules, err := globFragments(filepath.Join(baseDir, "rules"), "*.md")
-	if err != nil {
-		return nil, err
-	}
-	result.Rules = rules
-
-	// skills/*/SKILL.md (directory-based)
-	skills, err := scanSkills(filepath.Join(baseDir, "skills"))
-	if err != nil {
-		return nil, err
-	}
-	result.Skills = skills
-
-	// agents/*.md
-	agents, err := globFragments(filepath.Join(baseDir, "agents"), "*.md")
-	if err != nil {
-		return nil, err
-	}
-	result.Agents = agents
-
-	// plugins/*/
-	plugins, err := scanPlugins(filepath.Join(baseDir, "plugins"))
-	if err != nil {
-		return nil, err
-	}
-	result.Plugins = plugins
-
-	return result, nil
-}
-
 // globFragments reads all files matching pattern in dir and returns sorted Fragments.
 func globFragments(dir, pattern string) ([]Fragment, error) {
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
@@ -95,71 +55,6 @@ func globFragments(dir, pattern string) ([]Fragment, error) {
 	return fragments, nil
 }
 
-// scanPlugins looks for plugins/*/ directory entries.
-func scanPlugins(pluginsDir string) ([]Fragment, error) {
-	if _, err := os.Stat(pluginsDir); os.IsNotExist(err) {
-		return nil, nil
-	}
-
-	entries, err := os.ReadDir(pluginsDir)
-	if err != nil {
-		return nil, err
-	}
-
-	var fragments []Fragment
-	for _, entry := range entries {
-		fullPath := filepath.Join(pluginsDir, entry.Name())
-		info, err := os.Stat(fullPath)
-		if err != nil || !info.IsDir() {
-			continue
-		}
-		fragments = append(fragments, Fragment{
-			Name: entry.Name(),
-			Path: fullPath,
-		})
-	}
-
-	sort.Slice(fragments, func(i, j int) bool {
-		return fragments[i].Name < fragments[j].Name
-	})
-
-	return fragments, nil
-}
-
-// scanSkills looks for skills/*/SKILL.md entries.
-func scanSkills(skillsDir string) ([]Fragment, error) {
-	if _, err := os.Stat(skillsDir); os.IsNotExist(err) {
-		return nil, nil
-	}
-
-	entries, err := os.ReadDir(skillsDir)
-	if err != nil {
-		return nil, err
-	}
-
-	var fragments []Fragment
-	for _, entry := range entries {
-		fullPath := filepath.Join(skillsDir, entry.Name())
-		info, err := os.Stat(fullPath)
-		if err != nil || !info.IsDir() {
-			continue
-		}
-		skillFile := filepath.Join(fullPath, "SKILL.md")
-		if _, err := os.Stat(skillFile); err == nil {
-			fragments = append(fragments, Fragment{
-				Name: entry.Name(),
-				Path: skillFile,
-			})
-		}
-	}
-
-	sort.Slice(fragments, func(i, j int) bool {
-		return fragments[i].Name < fragments[j].Name
-	})
-
-	return fragments, nil
-}
-
 // FloxResult holds the build-time layout for one agent: the prebuilt
 // per-agent plugin dirs to point the agent at, and the shared rule files.
 type FloxResult struct {
@@ -175,8 +70,14 @@ func ScanFlox(shareDir, agent string) (*FloxResult, error) {
 	agentRoot := filepath.Join(shareDir, "flox", agent)
 	if entries, err := os.ReadDir(agentRoot); err == nil {
 		for _, e := range entries {
-			if e.IsDir() {
-				res.AgentDirs = append(res.AgentDirs, filepath.Join(agentRoot, e.Name()))
+			full := filepath.Join(agentRoot, e.Name())
+			// Stat (follows symlinks), NOT DirEntry.IsDir(): a flox env
+			// composes packages by exposing each one's
+			// share/flox/<agent>/<plugin> as a SYMLINK into its store path,
+			// and DirEntry.IsDir() is false for a symlink-to-dir — which
+			// would skip every plugin in an activated env.
+			if info, err := os.Stat(full); err == nil && info.IsDir() {
+				res.AgentDirs = append(res.AgentDirs, full)
 			}
 		}
 		sort.Strings(res.AgentDirs)
@@ -190,10 +91,12 @@ func ScanFlox(shareDir, agent string) (*FloxResult, error) {
 		return nil, err
 	}
 	for _, p := range plugins {
-		if !p.IsDir() {
+		full := filepath.Join(commonRoot, p.Name())
+		// Follow symlinks (see above) — common/<plugin> is also symlinked.
+		if info, err := os.Stat(full); err != nil || !info.IsDir() {
 			continue
 		}
-		rules, err := globFragments(filepath.Join(commonRoot, p.Name(), "rules"), "*.md")
+		rules, err := globFragments(filepath.Join(full, "rules"), "*.md")
 		if err != nil {
 			return nil, err
 		}
