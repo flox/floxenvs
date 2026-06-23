@@ -45,8 +45,7 @@ stdenvNoCC.mkDerivation {
     # command itself is derived from the skill directory
     # name, so this is purely a frontmatter-compliance fix.
     for dest in \
-      "$out/share/claude-code/skills/graphify" \
-      "$out/share/opencode/skills/graphify"; do
+      "$out/share/claude-code/skills/graphify"; do
       mkdir -p "$dest"
       awk '
         /^trigger:[[:space:]]/ && !done {

@@ -65,8 +65,7 @@ stdenvNoCC.mkDerivation {
     # whole set, one directory per skill, into every agent skills dir we
     # support — exactly how flox/claude-code discovers them on PATH.
     for share in \
-      "$out/share/claude-code/skills" \
-      "$out/share/opencode/skills"; do
+      "$out/share/claude-code/skills"; do
       mkdir -p "$share"
       cp -r "$src/skills"/. "$share/"
       chmod -R u+w "$share"
@@ -90,8 +89,7 @@ stdenvNoCC.mkDerivation {
   #      so nest it under `metadata:` (same fix as flox/skills-humanizer).
   postInstall = ''
     for share in \
-      "$out/share/claude-code/skills" \
-      "$out/share/opencode/skills"; do
+      "$out/share/claude-code/skills"; do
 
       # 1. Self-contain the Python helpers.
       find "$share" -name '*.py' -type f | while read -r f; do

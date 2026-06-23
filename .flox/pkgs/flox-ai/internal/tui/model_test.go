@@ -1,23 +1,69 @@
 package tui
 
 import (
+	"strings"
 	"testing"
 
 	"flox.dev/flox-ai/internal/catalog"
 )
 
+func TestSkillsOnlyFilter(t *testing.T) {
+	// Real data.json shape: Name is the DISPLAY name (no prefix), the package
+	// lives in InstallPkg ("flox/skills-*"). Filtering on Name would wrongly
+	// drop everything — this guards that regression.
+	in := []catalog.Item{
+		{Name: "Caveman", InstallPkg: "flox/skills-caveman"},
+		{Name: "Agent Browser", InstallPkg: "flox/agent-browser"},
+		{Name: "Graphify", InstallPkg: "flox/skills-graphify"},
+		{Name: "Ollama", InstallPkg: "flox/ollama"},
+	}
+	got := SkillsOnly(in)
+	if len(got) != 2 {
+		t.Fatalf("want 2 skills, got %d: %+v", len(got), got)
+	}
+	for _, it := range got {
+		if !strings.Contains(it.InstallPkg, "/skills-") {
+			t.Fatalf("non-skill leaked: %s", it.InstallPkg)
+		}
+	}
+}
+
+func TestFilterByQuery(t *testing.T) {
+	items := []catalog.Item{
+		{Name: "Caveman", InstallPkg: "flox/skills-caveman",
+			Description: "compress prompts", Tags: []string{"ai", "compression"}},
+		{Name: "Graphify", InstallPkg: "flox/skills-graphify",
+			Description: "knowledge graphs", Tags: []string{"ai", "knowledge"}},
+	}
+	if got := FilterByQuery(items, "graph"); len(got) != 1 || got[0].Name != "Graphify" {
+		t.Fatalf("free-text 'graph': %+v", got)
+	}
+	if got := FilterByQuery(items, "#compression"); len(got) != 1 || got[0].Name != "Caveman" {
+		t.Fatalf("tag '#compression': %+v", got)
+	}
+	if got := FilterByQuery(items, "#ai graph"); len(got) != 1 || got[0].Name != "Graphify" {
+		t.Fatalf("tag+text '#ai graph': %+v", got)
+	}
+	if got := FilterByQuery(items, ""); len(got) != 2 {
+		t.Fatalf("empty query should return all: %d", len(got))
+	}
+	if got := FilterByQuery(items, "zzz"); len(got) != 0 {
+		t.Fatalf("no match should be empty: %+v", got)
+	}
+}
+
 func testItems() []catalogItem {
 	return []catalogItem{
-		{ID: "skills-caveman", Name: "Caveman", Type: "plugin",
+		{ID: "skills-caveman", Name: "skills-caveman", Type: "plugin",
 			For: "claude-code", Tags: []string{"compression", "ai"},
 			InstallPkg: "flox/skills-caveman"},
-		{ID: "skills-graphify", Name: "Graphify", Type: "skill",
+		{ID: "skills-graphify", Name: "skills-graphify", Type: "skill",
 			For: "claude-code", Tags: []string{"knowledge", "ai"},
 			InstallPkg: "flox/skills-graphify"},
-		{ID: "skills-foo", Name: "Foo", Type: "skill",
+		{ID: "skills-foo", Name: "skills-foo", Type: "skill",
 			For: "claude-code", Tags: []string{"misc"},
 			InstallPkg: "flox/skills-foo"},
-		{ID: "other", Name: "Other", Type: "plugin",
+		{ID: "other", Name: "other", Type: "plugin",
 			For: "codex", InstallPkg: "flox/other"},
 	}
 }
@@ -177,19 +223,19 @@ func TestTopPicksSortsByAuditOverall(t *testing.T) {
 		return a
 	}
 	items := []catalogItem{
-		{ID: "a-low", Name: "ALow", Type: "skill", For: "claude-code",
-			InstallPkg: "flox/a-low", Audit: auditOf(40)},
-		{ID: "b-high", Name: "BHigh", Type: "skill", For: "claude-code",
-			InstallPkg: "flox/b-high", Audit: auditOf(90)},
-		{ID: "c-none", Name: "CNone", Type: "skill", For: "claude-code",
-			InstallPkg: "flox/c-none", Audit: nil},
-		{ID: "d-mid", Name: "DMid", Type: "skill", For: "claude-code",
-			InstallPkg: "flox/d-mid", Audit: auditOf(70)},
+		{ID: "skills-a-low", Name: "skills-a-low", Type: "skill", For: "claude-code",
+			InstallPkg: "flox/skills-a-low", Audit: auditOf(40)},
+		{ID: "skills-b-high", Name: "skills-b-high", Type: "skill", For: "claude-code",
+			InstallPkg: "flox/skills-b-high", Audit: auditOf(90)},
+		{ID: "skills-c-none", Name: "skills-c-none", Type: "skill", For: "claude-code",
+			InstallPkg: "flox/skills-c-none", Audit: nil},
+		{ID: "skills-d-mid", Name: "skills-d-mid", Type: "skill", For: "claude-code",
+			InstallPkg: "flox/skills-d-mid", Audit: auditOf(70)},
 	}
 	m := newModel(items, nil, []string{"claude"}, nil, nil, nil, nil, "s", "c", "p")
 	picks := m.topPicks()
-	// Expected order: BHigh(90) > DMid(70) > ALow(40) > CNone(nil)
-	wantOrder := []string{"b-high", "d-mid", "a-low", "c-none"}
+	// Expected order: b-high(90) > d-mid(70) > a-low(40) > c-none(nil)
+	wantOrder := []string{"skills-b-high", "skills-d-mid", "skills-a-low", "skills-c-none"}
 	for i, want := range wantOrder {
 		if i >= len(picks) {
 			t.Fatalf("picks too short: got %d, want at least %d", len(picks), i+1)
@@ -197,5 +243,27 @@ func TestTopPicksSortsByAuditOverall(t *testing.T) {
 		if picks[i].ID != want {
 			t.Errorf("picks[%d] = %q, want %q", i, picks[i].ID, want)
 		}
+	}
+}
+
+func TestTopPicksExcludesInstalled(t *testing.T) {
+	auditOf := func(score int) *catalog.Audit {
+		a := &catalog.Audit{}
+		a.Overall = score
+		a.Status = "stable"
+		return a
+	}
+	items := []catalogItem{
+		{ID: "skills-a", Name: "skills-a", Type: "skill", For: "claude-code",
+			InstallPkg: "flox/skills-a", Audit: auditOf(90)},
+		{ID: "skills-b", Name: "skills-b", Type: "skill", For: "claude-code",
+			InstallPkg: "flox/skills-b", Audit: auditOf(80)},
+	}
+	// skills-a (the higher score) is installed -> excluded from top picks.
+	m := newModel(items, map[string]bool{"skills-a": true},
+		[]string{"claude"}, nil, nil, nil, nil, "s", "c", "p")
+	picks := m.topPicks()
+	if len(picks) != 1 || picks[0].ID != "skills-b" {
+		t.Fatalf("installed item must be excluded from top picks; got %+v", picks)
 	}
 }
