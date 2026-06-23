@@ -13,12 +13,12 @@ try {
     readFileSync(join(import.meta.dirname, "..", "..", "public", "data.json"), "utf8"),
   );
 } catch {
-  /* data.json not built yet — island fetches live */
+  /* data.json not built yet; island fetches live */
 }
 ---
 
 <Layout
-  title="Build an AI environment you can rebuild — Flox"
+  title="Build an AI environment you can rebuild. Flox"
   description="Pick your agent, skills, and audit tools. Walk away with a pinned flox snippet you can rebuild from scratch."
 >
   <AiEnvBuilder client:load snapshot={snapshot} />

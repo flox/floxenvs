@@ -48,9 +48,13 @@ const BEATS: Record<StepId, { title: string; body: string }> = {
 const DATA_URL = `${import.meta.env.BASE_URL}data.json`;
 
 export default function AiEnvBuilder({ snapshot }: { snapshot?: RawDataJson }) {
-  const seed = typeof window !== "undefined"
-    ? decodeSelection(window.location.hash)
-    : { agents: [], skills: [], tools: [] };
+  const seed = useMemo(
+    () =>
+      typeof window !== "undefined"
+        ? decodeSelection(window.location.hash)
+        : { agents: [], skills: [], tools: [] },
+    [],
+  );
   const [state, dispatch] = useReducer(wizardReducer, initialState(seed));
   const [raw, setRaw] = useState<RawDataJson | null>(snapshot ?? null);
   const [query, setQuery] = useState("");
@@ -79,8 +83,8 @@ export default function AiEnvBuilder({ snapshot }: { snapshot?: RawDataJson }) {
   }, [state.selection]);
 
   // Keyboard model: ArrowRight advances steps, ArrowLeft/Esc goes back,
-  // "/" focuses search on the skills step. Tab is intentionally NOT
-  // hijacked -- it stays native focus traversal for a11y.
+  // "/" focuses search on the skills step. Tab is intentionally left alone
+  // for native focus traversal and a11y.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;

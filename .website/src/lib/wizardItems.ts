@@ -34,6 +34,7 @@ export const TOOL_IDS: ReadonlySet<string> = new Set([
 function classify(id: string, type: string): WizardKind {
   if (TOOL_IDS.has(id)) return "tool";
   if (type === "agent") return "agent";
+  // Non-agent, non-tool items (including plugin and rule subkinds) surface as skill intentionally.
   return "skill";
 }
 

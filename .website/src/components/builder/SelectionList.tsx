@@ -1,7 +1,8 @@
 import type { WizardItem } from "../../lib/wizardItems";
 
 function auditTone(status: string): string {
-  if (status === "ok" || status === "stable") return "var(--color-score-green)";
+  if (status === "stable") return "var(--color-score-green)";
+  if (status === "warn") return "var(--color-score-amber)";
   if (status === "risk") return "var(--color-score-red)";
   return "var(--builder-muted)";
 }
