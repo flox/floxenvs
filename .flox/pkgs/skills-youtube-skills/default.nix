@@ -33,8 +33,7 @@ stdenvNoCC.mkDerivation {
     # transcriptapi.com, so we drop a `curl` on PATH (see below) to make
     # the package self-contained — no host curl assumption.
     for share in \
-      "$out/share/claude-code/skills" \
-      "$out/share/opencode/skills"; do
+      "$out/share/claude-code/skills"; do
       mkdir -p "$share"
       cp -r "$src/skills/." "$share/"
       chmod -R u+w "$share"
