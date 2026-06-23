@@ -52,7 +52,7 @@ emit_all() {
 emit_explicit() {
   local s="$1"
   echo "$s" | tr ',' '\n' | sed 's/[[:space:]]//g' \
-    | grep -E '^(env|pkg):[A-Za-z0-9_.-]+$' || true
+    | grep -E '^(env|pkg|skill|agent):[A-Za-z0-9_.-]+$' || true
 }
 
 items=""
@@ -84,6 +84,6 @@ fi
 echo "$items" | sort -u | jq -Rsc '
   split("\n")
   | map(select(length > 0))
-  | map(capture("^(?<kind>env|pkg):(?<name>.+)$"))
+  | map(capture("^(?<kind>env|pkg|skill|agent):(?<name>.+)$"))
   | { include: . }
 '

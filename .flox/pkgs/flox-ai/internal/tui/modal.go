@@ -5,15 +5,16 @@ import "charm.land/bubbles/v2/viewport"
 type modalKind int
 
 const (
-	modalNone    modalKind = iota
-	modalConfirm           // apply diff confirmation (static)
-	modalStream            // live command output in a viewport (review/doctor)
-	modalAgents            // agent picker (master/detail)
-	modalThemes            // tint picker (live preview)
-	modalApply             // apply progress
-	modalUpgrade           // upgrade confirmation
-	modalLaunch            // launch confirmation
-	modalReview            // review-skills audit report (master/detail)
+	modalNone        modalKind = iota
+	modalConfirm               // apply diff confirmation (static)
+	modalStream                // live command output in a viewport (review/doctor)
+	modalAgents                // agent picker (master/detail)
+	modalThemes                // tint picker (live preview)
+	modalApply                 // apply progress
+	modalUpgrade               // upgrade confirmation
+	modalLaunch                // launch confirmation
+	modalReview                // review-skills audit report (master/detail)
+	modalAuditDetail           // pre-computed audit from data.json for selected item
 )
 
 // modalState is the floating modal: a confirm prompt (static) or a stream

@@ -15,7 +15,6 @@ export interface PkgData {
   tagline: string;
   tags?: string[];
   category: string;
-  status?: string;
   featured?: boolean;
   links?: Record<string, string>;
   install?: { pkg?: string };
@@ -34,7 +33,6 @@ export interface CatalogItem {
   description: string;
   tags: string[];
   categories: string[];
-  status: string;
   featured: boolean;
   link: string;
   homepage?: string;
@@ -53,7 +51,7 @@ export function isFragmentPkg(p: PkgData): boolean {
 // Extract the package's own pkg-path from the install.pkg TOML block.
 // The block lists the claude-code dependency plus the fragment itself;
 // we want the line keyed by the package name, e.g.
-//   claude-code-plugin-caveman.pkg-path = "flox/claude-code-plugin-caveman"
+//   skills-caveman.pkg-path = "flox/skills-caveman"
 export function extractInstallPkg(p: PkgData): string {
   const block = p.install?.pkg ?? "";
   const re = new RegExp(
@@ -79,7 +77,6 @@ export function toCatalogItem(p: PkgData): CatalogItem {
     description: (p.tagline ?? "").trim(),
     tags: p.tags ?? [],
     categories: p.category ? [p.category] : [],
-    status: p.status ?? "beta",
     featured: p.featured ?? false,
     link: p.links?.source ?? p.links?.floxhub ?? "",
     ...(p.links?.homepage ?? p.links?.website ?? p.links?.docs
@@ -94,21 +91,10 @@ export function toCatalogItem(p: PkgData): CatalogItem {
   };
 }
 
-// Lower rank sorts first; unknown statuses fall back to 9 (sort last).
-const STATUS_RANK: Record<string, number> = {
-  stable: 0,
-  beta: 1,
-  experimental: 2,
-  deprecated: 3,
-};
-
-// featured first, then status rank, then title A→Z.
+// featured first, then name A→Z.
 export function rankItems(items: CatalogItem[]): CatalogItem[] {
   return [...items].sort((a, b) => {
     if (a.featured !== b.featured) return a.featured ? -1 : 1;
-    const sa = STATUS_RANK[a.status] ?? 9;
-    const sb = STATUS_RANK[b.status] ?? 9;
-    if (sa !== sb) return sa - sb;
     return a.name.localeCompare(b.name);
   });
 }

@@ -1,24 +1,49 @@
 name: "CI Packages"
 
+# One workflow owns the whole per-package lifecycle: build (PRs) /
+# publish (main), audit, and the audit-driven website (data.json +
+# deploy). Fragments are BUILT ONCE here and that same build output is
+# audited — no second build in a separate website workflow.
+
 on:
   push:
     branches: ["main"]
     paths:
       - ".flox/**"
+      - "scripts/**"
+      - ".website/**"
       - ".github/workflows/ci_pkgs.yml"
   pull_request:
     paths:
       - ".flox/**"
+      - "scripts/**"
+      - ".website/**"
       - ".github/workflows/ci_pkgs.yml"
   workflow_dispatch:
     inputs:
       package:
         description: >
-          Package to build. Leave empty to build all
-          packages.
+          Single package to build/audit. Leave empty to do all.
         required: false
         default: ""
         type: string
+      items:
+        description: >
+          Audit scope for envs/site: "all" | "changed" |
+          "<kind>:<name>,...".
+        required: false
+        default: "all"
+        type: string
+      force_rescan:
+        description: "Ignore the audit cache and re-run scanners."
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: "write"
+  pages: "write"
+  id-token: "write"
 
 env:
   FLOX_DISABLE_METRICS: "true"
@@ -41,7 +66,9 @@ jobs:
       aarch64-linux: "${{ steps.discover.outputs.aarch64-linux }}"
       x86_64-darwin: "${{ steps.discover.outputs.x86_64-darwin }}"
       x86_64-linux: "${{ steps.discover.outputs.x86_64-linux }}"
-      publish_matrix: "${{ steps.discover.outputs.publish_matrix }}"
+      # Single source of truth: does this run publish (main + push/dispatch)
+      # or just build (PRs)? Drives job names and the Build/Publish gates.
+      is_publish: "${{ steps.discover.outputs.is_publish }}"
 
     steps:
       - name: "Checkout"
@@ -55,22 +82,21 @@ jobs:
           SINGLE_PKG: "${{ inputs.package }}"
           EVENT: "${{ github.event_name }}"
           BASE_SHA: "${{ github.event.pull_request.base.sha }}"
+          ITEMS: "${{ inputs.items }}"
         run: |
           set -euo pipefail
 
           ALL_SYSTEMS="aarch64-darwin aarch64-linux x86_64-darwin x86_64-linux"
 
-          # Collect package names
+          # ── Packages to build/publish ──
           if [ -n "$SINGLE_PKG" ]; then
             pkgs="[\"$SINGLE_PKG\"]"
           elif [ "$EVENT" = "workflow_dispatch" ]; then
-            # Manual dispatch with no package input: build every
-            # package, regardless of what the last commit changed.
+            # Manual dispatch builds every package.
             pkgs="[]"
             for dir in .flox/pkgs/*/; do
               name="$(basename "$dir")"
-              pkgs=$(echo "$pkgs" | jq -c \
-                ". + [\"$name\"]")
+              pkgs=$(echo "$pkgs" | jq -c ". + [\"$name\"]")
             done
           else
             if [ "$EVENT" = "pull_request" ]; then
@@ -78,241 +104,68 @@ jobs:
             else
               DIFF_BASE="HEAD~1"
             fi
-
-            # upgrade.sh isn't part of the build — a PR that touches
-            # only it produces a byte-identical package, so skip the
-            # matrix to avoid rebuilding (and re-hitting flaky cross
-            # builds like openclaw x86_64-darwin).
+            # upgrade.sh isn't part of the build — skip rebuilds when only
+            # it changed.
             pkgs="[]"
             for dir in .flox/pkgs/*/; do
               name="$(basename "$dir")"
-              build_changes=$(git diff --name-only \
-                  "$DIFF_BASE" HEAD \
+              build_changes=$(git diff --name-only "$DIFF_BASE" HEAD \
                 | grep -E "^\.flox/pkgs/$name/" \
-                | grep -vE \
-                  "^\.flox/pkgs/$name/upgrade\.sh$" \
-                || true)
+                | grep -vE "^\.flox/pkgs/$name/upgrade\.sh$" || true)
               if [ -n "$build_changes" ]; then
-                pkgs=$(echo "$pkgs" | jq -c \
-                  ". + [\"$name\"]")
+                pkgs=$(echo "$pkgs" | jq -c ". + [\"$name\"]")
               fi
             done
           fi
-
           echo "packages=$pkgs" >> "$GITHUB_OUTPUT"
           echo "Packages: $pkgs"
 
-          # Per-system package lists from publish.json
+          # Per-system package lists from publish.json. A package builds
+          # (and, on main, publishes) only on the systems it declares.
           for sys in $ALL_SYSTEMS; do
             sys_pkgs="[]"
             for pkg in $(echo "$pkgs" | jq -r '.[]'); do
               PJ=".flox/pkgs/$pkg/publish.json"
               if [ -f "$PJ" ]; then
-                has_field=$(jq -r \
-                  'has("systems")' "$PJ")
-                if [ "$has_field" = "false" ]; then
-                  sys_pkgs=$(echo "$sys_pkgs" | jq -c \
-                    ". + [\"$pkg\"]")
-                else
-                  has=$(jq -r \
-                    --arg s "$sys" \
-                    '.systems | index($s) != null' \
-                    "$PJ")
-                  if [ "$has" = "true" ]; then
-                    sys_pkgs=$(echo "$sys_pkgs" | jq -c \
-                      ". + [\"$pkg\"]")
-                  fi
+                if [ "$(jq -r 'has("systems")' "$PJ")" = "false" ]; then
+                  sys_pkgs=$(echo "$sys_pkgs" | jq -c ". + [\"$pkg\"]")
+                elif [ "$(jq -r --arg s "$sys" '.systems | index($s) != null' "$PJ")" = "true" ]; then
+                  sys_pkgs=$(echo "$sys_pkgs" | jq -c ". + [\"$pkg\"]")
                 fi
               else
-                sys_pkgs=$(echo "$sys_pkgs" | jq -c \
-                  ". + [\"$pkg\"]")
+                sys_pkgs=$(echo "$sys_pkgs" | jq -c ". + [\"$pkg\"]")
               fi
             done
             echo "$sys=$sys_pkgs" >> "$GITHUB_OUTPUT"
             echo "  $sys: $sys_pkgs"
           done
 
-          # Per-(package, system) tuples for the publish matrix
-          DEFAULT_SYS='["aarch64-darwin","aarch64-linux","x86_64-darwin","x86_64-linux"]'
-          publish_matrix="[]"
-          for pkg in $(echo "$pkgs" | jq -r '.[]'); do
-            PJ=".flox/pkgs/$pkg/publish.json"
-            if [ -f "$PJ" ]; then
-              pkg_sys=$(jq -rc \
-                ".systems // $DEFAULT_SYS" "$PJ")
-            else
-              pkg_sys="$DEFAULT_SYS"
-            fi
-            for sys in $(echo "$pkg_sys" | jq -r '.[]'); do
-              publish_matrix=$(echo "$publish_matrix" \
-                | jq -c \
-                  --arg p "$pkg" --arg s "$sys" \
-                  '. + [{package: $p, system: $s}]')
-            done
-          done
-          echo "publish_matrix=$publish_matrix" >> "$GITHUB_OUTPUT"
-          echo "  publish_matrix: $publish_matrix"
+          # ── is_publish: publish on a manual dispatch (any branch) or a
+          #    push to main; PRs and other pushes just build. ──
+          if [ "$EVENT" = "workflow_dispatch" ] \
+             || { [ "$EVENT" = "push" ] && [ "${{ github.ref_name }}" = "main" ]; }; then
+            is_publish=true
+          else
+            is_publish=false
+          fi
+          echo "is_publish=$is_publish" >> "$GITHUB_OUTPUT"
+          echo "is_publish: $is_publish"
 
-  # ── Build: one job per system ───────────────────────
+  # ── Build (PRs) or publish (main): one job per (package, system) ──
+  # The x86_64-linux leg additionally audits fragment CONTENT from the
+  # build it just produced — no second build.
 
-  build-aarch64-darwin:
-    name: "Build '${{ matrix.package }}' (aarch64-darwin)"
+  aarch64-darwin:
+    name: "${{ needs.discover.outputs.is_publish == 'true' && 'Publish' || 'Build' }} '${{ matrix.package }}' (aarch64-darwin)"
     runs-on: "ubuntu-latest"
     timeout-minutes: 90
     needs: ["discover"]
     if: needs.discover.outputs.aarch64-darwin != '[]'
-
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 6
       matrix:
         package: ${{ fromJSON(needs.discover.outputs.aarch64-darwin) }}
-
-    steps:
-      - name: "Checkout"
-        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
-      - name: "Install flox"
-        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
-      - name: "Setup Tailscale"
-        uses: "tailscale/github-action@306e68a486fd2350f2bfc3b19fcd143891a4a2d8" # v4
-        with:
-          oauth-secret: "${{ secrets.MANAGED_TAILSCALE_AUTH_KEY }}"
-          tags: "tag:ci"
-          timeout: "30s"
-          use-cache: true
-      - name: "Configure Nix remote builders"
-        uses: "flox/configure-nix-action@1ee58d63463cb1870ab73d9df0acfd9d8ba671f8" # main
-        with:
-          ssh-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
-          remote-builders: "${{ vars.MANAGED_REMOTE_BUILDERS }}"
-      - name: "Build"
-        run: flox build "${{ matrix.package }}" --system aarch64-darwin
-
-  build-aarch64-linux:
-    name: "Build '${{ matrix.package }}' (aarch64-linux)"
-    runs-on: "ubuntu-latest"
-    timeout-minutes: 90
-    needs: ["discover"]
-    if: needs.discover.outputs.aarch64-linux != '[]'
-
-    strategy:
-      fail-fast: false
-      max-parallel: 2
-      matrix:
-        package: ${{ fromJSON(needs.discover.outputs.aarch64-linux) }}
-
-    steps:
-      - name: "Checkout"
-        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
-      - name: "Install flox"
-        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
-      - name: "Setup Tailscale"
-        uses: "tailscale/github-action@306e68a486fd2350f2bfc3b19fcd143891a4a2d8" # v4
-        with:
-          oauth-secret: "${{ secrets.MANAGED_TAILSCALE_AUTH_KEY }}"
-          tags: "tag:ci"
-          timeout: "30s"
-          use-cache: true
-      - name: "Configure Nix remote builders"
-        uses: "flox/configure-nix-action@1ee58d63463cb1870ab73d9df0acfd9d8ba671f8" # main
-        with:
-          ssh-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
-          remote-builders: "${{ vars.MANAGED_REMOTE_BUILDERS }}"
-      - name: "Build"
-        run: flox build "${{ matrix.package }}" --system aarch64-linux
-
-  build-x86_64-darwin:
-    name: "Build '${{ matrix.package }}' (x86_64-darwin)"
-    runs-on: "ubuntu-latest"
-    timeout-minutes: 90
-    needs: ["discover"]
-    if: needs.discover.outputs.x86_64-darwin != '[]'
-
-    strategy:
-      fail-fast: false
-      max-parallel: 2
-      matrix:
-        package: ${{ fromJSON(needs.discover.outputs.x86_64-darwin) }}
-
-    steps:
-      - name: "Checkout"
-        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
-      - name: "Install flox"
-        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
-      - name: "Setup Tailscale"
-        uses: "tailscale/github-action@306e68a486fd2350f2bfc3b19fcd143891a4a2d8" # v4
-        with:
-          oauth-secret: "${{ secrets.MANAGED_TAILSCALE_AUTH_KEY }}"
-          tags: "tag:ci"
-          timeout: "30s"
-          use-cache: true
-      - name: "Configure Nix remote builders"
-        uses: "flox/configure-nix-action@1ee58d63463cb1870ab73d9df0acfd9d8ba671f8" # main
-        with:
-          ssh-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
-          remote-builders: "${{ vars.MANAGED_REMOTE_BUILDERS }}"
-      - name: "Build"
-        run: flox build "${{ matrix.package }}" --system x86_64-darwin
-
-  build-x86_64-linux:
-    name: "Build '${{ matrix.package }}' (x86_64-linux)"
-    runs-on: "ubuntu-latest"
-    timeout-minutes: 90
-    needs: ["discover"]
-    if: needs.discover.outputs.x86_64-linux != '[]'
-
-    strategy:
-      fail-fast: false
-      max-parallel: 2
-      matrix:
-        package: ${{ fromJSON(needs.discover.outputs.x86_64-linux) }}
-
-    steps:
-      - name: "Checkout"
-        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
-      - name: "Install flox"
-        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
-      - name: "Setup Tailscale"
-        uses: "tailscale/github-action@306e68a486fd2350f2bfc3b19fcd143891a4a2d8" # v4
-        with:
-          oauth-secret: "${{ secrets.MANAGED_TAILSCALE_AUTH_KEY }}"
-          tags: "tag:ci"
-          timeout: "30s"
-          use-cache: true
-      - name: "Configure Nix remote builders"
-        uses: "flox/configure-nix-action@1ee58d63463cb1870ab73d9df0acfd9d8ba671f8" # main
-        with:
-          ssh-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
-          remote-builders: "${{ vars.MANAGED_REMOTE_BUILDERS }}"
-      - name: "Build"
-        run: flox build "${{ matrix.package }}" --system x86_64-linux
-
-  # ── Publish: one job per (package, system) ──────────
-
-  publish:
-    name: "Publish '${{ matrix.package }}' (${{ matrix.system }})"
-    runs-on: "ubuntu-latest"
-    timeout-minutes: 30
-    needs:
-      - "discover"
-      - "build-aarch64-darwin"
-      - "build-aarch64-linux"
-      - "build-x86_64-darwin"
-      - "build-x86_64-linux"
-    if: >-
-      always()
-      && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-      && github.ref_name == 'main'
-      && needs.discover.outputs.publish_matrix != '[]'
-      && !contains(needs.*.result, 'failure')
-      && !contains(needs.*.result, 'cancelled')
-
-    strategy:
-      fail-fast: false
-      max-parallel: 4
-      matrix:
-        include: ${{ fromJSON(needs.discover.outputs.publish_matrix) }}
-
     steps:
       - name: "Checkout"
         uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
@@ -333,13 +186,305 @@ jobs:
         with:
           ssh-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
           remote-builders: "${{ vars.MANAGED_REMOTE_BUILDERS }}"
-      - name: "Get FloxHub token"
-        run: echo "FLOX_FLOXHUB_TOKEN=${{ secrets.FLOX_FLOXHUB_TOKEN }}" >> $GITHUB_ENV
-      - name: "Publish"
+      - name: "Build"
+        if: ${{ needs.discover.outputs.is_publish != 'true' }}
         run: |
-          PKG="${{ matrix.package }}"
-          SYS="${{ matrix.system }}"
-          PJ=".flox/pkgs/$PKG/publish.json"
-          ORG=$(jq -r '.org // "flox"' "$PJ" 2>/dev/null || echo flox)
-          echo "Publishing $PKG to $ORG ($SYS)"
-          flox publish -o "$ORG" "$PKG" --system "$SYS"
+          set -euo pipefail
+          flox build "${{ matrix.package }}" --system aarch64-darwin
+      - name: "Publish"
+        if: ${{ needs.discover.outputs.is_publish == 'true' }}
+        env:
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.FLOX_FLOXHUB_TOKEN }}"
+        run: |
+          set -euo pipefail
+          ORG="$(jq -r '.org // "flox"' ".flox/pkgs/${{ matrix.package }}/publish.json" 2>/dev/null || echo flox)"
+          flox publish -o "$ORG" "${{ matrix.package }}" --system aarch64-darwin
+
+  aarch64-linux:
+    name: "${{ needs.discover.outputs.is_publish == 'true' && 'Publish' || 'Build' }} '${{ matrix.package }}' (aarch64-linux)"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 90
+    needs: ["discover"]
+    if: needs.discover.outputs.aarch64-linux != '[]'
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        package: ${{ fromJSON(needs.discover.outputs.aarch64-linux) }}
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
+        with:
+          fetch-depth: 0
+          filter: "blob:none"
+      - name: "Install flox"
+        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
+      - name: "Setup Tailscale"
+        uses: "tailscale/github-action@306e68a486fd2350f2bfc3b19fcd143891a4a2d8" # v4
+        with:
+          oauth-secret: "${{ secrets.MANAGED_TAILSCALE_AUTH_KEY }}"
+          tags: "tag:ci"
+          timeout: "30s"
+          use-cache: true
+      - name: "Configure Nix remote builders"
+        uses: "flox/configure-nix-action@1ee58d63463cb1870ab73d9df0acfd9d8ba671f8" # main
+        with:
+          ssh-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
+          remote-builders: "${{ vars.MANAGED_REMOTE_BUILDERS }}"
+      - name: "Build"
+        if: ${{ needs.discover.outputs.is_publish != 'true' }}
+        run: |
+          set -euo pipefail
+          flox build "${{ matrix.package }}" --system aarch64-linux
+      - name: "Publish"
+        if: ${{ needs.discover.outputs.is_publish == 'true' }}
+        env:
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.FLOX_FLOXHUB_TOKEN }}"
+        run: |
+          set -euo pipefail
+          ORG="$(jq -r '.org // "flox"' ".flox/pkgs/${{ matrix.package }}/publish.json" 2>/dev/null || echo flox)"
+          flox publish -o "$ORG" "${{ matrix.package }}" --system aarch64-linux
+
+  x86_64-darwin:
+    name: "${{ needs.discover.outputs.is_publish == 'true' && 'Publish' || 'Build' }} '${{ matrix.package }}' (x86_64-darwin)"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 90
+    needs: ["discover"]
+    if: needs.discover.outputs.x86_64-darwin != '[]'
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        package: ${{ fromJSON(needs.discover.outputs.x86_64-darwin) }}
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
+        with:
+          fetch-depth: 0
+          filter: "blob:none"
+      - name: "Install flox"
+        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
+      - name: "Setup Tailscale"
+        uses: "tailscale/github-action@306e68a486fd2350f2bfc3b19fcd143891a4a2d8" # v4
+        with:
+          oauth-secret: "${{ secrets.MANAGED_TAILSCALE_AUTH_KEY }}"
+          tags: "tag:ci"
+          timeout: "30s"
+          use-cache: true
+      - name: "Configure Nix remote builders"
+        uses: "flox/configure-nix-action@1ee58d63463cb1870ab73d9df0acfd9d8ba671f8" # main
+        with:
+          ssh-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
+          remote-builders: "${{ vars.MANAGED_REMOTE_BUILDERS }}"
+      - name: "Build"
+        if: ${{ needs.discover.outputs.is_publish != 'true' }}
+        run: |
+          set -euo pipefail
+          flox build "${{ matrix.package }}" --system x86_64-darwin
+      - name: "Publish"
+        if: ${{ needs.discover.outputs.is_publish == 'true' }}
+        env:
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.FLOX_FLOXHUB_TOKEN }}"
+        run: |
+          set -euo pipefail
+          ORG="$(jq -r '.org // "flox"' ".flox/pkgs/${{ matrix.package }}/publish.json" 2>/dev/null || echo flox)"
+          flox publish -o "$ORG" "${{ matrix.package }}" --system x86_64-darwin
+
+  x86_64-linux:
+    name: "${{ needs.discover.outputs.is_publish == 'true' && 'Publish' || 'Build' }} '${{ matrix.package }}' (x86_64-linux)"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 90
+    needs: ["discover"]
+    if: needs.discover.outputs.x86_64-linux != '[]'
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        package: ${{ fromJSON(needs.discover.outputs.x86_64-linux) }}
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
+        with:
+          fetch-depth: 0
+          filter: "blob:none"
+      - name: "Install flox"
+        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
+      - name: "Setup Tailscale"
+        uses: "tailscale/github-action@306e68a486fd2350f2bfc3b19fcd143891a4a2d8" # v4
+        with:
+          oauth-secret: "${{ secrets.MANAGED_TAILSCALE_AUTH_KEY }}"
+          tags: "tag:ci"
+          timeout: "30s"
+          use-cache: true
+      - name: "Configure Nix remote builders"
+        uses: "flox/configure-nix-action@1ee58d63463cb1870ab73d9df0acfd9d8ba671f8" # main
+        with:
+          ssh-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
+          remote-builders: "${{ vars.MANAGED_REMOTE_BUILDERS }}"
+      # Always build x86_64-linux so the audit has a build output (and,
+      # on main, so publish has its artifact).
+      - name: "Build"
+        run: |
+          set -euo pipefail
+          flox build "${{ matrix.package }}" --system x86_64-linux
+      - name: "Publish"
+        if: ${{ needs.discover.outputs.is_publish == 'true' }}
+        env:
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.FLOX_FLOXHUB_TOKEN }}"
+        run: |
+          set -euo pipefail
+          ORG="$(jq -r '.org // "flox"' ".flox/pkgs/${{ matrix.package }}/publish.json" 2>/dev/null || echo flox)"
+          flox publish -o "$ORG" "${{ matrix.package }}" --system x86_64-linux
+      # Audit only skills-* packages (the Claude Code skill/plugin
+      # fragments) — gated here at the step level since matrix.package is
+      # known. Everything else is built/published, not audited.
+      - name: "Audit fragment content"
+        if: ${{ startsWith(matrix.package, 'skills-') }}
+        # Fragments are content-audited from the build above; run-audit.sh
+        # reuses result-<pkg> and runs the flox-ai audit engine. The
+        # flox-ai + skill-audit tools live in the .website env (NOT the
+        # root env — they're floxenvs-flake-sourced and would poison
+        # `flox build`'s nixpkgs resolution).
+        shell: "flox activate -d .website -- bash -e {0}"
+        run: |
+          set -euo pipefail
+          REPO_ROOT="$PWD" bash scripts/run-audit.sh skill "${{ matrix.package }}"
+      - name: "Upload fragment metrics"
+        if: ${{ startsWith(matrix.package, 'skills-') }}
+        uses: "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" # v7
+        with:
+          name: "metrics-skill-${{ matrix.package }}"
+          path: "audit/skill/${{ matrix.package }}/metrics.json"
+          if-no-files-found: "error"
+
+  # ── Site: collect metrics, build data.json, deploy (main only) ──
+  site:
+    name: "Build + deploy site"
+    # Wait on every system leg (not just x86_64-linux) so the site builds
+    # only after all builds/publishes settle. always() keeps it running
+    # even if a leg fails — data.json falls back to prior metrics.
+    needs: ["discover", "aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
+    if: always() && needs.discover.result == 'success'
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+    # Serialize the site/deploy half (gh-pages) per ref. A single global
+    # group means every PR's site job lands in the same queue; GitHub keeps
+    # only one running + one pending per group and CANCELS the rest, which
+    # cancels the whole CI Packages run and fails the Summary gate. Keying
+    # the group on github.ref isolates each PR while still serialising the
+    # only ref that actually deploys (refs/heads/main) against itself.
+    concurrency:
+      group: "pages-${{ github.ref }}"
+      cancel-in-progress: false
+    # Every run step executes inside the .website flox env (node, jq, …).
+    # Absolute -d path so steps with `working-directory: .website` still
+    # resolve the env relative to the repo root, not their cwd.
+    defaults:
+      run:
+        shell: "flox activate -d ${{ github.workspace }}/.website -- bash -e {0}"
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
+        with:
+          fetch-depth: 0
+      - name: "Install flox"
+        # Required so the run steps' `flox activate -d .website` works.
+        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
+      - name: "Download fresh metrics"
+        uses: "actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c" # v8
+        with:
+          pattern: "metrics-*"
+          path: "_metrics_in"
+          merge-multiple: false
+      - name: "Stage fresh metrics"
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          mkdir -p .website/src/content/metrics
+          for d in _metrics_in/metrics-*; do
+            base=$(basename "$d")        # metrics-<kind>-<name>
+            kind=$(echo "$base" | cut -d- -f2)
+            name=$(echo "$base" | cut -d- -f3-)
+            mkdir -p ".website/src/content/metrics/$kind"
+            cp "$d/metrics.json" \
+               ".website/src/content/metrics/$kind/$name.json"
+          done
+      - name: "Fetch prior metrics for unchanged items"
+        env:
+          DEPLOY_URL: "https://flox.github.io/floxenvs"
+        run: |
+          set -euo pipefail
+          export REPO_ROOT="$PWD"
+          mapfile -t items < <(bash scripts/list-items.sh)
+          for item in "${items[@]}"; do
+            kind="${item%%:*}"; name="${item##*:}"
+            target=".website/src/content/metrics/$kind/$name.json"
+            [ -f "$target" ] && continue
+            mkdir -p "$(dirname "$target")"
+            # env metrics under /envs/, everything else under /packages/.
+            case "$kind" in
+              env) url="$DEPLOY_URL/envs/$name/metrics.json" ;;
+              *)   url="$DEPLOY_URL/packages/$name/metrics.json" ;;
+            esac
+            if curl -sfL --max-time 10 -o "$target" "$url"; then
+              echo "fetched prior metrics for $item"
+            else
+              rm -f "$target"
+              echo "no prior metrics for $item"
+            fi
+          done
+      - name: "Surface metrics.json into dist for next deploy"
+        run: |
+          set -euo pipefail
+          while IFS= read -r f; do
+            rel="${f#.website/src/content/metrics/}"
+            kind="${rel%%/*}"
+            name="$(basename "${rel#"$kind"/}" .json)"
+            case "$kind" in
+              env) dest=".website/public/envs/$name/metrics.json" ;;
+              *)   dest=".website/public/packages/$name/metrics.json" ;;
+            esac
+            mkdir -p "$(dirname "$dest")"
+            cp "$f" "$dest"
+          done < <(find .website/src/content/metrics -name '*.json')
+      - name: "Install"
+        working-directory: ".website"
+        run: "npm ci"
+      - name: "Build data.json"
+        working-directory: ".website"
+        run: |
+          set -euo pipefail
+          node --experimental-strip-types scripts/build-data-json.mjs --full
+      - name: "Resolve OG font from the .website env"
+        # Inter ships from the .website flox env (the `inter` package), not
+        # apt. $FLOX_ENV resolves to the per-system run dir at activation.
+        run: |
+          set -euo pipefail
+          # share/fonts is a symlink into the nix store, so find needs -L to
+          # descend it. Non-fatal: if no font turns up, the OG route falls
+          # back to reading it directly / a system font — don't fail CI.
+          font="$(find -L "$FLOX_ENV/share/fonts" -iname 'InterVariable.ttf' 2>/dev/null | head -1)"
+          [ -n "$font" ] || font="$(find -L "$FLOX_ENV/share/fonts" -iname '*.ttf' 2>/dev/null | head -1)"
+          if [ -n "$font" ]; then
+            echo "OG_FONT_PATH=$font" >> "$GITHUB_ENV"
+            echo "OG font: $font"
+          else
+            echo "no Inter font in .website env; OG uses its fallback"
+          fi
+      - name: "Build"
+        working-directory: ".website"
+        env:
+          SITE_URL: "${{ vars.SITE_URL || 'https://envs.flox.dev' }}"
+          BASE_PATH: "${{ vars.BASE_PATH || '/' }}"
+        run: "npm run build"
+      - name: "Publish to gh-pages branch"
+        if: ${{ needs.discover.outputs.is_publish == 'true' }}
+        uses: "peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453" # v4
+        with:
+          github_token: "${{ secrets.GITHUB_TOKEN }}"
+          publish_dir: ".website/dist"
+          publish_branch: "gh-pages"
+          enable_jekyll: false
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
+          commit_message: "deploy: ${{ github.sha }}"

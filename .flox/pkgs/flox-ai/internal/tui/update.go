@@ -423,6 +423,13 @@ func (m model) handleModalKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		}
 		return m, nil
 	}
+	if m.modal.kind == modalAuditDetail {
+		switch msg.String() {
+		case "esc", "q", "V":
+			m.modal = modalState{}
+		}
+		return m, nil
+	}
 	// stream modal
 	switch msg.String() {
 	case "esc", "q":
@@ -638,6 +645,9 @@ func (m model) handleNormalKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 			}
 		}
 		m.modal = modalState{kind: modalThemes, title: "Theme"}
+		return m, nil
+	case "V":
+		m.modal = modalState{kind: modalAuditDetail, title: "audit detail"}
 		return m, nil
 	case "R":
 		return m.startReview()

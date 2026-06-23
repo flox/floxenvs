@@ -5,7 +5,9 @@
 
 buildGoModule {
   pname = "flox-ai";
-  version = "0.7.0";
+  # Single source of truth: the VERSION file, also embedded into the Go
+  # binary (see main.go //go:embed VERSION) so both report the same value.
+  version = lib.fileContents ./VERSION;
 
   src = ./.;
 

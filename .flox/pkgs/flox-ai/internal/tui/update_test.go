@@ -42,13 +42,13 @@ func TestApplyStreamsAndReloads(t *testing.T) {
 		UninstallerFunc(func(id string, out LineFunc) error { uninstalled = append(uninstalled, id); return nil }),
 		nil, nil, "share", "cfg", "proj")
 	m.applySteps = []applyStep{
-		{name: "Caveman", verb: "install", pkg: "flox/claude-code-plugin-caveman"},
+		{name: "Caveman", verb: "install", pkg: "flox/skills-caveman"},
 		{name: "Graphify", verb: "uninstall", pkg: "skills-graphify"},
 	}
 	ch := make(chan tea.Msg, 256)
 	m.streamCh = ch
 	done, _ := drainStream(m, m.runApplyCmd(ch))
-	if len(installed) != 1 || installed[0] != "flox/claude-code-plugin-caveman" {
+	if len(installed) != 1 || installed[0] != "flox/skills-caveman" {
 		t.Errorf("installed %v", installed)
 	}
 	if len(uninstalled) != 1 || uninstalled[0] != "skills-graphify" {
@@ -115,11 +115,11 @@ func TestSearchStageThenView(t *testing.T) {
 	m = pressKey(m, "e")
 	m = pressKey(m, "enter") // -> normal
 	m = pressKey(m, "i")     // stage install hovered
-	if m.pending["claude-code-plugin-caveman"] != actionInstall {
+	if m.pending["skills-caveman"] != actionInstall {
 		t.Fatalf("expected caveman staged install; pending=%v", m.pending)
 	}
 	view := m.View().Content
-	if !strings.Contains(view, "staged") || !strings.Contains(view, "Caveman") {
+	if !strings.Contains(view, "staged") || !strings.Contains(view, "skills-caveman") {
 		t.Errorf("view should show the staged item; got:\n%s", view)
 	}
 }
@@ -135,7 +135,7 @@ func TestApplyViaKeysStreams(t *testing.T) {
 	mm, _ := m.Update(tea.WindowSizeMsg{Width: 100, Height: 30})
 	m = mm.(model)
 	m.mode = modeNormal // leave search mode so "A" triggers apply, not query input
-	m.pending = map[string]action{"claude-code-plugin-caveman": actionInstall}
+	m.pending = map[string]action{"skills-caveman": actionInstall}
 	// "A" opens the confirm modal; it must not stream yet.
 	mm, _ = m.Update(tea.KeyPressMsg{Text: "A"})
 	m = mm.(model)
@@ -196,7 +196,7 @@ func TestSearchHashTagFilters(t *testing.T) {
 	if m.query != "#ai" {
 		t.Fatalf("query = %q, want #ai", m.query)
 	}
-	if !has(m.results(), "claude-code-plugin-caveman") {
+	if !has(m.results(), "skills-caveman") {
 		t.Errorf("#ai must filter to ai-tagged items: %v", m.results())
 	}
 }
