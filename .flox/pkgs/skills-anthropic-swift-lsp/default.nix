@@ -38,9 +38,10 @@ stdenv.mkDerivation {
       | jq '.lspServers' \
       > "$PLUGIN_DIR/.lsp.json"
 
-    mkdir -p "$out/bin"
-    ln -s ${sourcekit-lsp}/bin/sourcekit-lsp \
-      "$out/bin/sourcekit-lsp"
+    cmd_tmp=$(mktemp)
+    jq --arg c "${sourcekit-lsp}/bin/sourcekit-lsp" \
+      '."sourcekit-lsp".command = $c' "$PLUGIN_DIR/.lsp.json" > "$cmd_tmp"
+    mv "$cmd_tmp" "$PLUGIN_DIR/.lsp.json"
 
     runHook postInstall
   '';
@@ -48,6 +49,8 @@ stdenv.mkDerivation {
   postInstall = ''
     ${builtins.readFile ../../nix/flox-agent-layout.sh}
     flox_agent_layout "swift-lsp" "$out/share"
+    ${builtins.readFile ../../nix/flox-skill-check.sh}
+    flox_skill_check "$out"
   '';
 
   meta = {

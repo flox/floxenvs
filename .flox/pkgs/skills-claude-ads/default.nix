@@ -3,6 +3,7 @@
   lib,
   fetchFromGitHub,
   makeBinaryWrapper,
+  runCommandLocal,
   python3,
   curl,
   git,
@@ -30,6 +31,25 @@ let
       urllib3
     ]
   );
+
+  # Runtime tools the wrapped python3 must find on PATH so
+  # subprocess.run("curl"/"git"/"jq") inside plugin scripts works
+  # without depending on the caller's PATH.
+  runtimeBinPath = lib.makeBinPath [
+    curl
+    git
+    jq
+  ];
+
+  # The wrapped interpreter lives at its OWN store path (not in the
+  # shared $out/bin) so multiple skill packages can be installed
+  # together without colliding on bin/python3, and so the plugin tree
+  # never pollutes the consumer's PATH. Script shebangs point here.
+  pythonWrapped = runCommandLocal "python3-skills-claude-ads"
+    { nativeBuildInputs = [ makeBinaryWrapper ]; } ''
+      makeBinaryWrapper ${pythonEnv}/bin/python3 $out/bin/python3 \
+        --prefix PATH : ${runtimeBinPath}
+    '';
 in
 stdenv.mkDerivation {
   pname = "skills-claude-ads";
@@ -41,14 +61,6 @@ stdenv.mkDerivation {
     tag = "v${version}";
     hash = srcHash;
   };
-
-  # makeBinaryWrapper produces a compiled C wrapper for python3 so it
-  # is exec'd directly by the kernel via shebang on Darwin, where
-  # shebang chains through a shell script wrapper are unreliable
-  # under stripped environments.
-  nativeBuildInputs = [
-    makeBinaryWrapper
-  ];
 
   installPhase = ''
     runHook preInstall
@@ -71,30 +83,14 @@ stdenv.mkDerivation {
            "$PLUGIN_DIR/evals" \
            "$PLUGIN_DIR/research"
 
-    # Wrap python3 so subprocess.run() inside plugin scripts finds
-    # curl/git/jq without depending on the caller's PATH. The scripts
-    # mostly call playwright (bundled with the pythonEnv) and optional
-    # `mmdc` (mermaid-cli, looked up via shutil.which and skipped if
-    # absent), but bundling these matches the claude-seo pattern so
-    # any future subprocess call surface keeps working.
-    runtimeBins=${
-      lib.makeBinPath [
-        curl
-        git
-        jq
-      ]
-    }
-    mkdir -p "$out/bin"
-    makeBinaryWrapper "${pythonEnv}/bin/python3" "$out/bin/python3" \
-      --prefix PATH : "$runtimeBins"
-
     # Repoint every #!/usr/bin/env python3 shebang at the wrapped
-    # python3. Marks files executable so the kernel honors the
-    # shebang when Claude Code invokes them.
+    # python3 (its own store path, ${pythonWrapped}). Marks files
+    # executable so the kernel honors the shebang when Claude Code
+    # invokes them.
     while IFS= read -r f; do
       head -1 "$f" | grep -q '/usr/bin/env python3' || continue
       substituteInPlace "$f" --replace-fail \
-        '#!/usr/bin/env python3' "#!$out/bin/python3"
+        '#!/usr/bin/env python3' "#!${pythonWrapped}/bin/python3"
       chmod +x "$f"
     done < <(find "$PLUGIN_DIR" -name '*.py' -type f)
 
@@ -103,7 +99,7 @@ stdenv.mkDerivation {
     # plugins. Driven by a basename index of the plugin tree, so new
     # upstream files added in future versions are picked up without
     # changing this derivation.
-    "$out/bin/python3" ${./fix_md_paths.py} "$PLUGIN_DIR"
+    ${pythonWrapped}/bin/python3 ${./fix_md_paths.py} "$PLUGIN_DIR"
 
     runHook postInstall
   '';
@@ -111,6 +107,8 @@ stdenv.mkDerivation {
   postInstall = ''
     ${builtins.readFile ../../nix/flox-agent-layout.sh}
     flox_agent_layout "claude-ads" "$out/share"
+    ${builtins.readFile ../../nix/flox-skill-check.sh}
+    flox_skill_check "$out"
   '';
 
   meta = {

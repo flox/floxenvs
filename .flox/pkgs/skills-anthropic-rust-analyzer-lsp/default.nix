@@ -38,14 +38,18 @@ stdenv.mkDerivation {
       | jq '.lspServers' \
       > "$PLUGIN_DIR/.lsp.json"
 
-    mkdir -p "$out/bin"
-    ln -s ${rust-analyzer}/bin/rust-analyzer \
-      "$out/bin/rust-analyzer"
+    cmd_tmp=$(mktemp)
+    jq --arg c "${rust-analyzer}/bin/rust-analyzer" \
+      '."rust-analyzer".command = $c' "$PLUGIN_DIR/.lsp.json" > "$cmd_tmp"
+    mv "$cmd_tmp" "$PLUGIN_DIR/.lsp.json"
 
     ${builtins.readFile ../../nix/flox-agent-layout.sh}
     flox_agent_layout "rust-analyzer-lsp" "$out/share"
 
     runHook postInstall
+
+    ${builtins.readFile ../../nix/flox-skill-check.sh}
+    flox_skill_check "$out"
   '';
 
   meta = {

@@ -4,6 +4,7 @@
   fetchFromGitHub,
   makeBinaryWrapper,
   makeWrapper,
+  runCommandLocal,
   python3,
   curl,
   gh,
@@ -32,6 +33,21 @@ let
     pyyaml
     requests
   ]);
+
+  # Runtime tools the wrapped python3 must find on PATH so plugin
+  # scripts that shell to curl/gh/git/jq work without depending on
+  # the consumer flox env.
+  runtimeBinPath = lib.makeBinPath [ curl gh git jq ];
+
+  # The wrapped interpreter lives at its OWN store path (not in the
+  # shared $out/bin) so the 19 plugins ship without a bin/python3 that
+  # collides across skill packages or pollutes the consumer's PATH.
+  # Script shebangs point here.
+  pythonWrapped = runCommandLocal "python3-skills-financial-services"
+    { nativeBuildInputs = [ makeBinaryWrapper ]; } ''
+      makeBinaryWrapper ${pythonEnv}/bin/python3 $out/bin/python3 \
+        --prefix PATH : ${runtimeBinPath}
+    '';
 in
 stdenv.mkDerivation {
   pname = "skills-financial-services";
@@ -113,24 +129,17 @@ stdenv.mkDerivation {
         }' > "$plugin_dir/installed_plugins.json"
     done
 
-    # Wrap python3 so plugin scripts find curl/gh/git/jq on PATH
-    # without depending on the consumer flox env. Same pattern as
-    # skills-claude-seo.
-    runtimeBins=${lib.makeBinPath [ curl gh git jq ]}
-    mkdir -p "$out/bin"
-    makeBinaryWrapper "${pythonEnv}/bin/python3" "$out/bin/python3" \
-      --prefix PATH : "$runtimeBins"
-
     # Repoint every #!/usr/bin/env python3 shebang on line 1 at the
-    # wrapped python3 and mark executable so the kernel honors the
-    # shebang when Claude Code invokes the script. Only line 1 is
-    # rewritten — upstream skill-creator's init_skill.py embeds a
-    # second `#!/usr/bin/env python3` inside an EXAMPLE_SCRIPT
-    # template that gets written to user disk, which must remain
-    # portable (#!/usr/bin/env python3, not a /nix/store/... path).
+    # wrapped python3 (its own store path, ${pythonWrapped}) and mark
+    # executable so the kernel honors the shebang when Claude Code
+    # invokes the script. Only line 1 is rewritten — upstream
+    # skill-creator's init_skill.py embeds a second
+    # `#!/usr/bin/env python3` inside an EXAMPLE_SCRIPT template that
+    # gets written to user disk, which must remain portable
+    # (#!/usr/bin/env python3, not a /nix/store/... path).
     while IFS= read -r f; do
       head -1 "$f" | grep -q '^#!/usr/bin/env python3$' || continue
-      sed -i '1s|^#!/usr/bin/env python3$|#!'"$out"'/bin/python3|' "$f"
+      sed -i '1s|^#!/usr/bin/env python3$|#!${pythonWrapped}/bin/python3|' "$f"
       chmod +x "$f"
     done < <(find "$out/share/claude-code" -name '*.py' -type f)
 
@@ -141,7 +150,7 @@ stdenv.mkDerivation {
         "$out/share/claude-code/financial-services/scripts/test-cookbooks.sh"; do
       [ -f "$f" ] || continue
       chmod +x "$f"
-      wrapProgram "$f" --prefix PATH : "$runtimeBins:$out/bin"
+      wrapProgram "$f" --prefix PATH : "${runtimeBinPath}:${pythonWrapped}/bin"
     done
 
     runHook postInstall
@@ -156,6 +165,8 @@ stdenv.mkDerivation {
       plugin_name="$(basename "$plugin_dir")"
       flox_agent_layout "$plugin_name" "$out/share"
     done
+    ${builtins.readFile ../../nix/flox-skill-check.sh}
+    flox_skill_check "$out"
   '';
 
   meta = {

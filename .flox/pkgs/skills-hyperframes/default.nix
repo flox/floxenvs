@@ -4,6 +4,7 @@
   fetchFromGitHub,
   ffmpeg-headless,
   perl,
+  python3,
 }:
 
 let
@@ -23,6 +24,7 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [
     perl
+    python3
   ];
 
   dontConfigure = true;
@@ -63,6 +65,10 @@ stdenv.mkDerivation {
     flox_agent_layout "hyperframes" "$out/share"
 
     runHook postInstall
+
+    patchShebangs "$out/share/flox"
+    ${builtins.readFile ../../nix/flox-skill-check.sh}
+    flox_skill_check "$out"
   '';
 
   meta = {

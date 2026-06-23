@@ -24,10 +24,10 @@ let
 
   # The manim-video sub-skill drives the Manim CE engine. Bundle a TeX
   # distribution carrying the packages Manim's MathTex/Tex templates and
-  # the dvisvgm step need, so equation rendering works headless. The
-  # skill is consumed by installing this package into a flox env, so the
-  # `manim` wrapper we drop in $out/bin lands on PATH — which is exactly
-  # how the sub-skill invokes it (`manim -ql script.py Scene`).
+  # the dvisvgm step need, so equation rendering works headless. On Linux
+  # we build a wrapped manim (manim + TeX + ffmpeg on its private PATH)
+  # and rewrite the sub-skill's `manim -...` invocations to its absolute
+  # store path in postInstall — no $out/bin, no PATH pollution.
   texEnv = texliveMedium.withPackages (ps: [
     ps.standalone
     ps.preview
@@ -42,12 +42,30 @@ let
   # invalid-signature / SIGKILL issue nixpkgs hits with Darwin ffmpeg).
   # Catalog artifacts are prebuilt, so the dep cannot be reliably patched
   # out via an override. On Linux the whole closure builds cleanly, so we
-  # ship `manim` on PATH there; on Darwin the skill still ships and the
-  # prose tells the agent to install manim per slot.
+  # reference a wrapped `manim` by absolute store path in the prose there
+  # (see manimWrapped + the postInstall rewrite); on Darwin the skill
+  # still ships and the prose tells the agent to install manim per slot.
   bundleManim = stdenvNoCC.hostPlatform.isLinux;
+
+  # A self-contained manim that carries TeX (MathTex/Tex via dvisvgm) and
+  # ffmpeg (scene stitching) on its own PATH. The SKILL.md `manim -...`
+  # invocations are rewritten to "${manimWrapped}/bin/manim" on Linux, so
+  # the agent runs the engine by absolute store path with no $out/bin and
+  # no host PATH assumption. nix records the closure automatically.
+  manimWrapped = stdenvNoCC.mkDerivation {
+    name = "manim-wrapped";
+    nativeBuildInputs = [ makeWrapper ];
+    dontUnpack = true;
+    installPhase = ''
+      mkdir -p "$out/bin"
+      makeWrapper "${manim}/bin/manim" "$out/bin/manim" \
+        --prefix PATH : "${lib.makeBinPath [ texEnv ffmpeg ]}"
+    '';
+  };
+
   manimNote =
     if bundleManim then
-      "Manim CE v0.20.1, a bundled TeX distribution (for `MathTex`/`Tex` via dvisvgm), and ffmpeg are bundled with this package — the `manim` command is on PATH, nothing to install. `scripts/setup.sh` still works as a sanity check."
+      "Manim CE v0.20.1, a bundled TeX distribution (for `MathTex`/`Tex` via dvisvgm), and ffmpeg are bundled with this package — invoke it by the absolute store path shown in the render commands below, nothing to install. `scripts/setup.sh` still works as a sanity check."
     else
       "On macOS the Manim engine is not bundled (the upstream HEVC-encoder dependency fails to build in the flox sandbox on Darwin). Install it per slot when needed: `pip install manim` plus a LaTeX distribution (`brew install --cask mactex-no-gui`). ffmpeg ships with this package. `scripts/setup.sh` verifies the slot.";
 
@@ -70,17 +88,6 @@ stdenvNoCC.mkDerivation {
 
   installPhase = ''
     runHook preInstall
-
-    # Bundle the Manim engine on PATH for the manim-video sub-skill (Linux
-    # only — see bundleManim above): the real manim plus a TeX distro and
-    # ffmpeg for MathTex + dvisvgm + scene stitching. Lands in $out/bin,
-    # which is on PATH once the package is installed into the consumer's
-    # flox env.
-    ${lib.optionalString bundleManim ''
-      mkdir -p "$out/bin"
-      makeWrapper "${manim}/bin/manim" "$out/bin/manim" \
-        --prefix PATH : "${lib.makeBinPath [ texEnv ffmpeg ]}"
-    ''}
 
     # video-use is a directory skill: SKILL.md references its helpers
     # by bare name (`transcribe.py <video>`), so the whole repo tree
@@ -170,7 +177,7 @@ MD
       mv "$note" "$skill/install.md"
     done
 
-    # The Manim engine is bundled on PATH; reflect that in every copy of
+    # The Manim engine is bundled (Linux); reflect that in every copy of
     # the manim-video prereqs (it ships both as a top-level sibling skill
     # and nested under video-use/skills/manim-video).
     for md in "$out"/share/*/skills/manim-video/SKILL.md \
@@ -181,8 +188,26 @@ MD
           ${lib.escapeShellArg manimNote}
     done
 
+    # On Linux, rewrite the manim-video SKILL.md command invocations to the
+    # wrapped manim's absolute store path so the engine runs without a
+    # $out/bin entry. Match `manim -` (every invocation leads with a flag:
+    # -ql/-qh/-qm/-s/--version/--save_sections/...) — this deliberately
+    # does NOT touch `from manim import` Python lines, which never have a
+    # dash after `manim `. Darwin keeps its "install manim per slot" prose
+    # unchanged (manim is not bundled there). Runs pre-layout so every
+    # agent copy (claude/codex/pi/opencode) inherits the rewrite.
+    ${lib.optionalString bundleManim ''
+      while IFS= read -r f; do
+        substituteInPlace "$f" \
+          --replace-quiet 'manim -' '${manimWrapped}/bin/manim -'
+      done < <(find "$out/share" -name 'SKILL.md' -path '*manim-video*')
+    ''}
+
     ${builtins.readFile ../../nix/flox-agent-layout.sh}
     flox_agent_layout "video-use" "$out/share"
+    patchShebangs "$out/share/flox"
+    ${builtins.readFile ../../nix/flox-skill-check.sh}
+    flox_skill_check "$out"
   '';
 
   meta = {
