@@ -39,8 +39,7 @@ stdenvNoCC.mkDerivation {
     fi
 
     for dest in \
-      "$out/share/claude-code/skills/temporal-developer" \
-      "$out/share/opencode/skills/temporal-developer"; do
+      "$out/share/claude-code/skills/temporal-developer"; do
       mkdir -p "$dest"
       cp "$src/SKILL.md" "$dest/SKILL.md"
       if [ -d "$src/references" ]; then

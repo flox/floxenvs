@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "embed"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -10,19 +11,24 @@ import (
 	"sort"
 	"strings"
 	"text/tabwriter"
+	"time"
 
 	"flox.dev/flox-ai/internal/audit/audit"
 	"flox.dev/flox-ai/internal/audit/detect"
+	"flox.dev/flox-ai/internal/catalog"
 	"flox.dev/flox-ai/internal/discover"
 	"flox.dev/flox-ai/internal/doctor"
-	"flox.dev/flox-ai/internal/emit"
 	"flox.dev/flox-ai/internal/launch"
 	"flox.dev/flox-ai/internal/plugins"
-	"flox.dev/flox-ai/internal/symlinks"
 	"flox.dev/flox-ai/internal/tui"
 )
 
-const version = "0.7.0"
+//go:embed VERSION
+var versionRaw string
+
+// version is the single source of truth, read from the VERSION file at build
+// time (the same file nix reads via lib.fileContents for the package version).
+var version = strings.TrimSpace(versionRaw)
 
 // ANSI color helpers
 func ansi(code, s string) string { return "\033[" + code + "m" + s + "\033[0m" }
@@ -40,7 +46,7 @@ func main() {
 	}
 
 	var flagDir, flagConfigDir string
-	flag.StringVar(&flagDir, "dir", "", "fragment source directory (default: $FLOX_ENV/share/claude-code)")
+	flag.StringVar(&flagDir, "dir", "", "fragment source directory (default: $FLOX_ENV/share)")
 	flag.StringVar(&flagConfigDir, "config-dir", "", "config directory (default: $FLOX_ENV_PROJECT/.flox/cache/flox-ai)")
 	flag.Usage = printUsage
 	flag.Parse()
@@ -56,7 +62,7 @@ func main() {
 
 	shareDir := flagDir
 	if shareDir == "" && floxEnv != "" {
-		shareDir = filepath.Join(floxEnv, "share", "claude-code")
+		shareDir = filepath.Join(floxEnv, "share")
 	}
 
 	if projectDir == "" {
@@ -73,24 +79,6 @@ func main() {
 	}
 
 	switch cmd {
-	case "setup-hook":
-		requireShareDir()
-		if err := runSetup(shareDir, configDir, "hook"); err != nil {
-			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
-			os.Exit(1)
-		}
-	case "setup-profile", "setup-profile-bash", "setup-profile-zsh":
-		requireShareDir()
-		if err := runSetup(shareDir, configDir, "profile"); err != nil {
-			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
-			os.Exit(1)
-		}
-	case "setup-profile-fish":
-		requireShareDir()
-		if err := runSetup(shareDir, configDir, "profile-fish"); err != nil {
-			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
-			os.Exit(1)
-		}
 	case "doctor":
 		requireShareDir()
 		if err := runDoctor(shareDir, configDir, projectDir, managed); err != nil {
@@ -136,12 +124,6 @@ func main() {
 			printUsage()
 			os.Exit(1)
 		}
-	case "rules":
-		runFragmentSubcmd("rules", flag.Arg(1), flag.Arg(2), configDir, shareDir)
-	case "skills":
-		runFragmentSubcmd("skills", flag.Arg(1), flag.Arg(2), configDir, shareDir)
-	case "agents":
-		runFragmentSubcmd("agents", flag.Arg(1), flag.Arg(2), configDir, shareDir)
 	case "launch":
 		agentName := flag.Arg(1)
 		if agentName == "" {
@@ -151,11 +133,11 @@ func main() {
 		requireShareDir()
 		passthrough := agentPassthrough(flag.Args())
 		// Launch reads the per-agent build-time layout under
-		// <share>/flox/<agent>; pass the share root (parent of
-		// share/claude-code) so ScanFlox can find it.
+		// <share>/flox/<agent>; shareDir is the share root, which
+		// ScanFlox appends flox/<agent> to.
 		if err := launch.Run(launch.Options{
 			AgentName:   agentName,
-			ShareDir:    filepath.Dir(shareDir),
+			ShareDir:    shareDir,
 			ConfigDir:   configDir,
 			Passthrough: passthrough,
 		}); err != nil {
@@ -164,6 +146,12 @@ func main() {
 		}
 	case "audit":
 		os.Exit(runAudit(flag.Args()[1:], os.Stdout, os.Stderr))
+	case "search":
+		query := strings.Join(flag.Args()[1:], " ")
+		if err := runSearch(query); err != nil {
+			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
+			os.Exit(1)
+		}
 	case "tui":
 		if floxEnv == "" {
 			fmt.Fprintln(os.Stderr, red("ERROR:")+" flox-ai tui must run inside a Flox environment.")
@@ -223,64 +211,52 @@ func resolveConfigDir(flagConfigDir, floxAIDir, projectDir string) string {
 	return filepath.Join(projectDir, ".flox", "cache", "flox-ai")
 }
 
+// runSearch loads the catalog and prints the skills packages matching the
+// query, using the SAME filter path as the TUI (tui.SkillsOnly +
+// tui.FilterByQuery). Query supports "#tag" tokens plus free text.
+func runSearch(query string) error {
+	items, _, err := catalog.Load(catalog.Config{
+		URL:      catalog.DefaultURL,
+		CacheDir: catalog.CacheDir(),
+		Timeout:  3 * time.Second,
+	})
+	if err != nil {
+		return fmt.Errorf("load catalog: %w", err)
+	}
+	results := tui.FilterByQuery(tui.SkillsOnly(items), query)
+	if len(results) == 0 {
+		fmt.Fprintln(os.Stderr, "no skills matched")
+		return nil
+	}
+	w := tabwriter.NewWriter(os.Stdout, 0, 2, 2, ' ', 0)
+	for _, it := range results {
+		pkg := it.InstallPkg
+		if i := strings.LastIndex(pkg, "/"); i >= 0 {
+			pkg = pkg[i+1:]
+		}
+		fmt.Fprintf(w, "%s\t%s\t%s\n", bold(pkg), it.Name, it.Description)
+	}
+	return w.Flush()
+}
+
 func printUsage() {
 	fmt.Fprintln(os.Stderr, `Usage: flox-ai [flags] <command>
 
 Commands:
-  setup-hook            Emit shell code for on-activate hook
-  setup-profile         Emit POSIX profile code (bash/zsh default)
-  setup-profile-bash    Emit profile code for [profile.bash]
-  setup-profile-zsh     Emit profile code for [profile.zsh]
-  setup-profile-fish    Emit profile code for [profile.fish]
   doctor           Show config status, symlink health, and validation
-  rules add|remove|list|clean    Manage rule symlinks
-  skills add|remove|list|clean   Manage skill symlinks
-  agents add|remove|list|clean   Manage agent symlinks
   plugins add|remove|list|clean  Manage plugins (symlinks + JSON)
   launch <agent> [-- <args>]     Run an AI agent with flox fragments injected
   audit <path>                   Score a skill/agent (--json --findings --report --threshold N --kind)
   tui                            Browse, install, and launch fragments
+  search <query>                 List skills matching a query (#tag + text)
   version          Print version
 
 Flags:
-  --dir          Fragment source dir (default: $FLOX_ENV/share/claude-code)
+  --dir          Fragment source dir (default: $FLOX_ENV/share)
   --config-dir   Config dir (default: $FLOX_ENV_PROJECT/.flox/cache/flox-ai)`)
 }
 
-// runSetup emits the shell code for the requested setup phase. Fragment
-// validation is intentionally NOT performed here: surfacing frontmatter
-// warnings on every environment activation is noisy. Those checks now live
-// solely in `flox-ai doctor`, which users run on demand.
-func runSetup(shareDir, configDir, mode string) error {
-	frags, err := discover.Scan(shareDir)
-	if err != nil {
-		return fmt.Errorf("discover: %w", err)
-	}
-
-	params := &emit.Params{
-		Frags:     frags,
-		ShareDir:  shareDir,
-		ConfigDir: configDir,
-	}
-
-	switch mode {
-	case "hook":
-		fmt.Print(emit.HookCode(params))
-	case "profile":
-		fmt.Print(emit.ProfileCode(params))
-	case "profile-fish":
-		fmt.Print(emit.ProfileCodeFish(params))
-	}
-
-	return nil
-}
-
 func runDoctor(shareDir, configDir, projectDir string, managed bool) error {
-	frags, err := discover.Scan(shareDir)
-	if err != nil {
-		return err
-	}
-
 	rel := func(p string) string {
 		if r, err := filepath.Rel(projectDir, p); err == nil {
 			return r
@@ -303,63 +279,17 @@ func runDoctor(shareDir, configDir, projectDir string, managed bool) error {
 		fmt.Printf("  %s %s\n", dim("  auth:"), yellow("not bridged"))
 	}
 
-	result := doctor.Check(frags)
-	issuesByKey := make(map[string][]doctor.Issue)
-	for _, issue := range result.Issues {
-		key := issue.Type + "/" + issue.Name
-		issuesByKey[key] = append(issuesByKey[key], issue)
-	}
-
-	// installed-symlink lookup: subdir/<name> -> entry
-	installedByKey := make(map[string]symlinks.Entry)
-	for _, subdir := range []string{"rules", "skills", "agents", "plugins"} {
-		entries, _ := symlinks.List(filepath.Join(configDir, subdir))
-		for _, e := range entries {
-			installedByKey[subdir+"/"+e.Name] = e
+	// Fragments are installed per-agent under <share>/flox/<agent>; sum the
+	// prebuilt plugin dirs across all registered launch agents.
+	total := 0
+	for _, a := range launch.RegisteredNames() {
+		if r, err := discover.ScanFlox(shareDir, a); err == nil {
+			total += len(r.AgentDirs)
 		}
 	}
 
-	printSection := func(label, subdir string, items []discover.Fragment) {
-		fmt.Println()
-		fmt.Printf("  %s\n", bold(label))
-		if len(items) == 0 {
-			fmt.Printf("    %s\n", dim("No "+strings.ToLower(label)+" found."))
-			return
-		}
-		for _, f := range items {
-			issues := issuesByKey[subdir+"/"+f.Name]
-
-			symlinkKey := subdir + "/" + f.Name
-			if subdir == "rules" || subdir == "agents" {
-				symlinkKey = subdir + "/" + filepath.Base(f.Path)
-			}
-			entry, hasSymlink := installedByKey[symlinkKey]
-
-			marker := dim("·")
-			switch {
-			case hasIssueError(issues):
-				marker = red("✗")
-			case hasSymlink && entry.Broken:
-				marker = yellow("→ broken")
-			case hasSymlink:
-				marker = green("✓")
-			}
-
-			fmt.Printf("    %s %s\n", marker, f.Name)
-			for _, issue := range issues {
-				if issue.IsError() {
-					fmt.Printf("      %s\n", red(issue.Message))
-				} else {
-					fmt.Printf("      %s %s\n", yellow("⚠"), issue.Message)
-				}
-			}
-		}
-	}
-
-	printSection("Rules", "rules", frags.Rules)
-	printSection("Skills", "skills", frags.Skills)
-	printSection("Agents", "agents", frags.Agents)
-	printSection("Plugins", "plugins", frags.Plugins)
+	fmt.Println()
+	fmt.Printf("  %s %d\n", bold("Installed fragment dirs:"), total)
 
 	fmt.Println()
 
@@ -392,6 +322,7 @@ func runDoctor(shareDir, configDir, projectDir string, managed bool) error {
 	// fragments inject? Same Check the launch path runs.
 	fmt.Println()
 	fmt.Println(bold("Launch readiness"))
+	errCount, warnCount := 0, 0
 	for _, r := range launch.CheckAll() {
 		var mark string
 		switch r.Status.Level {
@@ -399,8 +330,10 @@ func runDoctor(shareDir, configDir, projectDir string, managed bool) error {
 			mark = green("ok")
 		case launch.Degraded:
 			mark = yellow("degraded")
+			warnCount++
 		default:
 			mark = red("fail")
+			errCount++
 		}
 		line := fmt.Sprintf("  %-12s %s", r.Name, mark)
 		if r.Status.Reason != "" {
@@ -408,9 +341,6 @@ func runDoctor(shareDir, configDir, projectDir string, managed bool) error {
 		}
 		fmt.Println(line)
 	}
-
-	errCount := len(result.Errors())
-	warnCount := len(result.Warnings())
 
 	switch {
 	case errCount == 0 && warnCount == 0:
@@ -519,85 +449,6 @@ func printAuditText(out io.Writer, res audit.Result, withFindings, withReport bo
 		for _, tool := range toolNames {
 			fmt.Fprintf(out, "\n=== %s ===\n%s\n", tool, res.RawByTool[tool])
 		}
-	}
-}
-
-func hasIssueError(issues []doctor.Issue) bool {
-	for _, i := range issues {
-		if i.IsError() {
-			return true
-		}
-	}
-	return false
-}
-
-func runSymlinkList(label, configDir, subdir string) error {
-	entries, err := symlinks.List(filepath.Join(configDir, subdir))
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(bold("Installed " + label))
-	fmt.Println()
-
-	if len(entries) == 0 {
-		fmt.Printf("  %s\n", dim("No "+label+" found."))
-		return nil
-	}
-
-	for _, e := range entries {
-		status := green("✓")
-		if e.Broken {
-			status = yellow("→ broken")
-		}
-		fmt.Printf("  %s %s\n", status, e.Name)
-		if e.Target != "" {
-			fmt.Printf("    %s\n", dim(e.Target))
-		}
-	}
-
-	return nil
-}
-
-func runFragmentSubcmd(typeName, subcmd, arg, configDir, shareDir string) {
-	subdir := typeName
-	switch subcmd {
-	case "add":
-		if arg == "" {
-			fmt.Fprintf(os.Stderr, red("ERROR:")+" usage: flox-ai %s add <path>\n", typeName)
-			os.Exit(1)
-		}
-		if err := symlinks.Add(arg, filepath.Join(configDir, subdir)); err != nil {
-			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
-			os.Exit(1)
-		}
-	case "remove":
-		if arg == "" {
-			fmt.Fprintf(os.Stderr, red("ERROR:")+" usage: flox-ai %s remove <name>\n", typeName)
-			os.Exit(1)
-		}
-		if err := symlinks.Remove(arg, filepath.Join(configDir, subdir)); err != nil {
-			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
-			os.Exit(1)
-		}
-	case "list":
-		if err := runSymlinkList(typeName, configDir, subdir); err != nil {
-			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
-			os.Exit(1)
-		}
-	case "clean":
-		if shareDir == "" {
-			fmt.Fprintln(os.Stderr, red("ERROR:")+" --dir is required or run inside Flox environment")
-			os.Exit(1)
-		}
-		if _, err := symlinks.Clean(filepath.Join(configDir, subdir), shareDir); err != nil {
-			fmt.Fprintf(os.Stderr, red("ERROR:")+" %v\n", err)
-			os.Exit(1)
-		}
-	default:
-		fmt.Fprintf(os.Stderr, red("ERROR:")+" unknown %s command: %s\n", typeName, subcmd)
-		printUsage()
-		os.Exit(1)
 	}
 }
 
