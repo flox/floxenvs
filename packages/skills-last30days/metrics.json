@@ -1,1 +1,44 @@
-{"identity":{"kind":"pkg","name":"skills-last30days","dir":".flox/pkgs/skills-last30days"},"overall":82,"status":"stable","quality":{"score":70,"checks":[{"id":"has-default-nix","pass":true,"weight":10},{"id":"has-publish-json","pass":true,"weight":10},{"id":"publish-json-valid","pass":true,"weight":5},{"id":"default-nix-parses","pass":true,"weight":10},{"id":"meta-yaml-complete","pass":true,"weight":15},{"id":"has-upgrade-sh","pass":true,"weight":5},{"id":"upgrade-sh-shellchecked","pass":true,"weight":5},{"id":"has-hashes-json","pass":true,"weight":5},{"id":"hashes-json-fresh","pass":true,"weight":5},{"id":"meta-yaml-exists","pass":false,"weight":30,"note":"no meta.yaml"}]},"reliability":{"ci_green_streak_days":9,"last_test_at":"2026-06-19","lockfile_fresh":true,"test_duration_s":946,"score":95,"note":""},"security":{"score":100,"cap":100,"scanners":[{"tool":"gitleaks","level":"INFO","status":"Passed"},{"tool":"shellcheck","level":"INFO","status":"Passed"},{"tool":"semgrep","level":"INFO","status":"Passed"},{"tool":"trivy","level":"INFO","status":"Passed"},{"tool":"snyk","level":"INFO","status":"Passed"}],"findings":[]},"impact":{"pass":0,"total":0,"score":null,"cases":[]}}
+{
+  "identity": {
+    "kind": "skill",
+    "name": "last30days",
+    "dir": "/home/runner/work/floxenvs/floxenvs/result-skills-last30days/share/flox/claude/last30days"
+  },
+  "overall": 28,
+  "status": "risk",
+  "quality": {
+    "score": 30,
+    "checks": [
+      {
+        "id": "skill-tools",
+        "weight": 40,
+        "note": "skill-tools failed to run",
+        "pass": false
+      },
+      {
+        "id": "skill-validator",
+        "weight": 30,
+        "note": "skill-validator failed to run",
+        "pass": false
+      },
+      {
+        "id": "claudelint",
+        "weight": 30,
+        "note": "100",
+        "pass": true
+      }
+    ]
+  },
+  "reliability": {
+    "score": 0
+  },
+  "security": {
+    "score": 50,
+    "cap": 50,
+    "severity": "CRITICAL"
+  },
+  "impact": {
+    "score": 70,
+    "estimated": true
+  }
+}
