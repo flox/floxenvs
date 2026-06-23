@@ -89,10 +89,15 @@ if [ -z "${AGENTMEMORY_CACHE:-}" ] || [ ! -d "$AGENTMEMORY_CACHE" ]; then
 fi
 echo ">>> AGENTMEMORY_CACHE=$AGENTMEMORY_CACHE"
 
-# flox-ai must report the plugin as discovered.
-if ! flox-ai doctor 2>&1 | grep -q agentmemory; then
+# flox-ai must report the plugin as discovered. doctor exits non-zero
+# when optional launchers (agent-deck, codex, opencode, pi) aren't on
+# PATH, which is expected in this minimal env — capture its output and
+# check only that agentmemory is surfaced, so doctor's overall exit
+# status doesn't fail the pipe under `pipefail`.
+doctor_out="$(flox-ai doctor 2>&1 || true)"
+if ! grep -q agentmemory <<<"$doctor_out"; then
   echo "Error: flox-ai doctor did not surface agentmemory"
-  flox-ai doctor 2>&1 | head -40
+  echo "$doctor_out" | head -40
   exit 1
 fi
 echo ">>> flox-ai sees the agentmemory plugin"
