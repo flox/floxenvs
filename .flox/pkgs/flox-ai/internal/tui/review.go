@@ -2,6 +2,7 @@ package tui
 
 import (
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"flox.dev/flox-ai/internal/audit/audit"
@@ -78,32 +79,45 @@ func fromEngine(r audit.Result) auditResult {
 	}
 }
 
-// reviewTargets returns the present skills/agents with their kind.
+// reviewTargets returns the present skills/agents with their kind. It walks
+// the build-time layout under <shareDir>/flox/<agent>/<plugin>, where each
+// plugin may carry skills/<name>/SKILL.md and agents/*.md.
 func reviewTargets(shareDir string) ([]struct {
 	kind string
 	frag discover.Fragment
 }, error) {
-	frags, err := discover.Scan(shareDir)
-	if err != nil {
-		return nil, err
-	}
-	var out []struct {
+	type target struct {
 		kind string
 		frag discover.Fragment
 	}
-	for _, f := range frags.Skills {
-		out = append(out, struct {
+	var out []target
+
+	floxRoot := filepath.Join(shareDir, "flox")
+	skillFiles, _ := filepath.Glob(filepath.Join(floxRoot, "*", "*", "skills", "*", "SKILL.md"))
+	sort.Strings(skillFiles)
+	for _, p := range skillFiles {
+		name := filepath.Base(filepath.Dir(p))
+		out = append(out, target{"skill", discover.Fragment{Name: name, Path: p}})
+	}
+
+	agentFiles, _ := filepath.Glob(filepath.Join(floxRoot, "*", "*", "agents", "*.md"))
+	sort.Strings(agentFiles)
+	for _, p := range agentFiles {
+		name := strings.TrimSuffix(filepath.Base(p), filepath.Ext(p))
+		out = append(out, target{"agent", discover.Fragment{Name: name, Path: p}})
+	}
+
+	plain := make([]struct {
+		kind string
+		frag discover.Fragment
+	}, len(out))
+	for i, t := range out {
+		plain[i] = struct {
 			kind string
 			frag discover.Fragment
-		}{"skill", f})
+		}{t.kind, t.frag}
 	}
-	for _, f := range frags.Agents {
-		out = append(out, struct {
-			kind string
-			frag discover.Fragment
-		}{"agent", f})
-	}
-	return out, nil
+	return plain, nil
 }
 
 // targetDir resolves a fragment to the directory review-skills expects.
