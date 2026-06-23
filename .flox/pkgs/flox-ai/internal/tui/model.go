@@ -14,6 +14,24 @@ import (
 
 type catalogItem = catalog.Item
 
+// SkillsOnly keeps only skills-* packages — the TUI (and the `search` CLI)
+// surface skills only. Filters on the package (InstallPkg, e.g.
+// "flox/skills-caveman"), NOT the display Name ("Caveman"), which carries no
+// prefix.
+func SkillsOnly(items []catalog.Item) []catalog.Item {
+	out := make([]catalog.Item, 0, len(items))
+	for _, it := range items {
+		pkg := it.InstallPkg
+		if i := strings.LastIndex(pkg, "/"); i >= 0 {
+			pkg = pkg[i+1:]
+		}
+		if strings.HasPrefix(pkg, "skills-") {
+			out = append(out, it)
+		}
+	}
+	return out
+}
+
 type action int
 
 const (
@@ -131,7 +149,7 @@ func newModel(items []catalogItem, installed map[string]bool,
 		installed = map[string]bool{}
 	}
 	m := model{
-		items:       items,
+		items:       SkillsOnly(items),
 		installed:   installed,
 		pending:     map[string]action{},
 		agents:      agents,
@@ -242,17 +260,31 @@ func hasAllTags(it catalogItem, tags []string) bool {
 	return true
 }
 
-// results returns the search matches for the current query.
-func (m model) results() []catalogItem {
-	text, tags := parseQuery(m.query)
-	var out []catalogItem
-	for _, it := range m.items {
-		if !m.matchesAgent(it) || !it.Match(text) || !hasAllTags(it, tags) {
-			continue
+// FilterByQuery returns the items matching a query string. The query supports
+// "#tag" tokens (all must be present) plus free text (substring over
+// name/id/description/tags). This is the shared search path used by both the
+// TUI results list and the `flox-ai search` CLI command.
+func FilterByQuery(items []catalog.Item, query string) []catalog.Item {
+	text, tags := parseQuery(query)
+	out := make([]catalog.Item, 0, len(items))
+	for _, it := range items {
+		if it.Match(text) && hasAllTags(it, tags) {
+			out = append(out, it)
 		}
-		out = append(out, it)
 	}
 	return out
+}
+
+// results returns the search matches for the current query, scoped to the
+// current agent, via the shared FilterByQuery path.
+func (m model) results() []catalogItem {
+	agentItems := make([]catalogItem, 0, len(m.items))
+	for _, it := range m.items {
+		if m.matchesAgent(it) {
+			agentItems = append(agentItems, it)
+		}
+	}
+	return FilterByQuery(agentItems, m.query)
 }
 
 // isTopPicks reports whether the list is showing the default recommendations
@@ -271,45 +303,26 @@ func (m model) visibleItems() []catalogItem {
 	return m.results()
 }
 
-// idleItems is the default list: currently-installed packages if any are
-// installed, otherwise the curated top picks.
+// idleItems is the default front-page list shown before any query: the
+// top-ranked, not-yet-installed skills (best audit score first).
 func (m model) idleItems() []catalogItem {
-	if inst := m.installedPicks(); len(inst) > 0 {
-		return inst
-	}
 	return m.topPicks()
 }
 
-// installedPicks returns the installed catalog packages for the agent, by name.
-func (m model) installedPicks() []catalogItem {
-	var out []catalogItem
-	for _, it := range m.items {
-		if m.matchesAgent(it) && m.installed[it.ID] {
-			out = append(out, it)
-		}
-	}
-	sort.Slice(out, func(i, j int) bool { return out[i].Name < out[j].Name })
-	return out
-}
+const topPicksLimit = 10
 
-const topPicksLimit = 8
-
-// topPicks returns a curated default set for the current agent: featured
-// first, then by title.
+// topPicks returns the default front-page set for the current agent: the
+// highest-ranked NOT-yet-installed skills (best audit score first; items
+// without an audit sort last; featured then name break ties).
 func (m model) topPicks() []catalogItem {
 	var out []catalogItem
 	for _, it := range m.items {
-		if m.matchesAgent(it) {
+		if m.matchesAgent(it) && !m.installed[it.ID] {
 			out = append(out, it)
 		}
 	}
 	sort.Slice(out, func(i, j int) bool {
 		a, b := out[i], out[j]
-		if a.Featured != b.Featured {
-			return a.Featured
-		}
-		// Secondary: higher audit score first; items without an audit sort
-		// after those that have one (treated as score -1).
 		aScore, bScore := -1, -1
 		if a.Audit != nil {
 			aScore = a.Audit.Overall
@@ -319,6 +332,9 @@ func (m model) topPicks() []catalogItem {
 		}
 		if aScore != bScore {
 			return aScore > bScore
+		}
+		if a.Featured != b.Featured {
+			return a.Featured
 		}
 		return a.Name < b.Name
 	})
