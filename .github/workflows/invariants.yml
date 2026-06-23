@@ -57,7 +57,7 @@ jobs:
   coexist:
     name: "All skills + agents + audit tools coexist in one Flox env"
     runs-on: "ubuntu-latest"
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     steps:
       - name: "Checkout"
@@ -70,11 +70,13 @@ jobs:
         run: |
           echo "FLOX_FLOXHUB_TOKEN=${{ secrets.FLOX_FLOXHUB_TOKEN }}" >> "$GITHUB_ENV"
 
-      # Create a throwaway Flox environment, `flox install` every skill +
-      # agent + audit tool into it (Flox rejects any that conflict — the
-      # original bug was four skills each shipping bin/python3), then tear it
-      # down. Installs resolve from the catalog, so this guards that the
-      # PUBLISHED packages stay co-installable in one environment.
+      # Build every skill + agent + audit tool FROM SOURCE, then `flox install
+      # ./result-<pkg>` each into one throwaway environment (Flox rejects any
+      # that conflict — the original bug was four skills each shipping
+      # bin/python3), then tear it down. Building from source and installing
+      # the local result validates THIS checkout, so a source fix turns the
+      # check green immediately rather than lagging until the catalog is
+      # republished.
       - name: "Assert coexistence"
         run: |
           bash scripts/coexist-check.sh
