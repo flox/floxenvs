@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-23T01:27:25.100Z",
+  "generated_at": "2026-06-23T01:31:34.511Z",
   "commit": "fec19ec9f2f9d7195916f149674e5fad12d9b4ba",
   "items": [
     {
@@ -2895,112 +2895,53 @@
       "license": "MIT",
       "audit": {
         "identity": {
-          "kind": "pkg",
-          "name": "skills-video-use",
-          "dir": ".flox/pkgs/skills-video-use"
+          "kind": "skill",
+          "name": "video-use",
+          "dir": "/home/runner/work/floxenvs/floxenvs/result-skills-video-use/share/flox/claude/video-use"
         },
-        "overall": 82,
-        "status": "stable",
+        "overall": 28,
+        "status": "risk",
         "quality": {
-          "score": 70,
+          "score": 30,
           "checks": [
             {
-              "id": "has-default-nix",
-              "pass": true,
-              "weight": 10
+              "id": "skill-tools",
+              "pass": false,
+              "weight": 40,
+              "note": "skill-tools failed to run"
             },
             {
-              "id": "has-publish-json",
-              "pass": true,
-              "weight": 10
-            },
-            {
-              "id": "publish-json-valid",
-              "pass": true,
-              "weight": 5
-            },
-            {
-              "id": "default-nix-parses",
-              "pass": true,
-              "weight": 10
-            },
-            {
-              "id": "meta-yaml-complete",
-              "pass": true,
-              "weight": 15
-            },
-            {
-              "id": "has-upgrade-sh",
-              "pass": true,
-              "weight": 5
-            },
-            {
-              "id": "upgrade-sh-shellchecked",
-              "pass": true,
-              "weight": 5
-            },
-            {
-              "id": "has-hashes-json",
-              "pass": true,
-              "weight": 5
-            },
-            {
-              "id": "hashes-json-fresh",
-              "pass": true,
-              "weight": 5
-            },
-            {
-              "id": "meta-yaml-exists",
+              "id": "skill-validator",
               "pass": false,
               "weight": 30,
-              "note": "no meta.yaml"
+              "note": "skill-validator failed to run"
+            },
+            {
+              "id": "claudelint",
+              "pass": true,
+              "weight": 30,
+              "note": "100"
             }
           ]
         },
         "reliability": {
-          "ci_green_streak_days": 9,
-          "last_test_at": "2026-06-19",
-          "lockfile_fresh": true,
-          "test_duration_s": 946,
-          "score": 95,
+          "ci_green_streak_days": 0,
+          "last_test_at": "",
+          "lockfile_fresh": false,
+          "test_duration_s": 0,
+          "score": 0,
           "note": ""
         },
         "security": {
-          "score": 100,
-          "cap": 100,
-          "scanners": [
-            {
-              "tool": "gitleaks",
-              "level": "INFO",
-              "status": "Passed"
-            },
-            {
-              "tool": "shellcheck",
-              "level": "INFO",
-              "status": "Passed"
-            },
-            {
-              "tool": "semgrep",
-              "level": "INFO",
-              "status": "Passed"
-            },
-            {
-              "tool": "trivy",
-              "level": "INFO",
-              "status": "Passed"
-            },
-            {
-              "tool": "snyk",
-              "level": "INFO",
-              "status": "Passed"
-            }
-          ],
+          "score": 50,
+          "cap": 50,
+          "scanners": [],
           "findings": []
         },
         "impact": {
           "pass": 0,
           "total": 0,
-          "score": null,
+          "score": 70,
           "cases": []
         }
       }
