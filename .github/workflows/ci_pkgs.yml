@@ -492,14 +492,15 @@ jobs:
   # ── Coexistence invariant: every skill + agent + audit tool installs into
   #    ONE Flox env without colliding (the original bug: four python skills
   #    each shipped bin/python3). Runs after the build matrix, in parallel
-  #    with the site job. Mirrors site's needs/if so it starts once all
-  #    build/publish legs settle; always() keeps it independent of a single
-  #    leg failing. coexist-check.sh builds every package from source (cache
-  #    hits on what the matrix just built) and installs each ./result-<pkg>.
+  #    with the site job. PUBLISH RUNS ONLY (push to main / dispatch): it
+  #    builds every package from source, which is too slow for PRs; the build
+  #    matrix already gates each package on PRs. always() keeps it independent
+  #    of a single leg failing. coexist-check.sh builds every package from
+  #    source and installs each ./result-<pkg> into one throwaway env.
   coexist:
     name: "All skills + agents + audit tools coexist in one Flox env"
     needs: ["discover", "aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
-    if: always() && needs.discover.result == 'success'
+    if: always() && needs.discover.result == 'success' && needs.discover.outputs.is_publish == 'true'
     runs-on: "ubuntu-latest"
     timeout-minutes: 60
     steps:
