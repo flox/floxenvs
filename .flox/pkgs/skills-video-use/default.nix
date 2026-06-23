@@ -88,8 +88,7 @@ stdenvNoCC.mkDerivation {
     # engine lives at skills/manim-video; expose it as a first-class
     # sibling skill too. Ship into every agent skills dir we support.
     for share in \
-      "$out/share/claude-code/skills" \
-      "$out/share/opencode/skills"; do
+      "$out/share/claude-code/skills"; do
       mkdir -p "$share/video-use"
       cp -r "$src"/. "$share/video-use/"
       chmod -R u+w "$share/video-use"
