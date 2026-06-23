@@ -2,8 +2,8 @@ diff --git a/core-skills/src/loader.rs b/core-skills/src/loader.rs
 index 3b59e90..c52b93a 100644
 --- a/core-skills/src/loader.rs
 +++ b/core-skills/src/loader.rs
-@@ -275,6 +275,25 @@ async fn skill_roots_with_home_dir(
-         plugin_id: None,
+@@ -252,6 +252,26 @@ async fn skill_roots_with_home_dir(
+         plugin_namespace: None,
          plugin_root: None,
      }));
 +    // flox-ai: extra skill roots injected via the CODEX_FLOX_SKILL_ROOTS env
@@ -20,6 +20,7 @@ index 3b59e90..c52b93a 100644
 +                    scope: SkillScope::User,
 +                    file_system: Arc::clone(&LOCAL_FS),
 +                    plugin_id: None,
++                    plugin_namespace: None,
 +                    plugin_root: None,
 +                });
 +            }
