@@ -34,8 +34,7 @@ stdenvNoCC.mkDerivation {
     # files: it references the detector's thresholds in prose but never
     # invokes it, so SKILL.md alone is the complete agent capability.
     for dest in \
-      "$out/share/claude-code/skills/avoid-ai-writing" \
-      "$out/share/opencode/skills/avoid-ai-writing"; do
+      "$out/share/claude-code/skills/avoid-ai-writing"; do
       mkdir -p "$dest"
       cp "$src/SKILL.md" "$dest/SKILL.md"
     done
