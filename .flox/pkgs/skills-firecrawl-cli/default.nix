@@ -33,8 +33,7 @@ stdenvNoCC.mkDerivation {
     runHook preInstall
 
     for root in \
-      "$out/share/claude-code/skills" \
-      "$out/share/opencode/skills"; do
+      "$out/share/claude-code/skills"; do
       mkdir -p "$root"
       cp -r "$src/${skillsSubdir}"/. "$root/"
     done
