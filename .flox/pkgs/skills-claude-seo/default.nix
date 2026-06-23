@@ -19,24 +19,40 @@ let
 
   # Python interpreter pre-loaded with every third-party module the
   # plugin's own scripts/ + hooks/ + extensions/ tree imports.
-  pythonEnv = python3.withPackages (ps: with ps; [
-    beautifulsoup4
-    google-api-python-client
-    google-auth
-    google-auth-httplib2
-    google-auth-oauthlib
-    lxml
-    matplotlib
-    numpy
-    openpyxl
-    pillow
-    playwright
-    pypdf
-    requests
-    urllib3
-    validators
-    weasyprint
-  ]);
+  pythonEnv = python3.withPackages (
+    ps:
+    let
+      # weasyprint's checkPhase is a pixel/font-rendering pytest suite that
+      # is darwin-environment sensitive (fontconfig) and fails when built
+      # from source on the CI darwin runners. Skip the check on darwin only;
+      # linux keeps it. The let-binding shadows `ps.weasyprint` below (a let
+      # binding takes precedence over `with`).
+      weasyprint =
+        if stdenv.hostPlatform.isDarwin then
+          ps.weasyprint.overridePythonAttrs (_: { doCheck = false; })
+        else
+          ps.weasyprint;
+    in
+    with ps;
+    [
+      beautifulsoup4
+      google-api-python-client
+      google-auth
+      google-auth-httplib2
+      google-auth-oauthlib
+      lxml
+      matplotlib
+      numpy
+      openpyxl
+      pillow
+      playwright
+      pypdf
+      requests
+      urllib3
+      validators
+      weasyprint
+    ]
+  );
 
   # Runtime tools the wrapped python3 must find on PATH so
   # subprocess.run("curl"/"gh"/"git"/"jq"/"node"/"npx") inside plugin
