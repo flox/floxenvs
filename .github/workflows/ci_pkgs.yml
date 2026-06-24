@@ -72,7 +72,7 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
+        uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
         with:
           fetch-depth: 0
 
@@ -168,12 +168,12 @@ jobs:
         package: ${{ fromJSON(needs.discover.outputs.aarch64-darwin) }}
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
+        uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
         with:
           fetch-depth: 0
           filter: "blob:none"
       - name: "Install flox"
-        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
+        uses: "flox/install-flox-action@3b80351ae97bbe063f264dc88fbd505507054963" # v2.5.3
       - name: "Setup Tailscale"
         uses: "tailscale/github-action@306e68a486fd2350f2bfc3b19fcd143891a4a2d8" # v4
         with:
@@ -213,12 +213,12 @@ jobs:
         package: ${{ fromJSON(needs.discover.outputs.aarch64-linux) }}
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
+        uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
         with:
           fetch-depth: 0
           filter: "blob:none"
       - name: "Install flox"
-        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
+        uses: "flox/install-flox-action@3b80351ae97bbe063f264dc88fbd505507054963" # v2.5.3
       - name: "Setup Tailscale"
         uses: "tailscale/github-action@306e68a486fd2350f2bfc3b19fcd143891a4a2d8" # v4
         with:
@@ -258,12 +258,12 @@ jobs:
         package: ${{ fromJSON(needs.discover.outputs.x86_64-darwin) }}
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
+        uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
         with:
           fetch-depth: 0
           filter: "blob:none"
       - name: "Install flox"
-        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
+        uses: "flox/install-flox-action@3b80351ae97bbe063f264dc88fbd505507054963" # v2.5.3
       - name: "Setup Tailscale"
         uses: "tailscale/github-action@306e68a486fd2350f2bfc3b19fcd143891a4a2d8" # v4
         with:
@@ -303,12 +303,12 @@ jobs:
         package: ${{ fromJSON(needs.discover.outputs.x86_64-linux) }}
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
+        uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
         with:
           fetch-depth: 0
           filter: "blob:none"
       - name: "Install flox"
-        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
+        uses: "flox/install-flox-action@3b80351ae97bbe063f264dc88fbd505507054963" # v2.5.3
       - name: "Setup Tailscale"
         uses: "tailscale/github-action@306e68a486fd2350f2bfc3b19fcd143891a4a2d8" # v4
         with:
@@ -384,12 +384,12 @@ jobs:
         shell: "flox activate -d ${{ github.workspace }}/.website -- bash -e {0}"
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
+        uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
         with:
           fetch-depth: 0
       - name: "Install flox"
         # Required so the run steps' `flox activate -d .website` works.
-        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
+        uses: "flox/install-flox-action@3b80351ae97bbe063f264dc88fbd505507054963" # v2.5.3
       - name: "Download fresh metrics"
         uses: "actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c" # v8
         with:
@@ -505,9 +505,9 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
+        uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
       - name: "Install flox"
-        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # v2.5.1
+        uses: "flox/install-flox-action@3b80351ae97bbe063f264dc88fbd505507054963" # v2.5.3
       - name: "Assert coexistence"
         env:
           FLOX_FLOXHUB_TOKEN: "${{ secrets.FLOX_FLOXHUB_TOKEN }}"

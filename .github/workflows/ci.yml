@@ -41,7 +41,7 @@ jobs:
         if: >-
           github.event_name == 'pull_request'
           || github.event_name == 'push'
-        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
+        uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
         with:
           fetch-depth: 0
 
@@ -261,7 +261,7 @@ jobs:
         if: >-
           github.event_name == 'pull_request'
           || github.event_name == 'push'
-        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
+        uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
         with:
           fetch-depth: 0
 
@@ -551,7 +551,7 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6
+        uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
 
       - name: "Check Linux support"
         id: "linux_support"
@@ -589,7 +589,7 @@ jobs:
 
       - name: "Install flox"
         if: steps.linux_support.outputs.env_linux == 'true' || steps.linux_support.outputs.demo_linux == 'true'
-        uses: "flox/install-flox-action@f6002ed63e483f134001de7b4b45be891e00b09f" # main
+        uses: "flox/install-flox-action@3b80351ae97bbe063f264dc88fbd505507054963" # main
 
       - name: "Login to GHCR"
         if: steps.linux_support.outputs.env_linux == 'true' || steps.linux_support.outputs.demo_linux == 'true'
