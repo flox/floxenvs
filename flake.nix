@@ -337,7 +337,17 @@
           # unshare are unavailable, or if setup times out.
           if [ "$(uname)" = "Linux" ] && command -v pasta >/dev/null 2>&1; then
             echo "👉 Isolating test in network+PID namespace (pasta)..."
+            # Bounds for the two phases that can wedge on a degraded
+            # builder. NS_SETUP_TIMEOUT guards namespace creation +
+            # pasta attach (fast on a healthy box). NS_TEST_TIMEOUT
+            # guards the test run itself, which can hang inside
+            # "flox activate" when in-namespace networking is broken.
+            # It is deliberately generous: the whole CI retry attempt
+            # is ~15 min (900s), and after a timeout the direct-exec
+            # fallback still has to finish within that same attempt,
+            # so 600s leaves ~5 min of headroom for the fallback run.
             NS_SETUP_TIMEOUT=120
+            NS_TEST_TIMEOUT=600
             NS_HOME=$(mktemp -d)
             mkdir -p "$NS_HOME/.nix-defexpr/channels"
             chmod 777 "$NS_HOME"
@@ -404,14 +414,35 @@
                 # Signal namespace to proceed with the test
                 touch "$NS_DONE"
 
-                # Wait for the test; propagate its exit code directly.
-                # A non-zero result here is a real test failure, not a
-                # setup problem — do not fall back to direct execution
-                # and mask it.
-                wait "$NS_PID"
-                NS_EXIT=$?
-                rm -f "$NS_READY" "$NS_DONE"
-                exit "$NS_EXIT"
+                # Bound the test run. `wait` can't be wrapped by
+                # timeout, so poll a deadline while the namespace
+                # process is alive. On a degraded builder the test
+                # can wedge inside "flox activate" (in-namespace
+                # networking dead) and emit no output; without this
+                # bound it would burn the full CI timeout.
+                _ns_test_deadline=$(( $(date +%s) + NS_TEST_TIMEOUT ))
+                _ns_test_timed_out=0
+                while kill -0 "$NS_PID" 2>/dev/null; do
+                  if [ "$(date +%s)" -ge "$_ns_test_deadline" ]; then
+                    _ns_test_timed_out=1
+                    break
+                  fi
+                  sleep 1
+                done
+
+                if [ "$_ns_test_timed_out" -eq 1 ]; then
+                  echo "👉 Namespaced test exceeded ''${NS_TEST_TIMEOUT}s — killing namespace and falling back to direct execution..."
+                  _ns_abort
+                  # fall through to the direct-execution line below
+                else
+                  # Test completed. Propagate its exit code directly —
+                  # a non-zero result here is a REAL test failure and
+                  # must not be masked by falling back. The if/else
+                  # capture keeps this safe under `set -e`.
+                  if wait "$NS_PID"; then NS_EXIT=0; else NS_EXIT=$?; fi
+                  rm -f "$NS_READY" "$NS_DONE"
+                  exit "$NS_EXIT"
+                fi
               fi
             fi
           fi
