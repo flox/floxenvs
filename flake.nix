@@ -328,16 +328,40 @@
           # Synchronization:
           #   Namespace signals readiness via a temp file,
           #   we attach pasta, then signal it to proceed.
+          #   Both the readiness wait and the pasta attach are
+          #   bounded by NS_SETUP_TIMEOUT so a wedged builder
+          #   degrades to direct execution in seconds rather
+          #   than burning the full CI timeout.
           #
           # Falls back to direct execution if pasta or
-          # unshare are unavailable.
+          # unshare are unavailable, or if setup times out.
           if [ "$(uname)" = "Linux" ] && command -v pasta >/dev/null 2>&1; then
             echo "👉 Isolating test in network+PID namespace (pasta)..."
+            # Bounds for the two phases that can wedge on a degraded
+            # builder. NS_SETUP_TIMEOUT guards namespace creation +
+            # pasta attach (fast on a healthy box). NS_TEST_TIMEOUT
+            # guards the test run itself, which can hang inside
+            # "flox activate" when in-namespace networking is broken.
+            # It is deliberately generous: the whole CI retry attempt
+            # is ~15 min (900s), and after a timeout the direct-exec
+            # fallback still has to finish within that same attempt,
+            # so 600s leaves ~5 min of headroom for the fallback run.
+            NS_SETUP_TIMEOUT=120
+            NS_TEST_TIMEOUT=600
             NS_HOME=$(mktemp -d)
             mkdir -p "$NS_HOME/.nix-defexpr/channels"
             chmod 777 "$NS_HOME"
             NS_READY=$(mktemp -u)
             NS_DONE=$(mktemp -u)
+
+            # Kill the namespace process and remove temp files.
+            # Only called when setup fails before the test runs.
+            _ns_abort() {
+              kill -TERM "$NS_PID" 2>/dev/null || true
+              wait "$NS_PID" 2>/dev/null || true
+              rm -f "$NS_READY" "$NS_DONE"
+              rm -rf "$NS_HOME" 2>/dev/null || true
+            }
 
             # Outer namespace: root + mount for bind-mounts
             unshare --user --map-root-user --mount --net --pid --fork ${pkgs.bashInteractive}/bin/bash --norc --noprofile -c \
@@ -357,26 +381,69 @@
                  eval \\\"flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'\\\"\"" &
             NS_PID=$!
 
-            # Wait for namespace, attach pasta for networking
-            while [ ! -f "$NS_READY" ]; do sleep 0.1; done
-            # pasta prints the gateway IP which is also the
-            # DNS server; capture it and patch resolv.conf
-            PASTA_OUT=$(pasta --config-net -t none -u none $NS_PID 2>&1)
-            PASTA_DNS=$(echo "$PASTA_OUT" | grep -A1 "^DNS:" | tail -1 | tr -d ' ')
-            if [ -n "$PASTA_DNS" ]; then
-              echo "nameserver $PASTA_DNS" > "$NS_HOME/resolv.conf"
-            fi
-            touch "$NS_DONE"
+            # Wait for namespace readiness with a timeout.
+            # A wedged unshare (e.g. user-ns or mount-ns disabled
+            # on this builder) would otherwise spin forever.
+            _ns_deadline=$(( $(date +%s) + NS_SETUP_TIMEOUT ))
+            _ns_ok=1
+            while [ ! -f "$NS_READY" ]; do
+              sleep 0.1
+              if [ "$(date +%s)" -ge "$_ns_deadline" ]; then
+                echo "👉 Namespace setup timed out after ''${NS_SETUP_TIMEOUT}s — falling back to direct execution..."
+                _ns_abort
+                _ns_ok=0
+                break
+              fi
+            done
 
-            # Wait for the test to finish
-            wait $NS_PID
-            NS_EXIT=$?
-            rm -f "$NS_READY" "$NS_DONE"
+            if [ "$_ns_ok" -eq 1 ]; then
+              # Namespace is ready; attach pasta for networking.
+              # Also bounded: pasta itself can block on some kernels.
+              PASTA_OUT=$(timeout "$NS_SETUP_TIMEOUT" pasta --config-net -t none -u none "$NS_PID" 2>&1)
+              PASTA_STATUS=$?
+              if [ "$PASTA_STATUS" -ne 0 ]; then
+                echo "👉 pasta attach failed (exit=$PASTA_STATUS) — falling back to direct execution..."
+                _ns_abort
+              else
+                # pasta prints the gateway IP which is also the
+                # DNS server; capture it and patch resolv.conf
+                PASTA_DNS=$(echo "$PASTA_OUT" | grep -A1 "^DNS:" | tail -1 | tr -d ' ')
+                if [ -n "$PASTA_DNS" ]; then
+                  echo "nameserver $PASTA_DNS" > "$NS_HOME/resolv.conf"
+                fi
+                # Signal namespace to proceed with the test
+                touch "$NS_DONE"
 
-            if [ $NS_EXIT -eq 0 ]; then
-              exit 0
-            else
-              echo "👉 Namespace isolation failed (exit=$NS_EXIT), falling back to direct execution..."
+                # Bound the test run. `wait` can't be wrapped by
+                # timeout, so poll a deadline while the namespace
+                # process is alive. On a degraded builder the test
+                # can wedge inside "flox activate" (in-namespace
+                # networking dead) and emit no output; without this
+                # bound it would burn the full CI timeout.
+                _ns_test_deadline=$(( $(date +%s) + NS_TEST_TIMEOUT ))
+                _ns_test_timed_out=0
+                while kill -0 "$NS_PID" 2>/dev/null; do
+                  if [ "$(date +%s)" -ge "$_ns_test_deadline" ]; then
+                    _ns_test_timed_out=1
+                    break
+                  fi
+                  sleep 1
+                done
+
+                if [ "$_ns_test_timed_out" -eq 1 ]; then
+                  echo "👉 Namespaced test exceeded ''${NS_TEST_TIMEOUT}s — killing namespace and falling back to direct execution..."
+                  _ns_abort
+                  # fall through to the direct-execution line below
+                else
+                  # Test completed. Propagate its exit code directly —
+                  # a non-zero result here is a REAL test failure and
+                  # must not be masked by falling back. The if/else
+                  # capture keeps this safe under `set -e`.
+                  if wait "$NS_PID"; then NS_EXIT=0; else NS_EXIT=$?; fi
+                  rm -f "$NS_READY" "$NS_DONE"
+                  exit "$NS_EXIT"
+                fi
+              fi
             fi
           fi
           eval "flox activate$start_services -c '${pkgs.bashInteractive}/bin/bash test.sh'"
