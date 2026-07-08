@@ -82,6 +82,7 @@ jobs:
           SINGLE_PKG: "${{ inputs.package }}"
           EVENT: "${{ github.event_name }}"
           BASE_SHA: "${{ github.event.pull_request.base.sha }}"
+          BEFORE_SHA: "${{ github.event.before }}"
           ITEMS: "${{ inputs.items }}"
         run: |
           set -euo pipefail
@@ -102,7 +103,17 @@ jobs:
             if [ "$EVENT" = "pull_request" ]; then
               DIFF_BASE="$BASE_SHA"
             else
-              DIFF_BASE="HEAD~1"
+              # A push can carry several coalesced merge commits (bot
+              # merge waves land seconds apart), so diff the whole push
+              # via the event's `before` SHA — HEAD~1 sees only the head
+              # commit and silently skips every other package in the
+              # push. Fall back to HEAD~1 when `before` is unavailable
+              # (force push, new branch).
+              DIFF_BASE="$BEFORE_SHA"
+              if [ -z "$DIFF_BASE" ] \
+                 || ! git cat-file -e "$DIFF_BASE" 2>/dev/null; then
+                DIFF_BASE="HEAD~1"
+              fi
             fi
             # upgrade.sh isn't part of the build — skip rebuilds when only
             # it changed.
