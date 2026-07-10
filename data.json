@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-10T14:08:24.041Z",
-  "commit": "b40fb6645bbc2d8821a4e58636a5ce2ac5b1e7e6",
+  "generated_at": "2026-07-10T14:35:04.183Z",
+  "commit": "383fc19abb9ef19e6cf9a8b7d6812f5ac63cceb8",
   "items": [
     {
       "id": "skills-agent-deck",
@@ -853,7 +853,58 @@
       "link": "https://github.com/flox/floxenvs/tree/main/.flox/pkgs/skills-shipshit",
       "installPkg": "flox/skills-shipshit",
       "license": "MIT",
-      "audit": null
+      "audit": {
+        "identity": {
+          "kind": "skill",
+          "name": "shipshit",
+          "dir": "/home/runner/work/floxenvs/floxenvs/result-skills-shipshit/share/flox/claude/shipshit"
+        },
+        "overall": 28,
+        "status": "risk",
+        "quality": {
+          "score": 30,
+          "checks": [
+            {
+              "id": "skill-tools",
+              "pass": false,
+              "weight": 40,
+              "note": "skill-tools failed to run"
+            },
+            {
+              "id": "skill-validator",
+              "pass": false,
+              "weight": 30,
+              "note": "skill-validator failed to run"
+            },
+            {
+              "id": "claudelint",
+              "pass": true,
+              "weight": 30,
+              "note": "100"
+            }
+          ]
+        },
+        "reliability": {
+          "ci_green_streak_days": 0,
+          "last_test_at": "",
+          "lockfile_fresh": false,
+          "test_duration_s": 0,
+          "score": 0,
+          "note": ""
+        },
+        "security": {
+          "score": 50,
+          "cap": 50,
+          "scanners": [],
+          "findings": []
+        },
+        "impact": {
+          "pass": 0,
+          "total": 0,
+          "score": 70,
+          "cases": []
+        }
+      }
     },
     {
       "id": "skills-skill-creator",
