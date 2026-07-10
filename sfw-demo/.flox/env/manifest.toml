@@ -1,7 +1,7 @@
 schema-version = "1.10.0"
 
 [include]
-environments = [{ dir = "../sfw" }]
+environments = [{ remote = "flox/sfw" }]
 
 [install]
 gum.pkg-path = "gum"
@@ -19,6 +19,7 @@ cargo.pkg-group = "demo-tools"
 # allows is `pip install --target=<dir>`.
 PIP_REQUIRE_VIRTUALENV = "false"
 PIP_BREAK_SYSTEM_PACKAGES = "true"
+SFW_VERBOSE="true"
 
 [hook]
 on-activate = '''
@@ -30,10 +31,6 @@ export CARGO_HOME="$FLOX_ENV_CACHE/cargo"
 mkdir -p "$CARGO_HOME/bin"
 export PIP_TARGET="$FLOX_ENV_CACHE/pip-target"
 mkdir -p "$PIP_TARGET"
-
-# Shim dir first so command-mode runs (flox activate -- cmd) also route
-# through sfw; the per-shell ordering fix lives in [profile].
-export PATH="$FLOX_ENV/libexec/sfw-shims:$NPM_CONFIG_PREFIX/bin:$CARGO_HOME/bin:$PATH"
 '''
 
 [profile]
@@ -41,11 +38,6 @@ common = '''
 # Runs in every shell, including ones attaching to an existing
 # activation, where on-activate does not re-run.
 unset PIP_CONFIG_FILE
-
-# Keep the sfw shim dir at the front of PATH, ahead of the per-env
-# install bins, so npm/pip/cargo still resolve to the shim and route
-# through sfw — even after the attaching shell's rc files reorder PATH.
-export PATH="$FLOX_ENV/libexec/sfw-shims:$NPM_CONFIG_PREFIX/bin:$CARGO_HOME/bin:$PATH"
 
 if [ "${FLOX_ENVS_TESTING:-}" != "1" ]; then
   gum style \
