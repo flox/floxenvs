@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-10T08:04:36.622Z",
-  "commit": "d74340bb798bf0093d3ed6c778bca768de5b0f59",
+  "generated_at": "2026-07-10T09:08:42.390Z",
+  "commit": "6f94234b7ae443a12386a07a6ae955058a5b3020",
   "items": [
     {
       "id": "skills-agent-deck",
@@ -426,7 +426,58 @@
       "link": "https://github.com/flox/floxenvs/tree/main/.flox/pkgs/skills-gstack",
       "installPkg": "flox/skills-gstack",
       "license": "MIT",
-      "audit": null
+      "audit": {
+        "identity": {
+          "kind": "skill",
+          "name": "gstack",
+          "dir": "/home/runner/work/floxenvs/floxenvs/result-skills-gstack/share/flox/claude/gstack"
+        },
+        "overall": 34,
+        "status": "risk",
+        "quality": {
+          "score": 30,
+          "checks": [
+            {
+              "id": "skill-tools",
+              "pass": false,
+              "weight": 40,
+              "note": "skill-tools failed to run"
+            },
+            {
+              "id": "skill-validator",
+              "pass": false,
+              "weight": 30,
+              "note": "0"
+            },
+            {
+              "id": "claudelint",
+              "pass": true,
+              "weight": 30,
+              "note": "100"
+            }
+          ]
+        },
+        "reliability": {
+          "ci_green_streak_days": 0,
+          "last_test_at": "",
+          "lockfile_fresh": false,
+          "test_duration_s": 0,
+          "score": 0,
+          "note": ""
+        },
+        "security": {
+          "score": 80,
+          "cap": 75,
+          "scanners": [],
+          "findings": []
+        },
+        "impact": {
+          "pass": 0,
+          "total": 0,
+          "score": 70,
+          "cases": []
+        }
+      }
     },
     {
       "id": "skills-humanizer",
