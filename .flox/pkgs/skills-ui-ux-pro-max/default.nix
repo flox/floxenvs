@@ -49,15 +49,22 @@ stdenv.mkDerivation {
 
     # Drop dirs that aren't part of the runtime plugin: GitHub config,
     # the standalone npm install CLI for non-Claude editors, docs site,
-    # marketing previews/screenshots, and the demo `cat-feeding-app`
-    # HTML page upstream ships as a sample artifact.
+    # marketing previews/screenshots, the demo `cat-feeding-app` HTML
+    # page upstream ships as a sample artifact, the example `projects`
+    # showcase apps, and the repo-level `scripts/` dev/CI helpers
+    # (smoke-*.sh, sync-release-version.mjs, validate-csv.py) — these
+    # ship `#!/usr/bin/env bash` shebangs that flox_skill_check rejects
+    # and are not part of the runtime skill (which lives under
+    # `.claude/skills/` and `src/`).
     rm -rf "$PLUGIN_DIR/.github" \
            "$PLUGIN_DIR/.gitignore" \
            "$PLUGIN_DIR/cat-feeding-app" \
            "$PLUGIN_DIR/cli" \
            "$PLUGIN_DIR/docs" \
            "$PLUGIN_DIR/preview" \
-           "$PLUGIN_DIR/screenshots"
+           "$PLUGIN_DIR/projects" \
+           "$PLUGIN_DIR/screenshots" \
+           "$PLUGIN_DIR/scripts"
 
     # Wrap python3 so the BM25 search scripts always find a working
     # interpreter even when the consumer's flox env doesn't ship one.
