@@ -17,7 +17,7 @@ command_exists npx
 echo ">>> node version: $(node --version)"
 
 # Plugin tree must land where flox-ai discovers it.
-plugin_dir="$FLOX_ENV/share/claude-code/plugins/agentmemory"
+plugin_dir="$FLOX_ENV/share/flox/claude/agentmemory"
 if [ ! -d "$plugin_dir" ]; then
   echo "Error: plugin dir missing: $plugin_dir"
   exit 1
@@ -41,11 +41,9 @@ done
 echo ">>> plugin layout looks complete"
 
 # Hook scripts must have been repointed at the bundled node
-# (not /usr/bin/env node) so they don't depend on the
-# consumer env's PATH having node on it. The substituted path is
-# the build-time $PLUGIN_DIR (a /nix/store path) rather than the
-# env's runtime mount of it, so just confirm /usr/bin/env is gone
-# and the shebang resolves to an executable.
+# (not /usr/bin/env node) so they don't depend on the consumer env's
+# PATH having node on it. The build bakes an absolute /nix/store path
+# into the shebang, so just confirm /usr/bin/env is gone.
 shebang="$(head -1 "$plugin_dir/scripts/session-start.mjs")"
 case "$shebang" in
   *'/usr/bin/env'*)
@@ -53,12 +51,15 @@ case "$shebang" in
     exit 1
     ;;
 esac
-shebang_bin="${shebang#\#!}"
-if [ ! -x "$shebang_bin" ]; then
-  echo "Error: session-start.mjs shebang target not executable: $shebang_bin"
+echo ">>> hook script shebang repointed off /usr/bin/env"
+
+# The node Claude Code actually runs is the bundled one anchored at
+# ${CLAUDE_PLUGIN_ROOT}/bin/node — confirm it exists and is executable.
+if [ ! -x "$plugin_dir/bin/node" ]; then
+  echo "Error: bundled node missing/not executable: $plugin_dir/bin/node"
   exit 1
 fi
-echo ">>> hook script shebang resolves to $shebang_bin"
+echo ">>> bundled node executable at $plugin_dir/bin/node"
 
 # hooks.json must invoke the bundled node via the
 # ${CLAUDE_PLUGIN_ROOT}-anchored path so Claude Code can
@@ -89,15 +90,15 @@ if [ -z "${AGENTMEMORY_CACHE:-}" ] || [ ! -d "$AGENTMEMORY_CACHE" ]; then
 fi
 echo ">>> AGENTMEMORY_CACHE=$AGENTMEMORY_CACHE"
 
-# flox-ai must report the plugin as discovered. doctor exits non-zero
-# when optional launchers (agent-deck, codex, opencode, pi) aren't on
-# PATH, which is expected in this minimal env — capture its output and
-# check only that agentmemory is surfaced, so doctor's overall exit
-# status doesn't fail the pipe under `pipefail`.
-doctor_out="$(flox-ai doctor 2>&1 || true)"
-if ! grep -q agentmemory <<<"$doctor_out"; then
-  echo "Error: flox-ai doctor did not surface agentmemory"
-  echo "$doctor_out" | head -40
+# flox-ai must discover the plugin's skills. `search` lists fragments
+# matching a query; the bundled skills surface under the
+# skills-agentmemory id, so confirm agentmemory is found. Capture the
+# output with `|| true` so a non-zero exit doesn't fail the pipe under
+# `pipefail`.
+search_out="$(flox-ai search agentmemory 2>&1 || true)"
+if ! grep -q agentmemory <<<"$search_out"; then
+  echo "Error: flox-ai search did not surface agentmemory"
+  echo "$search_out" | head -40
   exit 1
 fi
 echo ">>> flox-ai sees the agentmemory plugin"
