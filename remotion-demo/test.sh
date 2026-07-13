@@ -23,7 +23,7 @@ echo ">>> npm version:     $(npm --version)"
 echo ">>> gum version:     $(gum --version)"
 
 # ── Plugin tree present ────────────────────────────────
-plugin_dir="$FLOX_ENV/share/claude-code/plugins/remotion"
+plugin_dir="$FLOX_ENV/share/flox/claude/remotion"
 if [ ! -f "$plugin_dir/.claude-plugin/plugin.json" ]; then
   echo "Error: plugin.json missing at $plugin_dir"
   exit 1
@@ -34,12 +34,12 @@ if [ ! -f "$plugin_dir/skills/remotion/SKILL.md" ]; then
 fi
 echo ">>> remotion plugin tree present"
 
-# ── flox-ai registered the plugin ───────────────
-if ! flox-ai plugins list 2>&1 | grep -q remotion; then
-  echo "Error: flox-ai did not register the remotion plugin"
+# ── flox-ai discovered the skill ───────────────
+if ! flox-ai search remotion 2>&1 | grep -q remotion; then
+  echo "Error: flox-ai did not discover the remotion skill"
   flox-ai doctor || true
   exit 1
 fi
-echo ">>> flox-ai registered the remotion plugin"
+echo ">>> flox-ai discovered the remotion skill"
 
 echo ">>> remotion-demo environment is working"

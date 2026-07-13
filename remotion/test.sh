@@ -14,11 +14,11 @@ fi
 echo ">>> node version: $(node --version)"
 
 # The plugin ships its skill tree under
-# $FLOX_ENV/share/claude-code/plugins/remotion/. Verify the
+# $FLOX_ENV/share/flox/claude/remotion/. Verify the
 # files flox-ai will discover are actually present —
 # without them the on-activate hook would silently register
 # an empty plugin.
-plugin_dir="$FLOX_ENV/share/claude-code/plugins/remotion"
+plugin_dir="$FLOX_ENV/share/flox/claude/remotion"
 if [ ! -f "$plugin_dir/.claude-plugin/plugin.json" ]; then
   echo "Error: plugin.json missing at $plugin_dir"
   exit 1
@@ -29,14 +29,14 @@ if [ ! -f "$plugin_dir/skills/remotion/SKILL.md" ]; then
 fi
 echo ">>> remotion plugin tree present"
 
-# flox-ai setup-hook ran in on-activate and should
-# have symlinked the plugin under .flox-ai/. Without
-# this Claude Code lists the plugin but won't load it.
-if ! flox-ai plugins list 2>&1 | grep -q remotion; then
-  echo "Error: flox-ai did not register the remotion plugin"
+# flox-ai should discover the fragment shipped under
+# share/flox and surface its skill. Without this the
+# skill would not be available to launched AI agents.
+if ! flox-ai search remotion 2>&1 | grep -q remotion; then
+  echo "Error: flox-ai did not discover the remotion skill"
   flox-ai doctor || true
   exit 1
 fi
-echo ">>> flox-ai registered the remotion plugin"
+echo ">>> flox-ai discovered the remotion skill"
 
 echo ">>> remotion environment is working"
