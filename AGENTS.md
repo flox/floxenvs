@@ -233,6 +233,10 @@ demo.
 
 ## CI architecture
 
+For CI operational notes — rerunning failed jobs, infra flakes (wedged
+Hetzner remote builders), and platform-specific build gotchas — see
+[.github/AGENTS.md](.github/AGENTS.md).
+
 ### Three layers
 
 ```text
