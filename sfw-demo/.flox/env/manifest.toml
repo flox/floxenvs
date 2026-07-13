@@ -31,32 +31,44 @@ export CARGO_HOME="$FLOX_ENV_CACHE/cargo"
 mkdir -p "$CARGO_HOME/bin"
 export PIP_TARGET="$FLOX_ENV_CACHE/pip-target"
 mkdir -p "$PIP_TARGET"
+
+# Keep the sfw shim dir at the front of PATH, ahead of the per-env
+# install bins, so npm/pip/cargo still resolve to the shim and route
+# through sfw.
+export PATH="$FLOX_ENV/libexec/sfw-shims:$NPM_CONFIG_PREFIX/bin:$CARGO_HOME/bin:$PATH"
+
+# The banner has to print in every shell, including ones that attach to
+# an existing activation and so never re-run this hook. [profile] common
+# is sourced by bash, zsh, fish and tcsh, and no conditional or command
+# substitution is valid in all four — only a bare command call is. So
+# generate the banner as a bash script here and let common just run it.
+cat > "$FLOX_ENV_CACHE/banner.sh" <<'BANNER'
+#!/usr/bin/env bash
+[ "${FLOX_ENVS_TESTING:-}" = "1" ] && exit 0
+
+gum style \
+  --border rounded --border-foreground 212 \
+  --padding "1 2" --margin "1 0" \
+  "$(gum style --bold --foreground 212 'Socket Firewall demo (sfw-demo)')" \
+  "" \
+  "$(gum style --bold --foreground 196 'WARNING: best run inside a container or sandbox')" \
+  "" \
+  "$(gum style --italic 'npm, pip, and cargo route through sfw automatically.')" \
+  "" \
+  "$(gum style --bold 'Try a flagged package (sfw blocks it):')" \
+  "  npm install lodahs" \
+  "  pip install fabrice" \
+  "  cargo install rustdecimal" \
+  "" \
+  "$(gum style --bold 'And a clean one (sfw lets it through):')" \
+  "  npm install lodash" \
+  "" \
+  "Full walkthrough: README.md"
+BANNER
+chmod +x "$FLOX_ENV_CACHE/banner.sh"
 '''
 
 [profile]
 common = '''
-# Runs in every shell, including ones attaching to an existing
-# activation, where on-activate does not re-run.
-unset PIP_CONFIG_FILE
-
-if [ "${FLOX_ENVS_TESTING:-}" != "1" ]; then
-  gum style \
-    --border rounded --border-foreground 212 \
-    --padding "1 2" --margin "1 0" \
-    "$(gum style --bold --foreground 212 'Socket Firewall demo (sfw-demo)')" \
-    "" \
-    "$(gum style --bold --foreground 196 'WARNING: best run inside a container or sandbox')" \
-    "" \
-    "$(gum style --italic 'npm, pip, and cargo route through sfw automatically.')" \
-    "" \
-    "$(gum style --bold 'Try a flagged package (sfw blocks it):')" \
-    "  npm install lodahs" \
-    "  pip install fabrice" \
-    "  cargo install rustdecimal" \
-    "" \
-    "$(gum style --bold 'And a clean one (sfw lets it through):')" \
-    "  npm install lodash" \
-    "" \
-    "Full walkthrough: README.md"
-fi
+"$FLOX_ENV_CACHE/banner.sh"
 '''
