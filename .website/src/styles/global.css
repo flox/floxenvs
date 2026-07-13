@@ -34,3 +34,24 @@
 html { color-scheme: light dark; }
 html.dark { color-scheme: dark; }
 html:not(.dark) { color-scheme: light; }
+
+/* AI environment builder — refined dark-tech, one locked accent.
+   Dark-first; the page theme already toggles `html.dark`. */
+:root {
+  --builder-accent: oklch(0.72 0.17 165);   /* flox green, the only accent */
+  --builder-bg: oklch(0.17 0.012 240);
+  --builder-surface: oklch(0.21 0.014 240);
+  --builder-hairline: oklch(0.32 0.02 240);
+  --builder-text: oklch(0.93 0.01 240);
+  --builder-muted: oklch(0.68 0.015 240);
+}
+.builder {
+  background: var(--builder-bg);
+  color: var(--builder-text);
+  font-family: var(--font-mono);
+}
+.builder .hairline { border-color: var(--builder-hairline); }
+.builder .accent { color: var(--builder-accent); }
+@media (prefers-reduced-motion: reduce) {
+  .builder * { animation: none !important; transition: none !important; }
+}
