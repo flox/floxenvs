@@ -15,14 +15,31 @@
 
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version srcHash;
+  inherit (versionData) version srcHashes;
+
+  # Upstream 1.0.70+ ships a thin `@github/copilot` meta-package whose only
+  # payload is an npm-loader that resolves a per-platform binary package at
+  # runtime. The actual CLI (index.js entry point, ripgrep, prebuilds, native
+  # launcher) lives in `@github/copilot-<platform>-<arch>`. Fetch that package
+  # directly for the target system instead of the meta-package.
+  platformSuffix = {
+    aarch64-darwin = "darwin-arm64";
+    x86_64-darwin = "darwin-x64";
+    aarch64-linux = "linux-arm64";
+    x86_64-linux = "linux-x64";
+  }
+  .${stdenv.hostPlatform.system}
+    or (throw "copilot-cli: unsupported system ${stdenv.hostPlatform.system}");
+  srcHash =
+    srcHashes.${stdenv.hostPlatform.system}
+      or (throw "copilot-cli: no srcHash for ${stdenv.hostPlatform.system}");
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "copilot-cli";
   inherit version;
 
   src = fetchurl {
-    url = "https://registry.npmjs.org/@github/copilot/-/copilot-${version}.tgz";
+    url = "https://registry.npmjs.org/@github/copilot-${platformSuffix}/-/copilot-${platformSuffix}-${version}.tgz";
     hash = srcHash;
   };
 

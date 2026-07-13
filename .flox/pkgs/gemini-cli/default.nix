@@ -91,6 +91,29 @@ buildNpmPackage (finalAttrs: {
   '';
 
   postPatch = ''
+    # Upstream's package-lock.json is internally inconsistent: several
+    # workspaces pin an exact dependency version in package.json that differs
+    # from the version the lockfile actually resolved (e.g. tar 7.5.8 vs
+    # 7.5.11, clipboardy 5.2.0 vs 5.2.1). With npmDepsFetcherVersion = 2 only
+    # the lockfile-resolved versions are prefetched into the offline cache,
+    # so the mismatched exact pins make the offline install fail with
+    # "No matching version found for <pkg>@<pinned>". Realign each package.json
+    # pin to the version that is actually locked. The lockfile itself is left
+    # untouched so the npmDeps consistency check and npmDepsHash stay valid.
+    substituteInPlace packages/cli/package.json \
+      --replace-quiet '"tar": "7.5.8"' '"tar": "7.5.11"' \
+      --replace-quiet '"clipboardy": "5.2.0"' '"clipboardy": "5.2.1"' \
+      --replace-quiet '"vitest": "3.2.4"' '"vitest": "3.1.1"'
+    substituteInPlace packages/a2a-server/package.json \
+      --replace-quiet '"tar": "7.5.8"' '"tar": "7.5.11"' \
+      --replace-quiet '"vitest": "3.2.4"' '"vitest": "3.1.1"'
+    substituteInPlace packages/core/package.json \
+      --replace-quiet '"vitest": "3.2.4"' '"vitest": "3.1.1"'
+    substituteInPlace packages/sdk/package.json \
+      --replace-quiet '"vitest": "3.2.4"' '"vitest": "3.1.1"'
+    substituteInPlace packages/vscode-ide-companion/package.json \
+      --replace-quiet '"typescript": "5.8.3"' '"typescript": "5.9.3"'
+
     # Force ripgrep resolution to our Nix-provided binary. Upstream's
     # resolveRipgrepPath() probes bundled vendor/ paths then the system
     # PATH; prepend the store path as the first candidate so fileExists()
