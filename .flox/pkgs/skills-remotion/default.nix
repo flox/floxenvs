@@ -28,11 +28,14 @@ stdenv.mkDerivation {
     PLUGIN_DIR="$out/share/claude-code/plugins/remotion"
     mkdir -p "$PLUGIN_DIR/skills"
 
-    # Upstream layout is `skills/remotion/` with SKILL.md + rules/
-    # and a handful of .tsx asset examples. Copy the whole skill
-    # tree verbatim — Claude Code reads SKILL.md frontmatter
-    # to advertise it as `remotion-best-practices`.
-    cp -r "$src/skills/remotion" "$PLUGIN_DIR/skills/remotion"
+    # Upstream restructured skills/: the single `skills/remotion/`
+    # skill became `skills/remotion-best-practices/` (SKILL.md name:
+    # `remotion-best-practices`) with nested topic sub-skills. Copy
+    # that tree verbatim, but install it as `skills/remotion` so the
+    # plugin's skill folder keeps the `remotion` name that plugin.json
+    # and the `remotion` env test expect. Claude Code reads the SKILL.md
+    # frontmatter to advertise it as `remotion-best-practices`.
+    cp -r "$src/skills/remotion-best-practices" "$PLUGIN_DIR/skills/remotion"
     chmod -R u+w "$PLUGIN_DIR"
 
     # Upstream ships no .claude-plugin/plugin.json — the canonical
