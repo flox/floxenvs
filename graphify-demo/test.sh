@@ -29,11 +29,12 @@ graphify --help >/dev/null
 
 # Verify flox-ai discovered the bundled /graphify skill.
 # Strip ANSI colors so grep matches regardless of terminal style.
-doctor_out="$(flox-ai doctor 2>&1 \
+search_out="$(flox-ai search graphify 2>/dev/null \
   | sed $'s/\x1b\\[[0-9;]*[A-Za-z]//g')"
-if ! echo "$doctor_out" | grep -qE '✓[[:space:]]+graphify'; then
+if ! echo "$search_out" | grep -qiE 'graphify'; then
   echo "Error: flox-ai did not discover the graphify skill."
-  echo "$doctor_out" | tail -20
+  flox-ai doctor 2>&1 | sed $'s/\x1b\\[[0-9;]*[A-Za-z]//g' \
+    | tail -20
   exit 1
 fi
 echo ">>> flox-ai discovered the /graphify skill"
