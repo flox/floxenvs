@@ -183,6 +183,18 @@ python.pkgs.buildPythonApplication {
     hatch-vcs
   ];
 
+  # mistral-vibe 2.19.x pins its build backend with exact `==` versions
+  # (`hatchling==1.30.1`, `hatch-vcs==0.5.0`, `editables==0.6`) that don't
+  # match the versions nixpkgs ships. pythonRelaxDeps only rewrites the
+  # built wheel's runtime metadata, not `build-system.requires`, so relax
+  # those pins in the source pyproject before the wheel is built.
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace-fail 'hatchling==1.30.1' 'hatchling' \
+      --replace-fail 'hatch-vcs==0.5.0' 'hatch-vcs' \
+      --replace-fail 'editables==0.6' 'editables'
+  '';
+
   dependencies = with python.pkgs; [
     agent-client-protocol
     anyio
@@ -211,6 +223,7 @@ python.pkgs.buildPythonApplication {
     pyyaml
     requests
     rich
+    sentry-sdk
     sounddevice
     textual
     textual-speedups
@@ -231,6 +244,7 @@ python.pkgs.buildPythonApplication {
   # `GEN_AI_PROVIDER_NAME` symbol mistral-vibe needs.
   pythonRelaxDeps = [
     "agent-client-protocol"
+    "anyio"
     "attrs"
     "cachetools"
     "certifi"
@@ -242,6 +256,7 @@ python.pkgs.buildPythonApplication {
     "giturlparse"
     "google-auth"
     "googleapis-common-protos"
+    "humanize"
     "idna"
     "importlib-metadata"
     "jaraco-context"
@@ -267,11 +282,15 @@ python.pkgs.buildPythonApplication {
     "python-dotenv"
     "python-multipart"
     "pyyaml"
+    "requests"
     "rich"
+    "sentry-sdk"
     "smmap"
     "sounddevice"
     "sse-starlette"
     "starlette"
+    "textual"
+    "tree-sitter"
     "uc-micro-py"
     "urllib3"
     "uvicorn"
