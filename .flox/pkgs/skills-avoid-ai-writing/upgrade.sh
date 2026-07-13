@@ -34,8 +34,10 @@ commit_date=$(echo "$commit_json" \
 # Frontmatter `version:` from raw SKILL.md at this rev.
 skill_md=$(curl -sfL \
   "https://raw.githubusercontent.com/$OWNER/$REPO/$rev/SKILL.md")
-frontmatter_version=$(echo "$skill_md" \
-  | awk '
+# Feed awk via a here-string, not `echo … | awk`. awk `exit`s early
+# once it finds the version, which would SIGPIPE the upstream `echo`
+# and, under `set -o pipefail`, abort the script with exit 141.
+frontmatter_version=$(awk '
       BEGIN { in_fm = 0 }
       /^---[[:space:]]*$/ {
         if (in_fm == 0) { in_fm = 1; next }
@@ -47,7 +49,7 @@ frontmatter_version=$(echo "$skill_md" \
         print
         exit
       }
-    ')
+    ' <<<"$skill_md")
 
 if [ -z "$frontmatter_version" ]; then
   echo "Failed to extract frontmatter version from SKILL.md" >&2
