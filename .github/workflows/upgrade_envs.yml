@@ -128,9 +128,14 @@ jobs:
         uses: "peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1" # v8
         with:
           token: "${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}"
+          # Only add the demo path when a demo variant exists. Envs
+          # without one (e.g. `.website`) would otherwise make
+          # `git add` fail on a non-existent pathspec, aborting the PR
+          # creation. Fall back to repeating the minimal path (a no-op
+          # for `git add`) so the list is never empty.
           add-paths: |
             ${{ matrix.name }}/.flox
-            ${{ matrix.name }}-demo/.flox
+            ${{ matrix.has_demo && format('{0}-demo/.flox', matrix.name) || format('{0}/.flox', matrix.name) }}
           commit-message: "chore: update lockfiles for `${{ matrix.name }}`"
           committer: "FloxBot <bot@flox.dev>"
           author: "FloxBot <bot@flox.dev>"
