@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-13T14:42:11.415Z",
-  "commit": "4d3c26e3d71de1900a80e88fe84e944958526017",
+  "generated_at": "2026-07-13T14:43:57.810Z",
+  "commit": "3793e8b84aca4902a4793b822cd90310d955f226",
   "items": [
     {
       "id": "skills-agent-deck",
@@ -43,7 +43,58 @@
       "link": "https://github.com/flox/floxenvs/tree/main/.flox/pkgs/skills-agent-skills",
       "installPkg": "flox/skills-agent-skills",
       "license": "MIT",
-      "audit": null
+      "audit": {
+        "identity": {
+          "kind": "skill",
+          "name": "agent-skills",
+          "dir": "/home/runner/work/floxenvs/floxenvs/result-skills-agent-skills/share/flox/claude/agent-skills"
+        },
+        "overall": 34,
+        "status": "risk",
+        "quality": {
+          "score": 30,
+          "checks": [
+            {
+              "id": "skill-tools",
+              "pass": false,
+              "weight": 40,
+              "note": "skill-tools failed to run"
+            },
+            {
+              "id": "skill-validator",
+              "pass": false,
+              "weight": 30,
+              "note": "skill-validator failed to run"
+            },
+            {
+              "id": "claudelint",
+              "pass": true,
+              "weight": 30,
+              "note": "100"
+            }
+          ]
+        },
+        "reliability": {
+          "ci_green_streak_days": 0,
+          "last_test_at": "",
+          "lockfile_fresh": false,
+          "test_duration_s": 0,
+          "score": 0,
+          "note": ""
+        },
+        "security": {
+          "score": 80,
+          "cap": 75,
+          "scanners": [],
+          "findings": []
+        },
+        "impact": {
+          "pass": 0,
+          "total": 0,
+          "score": 70,
+          "cases": []
+        }
+      }
     },
     {
       "id": "skills-agentmemory",
