@@ -26,15 +26,11 @@ stdenv.mkDerivation {
     runHook preInstall
 
     mkdir -p $out/bin
-    cp $src/dist/cli.js $out/bin/ccr
+    cp $src/dist/main/cli.js $out/bin/ccr
     chmod +x $out/bin/ccr
 
     substituteInPlace $out/bin/ccr \
       --replace-quiet "#!/usr/bin/env node" "#!${nodejs}/bin/node"
-
-    # Bundle the tiktoken WASM next to the CLI so it can locate it via
-    # relative resolution at runtime.
-    cp $src/dist/tiktoken_bg.wasm $out/bin/
 
     runHook postInstall
   '';
