@@ -197,13 +197,13 @@ jobs:
         with:
           ssh-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
           remote-builders: "${{ vars.MANAGED_REMOTE_BUILDERS }}"
-          # Push each build output to the private S3 cache so the
+          # Push each build output to the private R2 cache so the
           # `coexist` job can substitute exactly these artifacts instead
           # of rebuilding all packages from source.
-          substituter: "${{ vars.MANAGED_CACHE_PRIVATE_S3_BUCKET }}"
+          substituter: "${{ vars.MANAGED_CACHE_PRIVATE_R2_BUCKET }}"
           substituter-key: "${{ secrets.MANAGED_CACHE_PRIVATE_SECRET_KEY }}"
-          aws-access-key-id: "${{ secrets.MANAGED_CACHE_PRIVATE_AWS_ACCESS_KEY_ID }}"
-          aws-secret-access-key: "${{ secrets.MANAGED_CACHE_PRIVATE_AWS_SECRET_ACCESS_KEY }}"
+          aws-access-key-id: "${{ secrets.MANAGED_CACHE_PRIVATE_R2_ACCESS_KEY_ID }}"
+          aws-secret-access-key: "${{ secrets.MANAGED_CACHE_PRIVATE_R2_SECRET_ACCESS_KEY }}"
       - name: "Build"
         if: ${{ needs.discover.outputs.is_publish != 'true' }}
         run: |
@@ -249,13 +249,13 @@ jobs:
         with:
           ssh-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
           remote-builders: "${{ vars.MANAGED_REMOTE_BUILDERS }}"
-          # Push each build output to the private S3 cache so the
+          # Push each build output to the private R2 cache so the
           # `coexist` job can substitute exactly these artifacts instead
           # of rebuilding all packages from source.
-          substituter: "${{ vars.MANAGED_CACHE_PRIVATE_S3_BUCKET }}"
+          substituter: "${{ vars.MANAGED_CACHE_PRIVATE_R2_BUCKET }}"
           substituter-key: "${{ secrets.MANAGED_CACHE_PRIVATE_SECRET_KEY }}"
-          aws-access-key-id: "${{ secrets.MANAGED_CACHE_PRIVATE_AWS_ACCESS_KEY_ID }}"
-          aws-secret-access-key: "${{ secrets.MANAGED_CACHE_PRIVATE_AWS_SECRET_ACCESS_KEY }}"
+          aws-access-key-id: "${{ secrets.MANAGED_CACHE_PRIVATE_R2_ACCESS_KEY_ID }}"
+          aws-secret-access-key: "${{ secrets.MANAGED_CACHE_PRIVATE_R2_SECRET_ACCESS_KEY }}"
       - name: "Build"
         if: ${{ needs.discover.outputs.is_publish != 'true' }}
         run: |
@@ -301,13 +301,13 @@ jobs:
         with:
           ssh-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
           remote-builders: "${{ vars.MANAGED_REMOTE_BUILDERS }}"
-          # Push each build output to the private S3 cache so the
+          # Push each build output to the private R2 cache so the
           # `coexist` job can substitute exactly these artifacts instead
           # of rebuilding all packages from source.
-          substituter: "${{ vars.MANAGED_CACHE_PRIVATE_S3_BUCKET }}"
+          substituter: "${{ vars.MANAGED_CACHE_PRIVATE_R2_BUCKET }}"
           substituter-key: "${{ secrets.MANAGED_CACHE_PRIVATE_SECRET_KEY }}"
-          aws-access-key-id: "${{ secrets.MANAGED_CACHE_PRIVATE_AWS_ACCESS_KEY_ID }}"
-          aws-secret-access-key: "${{ secrets.MANAGED_CACHE_PRIVATE_AWS_SECRET_ACCESS_KEY }}"
+          aws-access-key-id: "${{ secrets.MANAGED_CACHE_PRIVATE_R2_ACCESS_KEY_ID }}"
+          aws-secret-access-key: "${{ secrets.MANAGED_CACHE_PRIVATE_R2_SECRET_ACCESS_KEY }}"
       - name: "Build"
         if: ${{ needs.discover.outputs.is_publish != 'true' }}
         run: |
@@ -353,13 +353,13 @@ jobs:
         with:
           ssh-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
           remote-builders: "${{ vars.MANAGED_REMOTE_BUILDERS }}"
-          # Push each build output to the private S3 cache so the
+          # Push each build output to the private R2 cache so the
           # `coexist` job can substitute exactly these artifacts instead
           # of rebuilding all packages from source.
-          substituter: "${{ vars.MANAGED_CACHE_PRIVATE_S3_BUCKET }}"
+          substituter: "${{ vars.MANAGED_CACHE_PRIVATE_R2_BUCKET }}"
           substituter-key: "${{ secrets.MANAGED_CACHE_PRIVATE_SECRET_KEY }}"
-          aws-access-key-id: "${{ secrets.MANAGED_CACHE_PRIVATE_AWS_ACCESS_KEY_ID }}"
-          aws-secret-access-key: "${{ secrets.MANAGED_CACHE_PRIVATE_AWS_SECRET_ACCESS_KEY }}"
+          aws-access-key-id: "${{ secrets.MANAGED_CACHE_PRIVATE_R2_ACCESS_KEY_ID }}"
+          aws-secret-access-key: "${{ secrets.MANAGED_CACHE_PRIVATE_R2_SECRET_ACCESS_KEY }}"
       # Always build x86_64-linux so the audit has a build output (and,
       # on main, so publish has its artifact).
       - name: "Build"
@@ -563,10 +563,10 @@ jobs:
           # to, so the per-package `flox build` in coexist-check.sh
           # substitutes the already-built artifacts instead of compiling
           # every package from source (which chronically hit the 60m cap).
-          substituter: "${{ vars.MANAGED_CACHE_PRIVATE_S3_BUCKET }}"
+          substituter: "${{ vars.MANAGED_CACHE_PRIVATE_R2_BUCKET }}"
           substituter-key: "${{ secrets.MANAGED_CACHE_PRIVATE_SECRET_KEY }}"
-          aws-access-key-id: "${{ secrets.MANAGED_CACHE_PRIVATE_AWS_ACCESS_KEY_ID }}"
-          aws-secret-access-key: "${{ secrets.MANAGED_CACHE_PRIVATE_AWS_SECRET_ACCESS_KEY }}"
+          aws-access-key-id: "${{ secrets.MANAGED_CACHE_PRIVATE_R2_ACCESS_KEY_ID }}"
+          aws-secret-access-key: "${{ secrets.MANAGED_CACHE_PRIVATE_R2_SECRET_ACCESS_KEY }}"
       - name: "Assert coexistence"
         env:
           FLOX_FLOXHUB_TOKEN: "${{ secrets.FLOX_FLOXHUB_TOKEN }}"
