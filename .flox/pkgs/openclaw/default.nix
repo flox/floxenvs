@@ -49,6 +49,17 @@ stdenv.mkDerivation (finalAttrs: {
     prePnpmInstall = ''
       export pnpm_config_side_effects_cache=false
       export pnpm_config_update_notifier=false
+      # openclaw bundles many large (100MB+) platform-specific agent
+      # binaries (@openai/codex, @github/copilot, @node-llama-cpp, ...) for
+      # every OS/arch. By default pnpm spawns `availableParallelism()-1`
+      # worker threads that each extract a multi-hundred-MB tarball into the
+      # content-addressable store at once, so peak RSS scales with core
+      # count and OOM-kills (exit 137) the fetch on CI remote builders.
+      # Cap the extraction worker pool to one and serialise network fetches
+      # so peak memory stays bounded regardless of the builder's core count.
+      export PNPM_MAX_WORKERS=1
+      pnpm config set network-concurrency 1
+      pnpm config set child-concurrency 1
     '';
   }).overrideAttrs (old: {
     nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [
