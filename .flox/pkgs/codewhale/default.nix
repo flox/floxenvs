@@ -50,6 +50,19 @@ rustPlatform.buildRustPackage {
 
   doCheck = false;
 
+  # The final link of this multi-crate workspace can run silently for well
+  # over 30 minutes on slower builders (x86_64-darwin via Rosetta on
+  # aarch64 hardware), tripping Nix's max-silent-time default of 1800s.
+  # Emit a heartbeat every 60s during the build so it stays alive (same
+  # approach as pkgs/openclaw).
+  preBuild = ''
+    ( while true; do echo "[heartbeat] still building codewhale..."; sleep 60; done ) &
+    _codewhale_heartbeat_pid=$!
+  '';
+  postBuild = ''
+    kill "$_codewhale_heartbeat_pid" 2>/dev/null || true
+  '';
+
   postInstall = ''
     installShellCompletion --cmd codewhale \
       --bash <($out/bin/codewhale completion bash) \
@@ -57,7 +70,10 @@ rustPlatform.buildRustPackage {
       --zsh <($out/bin/codewhale completion zsh)
   '';
 
-  doInstallCheck = true;
+  # Skip the emulated `codewhale --version` check on x86_64-darwin: under
+  # Rosetta the emulated binary can hang past the 1800s builder timeout
+  # (same reason claude-code gates its install check on this platform).
+  doInstallCheck = stdenv.hostPlatform.system != "x86_64-darwin";
   nativeInstallCheckInputs = [ versionCheckHook ];
 
   meta = {
