@@ -96,8 +96,10 @@ buildNpmPackage (finalAttrs: {
       packages/channels/telegram \
       packages/channels/weixin \
       packages/channels/dingtalk \
+      packages/channels/wecom \
       packages/channels/feishu \
-      packages/channels/qqbot
+      packages/channels/qqbot \
+      packages/acp-bridge
     do
       npm run build --workspace=$ws
     done
@@ -111,12 +113,19 @@ buildNpmPackage (finalAttrs: {
 
     mkdir -p $out/bin $out/share/qwen-code
     cp -r dist/* $out/share/qwen-code/
+    # Upstream's bin entry is scripts/cli-entry.js (a shebang'd launcher that
+    # spawns the bundled dist/cli.js). The esbuild bundle no longer emits a
+    # runnable cli.js (no shebang, not executable), so install the wrapper
+    # next to cli.js and point qwen at it. package.json is required for the
+    # wrapper's --version fast path.
+    cp scripts/cli-entry.js $out/share/qwen-code/cli-entry.js
+    cp package.json $out/share/qwen-code/package.json
     npm prune --production
     cp -r node_modules $out/share/qwen-code/
     # Remove broken symlinks that confuse Nix tooling.
     find $out/share/qwen-code/node_modules -type l -delete || true
     patchShebangs $out/share/qwen-code
-    ln -s $out/share/qwen-code/cli.js $out/bin/qwen
+    ln -s $out/share/qwen-code/cli-entry.js $out/bin/qwen
 
     runHook postInstall
   '';
