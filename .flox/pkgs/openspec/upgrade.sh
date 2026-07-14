@@ -24,14 +24,21 @@ src_hash=$(nix-prefetch-url "$src_url" 2>/dev/null)
 src_sri=$(nix hash convert --hash-algo sha256 --to sri "$src_hash")
 echo "  sourceHash: $src_sri"
 
-# Refresh package-lock.json from upstream's repo at this version tag.
-lock_url="https://raw.githubusercontent.com/Fission-AI/OpenSpec/v${latest_version}/package-lock.json"
-if curl -sfL "$lock_url" -o "$SCRIPT_DIR/package-lock.json.tmp" 2>/dev/null; then
-  mv "$SCRIPT_DIR/package-lock.json.tmp" "$SCRIPT_DIR/package-lock.json"
-  echo "  refreshed package-lock.json from upstream"
+# Regenerate package-lock.json from the published tarball's package.json.
+# Upstream stopped shipping package-lock.json (they moved to pnpm), and the
+# npm tarball strips it on publish, so we synthesize a consistent lockfile
+# from package.json with `npm install --package-lock-only`.
+lock_tmp="$(mktemp -d)"
+if curl -sfL "$src_url" -o "$lock_tmp/openspec.tgz" 2>/dev/null &&
+  tar -xzf "$lock_tmp/openspec.tgz" -C "$lock_tmp" --strip-components=1 &&
+  (cd "$lock_tmp" && npm install --package-lock-only --ignore-scripts >/dev/null 2>&1) &&
+  [ -f "$lock_tmp/package-lock.json" ]; then
+  mv "$lock_tmp/package-lock.json" "$SCRIPT_DIR/package-lock.json"
+  echo "  regenerated package-lock.json from published tarball"
 else
-  echo "  WARNING: could not refresh upstream package-lock.json" >&2
+  echo "  WARNING: could not regenerate package-lock.json" >&2
 fi
+rm -rf "$lock_tmp"
 
 dummy="sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
 jq -n \
