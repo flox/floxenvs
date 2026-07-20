@@ -183,16 +183,14 @@ python.pkgs.buildPythonApplication {
     hatch-vcs
   ];
 
-  # mistral-vibe 2.19.x pins its build backend with exact `==` versions
-  # (`hatchling==1.30.1`, `hatch-vcs==0.5.0`, `editables==0.6`) that don't
-  # match the versions nixpkgs ships. pythonRelaxDeps only rewrites the
-  # built wheel's runtime metadata, not `build-system.requires`, so relax
-  # those pins in the source pyproject before the wheel is built.
+  # mistral-vibe pins its build backend with exact `==` versions
+  # (e.g. `hatchling==1.31.0`, `hatch-vcs==0.5.0`, `editables==0.6`) that
+  # don't match the versions nixpkgs ships, and the pinned versions change
+  # between releases. pythonRelaxDeps only rewrites the built wheel's runtime
+  # metadata, not `build-system.requires`, so strip the pins from the source
+  # pyproject before the wheel is built (version-agnostic to survive bumps).
   postPatch = ''
-    substituteInPlace pyproject.toml \
-      --replace-fail 'hatchling==1.30.1' 'hatchling' \
-      --replace-fail 'hatch-vcs==0.5.0' 'hatch-vcs' \
-      --replace-fail 'editables==0.6' 'editables'
+    sed -i -E 's/(hatchling|hatch-vcs|editables)==[0-9][0-9.]*/\1/g' pyproject.toml
   '';
 
   dependencies = with python.pkgs; [
@@ -263,6 +261,7 @@ python.pkgs.buildPythonApplication {
     "jsonpointer"
     "keyring"
     "linkify-it-py"
+    "markdownify"
     "mcp"
     "mistralai"
     "more-itertools"
