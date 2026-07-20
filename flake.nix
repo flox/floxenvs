@@ -18,81 +18,7 @@
         lib = nixpkgs.lib;
         pkgs = nixpkgs.legacyPackages.${system};
 
-        flox-ai = pkgs.callPackage ./.flox/pkgs/flox-ai/default.nix { };
-
         symphony = pkgs.callPackage ./.flox/pkgs/symphony/default.nix { };
-
-        batsWithLibs = pkgs.bats.withLibraries (p: [
-          p.bats-support
-          p.bats-assert
-        ]);
-
-        e2eTestDir = ./.flox/pkgs/flox-ai/e2e;
-
-        runTestCmNix = pkgs.writeShellScriptBin "run-test-flox-ai-with-nix" ''
-          set -euo pipefail
-          export PATH="${
-            lib.makeBinPath [
-              flox-ai
-              batsWithLibs
-              pkgs.coreutils
-              pkgs.tmux # launch.bats: agent-deck XDG-leak test spawns tmux
-            ]
-          }:$PATH"
-          export BATS_SUPPORT_LIB="${pkgs.bats.libraries.bats-support}/share/bats/bats-support"
-          export BATS_ASSERT_LIB="${pkgs.bats.libraries.bats-assert}/share/bats/bats-assert"
-          if [ $# -gt 0 ]; then
-            bats "$@"
-          else
-            bats --jobs 1 ${e2eTestDir}/*.bats
-          fi
-        '';
-
-        runTestCmFlox = pkgs.writeShellScriptBin "run-test-flox-ai-with-flox" ''
-          set -euo pipefail
-          export PATH="${
-            lib.makeBinPath [
-              batsWithLibs
-              pkgs.coreutils
-              pkgs.tmux # launch.bats: agent-deck XDG-leak test spawns tmux
-            ]
-          }:$PATH"
-          export BATS_SUPPORT_LIB="${pkgs.bats.libraries.bats-support}/share/bats/bats-support"
-          export BATS_ASSERT_LIB="${pkgs.bats.libraries.bats-assert}/share/bats/bats-assert"
-          export FLOX_DISABLE_METRICS=true
-
-          flox_bin="${
-            lib.makeBinPath [
-              flox.packages."${system}".default
-            ]
-          }"
-          export PATH="$flox_bin:$PATH"
-
-          tmpdir="$(mktemp -d)"
-          trap 'rm -rf "$tmpdir"' EXIT
-
-          binary_dir="$(nix build --no-link --print-out-paths \
-            '${inputs.self}#packages.${system}.flox-ai')"
-
-          cd "$tmpdir"
-          flox init
-
-          manifest_tpl=${pkgs.writeText "manifest-template.toml" ''
-            schema-version = "1.10.0"
-
-            [hook]
-            on-activate = """
-            export PATH="__BINARY_DIR__/bin:$PATH"
-            """
-          ''}
-          sed "s|__BINARY_DIR__|$binary_dir|g" "$manifest_tpl" > .flox/env/manifest.toml
-
-          if [ $# -gt 0 ]; then
-            flox activate -c "bats $*"
-          else
-            flox activate -c "bats --jobs 1 ${e2eTestDir}/*.bats"
-          fi
-        '';
 
         # Single entry point: nix run .#run-test -- <env-name>
         runTestScript = pkgs.writeShellScriptBin "run-test" ''
@@ -416,7 +342,6 @@
         '';
       in
       {
-        packages.flox-ai = flox-ai;
         packages.symphony = symphony;
 
         apps.run-test = {
@@ -432,16 +357,6 @@
         apps.check-devcontainers-coverage = {
           type = "app";
           program = "${checkDevcontainersCoverageScript}/bin/check-devcontainers-coverage";
-        };
-
-        apps.run-test-flox-ai-with-nix = {
-          type = "app";
-          program = "${runTestCmNix}/bin/run-test-flox-ai-with-nix";
-        };
-
-        apps.run-test-flox-ai-with-flox = {
-          type = "app";
-          program = "${runTestCmFlox}/bin/run-test-flox-ai-with-flox";
         };
 
         devShells.default = pkgs.mkShell {
