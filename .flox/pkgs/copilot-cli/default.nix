@@ -69,6 +69,9 @@ stdenv.mkDerivation (finalAttrs: {
   #     musl variants; they're not loaded on glibc, but autoPatchelfHook
   #     still processes any file matching the target arch and aborts on
   #     libc.musl. Ignoring the symbol is simpler than deleting the files.
+  #   - webview/node bundles a GTK/WebKit webview native module (1.0.71+).
+  #     The webview UI is an optional feature loaded lazily; let the build
+  #     pass and let it fail at runtime if ever invoked headless.
   autoPatchelfIgnoreMissingDeps = lib.optionals stdenv.hostPlatform.isLinux [
     "libX11.so.6"
     "libXtst.so.6"
@@ -80,6 +83,17 @@ stdenv.mkDerivation (finalAttrs: {
     "libei.so.1"
     "libc.musl-x86_64.so.1"
     "libc.musl-aarch64.so.1"
+    # webview/node
+    "libwebkit2gtk-4.1.so.0"
+    "libjavascriptcoregtk-4.1.so.0"
+    "libgtk-3.so.0"
+    "libgdk-3.so.0"
+    "libgdk_pixbuf-2.0.so.0"
+    "libcairo.so.2"
+    "libsoup-3.0.so.0"
+    "libwayland-client.so.0"
+    "libdbus-1.so.3"
+    "libxdo.so.3"
   ];
 
   dontBuild = true;
