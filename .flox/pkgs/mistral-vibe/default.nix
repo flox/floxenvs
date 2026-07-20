@@ -261,6 +261,7 @@ python.pkgs.buildPythonApplication {
     "jsonpointer"
     "keyring"
     "linkify-it-py"
+    "markdownify"
     "mcp"
     "mistralai"
     "more-itertools"
