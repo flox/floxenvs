@@ -45,13 +45,23 @@ mapfile -t SKILLS < <(
   grep -rl 'flox_agent_layout' "$REPO_ROOT"/.flox/pkgs/*/default.nix \
     | xargs -n1 dirname | xargs -n1 basename | sort -u
 )
-# The 4 agent runtimes + the 6 audit tools.
+# The 4 agent runtimes + the 5 source-built audit tools. flox-ai is NOT
+# built here: the CLI now lives in its own repo (flox/flox-ai) with no
+# local .flox/pkgs entry, so it can't be `flox build`-ed. It is still
+# checked for coexistence — installed from the catalog into the same env
+# below (see CATALOG_PKGS).
 TOOLS=(
   claude-code codex opencode pi
-  flox-ai skill-tools skill-validator skillcheck skillspector claudelint
+  skill-tools skill-validator skillcheck skillspector claudelint
 )
+# Catalog packages to also install into the single env: built and published
+# elsewhere, consumed from FloxHub (needs FLOX_FLOXHUB_TOKEN). flox-ai lives
+# in its own repo but must still coexist with every skill in one env.
+CATALOG_PKGS=(flox/flox-ai)
 PACKAGES=("${SKILLS[@]}" "${TOOLS[@]}")
-echo "Target: ${#SKILLS[@]} skills + ${#TOOLS[@]} agents/audit tools = ${#PACKAGES[@]} packages"
+TOTAL=$(( ${#PACKAGES[@]} + ${#CATALOG_PKGS[@]} ))
+echo "Target: ${#SKILLS[@]} skills + ${#TOOLS[@]} agents/audit tools" \
+     "+ ${#CATALOG_PKGS[@]} catalog pkgs = $TOTAL packages"
 
 # ── Build every package from source; collect the result symlink paths ──
 # `flox build <pkg>` writes ./result-<pkg> (and ./result-<pkg>-log) into the
@@ -115,6 +125,20 @@ for i in "${!BUILT[@]}"; do
 done
 rm -f "$inst_log"
 
+# ── Also install catalog packages (not built from source) into the SAME
+# env, proving they coexist with every locally-built skill/agent/tool. ──
+cat_log="$(mktemp)"
+for pkg in "${CATALOG_PKGS[@]}"; do
+  if flox install "$pkg" >"$cat_log" 2>&1; then
+    echo "  installed: $pkg (catalog)"
+  else
+    echo "  INSTALL FAILED: $pkg (catalog)" >&2
+    sed 's/^/      | /' "$cat_log" >&2
+    INSTALL_FAILED+=("$pkg")
+  fi
+done
+rm -f "$cat_log"
+
 # ── List everything installed into the single environment ──
 echo ""
 echo "Packages in the coexistence environment:"
@@ -128,12 +152,13 @@ if [ "${#BUILD_FAILED[@]}" -gt 0 ]; then
   status=1
 fi
 if [ "${#INSTALL_FAILED[@]}" -gt 0 ]; then
-  echo "coexist FAILED: ${#INSTALL_FAILED[@]}/${#BUILT[@]} built packages could" \
+  attempted=$(( ${#BUILT[@]} + ${#CATALOG_PKGS[@]} ))
+  echo "coexist FAILED: ${#INSTALL_FAILED[@]}/${attempted} packages could" \
        "not be installed into one environment:"
   printf '  - %s\n' "${INSTALL_FAILED[@]}"
   status=1
 fi
 [ "$status" -ne 0 ] && exit 1
 
-echo "coexist OK: all ${#PACKAGES[@]} packages built and installed into one Flox environment"
+echo "coexist OK: all $TOTAL packages built/installed into one Flox environment"
 exit 0
