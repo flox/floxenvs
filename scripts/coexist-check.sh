@@ -49,19 +49,30 @@ mapfile -t SKILLS < <(
 # built here: the CLI now lives in its own repo (flox/flox-ai) with no
 # local .flox/pkgs entry, so it can't be `flox build`-ed. It is still
 # checked for coexistence — installed from the catalog into the same env
-# below (see CATALOG_PKGS).
+# below (see EXTERNAL_PKGS).
 TOOLS=(
   claude-code codex opencode pi
   skill-tools skill-validator skillcheck skillspector claudelint
 )
-# Catalog packages to also install into the single env: built and published
-# elsewhere, consumed from FloxHub (needs FLOX_FLOXHUB_TOKEN). flox-ai lives
-# in its own repo but must still coexist with every skill in one env.
-CATALOG_PKGS=(flox/flox-ai)
+# Extra packages to install into the single env (NOT built from source),
+# each installed by pkg-path after the source-built artifacts:
+#
+#   - flox/flox-ai: our CLI, now in its own repo (no local .flox/pkgs
+#     entry), consumed from FloxHub — needs FLOX_FLOXHUB_TOKEN. Must still
+#     coexist with every skill in one env.
+#   - python3, nodejs: the runtimes skills bundle most (33 ship bin/python3,
+#     26 ship bin/node), deliberately UNDER their plugin dir so they don't
+#     land on $FLOX_ENV/bin. Real user envs almost always already have these
+#     at the env level, so installing them here guards that invariant: a
+#     skill that regresses and leaks bin/python3 (or bin/node) onto
+#     $FLOX_ENV/bin would collide with these and fail the check.
+#
+# Extend with uv/bun/ruby/go if those become common env-level runtimes.
+EXTERNAL_PKGS=(flox/flox-ai python3 nodejs)
 PACKAGES=("${SKILLS[@]}" "${TOOLS[@]}")
-TOTAL=$(( ${#PACKAGES[@]} + ${#CATALOG_PKGS[@]} ))
+TOTAL=$(( ${#PACKAGES[@]} + ${#EXTERNAL_PKGS[@]} ))
 echo "Target: ${#SKILLS[@]} skills + ${#TOOLS[@]} agents/audit tools" \
-     "+ ${#CATALOG_PKGS[@]} catalog pkgs = $TOTAL packages"
+     "+ ${#EXTERNAL_PKGS[@]} external pkgs = $TOTAL packages"
 
 # ── Build every package from source; collect the result symlink paths ──
 # `flox build <pkg>` writes ./result-<pkg> (and ./result-<pkg>-log) into the
@@ -125,19 +136,19 @@ for i in "${!BUILT[@]}"; do
 done
 rm -f "$inst_log"
 
-# ── Also install catalog packages (not built from source) into the SAME
+# ── Also install external packages (not built from source) into the SAME
 # env, proving they coexist with every locally-built skill/agent/tool. ──
-cat_log="$(mktemp)"
-for pkg in "${CATALOG_PKGS[@]}"; do
-  if flox install "$pkg" >"$cat_log" 2>&1; then
-    echo "  installed: $pkg (catalog)"
+ext_log="$(mktemp)"
+for pkg in "${EXTERNAL_PKGS[@]}"; do
+  if flox install "$pkg" >"$ext_log" 2>&1; then
+    echo "  installed: $pkg (external)"
   else
-    echo "  INSTALL FAILED: $pkg (catalog)" >&2
-    sed 's/^/      | /' "$cat_log" >&2
+    echo "  INSTALL FAILED: $pkg (external)" >&2
+    sed 's/^/      | /' "$ext_log" >&2
     INSTALL_FAILED+=("$pkg")
   fi
 done
-rm -f "$cat_log"
+rm -f "$ext_log"
 
 # ── List everything installed into the single environment ──
 echo ""
@@ -152,7 +163,7 @@ if [ "${#BUILD_FAILED[@]}" -gt 0 ]; then
   status=1
 fi
 if [ "${#INSTALL_FAILED[@]}" -gt 0 ]; then
-  attempted=$(( ${#BUILT[@]} + ${#CATALOG_PKGS[@]} ))
+  attempted=$(( ${#BUILT[@]} + ${#EXTERNAL_PKGS[@]} ))
   echo "coexist FAILED: ${#INSTALL_FAILED[@]}/${attempted} packages could" \
        "not be installed into one environment:"
   printf '  - %s\n' "${INSTALL_FAILED[@]}"
