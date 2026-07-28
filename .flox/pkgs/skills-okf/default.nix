@@ -96,14 +96,27 @@ stdenv.mkDerivation {
         'uv run "''${CLAUDE_SKILL_DIR}/../validate/scripts/okf_validate.py"' \
         "$PY $out/libexec/okf/validate/okf_validate.py"
 
+    # The upstream "If uv is unavailable, fall back to: <duplicate uv-free
+    # command>" paragraph loses all meaning once the primary command above
+    # is already rewritten to the bundled interpreter — there is no
+    # fallback path left to describe, and leaving the sentence in place
+    # would ship two byte-identical command blocks with a connective
+    # sentence that no longer makes sense. Delete the sentence and its
+    # code block outright rather than rewrite it into a second copy.
     substituteInPlace "$PLUGIN_DIR/skills/validate/SKILL.md" \
       --replace-fail \
         'uv run "''${CLAUDE_SKILL_DIR}/scripts/okf_validate.py"' \
         "$PY $out/libexec/okf/validate/okf_validate.py" \
       --replace-fail \
-        'python3 -m pip install --quiet pyyaml && \
-python3 "''${CLAUDE_SKILL_DIR}/scripts/okf_validate.py"' \
-        "$PY $out/libexec/okf/validate/okf_validate.py" \
+        'If `uv` is unavailable, fall back to:
+
+```bash
+python3 -m pip install --quiet pyyaml && \
+python3 "''${CLAUDE_SKILL_DIR}/scripts/okf_validate.py" $ARGUMENTS
+```
+
+' \
+        "" \
       --replace-fail \
         '`''${CLAUDE_SKILL_DIR}` resolves whether this skill runs as part of the `okf`
 plugin or is installed standalone (e.g. via `npx skills add`), so the checker is
@@ -116,9 +129,15 @@ always found at that location regardless of how the skill is installed.'
         'uv run "''${CLAUDE_SKILL_DIR}/scripts/okf_visualize.py"' \
         "$PY $out/libexec/okf/visualize/okf_visualize.py" \
       --replace-fail \
-        'python3 -m pip install --quiet pyyaml && \
-python3 "''${CLAUDE_SKILL_DIR}/scripts/okf_visualize.py"' \
-        "$PY $out/libexec/okf/visualize/okf_visualize.py" \
+        'If `uv` is unavailable:
+
+```bash
+python3 -m pip install --quiet pyyaml && \
+python3 "''${CLAUDE_SKILL_DIR}/scripts/okf_visualize.py" $ARGUMENTS
+```
+
+' \
+        "" \
       --replace-fail \
         'Open it in any browser; `''${CLAUDE_SKILL_DIR}` resolves whether this runs as part
 of the `okf` plugin or as a standalone skills.sh skill.' \
