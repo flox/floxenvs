@@ -25,6 +25,11 @@ latest_version=$(curl -sf \
   "https://raw.githubusercontent.com/${REPO}/${latest_rev}/.claude-plugin/plugin.json" \
   | jq -r '.version')
 
+if [ -z "$latest_version" ] || [ "$latest_version" = "null" ]; then
+  echo "Failed to resolve version" >&2
+  exit 1
+fi
+
 echo "Current: $current_version ($current_rev)"
 echo "Latest:  $latest_version ($latest_rev)"
 
