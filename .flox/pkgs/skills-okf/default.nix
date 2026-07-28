@@ -114,6 +114,39 @@ stdenv.mkDerivation {
       chmod +x "$f"
     done < <(find "$out/libexec/okf" -type f -name '*.py')
 
+    # okf_init.py computes its own "how to validate this" hint from
+    # `parents[2]`, a path that only resolves correctly in upstream's
+    # scripts/<skill>/scripts/ layout. Under libexec the scripts are one
+    # level shallower, so the hint pointed at a nonexistent path and
+    # still told the user to run `uv run`. Repoint it at the real
+    # libexec path and the bundled interpreter.
+    substituteInPlace "$out/libexec/okf/okf/okf_init.py" \
+      --replace-fail \
+        'validator = Path(__file__).resolve().parents[2] / "validate" / "scripts" / "okf_validate.py"' \
+        'validator = Path("'"$out"'/libexec/okf/validate/okf_validate.py")' \
+      --replace-fail \
+        'print(f"hint: validate it — uv run {validator} {args.target} --strict (or the validate skill)")' \
+        'print(f"hint: validate it — ${pythonEnv}/bin/python3 {validator} {args.target} --strict (or the validate skill)")'
+
+    # Each script also carries an inert `Run: uv run scripts/...` line in
+    # its module docstring. It is never executed, but it would trip the
+    # widened PATH-dependent-invocation gate below, and a literal `uv
+    # run` hint is wrong regardless — these scripts run under the
+    # bundled interpreter, not uv. Rewrite each to describe how the
+    # script actually runs post-install (flat, no scripts/ subdir).
+    substituteInPlace "$out/libexec/okf/okf/okf_init.py" \
+      --replace-fail \
+        'Run:  uv run scripts/okf_init.py <target-dir> [--title "..."] [--force]' \
+        'Run:  python3 okf_init.py <target-dir> [--title "..."] [--force]'
+    substituteInPlace "$out/libexec/okf/validate/okf_validate.py" \
+      --replace-fail \
+        'Run:  uv run scripts/okf_validate.py <bundle-dir>' \
+        'Run:  python3 okf_validate.py <bundle-dir>'
+    substituteInPlace "$out/libexec/okf/visualize/okf_visualize.py" \
+      --replace-fail \
+        'Run:  uv run okf_visualize.py <bundle-dir> [-o viz.html]' \
+        'Run:  python3 okf_visualize.py <bundle-dir> [-o viz.html]'
+
     # Point every invocation at the bundled interpreter and the libexec
     # copy, by absolute store path. Upstream offers `uv run` with a
     # `pip install pyyaml` fallback; under flox neither uv nor a
@@ -198,6 +231,17 @@ regardless of how the skill is installed.'
         exit 1
       fi
     done < <(find "$out/share/flox" -name 'SKILL.md' -type f)
+
+    # Also gate the shipped scripts themselves, so a future upstream
+    # sync that reintroduces a uv/pip/CLAUDE_SKILL_DIR reference (in a
+    # docstring, a hint string, anything) fails the build instead of
+    # shipping quietly.
+    for f in "$out"/libexec/okf/*/*.py; do
+      if grep -nE 'uv run|pip install|CLAUDE_SKILL_DIR' "$f"; then
+        echo "skills-okf: $f still has a PATH-dependent invocation" >&2
+        exit 1
+      fi
+    done
     ${builtins.readFile ../../nix/flox-skill-check.sh}
     flox_skill_check "$out"
   '';
@@ -208,7 +252,10 @@ regardless of how the skill is installed.'
       + "maintain, validate, and visualize portable markdown knowledge "
       + "bundles, with Python and pyyaml bundled for the skill scripts.";
     homepage = "https://github.com/scaccogatto/okf-skills";
-    license = lib.licenses.mit;
+    license = [
+      lib.licenses.mit
+      lib.licenses.asl20
+    ];
     platforms = [
       "aarch64-darwin"
       "aarch64-linux"
