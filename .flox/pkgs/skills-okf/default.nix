@@ -30,6 +30,41 @@ stdenv.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
+  # The upstream unittest suite plus three smoke runs, all under the
+  # bundled interpreter — this is what proves the shipped scripts execute
+  # with the bundled pyyaml and nothing else.
+  #
+  # Skipped on x86_64-darwin: those builds run under Rosetta on the
+  # aarch64 CI runners, where emulated check phases have hung past the
+  # 1800s silence timeout in this repo. The other three systems cover it.
+  doCheck = stdenv.hostPlatform.system != "x86_64-darwin";
+
+  checkPhase = ''
+    runHook preCheck
+
+    ${pythonEnv}/bin/python3 tests/test_okf_validate.py
+
+    # validate: the vendored sample bundle must pass --strict.
+    ${pythonEnv}/bin/python3 skills/validate/scripts/okf_validate.py \
+      examples/sample-bundle --strict
+
+    # init + validate round trip: a freshly scaffolded bundle must be
+    # strict-conformant, which is upstream's own stated invariant.
+    scaffold="$TMPDIR/okf-scaffold"
+    ${pythonEnv}/bin/python3 skills/okf/scripts/okf_init.py "$scaffold" \
+      --title "check"
+    ${pythonEnv}/bin/python3 skills/validate/scripts/okf_validate.py \
+      "$scaffold" --strict
+
+    # visualize: must emit a non-empty self-contained HTML file.
+    # The flag is `-o/--out` (argparse, okf_visualize.py:409).
+    ${pythonEnv}/bin/python3 skills/visualize/scripts/okf_visualize.py \
+      examples/sample-bundle --out "$TMPDIR/viz.html"
+    test -s "$TMPDIR/viz.html"
+
+    runHook postCheck
+  '';
+
   installPhase = ''
     runHook preInstall
 
