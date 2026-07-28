@@ -56,6 +56,29 @@ stdenv.mkDerivation {
            "$PLUGIN_DIR/CHANGELOG.md" \
            "$PLUGIN_DIR/README.md"
 
+    # The scripts live ONCE at $out/libexec, outside $out/share, so
+    # flox_agent_layout never copies them: all four per-agent trees
+    # reference the same absolute path. Keeping them under skills/<s>/
+    # would produce four duplicates and force SKILL.md to name one
+    # arbitrary copy.
+    for skill in okf validate visualize; do
+      src_dir="$PLUGIN_DIR/skills/$skill/scripts"
+      [ -d "$src_dir" ] || { echo "missing $src_dir" >&2; exit 1; }
+      mkdir -p "$out/libexec/okf/$skill"
+      mv "$src_dir"/*.py "$out/libexec/okf/$skill/"
+      rmdir "$src_dir"
+    done
+
+    # Repoint the #!/usr/bin/env python3 shebangs at the bundled
+    # interpreter and mark the scripts executable, so direct invocation
+    # works without python3 on the caller's PATH.
+    while IFS= read -r f; do
+      head -1 "$f" | grep -q '/usr/bin/env python3' || continue
+      substituteInPlace "$f" --replace-fail \
+        '#!/usr/bin/env python3' "#!${pythonEnv}/bin/python3"
+      chmod +x "$f"
+    done < <(find "$out/libexec/okf" -type f -name '*.py')
+
     runHook postInstall
   '';
 
