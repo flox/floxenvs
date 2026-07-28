@@ -79,6 +79,52 @@ stdenv.mkDerivation {
       chmod +x "$f"
     done < <(find "$out/libexec/okf" -type f -name '*.py')
 
+    # Point every invocation at the bundled interpreter and the libexec
+    # copy, by absolute store path. Upstream offers `uv run` with a
+    # `pip install pyyaml` fallback; under flox neither uv nor a
+    # system python3 is guaranteed, and a runtime pip install into an
+    # immutable store is meaningless. --replace-fail so an upstream
+    # rewording breaks the build instead of silently shipping a
+    # uv-dependent skill.
+    PY="${pythonEnv}/bin/python3"
+
+    substituteInPlace "$PLUGIN_DIR/skills/okf/SKILL.md" \
+      --replace-fail \
+        'uv run "''${CLAUDE_SKILL_DIR}/scripts/okf_init.py"' \
+        "$PY $out/libexec/okf/okf/okf_init.py" \
+      --replace-fail \
+        'uv run "''${CLAUDE_SKILL_DIR}/../validate/scripts/okf_validate.py"' \
+        "$PY $out/libexec/okf/validate/okf_validate.py"
+
+    substituteInPlace "$PLUGIN_DIR/skills/validate/SKILL.md" \
+      --replace-fail \
+        'uv run "''${CLAUDE_SKILL_DIR}/scripts/okf_validate.py"' \
+        "$PY $out/libexec/okf/validate/okf_validate.py" \
+      --replace-fail \
+        'python3 -m pip install --quiet pyyaml && \
+python3 "''${CLAUDE_SKILL_DIR}/scripts/okf_validate.py"' \
+        "$PY $out/libexec/okf/validate/okf_validate.py" \
+      --replace-fail \
+        '`''${CLAUDE_SKILL_DIR}` resolves whether this skill runs as part of the `okf`
+plugin or is installed standalone (e.g. via `npx skills add`), so the checker is
+always found alongside the skill.' \
+        'The path above is fixed by this flox package build, so the checker is
+always found at that location regardless of how the skill is installed.'
+
+    substituteInPlace "$PLUGIN_DIR/skills/visualize/SKILL.md" \
+      --replace-fail \
+        'uv run "''${CLAUDE_SKILL_DIR}/scripts/okf_visualize.py"' \
+        "$PY $out/libexec/okf/visualize/okf_visualize.py" \
+      --replace-fail \
+        'python3 -m pip install --quiet pyyaml && \
+python3 "''${CLAUDE_SKILL_DIR}/scripts/okf_visualize.py"' \
+        "$PY $out/libexec/okf/visualize/okf_visualize.py" \
+      --replace-fail \
+        'Open it in any browser; `''${CLAUDE_SKILL_DIR}` resolves whether this runs as part
+of the `okf` plugin or as a standalone skills.sh skill.' \
+        'Open it in any browser; the path above is fixed by this flox package build
+regardless of how the skill is installed.'
+
     runHook postInstall
   '';
 
@@ -89,6 +135,15 @@ stdenv.mkDerivation {
   postInstall = ''
     ${builtins.readFile ../../nix/flox-agent-layout.sh}
     flox_agent_layout "okf" "$out/share"
+
+    # Gate the FINAL per-agent trees: every SKILL.md that ships must be
+    # free of PATH-dependent invocations.
+    while IFS= read -r f; do
+      if grep -nE 'uv run|pip install|CLAUDE_SKILL_DIR' "$f"; then
+        echo "skills-okf: $f still has a PATH-dependent invocation" >&2
+        exit 1
+      fi
+    done < <(find "$out/share/flox" -name 'SKILL.md' -type f)
     ${builtins.readFile ../../nix/flox-skill-check.sh}
     flox_skill_check "$out"
   '';
