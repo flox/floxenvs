@@ -405,7 +405,7 @@ jobs:
       - name: "Pull or Create remote environment"
         env:
           FLOX_REMOTE_OWNER: "${{ steps.org.outputs.owner }}"
-          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOXENVS_FLOXHUB_TOKEN }}"
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           ENV="${{ inputs.environment }}"
           pushd "./$ENV"
@@ -422,7 +422,7 @@ jobs:
       - name: "Rewrite include to use remote environments"
         env:
           FLOX_REMOTE_OWNER: "${{ steps.org.outputs.owner }}"
-          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOXENVS_FLOXHUB_TOKEN }}"
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           ENV="${{ inputs.environment }}"
           MANIFEST="$ENV/.flox/env/manifest.toml"
@@ -443,7 +443,7 @@ jobs:
       - name: "Sync to remote environment"
         env:
           FLOX_REMOTE_OWNER: "${{ steps.org.outputs.owner }}"
-          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOXENVS_FLOXHUB_TOKEN }}"
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           ENV="${{ inputs.environment }}"
           pushd "./$ENV"
@@ -453,7 +453,7 @@ jobs:
 
       - name: "Push to remote environment"
         env:
-          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOXENVS_FLOXHUB_TOKEN }}"
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           ENV="${{ inputs.environment }}"
           pushd "./$ENV"
@@ -516,7 +516,7 @@ jobs:
 
       - name: "Upgrade includes"
         env:
-          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOXENVS_FLOXHUB_TOKEN }}"
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           ENV="${{ inputs.environment }}"
           DEMO_DIR="$ENV-demo"
@@ -527,7 +527,7 @@ jobs:
       - name: "Pull or Create remote environment"
         env:
           FLOX_REMOTE_OWNER: "${{ steps.org.outputs.owner }}"
-          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOXENVS_FLOXHUB_TOKEN }}"
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           ENV="${{ inputs.environment }}"
           DEMO_DIR="$ENV-demo"
@@ -544,7 +544,7 @@ jobs:
 
       - name: "Sync to remote environment"
         env:
-          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOXENVS_FLOXHUB_TOKEN }}"
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           ENV="${{ inputs.environment }}"
           DEMO_DIR="$ENV-demo"
@@ -555,7 +555,7 @@ jobs:
 
       - name: "Push to remote environment"
         env:
-          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOXENVS_FLOXHUB_TOKEN }}"
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           ENV="${{ inputs.environment }}"
           DEMO_DIR="$ENV-demo"
