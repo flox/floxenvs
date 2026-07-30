@@ -212,7 +212,7 @@ jobs:
       - name: "Publish"
         if: ${{ needs.discover.outputs.is_publish == 'true' }}
         env:
-          FLOX_FLOXHUB_TOKEN: "${{ secrets.FLOX_FLOXHUB_TOKEN }}"
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOXENVS_FLOXHUB_TOKEN }}"
         run: |
           set -euo pipefail
           ORG="$(jq -r '.org // "flox"' ".flox/pkgs/${{ matrix.package }}/publish.json" 2>/dev/null || echo flox)"
@@ -264,7 +264,7 @@ jobs:
       - name: "Publish"
         if: ${{ needs.discover.outputs.is_publish == 'true' }}
         env:
-          FLOX_FLOXHUB_TOKEN: "${{ secrets.FLOX_FLOXHUB_TOKEN }}"
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOXENVS_FLOXHUB_TOKEN }}"
         run: |
           set -euo pipefail
           ORG="$(jq -r '.org // "flox"' ".flox/pkgs/${{ matrix.package }}/publish.json" 2>/dev/null || echo flox)"
@@ -316,7 +316,7 @@ jobs:
       - name: "Publish"
         if: ${{ needs.discover.outputs.is_publish == 'true' }}
         env:
-          FLOX_FLOXHUB_TOKEN: "${{ secrets.FLOX_FLOXHUB_TOKEN }}"
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOXENVS_FLOXHUB_TOKEN }}"
         run: |
           set -euo pipefail
           ORG="$(jq -r '.org // "flox"' ".flox/pkgs/${{ matrix.package }}/publish.json" 2>/dev/null || echo flox)"
@@ -369,7 +369,7 @@ jobs:
       - name: "Publish"
         if: ${{ needs.discover.outputs.is_publish == 'true' }}
         env:
-          FLOX_FLOXHUB_TOKEN: "${{ secrets.FLOX_FLOXHUB_TOKEN }}"
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOXENVS_FLOXHUB_TOKEN }}"
         run: |
           set -euo pipefail
           ORG="$(jq -r '.org // "flox"' ".flox/pkgs/${{ matrix.package }}/publish.json" 2>/dev/null || echo flox)"
@@ -569,6 +569,6 @@ jobs:
           aws-secret-access-key: "${{ secrets.MANAGED_CACHE_PRIVATE_R2_SECRET_ACCESS_KEY }}"
       - name: "Assert coexistence"
         env:
-          FLOX_FLOXHUB_TOKEN: "${{ secrets.FLOX_FLOXHUB_TOKEN }}"
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOXENVS_FLOXHUB_TOKEN }}"
         run: |
           bash scripts/coexist-check.sh
