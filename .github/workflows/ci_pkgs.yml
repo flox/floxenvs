@@ -72,7 +72,7 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
+        uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
         with:
           fetch-depth: 0
 
@@ -179,7 +179,7 @@ jobs:
         package: ${{ fromJSON(needs.discover.outputs.aarch64-darwin) }}
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
+        uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
         with:
           fetch-depth: 0
           filter: "blob:none"
@@ -231,7 +231,7 @@ jobs:
         package: ${{ fromJSON(needs.discover.outputs.aarch64-linux) }}
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
+        uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
         with:
           fetch-depth: 0
           filter: "blob:none"
@@ -283,7 +283,7 @@ jobs:
         package: ${{ fromJSON(needs.discover.outputs.x86_64-darwin) }}
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
+        uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
         with:
           fetch-depth: 0
           filter: "blob:none"
@@ -335,7 +335,7 @@ jobs:
         package: ${{ fromJSON(needs.discover.outputs.x86_64-linux) }}
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
+        uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
         with:
           fetch-depth: 0
           filter: "blob:none"
@@ -423,7 +423,7 @@ jobs:
         shell: "flox activate -d ${{ github.workspace }}/.website -- bash -e {0}"
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
+        uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
         with:
           fetch-depth: 0
       - name: "Install flox"
@@ -544,7 +544,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7.0.0
+        uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
       - name: "Install flox"
         uses: "flox/install-flox-action@3b80351ae97bbe063f264dc88fbd505507054963" # v2.5.3
       - name: "Setup Tailscale"
