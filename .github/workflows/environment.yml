@@ -391,10 +391,6 @@ jobs:
       - name: "Install flox"
         uses: "flox/install-flox-action@3b80351ae97bbe063f264dc88fbd505507054963" # v2.5.3
 
-      - name: "Get FloxHub token"
-        run: |
-          echo "FLOX_FLOXHUB_TOKEN=${{ secrets.FLOX_FLOXHUB_TOKEN }}" >> "$GITHUB_ENV"
-
       - name: "Determine target org"
         id: "org"
         run: |
@@ -409,6 +405,7 @@ jobs:
       - name: "Pull or Create remote environment"
         env:
           FLOX_REMOTE_OWNER: "${{ steps.org.outputs.owner }}"
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           ENV="${{ inputs.environment }}"
           pushd "./$ENV"
@@ -425,6 +422,7 @@ jobs:
       - name: "Rewrite include to use remote environments"
         env:
           FLOX_REMOTE_OWNER: "${{ steps.org.outputs.owner }}"
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           ENV="${{ inputs.environment }}"
           MANIFEST="$ENV/.flox/env/manifest.toml"
@@ -445,6 +443,7 @@ jobs:
       - name: "Sync to remote environment"
         env:
           FLOX_REMOTE_OWNER: "${{ steps.org.outputs.owner }}"
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           ENV="${{ inputs.environment }}"
           pushd "./$ENV"
@@ -453,6 +452,8 @@ jobs:
           popd
 
       - name: "Push to remote environment"
+        env:
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           ENV="${{ inputs.environment }}"
           pushd "./$ENV"
@@ -484,10 +485,6 @@ jobs:
       - name: "Install flox"
         uses: "flox/install-flox-action@3b80351ae97bbe063f264dc88fbd505507054963" # v2.5.3
 
-      - name: "Get FloxHub token"
-        run: |
-          echo "FLOX_FLOXHUB_TOKEN=${{ secrets.FLOX_FLOXHUB_TOKEN }}" >> "$GITHUB_ENV"
-
       - name: "Determine target org"
         id: "org"
         run: |
@@ -518,6 +515,8 @@ jobs:
           cat "$DEMO_DIR/.flox/env/manifest.toml"
 
       - name: "Upgrade includes"
+        env:
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           ENV="${{ inputs.environment }}"
           DEMO_DIR="$ENV-demo"
@@ -528,6 +527,7 @@ jobs:
       - name: "Pull or Create remote environment"
         env:
           FLOX_REMOTE_OWNER: "${{ steps.org.outputs.owner }}"
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           ENV="${{ inputs.environment }}"
           DEMO_DIR="$ENV-demo"
@@ -543,6 +543,8 @@ jobs:
           popd
 
       - name: "Sync to remote environment"
+        env:
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           ENV="${{ inputs.environment }}"
           DEMO_DIR="$ENV-demo"
@@ -552,6 +554,8 @@ jobs:
           popd
 
       - name: "Push to remote environment"
+        env:
+          FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           ENV="${{ inputs.environment }}"
           DEMO_DIR="$ENV-demo"
