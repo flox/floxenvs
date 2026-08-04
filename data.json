@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-04T20:13:54.062Z",
-  "commit": "b15f3b06ada54cc18fb440f5ed3004c7ca9f1ecf",
+  "generated_at": "2026-08-04T20:36:42.165Z",
+  "commit": "00dd677c4815a10b94080aca3c5914fd34f96a3e",
   "items": [
     {
       "id": "skills-agent-deck",
@@ -703,10 +703,10 @@
           "name": "earnings-reviewer",
           "dir": "/home/runner/work/floxenvs/floxenvs/result-skills-financial-services/share/flox/claude/earnings-reviewer"
         },
-        "overall": 36,
-        "status": "risk",
+        "overall": 62,
+        "status": "warn",
         "quality": {
-          "score": 30,
+          "score": 100,
           "checks": [
             {
               "id": "skill-tools",
@@ -737,7 +737,7 @@
           "note": ""
         },
         "security": {
-          "score": 90,
+          "score": 100,
           "cap": 100,
           "scanners": [],
           "findings": []
@@ -1277,7 +1277,58 @@
       "link": "https://github.com/flox/floxenvs/tree/main/.flox/pkgs/skills-okf",
       "installPkg": "flox/skills-okf",
       "license": "MIT AND Apache-2.0",
-      "audit": null
+      "audit": {
+        "identity": {
+          "kind": "skill",
+          "name": "okf",
+          "dir": "/home/runner/work/floxenvs/floxenvs/result-skills-okf/share/flox/claude/okf"
+        },
+        "overall": 58,
+        "status": "risk",
+        "quality": {
+          "score": 100,
+          "checks": [
+            {
+              "id": "skill-tools",
+              "pass": false,
+              "weight": 40,
+              "note": "skill-tools failed to run"
+            },
+            {
+              "id": "skill-validator",
+              "pass": false,
+              "weight": 30,
+              "note": "skill-validator failed to run"
+            },
+            {
+              "id": "claudelint",
+              "pass": true,
+              "weight": 30,
+              "note": "100"
+            }
+          ]
+        },
+        "reliability": {
+          "ci_green_streak_days": 0,
+          "last_test_at": "",
+          "lockfile_fresh": false,
+          "test_duration_s": 0,
+          "score": 0,
+          "note": ""
+        },
+        "security": {
+          "score": 80,
+          "cap": 75,
+          "scanners": [],
+          "findings": []
+        },
+        "impact": {
+          "pass": 0,
+          "total": 0,
+          "score": 70,
+          "cases": []
+        }
+      }
     },
     {
       "id": "skills-playwright-cli",
