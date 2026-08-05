@@ -100,17 +100,14 @@ buildNpmPackage (finalAttrs: {
     # "No matching version found for <pkg>@<pinned>". Realign each package.json
     # pin to the version that is actually locked. The lockfile itself is left
     # untouched so the npmDeps consistency check and npmDepsHash stay valid.
+    # (vitest realignment dropped in 0.53.1: the root lock now resolves
+    # 3.2.4, matching every workspace's pin — rewriting it to 3.1.1 made
+    # `npm ci` fail with "Missing: vitest@3.1.1 from lock file".)
     substituteInPlace packages/cli/package.json \
       --replace-quiet '"tar": "7.5.8"' '"tar": "7.5.11"' \
-      --replace-quiet '"clipboardy": "5.2.0"' '"clipboardy": "5.2.1"' \
-      --replace-quiet '"vitest": "3.2.4"' '"vitest": "3.1.1"'
+      --replace-quiet '"clipboardy": "5.2.0"' '"clipboardy": "5.2.1"'
     substituteInPlace packages/a2a-server/package.json \
-      --replace-quiet '"tar": "7.5.8"' '"tar": "7.5.11"' \
-      --replace-quiet '"vitest": "3.2.4"' '"vitest": "3.1.1"'
-    substituteInPlace packages/core/package.json \
-      --replace-quiet '"vitest": "3.2.4"' '"vitest": "3.1.1"'
-    substituteInPlace packages/sdk/package.json \
-      --replace-quiet '"vitest": "3.2.4"' '"vitest": "3.1.1"'
+      --replace-quiet '"tar": "7.5.8"' '"tar": "7.5.11"'
     substituteInPlace packages/vscode-ide-companion/package.json \
       --replace-quiet '"typescript": "5.8.3"' '"typescript": "5.9.3"'
 
