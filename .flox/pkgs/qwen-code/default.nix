@@ -98,6 +98,8 @@ buildNpmPackage (finalAttrs: {
       packages/channels/dingtalk \
       packages/channels/wecom \
       packages/channels/feishu \
+      packages/channels/github \
+      packages/channels/gitlab \
       packages/channels/qqbot \
       packages/acp-bridge
     do
