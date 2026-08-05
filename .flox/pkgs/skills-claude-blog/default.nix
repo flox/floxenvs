@@ -85,6 +85,8 @@ stdenv.mkDerivation {
            "$PLUGIN_DIR/install.ps1" \
            "$PLUGIN_DIR/uninstall.sh" \
            "$PLUGIN_DIR/uninstall.ps1" \
+           "$PLUGIN_DIR/brain/install.sh" \
+           "$PLUGIN_DIR/brain/uninstall.sh" \
            "$PLUGIN_DIR/tests"
 
     # Repoint every #!/usr/bin/env python3 shebang at the wrapped
