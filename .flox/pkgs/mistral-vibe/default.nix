@@ -286,6 +286,7 @@ python.pkgs.buildPythonApplication {
     "sentry-sdk"
     "smmap"
     "sounddevice"
+    "soupsieve"
     "sse-starlette"
     "starlette"
     "textual"
