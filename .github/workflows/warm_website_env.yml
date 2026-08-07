@@ -1,0 +1,85 @@
+name: "Warm .website env cache"
+
+# Pre-warms the x86_64-linux closure of the .website flox env into a
+# local file:// binary cache stored in the Actions cache. The per-PR
+# "Audit fragment content" step in ci_pkgs.yml restores this cache and
+# substitutes from it, so the nightly floxbot PR wave (~40 parallel
+# runs) no longer hammers the catalog/R2 cache with simultaneous
+# `flox activate -d .website` activations — the exact overload that
+# made activations stall silently until the 90-minute job timeout.
+#
+# Runs on main so the produced Actions cache entry is visible to every
+# PR branch (caches created on PR branches are branch-scoped, caches
+# created on the default branch are shared).
+
+on:
+  schedule:
+    # 01:00 UTC — before the nightly floxbot upgrade wave (~01:45 UTC).
+    - cron: "0 1 * * *"
+  push:
+    branches: ["main"]
+    paths:
+      - ".website/.flox/**"
+      - ".github/workflows/warm_website_env.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: "read"
+
+env:
+  FLOX_DISABLE_METRICS: "true"
+  NIX_CONFIG: "fallback = true"
+
+jobs:
+  warm:
+    name: "Warm .website env (x86_64-linux)"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 45
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
+      - name: "Look up existing cache"
+        id: "cache"
+        uses: "actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9" # v6.1.0
+        with:
+          path: "_website_nix_cache"
+          key: "website-env-x86_64-linux-${{ hashFiles('.website/.flox/env/manifest.lock') }}"
+      - name: "Install flox"
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        uses: "flox/install-flox-action@3b80351ae97bbe063f264dc88fbd505507054963" # v2.5.3
+      - name: "Setup Tailscale"
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        uses: "tailscale/github-action@780049a30b6ff5c378a9e7b389d15ece7a204888" # v4.1.3
+        with:
+          oauth-secret: "${{ secrets.MANAGED_TAILSCALE_AUTH_KEY }}"
+          tags: "tag:ci"
+          timeout: "30s"
+          use-cache: true
+      - name: "Configure Nix remote builders + private cache"
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        uses: "flox/configure-nix-action@28a4eb7f63bf54c91670b4a698f0a9ebfb95384f" # main
+        with:
+          ssh-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
+          remote-builders: "${{ vars.MANAGED_REMOTE_BUILDERS }}"
+          substituter: "${{ vars.MANAGED_CACHE_PRIVATE_R2_BUCKET }}"
+          substituter-key: "${{ secrets.MANAGED_CACHE_PRIVATE_SECRET_KEY }}"
+          aws-access-key-id: "${{ secrets.MANAGED_CACHE_PRIVATE_R2_ACCESS_KEY_ID }}"
+          aws-secret-access-key: "${{ secrets.MANAGED_CACHE_PRIVATE_R2_SECRET_ACCESS_KEY }}"
+      - name: "Realize and export the .website env closure"
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        run: |
+          set -euo pipefail
+          # Activation realizes every store path of the env for this
+          # system (locked manifest — no resolution, only substitution).
+          flox activate -d .website -- true
+          # The rendered env lives behind .flox/run/<system>.<name>.<mode>;
+          # `nix copy` exports its full closure into a local file://
+          # binary cache, signed with the same key as the private R2
+          # cache so consumer jobs (which already trust that key via
+          # configure-nix-action) accept the paths.
+          run_link="$(readlink -f .website/.flox/run/x86_64-linux.*)"
+          echo "env store path: $run_link"
+          nix --extra-experimental-features nix-command \
+            copy --to "file://$PWD/_website_nix_cache?secret-key=/tmp/secret-key&compression=zstd" \
+            "$run_link"
+          du -sh _website_nix_cache

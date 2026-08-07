@@ -377,8 +377,45 @@ jobs:
       # Audit only skills-* packages (the Claude Code skill/plugin
       # fragments) — gated here at the step level since matrix.package is
       # known. Everything else is built/published, not audited.
+      #
+      # The audit shell activates the .website env; during the nightly
+      # floxbot PR wave dozens of runs used to do that activation against
+      # the catalog/R2 cache simultaneously, some stalled on substitution
+      # and nix silently fell back to building the env from source on the
+      # 2-core runner until the 90-minute job timeout. Restore the
+      # pre-warmed closure (warm_website_env.yml, nightly on main) into a
+      # local file:// binary cache and substitute from it instead.
+      - name: "Restore pre-warmed .website env cache"
+        id: "website-cache"
+        if: ${{ startsWith(matrix.package, 'skills-') }}
+        uses: "actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9" # v6.1.0
+        with:
+          path: "_website_nix_cache"
+          key: "website-env-x86_64-linux-${{ hashFiles('.website/.flox/env/manifest.lock') }}"
+      - name: "Seed empty .website env cache on restore miss"
+        if: ${{ startsWith(matrix.package, 'skills-') && steps.website-cache.outputs.cache-hit != 'true' }}
+        # A valid-but-empty local binary cache keeps the
+        # extra-substituters entry harmless when the warm cache is
+        # missing (first run after a lockfile bump): nix just finds no
+        # paths there and falls through to the normal substituters.
+        run: |
+          set -euo pipefail
+          mkdir -p _website_nix_cache
+          echo "StoreDir: /nix/store" > _website_nix_cache/nix-cache-info
       - name: "Audit fragment content"
         if: ${{ startsWith(matrix.package, 'skills-') }}
+        # Fail fast instead of stalling to the 90-minute job timeout when
+        # the env still cannot be substituted — reruns are cheap, silent
+        # 90-minute hangs are not.
+        timeout-minutes: 20
+        env:
+          # Overrides the workflow-level NIX_CONFIG for this step, so
+          # repeat `fallback = true` here. The file:// cache is signed
+          # with the same key as the private R2 cache, which
+          # configure-nix-action already trusts.
+          NIX_CONFIG: |
+            fallback = true
+            extra-substituters = file://${{ github.workspace }}/_website_nix_cache
         # Fragments are content-audited from the build above; run-audit.sh
         # reuses result-<pkg> and runs the flox-ai audit engine. The
         # flox-ai + skill-audit tools live in the .website env (NOT the
