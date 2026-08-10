@@ -1314,7 +1314,13 @@
           "hook": {
             "on-activate": "HF_HOME=\"$FLOX_ENV_CACHE/huggingface\"\nexport HF_HOME\nmkdir -p \"$HF_HOME\"\n\nsana_dir=\"$FLOX_ENV_CACHE/sana\"\nsana_bin=\"$sana_dir/bin\"\nmkdir -p \"$sana_bin\"\nexport SANA_DATA_DIR=\"$sana_dir\"\nexport PATH=\"$sana_bin:$PATH\"\n\n# _sana_device.py: shared device/dtype selector.\ncat > \"$sana_bin/_sana_device.py\" <<'PYEOF'\n\"\"\"Device selection helper for SANA scripts.\"\"\"\ndef best_device():\n    import os, torch\n    if os.environ.get(\"SANA_FORCE_CPU\") == \"1\":\n        return \"cpu\", torch.float32\n    if torch.cuda.is_available():\n        return \"cuda\", torch.bfloat16\n    if torch.backends.mps.is_available():\n        return \"mps\", torch.bfloat16\n    return \"cpu\", torch.float32\nPYEOF\n\n# sana-pull: download a SANA model into HF_HOME.\ncat > \"$sana_bin/sana-pull\" <<'SHEOF'\n#!/usr/bin/env bash\nset -eo pipefail\n\nCURATED=(\n  \"Efficient-Large-Model/Sana_600M_1024px_diffusers\"\n  \"Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers\"\n  \"Efficient-Large-Model/Sana_1600M_2Kpx_BF16_diffusers\"\n  \"Efficient-Large-Model/Sana_1600M_4Kpx_BF16_diffusers\"\n)\nDEFAULT=\"${SANA_DEFAULT_MODEL:-Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers}\"\n\nusage() {\n  cat <<EOF\nsana-pull — download a SANA model into HF_HOME\n\nUsage:\n  sana-pull                # pull the default model\n  sana-pull <model-id>     # pull a specific model\n  sana-pull --list         # print curated model IDs\n  sana-pull --help         # show this message\n\nDefault model: $DEFAULT\n\nCurated models:\n$(printf '  - %s\\n' \"${CURATED[@]}\")\nEOF\n}\n\ncase \"${1:-}\" in\n  \"\"|--default)\n    exec hf download \"$DEFAULT\"\n    ;;\n  --list)\n    printf '%s\\n' \"${CURATED[@]}\"\n    ;;\n  -h|--help)\n    usage\n    ;;\n  -*)\n    echo \"sana-pull: unknown flag: $1\" >&2\n    usage >&2\n    exit 1\n    ;;\n  *)\n    exec hf download \"$1\"\n    ;;\nesac\nSHEOF\nchmod +x \"$sana_bin/sana-pull\"\n\n# sana-generate: text-to-image via SANA diffusers pipeline.\ncat > \"$sana_bin/sana-generate\" <<'PYEOF'\n#!/usr/bin/env python3\n\"\"\"sana-generate: text-to-image via SANA diffusers pipeline.\"\"\"\nimport argparse\nimport os\nimport sys\nimport time\nfrom pathlib import Path\n\n_HERE = Path(__file__).resolve().parent\nsys.path.insert(0, str(_HERE))\nfrom _sana_device import best_device  # noqa: E402\n\nDEFAULT_MODEL = os.environ.get(\n    \"SANA_DEFAULT_MODEL\",\n    \"Efficient-Large-Model/SANA1.5_1.6B_1024px_diffusers\",\n)\n\n\ndef parse_args():\n    p = argparse.ArgumentParser(\n        prog=\"sana-generate\",\n        description=(\n            \"Generate an image with NVIDIA SANA via \"\n            \"HuggingFace diffusers.\"\n        ),\n    )\n    p.add_argument(\"prompt\", help=\"text prompt\")\n    p.add_argument(\n        \"--model\",\n        default=DEFAULT_MODEL,\n        help=f\"HuggingFace model ID (default: {DEFAULT_MODEL})\",\n    )\n    p.add_argument(\n        \"--output\",\n        \"-o\",\n        default=None,\n        help=\"output path (default: sana-<unixtime>.png)\",\n    )\n    p.add_argument(\"--width\", type=int, default=1024)\n    p.add_argument(\"--height\", type=int, default=1024)\n    p.add_argument(\n        \"--steps\",\n        type=int,\n        default=20,\n        help=\"number of inference steps\",\n    )\n    p.add_argument(\n        \"--guidance\",\n        type=float,\n        default=4.5,\n        help=\"classifier-free guidance scale\",\n    )\n    p.add_argument(\n        \"--seed\",\n        type=int,\n        default=None,\n        help=\"random seed (default: unseeded)\",\n    )\n    return p.parse_args()\n\n\ndef main():\n    args = parse_args()\n    import torch\n    from diffusers import SanaPipeline\n\n    device, dtype = best_device()\n    if device == \"cpu\":\n        print(\n            \"[sana-generate] WARNING: no GPU detected. \"\n            \"CPU inference will take minutes per image.\",\n            file=sys.stderr,\n        )\n\n    print(\n        f\"[sana-generate] loading {args.model} \"\n        f\"on {device} ({dtype})\",\n        file=sys.stderr,\n    )\n    pipe = SanaPipeline.from_pretrained(\n        args.model, torch_dtype=dtype,\n    )\n    pipe.to(device)\n    pipe.vae.to(dtype)\n    pipe.text_encoder.to(dtype)\n\n    if device == \"cuda\":\n        try:\n            pipe.enable_xformers_memory_efficient_attention()\n        except (ImportError, ModuleNotFoundError):\n            pass\n\n    generator = None\n    if args.seed is not None:\n        generator = torch.Generator(\n            device=device,\n        ).manual_seed(args.seed)\n\n    print(\n        f\"[sana-generate] generating {args.width}x{args.height}, \"\n        f\"steps={args.steps}, guidance={args.guidance}\",\n        file=sys.stderr,\n    )\n    image = pipe(\n        prompt=args.prompt,\n        height=args.height,\n        width=args.width,\n        guidance_scale=args.guidance,\n        num_inference_steps=args.steps,\n        generator=generator,\n    ).images[0]\n\n    output = args.output or f\"sana-{int(time.time())}.png\"\n    image.save(output)\n    print(output)\n\n\nif __name__ == \"__main__\":\n    try:\n        main()\n    except KeyboardInterrupt:\n        sys.exit(130)\n    except SystemExit:\n        raise\n    except Exception as exc:\n        print(\n            f\"[sana-generate] error: {exc}\",\n            file=sys.stderr,\n        )\n        sys.exit(2)\nPYEOF\nchmod +x \"$sana_bin/sana-generate\"\n"
           },
-          "options": {}
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          }
         },
         "name": "sana",
         "descriptor": {
@@ -1322,6 +1328,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

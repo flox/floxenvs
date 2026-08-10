@@ -550,7 +550,13 @@
               "pkg-group": "langchain"
             }
           },
-          "options": {},
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          },
           "services": {
             "ollama": {
               "command": "ollama serve"
@@ -563,6 +569,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

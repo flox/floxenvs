@@ -257,7 +257,13 @@
           "hook": {
             "on-activate": "HF_HOME=\"$FLOX_ENV_CACHE/huggingface\"\nexport HF_HOME\nmkdir -p \"$HF_HOME\"\n"
           },
-          "options": {}
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          }
         },
         "name": "huggingface",
         "descriptor": {
@@ -265,6 +271,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

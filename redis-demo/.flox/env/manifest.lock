@@ -258,7 +258,13 @@
           "hook": {
             "on-activate": "export REDIS_DATA=\"$FLOX_ENV_CACHE/redis\"\n\nif [ ! -d \"$REDIS_DATA\" ]; then\n  mkdir -p \"$REDIS_DATA\"\nfi\n"
           },
-          "options": {},
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          },
           "services": {
             "redis": {
               "command": "  REDIS_DATA=\"$FLOX_ENV_CACHE/redis\"\n  mkdir -p \"$REDIS_DATA\"\n  exec redis-server \\\n    --bind \"$REDIS_HOST\" \\\n    --port \"$REDIS_PORT\" \\\n    --dir \"$REDIS_DATA\" \\\n    --daemonize no\n"
@@ -271,6 +277,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

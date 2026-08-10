@@ -563,7 +563,13 @@
             "bash": "source \"$FLOX_ENV/libexec/sfw-shims/activate.bash\"\n",
             "zsh": "source \"$FLOX_ENV/libexec/sfw-shims/activate.zsh\"\n"
           },
-          "options": {}
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          }
         },
         "name": "sfw",
         "descriptor": {
@@ -571,6 +577,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

@@ -363,7 +363,13 @@
           "hook": {
             "on-activate": "export CAROOT=\"$FLOX_ENV_CACHE/mkcert\"\nexport NODE_EXTRA_CA_CERTS=\"$CAROOT/rootCA.pem\"\nmkdir -p \"$CAROOT\"\n\n# Create local CA if it doesn't exist\nif [ ! -f \"$CAROOT/rootCA.pem\" ]; then\n  mkcert -install\nfi\n\n# Generate domain certificates if domains changed\nDOMAINS_HASH=\"$CAROOT/domains\"\nif [ ! -f \"$DOMAINS_HASH\" ] \\\n    || [ \"$(cat \"$DOMAINS_HASH\")\" \\\n         != \"$MKCERT_DOMAINS\" ]; then\n  echo \"$MKCERT_DOMAINS\" > \"$DOMAINS_HASH\"\n  pushd \"$CAROOT\" >/dev/null\n  mkcert \\\n    -cert-file=domains.pem \\\n    -key-file=domains-key.pem \\\n    -p12-file=domains.p12 \\\n    $(echo $MKCERT_DOMAINS)\n  popd >/dev/null\nfi\n"
           },
-          "options": {}
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          }
         },
         "name": "mkcert",
         "descriptor": {
@@ -371,6 +377,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

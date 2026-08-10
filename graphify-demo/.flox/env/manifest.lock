@@ -1349,7 +1349,13 @@
             "fish": "source \"$PYTHON_DIR/bin/activate.fish\"\n",
             "tcsh": "source \"$PYTHON_DIR/bin/activate.csh\"\n"
           },
-          "options": {},
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          },
           "services": {
             "graphify-mcp": {
               "command": "PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\nsource \"$PYTHON_DIR/bin/activate\"\nroot=\"${GRAPHIFY_PROJECT_ROOT:-$FLOX_ENV_PROJECT}\"\ngraph=\"$root/graphify-out/graph.json\"\nuntil [ -f \"$graph\" ]; do\n  echo \"waiting for $graph (run graphify-watch first) ...\"\n  sleep 2\ndone\nexec python -m graphify.serve \"$graph\"\n"
@@ -1371,6 +1377,15 @@
           "Overriding": [
             "install",
             "flox-ai"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      },
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
           ]
         },
         "higher_priority_name": "Current manifest"

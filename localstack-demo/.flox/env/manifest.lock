@@ -587,7 +587,13 @@
             "fish": "source \"$PYTHON_DIR/bin/activate.fish\"\n",
             "tcsh": "source \"$PYTHON_DIR/bin/activate.csh\"\n"
           },
-          "options": {},
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          },
           "services": {
             "localstack": {
               "command": "docker rm -f localstack-main 2>/dev/null; localstack start -d",
@@ -604,6 +610,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

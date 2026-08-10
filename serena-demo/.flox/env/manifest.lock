@@ -361,7 +361,13 @@
           "hook": {
             "on-activate": "dir=\"$FLOX_ENV_CACHE/serena\"\nexport SERENA_DATA_DIR=\"$dir\"\nmkdir -p \"$dir\"\n"
           },
-          "options": {},
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          },
           "services": {
             "serena-mcp": {
               "command": "dir=\"${SERENA_DATA_DIR:-$FLOX_ENV_CACHE/serena}\"\nmkdir -p \"$dir\"\nexec serena start-mcp-server \\\n  --transport \"$SERENA_TRANSPORT\" \\\n  --host \"$SERENA_MCP_HOST\" \\\n  --port \"$SERENA_MCP_PORT\"\n"
@@ -374,6 +380,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

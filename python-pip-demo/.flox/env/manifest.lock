@@ -269,7 +269,13 @@
             "fish": "source \"$FLOX_ENV_CACHE/python-pip/venv/bin/activate.fish\"\n",
             "tcsh": "source \"$FLOX_ENV_CACHE/python-pip/venv/bin/activate.csh\"\n"
           },
-          "options": {}
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          }
         },
         "name": "python-pip",
         "descriptor": {
@@ -277,6 +283,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

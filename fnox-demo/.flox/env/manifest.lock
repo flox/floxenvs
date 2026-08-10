@@ -352,7 +352,13 @@
           "hook": {
             "on-activate": "# Per-environment data path; used by fnox to cache lease state,\n# session tokens, and resolved secrets.\nexport FNOX_DATA_DIR=\"$FLOX_ENV_CACHE/fnox\"\nmkdir -p \"$FNOX_DATA_DIR\"\n"
           },
-          "options": {}
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          }
         },
         "name": "fnox",
         "descriptor": {
@@ -360,6 +366,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

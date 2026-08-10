@@ -556,7 +556,13 @@
             "zsh": "eval \"$(flox-ai setup-profile-zsh)\"\n",
             "fish": "flox-ai setup-profile-fish | source\n"
           },
-          "options": {}
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          }
         },
         "name": "remotion",
         "descriptor": {
@@ -564,6 +570,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

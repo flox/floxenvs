@@ -151,7 +151,13 @@
           "hook": {
             "on-activate": "if [ -f \"$DOTENV_FILE\" ]; then\n  set -o allexport\n  source \"$DOTENV_FILE\"\n  set +o allexport\nfi\n"
           },
-          "options": {}
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          }
         },
         "name": "dotenv",
         "descriptor": {
@@ -159,6 +165,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

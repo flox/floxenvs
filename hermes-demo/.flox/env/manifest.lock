@@ -704,7 +704,13 @@
           "hook": {
             "on-activate": "HERMES_HOME=\"$FLOX_ENV_CACHE/hermes\"\nexport HERMES_HOME\nmkdir -p \"$HERMES_HOME\"\n\n# Lazy-install backends (anthropic, exa, faster-whisper, ...)\n# would try to `pip install` into the read-only Nix venv and\n# fail. Seed the user config to disable them so the user\n# gets clean FeatureUnavailable errors instead of pip\n# tracebacks.\nconfig=\"$HERMES_HOME/config.yaml\"\nif [ ! -f \"$config\" ]; then\n  printf 'security:\\n  allow_lazy_installs: false\\n' \\\n    > \"$config\"\nfi\n"
           },
-          "options": {}
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          }
         },
         "name": "hermes",
         "descriptor": {
@@ -712,6 +718,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

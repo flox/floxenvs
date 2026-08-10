@@ -573,7 +573,13 @@
             "zsh": "eval \"$(flox-ai setup-profile-zsh)\"\n",
             "fish": "flox-ai setup-profile-fish | source\n"
           },
-          "options": {},
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          },
           "services": {
             "agentmemory": {
               "command": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\nexport XDG_DATA_HOME=\"$AGENTMEMORY_CACHE/data\"\nmkdir -p \"$npm_config_cache\" \"$XDG_DATA_HOME\"\nexec npx -y \"@agentmemory/agentmemory@$AGENTMEMORY_VERSION\"\n"
@@ -586,6 +592,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

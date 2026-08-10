@@ -872,7 +872,13 @@
           "hook": {
             "on-activate": "dir=\"$FLOX_ENV_CACHE/playwright\"\nexport PLAYWRIGHT_DATA_DIR=\"$dir\"\nexport PLAYWRIGHT_BROWSERS_PATH=\"${PLAYWRIGHT_BROWSERS_PATH:-$dir/browsers}\"\nmkdir -p \"$PLAYWRIGHT_BROWSERS_PATH\"\n"
           },
-          "options": {},
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          },
           "services": {
             "playwright-mcp": {
               "command": "dir=\"${PLAYWRIGHT_DATA_DIR:-$FLOX_ENV_CACHE/playwright}\"\nexport PLAYWRIGHT_BROWSERS_PATH=\"${PLAYWRIGHT_BROWSERS_PATH:-$dir/browsers}\"\nmkdir -p \"$PLAYWRIGHT_BROWSERS_PATH\"\nexec playwright-mcp \\\n  --host \"$PLAYWRIGHT_MCP_HOST\" \\\n  --port \"$PLAYWRIGHT_MCP_PORT\" \\\n  --browser chromium\n"
@@ -885,6 +891,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

@@ -356,7 +356,13 @@
           "hook": {
             "on-activate": "export MONGO_DATA=\"$FLOX_ENV_CACHE/mongodb\"\n\nif [ ! -d \"$MONGO_DATA\" ]; then\n  mkdir -m 0700 -p \"$MONGO_DATA\"\nfi\n"
           },
-          "options": {},
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          },
           "services": {
             "mongodb": {
               "command": "  MONGO_DATA=\"$FLOX_ENV_CACHE/mongodb\"\n  exec mongod --dbpath \"$MONGO_DATA\" \\\n    --bind_ip \"$MONGO_HOST\" --port \"$MONGO_PORT\"\n"
@@ -369,6 +375,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

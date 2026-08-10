@@ -459,7 +459,13 @@
           "hook": {
             "on-activate": "export WORKTRUNK_CACHE=\"$FLOX_ENV_CACHE/worktrunk\"\nmkdir -p \"$WORKTRUNK_CACHE\"\n"
           },
-          "options": {}
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          }
         },
         "name": "worktrunk",
         "descriptor": {
@@ -467,6 +473,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

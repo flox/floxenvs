@@ -256,7 +256,13 @@
           "hook": {
             "on-activate": "export DENO_CACHE=\"$FLOX_ENV_CACHE/javascript-deno\"\nmkdir -p \"$DENO_CACHE\"\n\nif [ \"$DENO_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f deno.json ] \\\n    && [ -f deno.lock ]; then\n  HASH=$(cat deno.json deno.lock \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$DENO_CACHE/packages-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    deno install\n    echo \"$HASH\" > \"$DENO_CACHE/packages-hash\"\n  fi\nfi\n"
           },
-          "options": {}
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          }
         },
         "name": "javascript-deno",
         "descriptor": {
@@ -264,6 +270,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

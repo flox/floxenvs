@@ -258,7 +258,13 @@
           "hook": {
             "on-activate": "export VALKEY_DATA=\"$FLOX_ENV_CACHE/valkey\"\n\nif [ ! -d \"$VALKEY_DATA\" ]; then\n  mkdir -p \"$VALKEY_DATA\"\nfi\n"
           },
-          "options": {},
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          },
           "services": {
             "valkey": {
               "command": "  VALKEY_DATA=\"$FLOX_ENV_CACHE/valkey\"\n  mkdir -p \"$VALKEY_DATA\"\n  exec valkey-server \\\n    --bind \"$VALKEY_HOST\" \\\n    --port \"$VALKEY_PORT\" \\\n    --dir \"$VALKEY_DATA\" \\\n    --daemonize no\n"
@@ -271,6 +277,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

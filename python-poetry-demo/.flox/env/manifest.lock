@@ -365,7 +365,13 @@
             "fish": "if test -f pyproject.toml\n  set POETRY_VENV (poetry env info --path 2>/dev/null)\n  if test -n \"$POETRY_VENV\"\n    source \"$POETRY_VENV/bin/activate.fish\"\n  end\nend\n",
             "tcsh": "if ( -f pyproject.toml ) then\n  set POETRY_VENV=`poetry env info --path`\n  source \"$POETRY_VENV/bin/activate.csh\"\nendif\n"
           },
-          "options": {}
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          }
         },
         "name": "python-poetry",
         "descriptor": {
@@ -373,6 +379,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }
