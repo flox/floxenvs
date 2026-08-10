@@ -4,7 +4,6 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HASHES_FILE="$SCRIPT_DIR/hashes.json"
-PYPROJECT_FILE="$SCRIPT_DIR/pyproject.toml"
 
 current_tag=$(jq -r '.tag // empty' "$HASHES_FILE")
 latest_tag=$(curl -sfL \
@@ -25,23 +24,23 @@ fi
 
 echo "Updating hermes-agent to $latest_tag"
 
-# Bump tag in pyproject.toml (matches `tag = "vX.Y.Z"` under
-# [tool.uv.sources])
-sed -i.bak \
-  -E "s|tag = \"[^\"]+\"|tag = \"$latest_tag\"|" \
-  "$PYPROJECT_FILE"
-rm -f "$PYPROJECT_FILE.bak"
+# The package builds via upstream's own nix/python.nix, so an upgrade
+# is just the source pin: tag + hash of the unpacked tree. The flake
+# prefetch narHash is the same SRI value fetchFromGitHub expects.
+src_hash=$(nix --extra-experimental-features 'nix-command flakes' \
+  flake prefetch --json "github:NousResearch/hermes-agent/$latest_tag" \
+  | jq -r '.hash')
 
-# Regenerate uv.lock
-pushd "$SCRIPT_DIR" > /dev/null
-uv lock --upgrade-package hermes-agent
-popd > /dev/null
+if [ -z "$src_hash" ] || [ "$src_hash" = "null" ]; then
+  echo "ERROR: failed to prefetch source hash for $latest_tag" >&2
+  exit 1
+fi
 
-# Update hashes.json
 latest_version="${latest_tag#v}"
 jq -n \
   --arg v "$latest_version" \
   --arg t "$latest_tag" \
-  '{version: $v, tag: $t}' > "$HASHES_FILE"
+  --arg h "$src_hash" \
+  '{version: $v, tag: $t, srcHash: $h}' > "$HASHES_FILE"
 
 echo "Updated to $latest_tag"

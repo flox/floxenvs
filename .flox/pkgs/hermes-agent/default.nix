@@ -1,6 +1,6 @@
 {
   lib,
-  python313,
+  fetchFromGitHub,
   callPackage,
 }:
 
@@ -30,63 +30,43 @@ let
       pyproject-nix = pyproject-nix-lib;
     };
 
-  workspace = uv2nix-module.lib.workspace.loadWorkspace {
-    workspaceRoot = ./.;
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
+  inherit (versionData) version tag srcHash;
+
+  src = fetchFromGitHub {
+    owner = "NousResearch";
+    repo = "hermes-agent";
+    inherit tag;
+    hash = srcHash;
   };
 
-  overlay = workspace.mkPyprojectOverlay {
-    sourcePreference = "wheel";
-  };
-
-  # Per-package overrides for sdist builds whose build-system
-  # declaration uv2nix's default overlay doesn't fully resolve.
-  # Discovered iteratively in Task 4 — start empty.
-  pyprojectOverrides = final: prev:
-    let
-      addSetuptools = pkg:
-        pkg.overrideAttrs (old: {
-          nativeBuildInputs = (old.nativeBuildInputs or [ ])
-            ++ final.resolveBuildSystem { setuptools = [ ]; };
-        });
-      addHatchling = pkg:
-        pkg.overrideAttrs (old: {
-          nativeBuildInputs = (old.nativeBuildInputs or [ ])
-            ++ final.resolveBuildSystem { hatchling = [ ]; };
-        });
-    in
-    {
-      # Git-sourced: uv doesn't capture the package's
-      # declared build-system requirements in the lockfile,
-      # so uv2nix builds it without setuptools available.
-      hermes-agent = addSetuptools prev.hermes-agent;
+  # Reuse UPSTREAM's own uv2nix derivation (nix/python.nix) instead of
+  # maintaining a parallel one: it carries every per-package build
+  # override the app needs (voice-stack prebuilts, legacy sdist
+  # setuptools shims, the HERMES_NIX_BUILD=1 gate its setup.py
+  # enforces) and moves in lockstep with the source on every release.
+  # Its inputs mirror the upstream flake's: the uv2nix module family
+  # comes from our wrapper packages above; pythonSrc is the workspace
+  # root (upstream only narrows it for rebuild granularity, plain src
+  # is equally correct).
+  hermesPython = callPackage "${src}/nix/python.nix" {
+    uv2nix = uv2nix-module;
+    pyproject-nix = pyproject-nix-lib;
+    # Upstream expects the flake-shaped attrset (.overlays.default).
+    pyproject-build-systems = {
+      overlays.default = build-systems-overlays.default;
     };
+    pythonSrc = src;
+  };
 
-  pythonSet =
-    (callPackage pyproject-nix-lib.build.packages {
-      python = python313;
-    }).overrideScope
-      (lib.composeManyExtensions [
-        build-systems-overlays.default
-        overlay
-        pyprojectOverrides
-      ]);
-
-  venv = pythonSet.mkVirtualEnv "hermes-agent-env"
-    workspace.deps.default;
+  venv = hermesPython.venv;
 
 in
 venv.overrideAttrs (old: {
   pname = "hermes-agent";
-  version =
-    let
-      pyproject = lib.importTOML ./pyproject.toml;
-      src = pyproject.tool.uv.sources.hermes-agent;
-    in
-    lib.removePrefix "v" src.tag;
+  inherit version;
 
-  passthru = (old.passthru or { }) // {
-    python = python313;
-  };
+  passthru = old.passthru or { };
 
   meta = {
     description =
