@@ -377,8 +377,25 @@ jobs:
       # Audit only skills-* packages (the Claude Code skill/plugin
       # fragments) — gated here at the step level since matrix.package is
       # known. Everything else is built/published, not audited.
+      # Realizing the .website env normally takes ~17s, but under load
+      # (the nightly bot PR wave) substitution sometimes stalls with
+      # zero output until the 90-minute job timeout cancels the run.
+      # Health-check the activation first with a hard 1-minute bound and
+      # three attempts — a stall costs 3 minutes and a clear error, not
+      # 90 silent ones.
+      - name: "Warm .website env (bounded)"
+        if: ${{ startsWith(matrix.package, 'skills-') }}
+        uses: "nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60" # v4.0.0
+        with:
+          timeout_minutes: 1
+          max_attempts: 3
+          retry_wait_seconds: 10
+          command: "flox activate -d .website -- true"
       - name: "Audit fragment content"
         if: ${{ startsWith(matrix.package, 'skills-') }}
+        # Backstop for the audit run itself — the env is already
+        # realized above, so this activation is instant.
+        timeout-minutes: 20
         # Fragments are content-audited from the build above; run-audit.sh
         # reuses result-<pkg> and runs the flox-ai audit engine. The
         # flox-ai + skill-audit tools live in the .website env (NOT the
