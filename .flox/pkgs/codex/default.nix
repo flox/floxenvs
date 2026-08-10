@@ -69,7 +69,7 @@ rustPlatform.buildRustPackage {
   # and CODEX_FLOX_INSTRUCTIONS_FILE (extra project instructions). This lets
   # flox inject environment-managed skills and rules without mutating
   # ~/.codex or the working tree. Re-verify on every version bump
-  # (see upgrade.sh) — the patch targets core-skills/loader.rs and
+  # (see upgrade.sh) — the patch targets ext/skills/src/host_roots.rs and
   # core/agents_md.rs. Paths are relative to codex-rs (the sourceRoot).
   patches = [ ./flox-fragments.patch ];
 

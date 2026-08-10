@@ -1,11 +1,11 @@
-diff --git a/core-skills/src/loader.rs b/core-skills/src/loader.rs
+diff --git a/ext/skills/src/host_roots.rs b/ext/skills/src/host_roots.rs
 index 3b59e90..c52b93a 100644
---- a/core-skills/src/loader.rs
-+++ b/core-skills/src/loader.rs
-@@ -252,6 +252,26 @@ async fn skill_roots_with_home_dir(
-         plugin_namespace: None,
-         plugin_root: None,
-     }));
+--- a/ext/skills/src/host_roots.rs
++++ b/ext/skills/src/host_roots.rs
+@@ -74,6 +74,19 @@ async fn resolve_skill_roots_with_home_dir(
+             .map(|path| local_root(path, SkillScope::User))
+             .map(host_root_to_skill_root),
+     );
 +    // flox-ai: extra skill roots injected via the CODEX_FLOX_SKILL_ROOTS env
 +    // var (colon-separated absolute paths). Added by the flox downstream
 +    // patch so `flox-ai launch codex` can surface environment-managed skills
@@ -15,20 +15,13 @@ index 3b59e90..c52b93a 100644
 +            if let Ok(path) =
 +                AbsolutePathBuf::from_absolute_path_checked(std::path::PathBuf::from(entry))
 +            {
-+                roots.push(SkillRoot {
-+                    path,
-+                    scope: SkillScope::User,
-+                    file_system: Arc::clone(&LOCAL_FS),
-+                    plugin_id: None,
-+                    plugin_namespace: None,
-+                    plugin_root: None,
-+                });
++                roots.push(host_root_to_skill_root(local_root(path, SkillScope::User)));
 +            }
 +        }
 +    }
-     roots.extend(repo_agents_skill_roots(fs, config_layer_stack, cwd).await);
-     dedupe_skill_roots_by_path(&mut roots);
-     roots
+     roots.extend(
+         repo_agents_skill_roots(repository_file_system, config_layer_stack, cwd)
+             .await
 diff --git a/core/src/agents_md.rs b/core/src/agents_md.rs
 index d63342b..3dd345d 100644
 --- a/core/src/agents_md.rs
@@ -36,7 +29,7 @@ index d63342b..3dd345d 100644
 @@ -70,6 +70,21 @@ pub(crate) async fn load_project_instructions(
          }
      }
- 
+
 +    // flox-ai: extra project instructions injected via the
 +    // CODEX_FLOX_INSTRUCTIONS_FILE env var pointing at a file. Added by the
 +    // flox downstream patch so `flox-ai launch codex` can inject
@@ -54,4 +47,4 @@ index d63342b..3dd345d 100644
 +
      (!loaded.is_empty()).then_some(loaded)
  }
- 
+
