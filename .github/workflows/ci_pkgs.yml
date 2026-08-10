@@ -379,15 +379,35 @@ jobs:
       # known. Everything else is built/published, not audited.
       - name: "Audit fragment content"
         if: ${{ startsWith(matrix.package, 'skills-') }}
+        # Backstop for the audit run itself once the env is realized.
+        timeout-minutes: 20
         # Fragments are content-audited from the build above; run-audit.sh
         # reuses result-<pkg> and runs the flox-ai audit engine. The
         # flox-ai + skill-audit tools live in the .website env (NOT the
         # root env — they're floxenvs-flake-sourced and would poison
         # `flox build`'s nixpkgs resolution).
-        shell: "flox activate -d .website -- bash -e {0}"
         run: |
           set -euo pipefail
-          REPO_ROOT="$PWD" bash scripts/run-audit.sh skill "${{ matrix.package }}"
+          # Realizing the .website env normally takes ~17s, but under
+          # load (the nightly bot PR wave) substitution sometimes stalls
+          # with zero output until the 90-minute job timeout. Health-check
+          # the activation with a hard 60s bound, three attempts — a
+          # stall now costs 3 minutes and a clear error, not 90 silent
+          # ones.
+          ok=""
+          for attempt in 1 2 3; do
+            if timeout 60 flox activate -d .website -- true; then
+              ok=1
+              break
+            fi
+            echo "::warning::.website env activation attempt $attempt did not finish within 60s"
+          done
+          if [ -z "$ok" ]; then
+            echo "::error::.website env activation failed 3 times (60s each) — substitution stalled; rerun the job"
+            exit 1
+          fi
+          flox activate -d .website -- bash -e -c \
+            'REPO_ROOT="$PWD" bash scripts/run-audit.sh skill "${{ matrix.package }}"'
       - name: "Upload fragment metrics"
         if: ${{ startsWith(matrix.package, 'skills-') }}
         uses: "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" # v7
