@@ -24,7 +24,13 @@
       "fish": "source \"$FLOX_ENV_CACHE/python-pip/venv/bin/activate.fish\"\n",
       "tcsh": "source \"$FLOX_ENV_CACHE/python-pip/venv/bin/activate.csh\"\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -84,36 +90,6 @@
         "out": "/nix/store/51vn4xsrgzfl9g3s00byydpx6jgjgrnd-gum-0.17.0"
       },
       "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/w01nbfjmxqjr3w9sycd0jliiamnljij2-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:02.122815Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/m2wks8knnsfgjl0ikhbi0vv7bqn53385-gum-0.17.0"
-      },
-      "system": "x86_64-darwin",
       "group": "demo-tools",
       "priority": 5
     },
@@ -213,36 +189,6 @@
     {
       "attr_path": "python3",
       "broken": false,
-      "derivation": "/nix/store/5vh9qfs54q47jybcd5zhxmap7lgk2dhg-python3-3.13.13.drv",
-      "description": "High-level dynamically-typed programming language",
-      "install_id": "python",
-      "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "python3-3.13.13",
-      "pname": "python3",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:53.021160Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "3.13.13",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/1137mc2md1ip5pdslybxl05kysjyh4rg-python3-3.13.13"
-      },
-      "system": "x86_64-darwin",
-      "group": "python-pip",
-      "priority": 5
-    },
-    {
-      "attr_path": "python3",
-      "broken": false,
       "derivation": "/nix/store/d8rrzn9gg475brqyfpdaa3w76gzwmvx4-python3-3.13.13.drv",
       "description": "High-level dynamically-typed programming language",
       "install_id": "python",
@@ -286,7 +232,13 @@
       "hook": {
         "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Python + pip environment ready!' '' \\\n    'Python version:' \\\n    \"  $(python3 --version 2>&1)\" '' \\\n    'pip commands:' \\\n    '  pip install <package>' \\\n    '  pip install -r requirements.txt' \\\n    '  pip list'\nfi\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "include": {
         "environments": [
           {

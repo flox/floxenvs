@@ -13,7 +13,7 @@ schema-version = "1.10.0"
 # whenever a new Bazel release lands.
 bazel.pkg-path = "flox/bazel"
 bazel.pkg-group = "bazel"
-bazel.systems = ["aarch64-darwin", "x86_64-darwin"]
+bazel.systems = ["aarch64-darwin"]
 
 # Linux: the catalog `bazel_9` is source-built against nixpkgs
 # (currently 9.0.1) so it works on NixOS-style builders where the
@@ -35,3 +35,6 @@ on-activate = '''
 export BAZEL_CACHE_DIR="$FLOX_ENV_CACHE/bazel"
 mkdir -p "$BAZEL_CACHE_DIR"
 '''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]

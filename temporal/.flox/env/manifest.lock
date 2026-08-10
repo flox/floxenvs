@@ -20,7 +20,13 @@
     "hook": {
       "on-activate": "export TEMPORAL_DATA=\"$FLOX_ENV_CACHE/temporal\"\n\nif [ ! -d \"$TEMPORAL_DATA\" ]; then\n  mkdir -p \"$TEMPORAL_DATA\"\nfi\n"
     },
-    "options": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    },
     "services": {
       "temporal": {
         "command": "  TEMPORAL_DATA=\"$FLOX_ENV_CACHE/temporal\"\n  mkdir -p \"$TEMPORAL_DATA\"\n  exec temporal server start-dev \\\n    --ip \"$TEMPORAL_HOST\" \\\n    --port \"$TEMPORAL_PORT\" \\\n    --ui-port \"$TEMPORAL_UI_PORT\" \\\n    --db-filename \"$TEMPORAL_DATA/temporal.db\"\n"
@@ -83,35 +89,6 @@
         "out": "/nix/store/rvc61fy2wsg9kzjy77vkfl8ps623ma96-temporal-1.30.5"
       },
       "system": "aarch64-linux",
-      "group": "temporal",
-      "priority": 5
-    },
-    {
-      "attr_path": "temporal",
-      "broken": false,
-      "derivation": "/nix/store/6i455if03k3j7s05ng21qfkkralm6dh0-temporal-1.30.5.drv",
-      "description": "Microservice orchestration platform which enables developers to build scalable applications without sacrificing productivity or reliability",
-      "install_id": "temporal",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "temporal-1.30.5",
-      "pname": "temporal",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:11:28.373756Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "1.30.5",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/q8j7wdly6c1fv79xxhyr0irkn5rnvm69-temporal-1.30.5"
-      },
-      "system": "x86_64-darwin",
       "group": "temporal",
       "priority": 5
     },
@@ -199,35 +176,6 @@
         "out": "/nix/store/fvjbp6q9smsbid3mai9g7kph9s6i7c76-temporal-cli-1.7.2"
       },
       "system": "aarch64-linux",
-      "group": "temporal",
-      "priority": 5
-    },
-    {
-      "attr_path": "temporal-cli",
-      "broken": false,
-      "derivation": "/nix/store/3yfrdf75j5ddh6rnlidbasabmq8jvvn9-temporal-cli-1.7.2.drv",
-      "description": "Command-line interface for running Temporal Server and interacting with Workflows, Activities, Namespaces, and other parts of Temporal",
-      "install_id": "temporal-cli",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "temporal-cli-1.7.2",
-      "pname": "temporal-cli",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:11:28.377398Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "1.7.2",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/bh06550zmhadcmfn67a12265ppwzlnw1-temporal-cli-1.7.2"
-      },
-      "system": "x86_64-darwin",
       "group": "temporal",
       "priority": 5
     },

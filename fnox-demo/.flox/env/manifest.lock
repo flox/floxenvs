@@ -22,7 +22,13 @@
     "hook": {
       "on-activate": "# Per-environment data path; used by fnox to cache lease state,\n# session tokens, and resolved secrets.\nexport FNOX_DATA_DIR=\"$FLOX_ENV_CACHE/fnox\"\nmkdir -p \"$FNOX_DATA_DIR\"\n\n# Use the demo identity that's checked into the repo. This is a\n# *demo-only* key — never reuse it for real secrets.\nexport FNOX_AGE_KEY=\"$(grep '^AGE-SECRET-KEY-' \\\n  \"$FLOX_ENV_PROJECT/fnox-demo-key.txt\")\"\n\n# Per-cwd config (fnox auto-discovers fnox.toml).\nexport FNOX_CONFIG_DIR=\"$FLOX_ENV_PROJECT\"\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 60 --margin \"1 2\" --padding \"1 2\" \\\n    \"fnox demo\" \"Fort Knox for your secrets\"\n  echo \"\"\n  echo \"  Try one of these (cwd: $FLOX_ENV_PROJECT):\"\n  echo \"\"\n  echo \"    fnox list                  — view configured secrets\"\n  echo \"    fnox get DATABASE_URL      — decrypt one secret\"\n  echo \"    fnox exec -- env | grep ^DEMO_\"\n  echo \"    fnox lease create greeting — run command lease\"\n  echo \"    fnox tui                   — interactive dashboard\"\n  echo \"\"\nfi\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -82,36 +88,6 @@
         "out": "/nix/store/scmmn2j95r09yn4awzyz83jw0xikcvdr-age-1.3.1"
       },
       "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "age",
-      "broken": false,
-      "derivation": "/nix/store/85q2k1575isvgzzsykzvl7jxsh3s11zc-age-1.3.1.drv",
-      "description": "Modern encryption tool with small explicit keys",
-      "install_id": "age",
-      "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "age-1.3.1",
-      "pname": "age",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:08:59.949991Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "1.3.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/xb1bm4jymz2paaw31vrymqvsi5b2rf9s-age-1.3.1"
-      },
-      "system": "x86_64-darwin",
       "group": "demo-tools",
       "priority": 5
     },
@@ -202,36 +178,6 @@
         "out": "/nix/store/51vn4xsrgzfl9g3s00byydpx6jgjgrnd-gum-0.17.0"
       },
       "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/w01nbfjmxqjr3w9sycd0jliiamnljij2-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:02.122815Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/m2wks8knnsfgjl0ikhbi0vv7bqn53385-gum-0.17.0"
-      },
-      "system": "x86_64-darwin",
       "group": "demo-tools",
       "priority": 5
     },
@@ -330,37 +276,6 @@
     {
       "attr_path": "fnox",
       "broken": false,
-      "derivation": "/nix/store/912pfgcq106379lxcyirqrmyc6dzkwz7-fnox-1.33.0.drv",
-      "description": "Fort Knox for your secrets — manage secrets with encryption or cloud providers",
-      "install_id": "fnox",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=b350dcf5e46e4e1269a9311df1a572c3f3c0304c",
-      "name": "fnox-1.33.0",
-      "pname": "fnox",
-      "rev": "b350dcf5e46e4e1269a9311df1a572c3f3c0304c",
-      "rev_count": 18853,
-      "rev_date": "2026-08-09T13:00:34Z",
-      "scrape_date": "2026-08-10T01:18:05.088291441Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "1.33.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/jacc8ffxif3zqlbai91y960iv8dj45la-fnox-1.33.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "fnox",
-      "priority": 5
-    },
-    {
-      "attr_path": "fnox",
-      "broken": false,
       "derivation": "/nix/store/gb2rdwpld5r8yrkddr96nrabls2bylhf-fnox-1.33.0.drv",
       "description": "Fort Knox for your secrets — manage secrets with encryption or cloud providers",
       "install_id": "fnox",
@@ -406,7 +321,13 @@
       "hook": {
         "on-activate": "# Use the demo identity that's checked into the repo. This is a\n# *demo-only* key — never reuse it for real secrets.\nexport FNOX_AGE_KEY=\"$(grep '^AGE-SECRET-KEY-' \\\n  \"$FLOX_ENV_PROJECT/fnox-demo-key.txt\")\"\n\n# Per-cwd config (fnox auto-discovers fnox.toml).\nexport FNOX_CONFIG_DIR=\"$FLOX_ENV_PROJECT\"\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 60 --margin \"1 2\" --padding \"1 2\" \\\n    \"fnox demo\" \"Fort Knox for your secrets\"\n  echo \"\"\n  echo \"  Try one of these (cwd: $FLOX_ENV_PROJECT):\"\n  echo \"\"\n  echo \"    fnox list                  — view configured secrets\"\n  echo \"    fnox get DATABASE_URL      — decrypt one secret\"\n  echo \"    fnox exec -- env | grep ^DEMO_\"\n  echo \"    fnox lease create greeting — run command lease\"\n  echo \"    fnox tui                   — interactive dashboard\"\n  echo \"\"\nfi\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "include": {
         "environments": [
           {

@@ -14,7 +14,13 @@
     "hook": {
       "on-activate": "export RUBY_CACHE=\"$FLOX_ENV_CACHE/ruby\"\nexport BUNDLE_PATH=\"$RUBY_CACHE/vendor\"\nmkdir -p \"$RUBY_CACHE\"\n\nif [ \"$RUBY_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f Gemfile ] \\\n    && [ -f Gemfile.lock ]; then\n  HASH=$(cat Gemfile Gemfile.lock \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$RUBY_CACHE/gems-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    bundle install\n    echo \"$HASH\" > \"$RUBY_CACHE/gems-hash\"\n  fi\nfi\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -74,36 +80,6 @@
         "out": "/nix/store/y0h56495g3ym1mh7x5m84ji1gsv0n13q-ruby-3.4.9"
       },
       "system": "aarch64-linux",
-      "group": "ruby",
-      "priority": 5
-    },
-    {
-      "attr_path": "ruby",
-      "broken": false,
-      "derivation": "/nix/store/f1jda0n3i0nyrqwxl94jvh2hmm26hp2v-ruby-3.4.9.drv",
-      "description": "Object-oriented language for quick and easy programming",
-      "install_id": "ruby",
-      "license": "Ruby",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "name": "ruby-3.4.9",
-      "pname": "ruby",
-      "rev": "65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "rev_count": 1026231,
-      "rev_date": "2026-07-02T02:29:44Z",
-      "scrape_date": "2026-07-04T04:10:40.437389Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "3.4.9",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "devdoc": "/nix/store/rmqxa47vl3klg1ry4p8h3l1vigscqkk6-ruby-3.4.9-devdoc",
-        "out": "/nix/store/pj6sw5j7inzw14nx4mhad31bqr5xa7ky-ruby-3.4.9"
-      },
-      "system": "x86_64-darwin",
       "group": "ruby",
       "priority": 5
     },

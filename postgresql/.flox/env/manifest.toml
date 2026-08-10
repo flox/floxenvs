@@ -104,3 +104,6 @@ postgres.command = '''
     exec postgres -D "$PGDATA" -c unix_socket_directories="$SOCKETDIR" -c listen_addresses=""
   fi
 '''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]

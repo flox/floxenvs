@@ -44,7 +44,13 @@
     "hook": {
       "on-activate": "export HONCHO_CACHE=\"$FLOX_ENV_CACHE/honcho\"\nexport PGDIR=\"$HONCHO_CACHE/pgdata\"\nexport PGDATA=\"$PGDIR/data\"\nexport REDISDIR=\"$HONCHO_CACHE/redis\"\nexport LOGDIR=\"$HONCHO_CACHE/logs\"\nmkdir -p \"$PGDIR\" \"$REDISDIR\" \"$LOGDIR\"\n\n# Unix socket dir kept short (<103 bytes) — hashed per env.\nexport PG_SOCKETDIR=\"/tmp/flox-honcho-pg-$(echo \"$PGDIR\" | cksum | cut -d\" \" -f1)\"\nmkdir -p \"$PG_SOCKETDIR\"\n\nexport PGHOST=\"$PGHOSTADDR\"\nexport DB_CONNECTION_URI=\"postgresql+psycopg://$PGUSER:$PGPASS@$PGHOSTADDR:$PGPORT/$PGDATABASE\"\nexport CACHE_URL=\"redis://$PGHOSTADDR:$REDIS_PORT/0?suppress=true\"\n\n# Where pg_config et al find pgvector's .so — flox links the\n# extension into $FLOX_ENV but postgres needs the dynamic\n# library lookup to work.\nexport PG_LIBDIR=\"$FLOX_ENV/lib\"\nexport PG_SHAREDIR=\"$FLOX_ENV/share/postgresql\"\n\nINIT_LOG=\"$PGDIR/init.log\"\n\npg_init_fail() {\n  echo \"ERROR: PostgreSQL initialization failed.\" >&2\n  [ -f \"$INIT_LOG\" ] && { echo \"--- init.log ---\" >&2; cat \"$INIT_LOG\" >&2; echo \"--- end init.log ---\" >&2; }\n  exit 1\n}\n\nif [[ ! -d \"$PGDATA\" ]]; then\n  mkdir -p \"$PGDATA\"\n  initdb \"$PGDATA\" \\\n    --locale=C --encoding=UTF8 --auth=trust \\\n    --username \"$PGUSER\" \\\n    >> \"$INIT_LOG\" 2>&1 || pg_init_fail\n\n  pg_ctl -D \"$PGDATA\" -w start \\\n    -o \"-c unix_socket_directories=$PG_SOCKETDIR -c listen_addresses=$PGHOSTADDR -p $PGPORT\" \\\n    >> \"$INIT_LOG\" 2>&1 || pg_init_fail\n\n  createdb -h \"$PG_SOCKETDIR\" -p \"$PGPORT\" -U \"$PGUSER\" \"$PGDATABASE\" \\\n    >> \"$INIT_LOG\" 2>&1 || pg_init_fail\n  psql -h \"$PG_SOCKETDIR\" -p \"$PGPORT\" -U \"$PGUSER\" -d \"$PGDATABASE\" \\\n    -c \"CREATE EXTENSION IF NOT EXISTS vector\" \\\n    >> \"$INIT_LOG\" 2>&1 || pg_init_fail\n\n  # Run alembic migrations once at init.\n  honcho-migrate upgrade head >> \"$INIT_LOG\" 2>&1 || pg_init_fail\n\n  pg_ctl -D \"$PGDATA\" -m fast -w stop >> \"$INIT_LOG\" 2>&1\n  rm -f \"$INIT_LOG\"\nfi\n\n# One-shot reminder: honcho's reasoning paths need an LLM key.\n# /health and the storage API work without one, so this is a\n# soft warning, not a hard failure.\nif [ -z \"${LLM_OPENAI_API_KEY:-}${LLM_ANTHROPIC_API_KEY:-}${LLM_GEMINI_API_KEY:-}${LLM_OPENAI_BASE_URL:-}${LLM_ANTHROPIC_BASE_URL:-}${LLM_GEMINI_BASE_URL:-}\" ] \\\n    && [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  echo \"honcho: no LLM provider configured — chat/reasoning endpoints will fail.\" >&2\n  echo \"        set LLM_OPENAI_API_KEY (or _ANTHROPIC_, _GEMINI_), or an\" >&2\n  echo \"        LLM_*_BASE_URL for a local/compatible endpoint, first.\" >&2\nfi\n"
     },
-    "options": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    },
     "services": {
       "honcho-api": {
         "command": "until pg_isready -h \"$PGHOSTADDR\" -p \"$PGPORT\" -q 2>/dev/null; do sleep 0.3; done\nexec honcho-server\n"
@@ -217,36 +223,6 @@
     {
       "attr_path": "postgresqlPackages.pgvector",
       "broken": false,
-      "derivation": "/nix/store/m5026qrjzra8fji05pcahsmlg13gnm3f-pgvector-0.8.3.drv",
-      "description": "Open-source vector similarity search for PostgreSQL",
-      "install_id": "pgvector",
-      "license": "PostgreSQL",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "pgvector-0.8.3",
-      "pname": "pgvector",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:51.782883Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.8.3",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/rg578268r034ydwsgw3n0cyh15y6hrbb-pgvector-0.8.3"
-      },
-      "system": "x86_64-darwin",
-      "group": "honcho-pg",
-      "priority": 5
-    },
-    {
-      "attr_path": "postgresqlPackages.pgvector",
-      "broken": false,
       "derivation": "/nix/store/bfzkh9xmd17cv90q9y0p3w3yy7ijs7kg-pgvector-0.8.3.drv",
       "description": "Open-source vector similarity search for PostgreSQL",
       "install_id": "pgvector",
@@ -356,45 +332,6 @@
     {
       "attr_path": "postgresql",
       "broken": false,
-      "derivation": "/nix/store/5xd40wkf0rm6180gjnq5dw8j0sihab72-postgresql-17.10.drv",
-      "description": "Powerful, open source object-relational database system",
-      "install_id": "postgresql",
-      "license": "PostgreSQL",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "postgresql-17.10",
-      "pname": "postgresql",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:50.672113Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "17.10",
-      "outputs_to_install": [
-        "man",
-        "out"
-      ],
-      "outputs": {
-        "dev": "/nix/store/x1rfdcnxh1kj634bz73k8xg2p3i5rf22-postgresql-17.10-dev",
-        "doc": "/nix/store/3jj55asrgl1ahv01gkpzqmvwnzvg1wrb-postgresql-17.10-doc",
-        "jit": "/nix/store/5vfbgj9n87l1zk7ljqisigsz9ax5sgad-postgresql-17.10-jit",
-        "lib": "/nix/store/yvbnhnx1dk5i0877gam5yc8cvfiiz3bp-postgresql-17.10-lib",
-        "man": "/nix/store/bak19mp0xgx9rwsmw1lzwcl3wb2saz38-postgresql-17.10-man",
-        "out": "/nix/store/jgxdaiah5jwxw59dva74kgljyma997n8-postgresql-17.10",
-        "plperl": "/nix/store/3bdjvw41s62iq0abf17d5dcgmdmsrvaw-postgresql-17.10-plperl",
-        "plpython3": "/nix/store/pdqsdbz6ghicqhny4as3ws1gs0yy94s8-postgresql-17.10-plpython3",
-        "pltcl": "/nix/store/049bby0qrz8wh4073i41ghk4vfzs54vk-postgresql-17.10-pltcl"
-      },
-      "system": "x86_64-darwin",
-      "group": "honcho-pg",
-      "priority": 5
-    },
-    {
-      "attr_path": "postgresql",
-      "broken": false,
       "derivation": "/nix/store/77cxn4y98d9qk3dm6dwdfpbc5q7y79yk-postgresql-17.10.drv",
       "description": "Powerful, open source object-relational database system",
       "install_id": "postgresql",
@@ -489,36 +426,6 @@
         "out": "/nix/store/dpf7nfg3irpjq9lwa6l4467vj7923h2n-redis-8.8.0"
       },
       "system": "aarch64-linux",
-      "group": "honcho-redis",
-      "priority": 5
-    },
-    {
-      "attr_path": "redis",
-      "broken": false,
-      "derivation": "/nix/store/vxf2qmn8papk78g17fj08wn3gxk1imjw-redis-8.8.0.drv",
-      "description": "Open source, advanced key-value store",
-      "install_id": "redis",
-      "license": "AGPL-3.0-only",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "redis-8.8.0",
-      "pname": "redis",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:10:55.729787Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "8.8.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/i6a9ixvcpn5d57cndc1359ccils4q19h-redis-8.8.0"
-      },
-      "system": "x86_64-darwin",
       "group": "honcho-redis",
       "priority": 5
     },

@@ -7,8 +7,7 @@
         "pkg-path": "flox/bazel",
         "pkg-group": "bazel",
         "systems": [
-          "aarch64-darwin",
-          "x86_64-darwin"
+          "aarch64-darwin"
         ]
       },
       "bazel_catalog": {
@@ -31,7 +30,13 @@
     "hook": {
       "on-activate": "export BAZEL_CACHE_DIR=\"$FLOX_ENV_CACHE/bazel\"\nmkdir -p \"$BAZEL_CACHE_DIR\"\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -62,37 +67,6 @@
         "out": "/nix/store/v3rbpv051d9kf0w9gp06pdg2f1hp2kz8-bazel-9.2.0"
       },
       "system": "aarch64-darwin",
-      "group": "bazel",
-      "priority": 5
-    },
-    {
-      "attr_path": "bazel",
-      "broken": false,
-      "derivation": "/nix/store/a8rxg8p1xc28vs34f6kbxjwb5dfhclfs-bazel-9.2.0.drv",
-      "description": "Prebuilt Bazel 9.2.0 from bazel.build",
-      "install_id": "bazel",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/floxenvs?rev=9371c41386d5490df070c80584642a0ebd3c5b97",
-      "name": "bazel-9.2.0",
-      "pname": "bazel",
-      "rev": "9371c41386d5490df070c80584642a0ebd3c5b97",
-      "rev_count": 14323,
-      "rev_date": "2026-07-14T01:01:02Z",
-      "scrape_date": "2026-08-10T01:04:00.801483185Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "9.2.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/mri1qispxm9l31n3v6yf0ppkjzbc4jid-bazel-9.2.0"
-      },
-      "system": "x86_64-darwin",
       "group": "bazel",
       "priority": 5
     },

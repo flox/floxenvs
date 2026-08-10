@@ -24,7 +24,13 @@
     "hook": {
       "on-activate": "export CASSANDRA_CACHE=\"$FLOX_ENV_CACHE/cassandra\"\nexport CASSANDRA_CONFIG_FILE=\"$CASSANDRA_CACHE/cassandra.yaml\"\n\nif [ ! -d \"$CASSANDRA_CACHE\" ]; then\n  mkdir -p \"$CASSANDRA_CACHE\"\nfi\n\n# Detect version for JVM options\nCASSANDRA_VERSION=\"$(cassandra -v)\"\nif [ \"$(semver compare \"$CASSANDRA_VERSION\" \"4.0.0\")\" != \"-1\" ]; then\n  JVM_OPTS=\"$JVM_OPTS -Xlog:gc=warning,heap*=warning,age*=warning,safepoint=warning,promotion*=warning\"\nfi\n\nif [ ! -f \"$CASSANDRA_CONFIG_FILE\" ]; then\n  cat > \"$CASSANDRA_CONFIG_FILE\" <<EOF\nlisten_address: \"$CASSANDRA_HOST\"\nnative_transport_port: \"$CASSANDRA_PORT\"\nstorage_port: \"$CASSANDRA_STORAGE_PORT\"\nstart_native_transport: \"$CASSANDRA_ALLOW_CLIENTS\"\ncluster_name: \"$CASSANDRA_CLUSTER_NAME\"\ndata_file_directories:\n  - \"$CASSANDRA_CACHE/data\"\ncommitlog_directory: \"$CASSANDRA_CACHE/commitlog\"\nsaved_caches_directory: \"$CASSANDRA_CACHE/saved_caches\"\nhints_directory: \"$CASSANDRA_CACHE/hints\"\nseed_provider:\n  - class_name: \"org.apache.cassandra.locator.SimpleSeedProvider\"\n    parameters:\n      - seeds: \"$CASSANDRA_SEED_ADDRS\"\ncommitlog_sync: \"batch\"\ncommitlog_sync_batch_window_in_ms: 2\npartitioner: \"org.apache.cassandra.dht.Murmur3Partitioner\"\nendpoint_snitch: \"SimpleSnitch\"\nEOF\nfi\n"
     },
-    "options": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    },
     "services": {
       "cassandra": {
         "command": "cassandra -Dcassandra.config=file://$CASSANDRA_CONFIG_FILE -f"
@@ -87,35 +93,6 @@
         "out": "/nix/store/gk1nh53n419c4zhbigjsyviy7lw443lq-cassandra-4.1.8"
       },
       "system": "aarch64-linux",
-      "group": "cassandra",
-      "priority": 5
-    },
-    {
-      "attr_path": "cassandra_4",
-      "broken": false,
-      "derivation": "/nix/store/3dx1igiryh9305z2r0ind4ccqxwz2jab-cassandra-4.1.8.drv",
-      "description": "Massively scalable open source NoSQL database",
-      "install_id": "cassandra_4",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "name": "cassandra-4.1.8",
-      "pname": "cassandra_4",
-      "rev": "65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "rev_count": 1026231,
-      "rev_date": "2026-07-02T02:29:44Z",
-      "scrape_date": "2026-07-04T04:09:04.245930Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "4.1.8",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/dcqmzkf8n93ii2222z5zn6jj7b2zdgs6-cassandra-4.1.8"
-      },
-      "system": "x86_64-darwin",
       "group": "cassandra",
       "priority": 5
     },
@@ -203,35 +180,6 @@
         "out": "/nix/store/z4da1cqbdcwz3189sn2cljck2qvbamij-semver-tool-3.4.0"
       },
       "system": "aarch64-linux",
-      "group": "cassandra-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "semver-tool",
-      "broken": false,
-      "derivation": "/nix/store/p9970smxj1qi8vc0apscwa2d6xmabwqq-semver-tool-3.4.0.drv",
-      "description": "Semver bash implementation",
-      "install_id": "semver-tool",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "name": "semver-tool-3.4.0",
-      "pname": "semver-tool",
-      "rev": "65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "rev_count": 1026231,
-      "rev_date": "2026-07-02T02:29:44Z",
-      "scrape_date": "2026-07-04T04:11:01.622440Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "3.4.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/9vd6i12wyymclmsz8wj41hq3g81mp7rh-semver-tool-3.4.0"
-      },
-      "system": "x86_64-darwin",
       "group": "cassandra-tools",
       "priority": 5
     },

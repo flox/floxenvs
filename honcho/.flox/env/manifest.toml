@@ -177,3 +177,6 @@ honcho-deriver.command = '''
 until pg_isready -h "$PGHOSTADDR" -p "$PGPORT" -q 2>/dev/null; do sleep 0.3; done
 exec honcho-deriver
 '''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]

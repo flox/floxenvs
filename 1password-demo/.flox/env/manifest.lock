@@ -18,7 +18,13 @@
     "profile": {
       "common": "if [ -n \"${OP_SESSION_TOKEN:-}\" ]; then\n  alias op=\"op --session $OP_SESSION_TOKEN\"\nfi\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -83,37 +89,6 @@
         "out": "/nix/store/p515b57pf3wg2jhc8md9hbcva6jarsjc-1password-cli-2.32.0"
       },
       "system": "aarch64-linux",
-      "group": "1password",
-      "priority": 5
-    },
-    {
-      "attr_path": "_1password",
-      "broken": false,
-      "derivation": "/nix/store/gnv9l43qzjaqbwkyiqpc0hwzlbmd4lzp-1password-cli-2.32.0.drv",
-      "description": "1Password command-line tool",
-      "install_id": "op",
-      "license": "Unfree",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=01f116e4df6a15f4ccdffb1bcd41096869fb385c",
-      "name": "1password-cli-2.32.0",
-      "pname": "_1password",
-      "rev": "01f116e4df6a15f4ccdffb1bcd41096869fb385c",
-      "rev_count": 882227,
-      "rev_date": "2025-10-22T06:30:52Z",
-      "scrape_date": "2025-10-24T02:21:43.528277Z",
-      "stabilities": [
-        "stable",
-        "staging",
-        "unstable"
-      ],
-      "unfree": true,
-      "version": "2.32.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/gv6bgzp76viws8l647llyssrg09zzaq9-1password-cli-2.32.0"
-      },
-      "system": "x86_64-darwin",
       "group": "1password",
       "priority": 5
     },
@@ -213,36 +188,6 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/w01nbfjmxqjr3w9sycd0jliiamnljij2-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:02.122815Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/m2wks8knnsfgjl0ikhbi0vv7bqn53385-gum-0.17.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
       "derivation": "/nix/store/468b0lgb2p00hyfj24xb44yj24r33hy4-gum-0.17.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
@@ -283,7 +228,13 @@
       "hook": {
         "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    '1Password CLI environment ready!' '' \\\n    'op version:' \\\n    \"  $(op --version)\" '' \\\n    'Usage:' \\\n    '  op vault list          List vaults' \\\n    '  op item list           List items' \\\n    '  op item get <name>     Get an item' \\\n    '' \\\n    'Fetch secrets in your hook:' \\\n    '  export API_KEY=$(op item get \"MyService\" \\' \\\n    '    --field \"credential\")'\nfi\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "include": {
         "environments": [
           {

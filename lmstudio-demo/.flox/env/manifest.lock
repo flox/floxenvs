@@ -577,7 +577,13 @@
       "hook": {
         "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'LM Studio — local LLMs + OpenAI-compatible API' '' \\\n    'Start the API server:' \\\n    '  flox services start' '' \\\n    \"API: http://${LMS_HOST}:${LMS_PORT}/v1\" \\\n    'Health check:  lmstudio-health' '' \\\n    'Download + run a model:' \\\n    '  lms get qwen2.5-7b-instruct' \\\n    '  lms load qwen2.5-7b-instruct' '' \\\n    'Launch an agentic CLI against the local model:' \\\n    '  lms-launch claude --model qwen2.5-7b-instruct' \\\n    '  lms-launch codex  --model qwen2.5-7b-instruct'\nfi\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "include": {
         "environments": [
           {
@@ -635,6 +641,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

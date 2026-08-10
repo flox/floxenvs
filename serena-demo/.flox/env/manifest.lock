@@ -24,7 +24,13 @@
     "hook": {
       "on-activate": "dir=\"$FLOX_ENV_CACHE/serena\"\nexport SERENA_DATA_DIR=\"$dir\"\nmkdir -p \"$dir\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Serena demo — IDE-grade MCP toolkit for coding agents' '' \\\n    'Run the CLI:' \\\n    '  serena --help' '' \\\n    'Start the MCP server inside the sample project:' \\\n    '  cd sample-project' \\\n    '  flox services start serena-mcp' '' \\\n    \"MCP endpoint: http://${SERENA_MCP_HOST}:${SERENA_MCP_PORT}/sse\" '' \\\n    'Then point Claude Desktop / Cursor / Codex at that URL.'\nfi\n"
     },
-    "options": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    },
     "services": {
       "serena-mcp": {
         "command": "dir=\"${SERENA_DATA_DIR:-$FLOX_ENV_CACHE/serena}\"\nmkdir -p \"$dir\"\nexec serena start-mcp-server \\\n  --transport \"$SERENA_TRANSPORT\" \\\n  --host \"$SERENA_MCP_HOST\" \\\n  --port \"$SERENA_MCP_PORT\"\n"
@@ -89,36 +95,6 @@
         "out": "/nix/store/51vn4xsrgzfl9g3s00byydpx6jgjgrnd-gum-0.17.0"
       },
       "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/w01nbfjmxqjr3w9sycd0jliiamnljij2-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:02.122815Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/m2wks8knnsfgjl0ikhbi0vv7bqn53385-gum-0.17.0"
-      },
-      "system": "x86_64-darwin",
       "group": "demo-tools",
       "priority": 5
     },
@@ -217,37 +193,6 @@
     {
       "attr_path": "nodejs_20",
       "broken": false,
-      "derivation": "/nix/store/5zzbi87r5rln2sdjrl07wkr2yss6nbyv-nodejs-20.20.2.drv",
-      "description": "Event-driven I/O framework for the V8 JavaScript engine",
-      "install_id": "nodejs",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d233902339c02a9c334e7e593de68855ad26c4cb",
-      "name": "nodejs-20.20.2",
-      "pname": "nodejs_20",
-      "rev": "d233902339c02a9c334e7e593de68855ad26c4cb",
-      "rev_count": 998534,
-      "rev_date": "2026-05-15T18:21:44Z",
-      "scrape_date": "2026-05-17T08:01:42.783035Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "20.20.2",
-      "outputs_to_install": [
-        "out",
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/ggqdy8b4b62gr1ak2v41dka5s1dmflzk-nodejs-20.20.2"
-      },
-      "system": "x86_64-darwin",
-      "group": "serena",
-      "priority": 5
-    },
-    {
-      "attr_path": "nodejs_20",
-      "broken": false,
       "derivation": "/nix/store/d4szbwjarvpvg2dgxmch851mvi2a78mq-nodejs-20.20.2.drv",
       "description": "Event-driven I/O framework for the V8 JavaScript engine",
       "install_id": "nodejs",
@@ -339,36 +284,6 @@
     {
       "attr_path": "serena",
       "broken": false,
-      "derivation": "/nix/store/d216kraidhwcvv7praqnb8sm45nng19m-serena-env.drv",
-      "description": "MCP toolkit for coding agents — IDE-grade semantic tools",
-      "install_id": "serena",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=3a55503b98cfc338efcbf444b5efe4959c547712",
-      "name": "serena-env",
-      "pname": "serena",
-      "rev": "3a55503b98cfc338efcbf444b5efe4959c547712",
-      "rev_count": 4323,
-      "rev_date": "2026-05-26T20:24:30Z",
-      "scrape_date": "2026-08-10T02:06:43.561192188Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "1.5.3",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/0abxpakcjpigz1xy707k9kqv5akai53l-serena-env"
-      },
-      "system": "x86_64-darwin",
-      "group": "serena",
-      "priority": 5
-    },
-    {
-      "attr_path": "serena",
-      "broken": false,
       "derivation": "/nix/store/imk4k22sp739z2xxrpc3adyqsibzi048-serena-env.drv",
       "description": "MCP toolkit for coding agents — IDE-grade semantic tools",
       "install_id": "serena",
@@ -409,7 +324,13 @@
       "hook": {
         "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Serena demo — IDE-grade MCP toolkit for coding agents' '' \\\n    'Run the CLI:' \\\n    '  serena --help' '' \\\n    'Start the MCP server inside the sample project:' \\\n    '  cd sample-project' \\\n    '  flox services start serena-mcp' '' \\\n    \"MCP endpoint: http://${SERENA_MCP_HOST}:${SERENA_MCP_PORT}/sse\" '' \\\n    'Then point Claude Desktop / Cursor / Codex at that URL.'\nfi\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "include": {
         "environments": [
           {

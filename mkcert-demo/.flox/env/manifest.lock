@@ -22,7 +22,13 @@
     "hook": {
       "on-activate": "export CAROOT=\"$FLOX_ENV_CACHE/mkcert\"\nexport NODE_EXTRA_CA_CERTS=\"$CAROOT/rootCA.pem\"\nmkdir -p \"$CAROOT\"\n\n# Create local CA if it doesn't exist\nif [ ! -f \"$CAROOT/rootCA.pem\" ]; then\n  mkcert -install\nfi\n\n# Generate domain certificates if domains changed\nDOMAINS_HASH=\"$CAROOT/domains\"\nif [ ! -f \"$DOMAINS_HASH\" ] \\\n    || [ \"$(cat \"$DOMAINS_HASH\")\" \\\n         != \"$MKCERT_DOMAINS\" ]; then\n  echo \"$MKCERT_DOMAINS\" > \"$DOMAINS_HASH\"\n  pushd \"$CAROOT\" >/dev/null\n  mkcert \\\n    -cert-file=domains.pem \\\n    -key-file=domains-key.pem \\\n    -p12-file=domains.p12 \\\n    $(echo $MKCERT_DOMAINS)\n  popd >/dev/null\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'mkcert environment ready!' '' \\\n    'Domains:' \\\n    \"  $MKCERT_DOMAINS\" '' \\\n    'Certificate files:' \\\n    \"  $CAROOT/domains.pem\" \\\n    \"  $CAROOT/domains-key.pem\" '' \\\n    'Node.js CA:' \\\n    \"  NODE_EXTRA_CA_CERTS=$NODE_EXTRA_CA_CERTS\"\nfi\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -82,36 +88,6 @@
         "out": "/nix/store/51vn4xsrgzfl9g3s00byydpx6jgjgrnd-gum-0.17.0"
       },
       "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/w01nbfjmxqjr3w9sycd0jliiamnljij2-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:02.122815Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/m2wks8knnsfgjl0ikhbi0vv7bqn53385-gum-0.17.0"
-      },
-      "system": "x86_64-darwin",
       "group": "demo-tools",
       "priority": 5
     },
@@ -202,36 +178,6 @@
         "out": "/nix/store/fkslp1gjzhsj33y6z9rrcv6y1q9j38zz-mkcert-1.4.4"
       },
       "system": "aarch64-linux",
-      "group": "mkcert",
-      "priority": 5
-    },
-    {
-      "attr_path": "mkcert",
-      "broken": false,
-      "derivation": "/nix/store/qwrldpppwrn08fhckhwa5x32c2ax8231-mkcert-1.4.4.drv",
-      "description": "Simple tool for making locally-trusted development certificates",
-      "install_id": "mkcert",
-      "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "mkcert-1.4.4",
-      "pname": "mkcert",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:29.856601Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "1.4.4",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/slavppbap2pj7a3pbvrji4845ldx5fjh-mkcert-1.4.4"
-      },
-      "system": "x86_64-darwin",
       "group": "mkcert",
       "priority": 5
     },
@@ -337,40 +283,6 @@
     {
       "attr_path": "nssTools",
       "broken": false,
-      "derivation": "/nix/store/1fza8045jr77lipw6c3q8yws6ha47ixf-nss-3.112.5.drv",
-      "description": "Set of libraries for development of security-enabled client and server applications",
-      "install_id": "nssTools",
-      "license": "MPL-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "nss-3.112.5",
-      "pname": "nssTools",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:32.482713Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "3.112.5",
-      "outputs_to_install": [
-        "man",
-        "out"
-      ],
-      "outputs": {
-        "dev": "/nix/store/12r31jjzg08l63zj0czphz2xygwqqpw4-nss-3.112.5-dev",
-        "man": "/nix/store/i5j74klmfrdpnmdqirnhiq36qvx5sdw7-nss-3.112.5-man",
-        "out": "/nix/store/z61n2xk2w3bbc4d9763pz6qgggp0lbvz-nss-3.112.5",
-        "tools": "/nix/store/1j3xah2w56wj15dzv4y1i2djqikhk92x-nss-3.112.5-tools"
-      },
-      "system": "x86_64-darwin",
-      "group": "mkcert",
-      "priority": 5
-    },
-    {
-      "attr_path": "nssTools",
-      "broken": false,
       "derivation": "/nix/store/fqnhnbizqbv48akxp5ilmpgv90lrcrfz-nss-3.112.5.drv",
       "description": "Set of libraries for development of security-enabled client and server applications",
       "install_id": "nssTools",
@@ -416,7 +328,13 @@
       "hook": {
         "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'mkcert environment ready!' '' \\\n    'Domains:' \\\n    \"  $MKCERT_DOMAINS\" '' \\\n    'Certificate files:' \\\n    \"  $CAROOT/domains.pem\" \\\n    \"  $CAROOT/domains-key.pem\" '' \\\n    'Node.js CA:' \\\n    \"  NODE_EXTRA_CA_CERTS=$NODE_EXTRA_CA_CERTS\"\nfi\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "include": {
         "environments": [
           {

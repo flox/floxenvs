@@ -20,7 +20,13 @@
     "hook": {
       "on-activate": "dir=\"$FLOX_ENV_CACHE/serena\"\nexport SERENA_DATA_DIR=\"$dir\"\nmkdir -p \"$dir\"\n"
     },
-    "options": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    },
     "services": {
       "serena-mcp": {
         "command": "dir=\"${SERENA_DATA_DIR:-$FLOX_ENV_CACHE/serena}\"\nmkdir -p \"$dir\"\nexec serena start-mcp-server \\\n  --transport \"$SERENA_TRANSPORT\" \\\n  --host \"$SERENA_MCP_HOST\" \\\n  --port \"$SERENA_MCP_PORT\"\n"
@@ -87,37 +93,6 @@
         "out": "/nix/store/jx5whkya850cy6a1fjf74p5dfqlcp1cq-nodejs-20.20.2"
       },
       "system": "aarch64-linux",
-      "group": "serena",
-      "priority": 5
-    },
-    {
-      "attr_path": "nodejs_20",
-      "broken": false,
-      "derivation": "/nix/store/5zzbi87r5rln2sdjrl07wkr2yss6nbyv-nodejs-20.20.2.drv",
-      "description": "Event-driven I/O framework for the V8 JavaScript engine",
-      "install_id": "nodejs",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d233902339c02a9c334e7e593de68855ad26c4cb",
-      "name": "nodejs-20.20.2",
-      "pname": "nodejs_20",
-      "rev": "d233902339c02a9c334e7e593de68855ad26c4cb",
-      "rev_count": 998534,
-      "rev_date": "2026-05-15T18:21:44Z",
-      "scrape_date": "2026-05-17T08:01:42.783035Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "20.20.2",
-      "outputs_to_install": [
-        "out",
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/ggqdy8b4b62gr1ak2v41dka5s1dmflzk-nodejs-20.20.2"
-      },
-      "system": "x86_64-darwin",
       "group": "serena",
       "priority": 5
     },
@@ -209,36 +184,6 @@
         "out": "/nix/store/r9z30kyc5ripj98q8idcclja5x04v55j-serena-env"
       },
       "system": "aarch64-linux",
-      "group": "serena",
-      "priority": 5
-    },
-    {
-      "attr_path": "serena",
-      "broken": false,
-      "derivation": "/nix/store/d216kraidhwcvv7praqnb8sm45nng19m-serena-env.drv",
-      "description": "MCP toolkit for coding agents — IDE-grade semantic tools",
-      "install_id": "serena",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=3a55503b98cfc338efcbf444b5efe4959c547712",
-      "name": "serena-env",
-      "pname": "serena",
-      "rev": "3a55503b98cfc338efcbf444b5efe4959c547712",
-      "rev_count": 4323,
-      "rev_date": "2026-05-26T20:24:30Z",
-      "scrape_date": "2026-06-22T03:52:57.733200577Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "1.5.3",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/0abxpakcjpigz1xy707k9kqv5akai53l-serena-env"
-      },
-      "system": "x86_64-darwin",
       "group": "serena",
       "priority": 5
     },

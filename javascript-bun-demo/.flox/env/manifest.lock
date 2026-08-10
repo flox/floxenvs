@@ -19,7 +19,13 @@
     "hook": {
       "on-activate": "export BUN_CACHE=\"$FLOX_ENV_CACHE/javascript-bun\"\nmkdir -p \"$BUN_CACHE\"\n\nBUN_LOCKFILE=\"\"\nif [ -f bun.lockb ]; then\n  BUN_LOCKFILE=\"bun.lockb\"\nelif [ -f bun.lock ]; then\n  BUN_LOCKFILE=\"bun.lock\"\nfi\n\nif [ \"$BUN_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f package.json ] \\\n    && [ -n \"$BUN_LOCKFILE\" ]; then\n  HASH=$(cat package.json \"$BUN_LOCKFILE\" \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$BUN_CACHE/packages-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    bun install --frozen-lockfile\n    echo \"$HASH\" > \"$BUN_CACHE/packages-hash\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Bun environment ready!' '' \\\n    'Bun version:' \\\n    \"  $(bun --version)\" '' \\\n    'Commands:' \\\n    '  bun install    Install packages' \\\n    '  bun run        Run a script' \\\n    '  bun <file>     Run a file'\nfi\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -79,36 +85,6 @@
         "out": "/nix/store/51vn4xsrgzfl9g3s00byydpx6jgjgrnd-gum-0.17.0"
       },
       "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/w01nbfjmxqjr3w9sycd0jliiamnljij2-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:02.122815Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/m2wks8knnsfgjl0ikhbi0vv7bqn53385-gum-0.17.0"
-      },
-      "system": "x86_64-darwin",
       "group": "demo-tools",
       "priority": 5
     },
@@ -205,36 +181,6 @@
     {
       "attr_path": "bun",
       "broken": false,
-      "derivation": "/nix/store/d2xdkj5z0am9q690z71qysvl2ghyw3s9-bun-1.3.13.drv",
-      "description": "Incredibly fast JavaScript runtime, bundler, transpiler and package manager – all in one",
-      "install_id": "bun",
-      "license": "[ MIT, LGPL-2.1-only ]",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "bun-1.3.13",
-      "pname": "bun",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:00.268379Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "1.3.13",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/wn9cggwqflvqryxxb9xinl9iygndm8d9-bun-1.3.13"
-      },
-      "system": "x86_64-darwin",
-      "group": "javascript-bun",
-      "priority": 5
-    },
-    {
-      "attr_path": "bun",
-      "broken": false,
       "derivation": "/nix/store/0aa9vfw76bbnla6z8vv4x6iw5hzw5bb1-bun-1.3.13.drv",
       "description": "Incredibly fast JavaScript runtime, bundler, transpiler and package manager – all in one",
       "install_id": "bun",
@@ -275,7 +221,13 @@
       "hook": {
         "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Bun environment ready!' '' \\\n    'Bun version:' \\\n    \"  $(bun --version)\" '' \\\n    'Commands:' \\\n    '  bun install    Install packages' \\\n    '  bun run        Run a script' \\\n    '  bun <file>     Run a file'\nfi\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "include": {
         "environments": [
           {

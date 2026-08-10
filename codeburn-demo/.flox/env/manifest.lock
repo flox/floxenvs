@@ -15,7 +15,13 @@
     "hook": {
       "on-activate": "if [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 50 --margin \"1 2\" --padding \"1 2\" \\\n    \"CodeBurn\" \"AI coding token observability\"\n  echo \"\"\n  echo \"  codeburn          — interactive dashboard\"\n  echo \"  codeburn today    — today's usage\"\n  echo \"  codeburn month    — this month's usage\"\n  echo \"  codeburn optimize — find waste, get fixes\"\n  echo \"  codeburn compare  — side-by-side models\"\n  echo \"\"\nfi\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -77,37 +83,6 @@
         "out": "/nix/store/70bv1k0x6m7s2w7injcmxhpfmxybnmfy-codeburn-0.9.19"
       },
       "system": "aarch64-linux",
-      "group": "codeburn",
-      "priority": 5
-    },
-    {
-      "attr_path": "codeburn",
-      "broken": false,
-      "derivation": "/nix/store/p2h35wcnna52wcs0cj0wfdp0np19j1m8-codeburn-0.9.19.drv",
-      "description": "TUI dashboard for AI coding token usage and cost observability",
-      "install_id": "codeburn",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=f2d06bfc149c5531bc481755a13c04f8819cc214",
-      "name": "codeburn-0.9.19",
-      "pname": "codeburn",
-      "rev": "f2d06bfc149c5531bc481755a13c04f8819cc214",
-      "rev_count": 15152,
-      "rev_date": "2026-07-20T20:00:23Z",
-      "scrape_date": "2026-08-10T01:08:16.960777901Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "0.9.19",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/wymg5za2api5mhhhqp9248rad15m5gj3-codeburn-0.9.19"
-      },
-      "system": "x86_64-darwin",
       "group": "codeburn",
       "priority": 5
     },
@@ -205,36 +180,6 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/w01nbfjmxqjr3w9sycd0jliiamnljij2-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:02.122815Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/m2wks8knnsfgjl0ikhbi0vv7bqn53385-gum-0.17.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
       "derivation": "/nix/store/468b0lgb2p00hyfj24xb44yj24r33hy4-gum-0.17.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
@@ -275,7 +220,13 @@
       "hook": {
         "on-activate": "if [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 50 --margin \"1 2\" --padding \"1 2\" \\\n    \"CodeBurn\" \"AI coding token observability\"\n  echo \"\"\n  echo \"  codeburn          — interactive dashboard\"\n  echo \"  codeburn today    — today's usage\"\n  echo \"  codeburn month    — this month's usage\"\n  echo \"  codeburn optimize — find waste, get fixes\"\n  echo \"  codeburn compare  — side-by-side models\"\n  echo \"\"\nfi\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "include": {
         "environments": [
           {

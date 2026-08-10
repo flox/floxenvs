@@ -19,7 +19,13 @@
     "hook": {
       "on-activate": "export VALKEY_DATA=\"$FLOX_ENV_CACHE/valkey\"\n\nif [ ! -d \"$VALKEY_DATA\" ]; then\n  mkdir -p \"$VALKEY_DATA\"\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Valkey in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to Valkey:' \\\n    \"  valkey-cli -h $VALKEY_HOST -p $VALKEY_PORT\" '' \\\n    'Connection information:' \\\n    \"  host=$VALKEY_HOST\" \\\n    \"  port=$VALKEY_PORT\"\nfi\n"
     },
-    "options": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    },
     "services": {
       "valkey": {
         "command": "  VALKEY_DATA=\"$FLOX_ENV_CACHE/valkey\"\n  mkdir -p \"$VALKEY_DATA\"\n  exec valkey-server \\\n    --bind \"$VALKEY_HOST\" \\\n    --port \"$VALKEY_PORT\" \\\n    --dir \"$VALKEY_DATA\" \\\n    --daemonize no\n"
@@ -84,36 +90,6 @@
         "out": "/nix/store/51vn4xsrgzfl9g3s00byydpx6jgjgrnd-gum-0.17.0"
       },
       "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/w01nbfjmxqjr3w9sycd0jliiamnljij2-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:02.122815Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/m2wks8knnsfgjl0ikhbi0vv7bqn53385-gum-0.17.0"
-      },
-      "system": "x86_64-darwin",
       "group": "demo-tools",
       "priority": 5
     },
@@ -210,36 +186,6 @@
     {
       "attr_path": "valkey",
       "broken": false,
-      "derivation": "/nix/store/0676r59hdl0wm82wi0k81bir3qjdx0h7-valkey-9.1.0.drv",
-      "description": "High-performance data structure server that primarily serves key/value workloads",
-      "install_id": "valkey",
-      "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "valkey-9.1.0",
-      "pname": "valkey",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:12:23.522673Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "9.1.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/9y0106j3v3lhnnvxy24x1pl04qpkzrrj-valkey-9.1.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "valkey",
-      "priority": 5
-    },
-    {
-      "attr_path": "valkey",
-      "broken": false,
       "derivation": "/nix/store/gr9l0qg0pfvsgfalmxmsxa3xy09qnjgm-valkey-9.1.0.drv",
       "description": "High-performance data structure server that primarily serves key/value workloads",
       "install_id": "valkey",
@@ -280,7 +226,13 @@
       "hook": {
         "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Valkey in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to Valkey:' \\\n    \"  valkey-cli -h $VALKEY_HOST -p $VALKEY_PORT\" '' \\\n    'Connection information:' \\\n    \"  host=$VALKEY_HOST\" \\\n    \"  port=$VALKEY_PORT\"\nfi\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "include": {
         "environments": [
           {

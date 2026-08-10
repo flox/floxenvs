@@ -34,7 +34,13 @@
         "pkg-path": "yq-go"
       }
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -107,41 +113,6 @@
         "out": "/nix/store/c6mpfdagkmgq8z7j0l07p2xadr5kvrd1-curl-8.20.0"
       },
       "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "curl",
-      "broken": false,
-      "derivation": "/nix/store/6rk2yhzsz320155zaq90ci1fjkbnm16z-curl-8.20.0.drv",
-      "description": "Command line tool for transferring files with URL syntax",
-      "install_id": "curl",
-      "license": "curl",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "name": "curl-8.20.0",
-      "pname": "curl",
-      "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "rev_count": 1017464,
-      "rev_date": "2026-06-16T02:33:49Z",
-      "scrape_date": "2026-06-17T04:13:06.338981Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "8.20.0",
-      "outputs_to_install": [
-        "bin",
-        "man"
-      ],
-      "outputs": {
-        "bin": "/nix/store/9r2nm4k450arpl9avin0zkmn6k5k2365-curl-8.20.0-bin",
-        "dev": "/nix/store/1bqjzcb8460z8i0v3gj33a16aj5dhl4f-curl-8.20.0-dev",
-        "devdoc": "/nix/store/8fwnah6b0akr71gc6dmmi23pr1jps3id-curl-8.20.0-devdoc",
-        "man": "/nix/store/dbjs0lyplc5spvzp4pmjprvfwzrvjpjz-curl-8.20.0-man",
-        "out": "/nix/store/c5x3dxmv4cp1dxl87hjhgnijcb60h87q-curl-8.20.0"
-      },
-      "system": "x86_64-darwin",
       "group": "toplevel",
       "priority": 5
     },
@@ -251,36 +222,6 @@
     {
       "attr_path": "gitleaks",
       "broken": false,
-      "derivation": "/nix/store/pidznn4rby2cqnv36gj4miiw2qgbihda-gitleaks-8.30.1.drv",
-      "description": "Scan git repos (or files) for secrets",
-      "install_id": "gitleaks",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "name": "gitleaks-8.30.1",
-      "pname": "gitleaks",
-      "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "rev_count": 1017464,
-      "rev_date": "2026-06-16T02:33:49Z",
-      "scrape_date": "2026-06-17T04:13:07.228149Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "8.30.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/5b9l1mffmal15szv09033x5spvvraswg-gitleaks-8.30.1"
-      },
-      "system": "x86_64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "gitleaks",
-      "broken": false,
       "derivation": "/nix/store/npd5phfpxa1alyv8x9mc3gc5rqkmvg33-gitleaks-8.30.1.drv",
       "description": "Scan git repos (or files) for secrets",
       "install_id": "gitleaks",
@@ -365,36 +306,6 @@
         "out": "/nix/store/jkcwcbwvhgzmxg59798z4clmj4bfv42i-go-1.26.3"
       },
       "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "go",
-      "broken": false,
-      "derivation": "/nix/store/7injq3dc4gh49fwhgh403kf7n1y6f9ci-go-1.26.3.drv",
-      "description": "Go Programming language",
-      "install_id": "go",
-      "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "name": "go-1.26.3",
-      "pname": "go",
-      "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "rev_count": 1017464,
-      "rev_date": "2026-06-16T02:33:49Z",
-      "scrape_date": "2026-06-17T04:13:07.336579Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "1.26.3",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/3f2jzvxmhhlarjqxy1p7i9r5l34siz29-go-1.26.3"
-      },
-      "system": "x86_64-darwin",
       "group": "toplevel",
       "priority": 5
     },
@@ -497,41 +408,6 @@
         "out": "/nix/store/6y9n87w9lsk3x0fscm6kfirk3ssc0syr-jq-1.8.1"
       },
       "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "jq",
-      "broken": false,
-      "derivation": "/nix/store/0rlalgyahkwxqihahidkwic07lhgrz2v-jq-1.8.1.drv",
-      "description": "Lightweight and flexible command-line JSON processor",
-      "install_id": "jq",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "name": "jq-1.8.1",
-      "pname": "jq",
-      "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "rev_count": 1017464,
-      "rev_date": "2026-06-16T02:33:49Z",
-      "scrape_date": "2026-06-17T04:13:24.080171Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "1.8.1",
-      "outputs_to_install": [
-        "bin",
-        "man"
-      ],
-      "outputs": {
-        "bin": "/nix/store/pnm2frw3jwfrlycf730z5bfgixiyjal4-jq-1.8.1-bin",
-        "dev": "/nix/store/hg1vhcfr1lwv39vn84cijdn187jmcfnj-jq-1.8.1-dev",
-        "doc": "/nix/store/mzarfihn2c84s6qw7zp0rbbj7hb09dv2-jq-1.8.1-doc",
-        "man": "/nix/store/0yyamki3lhy0rp6vn45mn6cdhqb2c64a-jq-1.8.1-man",
-        "out": "/nix/store/8c9m07iqwczlfzx1sk0c5g2a9nnzvhc3-jq-1.8.1"
-      },
-      "system": "x86_64-darwin",
       "group": "toplevel",
       "priority": 5
     },
@@ -643,39 +519,6 @@
     {
       "attr_path": "just",
       "broken": false,
-      "derivation": "/nix/store/jfpdv33s6yn0rgx9m6kln6gqfq5zz24c-just-1.51.0.drv",
-      "description": "Handy way to save and run project-specific commands",
-      "install_id": "just",
-      "license": "CC0-1.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "name": "just-1.51.0",
-      "pname": "just",
-      "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "rev_count": 1017464,
-      "rev_date": "2026-06-16T02:33:49Z",
-      "scrape_date": "2026-06-17T04:13:24.214231Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "1.51.0",
-      "outputs_to_install": [
-        "man",
-        "out"
-      ],
-      "outputs": {
-        "doc": "/nix/store/x5g644hwbjdlij9w37gwgg1z1h4b6qqk-just-1.51.0-doc",
-        "man": "/nix/store/144wqvh3s441y05xvzn8m16rhcqbki7d-just-1.51.0-man",
-        "out": "/nix/store/7ppiil9ycr565vqgbc18x4rpgbfgcnzy-just-1.51.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "just",
-      "broken": false,
       "derivation": "/nix/store/4mjxfjyrfpi7kg4fninbycnkvfklcn53-just-1.51.0.drv",
       "description": "Handy way to save and run project-specific commands",
       "install_id": "just",
@@ -769,36 +612,6 @@
     {
       "attr_path": "nodejs",
       "broken": false,
-      "derivation": "/nix/store/f0ay9hny5gn4c0lfrb95xrakm7yf3s2q-nodejs-24.15.0.drv",
-      "description": "Event-driven I/O framework for the V8 JavaScript engine",
-      "install_id": "nodejs",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "name": "nodejs-24.15.0",
-      "pname": "nodejs",
-      "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "rev_count": 1017464,
-      "rev_date": "2026-06-16T02:33:49Z",
-      "scrape_date": "2026-06-17T04:13:32.462339Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "24.15.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/rhv8jiklgw2bw4ljh4nm3h3r3bpnkcl3-nodejs-24.15.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "nodejs",
-      "broken": false,
       "derivation": "/nix/store/f8i8jydaqs0ngxm97c091zna2mnjb43f-nodejs-24.15.0.drv",
       "description": "Event-driven I/O framework for the V8 JavaScript engine",
       "install_id": "nodejs",
@@ -883,36 +696,6 @@
         "out": "/nix/store/c454dd19nix0106zaw862s56fn3nw3yy-prefetch-npm-deps-0.1.0"
       },
       "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "prefetch-npm-deps",
-      "broken": false,
-      "derivation": "/nix/store/vrfkswz76rvc8sbi7qhkn3xpwdsq4b6a-prefetch-npm-deps-0.1.0.drv",
-      "description": "Prefetch dependencies from npm (for use with `fetchNpmDeps`)",
-      "install_id": "prefetch-npm-deps",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "name": "prefetch-npm-deps-0.1.0",
-      "pname": "prefetch-npm-deps",
-      "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "rev_count": 1017464,
-      "rev_date": "2026-06-16T02:33:49Z",
-      "scrape_date": "2026-06-17T04:13:48.807333Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.1.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/x3kaz29arlzl3sfqzc3vd64qc36yh55s-prefetch-npm-deps-0.1.0"
-      },
-      "system": "x86_64-darwin",
       "group": "toplevel",
       "priority": 5
     },
@@ -1019,41 +802,6 @@
     {
       "attr_path": "shellcheck",
       "broken": false,
-      "derivation": "/nix/store/78nb4bjx7wwl4jqzadlv2si6iy4m6zhi-shellcheck-0.11.0.drv",
-      "description": "Shell script analysis tool",
-      "install_id": "shellcheck",
-      "license": "GPL-3.0-only",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "name": "shellcheck-0.11.0",
-      "pname": "shellcheck",
-      "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "rev_count": 1017464,
-      "rev_date": "2026-06-16T02:33:49Z",
-      "scrape_date": "2026-06-17T04:15:05.747291Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.11.0",
-      "outputs_to_install": [
-        "bin",
-        "doc",
-        "man"
-      ],
-      "outputs": {
-        "bin": "/nix/store/hn2l442nhcahcb8cvhf9g7nymzczciyi-shellcheck-0.11.0-bin",
-        "doc": "/nix/store/rjfwbcm3kpfvsvskybl64b1qwzlnnw5g-shellcheck-0.11.0-doc",
-        "man": "/nix/store/y781lm7p97zggqqw4wyl9r13z5fj7jgx-shellcheck-0.11.0-man",
-        "out": "/nix/store/wlb6zh8kjhfhaywhksn3mq2gmbarvmns-shellcheck-0.11.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "shellcheck",
-      "broken": false,
       "derivation": "/nix/store/y30dil3896v8wh6y4rqh6cplniir7851-shellcheck-0.11.0.drv",
       "description": "Shell script analysis tool",
       "install_id": "shellcheck",
@@ -1149,36 +897,6 @@
     {
       "attr_path": "uv",
       "broken": false,
-      "derivation": "/nix/store/krw8vs7zd628pgksi33r3m22axssx5mb-uv-0.11.19.drv",
-      "description": "Extremely fast Python package installer and resolver, written in Rust",
-      "install_id": "uv",
-      "license": "[ Apache-2.0, MIT ]",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "name": "uv-0.11.19",
-      "pname": "uv",
-      "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "rev_count": 1017464,
-      "rev_date": "2026-06-16T02:33:49Z",
-      "scrape_date": "2026-06-17T04:15:56.262354Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.11.19",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/285wms6br1rpnjydfl1x1qd82bvvrhc1-uv-0.11.19"
-      },
-      "system": "x86_64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "uv",
-      "broken": false,
       "derivation": "/nix/store/6gsa8bwxzr74ilavh9xy2nr40k0p58k7-uv-0.11.19.drv",
       "description": "Extremely fast Python package installer and resolver, written in Rust",
       "install_id": "uv",
@@ -1263,36 +981,6 @@
         "out": "/nix/store/44mvgs3i53zr64y7mffxynd12z5r1rx9-yq-go-4.53.3"
       },
       "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "yq-go",
-      "broken": false,
-      "derivation": "/nix/store/0c0lf8jl23aa9zkbvanlwb65hnzzard9-yq-go-4.53.3.drv",
-      "description": "Portable command-line YAML processor",
-      "install_id": "yq-go",
-      "license": "[ MIT ]",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "name": "yq-go-4.53.3",
-      "pname": "yq-go",
-      "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "rev_count": 1017464,
-      "rev_date": "2026-06-16T02:33:49Z",
-      "scrape_date": "2026-06-17T04:16:13.453676Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "4.53.3",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/2i52idac46kyqia6630pjc09nad8jvsc-yq-go-4.53.3"
-      },
-      "system": "x86_64-darwin",
       "group": "toplevel",
       "priority": 5
     },

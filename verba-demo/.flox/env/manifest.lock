@@ -67,7 +67,13 @@
     "profile": {
       "common": "source \"$PYTHON_DIR/bin/activate\"\n"
     },
-    "options": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    },
     "services": {
       "models": {
         "command": "until ollama list; do\n  sleep 0.1\ndone\nollama pull \"$OLLAMA_MODEL\"\nollama pull \"$OLLAMA_EMBED_MODEL\"\n"
@@ -141,36 +147,6 @@
         "out": "/nix/store/51vn4xsrgzfl9g3s00byydpx6jgjgrnd-gum-0.17.0"
       },
       "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/w01nbfjmxqjr3w9sycd0jliiamnljij2-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:02.122815Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/m2wks8knnsfgjl0ikhbi0vv7bqn53385-gum-0.17.0"
-      },
-      "system": "x86_64-darwin",
       "group": "demo-tools",
       "priority": 5
     },
@@ -285,41 +261,6 @@
     {
       "attr_path": "bash",
       "broken": false,
-      "derivation": "/nix/store/yb9kpvy2nd1js69sgqbgb198yhs63bla-bash-interactive-5.3p9.drv",
-      "description": "GNU Bourne-Again Shell, the de facto standard shell on Linux (for interactive use)",
-      "install_id": "bash",
-      "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "bash-interactive-5.3p9",
-      "pname": "bash",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:00.158723Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "5.3p9",
-      "outputs_to_install": [
-        "man",
-        "out"
-      ],
-      "outputs": {
-        "dev": "/nix/store/wgr49gwvsndc3sxixqx2l6zzs4vsy491-bash-interactive-5.3p9-dev",
-        "doc": "/nix/store/g0sfzlvvzcc0zggisi0cyrl85ss73rsi-bash-interactive-5.3p9-doc",
-        "info": "/nix/store/2rz7yhyblhd493hyav8awfr4rjgrf2sq-bash-interactive-5.3p9-info",
-        "man": "/nix/store/iaczqmz4gcbbrfkis26vccki5ikfmq5f-bash-interactive-5.3p9-man",
-        "out": "/nix/store/9a17cl5bfjsv3k8nk5flvw3cpb0wj475-bash-interactive-5.3p9"
-      },
-      "system": "x86_64-darwin",
-      "group": "verba",
-      "priority": 0
-    },
-    {
-      "attr_path": "bash",
-      "broken": false,
       "derivation": "/nix/store/dyc6zck7wfyh1l8c0qphc1lfipp8fap7-bash-interactive-5.3p9.drv",
       "description": "GNU Bourne-Again Shell, the de facto standard shell on Linux (for interactive use)",
       "install_id": "bash",
@@ -419,36 +360,6 @@
     {
       "attr_path": "ollama",
       "broken": false,
-      "derivation": "/nix/store/d1y6xg2k13agkq5knwpiswvxxpwg2fik-ollama-0.31.1.drv",
-      "description": "Get up and running with large language models locally",
-      "install_id": "ollama",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "ollama-0.31.1",
-      "pname": "ollama",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:38.426227Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.31.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/y09wagr7kxyb25sblfdsg951j2xc94c6-ollama-0.31.1"
-      },
-      "system": "x86_64-darwin",
-      "group": "verba",
-      "priority": 5
-    },
-    {
-      "attr_path": "ollama",
-      "broken": false,
       "derivation": "/nix/store/w5nr99zwvz9h3s9lyh897s31hnrlc4hw-ollama-0.31.1.drv",
       "description": "Get up and running with large language models locally",
       "install_id": "ollama",
@@ -540,36 +451,6 @@
     {
       "attr_path": "python311",
       "broken": false,
-      "derivation": "/nix/store/8bhjnvxm2b52kzaak8xhk005c7h06a0x-python3-3.11.15.drv",
-      "description": "High-level dynamically-typed programming language",
-      "install_id": "python",
-      "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "python3-3.11.15",
-      "pname": "python311",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:53.024332Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "python3-3.11.15",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/4w7i02q2kvwbhi4xmw14rkwbmv5s1h8n-python3-3.11.15"
-      },
-      "system": "x86_64-darwin",
-      "group": "verba",
-      "priority": 5
-    },
-    {
-      "attr_path": "python311",
-      "broken": false,
       "derivation": "/nix/store/m63kmcq43bwjgfmhn1b3mi0pw916h7v2-python3-3.11.15.drv",
       "description": "High-level dynamically-typed programming language",
       "install_id": "python",
@@ -655,36 +536,6 @@
         "out": "/nix/store/fmf2h620fd3xyqxpsvv5az1pxvpcbbdi-weaviate-1.38.0"
       },
       "system": "aarch64-linux",
-      "group": "verba",
-      "priority": 5
-    },
-    {
-      "attr_path": "weaviate",
-      "broken": false,
-      "derivation": "/nix/store/g1pkx7s7cyr2fb93agjdr1i7xa2hzxky-weaviate-1.38.0.drv",
-      "description": "ML-first vector search engine",
-      "install_id": "weaviate",
-      "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "weaviate-1.38.0",
-      "pname": "weaviate",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:12:40.792921Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "1.38.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/7bc7s4k9xds8f61a3s3g3smyfjgqp3xn-weaviate-1.38.0"
-      },
-      "system": "x86_64-darwin",
       "group": "verba",
       "priority": 5
     },
@@ -786,40 +637,6 @@
         "out": "/nix/store/8hwmjrgdixn4612zrlabmych64ix89mx-gcc-15.2.0"
       },
       "system": "aarch64-linux",
-      "group": "verba-build",
-      "priority": 5
-    },
-    {
-      "attr_path": "gcc-unwrapped",
-      "broken": false,
-      "derivation": "/nix/store/mlwhfwqf2nccqbav2nh6xmzjv7dh4sqi-gcc-15.2.0.drv",
-      "description": "GNU Compiler Collection, version 15.2.0",
-      "install_id": "gcc-unwrapped",
-      "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gcc-15.2.0",
-      "pname": "gcc-unwrapped",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:01.502606Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "15.2.0",
-      "outputs_to_install": [
-        "man",
-        "out"
-      ],
-      "outputs": {
-        "info": "/nix/store/z638rdi67s5cr9lwwnjjn60rckhdrq3x-gcc-15.2.0-info",
-        "lib": "/nix/store/vgdqp213pwqjcdz0iya3qv2sh051a92j-gcc-15.2.0-lib",
-        "man": "/nix/store/f9v0msz6xk4wz0qk3f3y9glmq9rzvrhr-gcc-15.2.0-man",
-        "out": "/nix/store/drlwi70dwk7ji20zv140n6sl098lprx6-gcc-15.2.0"
-      },
-      "system": "x86_64-darwin",
       "group": "verba-build",
       "priority": 5
     },
@@ -1014,39 +831,6 @@
     {
       "attr_path": "pkg-config",
       "broken": false,
-      "derivation": "/nix/store/1lcn6x97s98c9s8sjxv3k3iv05x4qvrh-pkg-config-wrapper-0.29.2.drv",
-      "description": "Tool that allows packages to find out information about other packages (wrapper script)",
-      "install_id": "pkg-config",
-      "license": "GPL-2.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "pkg-config-wrapper-0.29.2",
-      "pname": "pkg-config",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:50.236832Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.29.2",
-      "outputs_to_install": [
-        "man",
-        "out"
-      ],
-      "outputs": {
-        "doc": "/nix/store/y9vjqqsrn50xv6mar0ffpk3v90xk9n92-pkg-config-wrapper-0.29.2-doc",
-        "man": "/nix/store/9qd0n1nb130ixha7nn5f0hsnz89nl8vw-pkg-config-wrapper-0.29.2-man",
-        "out": "/nix/store/vplhggifvzl90sqphk9b37bjld2wsd5z-pkg-config-wrapper-0.29.2"
-      },
-      "system": "x86_64-darwin",
-      "group": "verba-build",
-      "priority": 5
-    },
-    {
-      "attr_path": "pkg-config",
-      "broken": false,
       "derivation": "/nix/store/7mq8skw5qdwpypgy5jcci2qxvhmslnvm-pkg-config-wrapper-0.29.2.drv",
       "description": "Tool that allows packages to find out information about other packages (wrapper script)",
       "install_id": "pkg-config",
@@ -1158,41 +942,6 @@
     {
       "attr_path": "curl",
       "broken": false,
-      "derivation": "/nix/store/yimp796x73y7ya2g3xrzhrklpzi4bhmr-curl-8.20.0.drv",
-      "description": "Command line tool for transferring files with URL syntax",
-      "install_id": "curl",
-      "license": "curl",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "curl-8.20.0",
-      "pname": "curl",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:00.699956Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "8.20.0",
-      "outputs_to_install": [
-        "bin",
-        "man"
-      ],
-      "outputs": {
-        "bin": "/nix/store/ay2d39b1rxpycpw6501kvx9bkj2flg3q-curl-8.20.0-bin",
-        "dev": "/nix/store/nq8f3x5kblji4ndh6l8fbzrxfkn3smdf-curl-8.20.0-dev",
-        "devdoc": "/nix/store/p8xshzip25m4g57jjpgddwssjavjb4h4-curl-8.20.0-devdoc",
-        "man": "/nix/store/brqfirf14dch7cp25snkfa82l1ckdmcs-curl-8.20.0-man",
-        "out": "/nix/store/b7rkky5rsnc5d6yjppxs67qvjrj27a06-curl-8.20.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "verba-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "curl",
-      "broken": false,
       "derivation": "/nix/store/zqkrwwbym85n95fd4xl1x2x2sg3iyihc-curl-8.20.0.drv",
       "description": "Command line tool for transferring files with URL syntax",
       "install_id": "curl",
@@ -1295,37 +1044,6 @@
     {
       "attr_path": "git",
       "broken": false,
-      "derivation": "/nix/store/dbxkqx6x4irzb4jd65110qkxwm40548v-git-2.54.0.drv",
-      "description": "Distributed version control system",
-      "install_id": "git",
-      "license": "GPL-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "git-2.54.0",
-      "pname": "git",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:01.623127Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.54.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "doc": "/nix/store/zakmjh312hmg2yslsyqmnw8lb8dgmyyk-git-2.54.0-doc",
-        "out": "/nix/store/x671lak90qvcxgc5irp4xv5zdbaym2yr-git-2.54.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "verba-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "git",
-      "broken": false,
       "derivation": "/nix/store/214n5nb1k4qzynzgw7xpsp4fp19vni8i-git-2.54.0.drv",
       "description": "Distributed version control system",
       "install_id": "git",
@@ -1369,7 +1087,13 @@
       "hook": {
         "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Verba services in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Services:' \\\n    '  weaviate  http://localhost:8080' \\\n    '  ollama    http://localhost:11434' \\\n    '  verba     http://localhost:8000' '' \\\n    'Ollama models:' \\\n    \"  chat   = $OLLAMA_MODEL\" \\\n    \"  embed  = $OLLAMA_EMBED_MODEL\"\nfi\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "include": {
         "environments": [
           {

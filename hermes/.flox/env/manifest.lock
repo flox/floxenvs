@@ -30,7 +30,13 @@
     "hook": {
       "on-activate": "HERMES_HOME=\"$FLOX_ENV_CACHE/hermes\"\nexport HERMES_HOME\nmkdir -p \"$HERMES_HOME\"\n\n# Lazy-install backends (anthropic, exa, faster-whisper, ...)\n# would try to `pip install` into the read-only Nix venv and\n# fail. Seed the user config to disable them so the user\n# gets clean FeatureUnavailable errors instead of pip\n# tracebacks.\nconfig=\"$HERMES_HOME/config.yaml\"\nif [ ! -f \"$config\" ]; then\n  printf 'security:\\n  allow_lazy_installs: false\\n' \\\n    > \"$config\"\nfi\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -108,45 +114,6 @@
         "out": "/nix/store/wdrpm09qjhb155kwch9b19pag9wagpkz-ffmpeg-8.1"
       },
       "system": "aarch64-linux",
-      "group": "hermes",
-      "priority": 5
-    },
-    {
-      "attr_path": "ffmpeg",
-      "broken": false,
-      "derivation": "/nix/store/g0savvq5i50kawp9bgjx71c9f1qyi692-ffmpeg-8.1.drv",
-      "description": "Complete, cross-platform solution to record, convert and stream audio and video",
-      "install_id": "ffmpeg",
-      "license": "[ LGPL-2.1-or-later, GPL-2.0-or-later, LGPL-3.0-or-later, GPL-3.0-or-later ]",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "name": "ffmpeg-8.1",
-      "pname": "ffmpeg",
-      "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "rev_count": 1017464,
-      "rev_date": "2026-06-16T02:33:49Z",
-      "scrape_date": "2026-06-17T04:13:06.857980Z",
-      "stabilities": [
-        "stable",
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "8.1",
-      "outputs_to_install": [
-        "bin",
-        "bin",
-        "man"
-      ],
-      "outputs": {
-        "bin": "/nix/store/qjil0v0y05rcrs2bzyijwyb90d5zfbzw-ffmpeg-8.1-bin",
-        "data": "/nix/store/hrvdbg19nsdh94rzvgxcvvkkq6rkph2k-ffmpeg-8.1-data",
-        "dev": "/nix/store/8r42iwc8pcz420gjczzgmgy86kn8wc39-ffmpeg-8.1-dev",
-        "doc": "/nix/store/mwn24al75gjgm42nck1bckmplv2zdz8h-ffmpeg-8.1-doc",
-        "lib": "/nix/store/7vy887l5yhwaisic91xj6rdp7m7vd8jm-ffmpeg-8.1-lib",
-        "man": "/nix/store/481y1x104ril85y1fdvpf55yk6r9n732-ffmpeg-8.1-man",
-        "out": "/nix/store/his8zz9p0mc0azz3rwjyknydn0d67n6s-ffmpeg-8.1"
-      },
-      "system": "x86_64-darwin",
       "group": "hermes",
       "priority": 5
     },
@@ -260,39 +227,6 @@
     {
       "attr_path": "git",
       "broken": false,
-      "derivation": "/nix/store/kfyjgmz1vv4jn18j90mdwhdlbihg93w2-git-2.54.0.drv",
-      "description": "Distributed version control system",
-      "install_id": "git",
-      "license": "GPL-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "name": "git-2.54.0",
-      "pname": "git",
-      "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "rev_count": 1017464,
-      "rev_date": "2026-06-16T02:33:49Z",
-      "scrape_date": "2026-06-17T04:13:07.165719Z",
-      "stabilities": [
-        "stable",
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.54.0",
-      "outputs_to_install": [
-        "out",
-        "out"
-      ],
-      "outputs": {
-        "doc": "/nix/store/agyxy5ay4x06b52mj24rz44fc82328ha-git-2.54.0-doc",
-        "out": "/nix/store/s9lsrlgwr3sabw9a2dl3laykas0ijk85-git-2.54.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "hermes",
-      "priority": 5
-    },
-    {
-      "attr_path": "git",
-      "broken": false,
       "derivation": "/nix/store/hg2n96ng32fxylxqci9jb8rwgd4hpc5g-git-2.54.0.drv",
       "description": "Distributed version control system",
       "install_id": "git",
@@ -386,37 +320,6 @@
         "out": "/nix/store/cl9igab1d64dk76y71dmjymgypv8sybs-hermes-agent-env"
       },
       "system": "aarch64-linux",
-      "group": "hermes",
-      "priority": 5
-    },
-    {
-      "attr_path": "hermes-agent",
-      "broken": false,
-      "derivation": "/nix/store/ckid7b62s9dhfg7h2hxaa5rhch0jfahg-hermes-agent-env.drv",
-      "description": "Self-improving AI agent from Nous Research",
-      "install_id": "hermes-agent",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=69304793cb90e07c2adefd7a05f0f678aed9bf55",
-      "name": "hermes-agent-env",
-      "pname": "hermes-agent",
-      "rev": "69304793cb90e07c2adefd7a05f0f678aed9bf55",
-      "rev_count": 14161,
-      "rev_date": "2026-07-13T15:44:29Z",
-      "scrape_date": "2026-07-20T01:46:17.387705333Z",
-      "stabilities": [
-        "stable",
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2026.7.7.2",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/hgjfkvi7g9jlh8kj42arjp4p5dk08acj-hermes-agent-env"
-      },
-      "system": "x86_64-darwin",
       "group": "hermes",
       "priority": 5
     },
@@ -518,38 +421,6 @@
     {
       "attr_path": "nodejs_22",
       "broken": false,
-      "derivation": "/nix/store/swx0aijnc54mq15z3s323alzv6j510wx-nodejs-22.22.3.drv",
-      "description": "Event-driven I/O framework for the V8 JavaScript engine",
-      "install_id": "nodejs",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "name": "nodejs-22.22.3",
-      "pname": "nodejs_22",
-      "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "rev_count": 1017464,
-      "rev_date": "2026-06-16T02:33:49Z",
-      "scrape_date": "2026-06-17T04:13:32.477802Z",
-      "stabilities": [
-        "stable",
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "22.22.3",
-      "outputs_to_install": [
-        "out",
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/9yvmgryhhwnswgaji30cpw4m9swhv1ia-nodejs-22.22.3"
-      },
-      "system": "x86_64-darwin",
-      "group": "hermes",
-      "priority": 5
-    },
-    {
-      "attr_path": "nodejs_22",
-      "broken": false,
       "derivation": "/nix/store/x0vx03v1gd5bzlqias0gixnf8m5y31xp-nodejs-22.22.3.drv",
       "description": "Event-driven I/O framework for the V8 JavaScript engine",
       "install_id": "nodejs",
@@ -644,38 +515,6 @@
         "out": "/nix/store/q8diaci9n2w99wa4c5vvh599a1bqckr1-ripgrep-15.1.0"
       },
       "system": "aarch64-linux",
-      "group": "hermes",
-      "priority": 5
-    },
-    {
-      "attr_path": "ripgrep",
-      "broken": false,
-      "derivation": "/nix/store/1dh84ml8q9853lhbkjl3hzxjmd23ibbr-ripgrep-15.1.0.drv",
-      "description": "Utility that combines the usability of The Silver Searcher with the raw speed of grep",
-      "install_id": "ripgrep",
-      "license": "[ Unlicense, MIT ]",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "name": "ripgrep-15.1.0",
-      "pname": "ripgrep",
-      "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "rev_count": 1017464,
-      "rev_date": "2026-06-16T02:33:49Z",
-      "scrape_date": "2026-06-17T04:14:42.721406Z",
-      "stabilities": [
-        "stable",
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "15.1.0",
-      "outputs_to_install": [
-        "out",
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/awcw6xygd9qb53glxyrf58yc4vx0aq6s-ripgrep-15.1.0"
-      },
-      "system": "x86_64-darwin",
       "group": "hermes",
       "priority": 5
     },

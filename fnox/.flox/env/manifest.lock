@@ -14,7 +14,13 @@
     "hook": {
       "on-activate": "# Per-environment data path; used by fnox to cache lease state,\n# session tokens, and resolved secrets.\nexport FNOX_DATA_DIR=\"$FLOX_ENV_CACHE/fnox\"\nmkdir -p \"$FNOX_DATA_DIR\"\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -76,37 +82,6 @@
         "out": "/nix/store/d7l5974gvgpm256b7871h6ivlw9p6472-fnox-1.33.0"
       },
       "system": "aarch64-linux",
-      "group": "fnox",
-      "priority": 5
-    },
-    {
-      "attr_path": "fnox",
-      "broken": false,
-      "derivation": "/nix/store/912pfgcq106379lxcyirqrmyc6dzkwz7-fnox-1.33.0.drv",
-      "description": "Fort Knox for your secrets — manage secrets with encryption or cloud providers",
-      "install_id": "fnox",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=b350dcf5e46e4e1269a9311df1a572c3f3c0304c",
-      "name": "fnox-1.33.0",
-      "pname": "fnox",
-      "rev": "b350dcf5e46e4e1269a9311df1a572c3f3c0304c",
-      "rev_count": 18853,
-      "rev_date": "2026-08-09T13:00:34Z",
-      "scrape_date": "2026-08-10T01:18:02.622924065Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "1.33.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/jacc8ffxif3zqlbai91y960iv8dj45la-fnox-1.33.0"
-      },
-      "system": "x86_64-darwin",
       "group": "fnox",
       "priority": 5
     },

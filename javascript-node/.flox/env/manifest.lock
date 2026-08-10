@@ -15,7 +15,13 @@
     "hook": {
       "on-activate": "export NODE_CACHE=\"$FLOX_ENV_CACHE/javascript-node\"\nmkdir -p \"$NODE_CACHE\"\n\n# Ensure npm cache is writable (HOME may be /var/empty\n# inside namespace isolation)\nexport npm_config_cache=\"$NODE_CACHE/npm-cache\"\n\nif [ \"$NODE_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f package.json ] \\\n    && [ -f package-lock.json ]; then\n  HASH=$(cat package.json package-lock.json \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$NODE_CACHE/packages-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    npm install\n    echo \"$HASH\" > \"$NODE_CACHE/packages-hash\"\n  fi\nfi\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -73,35 +79,6 @@
         "out": "/nix/store/jx5whkya850cy6a1fjf74p5dfqlcp1cq-nodejs-20.20.2"
       },
       "system": "aarch64-linux",
-      "group": "javascript-node",
-      "priority": 5
-    },
-    {
-      "attr_path": "nodejs_20",
-      "broken": false,
-      "derivation": "/nix/store/5zzbi87r5rln2sdjrl07wkr2yss6nbyv-nodejs-20.20.2.drv",
-      "description": "Event-driven I/O framework for the V8 JavaScript engine",
-      "install_id": "nodejs",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=15f4ee454b1dce334612fa6843b3e05cf546efab",
-      "name": "nodejs-20.20.2",
-      "pname": "nodejs_20",
-      "rev": "15f4ee454b1dce334612fa6843b3e05cf546efab",
-      "rev_count": 990025,
-      "rev_date": "2026-04-30T19:45:37Z",
-      "scrape_date": "2026-05-03T09:16:20.083199Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "20.20.2",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/ggqdy8b4b62gr1ak2v41dka5s1dmflzk-nodejs-20.20.2"
-      },
-      "system": "x86_64-darwin",
       "group": "javascript-node",
       "priority": 5
     },

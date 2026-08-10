@@ -15,7 +15,13 @@
     "hook": {
       "on-activate": "export MONGO_DATA=\"$FLOX_ENV_CACHE/mongodb\"\n\nif [ ! -d \"$MONGO_DATA\" ]; then\n  mkdir -m 0700 -p \"$MONGO_DATA\"\nfi\n"
     },
-    "options": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    },
     "services": {
       "mongodb": {
         "command": "  MONGO_DATA=\"$FLOX_ENV_CACHE/mongodb\"\n  exec mongod --dbpath \"$MONGO_DATA\" \\\n    --bind_ip \"$MONGO_HOST\" --port \"$MONGO_PORT\"\n"
@@ -78,35 +84,6 @@
         "out": "/nix/store/588dgi7d53znbyjqglij956dm8pyssil-mongodb-ce-8.2.11"
       },
       "system": "aarch64-linux",
-      "group": "mongodb",
-      "priority": 5
-    },
-    {
-      "attr_path": "mongodb-ce",
-      "broken": false,
-      "derivation": "/nix/store/sppy2nk00f2sjy6i5bqzxa3nlyq49xvi-mongodb-ce-8.2.11.drv",
-      "description": "MongoDB is a general purpose, document-based, distributed database",
-      "install_id": "mongodb-ce",
-      "license": "[ SSPL-1.0 ]",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "name": "mongodb-ce-8.2.11",
-      "pname": "mongodb-ce",
-      "rev": "65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "rev_count": 1026231,
-      "rev_date": "2026-07-02T02:29:44Z",
-      "scrape_date": "2026-07-04T04:09:27.827052Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": true,
-      "version": "8.2.11",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/h5smsv4c0dkxx54dmbz8f4dzlmgp7a4l-mongodb-ce-8.2.11"
-      },
-      "system": "x86_64-darwin",
       "group": "mongodb",
       "priority": 5
     },

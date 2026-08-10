@@ -15,7 +15,13 @@
     "hook": {
       "on-activate": "export REDIS_DATA=\"$FLOX_ENV_CACHE/redis\"\n\nif [ ! -d \"$REDIS_DATA\" ]; then\n  mkdir -p \"$REDIS_DATA\"\nfi\n"
     },
-    "options": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    },
     "services": {
       "redis": {
         "command": "  REDIS_DATA=\"$FLOX_ENV_CACHE/redis\"\n  mkdir -p \"$REDIS_DATA\"\n  exec redis-server \\\n    --bind \"$REDIS_HOST\" \\\n    --port \"$REDIS_PORT\" \\\n    --dir \"$REDIS_DATA\" \\\n    --daemonize no\n"
@@ -78,35 +84,6 @@
         "out": "/nix/store/dpf7nfg3irpjq9lwa6l4467vj7923h2n-redis-8.8.0"
       },
       "system": "aarch64-linux",
-      "group": "redis",
-      "priority": 5
-    },
-    {
-      "attr_path": "redis",
-      "broken": false,
-      "derivation": "/nix/store/vxf2qmn8papk78g17fj08wn3gxk1imjw-redis-8.8.0.drv",
-      "description": "Open source, advanced key-value store",
-      "install_id": "redis",
-      "license": "AGPL-3.0-only",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "name": "redis-8.8.0",
-      "pname": "redis",
-      "rev": "65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "rev_count": 1026231,
-      "rev_date": "2026-07-02T02:29:44Z",
-      "scrape_date": "2026-07-04T04:10:38.730619Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "8.8.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/i6a9ixvcpn5d57cndc1359ccils4q19h-redis-8.8.0"
-      },
-      "system": "x86_64-darwin",
       "group": "redis",
       "priority": 5
     },

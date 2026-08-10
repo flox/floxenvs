@@ -15,7 +15,13 @@
     "hook": {
       "on-activate": "export VALKEY_DATA=\"$FLOX_ENV_CACHE/valkey\"\n\nif [ ! -d \"$VALKEY_DATA\" ]; then\n  mkdir -p \"$VALKEY_DATA\"\nfi\n"
     },
-    "options": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    },
     "services": {
       "valkey": {
         "command": "  VALKEY_DATA=\"$FLOX_ENV_CACHE/valkey\"\n  mkdir -p \"$VALKEY_DATA\"\n  exec valkey-server \\\n    --bind \"$VALKEY_HOST\" \\\n    --port \"$VALKEY_PORT\" \\\n    --dir \"$VALKEY_DATA\" \\\n    --daemonize no\n"
@@ -78,35 +84,6 @@
         "out": "/nix/store/m2x1jsjb2l327z8kgn1hnln302mcnf13-valkey-9.1.0"
       },
       "system": "aarch64-linux",
-      "group": "valkey",
-      "priority": 5
-    },
-    {
-      "attr_path": "valkey",
-      "broken": false,
-      "derivation": "/nix/store/0676r59hdl0wm82wi0k81bir3qjdx0h7-valkey-9.1.0.drv",
-      "description": "High-performance data structure server that primarily serves key/value workloads",
-      "install_id": "valkey",
-      "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "name": "valkey-9.1.0",
-      "pname": "valkey",
-      "rev": "65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "rev_count": 1026231,
-      "rev_date": "2026-07-02T02:29:44Z",
-      "scrape_date": "2026-07-04T04:11:50.268573Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "9.1.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/9y0106j3v3lhnnvxy24x1pl04qpkzrrj-valkey-9.1.0"
-      },
-      "system": "x86_64-darwin",
       "group": "valkey",
       "priority": 5
     },
