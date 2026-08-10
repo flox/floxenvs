@@ -18,7 +18,13 @@
     "hook": {
       "on-activate": "export RUBY_CACHE=\"$FLOX_ENV_CACHE/ruby\"\nexport BUNDLE_PATH=\"$RUBY_CACHE/vendor\"\nmkdir -p \"$RUBY_CACHE\"\n\nif [ \"$RUBY_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f Gemfile ] \\\n    && [ -f Gemfile.lock ]; then\n  HASH=$(cat Gemfile Gemfile.lock \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$RUBY_CACHE/gems-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    bundle install\n    echo \"$HASH\" > \"$RUBY_CACHE/gems-hash\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Ruby environment ready!' '' \\\n    'Ruby version:' \\\n    \"  $(ruby --version)\" '' \\\n    'Commands:' \\\n    '  bundle install   Install gems' \\\n    '  bundle exec      Run with bundler' \\\n    '  ruby <file>      Run a script'\nfi\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -78,36 +84,6 @@
         "out": "/nix/store/51vn4xsrgzfl9g3s00byydpx6jgjgrnd-gum-0.17.0"
       },
       "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/w01nbfjmxqjr3w9sycd0jliiamnljij2-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:02.122815Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/m2wks8knnsfgjl0ikhbi0vv7bqn53385-gum-0.17.0"
-      },
-      "system": "x86_64-darwin",
       "group": "demo-tools",
       "priority": 5
     },
@@ -206,37 +182,6 @@
     {
       "attr_path": "ruby",
       "broken": false,
-      "derivation": "/nix/store/f1jda0n3i0nyrqwxl94jvh2hmm26hp2v-ruby-3.4.9.drv",
-      "description": "Object-oriented language for quick and easy programming",
-      "install_id": "ruby",
-      "license": "Ruby",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "ruby-3.4.9",
-      "pname": "ruby",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:10:57.408955Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "3.4.9",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "devdoc": "/nix/store/rmqxa47vl3klg1ry4p8h3l1vigscqkk6-ruby-3.4.9-devdoc",
-        "out": "/nix/store/pj6sw5j7inzw14nx4mhad31bqr5xa7ky-ruby-3.4.9"
-      },
-      "system": "x86_64-darwin",
-      "group": "ruby",
-      "priority": 5
-    },
-    {
-      "attr_path": "ruby",
-      "broken": false,
       "derivation": "/nix/store/kr2713syv2cv4zzygplq7fddwx7dfrmp-ruby-3.4.9.drv",
       "description": "Object-oriented language for quick and easy programming",
       "install_id": "ruby",
@@ -278,7 +223,13 @@
       "hook": {
         "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Ruby environment ready!' '' \\\n    'Ruby version:' \\\n    \"  $(ruby --version)\" '' \\\n    'Commands:' \\\n    '  bundle install   Install gems' \\\n    '  bundle exec      Run with bundler' \\\n    '  ruby <file>      Run a script'\nfi\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "include": {
         "environments": [
           {
@@ -303,7 +254,13 @@
           "hook": {
             "on-activate": "export RUBY_CACHE=\"$FLOX_ENV_CACHE/ruby\"\nexport BUNDLE_PATH=\"$RUBY_CACHE/vendor\"\nmkdir -p \"$RUBY_CACHE\"\n\nif [ \"$RUBY_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f Gemfile ] \\\n    && [ -f Gemfile.lock ]; then\n  HASH=$(cat Gemfile Gemfile.lock \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$RUBY_CACHE/gems-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    bundle install\n    echo \"$HASH\" > \"$RUBY_CACHE/gems-hash\"\n  fi\nfi\n"
           },
-          "options": {}
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          }
         },
         "name": "ruby",
         "descriptor": {
@@ -311,6 +268,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

@@ -27,7 +27,13 @@
       "fish": "if test -f pyproject.toml\n  set POETRY_VENV (poetry env info --path 2>/dev/null)\n  if test -n \"$POETRY_VENV\"\n    source \"$POETRY_VENV/bin/activate.fish\"\n  end\nend\n",
       "tcsh": "if ( -f pyproject.toml ) then\n  set POETRY_VENV=`poetry env info --path`\n  source \"$POETRY_VENV/bin/activate.csh\"\nendif\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -87,36 +93,6 @@
         "out": "/nix/store/51vn4xsrgzfl9g3s00byydpx6jgjgrnd-gum-0.17.0"
       },
       "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/w01nbfjmxqjr3w9sycd0jliiamnljij2-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:02.122815Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/m2wks8knnsfgjl0ikhbi0vv7bqn53385-gum-0.17.0"
-      },
-      "system": "x86_64-darwin",
       "group": "demo-tools",
       "priority": 5
     },
@@ -207,36 +183,6 @@
         "out": "/nix/store/z0p5433264lbih8r0rcj1s3x9mzpd2p1-python3.13-poetry-2.4.1"
       },
       "system": "aarch64-linux",
-      "group": "python-poetry",
-      "priority": 5
-    },
-    {
-      "attr_path": "poetry",
-      "broken": false,
-      "derivation": "/nix/store/y37lwprpgkqhrhiqpb82sgff3inz2sgj-python3.13-poetry-2.4.1.drv",
-      "description": "Python dependency management and packaging made easy",
-      "install_id": "poetry",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=e73de5be04e0eff4190a1432b946d469c794e7b4",
-      "name": "poetry-2.4.1",
-      "pname": "poetry",
-      "rev": "e73de5be04e0eff4190a1432b946d469c794e7b4",
-      "rev_count": 1022855,
-      "rev_date": "2026-06-26T09:58:34Z",
-      "scrape_date": "2026-06-27T04:21:44.590475Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "dist": "/nix/store/mpigmi2aj53kz5ix84gij0ybxfwis6pp-python3.13-poetry-2.4.1-dist",
-        "out": "/nix/store/45rgib78zs3rklv7v05n3scncgb0xp0b-python3.13-poetry-2.4.1"
-      },
-      "system": "x86_64-darwin",
       "group": "python-poetry",
       "priority": 5
     },
@@ -336,36 +282,6 @@
     {
       "attr_path": "python3",
       "broken": false,
-      "derivation": "/nix/store/5vh9qfs54q47jybcd5zhxmap7lgk2dhg-python3-3.13.13.drv",
-      "description": "High-level dynamically-typed programming language",
-      "install_id": "python",
-      "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "python3-3.13.13",
-      "pname": "python3",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:53.021160Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "3.13.13",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/1137mc2md1ip5pdslybxl05kysjyh4rg-python3-3.13.13"
-      },
-      "system": "x86_64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "python3",
-      "broken": false,
       "derivation": "/nix/store/d8rrzn9gg475brqyfpdaa3w76gzwmvx4-python3-3.13.13.drv",
       "description": "High-level dynamically-typed programming language",
       "install_id": "python",
@@ -409,7 +325,13 @@
       "hook": {
         "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Python + Poetry environment ready!' '' \\\n    'Python version:' \\\n    \"  $(python3 --version 2>&1)\" '' \\\n    'Poetry commands:' \\\n    '  poetry add <package>' \\\n    '  poetry install' \\\n    '  poetry show'\nfi\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "include": {
         "environments": [
           {
@@ -443,7 +365,13 @@
             "fish": "if test -f pyproject.toml\n  set POETRY_VENV (poetry env info --path 2>/dev/null)\n  if test -n \"$POETRY_VENV\"\n    source \"$POETRY_VENV/bin/activate.fish\"\n  end\nend\n",
             "tcsh": "if ( -f pyproject.toml ) then\n  set POETRY_VENV=`poetry env info --path`\n  source \"$POETRY_VENV/bin/activate.csh\"\nendif\n"
           },
-          "options": {}
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          }
         },
         "name": "python-poetry",
         "descriptor": {
@@ -451,6 +379,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

@@ -72,3 +72,6 @@ export XDG_DATA_HOME="$AGENTMEMORY_CACHE/data"
 mkdir -p "$npm_config_cache" "$XDG_DATA_HOME"
 exec npx -y "@agentmemory/agentmemory@$AGENTMEMORY_VERSION"
 '''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]

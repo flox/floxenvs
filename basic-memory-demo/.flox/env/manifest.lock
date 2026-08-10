@@ -24,7 +24,13 @@
     "hook": {
       "on-activate": "# Project-scope MCP wiring. claude reads .mcp.json from CWD,\n# so basic-memory is available immediately when claude is run\n# from this dir. Idempotent — overwritten every activation.\ncat > \"$FLOX_ENV_PROJECT/.mcp.json\" <<'JSON'\n{\n  \"mcpServers\": {\n    \"basic-memory\": {\n      \"command\": \"basic-memory\",\n      \"args\": [\"mcp\"]\n    }\n  }\n}\nJSON\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 60 --margin \"1 2\" --padding \"1 2\" \\\n    \"Basic Memory\" \\\n    \"Local-first knowledge graph wired into Claude Code\"\n  echo \"\"\n  echo \"  basic-memory --help        — CLI overview\"\n  echo \"  basic-memory project list  — list projects\"\n  echo \"  claude                     — start Claude Code with\"\n  echo \"                                basic-memory MCP wired up\"\n  echo \"\"\nfi\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -183,36 +189,6 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/w01nbfjmxqjr3w9sycd0jliiamnljij2-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:02.122815Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/m2wks8knnsfgjl0ikhbi0vv7bqn53385-gum-0.17.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
       "derivation": "/nix/store/468b0lgb2p00hyfj24xb44yj24r33hy4-gum-0.17.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
@@ -303,36 +279,6 @@
     {
       "attr_path": "flox-ai",
       "broken": false,
-      "derivation": "/nix/store/x67927620yafssr4pmkjws7dv6v132d3-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-08-10T00:59:59.596375235Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.8.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/l6j0hn116hn91ld4ynj13n1vk90i0q5s-flox-ai-0.8.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "flox-ai",
-      "priority": 5
-    },
-    {
-      "attr_path": "flox-ai",
-      "broken": false,
       "derivation": "/nix/store/w14almryjawbkglkr56spfxi25ihvhzw-flox-ai-0.8.0.drv",
       "description": "Flox-native config management for Claude Code CLI",
       "install_id": "flox-ai",
@@ -377,7 +323,13 @@
       "hook": {
         "on-activate": "# Project-scope MCP wiring. claude reads .mcp.json from CWD,\n# so basic-memory is available immediately when claude is run\n# from this dir. Idempotent — overwritten every activation.\ncat > \"$FLOX_ENV_PROJECT/.mcp.json\" <<'JSON'\n{\n  \"mcpServers\": {\n    \"basic-memory\": {\n      \"command\": \"basic-memory\",\n      \"args\": [\"mcp\"]\n    }\n  }\n}\nJSON\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 60 --margin \"1 2\" --padding \"1 2\" \\\n    \"Basic Memory\" \\\n    \"Local-first knowledge graph wired into Claude Code\"\n  echo \"\"\n  echo \"  basic-memory --help        — CLI overview\"\n  echo \"  basic-memory project list  — list projects\"\n  echo \"  claude                     — start Claude Code with\"\n  echo \"                                basic-memory MCP wired up\"\n  echo \"\"\nfi\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "include": {
         "environments": [
           {
@@ -405,7 +357,13 @@
               "pkg-group": "flox-ai"
             }
           },
-          "options": {}
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          }
         },
         "name": "basic-memory",
         "descriptor": {
@@ -419,6 +377,15 @@
           "Overriding": [
             "install",
             "flox-ai"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      },
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
           ]
         },
         "higher_priority_name": "Current manifest"

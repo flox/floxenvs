@@ -14,7 +14,13 @@
     "profile": {
       "common": "if [ -n \"${OP_SESSION_TOKEN:-}\" ]; then\n  alias op=\"op --session $OP_SESSION_TOKEN\"\nfi\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -72,35 +78,6 @@
         "out": "/nix/store/p515b57pf3wg2jhc8md9hbcva6jarsjc-1password-cli-2.32.0"
       },
       "system": "aarch64-linux",
-      "group": "1password",
-      "priority": 5
-    },
-    {
-      "attr_path": "_1password",
-      "broken": false,
-      "derivation": "/nix/store/gnv9l43qzjaqbwkyiqpc0hwzlbmd4lzp-1password-cli-2.32.0.drv",
-      "description": "1Password command-line tool",
-      "install_id": "op",
-      "license": "Unfree",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
-      "name": "1password-cli-2.32.0",
-      "pname": "_1password",
-      "rev": "6a08e6bb4e46ff7fcbb53d409b253f6bad8a28ce",
-      "rev_count": 883951,
-      "rev_date": "2025-10-25T06:24:58Z",
-      "scrape_date": "2025-10-27T02:29:21.139103Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": true,
-      "version": "2.32.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/gv6bgzp76viws8l647llyssrg09zzaq9-1password-cli-2.32.0"
-      },
-      "system": "x86_64-darwin",
       "group": "1password",
       "priority": 5
     },

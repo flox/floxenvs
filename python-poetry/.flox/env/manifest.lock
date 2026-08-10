@@ -23,7 +23,13 @@
       "fish": "if test -f pyproject.toml\n  set POETRY_VENV (poetry env info --path 2>/dev/null)\n  if test -n \"$POETRY_VENV\"\n    source \"$POETRY_VENV/bin/activate.fish\"\n  end\nend\n",
       "tcsh": "if ( -f pyproject.toml ) then\n  set POETRY_VENV=`poetry env info --path`\n  source \"$POETRY_VENV/bin/activate.csh\"\nendif\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -83,36 +89,6 @@
         "out": "/nix/store/z0p5433264lbih8r0rcj1s3x9mzpd2p1-python3.13-poetry-2.4.1"
       },
       "system": "aarch64-linux",
-      "group": "python-poetry",
-      "priority": 5
-    },
-    {
-      "attr_path": "poetry",
-      "broken": false,
-      "derivation": "/nix/store/y37lwprpgkqhrhiqpb82sgff3inz2sgj-python3.13-poetry-2.4.1.drv",
-      "description": "Python dependency management and packaging made easy",
-      "install_id": "poetry",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=e73de5be04e0eff4190a1432b946d469c794e7b4",
-      "name": "poetry-2.4.1",
-      "pname": "poetry",
-      "rev": "e73de5be04e0eff4190a1432b946d469c794e7b4",
-      "rev_count": 1022855,
-      "rev_date": "2026-06-26T09:58:34Z",
-      "scrape_date": "2026-06-27T04:21:44.590475Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "dist": "/nix/store/mpigmi2aj53kz5ix84gij0ybxfwis6pp-python3.13-poetry-2.4.1-dist",
-        "out": "/nix/store/45rgib78zs3rklv7v05n3scncgb0xp0b-python3.13-poetry-2.4.1"
-      },
-      "system": "x86_64-darwin",
       "group": "python-poetry",
       "priority": 5
     },
@@ -203,35 +179,6 @@
         "out": "/nix/store/smwd56pl54f0pcjdspgh5vnf20c8xwsc-python3-3.13.13"
       },
       "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "python3",
-      "broken": false,
-      "derivation": "/nix/store/5vh9qfs54q47jybcd5zhxmap7lgk2dhg-python3-3.13.13.drv",
-      "description": "High-level dynamically-typed programming language",
-      "install_id": "python",
-      "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "name": "python3-3.13.13",
-      "pname": "python3",
-      "rev": "65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "rev_count": 1026231,
-      "rev_date": "2026-07-02T02:29:44Z",
-      "scrape_date": "2026-07-04T04:09:45.917689Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "3.13.13",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/1137mc2md1ip5pdslybxl05kysjyh4rg-python3-3.13.13"
-      },
-      "system": "x86_64-darwin",
       "group": "toplevel",
       "priority": 5
     },

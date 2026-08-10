@@ -28,7 +28,13 @@
       "zsh": "eval \"$(flox-ai setup-profile-zsh)\"\n",
       "fish": "flox-ai setup-profile-fish | source\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -90,37 +96,6 @@
         "out": "/nix/store/6n8d68cz6sdf5w2h37lq388pxckh6kh7-claude-code-2.1.226"
       },
       "system": "aarch64-linux",
-      "group": "claude-code",
-      "priority": 5
-    },
-    {
-      "attr_path": "claude-code",
-      "broken": false,
-      "derivation": "/nix/store/iq72qv1lyhwv1q3p2hvq02ff8cmmwifv-claude-code-2.1.226.drv",
-      "description": "Agentic coding tool from Anthropic",
-      "install_id": "claude-code",
-      "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=bb6fb0a157b88dfc76812a9194905015ea1d90e3",
-      "name": "claude-code-2.1.226",
-      "pname": "claude-code",
-      "rev": "bb6fb0a157b88dfc76812a9194905015ea1d90e3",
-      "rev_count": 18717,
-      "rev_date": "2026-08-08T07:01:06Z",
-      "scrape_date": "2026-08-10T01:57:14.635088951Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": true,
-      "version": "2.1.226",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/v3swhl1cjm2g9syn6wkia932k0gii8a6-claude-code-2.1.226"
-      },
-      "system": "x86_64-darwin",
       "group": "claude-code",
       "priority": 5
     },
@@ -218,36 +193,6 @@
     {
       "attr_path": "flox-ai",
       "broken": false,
-      "derivation": "/nix/store/x67927620yafssr4pmkjws7dv6v132d3-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-08-10T01:57:14.635107346Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.8.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/l6j0hn116hn91ld4ynj13n1vk90i0q5s-flox-ai-0.8.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "flox-ai",
-      "priority": 5
-    },
-    {
-      "attr_path": "flox-ai",
-      "broken": false,
       "derivation": "/nix/store/w14almryjawbkglkr56spfxi25ihvhzw-flox-ai-0.8.0.drv",
       "description": "Flox-native config management for Claude Code CLI",
       "install_id": "flox-ai",
@@ -333,36 +278,6 @@
         "out": "/nix/store/26r12fb2ywx1q5f9paf1sjibsajz1q99-nodejs-22.23.1"
       },
       "system": "aarch64-linux",
-      "group": "remotion",
-      "priority": 5
-    },
-    {
-      "attr_path": "nodejs_22",
-      "broken": false,
-      "derivation": "/nix/store/3vxsfqn82i1z86659wiasjlb2dfvgibm-nodejs-22.23.1.drv",
-      "description": "Event-driven I/O framework for the V8 JavaScript engine",
-      "install_id": "nodejs",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "nodejs-22.23.1",
-      "pname": "nodejs_22",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:32.260955Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "22.23.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/l1yfdvdrz1vl6f3wsyjglxgsk6r29rkn-nodejs-22.23.1"
-      },
-      "system": "x86_64-darwin",
       "group": "remotion",
       "priority": 5
     },
@@ -455,37 +370,6 @@
         "out": "/nix/store/qayfvzbf4awhfynssqvvwkzbrgfk4nc1-skills-remotion-2026.08.07"
       },
       "system": "aarch64-linux",
-      "group": "skills-remotion",
-      "priority": 5
-    },
-    {
-      "attr_path": "skills-remotion",
-      "broken": false,
-      "derivation": "/nix/store/i3k0cjvzms8shf5fi2d9ag95ilyywmsq-skills-remotion-2026.08.07.drv",
-      "description": "Remotion best-practices plugin for Claude Code — 1 skill, 30+ topic rules covering animations, audio, captions, 3D, transitions, and more for programmatic video creation in React.",
-      "install_id": "skills-remotion",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=202a224d8cb4381cb9f0fceea5617d657988dc2a",
-      "name": "skills-remotion-2026.08.07",
-      "pname": "skills-remotion",
-      "rev": "202a224d8cb4381cb9f0fceea5617d657988dc2a",
-      "rev_count": 18615,
-      "rev_date": "2026-08-07T20:01:14Z",
-      "scrape_date": "2026-08-10T01:57:14.635143914Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "2026.08.07",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/yq85ri988m23czifcamx00izmnswcpwx-skills-remotion-2026.08.07"
-      },
-      "system": "x86_64-darwin",
       "group": "skills-remotion",
       "priority": 5
     },

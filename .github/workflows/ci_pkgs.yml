@@ -184,7 +184,7 @@ jobs:
           fetch-depth: 0
           filter: "blob:none"
       - name: "Install flox"
-        uses: "flox/install-flox-action@3b80351ae97bbe063f264dc88fbd505507054963" # v2.5.3
+        uses: "flox/install-flox-action@1128abd73431089ab9d871c893b4e72a729354e1" # v2.6.0
       - name: "Setup Tailscale"
         uses: "tailscale/github-action@780049a30b6ff5c378a9e7b389d15ece7a204888" # v4.1.3
         with:
@@ -236,7 +236,7 @@ jobs:
           fetch-depth: 0
           filter: "blob:none"
       - name: "Install flox"
-        uses: "flox/install-flox-action@3b80351ae97bbe063f264dc88fbd505507054963" # v2.5.3
+        uses: "flox/install-flox-action@1128abd73431089ab9d871c893b4e72a729354e1" # v2.6.0
       - name: "Setup Tailscale"
         uses: "tailscale/github-action@780049a30b6ff5c378a9e7b389d15ece7a204888" # v4.1.3
         with:
@@ -288,7 +288,7 @@ jobs:
           fetch-depth: 0
           filter: "blob:none"
       - name: "Install flox"
-        uses: "flox/install-flox-action@3b80351ae97bbe063f264dc88fbd505507054963" # v2.5.3
+        uses: "flox/install-flox-action@1128abd73431089ab9d871c893b4e72a729354e1" # v2.6.0
       - name: "Setup Tailscale"
         uses: "tailscale/github-action@780049a30b6ff5c378a9e7b389d15ece7a204888" # v4.1.3
         with:
@@ -340,7 +340,7 @@ jobs:
           fetch-depth: 0
           filter: "blob:none"
       - name: "Install flox"
-        uses: "flox/install-flox-action@3b80351ae97bbe063f264dc88fbd505507054963" # v2.5.3
+        uses: "flox/install-flox-action@1128abd73431089ab9d871c893b4e72a729354e1" # v2.6.0
       - name: "Setup Tailscale"
         uses: "tailscale/github-action@780049a30b6ff5c378a9e7b389d15ece7a204888" # v4.1.3
         with:
@@ -377,8 +377,25 @@ jobs:
       # Audit only skills-* packages (the Claude Code skill/plugin
       # fragments) — gated here at the step level since matrix.package is
       # known. Everything else is built/published, not audited.
+      # Realizing the .website env normally takes ~17s, but under load
+      # (the nightly bot PR wave) substitution sometimes stalls with
+      # zero output until the 90-minute job timeout cancels the run.
+      # Health-check the activation first with a hard 1-minute bound and
+      # three attempts — a stall costs 3 minutes and a clear error, not
+      # 90 silent ones.
+      - name: "Warm .website env (bounded)"
+        if: ${{ startsWith(matrix.package, 'skills-') }}
+        uses: "nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60" # v4.0.0
+        with:
+          timeout_minutes: 1
+          max_attempts: 3
+          retry_wait_seconds: 10
+          command: "flox activate -d .website -- true"
       - name: "Audit fragment content"
         if: ${{ startsWith(matrix.package, 'skills-') }}
+        # Backstop for the audit run itself — the env is already
+        # realized above, so this activation is instant.
+        timeout-minutes: 20
         # Fragments are content-audited from the build above; run-audit.sh
         # reuses result-<pkg> and runs the flox-ai audit engine. The
         # flox-ai + skill-audit tools live in the .website env (NOT the
@@ -428,7 +445,7 @@ jobs:
           fetch-depth: 0
       - name: "Install flox"
         # Required so the run steps' `flox activate -d .website` works.
-        uses: "flox/install-flox-action@3b80351ae97bbe063f264dc88fbd505507054963" # v2.5.3
+        uses: "flox/install-flox-action@1128abd73431089ab9d871c893b4e72a729354e1" # v2.6.0
       - name: "Download fresh metrics"
         uses: "actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c" # v8
         with:
@@ -546,7 +563,7 @@ jobs:
       - name: "Checkout"
         uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
       - name: "Install flox"
-        uses: "flox/install-flox-action@3b80351ae97bbe063f264dc88fbd505507054963" # v2.5.3
+        uses: "flox/install-flox-action@1128abd73431089ab9d871c893b4e72a729354e1" # v2.6.0
       - name: "Setup Tailscale"
         uses: "tailscale/github-action@780049a30b6ff5c378a9e7b389d15ece7a204888" # v4.1.3
         with:

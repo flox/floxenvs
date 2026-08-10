@@ -33,7 +33,13 @@
       "zsh": "eval \"$(flox-ai setup-profile-zsh)\"\n",
       "fish": "flox-ai setup-profile-fish | source\n"
     },
-    "options": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    },
     "services": {
       "agentmemory": {
         "command": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\nexport XDG_DATA_HOME=\"$AGENTMEMORY_CACHE/data\"\nmkdir -p \"$npm_config_cache\" \"$XDG_DATA_HOME\"\nexec npx -y \"@agentmemory/agentmemory@$AGENTMEMORY_VERSION\"\n"
@@ -100,37 +106,6 @@
         "out": "/nix/store/jx5whkya850cy6a1fjf74p5dfqlcp1cq-nodejs-20.20.2"
       },
       "system": "aarch64-linux",
-      "group": "agentmemory",
-      "priority": 5
-    },
-    {
-      "attr_path": "nodejs_20",
-      "broken": false,
-      "derivation": "/nix/store/5zzbi87r5rln2sdjrl07wkr2yss6nbyv-nodejs-20.20.2.drv",
-      "description": "Event-driven I/O framework for the V8 JavaScript engine",
-      "install_id": "nodejs",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d233902339c02a9c334e7e593de68855ad26c4cb",
-      "name": "nodejs-20.20.2",
-      "pname": "nodejs_20",
-      "rev": "d233902339c02a9c334e7e593de68855ad26c4cb",
-      "rev_count": 998534,
-      "rev_date": "2026-05-15T18:21:44Z",
-      "scrape_date": "2026-05-17T08:01:42.783035Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "20.20.2",
-      "outputs_to_install": [
-        "out",
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/ggqdy8b4b62gr1ak2v41dka5s1dmflzk-nodejs-20.20.2"
-      },
-      "system": "x86_64-darwin",
       "group": "agentmemory",
       "priority": 5
     },
@@ -230,37 +205,6 @@
     {
       "attr_path": "claude-code",
       "broken": false,
-      "derivation": "/nix/store/iq72qv1lyhwv1q3p2hvq02ff8cmmwifv-claude-code-2.1.226.drv",
-      "description": "Agentic coding tool from Anthropic",
-      "install_id": "claude-code",
-      "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=bb6fb0a157b88dfc76812a9194905015ea1d90e3",
-      "name": "claude-code-2.1.226",
-      "pname": "claude-code",
-      "rev": "bb6fb0a157b88dfc76812a9194905015ea1d90e3",
-      "rev_count": 18717,
-      "rev_date": "2026-08-08T07:01:06Z",
-      "scrape_date": "2026-08-10T00:57:04.907943117Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": true,
-      "version": "2.1.226",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/v3swhl1cjm2g9syn6wkia932k0gii8a6-claude-code-2.1.226"
-      },
-      "system": "x86_64-darwin",
-      "group": "claude-code",
-      "priority": 5
-    },
-    {
-      "attr_path": "claude-code",
-      "broken": false,
       "derivation": "/nix/store/j68apj97hbnaa3r20lv8kv4vf4bplgwl-claude-code-2.1.226.drv",
       "description": "Agentic coding tool from Anthropic",
       "install_id": "claude-code",
@@ -346,36 +290,6 @@
         "out": "/nix/store/4zf5cxf627sbr8syddjx7j5pmk4321ri-flox-ai-0.8.0"
       },
       "system": "aarch64-linux",
-      "group": "flox-ai",
-      "priority": 5
-    },
-    {
-      "attr_path": "flox-ai",
-      "broken": false,
-      "derivation": "/nix/store/x67927620yafssr4pmkjws7dv6v132d3-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-08-10T00:57:04.907958302Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.8.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/l6j0hn116hn91ld4ynj13n1vk90i0q5s-flox-ai-0.8.0"
-      },
-      "system": "x86_64-darwin",
       "group": "flox-ai",
       "priority": 5
     },
@@ -468,37 +382,6 @@
         "out": "/nix/store/l363b0dld5qiqzaz22sxkzr2v6m9lsdq-skills-agentmemory-0.9.28"
       },
       "system": "aarch64-linux",
-      "group": "skills-agentmemory",
-      "priority": 5
-    },
-    {
-      "attr_path": "skills-agentmemory",
-      "broken": false,
-      "derivation": "/nix/store/qvzki8dngbggahfwk9a0fkq5wrakxrcb-skills-agentmemory-0.9.28.drv",
-      "description": "agentmemory plugin for Claude Code (13 hooks + 8 skills) with Node.js bundled for the hook scripts and MCP shim.",
-      "install_id": "skills-agentmemory",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/floxenvs?rev=d0bf78d417a9fb413b6ac1c4462cfbe3c6ae3898",
-      "name": "skills-agentmemory-0.9.28",
-      "pname": "skills-agentmemory",
-      "rev": "d0bf78d417a9fb413b6ac1c4462cfbe3c6ae3898",
-      "rev_count": 15198,
-      "rev_date": "2026-07-20T20:01:22Z",
-      "scrape_date": "2026-08-10T00:57:04.907973011Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "0.9.28",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/j7swhm74v3mx4mwnqf9h1r56d84ms05w-skills-agentmemory-0.9.28"
-      },
-      "system": "x86_64-darwin",
       "group": "skills-agentmemory",
       "priority": 5
     },

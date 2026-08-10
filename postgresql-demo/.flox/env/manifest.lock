@@ -31,7 +31,13 @@
     "hook": {
       "on-activate": "export PGDIR=\"$FLOX_ENV_CACHE/postgres\"\nexport PGDATA=\"$PGDIR/data\"\n\n# Socket dir must be short to stay under the 103-byte\n# unix socket path limit. Use a hash of $PGDIR to keep\n# it unique per environment.\nSOCKETDIR=\"/tmp/flox-pg-$(echo \"$PGDIR\" | cksum | cut -d' ' -f1)\"\n\nif [[ ! -d \"$SOCKETDIR\" ]]; then\n  mkdir -p \"$SOCKETDIR\"\nfi\n\nif [[ -n \"${PGPORT:-}\" ]]; then\n  # TCP mode: PGPORT is set, clients connect via host:port\n  export PGHOST=\"$PGHOSTADDR\"\n  export DATABASE_URL=\"postgresql://$PGUSER:$PGPASS@$PGHOSTADDR:$PGPORT/$PGDATABASE\"\n  PG_LISTEN_FLAGS=\"-c listen_addresses=$PGHOSTADDR -p $PGPORT\"\nelse\n  # Socket mode: no PGPORT, clients connect via unix socket\n  unset PGHOSTADDR\n  export PGHOST=\"$SOCKETDIR\"\n  export DATABASE_URL=\"postgresql:///$PGDATABASE?host=$SOCKETDIR\"\n  PG_LISTEN_FLAGS=\"\"\nfi\n\nINIT_LOG=\"$PGDIR/init.log\"\n\npg_init_fail() {\n  echo \"ERROR: PostgreSQL initialization failed.\" >&2\n  if [ -f \"$INIT_LOG\" ]; then\n    echo \"--- init.log ---\" >&2\n    cat \"$INIT_LOG\" >&2\n    echo \"--- end init.log ---\" >&2\n  fi\n  exit 1\n}\n\nif [[ ! -d \"$PGDATA\" ]]; then\n  mkdir -p \"$PGDATA\"\n  initdb \"$PGDATA\" \\\n    --locale=C \\\n    --encoding=UTF8 \\\n    --auth=trust \\\n    --username \"$PGUSER\" \\\n    >> \"$INIT_LOG\" 2>&1 \\\n    || pg_init_fail\nfi\n\npg_ctl -D \"$PGDATA\" -w start \\\n  -o \"-c unix_socket_directories=$SOCKETDIR $PG_LISTEN_FLAGS\" \\\n  >> \"$INIT_LOG\" 2>&1 \\\n  || pg_init_fail\nif psql -lqt | cut -d \\| -f 1 | grep -qw \"$PGDATABASE\"; then\n  true\nelse\n  createdb >> \"$INIT_LOG\" 2>&1 || pg_init_fail\nfi\npg_ctl -D \"$PGDATA\" -m fast -w stop >> \"$INIT_LOG\" 2>&1\nrm -f \"$INIT_LOG\"\n\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'Start PostgreSQL in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to PostgreSQL:' \\\n    '  psql' '' \\\n    'Connection information:' \\\n    \"  listen_addresses=$PGHOSTADDR\" \\\n    \"  port=$PGPORT\" \\\n    \"  user=$PGUSER\" \\\n    \"  database=$PGDATABASE\" \\\n    \"  DATABASE_URL=$DATABASE_URL\" '' \\\n    'Add extensions (use the postgresql pkg-group):' \\\n    '  flox search postgresqlPackages' \\\n    '  flox install postgresqlPackages.postgis -g postgresql'\nfi\n\n"
     },
-    "options": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    },
     "services": {
       "postgres": {
         "command": "  PGDATA=\"$FLOX_ENV_CACHE/postgres/data\"\n  SOCKETDIR=\"/tmp/flox-pg-$(echo \"$FLOX_ENV_CACHE/postgres\" | cksum | cut -d' ' -f1)\"\n  mkdir -p \"$SOCKETDIR\"\n  if [[ -n \"${PGPORT:-}\" ]]; then\n    exec postgres -D \"$PGDATA\" -c unix_socket_directories=\"$SOCKETDIR\" -c listen_addresses=\"$PGHOSTADDR\" -p \"$PGPORT\"\n  else\n    exec postgres -D \"$PGDATA\" -c unix_socket_directories=\"$SOCKETDIR\" -c listen_addresses=\"\"\n  fi\n"
@@ -109,41 +115,6 @@
         "out": "/nix/store/v9dm55hnfslwma8x0vkrb12rc7xgw4br-curl-8.20.0"
       },
       "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "curl",
-      "broken": false,
-      "derivation": "/nix/store/yimp796x73y7ya2g3xrzhrklpzi4bhmr-curl-8.20.0.drv",
-      "description": "Command line tool for transferring files with URL syntax",
-      "install_id": "curl",
-      "license": "curl",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "curl-8.20.0",
-      "pname": "curl",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:00.699956Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "8.20.0",
-      "outputs_to_install": [
-        "bin",
-        "man"
-      ],
-      "outputs": {
-        "bin": "/nix/store/ay2d39b1rxpycpw6501kvx9bkj2flg3q-curl-8.20.0-bin",
-        "dev": "/nix/store/nq8f3x5kblji4ndh6l8fbzrxfkn3smdf-curl-8.20.0-dev",
-        "devdoc": "/nix/store/p8xshzip25m4g57jjpgddwssjavjb4h4-curl-8.20.0-devdoc",
-        "man": "/nix/store/brqfirf14dch7cp25snkfa82l1ckdmcs-curl-8.20.0-man",
-        "out": "/nix/store/b7rkky5rsnc5d6yjppxs67qvjrj27a06-curl-8.20.0"
-      },
-      "system": "x86_64-darwin",
       "group": "demo-tools",
       "priority": 5
     },
@@ -248,36 +219,6 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/w01nbfjmxqjr3w9sycd0jliiamnljij2-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:02.122815Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/m2wks8knnsfgjl0ikhbi0vv7bqn53385-gum-0.17.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
       "derivation": "/nix/store/468b0lgb2p00hyfj24xb44yj24r33hy4-gum-0.17.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
@@ -362,36 +303,6 @@
         "out": "/nix/store/lkfd06dar5ij8f9zq20gfiqfhd554kax-pgvector-0.8.3"
       },
       "system": "aarch64-linux",
-      "group": "postgresql",
-      "priority": 5
-    },
-    {
-      "attr_path": "postgresqlPackages.pgvector",
-      "broken": false,
-      "derivation": "/nix/store/m5026qrjzra8fji05pcahsmlg13gnm3f-pgvector-0.8.3.drv",
-      "description": "Open-source vector similarity search for PostgreSQL",
-      "install_id": "pgvector",
-      "license": "PostgreSQL",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "pgvector-0.8.3",
-      "pname": "pgvector",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:51.782883Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.8.3",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/rg578268r034ydwsgw3n0cyh15y6hrbb-pgvector-0.8.3"
-      },
-      "system": "x86_64-darwin",
       "group": "postgresql",
       "priority": 5
     },
@@ -507,45 +418,6 @@
     {
       "attr_path": "postgresql",
       "broken": false,
-      "derivation": "/nix/store/5xd40wkf0rm6180gjnq5dw8j0sihab72-postgresql-17.10.drv",
-      "description": "Powerful, open source object-relational database system",
-      "install_id": "postgresql",
-      "license": "PostgreSQL",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "postgresql-17.10",
-      "pname": "postgresql",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:50.672113Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "17.10",
-      "outputs_to_install": [
-        "man",
-        "out"
-      ],
-      "outputs": {
-        "dev": "/nix/store/x1rfdcnxh1kj634bz73k8xg2p3i5rf22-postgresql-17.10-dev",
-        "doc": "/nix/store/3jj55asrgl1ahv01gkpzqmvwnzvg1wrb-postgresql-17.10-doc",
-        "jit": "/nix/store/5vfbgj9n87l1zk7ljqisigsz9ax5sgad-postgresql-17.10-jit",
-        "lib": "/nix/store/yvbnhnx1dk5i0877gam5yc8cvfiiz3bp-postgresql-17.10-lib",
-        "man": "/nix/store/bak19mp0xgx9rwsmw1lzwcl3wb2saz38-postgresql-17.10-man",
-        "out": "/nix/store/jgxdaiah5jwxw59dva74kgljyma997n8-postgresql-17.10",
-        "plperl": "/nix/store/3bdjvw41s62iq0abf17d5dcgmdmsrvaw-postgresql-17.10-plperl",
-        "plpython3": "/nix/store/pdqsdbz6ghicqhny4as3ws1gs0yy94s8-postgresql-17.10-plpython3",
-        "pltcl": "/nix/store/049bby0qrz8wh4073i41ghk4vfzs54vk-postgresql-17.10-pltcl"
-      },
-      "system": "x86_64-darwin",
-      "group": "postgresql",
-      "priority": 5
-    },
-    {
-      "attr_path": "postgresql",
-      "broken": false,
       "derivation": "/nix/store/77cxn4y98d9qk3dm6dwdfpbc5q7y79yk-postgresql-17.10.drv",
       "description": "Powerful, open source object-relational database system",
       "install_id": "postgresql",
@@ -607,7 +479,13 @@
       "hook": {
         "on-activate": "\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'Start PostgreSQL in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to PostgreSQL:' \\\n    '  psql' '' \\\n    'Connection information:' \\\n    \"  listen_addresses=$PGHOSTADDR\" \\\n    \"  port=$PGPORT\" \\\n    \"  user=$PGUSER\" \\\n    \"  database=$PGDATABASE\" \\\n    \"  DATABASE_URL=$DATABASE_URL\" '' \\\n    'Add extensions (use the postgresql pkg-group):' \\\n    '  flox search postgresqlPackages' \\\n    '  flox install postgresqlPackages.postgis -g postgresql'\nfi\n\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "include": {
         "environments": [
           {
@@ -636,7 +514,13 @@
           "hook": {
             "on-activate": "export PGDIR=\"$FLOX_ENV_CACHE/postgres\"\nexport PGDATA=\"$PGDIR/data\"\n\n# Socket dir must be short to stay under the 103-byte\n# unix socket path limit. Use a hash of $PGDIR to keep\n# it unique per environment.\nSOCKETDIR=\"/tmp/flox-pg-$(echo \"$PGDIR\" | cksum | cut -d' ' -f1)\"\n\nif [[ ! -d \"$SOCKETDIR\" ]]; then\n  mkdir -p \"$SOCKETDIR\"\nfi\n\nif [[ -n \"${PGPORT:-}\" ]]; then\n  # TCP mode: PGPORT is set, clients connect via host:port\n  export PGHOST=\"$PGHOSTADDR\"\n  export DATABASE_URL=\"postgresql://$PGUSER:$PGPASS@$PGHOSTADDR:$PGPORT/$PGDATABASE\"\n  PG_LISTEN_FLAGS=\"-c listen_addresses=$PGHOSTADDR -p $PGPORT\"\nelse\n  # Socket mode: no PGPORT, clients connect via unix socket\n  unset PGHOSTADDR\n  export PGHOST=\"$SOCKETDIR\"\n  export DATABASE_URL=\"postgresql:///$PGDATABASE?host=$SOCKETDIR\"\n  PG_LISTEN_FLAGS=\"\"\nfi\n\nINIT_LOG=\"$PGDIR/init.log\"\n\npg_init_fail() {\n  echo \"ERROR: PostgreSQL initialization failed.\" >&2\n  if [ -f \"$INIT_LOG\" ]; then\n    echo \"--- init.log ---\" >&2\n    cat \"$INIT_LOG\" >&2\n    echo \"--- end init.log ---\" >&2\n  fi\n  exit 1\n}\n\nif [[ ! -d \"$PGDATA\" ]]; then\n  mkdir -p \"$PGDATA\"\n  initdb \"$PGDATA\" \\\n    --locale=C \\\n    --encoding=UTF8 \\\n    --auth=trust \\\n    --username \"$PGUSER\" \\\n    >> \"$INIT_LOG\" 2>&1 \\\n    || pg_init_fail\nfi\n\npg_ctl -D \"$PGDATA\" -w start \\\n  -o \"-c unix_socket_directories=$SOCKETDIR $PG_LISTEN_FLAGS\" \\\n  >> \"$INIT_LOG\" 2>&1 \\\n  || pg_init_fail\nif psql -lqt | cut -d \\| -f 1 | grep -qw \"$PGDATABASE\"; then\n  true\nelse\n  createdb >> \"$INIT_LOG\" 2>&1 || pg_init_fail\nfi\npg_ctl -D \"$PGDATA\" -m fast -w stop >> \"$INIT_LOG\" 2>&1\nrm -f \"$INIT_LOG\"\n"
           },
-          "options": {},
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          },
           "services": {
             "postgres": {
               "command": "  PGDATA=\"$FLOX_ENV_CACHE/postgres/data\"\n  SOCKETDIR=\"/tmp/flox-pg-$(echo \"$FLOX_ENV_CACHE/postgres\" | cksum | cut -d' ' -f1)\"\n  mkdir -p \"$SOCKETDIR\"\n  if [[ -n \"${PGPORT:-}\" ]]; then\n    exec postgres -D \"$PGDATA\" -c unix_socket_directories=\"$SOCKETDIR\" -c listen_addresses=\"$PGHOSTADDR\" -p \"$PGPORT\"\n  else\n    exec postgres -D \"$PGDATA\" -c unix_socket_directories=\"$SOCKETDIR\" -c listen_addresses=\"\"\n  fi\n"
@@ -649,6 +533,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

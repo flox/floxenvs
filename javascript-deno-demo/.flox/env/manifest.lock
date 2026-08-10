@@ -19,7 +19,13 @@
     "hook": {
       "on-activate": "export DENO_CACHE=\"$FLOX_ENV_CACHE/javascript-deno\"\nmkdir -p \"$DENO_CACHE\"\n\nif [ \"$DENO_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f deno.json ] \\\n    && [ -f deno.lock ]; then\n  HASH=$(cat deno.json deno.lock \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$DENO_CACHE/packages-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    deno install\n    echo \"$HASH\" > \"$DENO_CACHE/packages-hash\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Deno environment ready!' '' \\\n    'Deno version:' \\\n    \"  $(deno --version | head -1)\" '' \\\n    'Commands:' \\\n    '  deno install    Install packages' \\\n    '  deno run        Run a script' \\\n    '  deno task       Run a task'\nfi\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -79,36 +85,6 @@
         "out": "/nix/store/51vn4xsrgzfl9g3s00byydpx6jgjgrnd-gum-0.17.0"
       },
       "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/w01nbfjmxqjr3w9sycd0jliiamnljij2-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:02.122815Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/m2wks8knnsfgjl0ikhbi0vv7bqn53385-gum-0.17.0"
-      },
-      "system": "x86_64-darwin",
       "group": "demo-tools",
       "priority": 5
     },
@@ -207,37 +183,6 @@
     {
       "attr_path": "deno",
       "broken": false,
-      "derivation": "/nix/store/kfyb8yprsacv0mwzi2syki6avgwhjqzs-deno-2.8.3.drv",
-      "description": "Secure runtime for JavaScript and TypeScript",
-      "install_id": "deno",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "deno-2.8.3",
-      "pname": "deno",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:00.802443Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.8.3",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "denort": "/nix/store/ghijk6dx8dsm4s56qdr5f5vfxaacl8dw-deno-2.8.3-denort",
-        "out": "/nix/store/3mvc0dm4lkas8a9sxngabyd74hkba5dg-deno-2.8.3"
-      },
-      "system": "x86_64-darwin",
-      "group": "javascript-deno",
-      "priority": 5
-    },
-    {
-      "attr_path": "deno",
-      "broken": false,
       "derivation": "/nix/store/2crm2nakkbbaxrkcr190dkpzjbzjldyd-deno-2.8.3.drv",
       "description": "Secure runtime for JavaScript and TypeScript",
       "install_id": "deno",
@@ -279,7 +224,13 @@
       "hook": {
         "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Deno environment ready!' '' \\\n    'Deno version:' \\\n    \"  $(deno --version | head -1)\" '' \\\n    'Commands:' \\\n    '  deno install    Install packages' \\\n    '  deno run        Run a script' \\\n    '  deno task       Run a task'\nfi\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "include": {
         "environments": [
           {
@@ -305,7 +256,13 @@
           "hook": {
             "on-activate": "export DENO_CACHE=\"$FLOX_ENV_CACHE/javascript-deno\"\nmkdir -p \"$DENO_CACHE\"\n\nif [ \"$DENO_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f deno.json ] \\\n    && [ -f deno.lock ]; then\n  HASH=$(cat deno.json deno.lock \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$DENO_CACHE/packages-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    deno install\n    echo \"$HASH\" > \"$DENO_CACHE/packages-hash\"\n  fi\nfi\n"
           },
-          "options": {}
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          }
         },
         "name": "javascript-deno",
         "descriptor": {
@@ -313,6 +270,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

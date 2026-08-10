@@ -104,7 +104,11 @@
       "hook": {
         "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'oMLX — local LLM inference for Apple Silicon' '' \\\n    'Start the server:' \\\n    '  flox services start' '' \\\n    \"Server:   http://${OMLX_HOST}:${OMLX_PORT}\" \\\n    \"Admin UI: http://${OMLX_HOST}:${OMLX_PORT}/admin\" '' \\\n    'Download a small model via the admin UI, or:' \\\n    '  huggingface-cli download \\' \\\n    '    mlx-community/Qwen3-1.7B-MLX-4bit \\' \\\n    \"    --local-dir \\\"\\$OMLX_MODEL_DIR/Qwen3-1.7B-MLX-4bit\\\"\" '' \\\n    'Test inference:' \\\n    \"  curl http://${OMLX_HOST}:${OMLX_PORT}/v1/models\"\nfi\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin"
+        ]
+      },
       "include": {
         "environments": [
           {
@@ -147,6 +151,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

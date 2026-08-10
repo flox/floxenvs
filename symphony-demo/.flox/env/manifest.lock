@@ -30,7 +30,13 @@
     "hook": {
       "on-activate": "export SYMPHONY_DATA=\"$FLOX_ENV_CACHE/symphony\"\nexport SYMPHONY_WORKSPACE_ROOT=\"$SYMPHONY_DATA/workspaces\"\nexport SYMPHONY_LOGS_ROOT=\"$SYMPHONY_DATA/log\"\nexport CODEX_BIN=\"$(command -v codex)\"\nmkdir -p \"$SYMPHONY_WORKSPACE_ROOT\" \"$SYMPHONY_LOGS_ROOT\"\n\n# Always regenerate WORKFLOW.md so the tracker stays in\n# sync with the current LINEAR_API_KEY state. Edits to\n# the cached file are intentionally discarded.\nif [[ -n \"${LINEAR_API_KEY:-}\" ]]; then\n  cat > \"$SYMPHONY_DATA/WORKFLOW.md\" <<EOF\n---\ntracker:\n  kind: linear\n  active_states: [Todo, In Progress, Merging, Rework]\n  terminal_states: [Closed, Cancelled, Done]\npolling:\n  interval_ms: 5000\nworkspace:\n  root: $SYMPHONY_WORKSPACE_ROOT\nagent:\n  max_concurrent_agents: 4\n  max_turns: 20\ncodex:\n  bin: $CODEX_BIN\n---\n# Symphony — Linear workflow\nEOF\nelse\n  cat > \"$SYMPHONY_DATA/WORKFLOW.md\" <<EOF\n---\ntracker:\n  kind: memory\npolling:\n  interval_ms: 5000\nworkspace:\n  root: $SYMPHONY_WORKSPACE_ROOT\nagent:\n  max_concurrent_agents: 2\n  max_turns: 10\ncodex:\n  bin: $CODEX_BIN\n---\n# Symphony — in-memory dashboard demo\nEOF\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  if [[ -n \"${LINEAR_API_KEY:-}\" ]]; then\n    tracker=\"linear (LINEAR_API_KEY detected)\"\n  else\n    tracker=\"memory (no LINEAR_API_KEY set)\"\n  fi\n\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Symphony in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Dashboard:' \\\n    \"  http://localhost:$SYMPHONY_PORT\" '' \\\n    'Tracker:' \\\n    \"  $tracker\" '' \\\n    'Codex binary:' \\\n    \"  $CODEX_BIN\" '' \\\n    'Workspace root:' \\\n    \"  $SYMPHONY_WORKSPACE_ROOT\"\nfi\n"
     },
-    "options": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    },
     "services": {
       "symphony": {
         "command": "SYMPHONY_DATA=\"$FLOX_ENV_CACHE/symphony\"\nexec symphony \\\n  --i-understand-that-this-will-be-running-without-the-usual-guardrails \\\n  --port \"$SYMPHONY_PORT\" \\\n  --logs-root \"$SYMPHONY_DATA/log\" \\\n  \"$SYMPHONY_DATA/WORKFLOW.md\"\n"
@@ -93,35 +99,6 @@
         "out": "/nix/store/51vn4xsrgzfl9g3s00byydpx6jgjgrnd-gum-0.17.0"
       },
       "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/w01nbfjmxqjr3w9sycd0jliiamnljij2-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:02.122815Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/m2wks8knnsfgjl0ikhbi0vv7bqn53385-gum-0.17.0"
-      },
-      "system": "x86_64-darwin",
       "group": "demo-tools",
       "priority": 5
     },
@@ -231,42 +208,6 @@
     {
       "attr_path": "bash",
       "broken": false,
-      "derivation": "/nix/store/2y83zwwsap35s39n0nszbk7drpmjcj5b-bash-interactive-5.3p9.drv",
-      "description": "GNU Bourne-Again Shell, the de facto standard shell on Linux (for interactive use)",
-      "install_id": "bash",
-      "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d233902339c02a9c334e7e593de68855ad26c4cb",
-      "name": "bash-interactive-5.3p9",
-      "pname": "bash",
-      "rev": "d233902339c02a9c334e7e593de68855ad26c4cb",
-      "rev_count": 998534,
-      "rev_date": "2026-05-15T18:21:44Z",
-      "scrape_date": "2026-05-17T08:01:17.099348Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "5.3p9",
-      "outputs_to_install": [
-        "man",
-        "out",
-        "out"
-      ],
-      "outputs": {
-        "dev": "/nix/store/a5jlanqwr330df9f7wj231zwls57b2w9-bash-interactive-5.3p9-dev",
-        "doc": "/nix/store/r32ymasfy6z5x0394hgifkfcqj175d4h-bash-interactive-5.3p9-doc",
-        "info": "/nix/store/syfrnwhbm2zlyilq14ks773h0yjrj5jc-bash-interactive-5.3p9-info",
-        "man": "/nix/store/k48vfj52w13xhqfs8rjkk25k5ian1xzs-bash-interactive-5.3p9-man",
-        "out": "/nix/store/7i5gfqa19rj4sydhl2rbb6spcisis1c9-bash-interactive-5.3p9"
-      },
-      "system": "x86_64-darwin",
-      "group": "symphony",
-      "priority": 5
-    },
-    {
-      "attr_path": "bash",
-      "broken": false,
       "derivation": "/nix/store/5bdprl0q08gk4cynpik0ssmg0ky7lzbh-bash-interactive-5.3p9.drv",
       "description": "GNU Bourne-Again Shell, the de facto standard shell on Linux (for interactive use)",
       "install_id": "bash",
@@ -367,36 +308,6 @@
     {
       "attr_path": "codex",
       "broken": false,
-      "derivation": "/nix/store/dr5f30q69pjmdapj1aa9njw2jmfw5cvq-codex-0.141.0.drv",
-      "description": "OpenAI Codex CLI - a coding agent that runs locally",
-      "install_id": "codex",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/floxenvs?rev=a097189776d7b6ed13ec0db562ab2ca9b92cdb75",
-      "name": "codex-0.141.0",
-      "pname": "codex",
-      "rev": "a097189776d7b6ed13ec0db562ab2ca9b92cdb75",
-      "rev_count": 9074,
-      "rev_date": "2026-06-18T12:51:36Z",
-      "scrape_date": "2026-07-13T03:12:45.591842995Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.141.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/qxnpvsz6vb7qqp9r6r9173nnan812wcg-codex-0.141.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "symphony",
-      "priority": 5
-    },
-    {
-      "attr_path": "codex",
-      "broken": false,
       "derivation": "/nix/store/3g8dbcdrgjds2pfsl8x254c0yn4jd4ab-codex-0.141.0.drv",
       "description": "OpenAI Codex CLI - a coding agent that runs locally",
       "install_id": "codex",
@@ -481,36 +392,6 @@
         "out": "/nix/store/ccjb97h7sadmm6c9mcl6i7pxifripsif-symphony-4cbe3a9"
       },
       "system": "aarch64-linux",
-      "group": "symphony",
-      "priority": 5
-    },
-    {
-      "attr_path": "symphony",
-      "broken": false,
-      "derivation": "/nix/store/r8ay07p7m006y044mbza54lb9wx682wz-symphony-4cbe3a9.drv",
-      "description": "OpenAI Symphony agent orchestrator",
-      "install_id": "symphony",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/floxenvs?rev=b579a03a6f8e59dd52a7c0b719c8986afc079a7a",
-      "name": "symphony-4cbe3a9",
-      "pname": "symphony",
-      "rev": "b579a03a6f8e59dd52a7c0b719c8986afc079a7a",
-      "rev_count": 7137,
-      "rev_date": "2026-06-10T08:42:02Z",
-      "scrape_date": "2026-07-13T03:12:45.591847494Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "4cbe3a9",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/1whfd8j8dbr0jvpgi2y0shhgg560k026-symphony-4cbe3a9"
-      },
-      "system": "x86_64-darwin",
       "group": "symphony",
       "priority": 5
     },
@@ -608,36 +489,6 @@
     {
       "attr_path": "git",
       "broken": false,
-      "derivation": "/nix/store/dbxkqx6x4irzb4jd65110qkxwm40548v-git-2.54.0.drv",
-      "description": "Distributed version control system",
-      "install_id": "git",
-      "license": "GPL-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "git-2.54.0",
-      "pname": "git",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:01.623127Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.54.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "doc": "/nix/store/zakmjh312hmg2yslsyqmnw8lb8dgmyyk-git-2.54.0-doc",
-        "out": "/nix/store/x671lak90qvcxgc5irp4xv5zdbaym2yr-git-2.54.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "symphony-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "git",
-      "broken": false,
       "derivation": "/nix/store/214n5nb1k4qzynzgw7xpsp4fp19vni8i-git-2.54.0.drv",
       "description": "Distributed version control system",
       "install_id": "git",
@@ -679,7 +530,13 @@
       "hook": {
         "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  if [[ -n \"${LINEAR_API_KEY:-}\" ]]; then\n    tracker=\"linear (LINEAR_API_KEY detected)\"\n  else\n    tracker=\"memory (no LINEAR_API_KEY set)\"\n  fi\n\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Symphony in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Dashboard:' \\\n    \"  http://localhost:$SYMPHONY_PORT\" '' \\\n    'Tracker:' \\\n    \"  $tracker\" '' \\\n    'Codex binary:' \\\n    \"  $CODEX_BIN\" '' \\\n    'Workspace root:' \\\n    \"  $SYMPHONY_WORKSPACE_ROOT\"\nfi\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "include": {
         "environments": [
           {
@@ -716,7 +573,13 @@
           "hook": {
             "on-activate": "export SYMPHONY_DATA=\"$FLOX_ENV_CACHE/symphony\"\nexport SYMPHONY_WORKSPACE_ROOT=\"$SYMPHONY_DATA/workspaces\"\nexport SYMPHONY_LOGS_ROOT=\"$SYMPHONY_DATA/log\"\nexport CODEX_BIN=\"$(command -v codex)\"\nmkdir -p \"$SYMPHONY_WORKSPACE_ROOT\" \"$SYMPHONY_LOGS_ROOT\"\n\n# Always regenerate WORKFLOW.md so the tracker stays in\n# sync with the current LINEAR_API_KEY state. Edits to\n# the cached file are intentionally discarded.\nif [[ -n \"${LINEAR_API_KEY:-}\" ]]; then\n  cat > \"$SYMPHONY_DATA/WORKFLOW.md\" <<EOF\n---\ntracker:\n  kind: linear\n  active_states: [Todo, In Progress, Merging, Rework]\n  terminal_states: [Closed, Cancelled, Done]\npolling:\n  interval_ms: 5000\nworkspace:\n  root: $SYMPHONY_WORKSPACE_ROOT\nagent:\n  max_concurrent_agents: 4\n  max_turns: 20\ncodex:\n  bin: $CODEX_BIN\n---\n# Symphony — Linear workflow\nEOF\nelse\n  cat > \"$SYMPHONY_DATA/WORKFLOW.md\" <<EOF\n---\ntracker:\n  kind: memory\npolling:\n  interval_ms: 5000\nworkspace:\n  root: $SYMPHONY_WORKSPACE_ROOT\nagent:\n  max_concurrent_agents: 2\n  max_turns: 10\ncodex:\n  bin: $CODEX_BIN\n---\n# Symphony — in-memory dashboard demo\nEOF\nfi\n"
           },
-          "options": {},
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          },
           "services": {
             "symphony": {
               "command": "SYMPHONY_DATA=\"$FLOX_ENV_CACHE/symphony\"\nexec symphony \\\n  --i-understand-that-this-will-be-running-without-the-usual-guardrails \\\n  --port \"$SYMPHONY_PORT\" \\\n  --logs-root \"$SYMPHONY_DATA/log\" \\\n  \"$SYMPHONY_DATA/WORKFLOW.md\"\n"
@@ -729,6 +592,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

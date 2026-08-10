@@ -7,8 +7,7 @@
         "pkg-path": "flox/bazel",
         "pkg-group": "bazel",
         "systems": [
-          "aarch64-darwin",
-          "x86_64-darwin"
+          "aarch64-darwin"
         ]
       },
       "bazel_catalog": {
@@ -34,7 +33,13 @@
     "hook": {
       "on-activate": "export BAZEL_CACHE_DIR=\"$FLOX_ENV_CACHE/bazel\"\nmkdir -p \"$BAZEL_CACHE_DIR\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Bazel development environment' '' \\\n    'Try the sample build:' \\\n    '  flox build hello' \\\n    '  ./result-hello/bin/hello'\nfi\n"
     },
-    "options": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    },
     "build": {
       "hello": {
         "command": "set -eo pipefail\n\nbazel build //:hello\n\nmkdir -p \"$out/bin\"\ncp -L bazel-bin/hello_/hello \"$out/bin/hello\"\nchmod +x \"$out/bin/hello\"\n",
@@ -72,37 +77,6 @@
         "out": "/nix/store/v3rbpv051d9kf0w9gp06pdg2f1hp2kz8-bazel-9.2.0"
       },
       "system": "aarch64-darwin",
-      "group": "bazel",
-      "priority": 5
-    },
-    {
-      "attr_path": "bazel",
-      "broken": false,
-      "derivation": "/nix/store/a8rxg8p1xc28vs34f6kbxjwb5dfhclfs-bazel-9.2.0.drv",
-      "description": "Prebuilt Bazel 9.2.0 from bazel.build",
-      "install_id": "bazel",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/floxenvs?rev=9371c41386d5490df070c80584642a0ebd3c5b97",
-      "name": "bazel-9.2.0",
-      "pname": "bazel",
-      "rev": "9371c41386d5490df070c80584642a0ebd3c5b97",
-      "rev_count": 14323,
-      "rev_date": "2026-07-14T01:01:02Z",
-      "scrape_date": "2026-08-10T01:04:09.461545086Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "9.2.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/mri1qispxm9l31n3v6yf0ppkjzbc4jid-bazel-9.2.0"
-      },
-      "system": "x86_64-darwin",
       "group": "bazel",
       "priority": 5
     },
@@ -299,36 +273,6 @@
     {
       "attr_path": "gum",
       "broken": false,
-      "derivation": "/nix/store/w01nbfjmxqjr3w9sycd0jliiamnljij2-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:02.122815Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/m2wks8knnsfgjl0ikhbi0vv7bqn53385-gum-0.17.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
       "derivation": "/nix/store/468b0lgb2p00hyfj24xb44yj24r33hy4-gum-0.17.0.drv",
       "description": "Tasty Bubble Gum for your shell",
       "install_id": "gum",
@@ -368,7 +312,13 @@
       "hook": {
         "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Bazel development environment' '' \\\n    'Try the sample build:' \\\n    '  flox build hello' \\\n    '  ./result-hello/bin/hello'\nfi\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "build": {
         "hello": {
           "command": "set -eo pipefail\n\nbazel build //:hello\n\nmkdir -p \"$out/bin\"\ncp -L bazel-bin/hello_/hello \"$out/bin/hello\"\nchmod +x \"$out/bin/hello\"\n",
@@ -393,8 +343,7 @@
               "pkg-path": "flox/bazel",
               "pkg-group": "bazel",
               "systems": [
-                "aarch64-darwin",
-                "x86_64-darwin"
+                "aarch64-darwin"
               ]
             },
             "bazel_catalog": {
@@ -417,7 +366,13 @@
           "hook": {
             "on-activate": "export BAZEL_CACHE_DIR=\"$FLOX_ENV_CACHE/bazel\"\nmkdir -p \"$BAZEL_CACHE_DIR\"\n"
           },
-          "options": {}
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          }
         },
         "name": "bazel",
         "descriptor": {
@@ -425,6 +380,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

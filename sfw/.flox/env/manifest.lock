@@ -16,7 +16,13 @@
       "bash": "source \"$FLOX_ENV/libexec/sfw-shims/activate.bash\"\n",
       "zsh": "source \"$FLOX_ENV/libexec/sfw-shims/activate.zsh\"\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -78,37 +84,6 @@
         "out": "/nix/store/z0d8y51k041axdk3jsnzi6lkhszw2rmp-sfw-1.15.0"
       },
       "system": "aarch64-linux",
-      "group": "sfw",
-      "priority": 5
-    },
-    {
-      "attr_path": "sfw",
-      "broken": false,
-      "derivation": "/nix/store/69s3121yh3302b7ym4va2lx3dbc9fx3d-sfw-1.15.0.drv",
-      "description": "Socket Firewall Free - wraps your package manager to prevent installation of malicious packages",
-      "install_id": "sfw",
-      "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=68a3dc74e4e58fe1e14a001a8ef6b530f3030177",
-      "name": "sfw-1.15.0",
-      "pname": "sfw",
-      "rev": "68a3dc74e4e58fe1e14a001a8ef6b530f3030177",
-      "rev_count": 16647,
-      "rev_date": "2026-07-28T02:00:43Z",
-      "scrape_date": "2026-08-03T02:43:18.391742701Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": true,
-      "version": "1.15.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/9g46gxnh2dz6jrpj7x1xrvy8vq53i350-sfw-1.15.0"
-      },
-      "system": "x86_64-darwin",
       "group": "sfw",
       "priority": 5
     },

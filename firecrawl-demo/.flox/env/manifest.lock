@@ -26,7 +26,13 @@
     "hook": {
       "on-activate": "dir=\"$FLOX_ENV_CACHE/firecrawl\"\nmkdir -p \"$dir\"\nexport FIRECRAWL_DATA_DIR=\"$dir\"\n\n# Persist the key across activations: if it isn't set in the\n# environment but was saved to the cache before, load it back.\nkey_file=\"$dir/api-key\"\nif [ -z \"${FIRECRAWL_API_KEY:-}\" ] && [ -f \"$key_file\" ]; then\n  FIRECRAWL_API_KEY=\"$(cat \"$key_file\")\"\n  export FIRECRAWL_API_KEY\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  dir=\"${FIRECRAWL_DATA_DIR:-$FLOX_ENV_CACHE/firecrawl}\"\n  mkdir -p \"$dir\"\n  key_file=\"$dir/api-key\"\n\n  # Ask for the Firecrawl API key on first run. Only prompt\n  # when running interactively and the key isn't already set.\n  if [[ -z \"${FIRECRAWL_API_KEY:-}\" && -t 0 ]]; then\n    gum style --border double --margin '1 2' --padding '1 4' \\\n      'Firecrawl demo — scrape, crawl, and search the web' '' \\\n      'A Firecrawl API key is required.' \\\n      'Grab one (free tier available) at:' \\\n      '  https://firecrawl.dev/app/api-keys'\n    key=\"$(gum input --password \\\n      --placeholder 'fc-...' \\\n      --prompt 'FIRECRAWL_API_KEY > ')\"\n    if [[ -n \"$key\" ]]; then\n      printf '%s' \"$key\" > \"$key_file\"\n      chmod 600 \"$key_file\"\n      FIRECRAWL_API_KEY=\"$key\"\n      export FIRECRAWL_API_KEY\n      gum style --foreground 42 'Key saved to the env cache. ✓'\n    else\n      gum style --foreground 214 \\\n        'No key entered — set FIRECRAWL_API_KEY later or run `firecrawl login`.'\n    fi\n  fi\n\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'Firecrawl CLI' '' \\\n    'Check auth + credits:' \\\n    '  firecrawl --status' '' \\\n    'Scrape a page to clean markdown:' \\\n    '  firecrawl scrape \"https://firecrawl.dev\" -o page.md' '' \\\n    'Search the web:' \\\n    '  firecrawl search \"flox dev environments\"' '' \\\n    'Drive it from Claude Code / OpenCode via the bundled skill.'\nfi\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -86,36 +92,6 @@
         "out": "/nix/store/51vn4xsrgzfl9g3s00byydpx6jgjgrnd-gum-0.17.0"
       },
       "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/w01nbfjmxqjr3w9sycd0jliiamnljij2-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:02.122815Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/m2wks8knnsfgjl0ikhbi0vv7bqn53385-gum-0.17.0"
-      },
-      "system": "x86_64-darwin",
       "group": "demo-tools",
       "priority": 5
     },
@@ -208,37 +184,6 @@
         "out": "/nix/store/38jfzibqygccdvyib4fpzbs49fbplni4-firecrawl-cli-1.19.30"
       },
       "system": "aarch64-linux",
-      "group": "firecrawl",
-      "priority": 5
-    },
-    {
-      "attr_path": "firecrawl-cli",
-      "broken": false,
-      "derivation": "/nix/store/20j4g0nidzh4f7qpgp18w453vpiralfk-firecrawl-cli-1.19.30.drv",
-      "description": "Official Firecrawl CLI — scrape, crawl, search, and extract data from any website directly from the terminal.",
-      "install_id": "firecrawl-cli",
-      "license": "ISC",
-      "locked_url": "https://github.com/flox/floxenvs?rev=b8612012461a6ad7b010e1f940da4df54c716c73",
-      "name": "firecrawl-cli-1.19.30",
-      "pname": "firecrawl-cli",
-      "rev": "b8612012461a6ad7b010e1f940da4df54c716c73",
-      "rev_count": 18667,
-      "rev_date": "2026-08-08T01:01:34Z",
-      "scrape_date": "2026-08-10T01:14:56.433064780Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "1.19.30",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/r150kijxng40whd683p2vbxqdpvl917y-firecrawl-cli-1.19.30"
-      },
-      "system": "x86_64-darwin",
       "group": "firecrawl",
       "priority": 5
     },
@@ -338,37 +283,6 @@
     {
       "attr_path": "skills-firecrawl-cli",
       "broken": false,
-      "derivation": "/nix/store/f42zh58rc6f6zscv3d2nz1lbhj82zp3i-skills-firecrawl-cli-0+unstable-2026-08-07.296b5b9.drv",
-      "description": "Firecrawl CLI skill bundle for Claude Code and OpenCode — search, scrape, crawl, and interact with the web by driving firecrawl-cli from an agent.",
-      "install_id": "skills-firecrawl-cli",
-      "license": "ISC",
-      "locked_url": "https://github.com/flox/floxenvs?rev=8eed0bd3a52b4bc066a156c9dd504c03d3924dcb",
-      "name": "skills-firecrawl-cli-0+unstable-2026-08-07.296b5b9",
-      "pname": "skills-firecrawl-cli",
-      "rev": "8eed0bd3a52b4bc066a156c9dd504c03d3924dcb",
-      "rev_count": 18703,
-      "rev_date": "2026-08-08T02:01:26Z",
-      "scrape_date": "2026-08-10T01:14:56.433068968Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "0+unstable-2026-08-07.296b5b9",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/zvjbhf30m9lmm7ladfw1n0z9bvdzz0d2-skills-firecrawl-cli-0+unstable-2026-08-07.296b5b9"
-      },
-      "system": "x86_64-darwin",
-      "group": "firecrawl",
-      "priority": 5
-    },
-    {
-      "attr_path": "skills-firecrawl-cli",
-      "broken": false,
       "derivation": "/nix/store/vn6p20lfdzaib374rjvnbjl7yznf8iqn-skills-firecrawl-cli-0+unstable-2026-08-07.296b5b9.drv",
       "description": "Firecrawl CLI skill bundle for Claude Code and OpenCode — search, scrape, crawl, and interact with the web by driving firecrawl-cli from an agent.",
       "install_id": "skills-firecrawl-cli",
@@ -460,36 +374,6 @@
     {
       "attr_path": "flox-ai",
       "broken": false,
-      "derivation": "/nix/store/x67927620yafssr4pmkjws7dv6v132d3-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-08-10T01:14:56.433085198Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.8.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/l6j0hn116hn91ld4ynj13n1vk90i0q5s-flox-ai-0.8.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "flox-ai",
-      "priority": 5
-    },
-    {
-      "attr_path": "flox-ai",
-      "broken": false,
       "derivation": "/nix/store/w14almryjawbkglkr56spfxi25ihvhzw-flox-ai-0.8.0.drv",
       "description": "Flox-native config management for Claude Code CLI",
       "install_id": "flox-ai",
@@ -530,7 +414,13 @@
       "hook": {
         "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  dir=\"${FIRECRAWL_DATA_DIR:-$FLOX_ENV_CACHE/firecrawl}\"\n  mkdir -p \"$dir\"\n  key_file=\"$dir/api-key\"\n\n  # Ask for the Firecrawl API key on first run. Only prompt\n  # when running interactively and the key isn't already set.\n  if [[ -z \"${FIRECRAWL_API_KEY:-}\" && -t 0 ]]; then\n    gum style --border double --margin '1 2' --padding '1 4' \\\n      'Firecrawl demo — scrape, crawl, and search the web' '' \\\n      'A Firecrawl API key is required.' \\\n      'Grab one (free tier available) at:' \\\n      '  https://firecrawl.dev/app/api-keys'\n    key=\"$(gum input --password \\\n      --placeholder 'fc-...' \\\n      --prompt 'FIRECRAWL_API_KEY > ')\"\n    if [[ -n \"$key\" ]]; then\n      printf '%s' \"$key\" > \"$key_file\"\n      chmod 600 \"$key_file\"\n      FIRECRAWL_API_KEY=\"$key\"\n      export FIRECRAWL_API_KEY\n      gum style --foreground 42 'Key saved to the env cache. ✓'\n    else\n      gum style --foreground 214 \\\n        'No key entered — set FIRECRAWL_API_KEY later or run `firecrawl login`.'\n    fi\n  fi\n\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'Firecrawl CLI' '' \\\n    'Check auth + credits:' \\\n    '  firecrawl --status' '' \\\n    'Scrape a page to clean markdown:' \\\n    '  firecrawl scrape \"https://firecrawl.dev\" -o page.md' '' \\\n    'Search the web:' \\\n    '  firecrawl search \"flox dev environments\"' '' \\\n    'Drive it from Claude Code / OpenCode via the bundled skill.'\nfi\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "include": {
         "environments": [
           {
@@ -563,7 +453,13 @@
           "hook": {
             "on-activate": "dir=\"$FLOX_ENV_CACHE/firecrawl\"\nmkdir -p \"$dir\"\nexport FIRECRAWL_DATA_DIR=\"$dir\"\n\n# Persist the key across activations: if it isn't set in the\n# environment but was saved to the cache before, load it back.\nkey_file=\"$dir/api-key\"\nif [ -z \"${FIRECRAWL_API_KEY:-}\" ] && [ -f \"$key_file\" ]; then\n  FIRECRAWL_API_KEY=\"$(cat \"$key_file\")\"\n  export FIRECRAWL_API_KEY\nfi\n"
           },
-          "options": {}
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          }
         },
         "name": "firecrawl",
         "descriptor": {
@@ -571,6 +467,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

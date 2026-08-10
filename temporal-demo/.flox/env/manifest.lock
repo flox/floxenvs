@@ -44,7 +44,13 @@
     "hook": {
       "on-activate": "export TEMPORAL_DATA=\"$FLOX_ENV_CACHE/temporal\"\n\nif [ ! -d \"$TEMPORAL_DATA\" ]; then\n  mkdir -p \"$TEMPORAL_DATA\"\nfi\n\n# Point Go's caches at a writable location.\n# Default GOPATH is $HOME/go, which fails inside the\n# CI test namespace where HOME=/var/empty (read-only).\nexport GOPATH=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$GOPATH/pkg/mod\"\nexport GOCACHE=\"$FLOX_ENV_CACHE/go-build\"\nmkdir -p \"$GOPATH\" \"$GOCACHE\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Temporal + worker in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Send a hello workflow:' \\\n    '  go run ./start YourName' '' \\\n    'Temporal Web UI:' \\\n    \"  http://$TEMPORAL_HOST:$TEMPORAL_UI_PORT\"\nfi\n"
     },
-    "options": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    },
     "services": {
       "temporal": {
         "command": "  TEMPORAL_DATA=\"$FLOX_ENV_CACHE/temporal\"\n  mkdir -p \"$TEMPORAL_DATA\"\n  exec temporal server start-dev \\\n    --ip \"$TEMPORAL_HOST\" \\\n    --port \"$TEMPORAL_PORT\" \\\n    --ui-port \"$TEMPORAL_UI_PORT\" \\\n    --db-filename \"$TEMPORAL_DATA/temporal.db\"\n"
@@ -112,36 +118,6 @@
         "out": "/nix/store/51vn4xsrgzfl9g3s00byydpx6jgjgrnd-gum-0.17.0"
       },
       "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/w01nbfjmxqjr3w9sycd0jliiamnljij2-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:02.122815Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/m2wks8knnsfgjl0ikhbi0vv7bqn53385-gum-0.17.0"
-      },
-      "system": "x86_64-darwin",
       "group": "demo-tools",
       "priority": 5
     },
@@ -251,41 +227,6 @@
     {
       "attr_path": "jq",
       "broken": false,
-      "derivation": "/nix/store/0shj1l58q4p6g3kf20748vq91b6rvr0r-jq-1.8.1.drv",
-      "description": "Lightweight and flexible command-line JSON processor",
-      "install_id": "jq",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "jq-1.8.1",
-      "pname": "jq",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:22.080679Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "1.8.1",
-      "outputs_to_install": [
-        "bin",
-        "man"
-      ],
-      "outputs": {
-        "bin": "/nix/store/glj1kzrb6jm7x4r5z400mcmja8ws657q-jq-1.8.1-bin",
-        "dev": "/nix/store/akbah2c4a6xcgpx2l7xqqgfbxgi8anfj-jq-1.8.1-dev",
-        "doc": "/nix/store/jb2xgi4gjvzwifzfmf4kzkimbgrhsaav-jq-1.8.1-doc",
-        "man": "/nix/store/vpk901871j7kfmmb20i1vfxh5d8mhim2-jq-1.8.1-man",
-        "out": "/nix/store/l4i89frkjf4dly7gxwbksrcimcgr2x8f-jq-1.8.1"
-      },
-      "system": "x86_64-darwin",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "jq",
-      "broken": false,
       "derivation": "/nix/store/n9cdsl2rnrzwh2c3kw6ib023vp9qfm9f-jq-1.8.1.drv",
       "description": "Lightweight and flexible command-line JSON processor",
       "install_id": "jq",
@@ -383,36 +324,6 @@
     {
       "attr_path": "flox-ai",
       "broken": false,
-      "derivation": "/nix/store/x67927620yafssr4pmkjws7dv6v132d3-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-08-10T02:13:35.760503300Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.8.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/l6j0hn116hn91ld4ynj13n1vk90i0q5s-flox-ai-0.8.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "flox-ai",
-      "priority": 5
-    },
-    {
-      "attr_path": "flox-ai",
-      "broken": false,
       "derivation": "/nix/store/w14almryjawbkglkr56spfxi25ihvhzw-flox-ai-0.8.0.drv",
       "description": "Flox-native config management for Claude Code CLI",
       "install_id": "flox-ai",
@@ -504,39 +415,6 @@
         "out": "/nix/store/lx4f4lvm5hrbxbils30ssjal1jz9yxgh-gcc-wrapper-15.2.0"
       },
       "system": "aarch64-linux",
-      "group": "go",
-      "priority": 5
-    },
-    {
-      "attr_path": "gcc",
-      "broken": false,
-      "derivation": "/nix/store/160s4m0c6rbs4apvbzb068q4ldw49618-gcc-wrapper-15.2.0.drv",
-      "description": "GNU Compiler Collection, version 15.2.0 (wrapper script)",
-      "install_id": "gcc",
-      "license": "GPL-3.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gcc-wrapper-15.2.0",
-      "pname": "gcc",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:01.501603Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "15.2.0",
-      "outputs_to_install": [
-        "man",
-        "out"
-      ],
-      "outputs": {
-        "info": "/nix/store/y0vblnaz09f5hws1pnx59fzvlpcrd1zn-gcc-wrapper-15.2.0-info",
-        "man": "/nix/store/zhrv9vafnz3agiwznkij8p36fpa17py7-gcc-wrapper-15.2.0-man",
-        "out": "/nix/store/a9dhskc2ladjh7aph2z1b7x0lsdl506l-gcc-wrapper-15.2.0"
-      },
-      "system": "x86_64-darwin",
       "group": "go",
       "priority": 5
     },
@@ -643,36 +521,6 @@
     {
       "attr_path": "go",
       "broken": false,
-      "derivation": "/nix/store/0lvbzgq250sass3jyxxvpamk09gcnym3-go-1.26.4.drv",
-      "description": "Go Programming language",
-      "install_id": "go",
-      "license": "BSD-3-Clause",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "go-1.26.4",
-      "pname": "go",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:01.839364Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "1.26.4",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/h0z6ghmi3cihlbm163d72xs9p9nn04a1-go-1.26.4"
-      },
-      "system": "x86_64-darwin",
-      "group": "go",
-      "priority": 5
-    },
-    {
-      "attr_path": "go",
-      "broken": false,
       "derivation": "/nix/store/z0b6qhv17xys7hfpnxmk0vm31nc3pxdf-go-1.26.4.drv",
       "description": "Go Programming language",
       "install_id": "go",
@@ -759,37 +607,6 @@
         "out": "/nix/store/j35i5mpn8126pr46pm1r9csqqmvqilgx-skills-temporal-developer-0.5.0"
       },
       "system": "aarch64-linux",
-      "group": "skills-temporal-developer",
-      "priority": 5
-    },
-    {
-      "attr_path": "skills-temporal-developer",
-      "broken": false,
-      "derivation": "/nix/store/gq8lrawijrhlh0qdlcx5j06v3xps076s-skills-temporal-developer-0.5.0.drv",
-      "description": "Temporal Developer skill for Claude Code and OpenCode — build, debug, and manage Temporal workflows, activities, and workers across Python, TypeScript, Go, Java, .NET, and Ruby.",
-      "install_id": "skills-temporal-developer",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=69304793cb90e07c2adefd7a05f0f678aed9bf55",
-      "name": "skills-temporal-developer-0.5.0",
-      "pname": "skills-temporal-developer",
-      "rev": "69304793cb90e07c2adefd7a05f0f678aed9bf55",
-      "rev_count": 14161,
-      "rev_date": "2026-07-13T15:44:29Z",
-      "scrape_date": "2026-08-10T02:13:35.760541287Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "0.5.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/f714kp3wv3011yly5g1gfxv8nrq132n8-skills-temporal-developer-0.5.0"
-      },
-      "system": "x86_64-darwin",
       "group": "skills-temporal-developer",
       "priority": 5
     },
@@ -887,36 +704,6 @@
     {
       "attr_path": "temporal",
       "broken": false,
-      "derivation": "/nix/store/6i455if03k3j7s05ng21qfkkralm6dh0-temporal-1.30.5.drv",
-      "description": "Microservice orchestration platform which enables developers to build scalable applications without sacrificing productivity or reliability",
-      "install_id": "temporal",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "temporal-1.30.5",
-      "pname": "temporal",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:11:28.373756Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "1.30.5",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/q8j7wdly6c1fv79xxhyr0irkn5rnvm69-temporal-1.30.5"
-      },
-      "system": "x86_64-darwin",
-      "group": "temporal",
-      "priority": 5
-    },
-    {
-      "attr_path": "temporal",
-      "broken": false,
       "derivation": "/nix/store/zdvmv76qdsva5dlawfdhy5wwmany83sy-temporal-1.30.5.drv",
       "description": "Microservice orchestration platform which enables developers to build scalable applications without sacrificing productivity or reliability",
       "install_id": "temporal",
@@ -1007,36 +794,6 @@
     {
       "attr_path": "temporal-cli",
       "broken": false,
-      "derivation": "/nix/store/3yfrdf75j5ddh6rnlidbasabmq8jvvn9-temporal-cli-1.7.2.drv",
-      "description": "Command-line interface for running Temporal Server and interacting with Workflows, Activities, Namespaces, and other parts of Temporal",
-      "install_id": "temporal-cli",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "temporal-cli-1.7.2",
-      "pname": "temporal-cli",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:11:28.377398Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "1.7.2",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/bh06550zmhadcmfn67a12265ppwzlnw1-temporal-cli-1.7.2"
-      },
-      "system": "x86_64-darwin",
-      "group": "temporal",
-      "priority": 5
-    },
-    {
-      "attr_path": "temporal-cli",
-      "broken": false,
       "derivation": "/nix/store/alm6xwg2izqq5y1qlm4sh07qdy5z5rfk-temporal-cli-1.7.2.drv",
       "description": "Command-line interface for running Temporal Server and interacting with Workflows, Activities, Namespaces, and other parts of Temporal",
       "install_id": "temporal-cli",
@@ -1097,7 +854,13 @@
       "hook": {
         "on-activate": "# Point Go's caches at a writable location.\n# Default GOPATH is $HOME/go, which fails inside the\n# CI test namespace where HOME=/var/empty (read-only).\nexport GOPATH=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$GOPATH/pkg/mod\"\nexport GOCACHE=\"$FLOX_ENV_CACHE/go-build\"\nmkdir -p \"$GOPATH\" \"$GOCACHE\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Temporal + worker in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Send a hello workflow:' \\\n    '  go run ./start YourName' '' \\\n    'Temporal Web UI:' \\\n    \"  http://$TEMPORAL_HOST:$TEMPORAL_UI_PORT\"\nfi\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "services": {
         "worker": {
           "command": "  cd \"$FLOX_ENV_PROJECT\"\n  export GOPATH=\"$FLOX_ENV_CACHE/go\"\n  export GOMODCACHE=\"$GOPATH/pkg/mod\"\n  export GOCACHE=\"$FLOX_ENV_CACHE/go-build\"\n  mkdir -p \"$GOPATH\" \"$GOCACHE\"\n  until temporal workflow list \\\n      --address \"$TEMPORAL_HOST:$TEMPORAL_PORT\" \\\n      >/dev/null 2>&1; do\n    sleep 1\n  done\n  exec go run ./worker\n"
@@ -1133,7 +896,13 @@
           "hook": {
             "on-activate": "export TEMPORAL_DATA=\"$FLOX_ENV_CACHE/temporal\"\n\nif [ ! -d \"$TEMPORAL_DATA\" ]; then\n  mkdir -p \"$TEMPORAL_DATA\"\nfi\n"
           },
-          "options": {},
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          },
           "services": {
             "temporal": {
               "command": "  TEMPORAL_DATA=\"$FLOX_ENV_CACHE/temporal\"\n  mkdir -p \"$TEMPORAL_DATA\"\n  exec temporal server start-dev \\\n    --ip \"$TEMPORAL_HOST\" \\\n    --port \"$TEMPORAL_PORT\" \\\n    --ui-port \"$TEMPORAL_UI_PORT\" \\\n    --db-filename \"$TEMPORAL_DATA/temporal.db\"\n"
@@ -1146,6 +915,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

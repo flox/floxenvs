@@ -23,7 +23,13 @@
     "hook": {
       "on-activate": "export WORKTRUNK_CACHE=\"$FLOX_ENV_CACHE/worktrunk\"\nmkdir -p \"$WORKTRUNK_CACHE\"\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 60 --margin \"1 2\" --padding \"1 2\" \\\n    \"Worktrunk\" \"git worktrees, made easy\"\n  echo \"\"\n  echo \"  wt switch <branch>        — switch / create worktree\"\n  echo \"  wt switch -c -x claude X  — create + start coding agent\"\n  echo \"  wt list                   — list worktrees with status\"\n  echo \"  wt merge                  — merge + clean up\"\n  echo \"  wt remove                 — remove worktree + branch\"\n  echo \"\"\n  echo \"  Docs: https://worktrunk.dev\"\n  echo \"\"\nfi\n"
     },
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -83,36 +89,6 @@
         "out": "/nix/store/51vn4xsrgzfl9g3s00byydpx6jgjgrnd-gum-0.17.0"
       },
       "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/w01nbfjmxqjr3w9sycd0jliiamnljij2-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d407951447dcd00442e97087bf374aad70c04cea",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "d407951447dcd00442e97087bf374aad70c04cea",
-      "rev_count": 1027867,
-      "rev_date": "2026-07-05T04:06:12Z",
-      "scrape_date": "2026-07-06T04:09:02.122815Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/m2wks8knnsfgjl0ikhbi0vv7bqn53385-gum-0.17.0"
-      },
-      "system": "x86_64-darwin",
       "group": "demo-tools",
       "priority": 5
     },
@@ -203,36 +179,6 @@
         "out": "/nix/store/4zf5cxf627sbr8syddjx7j5pmk4321ri-flox-ai-0.8.0"
       },
       "system": "aarch64-linux",
-      "group": "flox-ai",
-      "priority": 5
-    },
-    {
-      "attr_path": "flox-ai",
-      "broken": false,
-      "derivation": "/nix/store/x67927620yafssr4pmkjws7dv6v132d3-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-08-10T02:17:56.862397398Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.8.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/l6j0hn116hn91ld4ynj13n1vk90i0q5s-flox-ai-0.8.0"
-      },
-      "system": "x86_64-darwin",
       "group": "flox-ai",
       "priority": 5
     },
@@ -331,39 +277,6 @@
         "out": "/nix/store/ixp98f9avf8ikpdrmp40cj33g0dazyp9-git-2.54.0"
       },
       "system": "aarch64-linux",
-      "group": "worktrunk",
-      "priority": 5
-    },
-    {
-      "attr_path": "git",
-      "broken": false,
-      "derivation": "/nix/store/kfyjgmz1vv4jn18j90mdwhdlbihg93w2-git-2.54.0.drv",
-      "description": "Distributed version control system",
-      "install_id": "git",
-      "license": "GPL-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "name": "git-2.54.0",
-      "pname": "git",
-      "rev": "567a49d1913ce81ac6e9582e3553dd90a955875f",
-      "rev_count": 1017464,
-      "rev_date": "2026-06-16T02:33:49Z",
-      "scrape_date": "2026-06-17T04:13:07.165719Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "2.54.0",
-      "outputs_to_install": [
-        "out",
-        "out"
-      ],
-      "outputs": {
-        "doc": "/nix/store/agyxy5ay4x06b52mj24rz44fc82328ha-git-2.54.0-doc",
-        "out": "/nix/store/s9lsrlgwr3sabw9a2dl3laykas0ijk85-git-2.54.0"
-      },
-      "system": "x86_64-darwin",
       "group": "worktrunk",
       "priority": 5
     },
@@ -469,37 +382,6 @@
     {
       "attr_path": "worktrunk",
       "broken": false,
-      "derivation": "/nix/store/arjv5j7zdwkgsfal936h9cqv5krb47fz-worktrunk-0.72.0.drv",
-      "description": "CLI for git worktree management, designed for parallel AI agent workflows",
-      "install_id": "worktrunk",
-      "license": "[ MIT, Apache-2.0 ]",
-      "locked_url": "https://github.com/flox/floxenvs?rev=8eed0bd3a52b4bc066a156c9dd504c03d3924dcb",
-      "name": "worktrunk-0.72.0",
-      "pname": "worktrunk",
-      "rev": "8eed0bd3a52b4bc066a156c9dd504c03d3924dcb",
-      "rev_count": 18703,
-      "rev_date": "2026-08-08T02:01:26Z",
-      "scrape_date": "2026-08-10T02:17:56.862438298Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "0.72.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/spb9pzcbc5z2c18qpmxpj3kkldi530xf-worktrunk-0.72.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "worktrunk",
-      "priority": 5
-    },
-    {
-      "attr_path": "worktrunk",
-      "broken": false,
       "derivation": "/nix/store/xxqyglf0f7hwcics3gj0c5y1k6419vfn-worktrunk-0.72.0.drv",
       "description": "CLI for git worktree management, designed for parallel AI agent workflows",
       "install_id": "worktrunk",
@@ -541,7 +423,13 @@
       "hook": {
         "on-activate": "if [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 60 --margin \"1 2\" --padding \"1 2\" \\\n    \"Worktrunk\" \"git worktrees, made easy\"\n  echo \"\"\n  echo \"  wt switch <branch>        — switch / create worktree\"\n  echo \"  wt switch -c -x claude X  — create + start coding agent\"\n  echo \"  wt list                   — list worktrees with status\"\n  echo \"  wt merge                  — merge + clean up\"\n  echo \"  wt remove                 — remove worktree + branch\"\n  echo \"\"\n  echo \"  Docs: https://worktrunk.dev\"\n  echo \"\"\nfi\n"
       },
-      "options": {},
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
       "include": {
         "environments": [
           {
@@ -571,7 +459,13 @@
           "hook": {
             "on-activate": "export WORKTRUNK_CACHE=\"$FLOX_ENV_CACHE/worktrunk\"\nmkdir -p \"$WORKTRUNK_CACHE\"\n"
           },
-          "options": {}
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          }
         },
         "name": "worktrunk",
         "descriptor": {
@@ -579,6 +473,16 @@
         }
       }
     ],
-    "warnings": []
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
   }
 }

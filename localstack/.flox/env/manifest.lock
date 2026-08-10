@@ -29,7 +29,13 @@
       "fish": "source \"$PYTHON_DIR/bin/activate.fish\"\n",
       "tcsh": "source \"$PYTHON_DIR/bin/activate.csh\"\n"
     },
-    "options": {},
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    },
     "services": {
       "localstack": {
         "command": "docker rm -f localstack-main 2>/dev/null; localstack start -d",
@@ -98,36 +104,6 @@
         "out": "/nix/store/9xiksv1xwy6p1ajp5gskzcvp9ab2lw0z-awscli2-2.34.24"
       },
       "system": "aarch64-linux",
-      "group": "localstack",
-      "priority": 5
-    },
-    {
-      "attr_path": "awscli2",
-      "broken": false,
-      "derivation": "/nix/store/lgnijpclgfajbhd3dp38i8iafrvbrlli-awscli2-2.34.24.drv",
-      "description": "Unified tool to manage your AWS services",
-      "install_id": "awscli2",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "name": "awscli2-2.34.24",
-      "pname": "awscli2",
-      "rev": "65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "rev_count": 1026231,
-      "rev_date": "2026-07-02T02:29:44Z",
-      "scrape_date": "2026-07-04T04:09:04.078279Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.34.24",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "dist": "/nix/store/1a995djpcs9wknjw260qq0qwv2y338gs-awscli2-2.34.24-dist",
-        "out": "/nix/store/s24i1bj3l4xx8vm2gym7fypskjljp2mn-awscli2-2.34.24"
-      },
-      "system": "x86_64-darwin",
       "group": "localstack",
       "priority": 5
     },
@@ -224,36 +200,6 @@
     {
       "attr_path": "localstack",
       "broken": false,
-      "derivation": "/nix/store/vrhg71fp85ycni8n7y7cmqmjr5q46mjc-localstack-4.12.0.drv",
-      "description": "Fully functional local Cloud stack",
-      "install_id": "localstack",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "name": "localstack-4.12.0",
-      "pname": "localstack",
-      "rev": "65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "rev_count": 1026231,
-      "rev_date": "2026-07-02T02:29:44Z",
-      "scrape_date": "2026-07-04T04:09:24.663980Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "4.12.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "dist": "/nix/store/3zcp1fckgkpky4i3f9r3nzcrv2awlb34-localstack-4.12.0-dist",
-        "out": "/nix/store/mnwmk02rm6gk538fq5v3yc3smz3c77xy-localstack-4.12.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "localstack",
-      "priority": 5
-    },
-    {
-      "attr_path": "localstack",
-      "broken": false,
       "derivation": "/nix/store/150kjyr3c7znlqgv2z30m8sqaczh5894-localstack-4.12.0.drv",
       "description": "Fully functional local Cloud stack",
       "install_id": "localstack",
@@ -338,35 +284,6 @@
         "out": "/nix/store/smwd56pl54f0pcjdspgh5vnf20c8xwsc-python3-3.13.13"
       },
       "system": "aarch64-linux",
-      "group": "localstack",
-      "priority": 5
-    },
-    {
-      "attr_path": "python3",
-      "broken": false,
-      "derivation": "/nix/store/5vh9qfs54q47jybcd5zhxmap7lgk2dhg-python3-3.13.13.drv",
-      "description": "High-level dynamically-typed programming language",
-      "install_id": "python3",
-      "license": "Python-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "name": "python3-3.13.13",
-      "pname": "python3",
-      "rev": "65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "rev_count": 1026231,
-      "rev_date": "2026-07-02T02:29:44Z",
-      "scrape_date": "2026-07-04T04:09:45.917689Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "3.13.13",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/1137mc2md1ip5pdslybxl05kysjyh4rg-python3-3.13.13"
-      },
-      "system": "x86_64-darwin",
       "group": "localstack",
       "priority": 5
     },
@@ -462,38 +379,6 @@
         "out": "/nix/store/37b8wvibnxkxp54ndndacvi72a81ylsb-kubectl-1.36.2"
       },
       "system": "aarch64-linux",
-      "group": "localstack-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "kubectl",
-      "broken": false,
-      "derivation": "/nix/store/g0j5sp2386b1afpsgdhb5sbyrggfg89w-kubectl-1.36.2.drv",
-      "description": "Kubernetes CLI",
-      "install_id": "kubectl",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "name": "kubectl-1.36.2",
-      "pname": "kubectl",
-      "rev": "65179426c83bb3f6bc14898b42ea1c6f01d374b0",
-      "rev_count": 1026231,
-      "rev_date": "2026-07-02T02:29:44Z",
-      "scrape_date": "2026-07-04T04:09:22.444040Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "1.36.2",
-      "outputs_to_install": [
-        "man",
-        "out"
-      ],
-      "outputs": {
-        "convert": "/nix/store/xavdplccjx28qkqadjgs7mnimc3sizjk-kubectl-1.36.2-convert",
-        "man": "/nix/store/8agbav6nsacbxb826wwhy27dckb60hhk-kubectl-1.36.2-man",
-        "out": "/nix/store/2mzx35a2g3h1n4lpk0p6qm6dl83d2gi6-kubectl-1.36.2"
-      },
-      "system": "x86_64-darwin",
       "group": "localstack-tools",
       "priority": 5
     },

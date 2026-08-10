@@ -40,7 +40,13 @@
     },
     "hook": {},
     "profile": {},
-    "options": {}
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
   },
   "packages": [
     {
@@ -102,37 +108,6 @@
         "out": "/nix/store/7c6ymss4jm8zv3d41x0mx8bwrnpddk6v-claude-code-lint-0.7.1"
       },
       "system": "aarch64-linux",
-      "group": "claudelint",
-      "priority": 5
-    },
-    {
-      "attr_path": "claudelint",
-      "broken": false,
-      "derivation": "/nix/store/5qx41s2dvfh6rsqfmg923arjj7x135iq-claude-code-lint-0.7.1.drv",
-      "description": "Linter for the whole Claude Code project: skills, agents, settings, hooks, MCP",
-      "install_id": "claudelint",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=cb6ca7d88e3a1aca40a6851605a555b3c1679fd6",
-      "name": "claude-code-lint-0.7.1",
-      "pname": "claude-code-lint",
-      "rev": "cb6ca7d88e3a1aca40a6851605a555b3c1679fd6",
-      "rev_count": 16941,
-      "rev_date": "2026-07-31T01:00:20Z",
-      "scrape_date": "2026-08-03T01:03:54.846666114Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "0.7.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/f049ljrwi0cq3ahrrcnafqzn97c1h4x5-claude-code-lint-0.7.1"
-      },
-      "system": "x86_64-darwin",
       "group": "claudelint",
       "priority": 5
     },
@@ -230,36 +205,6 @@
     {
       "attr_path": "flox-ai",
       "broken": false,
-      "derivation": "/nix/store/x67927620yafssr4pmkjws7dv6v132d3-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=b9e29782066fc4be13088b28f3e2dd659b87f962",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "b9e29782066fc4be13088b28f3e2dd659b87f962",
-      "rev_count": 83,
-      "rev_date": "2026-07-31T16:31:58Z",
-      "scrape_date": "2026-08-03T01:03:54.846680471Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.8.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/l6j0hn116hn91ld4ynj13n1vk90i0q5s-flox-ai-0.8.0"
-      },
-      "system": "x86_64-darwin",
-      "group": "flox-ai",
-      "priority": 5
-    },
-    {
-      "attr_path": "flox-ai",
-      "broken": false,
       "derivation": "/nix/store/w14almryjawbkglkr56spfxi25ihvhzw-flox-ai-0.8.0.drv",
       "description": "Flox-native config management for Claude Code CLI",
       "install_id": "flox-ai",
@@ -344,36 +289,6 @@
         "out": "/nix/store/g222a402nym43ahx1impg47pwy3h5d0p-skill-tools-0.4.1"
       },
       "system": "aarch64-linux",
-      "group": "skill-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "skill-tools",
-      "broken": false,
-      "derivation": "/nix/store/d0y4jd2j132973y68ays63b75l21xaqz-skill-tools-0.4.1.drv",
-      "description": "CLI to score, validate, lint, and route Claude Agent Skills (SKILL.md)",
-      "install_id": "skill-tools",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/floxenvs?rev=5d1e66d4c6097becf7151ee94e49b696fa11c8b1",
-      "name": "skill-tools-0.4.1",
-      "pname": "skill-tools",
-      "rev": "5d1e66d4c6097becf7151ee94e49b696fa11c8b1",
-      "rev_count": 7401,
-      "rev_date": "2026-06-11T21:58:43Z",
-      "scrape_date": "2026-08-03T01:03:54.846695749Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/hpminp2dvwyhv6prkaf5ksdpsa3g82wc-skill-tools-0.4.1"
-      },
-      "system": "x86_64-darwin",
       "group": "skill-tools",
       "priority": 5
     },
@@ -472,37 +387,6 @@
     {
       "attr_path": "skill-validator",
       "broken": false,
-      "derivation": "/nix/store/3g9d4d567flpari8i2l87z0v8smf9gfg-skill-validator-1.5.6.drv",
-      "description": "Validate and score Claude Agent Skills (SKILL.md)",
-      "install_id": "skill-validator",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=69304793cb90e07c2adefd7a05f0f678aed9bf55",
-      "name": "skill-validator-1.5.6",
-      "pname": "skill-validator",
-      "rev": "69304793cb90e07c2adefd7a05f0f678aed9bf55",
-      "rev_count": 14161,
-      "rev_date": "2026-07-13T15:44:29Z",
-      "scrape_date": "2026-08-03T01:03:54.846707501Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "1.5.6",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/gxh5civ8s3z7v7xzxx5hcaln063ap9qq-skill-validator-1.5.6"
-      },
-      "system": "x86_64-darwin",
-      "group": "skill-validator",
-      "priority": 5
-    },
-    {
-      "attr_path": "skill-validator",
-      "broken": false,
       "derivation": "/nix/store/rkmxq0cm8y2q0wqc1s47wrvmx08w1mdr-skill-validator-1.5.6.drv",
       "description": "Validate and score Claude Agent Skills (SKILL.md)",
       "install_id": "skill-validator",
@@ -588,36 +472,6 @@
         "out": "/nix/store/ganmrf2nav81kvapnyljjyz1hxpcgypc-skillcheck-1.0.0"
       },
       "system": "aarch64-linux",
-      "group": "skillcheck",
-      "priority": 5
-    },
-    {
-      "attr_path": "skillcheck",
-      "broken": false,
-      "derivation": "/nix/store/kc499kk7mzkd8sc2caj7hzzf6rjq35sv-skillcheck-1.0.0.drv",
-      "description": "SAST scanner for SKILL.md bodies — secrets, injection, priv-esc (SARIF)",
-      "install_id": "skillcheck",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=5d1e66d4c6097becf7151ee94e49b696fa11c8b1",
-      "name": "skillcheck-1.0.0",
-      "pname": "skillcheck",
-      "rev": "5d1e66d4c6097becf7151ee94e49b696fa11c8b1",
-      "rev_count": 7401,
-      "rev_date": "2026-06-11T21:58:43Z",
-      "scrape_date": "2026-08-03T01:03:54.846722019Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "1.0.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/g8agqnkbaag0bzdvdm9jhsbvq236wy3l-skillcheck-1.0.0"
-      },
-      "system": "x86_64-darwin",
       "group": "skillcheck",
       "priority": 5
     },
@@ -716,37 +570,6 @@
     {
       "attr_path": "skillspector",
       "broken": false,
-      "derivation": "/nix/store/hw33slk625b6hj1yvrj67faascbzlbki-skillspector-env.drv",
-      "description": "Security scanner for AI agent skills",
-      "install_id": "skillspector",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/floxenvs?rev=d3d7cdf5056b7671fb5f7e4ef57a6ef9a4b349e8",
-      "name": "skillspector-env",
-      "pname": "skillspector",
-      "rev": "d3d7cdf5056b7671fb5f7e4ef57a6ef9a4b349e8",
-      "rev_count": 17114,
-      "rev_date": "2026-07-31T20:00:56Z",
-      "scrape_date": "2026-08-03T01:03:54.846733830Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "2.5.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/zpqhrsnp0fsvmr2y77yrj1g1zayh7mi7-skillspector-env"
-      },
-      "system": "x86_64-darwin",
-      "group": "skillspector",
-      "priority": 5
-    },
-    {
-      "attr_path": "skillspector",
-      "broken": false,
       "derivation": "/nix/store/ya1339006qj8i27v4dfcvc8arwck173d-skillspector-env.drv",
       "description": "Security scanner for AI agent skills",
       "install_id": "skillspector",
@@ -834,37 +657,6 @@
         "out": "/nix/store/4539mqayvrkxrcwayhxiafx4vbjwpsij-inter-4.1"
       },
       "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "inter",
-      "broken": false,
-      "derivation": "/nix/store/75d0cb2grhji82r4pvm1shyyj879588j-inter-4.1.drv",
-      "description": "Typeface specially designed for user interfaces",
-      "install_id": "inter",
-      "license": "OFL-1.1",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "inter-4.1",
-      "pname": "inter",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:35:12.046512Z",
-      "stabilities": [
-        "stable",
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/1sxi2cc0zqbjpg3fk1m9w7i1x20mzv6a-inter-4.1"
-      },
-      "system": "x86_64-darwin",
       "group": "toplevel",
       "priority": 5
     },
@@ -977,42 +769,6 @@
     {
       "attr_path": "jq",
       "broken": false,
-      "derivation": "/nix/store/bi6avhm2xlfhjjm7rns0dkddfz5qimis-jq-1.8.1.drv",
-      "description": "Lightweight and flexible command-line JSON processor",
-      "install_id": "jq",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "jq-1.8.1",
-      "pname": "jq",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:35:12.444642Z",
-      "stabilities": [
-        "stable",
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "1.8.1",
-      "outputs_to_install": [
-        "bin",
-        "man"
-      ],
-      "outputs": {
-        "bin": "/nix/store/0kz2h1wisnvpmavfra6n8fi0x2brhfg6-jq-1.8.1-bin",
-        "dev": "/nix/store/w96fml250mbz0p0an0f7p6zfblrpz0pn-jq-1.8.1-dev",
-        "doc": "/nix/store/k388l1qgp6dcn80njl1by9x5i2jy8i0m-jq-1.8.1-doc",
-        "man": "/nix/store/8xvsm6pzpya6jc3vfmxagxj46iz9hix9-jq-1.8.1-man",
-        "out": "/nix/store/30wa9jl18hjfi5756chyg4kl1164d5wk-jq-1.8.1"
-      },
-      "system": "x86_64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "jq",
-      "broken": false,
       "derivation": "/nix/store/9952hq9bcj0gj3xipmw3fmbsim15myk5-jq-1.8.1.drv",
       "description": "Lightweight and flexible command-line JSON processor",
       "install_id": "jq",
@@ -1114,39 +870,6 @@
         "out": "/nix/store/hps7k16bd9isj7pfsjzg7q0wgvrw47kn-nodejs-22.21.1"
       },
       "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "nodejs",
-      "broken": false,
-      "derivation": "/nix/store/zkqj1m59wbz3dpjsn9zi60w139v0a7fg-nodejs-22.21.1.drv",
-      "description": "Event-driven I/O framework for the V8 JavaScript engine",
-      "install_id": "nodejs",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "name": "nodejs-22.21.1",
-      "pname": "nodejs",
-      "rev": "3e2499d5539c16d0d173ba53552a4ff8547f4539",
-      "rev_count": 916364,
-      "rev_date": "2025-12-25T08:32:45Z",
-      "scrape_date": "2025-12-26T03:35:19.566282Z",
-      "stabilities": [
-        "stable",
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "22.21.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "dev": "/nix/store/haa4773lz7wfhnql05181azh4z5141r7-nodejs-22.21.1-dev",
-        "libv8": "/nix/store/0pswqdxlx8y0v54gq0ixwps19agv6bds-nodejs-22.21.1-libv8",
-        "out": "/nix/store/wfjyiwara336j7r1v0ia3kib8779wzwf-nodejs-22.21.1"
-      },
-      "system": "x86_64-darwin",
       "group": "toplevel",
       "priority": 5
     },

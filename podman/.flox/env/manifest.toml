@@ -20,7 +20,7 @@ podman-compose.pkg-group = "podman"
 [install.qemu]
 pkg-path = "qemu"
 pkg-group = "podman"
-systems = ["x86_64-darwin", "aarch64-darwin"]
+systems = ["aarch64-darwin"]
 
 [hook]
 on-activate = '''
@@ -35,3 +35,6 @@ if [ "$(uname -s)" = "Linux" ]; then
   fi
 fi
 '''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]
