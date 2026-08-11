@@ -3,6 +3,8 @@
   python313,
   callPackage,
   yara,
+  runCommand,
+  makeBinaryWrapper,
 }:
 
 let
@@ -79,24 +81,36 @@ let
 
   venv = pythonSet.mkVirtualEnv "skillspector-env" workspace.deps.default;
 
-in
-venv.overrideAttrs (old: {
-  pname = "skillspector";
   version = (lib.importJSON ./hashes.json).version;
 
-  passthru = (old.passthru or { }) // {
-    python = python313;
-  };
+in
+# Expose ONLY bin/skillspector. Installing the venv itself would put its
+# bin/python{,3,3.13} symlinks on $FLOX_ENV/bin and collide with an
+# env-level python3 (the coexist check guards exactly this).
+runCommand "skillspector-${version}"
+  {
+    pname = "skillspector";
+    inherit version;
+    nativeBuildInputs = [ makeBinaryWrapper ];
 
-  meta = {
-    description = "Security scanner for AI agent skills";
-    homepage = "https://github.com/NVIDIA/SkillSpector";
-    license = lib.licenses.asl20;
-    mainProgram = "skillspector";
-    platforms = [
-      "aarch64-darwin"
-      "aarch64-linux"
-      "x86_64-linux"
-    ];
-  };
-})
+    passthru = {
+      inherit venv;
+      python = python313;
+    };
+
+    meta = {
+      description = "Security scanner for AI agent skills";
+      homepage = "https://github.com/NVIDIA/SkillSpector";
+      license = lib.licenses.asl20;
+      mainProgram = "skillspector";
+      platforms = [
+        "aarch64-darwin"
+        "aarch64-linux"
+        "x86_64-linux"
+      ];
+    };
+  }
+  ''
+    mkdir -p $out/bin
+    makeBinaryWrapper ${venv}/bin/skillspector $out/bin/skillspector
+  ''
