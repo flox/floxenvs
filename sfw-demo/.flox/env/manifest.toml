@@ -1,7 +1,7 @@
 schema-version = "1.10.0"
 
 [include]
-environments = [{ remote = "flox/sfw" }]
+environments = [{ dir = "../sfw" }]
 
 [install]
 gum.pkg-path = "gum"
@@ -19,7 +19,10 @@ cargo.pkg-group = "demo-tools"
 # allows is `pip install --target=<dir>`.
 PIP_REQUIRE_VIRTUALENV = "false"
 PIP_BREAK_SYSTEM_PACKAGES = "true"
-SFW_VERBOSE="true"
+# sfw is silent by default; SFW_VERBOSE=true (same as `sfw --verbose`)
+# makes it print "Protected by Socket Firewall" and scan results on
+# every install, so the demo visibly shows sfw is in the loop.
+SFW_VERBOSE = "true"
 
 [hook]
 on-activate = '''
@@ -42,7 +45,9 @@ export PATH="$FLOX_ENV/libexec/sfw-shims:$NPM_CONFIG_PREFIX/bin:$CARGO_HOME/bin:
 # is sourced by bash, zsh, fish and tcsh, and no conditional or command
 # substitution is valid in all four — only a bare command call is. So
 # generate the banner as a bash script here and let common just run it.
-cat > "$FLOX_ENV_CACHE/banner.sh" <<'BANNER'
+# Write to a temp file and mv into place so shells attaching mid-write
+# never execute a truncated script.
+cat > "$FLOX_ENV_CACHE/banner.sh.$$" <<'BANNER'
 #!/usr/bin/env bash
 [ "${FLOX_ENVS_TESTING:-}" = "1" ] && exit 0
 
@@ -65,7 +70,8 @@ gum style \
   "" \
   "Full walkthrough: README.md"
 BANNER
-chmod +x "$FLOX_ENV_CACHE/banner.sh"
+chmod +x "$FLOX_ENV_CACHE/banner.sh.$$"
+mv -f "$FLOX_ENV_CACHE/banner.sh.$$" "$FLOX_ENV_CACHE/banner.sh"
 '''
 
 [profile]
