@@ -84,6 +84,48 @@ stdenv.mkDerivation {
            "$PLUGIN_DIR/src/rules" \
            "$PLUGIN_DIR/src/tools"
 
+    # v2.0.0 turned upstream into a monorepo: CLI, browser extension,
+    # cache engine, SDKs, MCP servers, release tooling. None of it is
+    # plugin content Claude Code loads — the plugin needs only
+    # .claude-plugin/, skills/, agents/ and src/hooks/. Drop the rest
+    # (scripts/ ships the dev installer whose /usr/bin/env shebang
+    # fails flox_skill_check).
+    rm -rf "$PLUGIN_DIR/browse" \
+           "$PLUGIN_DIR/cacheengine" \
+           "$PLUGIN_DIR/cli" \
+           "$PLUGIN_DIR/engine" \
+           "$PLUGIN_DIR/explorer" \
+           "$PLUGIN_DIR/extension" \
+           "$PLUGIN_DIR/integrations" \
+           "$PLUGIN_DIR/mcp" \
+           "$PLUGIN_DIR/mem" \
+           "$PLUGIN_DIR/packages" \
+           "$PLUGIN_DIR/proxy" \
+           "$PLUGIN_DIR/rewriter" \
+           "$PLUGIN_DIR/scripts" \
+           "$PLUGIN_DIR/shared" \
+           "$PLUGIN_DIR/shrink" \
+           "$PLUGIN_DIR/ui" \
+           "$PLUGIN_DIR/src/mcp-servers" \
+           "$PLUGIN_DIR/src/hooks/install.sh" \
+           "$PLUGIN_DIR/src/hooks/install.ps1" \
+           "$PLUGIN_DIR/src/hooks/uninstall.sh" \
+           "$PLUGIN_DIR/src/hooks/uninstall.ps1" \
+           "$PLUGIN_DIR/go.mod" \
+           "$PLUGIN_DIR/go.sum" \
+           "$PLUGIN_DIR/pnpm-lock.yaml" \
+           "$PLUGIN_DIR/pnpm-workspace.yaml" \
+           "$PLUGIN_DIR/tsconfig.base.json" \
+           "$PLUGIN_DIR/skills-lock.json" \
+           "$PLUGIN_DIR/ANNOUNCEMENT.md" \
+           "$PLUGIN_DIR/CODE_OF_CONDUCT.md" \
+           "$PLUGIN_DIR/LICENSING.md" \
+           "$PLUGIN_DIR/LICENSE.BSL" \
+           "$PLUGIN_DIR/SECURITY.md" \
+           "$PLUGIN_DIR/TRADEMARKS.md" \
+           "$PLUGIN_DIR/.editorconfig" \
+           "$PLUGIN_DIR/.npmignore"
+
     # The commands/ directory ships *only* Codex-flavored `.toml` files
     # at the upstream root. Claude Code's plugin loader picks up `.md`
     # files from `commands/` and would otherwise warn on the `.toml`s.
@@ -152,6 +194,18 @@ stdenv.mkDerivation {
         'python3 -m scripts' \
         '${pluginRootRef}/bin/python3 -m scripts'
     fi
+
+    # Defense in depth for flox_skill_check: any surviving executable
+    # .sh/.py whose shebang still points at /usr/bin/env (e.g.
+    # src/hooks/caveman-statusline.sh — user-invoked via `bash <path>`
+    # from a statusline command, so the executable bit is not needed)
+    # loses the executable bit instead of failing the build.
+    while IFS= read -r f; do
+      if head -1 "$f" | grep -qE '^#!/usr/bin/env |^#![a-zA-Z]'; then
+        chmod -x "$f"
+      fi
+    done < <(find "$PLUGIN_DIR" -type f -perm -u+x \
+              \( -name '*.sh' -o -name '*.py' \))
 
     runHook postInstall
   '';
