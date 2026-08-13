@@ -1,294 +1,70 @@
 #!/usr/bin/env bash
+# discover-envs.sh — select environments to run CI for.
 #
-# Discover flox environments and produce CI matrix JSON.
+#   scripts/discover-envs.sh [single-env] < changed-file-paths
 #
-# Parses manifest.lock (JSON) instead of manifest.toml to
-# avoid brittle TOML parsing. Only needs coreutils, git, jq
-# (all present on ubuntu-latest).
+# stdin: newline-separated changed file paths (ignored when
+#        single-env is given).
+# arg1:  optional single environment name — output exactly that env
+#        (workflow_dispatch override). "all" or "" means: no
+#        override.
+# stdout: compact JSON array of environment names.
 #
-# Environment variables (inputs):
-#   BASE_SHA    - git diff base (default: HEAD~1)
-#   UPDATE_ALL  - set to "true" to include all envs
-#   GITHUB_OUTPUT - if set, write CI outputs there
+# Selection rules:
+#   1. arg1 set (not "" / "all")  -> exactly that env
+#   2. any SHARED path changed    -> all envs
+#   3. otherwise                  -> envs whose <env>/** or
+#                                    <env>-demo/** changed
 #
-# Usage:
-#   bash scripts/discover-envs.sh            # JSON matrices
-#   bash scripts/discover-envs.sh --list     # table view
-#   bash scripts/discover-envs.sh --validate # check manifests
-#
+# Environments are discovered from the tree: every top-level
+# directory containing .flox/env/manifest.toml whose name does not
+# end in -demo. Demo dirs are owned by their base env.
+
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$REPO_ROOT"
 
-# ── Lock file helpers ─────────────────────────────────────
+single="${1:-}"
 
-# Check if environment has services defined in lock file.
-has_services() {
-  local lock="$1"
-  jq -e '.manifest.services // {} | length > 0' "$lock" \
-    >/dev/null 2>&1
-}
+# ── Enumerate environments from the tree ──
+envs=()
+for d in */; do
+  name="${d%/}"
+  case "$name" in *-demo) continue ;; esac
+  [ -f "$name/.flox/env/manifest.toml" ] && envs+=("$name")
+done
 
-# Extract systems list from lock file (one per line).
-# If manifest.options.systems is empty or absent, all
-# default systems are assumed (per ADR-004).
-# We are skipping x86_64-darwin intentionally since
-# we don't have good enough CI for it.
-ALL_SYSTEMS="aarch64-darwin
-aarch64-linux
-x86_64-linux"
+if [ -n "$single" ] && [ "$single" != "all" ]; then
+  for e in "${envs[@]}"; do
+    if [ "$e" = "$single" ]; then
+      jq -cn --arg e "$single" '[$e]'
+      exit 0
+    fi
+  done
+  echo "ERROR: unknown environment '$single'" >&2
+  exit 1
+fi
 
-get_systems() {
-  local lock="$1"
-  local systems
-  systems="$(jq -r '.manifest.options.systems // [] | map(select(. != "x86_64-darwin")) | .[]' "$lock")"
-  if [ -z "$systems" ]; then
-    systems="$ALL_SYSTEMS"
+changed="$(cat)"
+
+# ── Shared paths: any hit selects every env ──
+if echo "$changed" | grep -qE \
+  '^(flake\.nix|flake\.lock|scripts/|\.github/workflows/environment\.yml|\.github/workflows/ci_envs\.yml)'; then
+  printf '%s\n' "${envs[@]}" | jq -Rc . | jq -sc .
+  exit 0
+fi
+
+# ── Per-env selection ──
+selected=()
+for e in "${envs[@]}"; do
+  if echo "$changed" | grep -qE "^$e(-demo)?/"; then
+    selected+=("$e")
   fi
-  echo "$systems"
-}
+done
 
-# Pick a GitHub Actions runner that can build the env.
-# Prefer Linux (cheaper minutes); fall back to macOS for
-# darwin-only envs. Mirrors environment.yml.
-runner_for_systems() {
-  local systems="$1"
-  if   echo "$systems" | grep -qx 'x86_64-linux';   then echo "ubuntu-latest"
-  elif echo "$systems" | grep -qx 'aarch64-linux';  then echo "ubuntu-24.04-arm"
-  elif echo "$systems" | grep -qx 'aarch64-darwin'; then echo "macos-latest"
-  else
-    echo "no supported runner for systems: $systems" >&2
-    return 1
-  fi
-}
-
-# ── Environment discovery ──────────────────────────────────
-
-find_locks() {
-  find "$REPO_ROOT" -maxdepth 4 -path '*/.flox/env/manifest.lock' \
-    -not -path "$REPO_ROOT/.flox/*" \
-    -not -path "$REPO_ROOT/_worktrees/*" \
-    -not -path '*/remote/*' \
-    -not -path '*/.git/*' \
-    | sort
-}
-
-is_demo() {
-  local name="$1"
-  [[ "$name" == *-demo ]]
-}
-
-# Resolve lock path to the env directory (two levels up
-# from .flox/env/manifest.lock).
-lock_to_env() {
-  local lock="$1"
-  dirname "$(dirname "$(dirname "$lock")")"
-}
-
-# ── Modes ──────────────────────────────────────────────────
-
-mode_validate() {
-  local warnings=0
-  while IFS= read -r lock; do
-    local env_path
-    env_path="$(lock_to_env "$lock")"
-    local name
-    name="$(basename "$env_path")"
-
-    if ! jq empty "$lock" 2>/dev/null; then
-      echo "FAIL: $name - invalid JSON in manifest.lock"
-      warnings=$((warnings + 1))
-      continue
-    fi
-
-    local systems
-    systems="$(get_systems "$lock")"
-    if [ -z "$systems" ]; then
-      echo "WARN: $name - no systems found (skipped in CI)"
-      continue
-    fi
-
-    local svc="false"
-    if has_services "$lock"; then
-      svc="true"
-    fi
-
-    echo "OK:   $name  systems=$(echo "$systems" | tr '\n' ',' | sed 's/,$//')  services=$svc"
-  done < <(find_locks)
-
-  if [ "$warnings" -gt 0 ]; then
-    echo ""
-    echo "$warnings lock file(s) have issues"
-    exit 1
-  fi
-  echo ""
-  echo "All lock files valid."
-}
-
-mode_list() {
-  printf "%-25s %-8s %-40s\n" "ENVIRONMENT" "SERVICES" "SYSTEMS"
-  printf "%-25s %-8s %-40s\n" "-----------" "--------" "-------"
-  while IFS= read -r lock; do
-    local env_path
-    env_path="$(lock_to_env "$lock")"
-    local name
-    name="$(basename "$env_path")"
-
-    local svc="no"
-    if has_services "$lock"; then
-      svc="yes"
-    fi
-
-    local systems
-    systems="$(get_systems "$lock" | tr '\n' ',' | sed 's/,$//')"
-
-    printf "%-25s %-8s %-40s\n" "$name" "$svc" "$systems"
-  done < <(find_locks)
-}
-
-mode_discover() {
-  local base_sha="${BASE_SHA:-HEAD~1}"
-  local update_all="${UPDATE_ALL:-}"
-
-  # Check for major changes that force full rebuild
-  if [ -z "$update_all" ]; then
-    if git -C "$REPO_ROOT" diff --name-only "$base_sha" HEAD -- \
-        | grep -qE 'flake\.nix|flake\.lock|\.github'; then
-      echo "detected major change" >&2
-      update_all=true
-    fi
-  fi
-
-  local envs_per_system=()
-  local envs_only=()
-  local envs_deploy=()
-
-  while IFS= read -r lock; do
-    local env_path
-    env_path="$(lock_to_env "$lock")"
-    local name
-    name="$(basename "$env_path")"
-    local rel_env_path
-    rel_env_path="${env_path#"$REPO_ROOT"/}"
-
-    echo "env_path=$env_path" >&2
-    echo "rel_env_path=$rel_env_path" >&2
-
-    # Include env if: (has test.sh AND update_all) OR git changed
-    local include=false
-    if [ -f "$env_path/test.sh" ] && [ "$update_all" = "true" ]; then
-      include=true
-    elif git -C "$REPO_ROOT" diff --name-only "$base_sha" HEAD \
-        | grep -q "$rel_env_path/"; then
-      include=true
-    fi
-
-    if [ "$include" = "true" ]; then
-      local start_services="false"
-      if has_services "$lock"; then
-        start_services="true"
-      fi
-
-      local systems
-      systems="$(get_systems "$lock")"
-
-      while IFS= read -r sys; do
-        [ -z "$sys" ] && continue
-        envs_per_system+=("{\"example\":\"$name\",\"system\":\"$sys\",\"start_services\":$start_services}")
-      done <<< "$systems"
-
-      envs_only+=("\"$name\"")
-
-      # Deploy list excludes demo environments
-      if ! is_demo "$name"; then
-        envs_deploy+=("\"$name\"")
-      fi
-    fi
-  done < <(find_locks)
-
-  # Build JSON arrays
-  local per_system_json
-  per_system_json="[$(IFS=,; echo "${envs_per_system[*]:-}")]"
-  local only_json
-  only_json="[$(IFS=,; echo "${envs_only[*]:-}")]"
-  local deploy_json
-  deploy_json="[$(IFS=,; echo "${envs_deploy[*]:-}")]"
-
-  echo "-- envs_per_system ---------" >&2
-  echo "$per_system_json" | jq . >&2
-  echo "----------------------------" >&2
-
-  echo "-- envs_only ---------------" >&2
-  echo "$only_json" | jq . >&2
-  echo "----------------------------" >&2
-
-  echo "-- envs_deploy -------------" >&2
-  echo "$deploy_json" | jq . >&2
-  echo "----------------------------" >&2
-
-  # Output for CI or stdout
-  if [ -n "${GITHUB_OUTPUT:-}" ]; then
-    echo "envs_per_system=$per_system_json" >> "$GITHUB_OUTPUT"
-    echo "envs_only=$only_json" >> "$GITHUB_OUTPUT"
-    echo "envs_deploy=$deploy_json" >> "$GITHUB_OUTPUT"
-  else
-    echo "envs_per_system=$per_system_json"
-    echo "envs_only=$only_json"
-    echo "envs_deploy=$deploy_json"
-  fi
-}
-
-mode_update() {
-  # Output JSON array of minimal (non-demo) envs with
-  # a has_demo flag and runs_on selector. Used by
-  # upgrade_envs.yml to upgrade env + demo together on
-  # a runner compatible with the env's lockfile systems.
-  local envs=()
-
-  while IFS= read -r lock; do
-    local env_path
-    env_path="$(lock_to_env "$lock")"
-    local name
-    name="$(basename "$env_path")"
-
-    # Skip demos — handled with their parent
-    if is_demo "$name"; then
-      continue
-    fi
-
-    local has_demo="false"
-    local demo_dir="$REPO_ROOT/${name}-demo"
-    if [ -d "$demo_dir/.flox/env" ]; then
-      has_demo="true"
-    fi
-
-    local systems
-    systems="$(get_systems "$lock")"
-    local runs_on
-    runs_on="$(runner_for_systems "$systems")"
-
-    envs+=("{\"name\":\"$name\",\"has_demo\":$has_demo,\"runs_on\":\"$runs_on\"}")
-  done < <(find_locks)
-
-  local json
-  json="[$(IFS=,; echo "${envs[*]:-}")]"
-
-  echo "-- update envs -------------" >&2
-  echo "$json" | jq . >&2
-  echo "----------------------------" >&2
-
-  if [ -n "${GITHUB_OUTPUT:-}" ]; then
-    echo "envs=$json" >> "$GITHUB_OUTPUT"
-  else
-    echo "envs=$json"
-  fi
-}
-
-# ── Main ───────────────────────────────────────────────────
-
-case "${1:-}" in
-  --validate) mode_validate ;;
-  --list)     mode_list ;;
-  --update)   mode_update ;;
-  *)          mode_discover ;;
-esac
+if [ ${#selected[@]} -eq 0 ]; then
+  echo "[]"
+else
+  printf '%s\n' "${selected[@]}" | jq -Rc . | jq -sc .
+fi
