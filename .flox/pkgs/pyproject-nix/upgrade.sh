@@ -6,7 +6,15 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HASHES_FILE="$SCRIPT_DIR/hashes.json"
 
 current_rev=$(jq -r '.rev // empty' "$HASHES_FILE")
-latest_rev=$(curl -sfL "https://api.github.com/repos/pyproject-nix/pyproject.nix/commits/HEAD" \
+# Authenticate when a token is available — unauthenticated api.github.com
+# calls share the runner IP's 60/h budget and get rate-limited (curl -f
+# exits 22 before any error output under set -e).
+auth_header=()
+[ -n "${GITHUB_TOKEN:-}" ] \
+  && auth_header=(-H "Authorization: Bearer $GITHUB_TOKEN")
+
+latest_rev=$(curl -sfL "${auth_header[@]}" \
+  "https://api.github.com/repos/pyproject-nix/pyproject.nix/commits/HEAD" \
   | jq -r '.sha')
 
 if [ -z "$latest_rev" ] || [ "$latest_rev" = "null" ]; then
