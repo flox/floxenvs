@@ -35,6 +35,11 @@ for d in */; do
   [ -f "$name/.flox/env/manifest.toml" ] && envs+=("$name")
 done
 
+if [ ${#envs[@]} -eq 0 ]; then
+  echo "ERROR: no environments found in repo" >&2
+  exit 1
+fi
+
 if [ -n "$single" ] && [ "$single" != "all" ]; then
   for e in "${envs[@]}"; do
     if [ "$e" = "$single" ]; then
@@ -50,7 +55,7 @@ changed="$(cat)"
 
 # ── Shared paths: any hit selects every env ──
 if echo "$changed" | grep -qE \
-  '^(flake\.nix|flake\.lock|scripts/|\.github/workflows/environment\.yml|\.github/workflows/ci_envs\.yml)'; then
+  '^(flake\.nix$|flake\.lock$|scripts/|\.github/workflows/environment\.yml$|\.github/workflows/ci_envs\.yml$)'; then
   printf '%s\n' "${envs[@]}" | jq -Rc . | jq -sc .
   exit 0
 fi
