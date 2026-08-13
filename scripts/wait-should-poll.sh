@@ -10,7 +10,10 @@
 #
 # Run from the repository root (envs mode discovers env names from
 # the tree: top-level directories containing .flox/env/manifest.toml
-# whose name does not end in -demo — same rule as discover-envs.sh).
+# whose name does not end in -demo — same rule as select-envs.sh.
+# .flox/pkgs/<p>/ changes are mapped to envs whose manifest.toml (or
+# its -demo counterpart) declares pkg-path = "flox/<p>" — same
+# tree-derived rule select-envs.sh uses, no hardcoded package list).
 set -euo pipefail
 
 mode="${1:-}"
@@ -46,7 +49,7 @@ if [ "$mode" = "packages" ]; then
 fi
 
 # envs mode: derive env names from the tree (same rule as
-# discover-envs.sh) — every top-level directory containing
+# select-envs.sh) — every top-level directory containing
 # .flox/env/manifest.toml whose name does not end in -demo.
 envs=()
 for d in */; do
@@ -61,16 +64,19 @@ for p in "${changed[@]}"; do
     scripts/*) echo "true"; exit 0 ;;
     .github/workflows/environment.yml) echo "true"; exit 0 ;;
     .github/workflows/ci_envs.yml) echo "true"; exit 0 ;;
-    .flox/pkgs/basic-memory/*) echo "true"; exit 0 ;;
-    .flox/pkgs/honcho/*) echo "true"; exit 0 ;;
-    .flox/pkgs/review-skills/*) echo "true"; exit 0 ;;
-    .flox/pkgs/skill-validator/*) echo "true"; exit 0 ;;
-    .flox/pkgs/claudelint/*) echo "true"; exit 0 ;;
-    .flox/pkgs/cclint/*) echo "true"; exit 0 ;;
-    .flox/pkgs/skill-tools/*) echo "true"; exit 0 ;;
-    .flox/pkgs/agnix/*) echo "true"; exit 0 ;;
-    .flox/pkgs/skillcheck/*) echo "true"; exit 0 ;;
-    .flox/pkgs/skillspector/*) echo "true"; exit 0 ;;
+    .flox/pkgs/*)
+      pkgname="${p#.flox/pkgs/}"
+      pkgname="${pkgname%%/*}"
+      for env in "${envs[@]}"; do
+        for manifest in "$env/.flox/env/manifest.toml" \
+          "$env-demo/.flox/env/manifest.toml"; do
+          if [ -f "$manifest" ] \
+            && grep -q "\"flox/$pkgname\"" "$manifest"; then
+            echo "true"; exit 0
+          fi
+        done
+      done
+      ;;
     *)
       for env in "${envs[@]}"; do
         case "$p" in

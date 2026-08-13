@@ -1,5 +1,9 @@
 # Merge per-env CI workflows into ci_envs.yml — Implementation Plan
 
+> **Note:** `scripts/discover-envs.sh` below was renamed to
+> `scripts/select-envs.sh` post-review — it collided with a
+> pre-existing manifest.lock parser of the same name.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use
 > superpowers:subagent-driven-development (recommended) or
 > superpowers:executing-plans to implement this plan task-by-task.

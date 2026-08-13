@@ -2,7 +2,7 @@ name: "CI Environments"
 
 # One workflow replaces the 49 per-env ci_<env>.yml callers.
 # Broad trigger + discover: a cheap job diffs changed paths and
-# selects the envs to run (scripts/discover-envs.sh); zero selected
+# selects the envs to run (scripts/select-envs.sh); zero selected
 # envs spawns no matrix jobs. The reusable environment.yml is
 # unchanged and called once per selected env.
 
@@ -14,8 +14,9 @@ on:
     inputs:
       environment:
         description: >
-          Single environment to run. Leave empty (or "all") to run
-          discovery over all environments.
+          Required for manual dispatch: an environment name to run
+          only that env, or the literal "all" to run every
+          environment. Leaving this empty fails the discover job.
         required: false
         default: ""
         type: string
@@ -52,12 +53,15 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [ "$EVENT" = "workflow_dispatch" ] \
-             && { [ -z "$SINGLE_ENV" ] || [ "$SINGLE_ENV" = "all" ]; }; then
-            # Dispatch without a target: run everything.
-            envs="$(echo "flake.lock" | scripts/discover-envs.sh)"
+          if [ "$EVENT" = "workflow_dispatch" ] && [ -z "$SINGLE_ENV" ]; then
+            echo "ERROR: manual dispatch requires an environment" \
+              "name or the literal 'all' in the environment input." >&2
+            exit 1
+          elif [ "$EVENT" = "workflow_dispatch" ] \
+             && [ "$SINGLE_ENV" = "all" ]; then
+            envs="$(scripts/select-envs.sh --all)"
           elif [ "$EVENT" = "workflow_dispatch" ]; then
-            envs="$(echo "" | scripts/discover-envs.sh "$SINGLE_ENV")"
+            envs="$(echo "" | scripts/select-envs.sh "$SINGLE_ENV")"
           else
             if [ "$EVENT" = "pull_request" ]; then
               DIFF_BASE="$BASE_SHA"
@@ -71,7 +75,7 @@ jobs:
               fi
             fi
             envs="$(git diff --name-only "$DIFF_BASE" HEAD \
-              | scripts/discover-envs.sh)"
+              | scripts/select-envs.sh)"
           fi
 
           echo "environments=$envs" >> "$GITHUB_OUTPUT"
