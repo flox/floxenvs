@@ -131,7 +131,45 @@ jobs:
           echo "packages=$pkgs" >> "$GITHUB_OUTPUT"
           echo "Packages: $pkgs"
 
-          # Per-system package lists from publish.json. A package builds
+          # ── CI grouping: bucket the CHANGED set into matrix chunks ──
+          # Group is a scheduling hint, not a build unit: chunking runs on
+          # the changed set only, so a single-package change always yields
+          # a single one-package job regardless of group membership.
+          #   publish.json  .ci.solo  = true  → own job, always (heavy
+          #                                     source builds: codex, uv2nix
+          #                                     venvs, big fragments)
+          #   publish.json  .ci.group = "<g>" → explicit group override
+          #   default: skills-* → "skills", everything else → "default"
+          # Each group is chunked to at most $CHUNK packages per job.
+          CHUNK=6
+          groups="{}"
+          for pkg in $(echo "$pkgs" | jq -r '.[]'); do
+            PJ=".flox/pkgs/$pkg/publish.json"
+            [ -f "$PJ" ] || continue
+            solo=$(jq -r '.ci.solo // false' "$PJ")
+            g=$(jq -r '.ci.group // empty' "$PJ")
+            if [ "$solo" = "true" ]; then
+              groups=$(echo "$groups" | jq -c --arg p "$pkg" '. + {($p): "solo"}')
+            elif [ -n "$g" ]; then
+              groups=$(echo "$groups" | jq -c --arg p "$pkg" --arg g "$g" '. + {($p): $g}')
+            fi
+          done
+
+          CHUNK_JQ='
+            def chunk(n): [range(0; length; n) as $i | .[$i:$i+n]];
+            map({p: ., g: ($groups[.] // (if startswith("skills-") then "skills" else "default" end))})
+            | group_by(.g)
+            | map(
+                if .[0].g == "solo"
+                then map({id: .p, pkgs: .p})
+                else .[0].g as $g
+                  | [.[].p] | chunk($n) | to_entries
+                  | map({id: ($g + "-" + ((.key + 1) | tostring)),
+                         pkgs: (.value | join(" "))})
+                end)
+            | add // []'
+
+          # Per-system chunk lists from publish.json. A package builds
           # (and, on main, publishes) only on the systems it declares.
           for sys in $ALL_SYSTEMS; do
             sys_pkgs="[]"
@@ -147,8 +185,10 @@ jobs:
                 sys_pkgs=$(echo "$sys_pkgs" | jq -c ". + [\"$pkg\"]")
               fi
             done
-            echo "$sys=$sys_pkgs" >> "$GITHUB_OUTPUT"
-            echo "  $sys: $sys_pkgs"
+            sys_chunks=$(echo "$sys_pkgs" \
+              | jq -c --argjson groups "$groups" --argjson n "$CHUNK" "$CHUNK_JQ")
+            echo "$sys=$sys_chunks" >> "$GITHUB_OUTPUT"
+            echo "  $sys: $sys_chunks"
           done
 
           # ── is_publish: publish on a manual dispatch (any branch) or a
@@ -167,7 +207,7 @@ jobs:
   # build it just produced — no second build.
 
   aarch64-darwin:
-    name: "${{ needs.discover.outputs.is_publish == 'true' && 'Publish' || 'Build' }} '${{ matrix.package }}' (aarch64-darwin)"
+    name: "${{ needs.discover.outputs.is_publish == 'true' && 'Publish' || 'Build' }} '${{ matrix.chunk.id }}' (aarch64-darwin)"
     runs-on: "ubuntu-latest"
     timeout-minutes: 90
     needs: ["discover"]
@@ -176,7 +216,7 @@ jobs:
       fail-fast: false
       max-parallel: 6
       matrix:
-        package: ${{ fromJSON(needs.discover.outputs.aarch64-darwin) }}
+        chunk: ${{ fromJSON(needs.discover.outputs.aarch64-darwin) }}
     steps:
       - name: "Checkout"
         uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
@@ -208,18 +248,30 @@ jobs:
         if: ${{ needs.discover.outputs.is_publish != 'true' }}
         run: |
           set -euo pipefail
-          flox build "${{ matrix.package }}" --system aarch64-darwin
+          failed=()
+          for pkg in ${{ matrix.chunk.pkgs }}; do
+            echo "::group::flox build $pkg"
+            flox build "$pkg" --system aarch64-darwin || failed+=("$pkg")
+            echo "::endgroup::"
+          done
+          [ ${#failed[@]} -eq 0 ] || { echo "BUILD FAILED: ${failed[*]}" >&2; exit 1; }
       - name: "Publish"
         if: ${{ needs.discover.outputs.is_publish == 'true' }}
         env:
           FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           set -euo pipefail
-          ORG="$(jq -r '.org // "flox"' ".flox/pkgs/${{ matrix.package }}/publish.json" 2>/dev/null || echo flox)"
-          flox publish -o "$ORG" "${{ matrix.package }}" --system aarch64-darwin
+          failed=()
+          for pkg in ${{ matrix.chunk.pkgs }}; do
+            echo "::group::flox publish $pkg"
+            ORG="$(jq -r '.org // "flox"' ".flox/pkgs/$pkg/publish.json" 2>/dev/null || echo flox)"
+            flox publish -o "$ORG" "$pkg" --system aarch64-darwin || failed+=("$pkg")
+            echo "::endgroup::"
+          done
+          [ ${#failed[@]} -eq 0 ] || { echo "PUBLISH FAILED: ${failed[*]}" >&2; exit 1; }
 
   aarch64-linux:
-    name: "${{ needs.discover.outputs.is_publish == 'true' && 'Publish' || 'Build' }} '${{ matrix.package }}' (aarch64-linux)"
+    name: "${{ needs.discover.outputs.is_publish == 'true' && 'Publish' || 'Build' }} '${{ matrix.chunk.id }}' (aarch64-linux)"
     runs-on: "ubuntu-latest"
     timeout-minutes: 90
     needs: ["discover"]
@@ -228,7 +280,7 @@ jobs:
       fail-fast: false
       max-parallel: 6
       matrix:
-        package: ${{ fromJSON(needs.discover.outputs.aarch64-linux) }}
+        chunk: ${{ fromJSON(needs.discover.outputs.aarch64-linux) }}
     steps:
       - name: "Checkout"
         uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
@@ -260,18 +312,30 @@ jobs:
         if: ${{ needs.discover.outputs.is_publish != 'true' }}
         run: |
           set -euo pipefail
-          flox build "${{ matrix.package }}" --system aarch64-linux
+          failed=()
+          for pkg in ${{ matrix.chunk.pkgs }}; do
+            echo "::group::flox build $pkg"
+            flox build "$pkg" --system aarch64-linux || failed+=("$pkg")
+            echo "::endgroup::"
+          done
+          [ ${#failed[@]} -eq 0 ] || { echo "BUILD FAILED: ${failed[*]}" >&2; exit 1; }
       - name: "Publish"
         if: ${{ needs.discover.outputs.is_publish == 'true' }}
         env:
           FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           set -euo pipefail
-          ORG="$(jq -r '.org // "flox"' ".flox/pkgs/${{ matrix.package }}/publish.json" 2>/dev/null || echo flox)"
-          flox publish -o "$ORG" "${{ matrix.package }}" --system aarch64-linux
+          failed=()
+          for pkg in ${{ matrix.chunk.pkgs }}; do
+            echo "::group::flox publish $pkg"
+            ORG="$(jq -r '.org // "flox"' ".flox/pkgs/$pkg/publish.json" 2>/dev/null || echo flox)"
+            flox publish -o "$ORG" "$pkg" --system aarch64-linux || failed+=("$pkg")
+            echo "::endgroup::"
+          done
+          [ ${#failed[@]} -eq 0 ] || { echo "PUBLISH FAILED: ${failed[*]}" >&2; exit 1; }
 
   x86_64-darwin:
-    name: "${{ needs.discover.outputs.is_publish == 'true' && 'Publish' || 'Build' }} '${{ matrix.package }}' (x86_64-darwin)"
+    name: "${{ needs.discover.outputs.is_publish == 'true' && 'Publish' || 'Build' }} '${{ matrix.chunk.id }}' (x86_64-darwin)"
     runs-on: "ubuntu-latest"
     timeout-minutes: 90
     needs: ["discover"]
@@ -280,7 +344,7 @@ jobs:
       fail-fast: false
       max-parallel: 6
       matrix:
-        package: ${{ fromJSON(needs.discover.outputs.x86_64-darwin) }}
+        chunk: ${{ fromJSON(needs.discover.outputs.x86_64-darwin) }}
     steps:
       - name: "Checkout"
         uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
@@ -312,18 +376,30 @@ jobs:
         if: ${{ needs.discover.outputs.is_publish != 'true' }}
         run: |
           set -euo pipefail
-          flox build "${{ matrix.package }}" --system x86_64-darwin
+          failed=()
+          for pkg in ${{ matrix.chunk.pkgs }}; do
+            echo "::group::flox build $pkg"
+            flox build "$pkg" --system x86_64-darwin || failed+=("$pkg")
+            echo "::endgroup::"
+          done
+          [ ${#failed[@]} -eq 0 ] || { echo "BUILD FAILED: ${failed[*]}" >&2; exit 1; }
       - name: "Publish"
         if: ${{ needs.discover.outputs.is_publish == 'true' }}
         env:
           FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           set -euo pipefail
-          ORG="$(jq -r '.org // "flox"' ".flox/pkgs/${{ matrix.package }}/publish.json" 2>/dev/null || echo flox)"
-          flox publish -o "$ORG" "${{ matrix.package }}" --system x86_64-darwin
+          failed=()
+          for pkg in ${{ matrix.chunk.pkgs }}; do
+            echo "::group::flox publish $pkg"
+            ORG="$(jq -r '.org // "flox"' ".flox/pkgs/$pkg/publish.json" 2>/dev/null || echo flox)"
+            flox publish -o "$ORG" "$pkg" --system x86_64-darwin || failed+=("$pkg")
+            echo "::endgroup::"
+          done
+          [ ${#failed[@]} -eq 0 ] || { echo "PUBLISH FAILED: ${failed[*]}" >&2; exit 1; }
 
   x86_64-linux:
-    name: "${{ needs.discover.outputs.is_publish == 'true' && 'Publish' || 'Build' }} '${{ matrix.package }}' (x86_64-linux)"
+    name: "${{ needs.discover.outputs.is_publish == 'true' && 'Publish' || 'Build' }} '${{ matrix.chunk.id }}' (x86_64-linux)"
     runs-on: "ubuntu-latest"
     timeout-minutes: 90
     needs: ["discover"]
@@ -332,7 +408,7 @@ jobs:
       fail-fast: false
       max-parallel: 6
       matrix:
-        package: ${{ fromJSON(needs.discover.outputs.x86_64-linux) }}
+        chunk: ${{ fromJSON(needs.discover.outputs.x86_64-linux) }}
     steps:
       - name: "Checkout"
         uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
@@ -365,18 +441,31 @@ jobs:
       - name: "Build"
         run: |
           set -euo pipefail
-          flox build "${{ matrix.package }}" --system x86_64-linux
+          failed=()
+          for pkg in ${{ matrix.chunk.pkgs }}; do
+            echo "::group::flox build $pkg"
+            flox build "$pkg" --system x86_64-linux || failed+=("$pkg")
+            echo "::endgroup::"
+          done
+          [ ${#failed[@]} -eq 0 ] || { echo "BUILD FAILED: ${failed[*]}" >&2; exit 1; }
       - name: "Publish"
         if: ${{ needs.discover.outputs.is_publish == 'true' }}
         env:
           FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           set -euo pipefail
-          ORG="$(jq -r '.org // "flox"' ".flox/pkgs/${{ matrix.package }}/publish.json" 2>/dev/null || echo flox)"
-          flox publish -o "$ORG" "${{ matrix.package }}" --system x86_64-linux
+          failed=()
+          for pkg in ${{ matrix.chunk.pkgs }}; do
+            echo "::group::flox publish $pkg"
+            ORG="$(jq -r '.org // "flox"' ".flox/pkgs/$pkg/publish.json" 2>/dev/null || echo flox)"
+            flox publish -o "$ORG" "$pkg" --system x86_64-linux || failed+=("$pkg")
+            echo "::endgroup::"
+          done
+          [ ${#failed[@]} -eq 0 ] || { echo "PUBLISH FAILED: ${failed[*]}" >&2; exit 1; }
       # Audit only skills-* packages (the Claude Code skill/plugin
-      # fragments) — gated here at the step level since matrix.package is
-      # known. Everything else is built/published, not audited.
+      # fragments) — gated on the chunk containing any skills-* member;
+      # the loop below re-checks per package. Everything else is
+      # built/published, not audited.
       # Realizing the .website env normally takes ~17s, but under load
       # (the nightly bot PR wave) substitution sometimes stalls with
       # zero output until the 90-minute job timeout cancels the run.
@@ -384,7 +473,7 @@ jobs:
       # three attempts — a stall costs 3 minutes and a clear error, not
       # 90 silent ones.
       - name: "Warm .website env (bounded)"
-        if: ${{ startsWith(matrix.package, 'skills-') }}
+        if: ${{ contains(matrix.chunk.pkgs, 'skills-') }}
         uses: "nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60" # v4.0.0
         with:
           timeout_minutes: 1
@@ -392,7 +481,7 @@ jobs:
           retry_wait_seconds: 10
           command: "flox activate -d .website -- true"
       - name: "Audit fragment content"
-        if: ${{ startsWith(matrix.package, 'skills-') }}
+        if: ${{ contains(matrix.chunk.pkgs, 'skills-') }}
         # Backstop for the audit run itself — the env is already
         # realized above, so this activation is instant.
         timeout-minutes: 20
@@ -404,13 +493,25 @@ jobs:
         shell: "flox activate -d .website -- bash -e {0}"
         run: |
           set -euo pipefail
-          REPO_ROOT="$PWD" bash scripts/run-audit.sh skill "${{ matrix.package }}"
+          failed=()
+          for pkg in ${{ matrix.chunk.pkgs }}; do
+            case "$pkg" in
+              skills-*)
+                echo "::group::audit $pkg"
+                REPO_ROOT="$PWD" bash scripts/run-audit.sh skill "$pkg" || failed+=("$pkg")
+                echo "::endgroup::"
+                ;;
+            esac
+          done
+          [ ${#failed[@]} -eq 0 ] || { echo "AUDIT FAILED: ${failed[*]}" >&2; exit 1; }
       - name: "Upload fragment metrics"
-        if: ${{ startsWith(matrix.package, 'skills-') }}
+        if: ${{ contains(matrix.chunk.pkgs, 'skills-') }}
         uses: "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" # v7
         with:
-          name: "metrics-skill-${{ matrix.package }}"
-          path: "audit/skill/${{ matrix.package }}/metrics.json"
+          # One artifact per chunk; it holds <pkg>/metrics.json for every
+          # audited package (the site job globs them out).
+          name: "metrics-skill-${{ matrix.chunk.id }}"
+          path: "audit/skill/"
           if-no-files-found: "error"
 
   # ── Site: collect metrics, build data.json, deploy (main only) ──
@@ -457,13 +558,16 @@ jobs:
           set -euo pipefail
           shopt -s nullglob
           mkdir -p .website/src/content/metrics
+          # Each artifact is metrics-<kind>-<chunkid> and holds
+          # <name>/metrics.json for every audited package in that chunk.
           for d in _metrics_in/metrics-*; do
-            base=$(basename "$d")        # metrics-<kind>-<name>
+            base=$(basename "$d")        # metrics-<kind>-<chunkid>
             kind=$(echo "$base" | cut -d- -f2)
-            name=$(echo "$base" | cut -d- -f3-)
             mkdir -p ".website/src/content/metrics/$kind"
-            cp "$d/metrics.json" \
-               ".website/src/content/metrics/$kind/$name.json"
+            for f in "$d"/*/metrics.json; do
+              name=$(basename "$(dirname "$f")")
+              cp "$f" ".website/src/content/metrics/$kind/$name.json"
+            done
           done
       - name: "Fetch prior metrics for unchanged items"
         env:
