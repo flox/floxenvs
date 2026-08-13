@@ -24,12 +24,14 @@ floxenvs/
 ├── .github/workflows/
 │   ├── ci.yml               # Coordinator (wait, summary, auto-merge, containerize)
 │   ├── environment.yml       # Reusable workflow (discover, test, push)
-│   ├── ci_<name>.yml         # Per-environment trigger
+│   ├── ci_envs.yml           # Single trigger for all environments
 │   ├── ci_pkgs.yml           # Build/publish custom packages
 │   ├── upgrade_envs.yml      # Weekly environment lockfile upgrades
 │   └── upgrade_pkgs.yml      # 6-hourly package version upgrades
 ├── scripts/
-│   └── discover-envs.sh      # Shared discovery script
+│   ├── select-envs.sh        # Env selection for ci_envs.yml
+│   ├── wait-should-poll.sh   # Short-circuit helper for ci.yml
+│   └── discover-envs.sh      # manifest.lock matrix/list/validate
 ├── flake.nix                 # Nix flake with run-test script
 ├── <name>/                   # Minimal environment
 │   ├── .flox/env/manifest.toml
@@ -178,52 +180,19 @@ Apply: `flox edit -f .flox/env/manifest.toml`
 
 Add sample project files, test.sh, README.md.
 
-### Step 3: Add CI workflow
+### Step 3: No CI workflow to add
 
-Create `.github/workflows/ci_<name>.yml`:
-
-```yaml
-name: "CI: <name>"
-
-on:
-  push:
-    branches: ["main"]
-    paths:
-      - "<name>/**"
-      - "<name>-demo/**"
-      - "flake.nix"
-      - "flake.lock"
-      - "scripts/**"
-      - ".github/workflows/environment.yml"
-      - ".github/workflows/ci_<name>.yml"
-  pull_request:
-    paths:
-      - "<name>/**"
-      - "<name>-demo/**"
-      - "flake.nix"
-      - "flake.lock"
-      - "scripts/**"
-      - ".github/workflows/environment.yml"
-      - ".github/workflows/ci_<name>.yml"
-  workflow_dispatch:
-
-permissions:
-  contents: "read"
-  packages: "write"
-  attestations: "write"
-  id-token: "write"
-
-jobs:
-  run:
-    uses: "./.github/workflows/environment.yml"
-    with:
-      environment: "<name>"
-    secrets: inherit
-```
-
-No change to `ci.yml` or `scripts/wait-should-poll.sh` is
-required — the wait job derives env names from
-`ci_<name>.yml` filenames automatically.
+There is nothing to create here. The single
+`.github/workflows/ci_envs.yml` workflow discovers
+environments straight from the tree: `scripts/select-envs.sh`
+enumerates every top-level directory containing
+`.flox/env/manifest.toml` (skipping `-demo` dirs, which are
+owned by their base env) and selects the ones whose paths
+changed. As soon as `<name>/.flox/env/manifest.toml` exists,
+`ci_envs.yml` picks it up on the next push or PR — no new
+workflow file, and no change to `ci.yml` or
+`scripts/wait-should-poll.sh` (its envs mode enumerates the
+tree the same way).
 
 ### Step 4: Update README.md
 
@@ -240,10 +209,12 @@ Hetzner remote builders), and platform-specific build gotchas — see
 ### Three layers
 
 ```text
-ci_<name>.yml          Thin trigger (path filters)
+ci_envs.yml             Single broad trigger, all envs
     │
-    └──▶ environment.yml    Reusable workflow
-              │
+    ├── discover          select-envs.sh picks envs from
+    │                     the changed-path diff
+    └──▶ environment.yml    Reusable workflow, once per
+              │              selected env (matrix)
               ├── discover   Read manifest.lock for
               │              systems, services, demo
               ├── test       SSH to remote builder,
@@ -255,7 +226,8 @@ ci_<name>.yml          Thin trigger (path filters)
 
 ci.yml                 Coordinator
     │
-    ├── wait           Poll until all CI: * complete
+    ├── wait           Poll the single "CI Environments" run
+    │                  until it (and any packages run) completes
     ├── summary        Pass/fail gate for branch
     │                  protection
     ├── auto-merge     Approve + merge floxbot PRs
@@ -273,20 +245,24 @@ network connectivity. See `flake.nix` for details.
 
 ### Wait-job path filters
 
-The `wait-for-environments` and `wait-for-packages` jobs
-in `ci.yml` short-circuit when `git diff` shows no relevant
-paths changed. Their path patterns live in
-`scripts/wait-should-poll.sh` and **must stay in sync** with
-the `on.paths` triggers in `ci_pkgs.yml` and each
-`ci_<name>.yml`. When editing trigger paths, also update
-the helper.
+The `wait-for-environments` job in `ci.yml` short-circuits
+when `git diff` shows no relevant paths changed, instead of
+polling. Its `envs` mode in `scripts/wait-should-poll.sh`
+**must stay in sync** with the selection rules in
+`scripts/select-envs.sh` — both enumerate environments the
+same way (tree-based: top-level dirs with
+`.flox/env/manifest.toml`, `-demo` owned by their base env)
+and both map `.flox/pkgs/<p>/` changes to envs whose manifest
+declares `pkg-path = "flox/<p>"`. When `should_poll` resolves
+to `true`, the job polls the single `CI Environments` run for
+the commit and reads per-env results from its job names.
 
-Env names are derived automatically from `ci_<name>.yml`
-filenames, so adding a new env workflow needs no change to
-`ci.yml` or the helper. Adding new shared paths to env
-workflow triggers (e.g. a new top-level directory like
-`scripts/`) requires updating
-`scripts/wait-should-poll.sh`.
+Env names are derived automatically from the tree, so adding
+a new env needs no change to `ci.yml`, `ci_envs.yml`, or
+either helper script. Adding a new shared trigger path (e.g. a
+new top-level directory like `scripts/`) requires updating
+both `scripts/select-envs.sh` and `scripts/wait-should-poll.sh`
+in lockstep.
 
 ### FloxHub target org
 
