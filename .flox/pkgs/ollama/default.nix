@@ -170,6 +170,10 @@ buildGoModule (finalAttrs: {
         # isn't populated inside the build sandbox
         "TestOpenclawRun_FirstLaunchOnboardUsesLaunchManagedHealthFlow"
         "TestEnsureOpenclawInstalled_UsesBundledPluginInstallEnv"
+        # stub installers resolve chmod/mkdir via a PATH limited to
+        # /bin and /usr/bin, which don't exist in the Linux sandbox
+        "TestEnsureDeepSeekHarnessInstalledUsesPublicNpmPackage"
+        "TestEnsureMuseInstalled"
       ];
     in
     [ "-skip=^${builtins.concatStringsSep "$|^" skippedTests}$" ];
