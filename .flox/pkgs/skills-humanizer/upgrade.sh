@@ -22,9 +22,17 @@ fi
 
 short_sha="${rev:0:7}"
 
+# Authenticate when a token is available: the shared unauthenticated
+# 60/hr GitHub API quota per egress IP gets exhausted by parallel
+# runners, surfacing as `curl exit 22`.
+auth_header=()
+[ -n "${GITHUB_TOKEN:-}" ] \
+  && auth_header=(-H "Authorization: Bearer $GITHUB_TOKEN")
+
 # Committer date (YYYY-MM-DD) via the GitHub commits API.
-commit_json=$(curl -sfL \
+commit_json=$(curl -sfL --retry 3 --retry-delay 5 \
   -H "Accept: application/vnd.github+json" \
+  "${auth_header[@]}" \
   "https://api.github.com/repos/$OWNER/$REPO/commits/$rev")
 commit_date=$(echo "$commit_json" \
   | jq -r '.commit.committer.date' \
@@ -40,8 +48,8 @@ frontmatter_version=$(echo "$skill_md" \
         if (in_fm == 0) { in_fm = 1; next }
         else { exit }
       }
-      in_fm == 1 && /^version:[[:space:]]*/ {
-        sub(/^version:[[:space:]]*/, "")
+      in_fm == 1 && /^[[:space:]]*version:[[:space:]]*/ {
+        sub(/^[[:space:]]*version:[[:space:]]*/, "")
         gsub(/^["'\'']|["'\''][[:space:]]*$/, "")
         print
         exit

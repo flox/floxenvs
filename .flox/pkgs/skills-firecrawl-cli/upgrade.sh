@@ -21,8 +21,16 @@ fi
 
 short_sha="${rev:0:7}"
 
-commit_json=$(curl -sfL \
+# Authenticate when a token is available: the shared unauthenticated
+# 60/hr GitHub API quota per egress IP gets exhausted by parallel
+# runners, surfacing as `curl exit 22`.
+auth_header=()
+[ -n "${GITHUB_TOKEN:-}" ] \
+  && auth_header=(-H "Authorization: Bearer $GITHUB_TOKEN")
+
+commit_json=$(curl -sfL --retry 3 --retry-delay 5 \
   -H "Accept: application/vnd.github+json" \
+  "${auth_header[@]}" \
   "https://api.github.com/repos/$OWNER/$REPO/commits/$rev")
 commit_date=$(echo "$commit_json" \
   | jq -r '.commit.committer.date' | cut -c1-10)
