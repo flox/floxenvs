@@ -10,16 +10,23 @@ FAIL=0
 FAILED_TESTS=()
 
 # Build a temp dir that looks like the repo root so the
-# helper can discover env names from ci_*.yml files.
+# helper can discover env names from the tree (top-level
+# directories containing .flox/env/manifest.toml).
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 mkdir -p "$TMP/.github/workflows"
-# Mock env workflows
+# Mock env directories
 for env in redis postgresql go; do
-  touch "$TMP/.github/workflows/ci_$env.yml"
+  mkdir -p "$TMP/$env/.flox/env"
+  printf '[install]\n' > "$TMP/$env/.flox/env/manifest.toml"
 done
+# Give redis a mapped pkg-path, for the pkg-mapping tests below.
+cat >> "$TMP/redis/.flox/env/manifest.toml" <<'EOF'
+redis-tools.pkg-path = "flox/redis-tools"
+EOF
 touch "$TMP/.github/workflows/ci_pkgs.yml"
 touch "$TMP/.github/workflows/ci.yml"
+touch "$TMP/.github/workflows/ci_envs.yml"
 
 assert_eq() {
   local label="$1" expected="$2" actual="$3"
@@ -69,10 +76,14 @@ assert_eq "envs: scripts/ → true" "true" \
 assert_eq "envs: environment.yml → true" "true" \
   "$(printf '.github/workflows/environment.yml\n' \
     | run envs)"
-assert_eq "envs: ci_redis.yml → true" "true" \
-  "$(printf '.github/workflows/ci_redis.yml\n' | run envs)"
+assert_eq "envs: ci_envs.yml → true" "true" \
+  "$(printf '.github/workflows/ci_envs.yml\n' | run envs)"
 assert_eq "envs: ci_pkgs.yml → false" "false" \
   "$(printf '.github/workflows/ci_pkgs.yml\n' | run envs)"
+assert_eq "envs: pkg-path mapped pkg change → true" "true" \
+  "$(printf '.flox/pkgs/redis-tools/build.nix\n' | run envs)"
+assert_eq "envs: pkg-path unmapped pkg change → false" "false" \
+  "$(printf '.flox/pkgs/nonexistent-pkg/build.nix\n' | run envs)"
 assert_eq "envs: ci.yml only → false" "false" \
   "$(printf '.github/workflows/ci.yml\n' | run envs)"
 assert_eq "envs: pkg change only → false" "false" \

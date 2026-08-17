@@ -1,0 +1,95 @@
+name: "CI Environments"
+
+# One workflow replaces the 49 per-env ci_<env>.yml callers.
+# Broad trigger + discover: a cheap job diffs changed paths and
+# selects the envs to run (scripts/select-envs.sh); zero selected
+# envs spawns no matrix jobs. The reusable environment.yml is
+# unchanged and called once per selected env.
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: >
+          Required for manual dispatch: an environment name to run
+          only that env, or the literal "all" to run every
+          environment. Leaving this empty fails the discover job.
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: "read"
+  packages: "write"
+  attestations: "write"
+  id-token: "write"
+
+env:
+  FLOX_DISABLE_METRICS: "true"
+
+jobs:
+
+  discover:
+    name: "Discover changed environments"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 5
+    outputs:
+      environments: "${{ steps.discover.outputs.environments }}"
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: "Select environments"
+        id: "discover"
+        env:
+          SINGLE_ENV: "${{ inputs.environment }}"
+          EVENT: "${{ github.event_name }}"
+          BASE_SHA: "${{ github.event.pull_request.base.sha }}"
+          BEFORE_SHA: "${{ github.event.before }}"
+        run: |
+          set -euo pipefail
+
+          if [ "$EVENT" = "workflow_dispatch" ] && [ -z "$SINGLE_ENV" ]; then
+            echo "ERROR: manual dispatch requires an environment" \
+              "name or the literal 'all' in the environment input." >&2
+            exit 1
+          elif [ "$EVENT" = "workflow_dispatch" ] \
+             && [ "$SINGLE_ENV" = "all" ]; then
+            envs="$(scripts/select-envs.sh --all)"
+          elif [ "$EVENT" = "workflow_dispatch" ]; then
+            envs="$(echo "" | scripts/select-envs.sh "$SINGLE_ENV")"
+          else
+            if [ "$EVENT" = "pull_request" ]; then
+              DIFF_BASE="$BASE_SHA"
+            else
+              # Diff the whole push (coalesced merge waves); fall
+              # back to HEAD~1 on force-push / new branch.
+              DIFF_BASE="$BEFORE_SHA"
+              if [ -z "$DIFF_BASE" ] \
+                 || ! git cat-file -e "$DIFF_BASE" 2>/dev/null; then
+                DIFF_BASE="HEAD~1"
+              fi
+            fi
+            envs="$(git diff --name-only "$DIFF_BASE" HEAD \
+              | scripts/select-envs.sh)"
+          fi
+
+          echo "environments=$envs" >> "$GITHUB_OUTPUT"
+          echo "Selected: $envs"
+
+  run:
+    name: "${{ matrix.environment }}"
+    needs: ["discover"]
+    if: needs.discover.outputs.environments != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: ${{ fromJSON(needs.discover.outputs.environments) }}
+    uses: "./.github/workflows/environment.yml"
+    with:
+      environment: "${{ matrix.environment }}"
+    secrets: inherit

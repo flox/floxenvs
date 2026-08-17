@@ -95,7 +95,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           echo "No env paths changed — short-circuiting."
 
-      - name: "Wait for all CI: * workflows"
+      - name: "Wait for CI Environments run"
         id: "wait"
         if: >-
           github.event_name == 'merge_group'
@@ -137,7 +137,7 @@ jobs:
             core.info('Waiting 30s for environment workflows to register...');
             await new Promise(r => setTimeout(r, 30000));
 
-            // Poll until all CI: * workflows are complete
+            // Poll until the "CI Environments" run for this sha completes
             const maxAttempts = 1400;  // ~2 hours at 5s
             const interval = 5000;
 
@@ -149,22 +149,23 @@ jobs:
                 per_page: 100,
               });
 
-              // Filter for CI: * environment workflows (not this "CI" workflow)
+              // One merged workflow per sha
               const ciRuns = runs.data.workflow_runs.filter(
-                r => r.name.startsWith('CI: ')
+                r => r.name === 'CI Environments'
               );
 
               if (ciRuns.length === 0) {
                 if (attempt <= 12) {
-                  // Still early — workflows may not have registered yet
+                  // Still early — workflow may not have registered yet
                   core.info(
-                    `Attempt ${attempt}: no CI workflows found yet, waiting...`
+                    `Attempt ${attempt}: no CI Environments run found yet, ` +
+                    'waiting...'
                   );
                   await new Promise(r => setTimeout(r, interval));
                   continue;
                 }
-                // No workflows found after 1 minute — nothing to wait for
-                core.info('No environment workflows triggered for this SHA');
+                // No run found after 1 minute — nothing to wait for
+                core.info('No environment workflow triggered for this SHA');
                 core.setOutput('any_failed', 'false');
                 core.setOutput('failed_workflows', '');
                 core.setOutput('total_workflows', '0');
@@ -174,61 +175,93 @@ jobs:
                 return;
               }
 
-              const pending = ciRuns.filter(
-                r => r.status !== 'completed'
-              );
-              const failed = ciRuns.filter(
-                r => r.status === 'completed'
-                  && r.conclusion !== 'success'
-                  && r.conclusion !== 'skipped'
-              );
+              // Two "CI Environments" runs can exist for the same sha
+              // (e.g. workflow_dispatch + pull_request) — wait for ALL
+              // of them and attribute jobs from ALL of them.
+              const pending = ciRuns.some(r => r.status !== 'completed');
 
               if (attempt % 12 === 1) {
                 // Log status every ~60s
                 core.info(
                   `[${Math.floor(attempt * 5 / 60)}m] ` +
-                  `${ciRuns.length} workflows: ` +
-                  `${ciRuns.length - pending.length} complete, ` +
-                  `${pending.length} pending, ` +
-                  `${failed.length} failed`
+                  `${ciRuns.length} CI Environments run(s): ` +
+                  ciRuns.map(
+                    r => `${r.status}` + (r.conclusion ? ` (${r.conclusion})` : '')
+                  ).join(', ')
                 );
-                for (const run of ciRuns) {
-                  core.info(
-                    `  ${run.name}: ${run.status}` +
-                    (run.conclusion ? ` (${run.conclusion})` : '')
-                  );
-                }
               }
 
-              if (pending.length === 0) {
+              if (!pending) {
                 core.info(
-                  `All ${ciRuns.length} environment workflows complete!`
-                );
-                const failedNames = failed.map(r => r.name).join(', ');
-                if (failed.length > 0) {
-                  core.info(`Failed: ${failedNames}`);
-                }
-                core.setOutput(
-                  'any_failed', (failed.length > 0).toString()
-                );
-                core.setOutput('failed_workflows', failedNames);
-                core.setOutput(
-                  'total_workflows', ciRuns.length.toString()
+                  `All ${ciRuns.length} CI Environments run(s) complete!`
                 );
 
-                // Extract env names from successful workflows
-                // "CI: redis" → "redis"
-                const successfulEnvs = ciRuns
-                  .filter(r => r.conclusion === 'success')
-                  .map(r => r.name.replace('CI: ', ''))
-                  .filter(n => n.length > 0);
-                core.setOutput(
-                  'successful_envs',
-                  JSON.stringify(successfulEnvs)
-                );
-                core.info(
-                  `Successful envs: ${successfulEnvs.join(', ')}`
-                );
+                // The merged run's matrix jobs are named
+                // "<env> / <inner job>". An env failed if ANY of its jobs
+                // failed; it succeeded if all of its jobs completed
+                // without failure. Discover/site-level jobs (no " / " in
+                // the name) are ignored for env attribution.
+                const envResults = new Map();
+                let anyRunBad = false;
+                for (const run of ciRuns) {
+                  const runBad = run.conclusion !== 'success'
+                    && run.conclusion !== 'skipped';
+                  if (runBad) anyRunBad = true;
+
+                  const jobs = await github.paginate(
+                    github.rest.actions.listJobsForWorkflowRun,
+                    {
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      run_id: run.id,
+                      filter: 'latest',
+                      per_page: 100,
+                    }
+                  );
+                  for (const job of jobs) {
+                    const idx = job.name.indexOf(' / ');
+                    if (idx === -1) continue;
+                    const env = job.name.slice(0, idx);
+                    const bad = job.conclusion !== null
+                      && job.conclusion !== 'success'
+                      && job.conclusion !== 'skipped';
+                    envResults.set(
+                      env, (envResults.get(env) || false) || bad
+                    );
+                  }
+                }
+                const failedEnvs = [...envResults.entries()]
+                  .filter(([, bad]) => bad).map(([env]) => env).sort();
+                const okEnvs = [...envResults.entries()]
+                  .filter(([, bad]) => !bad).map(([env]) => env).sort();
+
+                // Run-level failure not reflected in any job (e.g. the
+                // discover job failed, so the matrix never spawned and
+                // envResults is empty) must not be swallowed as green.
+                // A failing env job already implies run failure AND a
+                // failedEnvs entry, so only fold this in when the job
+                // attribution above found nothing — otherwise we'd
+                // double-report the same failure.
+                if (anyRunBad && failedEnvs.length === 0) {
+                  for (const run of ciRuns) {
+                    const runBad = run.conclusion !== 'success'
+                      && run.conclusion !== 'skipped';
+                    if (runBad) {
+                      failedEnvs.push(
+                        `CI Environments run ${run.id} (${run.conclusion})`
+                      );
+                    }
+                  }
+                }
+
+                if (failedEnvs.length > 0) {
+                  core.info(`Failed: ${failedEnvs.join(', ')}`);
+                }
+                core.setOutput('any_failed', String(failedEnvs.length > 0));
+                core.setOutput('failed_workflows', failedEnvs.join(', '));
+                core.setOutput('total_workflows', String(envResults.size));
+                core.setOutput('successful_envs', JSON.stringify(okEnvs));
+                core.info(`Successful envs: ${okEnvs.join(', ')}`);
 
                 core.setOutput('pr_number', prNumber.toString());
                 core.setOutput('pr_author', prAuthor);

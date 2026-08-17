@@ -23,7 +23,7 @@ NAME="${2:?name}"
 REPO="${GITHUB_REPOSITORY:-flox/floxenvs}"
 
 case "$KIND" in
-  env) workflow_file="ci_${NAME}.yml" ;;
+  env) workflow_file="ci_envs.yml" ;;
   pkg) workflow_file="ci_pkgs.yml" ;;
   *)   echo "unknown kind: $KIND" >&2; exit 2 ;;
 esac
