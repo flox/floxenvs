@@ -12,12 +12,21 @@ FAKE_HASH="sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
 
 current_rev=$(jq -r '.rev' "$HASHES_FILE")
 
+# Authenticate when a token is available: the shared unauthenticated
+# 60/hr GitHub API quota per egress IP gets exhausted by parallel
+# runners, surfacing as `curl exit 22`.
+auth_header=()
+[ -n "${GITHUB_TOKEN:-}" ] \
+  && auth_header=(-H "Authorization: Bearer $GITHUB_TOKEN")
+
 # Upstream ships no tags/releases, so track the latest commit on the
 # default branch and read the version from its package.json.
-latest_rev=$(curl -sfL \
+latest_rev=$(curl -sfL --retry 3 --retry-delay 5 \
+  -H "Accept: application/vnd.github+json" \
+  "${auth_header[@]}" \
   "https://api.github.com/repos/${OWNER}/${REPO}/commits/${BRANCH}" \
   | jq -r '.sha')
-latest_version=$(curl -sfL \
+latest_version=$(curl -sfL --retry 3 --retry-delay 5 \
   "https://raw.githubusercontent.com/${OWNER}/${REPO}/${latest_rev}/package.json" \
   | jq -r '.version')
 
