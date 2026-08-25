@@ -20,7 +20,7 @@ jobs:
 
   envs:
     name: "Find environments"
-    runs-on: "ubuntu-latest"
+    runs-on: "blacksmith-2vcpu-ubuntu-2404"
     timeout-minutes: 30
 
     outputs:
@@ -60,9 +60,9 @@ jobs:
               | .[]
             ' "$LOCK")"
             runs_on="$(
-              if   echo "$systems" | grep -qx 'x86_64-linux';   then echo "ubuntu-latest"
-              elif echo "$systems" | grep -qx 'aarch64-linux';  then echo "ubuntu-24.04-arm"
-              elif echo "$systems" | grep -qx 'aarch64-darwin'; then echo "macos-latest"
+              if   echo "$systems" | grep -qx 'x86_64-linux';   then echo "blacksmith-4vcpu-ubuntu-2404"
+              elif echo "$systems" | grep -qx 'aarch64-linux';  then echo "blacksmith-4vcpu-ubuntu-2404-arm"
+              elif echo "$systems" | grep -qx 'aarch64-darwin'; then echo "blacksmith-6vcpu-macos-latest"
               else echo "ERROR"; fi
             )"
             if [ "$runs_on" = "ERROR" ]; then
@@ -101,6 +101,19 @@ jobs:
         uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
         with:
           ref: "main"
+
+      - name: "Create Nix store mount point"
+        if: runner.os == 'Linux'
+        run: |
+          sudo mkdir -p /nix/store
+          sudo chmod -R 777 /nix
+
+      - name: "Mount Nix store"
+        if: runner.os == 'Linux'
+        uses: "useblacksmith/stickydisk@74f3f01ab1392726dd6ee06904f0452b0ec1e151" # v1
+        with:
+          key: "${{ github.repository }}-nix-${{ runner.arch }}"
+          path: "/nix"
 
       - name: "Install flox"
         uses: "flox/install-flox-action@1128abd73431089ab9d871c893b4e72a729354e1" # v2.6.0
