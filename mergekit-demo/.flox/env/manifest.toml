@@ -1,0 +1,41 @@
+schema-version = "1.11.0"
+
+[include]
+environments = [{ dir = "../mergekit" }]
+
+[install]
+gum.pkg-path = "gum"
+gum.pkg-group = "demo-tools"
+
+[hook]
+on-activate = '''
+# Example merge config: two small models, linear merge. Small
+# enough (~1GB of downloads) to finish on a laptop. Idempotent —
+# overwritten every activation.
+cat > "$FLOX_ENV_PROJECT/example-merge.yml" <<'YAML'
+models:
+  - model: Qwen/Qwen2.5-0.5B
+  - model: Qwen/Qwen2.5-0.5B-Instruct
+merge_method: linear
+dtype: float16
+YAML
+
+if [ "${FLOX_ENVS_TESTING:-}" != "1" ]; then
+  gum style \
+    --foreground 212 --border-foreground 212 \
+    --border double --align center \
+    --width 60 --margin "1 2" --padding "1 2" \
+    "Mergekit" \
+    "Merge LLMs on CPU — no GPU needed"
+  echo ""
+  echo "  mergekit-yaml example-merge.yml ./merged-model"
+  echo "                             — run the example merge"
+  echo "                                (~1GB model download)"
+  echo "  mergekit-yaml --help       — all merge options"
+  echo "  mergekit-moe --help        — Mixture-of-Experts builds"
+  echo ""
+fi
+'''
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]

@@ -1,0 +1,24 @@
+schema-version = "1.10.0"
+
+# Minimal Mergekit environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/mergekit"]
+
+[install]
+flox-ai.pkg-path = "flox/flox-ai"
+flox-ai.pkg-group = "flox-ai"
+mergekit.pkg-path = "flox/mergekit"
+mergekit.pkg-group = "mergekit"
+# torch ships no x86_64-darwin wheels since 2.3; the catalog
+# package targets only these systems.
+mergekit.systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]
+
+[vars]
+# HF_HOME overrides the Hugging Face cache location used when
+# mergekit downloads models (default: ~/.cache/huggingface).
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]
