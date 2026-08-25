@@ -1,0 +1,379 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.11.0",
+    "install": {
+      "flox-ai": {
+        "pkg-path": "flox/flox-ai",
+        "pkg-group": "flox-ai"
+      },
+      "gum": {
+        "pkg-path": "gum",
+        "pkg-group": "demo-tools"
+      },
+      "mergekit": {
+        "pkg-path": "flox/mergekit",
+        "pkg-group": "mergekit",
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      }
+    },
+    "hook": {
+      "on-activate": "# Example merge config: two small models, linear merge. Small\n# enough (~1GB of downloads) to finish on a laptop. Idempotent —\n# overwritten every activation.\ncat > \"$FLOX_ENV_PROJECT/example-merge.yml\" <<'YAML'\nmodels:\n  - model: Qwen/Qwen2.5-0.5B\n  - model: Qwen/Qwen2.5-0.5B-Instruct\nmerge_method: linear\ndtype: float16\nYAML\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 60 --margin \"1 2\" --padding \"1 2\" \\\n    \"Mergekit\" \\\n    \"Merge LLMs on CPU — no GPU needed\"\n  echo \"\"\n  echo \"  mergekit-yaml example-merge.yml ./merged-model\"\n  echo \"                             — run the example merge\"\n  echo \"                                (~1GB model download)\"\n  echo \"  mergekit-yaml --help       — all merge options\"\n  echo \"  mergekit-moe --help        — Mixture-of-Experts builds\"\n  echo \"\"\nfi\n"
+    },
+    "options": {
+      "systems": [
+        "aarch64-darwin",
+        "aarch64-linux",
+        "x86_64-linux"
+      ]
+    }
+  },
+  "packages": [
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/l5myxfa4q2zikf5z0w46sp2p9qisz58k-gum-2.0.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=56c02bc00adcf003215cc4bd996d6efaf4cff188",
+      "name": "gum-2.0.0",
+      "pname": "gum",
+      "rev": "56c02bc00adcf003215cc4bd996d6efaf4cff188",
+      "rev_count": 1060451,
+      "rev_date": "2026-08-23T15:22:48Z",
+      "scrape_date": "2026-08-25T04:56:38.167150Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.0.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/6szglxag2dwsqv21h0ch76plnig00mmz-gum-2.0.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/licaci8b4i2jm92gkgvqh0y7hsk5scl0-gum-2.0.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=56c02bc00adcf003215cc4bd996d6efaf4cff188",
+      "name": "gum-2.0.0",
+      "pname": "gum",
+      "rev": "56c02bc00adcf003215cc4bd996d6efaf4cff188",
+      "rev_count": 1060451,
+      "rev_date": "2026-08-23T15:22:48Z",
+      "scrape_date": "2026-08-25T05:27:24.647337Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.0.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/xfj4ikp1phw1x4khd88kvyv9p9zjcabw-gum-2.0.0"
+      },
+      "system": "aarch64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "gum",
+      "broken": false,
+      "derivation": "/nix/store/0jl3drvbkvkc35wd4yrv5qvd64xyxc2w-gum-2.0.0.drv",
+      "description": "Tasty Bubble Gum for your shell",
+      "install_id": "gum",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=56c02bc00adcf003215cc4bd996d6efaf4cff188",
+      "name": "gum-2.0.0",
+      "pname": "gum",
+      "rev": "56c02bc00adcf003215cc4bd996d6efaf4cff188",
+      "rev_count": 1060451,
+      "rev_date": "2026-08-23T15:22:48Z",
+      "scrape_date": "2026-08-25T06:00:39.127852Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.0.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/nzkd6jfh145msm96107c3nk8mjjnmvq2-gum-2.0.0"
+      },
+      "system": "x86_64-linux",
+      "group": "demo-tools",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-ai",
+      "broken": false,
+      "derivation": "/nix/store/57jfyz6s1dig32zmb9ik9ih8kqkvv7dd-flox-ai-0.8.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "flox-ai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
+      "name": "flox-ai-0.8.0",
+      "pname": "flox-ai",
+      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
+      "rev_count": 84,
+      "rev_date": "2026-08-04T10:34:57Z",
+      "scrape_date": "2026-08-25T19:00:53.698175Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.8.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/crwyb5188yw5lv4znqprzbiqg5vy4ibd-flox-ai-0.8.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "flox-ai",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-ai",
+      "broken": false,
+      "derivation": "/nix/store/1clj1qp1zchjr18xqd6h5qy4krnbfp7x-flox-ai-0.8.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "flox-ai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
+      "name": "flox-ai-0.8.0",
+      "pname": "flox-ai",
+      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
+      "rev_count": 84,
+      "rev_date": "2026-08-04T10:34:57Z",
+      "scrape_date": "2026-08-25T19:00:53.698175Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.8.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/4zf5cxf627sbr8syddjx7j5pmk4321ri-flox-ai-0.8.0"
+      },
+      "system": "aarch64-linux",
+      "group": "flox-ai",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-ai",
+      "broken": false,
+      "derivation": "/nix/store/w14almryjawbkglkr56spfxi25ihvhzw-flox-ai-0.8.0.drv",
+      "description": "Flox-native config management for Claude Code CLI",
+      "install_id": "flox-ai",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
+      "name": "flox-ai-0.8.0",
+      "pname": "flox-ai",
+      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
+      "rev_count": 84,
+      "rev_date": "2026-08-04T10:34:57Z",
+      "scrape_date": "2026-08-25T19:00:53.698178Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.8.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/0d1s3sqq8r88f30qjg29gw76vl4gfbwg-flox-ai-0.8.0"
+      },
+      "system": "x86_64-linux",
+      "group": "flox-ai",
+      "priority": 5
+    },
+    {
+      "attr_path": "mergekit",
+      "broken": false,
+      "derivation": "/nix/store/wqb9jk2zzr2189agkq21aknz1vrcm783-mergekit-env.drv",
+      "description": "Tools for merging pre-trained large language models.",
+      "install_id": "mergekit",
+      "license": "LGPL-3.0-only",
+      "locked_url": "https://github.com/flox/floxenvs?rev=7b9ab6892146f26d1548cef9b91eefb94438aafa",
+      "name": "mergekit-env",
+      "pname": "mergekit",
+      "rev": "7b9ab6892146f26d1548cef9b91eefb94438aafa",
+      "rev_count": 21924,
+      "rev_date": "2026-08-25T17:16:51Z",
+      "scrape_date": "2026-08-25T19:00:53.698182Z",
+      "stabilities": [
+        "staging",
+        "unstable",
+        "stable"
+      ],
+      "unfree": false,
+      "version": "0.1.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/8wdv6f08pc6x047vi68nv3anm4y40mhy-mergekit-env"
+      },
+      "system": "aarch64-darwin",
+      "group": "mergekit",
+      "priority": 5
+    },
+    {
+      "attr_path": "mergekit",
+      "broken": false,
+      "derivation": "/nix/store/r6a0kkkmkvdnp4b0902wspaanfk2y8fj-mergekit-env.drv",
+      "description": "Tools for merging pre-trained large language models.",
+      "install_id": "mergekit",
+      "license": "LGPL-3.0-only",
+      "locked_url": "https://github.com/flox/floxenvs?rev=7b9ab6892146f26d1548cef9b91eefb94438aafa",
+      "name": "mergekit-env",
+      "pname": "mergekit",
+      "rev": "7b9ab6892146f26d1548cef9b91eefb94438aafa",
+      "rev_count": 21924,
+      "rev_date": "2026-08-25T17:16:51Z",
+      "scrape_date": "2026-08-25T19:00:53.698182Z",
+      "stabilities": [
+        "staging",
+        "unstable",
+        "stable"
+      ],
+      "unfree": false,
+      "version": "0.1.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/1yjhgcpa05ih55vbxyv5bv97skki115h-mergekit-env"
+      },
+      "system": "aarch64-linux",
+      "group": "mergekit",
+      "priority": 5
+    },
+    {
+      "attr_path": "mergekit",
+      "broken": false,
+      "derivation": "/nix/store/1cxqfjynnnj8y5c4nrpbb3gnihrc4mch-mergekit-env.drv",
+      "description": "Tools for merging pre-trained large language models.",
+      "install_id": "mergekit",
+      "license": "LGPL-3.0-only",
+      "locked_url": "https://github.com/flox/floxenvs?rev=7b9ab6892146f26d1548cef9b91eefb94438aafa",
+      "name": "mergekit-env",
+      "pname": "mergekit",
+      "rev": "7b9ab6892146f26d1548cef9b91eefb94438aafa",
+      "rev_count": 21924,
+      "rev_date": "2026-08-25T17:16:51Z",
+      "scrape_date": "2026-08-25T19:00:53.698183Z",
+      "stabilities": [
+        "staging",
+        "unstable",
+        "stable"
+      ],
+      "unfree": false,
+      "version": "0.1.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/fb1qrclv6grzlmn1vqjqaqagjmpddnbq-mergekit-env"
+      },
+      "system": "x86_64-linux",
+      "group": "mergekit",
+      "priority": 5
+    }
+  ],
+  "compose": {
+    "composer": {
+      "schema-version": "1.11.0",
+      "install": {
+        "gum": {
+          "pkg-path": "gum",
+          "pkg-group": "demo-tools"
+        }
+      },
+      "hook": {
+        "on-activate": "# Example merge config: two small models, linear merge. Small\n# enough (~1GB of downloads) to finish on a laptop. Idempotent —\n# overwritten every activation.\ncat > \"$FLOX_ENV_PROJECT/example-merge.yml\" <<'YAML'\nmodels:\n  - model: Qwen/Qwen2.5-0.5B\n  - model: Qwen/Qwen2.5-0.5B-Instruct\nmerge_method: linear\ndtype: float16\nYAML\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 60 --margin \"1 2\" --padding \"1 2\" \\\n    \"Mergekit\" \\\n    \"Merge LLMs on CPU — no GPU needed\"\n  echo \"\"\n  echo \"  mergekit-yaml example-merge.yml ./merged-model\"\n  echo \"                             — run the example merge\"\n  echo \"                                (~1GB model download)\"\n  echo \"  mergekit-yaml --help       — all merge options\"\n  echo \"  mergekit-moe --help        — Mixture-of-Experts builds\"\n  echo \"\"\nfi\n"
+      },
+      "options": {
+        "systems": [
+          "aarch64-darwin",
+          "aarch64-linux",
+          "x86_64-linux"
+        ]
+      },
+      "include": {
+        "environments": [
+          {
+            "dir": "../mergekit"
+          }
+        ]
+      }
+    },
+    "include": [
+      {
+        "manifest": {
+          "schema-version": "1.10.0",
+          "install": {
+            "flox-ai": {
+              "pkg-path": "flox/flox-ai",
+              "pkg-group": "flox-ai"
+            },
+            "mergekit": {
+              "pkg-path": "flox/mergekit",
+              "pkg-group": "mergekit",
+              "systems": [
+                "aarch64-darwin",
+                "aarch64-linux",
+                "x86_64-linux"
+              ]
+            }
+          },
+          "options": {
+            "systems": [
+              "aarch64-darwin",
+              "aarch64-linux",
+              "x86_64-linux"
+            ]
+          }
+        },
+        "name": "mergekit",
+        "descriptor": {
+          "dir": "../mergekit"
+        }
+      }
+    ],
+    "warnings": [
+      {
+        "warning": {
+          "Overriding": [
+            "options",
+            "systems"
+          ]
+        },
+        "higher_priority_name": "Current manifest"
+      }
+    ]
+  }
+}
