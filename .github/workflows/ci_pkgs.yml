@@ -581,6 +581,9 @@ jobs:
         with:
           fetch-depth: 0
       - name: "Create Nix store mount point"
+        # Explicit plain shell: the job's default shell is
+        # `flox activate`, but flox isn't installed yet here.
+        shell: "bash -e {0}"
         run: |
           sudo mkdir -p /nix/store
           sudo chmod -R 777 /nix
