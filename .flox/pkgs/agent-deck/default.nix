@@ -1,8 +1,10 @@
 {
   lib,
+  stdenv,
   buildGoModule,
   fetchFromGitHub,
   git,
+  lsof,
   versionCheckHook,
   writableTmpDirAsHomeHook,
 }:
@@ -76,15 +78,31 @@ buildGoModule (finalAttrs: {
   # clearSessionUserConfigCache is a no-op (see plugin_cli_test.go:35).
   # Darwin's coarser mtime resolution hides this. Skip the group until
   # upstream wires real cache invalidation.
+  # On darwin the three live-process cleanup-safety tests spawn a
+  # subprocess and poll its cwd via lsof; the darwin Nix sandbox denies
+  # lsof access to other processes' file tables, so the helper exits 1.
+  # Skip them there only — on Linux they run (procfs works in the
+  # sandbox), and the remaining cleanup-safety tests (unpushed/dirty
+  # exclusion) run everywhere with lsof on PATH.
   checkFlags = [
     "-short"
     "-skip"
-    "^TestValidatePluginFlags_"
+    (
+      "^TestValidatePluginFlags_"
+      + lib.optionalString stdenv.hostPlatform.isDarwin (
+        "|^TestCleanupExcludesLiveProcessCWDInside$"
+        + "|^TestCleanupRevalidatesRealityBeforeRemoval$"
+        + "|^TestCleanupForceCannotOverrideRealityExclusions$"
+      )
+    )
   ];
 
+  # lsof: the 1.15.0 worktree-cleanup safety tests shell out to lsof to
+  # inspect live processes; without it every cleanup candidate is treated
+  # as protected and the tests fail (surfaced on darwin builders).
   preCheck = ''
     export HOME=$(mktemp -d)
-    export PATH="${git}/bin:$PATH"
+    export PATH="${git}/bin:${lsof}/bin:$PATH"
   '';
 
   ldflags = [
