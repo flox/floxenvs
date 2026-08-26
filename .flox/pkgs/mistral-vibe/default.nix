@@ -222,6 +222,7 @@ python.pkgs.buildPythonApplication {
     requests
     rich
     sentry-sdk
+    setproctitle
     sounddevice
     textual
     textual-speedups
