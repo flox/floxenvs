@@ -2,6 +2,7 @@
   lib,
   stdenvNoCC,
   fetchFromGitHub,
+  python3,
 }:
 
 let
@@ -21,6 +22,11 @@ stdenvNoCC.mkDerivation {
 
   dontConfigure = true;
   dontBuild = true;
+
+  # python3 so patchShebangs can rewrite the executable
+  # scripts/validate-package.py that 2.11.2 added (flox_skill_check
+  # rejects PATH-dependent shebangs).
+  nativeBuildInputs = [ python3 ];
 
   installPhase = ''
     runHook preInstall
@@ -55,6 +61,7 @@ stdenvNoCC.mkDerivation {
 
     ${builtins.readFile ../../nix/flox-agent-layout.sh}
     flox_agent_layout "humanizer" "$out/share"
+    patchShebangs "$out/share/flox"
     ${builtins.readFile ../../nix/flox-skill-check.sh}
     flox_skill_check "$out"
   '';
