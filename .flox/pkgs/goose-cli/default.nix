@@ -6,6 +6,7 @@
   rustPlatform,
   cacert,
   cmake,
+  gitMinimal,
   pkg-config,
   openssl,
   libxcb,
@@ -72,7 +73,12 @@ rustPlatform.buildRustPackage {
   # were loaded from the system" on Linux, where there's no system
   # trust store in the Nix sandbox).
   doCheck = true;
-  nativeCheckInputs = [ cacert ];
+  # gitMinimal: the review-handler tests spawn `git init` inside
+  # tempdirs; without git on PATH they panic in the sandbox.
+  nativeCheckInputs = [
+    cacert
+    gitMinimal
+  ];
   checkPhase = ''
     runHook preCheck
 
