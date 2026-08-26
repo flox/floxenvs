@@ -46,15 +46,50 @@ let
 
   # Per-package overrides for sdist builds that uv2nix's
   # default build-systems overlay doesn't fully resolve.
-  pyprojectOverrides = final: prev: {
-    # mergekit is sourced from git. uv lock doesn't capture its
-    # declared build-system requires (setuptools), so uv2nix
-    # builds it without setuptools available.
-    mergekit = prev.mergekit.overrideAttrs (old: {
-      nativeBuildInputs =
-        (old.nativeBuildInputs or [ ]) ++ final.resolveBuildSystem { setuptools = [ ]; };
-    });
-  };
+  pyprojectOverrides =
+    final: prev:
+    let
+      # torch and the nvidia-* runtime wheels cross-reference
+      # CUDA libraries that live in sibling wheels (and
+      # libcuda.so.1 comes from the host driver). torch loads
+      # them at runtime via its own preload logic, so
+      # auto-patchelf's unresolved-dependency errors are
+      # expected — silence them instead of failing the build.
+      ignoreMissing =
+        pkg:
+        pkg.overrideAttrs (_: {
+          autoPatchelfIgnoreMissingDeps = true;
+        });
+      cudaWheels = [
+        "torch"
+        "triton"
+        "nvidia-cublas"
+        "nvidia-cuda-cupti"
+        "nvidia-cuda-nvrtc"
+        "nvidia-cuda-runtime"
+        "nvidia-cudnn-cu13"
+        "nvidia-cufft"
+        "nvidia-cufile"
+        "nvidia-curand"
+        "nvidia-cusolver"
+        "nvidia-cusparse"
+        "nvidia-cusparselt-cu13"
+        "nvidia-nccl-cu13"
+        "nvidia-nvjitlink"
+        "nvidia-nvshmem-cu13"
+        "nvidia-nvtx"
+      ];
+    in
+    lib.genAttrs cudaWheels (name: ignoreMissing prev.${name})
+    // {
+      # mergekit is sourced from git. uv lock doesn't capture its
+      # declared build-system requires (setuptools), so uv2nix
+      # builds it without setuptools available.
+      mergekit = prev.mergekit.overrideAttrs (old: {
+        nativeBuildInputs =
+          (old.nativeBuildInputs or [ ]) ++ final.resolveBuildSystem { setuptools = [ ]; };
+      });
+    };
 
   pythonSet =
     (callPackage pyproject-nix-lib.build.packages {
