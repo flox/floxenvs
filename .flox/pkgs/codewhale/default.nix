@@ -50,6 +50,12 @@ rustPlatform.buildRustPackage {
 
   doCheck = false;
 
+  # 0.9.11 ships a `#[cfg_attr(not(test), expect(dead_code))]` in
+  # crates/tui/src/prompt_zones.rs that is unfulfilled with our rustc,
+  # and upstream builds with `-D warnings`, turning that into a hard
+  # error. Downgrade just that lint; drop when upstream fixes it.
+  env.RUSTFLAGS = "-A unfulfilled_lint_expectations";
+
   postInstall = ''
     installShellCompletion --cmd codewhale \
       --bash <($out/bin/codewhale completion bash) \
