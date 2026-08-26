@@ -3,20 +3,22 @@ name: mergekit
 title: Mergekit
 publisher: flox
 tagline: >
-  Merge pre-trained LLMs on CPU with Arcee's Mergekit — SLERP,
-  TIES, DARE, MoE, and LoRA extraction.
+  Merge pre-trained LLMs with Arcee's Mergekit — SLERP, TIES,
+  DARE, MoE, and LoRA extraction. GPU optional.
 seo_title: >
   Mergekit dev environment — merge LLMs with SLERP, TIES, DARE
   and build MoE models, no GPU needed
 seo_description: >
   Flox-packaged Mergekit: Arcee's LLM merging toolkit with
-  CPU-only torch. mergekit-yaml, mergekit-moe, and LoRA
-  extraction from one include line — no CUDA, no venv.
+  CUDA torch on linux and CPU torch on macOS. mergekit-yaml,
+  mergekit-moe, and LoRA extraction from one include line.
 intro: >
   flox/mergekit packages Mergekit — Arcee's open source toolkit
-  for merging pre-trained large language models — with a
-  CPU-only torch build so the closure stays lean and merges run
-  anywhere. All upstream entry points are on PATH:
+  for merging pre-trained large language models. The env picks
+  the right torch per platform: CUDA-enabled on linux (GPU
+  acceleration when a card is present, CPU fallback otherwise),
+  lean CPU-only on darwin. All upstream entry points are on
+  PATH:
   `mergekit-yaml` for config-driven merges (linear, SLERP,
   TIES, DARE, and more), `mergekit-moe` for Mixture-of-Experts
   assembly, and `mergekit-extract-lora` for pulling a LoRA out
@@ -25,7 +27,7 @@ intro: >
   flox/huggingface for hub authentication and cache tooling.
 summary:
   - "Config-driven LLM merging: linear, SLERP, TIES, DARE"
-  - "CPU-only torch — small closure, no GPU required"
+  - "CUDA torch on linux, CPU torch on darwin — no GPU required"
   - "MoE assembly and LoRA extraction included"
   - "Lazy tensor loading keeps RAM use modest"
 category: ai

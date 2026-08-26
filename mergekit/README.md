@@ -48,5 +48,6 @@ Models are pulled from the Hugging Face Hub into `HF_HOME`
 
 `aarch64-darwin`, `aarch64-linux`, `x86_64-linux`. torch ships
 no `x86_64-darwin` wheels since 2.3, so that platform is
-excluded. Linux builds use CPU-only torch wheels to keep the
-closure small.
+excluded. Linux systems get `flox/mergekit-cuda` (CUDA-enabled
+torch, falls back to CPU without a GPU); darwin gets the
+CPU-only `flox/mergekit`.

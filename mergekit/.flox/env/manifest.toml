@@ -10,11 +10,16 @@ schema-version = "1.10.0"
 [install]
 flox-ai.pkg-path = "flox/flox-ai"
 flox-ai.pkg-group = "flox-ai"
+# CPU torch build on darwin, CUDA-enabled torch build on linux.
+# Both packages expose the same mergekit-* entry points; the
+# CUDA build falls back to CPU when no GPU is present. torch
+# ships no x86_64-darwin wheels since 2.3, hence no such system.
 mergekit.pkg-path = "flox/mergekit"
 mergekit.pkg-group = "mergekit"
-# torch ships no x86_64-darwin wheels since 2.3; the catalog
-# package targets only these systems.
-mergekit.systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]
+mergekit.systems = ["aarch64-darwin"]
+mergekit-cuda.pkg-path = "flox/mergekit-cuda"
+mergekit-cuda.pkg-group = "mergekit-cuda"
+mergekit-cuda.systems = ["aarch64-linux", "x86_64-linux"]
 
 [vars]
 # HF_HOME overrides the Hugging Face cache location used when
