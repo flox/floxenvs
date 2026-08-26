@@ -12,7 +12,8 @@ echo ">>> firecrawl present"
 firecrawl --version >/dev/null
 echo ">>> firecrawl --version ... OK"
 
-for skill in firecrawl-cli firecrawl-scrape firecrawl-search; do
+# Upstream renamed the entry skill firecrawl-cli -> firecrawl.
+for skill in firecrawl firecrawl-scrape firecrawl-search; do
   if [ ! -f \
     "$FLOX_ENV/share/flox/claude/firecrawl-cli/skills/$skill/SKILL.md" ]; then
     echo "Error: $skill SKILL.md not installed under" \
