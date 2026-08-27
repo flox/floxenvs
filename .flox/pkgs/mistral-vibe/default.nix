@@ -220,6 +220,7 @@ python.pkgs.buildPythonApplication {
     python-dotenv
     pyyaml
     requests
+    rfc8785
     rich
     sentry-sdk
     setproctitle
@@ -245,8 +246,10 @@ python.pkgs.buildPythonApplication {
     "agent-client-protocol"
     "anyio"
     "attrs"
+    "beautifulsoup4"
     "cachetools"
     "certifi"
+    "cffi"
     "charset-normalizer"
     "click"
     "cryptography"
@@ -259,11 +262,14 @@ python.pkgs.buildPythonApplication {
     "idna"
     "importlib-metadata"
     "jaraco-context"
+    "jsonpath-python"
     "jsonpointer"
     "keyring"
     "linkify-it-py"
+    "markdown-it-py"
     "markdownify"
     "mcp"
+    "mdit-py-plugins"
     "mistralai"
     "more-itertools"
     "opentelemetry-api"
@@ -284,6 +290,7 @@ python.pkgs.buildPythonApplication {
     "pyyaml"
     "requests"
     "rich"
+    "rpds-py"
     "sentry-sdk"
     "smmap"
     "sounddevice"
@@ -292,10 +299,13 @@ python.pkgs.buildPythonApplication {
     "starlette"
     "textual"
     "tree-sitter"
+    "typing-extensions"
     "uc-micro-py"
     "urllib3"
     "uvicorn"
     "watchfiles"
+    "websockets"
+    "zipp"
     "zstandard"
   ];
 
