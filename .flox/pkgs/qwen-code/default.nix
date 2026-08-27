@@ -101,6 +101,7 @@ buildNpmPackage (finalAttrs: {
       packages/channels/github \
       packages/channels/gitlab \
       packages/channels/qqbot \
+      packages/channels/dws \
       packages/acp-bridge
     do
       npm run build --workspace=$ws
