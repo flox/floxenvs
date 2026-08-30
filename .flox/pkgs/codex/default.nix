@@ -19,13 +19,38 @@ let
     builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hash cargoHash;
 
-  # The v8 crate downloads a prebuilt static library at build time.
-  # Fetch it as a fixed-output derivation so the build stays sandboxed.
+  # The v8 crate downloads a prebuilt static library and a matching generated
+  # bindings file at build time. Fetch both as fixed-output derivations so the
+  # build stays sandboxed.
+  #
+  # It must be the POINTER-COMPRESSION + SANDBOX variant: codex-code-mode-host
+  # depends on codex-code-mode-runtime, which takes `v8` with the
+  # `v8_enable_sandbox` feature, and cargo's feature resolution then builds the
+  # whole v8 crate that way. denoland/rusty_v8 publishes no prebuilt artifacts
+  # for that combination (its releases carry only the plain, ptrcomp and
+  # simdutf variants), so upstream builds its own pair from source and
+  # publishes it on the openai/codex release `rusty-v8-v<v8 crate version>`.
+  # Upstream's own builds consume exactly these two files via
+  # RUSTY_V8_ARCHIVE / RUSTY_V8_SRC_BINDING_PATH — see
+  # .github/actions/setup-rusty-v8 in openai/codex.
+  #
+  # `v8_version` is the v8 crate version pinned by codex-rs/Cargo.toml, NOT the
+  # codex version; re-check it on every version bump (see upgrade.sh).
+  rustyV8 = versionData.rusty_v8;
+  rustyV8BaseUrl = "https://github.com/openai/codex/releases/download/rusty-v8-v${rustyV8.v8_version}";
+  rustyV8Target = stdenv.hostPlatform.rust.rustcTarget;
+
   librusty_v8 = fetchurl {
-    name = "librusty_v8-${versionData.librusty_v8.version}";
-    url = "https://github.com/denoland/rusty_v8/releases/download/v${versionData.librusty_v8.version}/librusty_v8_release_${stdenv.hostPlatform.rust.rustcTarget}.a.gz";
-    hash = versionData.librusty_v8.hashes.${stdenv.hostPlatform.system};
+    name = "librusty_v8-${rustyV8.profile}-${rustyV8.v8_version}.a.gz";
+    url = "${rustyV8BaseUrl}/librusty_v8_${rustyV8.profile}_${rustyV8Target}.a.gz";
+    hash = rustyV8.archive_hashes.${stdenv.hostPlatform.system};
     meta.sourceProvenance = [ lib.sourceTypes.binaryNativeCode ];
+  };
+
+  rustyV8SrcBinding = fetchurl {
+    name = "src_binding-${rustyV8.profile}-${rustyV8.v8_version}.rs";
+    url = "${rustyV8BaseUrl}/src_binding_${rustyV8.profile}_${rustyV8Target}.rs";
+    hash = rustyV8.binding_hashes.${stdenv.hostPlatform.system};
   };
 
   # codex-realtime-webrtc pulls in livekit's webrtc-sys on macOS,
@@ -73,9 +98,16 @@ rustPlatform.buildRustPackage {
   # core/agents_md.rs. Paths are relative to codex-rs (the sourceRoot).
   patches = [ ./flox-fragments.patch ];
 
+  # codex-cli alone leaves out the Code Mode host binary. Codex's Code Mode
+  # spawns `codex-code-mode-host` (workspace member code-mode-host) as a child
+  # process for tool execution, so omitting it makes every Code Mode tool call
+  # fail with "failed to spawn code-mode host ...: No such file or directory".
+  # Upstream ships it as its own release asset; build it as a package too.
   cargoBuildFlags = [
     "--package"
     "codex-cli"
+    "--package"
+    "codex-code-mode-host"
   ];
 
   nativeBuildInputs = [
@@ -90,6 +122,7 @@ rustPlatform.buildRustPackage {
 
   env = {
     RUSTY_V8_ARCHIVE = librusty_v8;
+    RUSTY_V8_SRC_BINDING_PATH = rustyV8SrcBinding;
   }
   // lib.optionalAttrs (livekitWebrtc != null) {
     LK_CUSTOM_WEBRTC = livekitWebrtc;

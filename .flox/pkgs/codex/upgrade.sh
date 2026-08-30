@@ -41,8 +41,7 @@ echo "  hash: $src_hash"
 #
 # Read the v8 and livekit hashes (rarely change) so we can rewrite
 # the file with a fake cargoHash without losing them.
-v8_version=$(jq -r '.librusty_v8.version' "$HASHES_FILE")
-v8_hashes=$(jq '.librusty_v8.hashes' "$HASHES_FILE")
+v8_block=$(jq '.rusty_v8' "$HASHES_FILE")
 lk_tag=$(jq -r '.livekit_webrtc.tag' "$HASHES_FILE")
 lk_hashes=$(jq '.livekit_webrtc.hashes' "$HASHES_FILE")
 
@@ -56,15 +55,14 @@ write_hashes() {
     --arg v "$latest_version" \
     --arg h "$src_hash" \
     --arg c "$cargo_hash" \
-    --arg v8v "$v8_version" \
-    --argjson v8h "$v8_hashes" \
+    --argjson v8 "$v8_block" \
     --arg lkt "$lk_tag" \
     --argjson lkh "$lk_hashes" \
     '{
       version: $v,
       hash: $h,
       cargoHash: $c,
-      librusty_v8: { version: $v8v, hashes: $v8h },
+      rusty_v8: $v8,
       livekit_webrtc: { tag: $lkt, hashes: $lkh }
     }' > "$HASHES_FILE"
 }
@@ -95,8 +93,13 @@ rm -f "$tmp_hashes"
 trap - EXIT
 
 echo "Updated to $latest_version"
-echo "NOTE: librusty_v8 and livekit_webrtc hashes were kept as-is."
+echo "NOTE: rusty_v8 and livekit_webrtc hashes were kept as-is."
 echo "      If the build fails, check if those deps changed upstream."
+echo "      rusty_v8.v8_version must match the \`v8\` pin in"
+echo "      codex-rs/Cargo.toml. When it moves, refresh the block from"
+echo "      https://github.com/openai/codex/releases/tag/rusty-v8-v<ver>"
+echo "      — the .sha256 asset for each target lists both files' digests"
+echo "      (nix hash convert --hash-algo sha256 --from base16 --to sri)."
 echo "WARNING: flox-fragments.patch must be re-verified against the new"
 echo "         version. It targets core-skills/src/loader.rs and"
 echo "         core/src/agents_md.rs. If 'flox build codex' fails on the"
