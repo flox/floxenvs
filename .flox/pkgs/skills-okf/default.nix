@@ -3,17 +3,23 @@
   lib,
   fetchFromGitHub,
   python3,
+  git,
 }:
 
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version rev srcHash;
 
-  # The three shipped scripts are PEP-723 single-file scripts whose only
-  # third-party dependency is pyyaml. They import no subprocess module and
-  # shell out to nothing, so a plain interpreter (no makeBinaryWrapper, no
-  # PATH prefix) is enough — script shebangs and the SKILL.md invocations
-  # point at this store path.
+  # The four shipped scripts are PEP-723 single-file scripts whose only
+  # third-party dependency is pyyaml, so a plain interpreter (no
+  # makeBinaryWrapper, no PATH prefix) is enough — script shebangs and the
+  # SKILL.md invocations point at this store path.
+  #
+  # The one exception is backfill's okf_backfill_events.py, which shells
+  # out to `git` to read commit history. Rather than wrap it (which would
+  # replace the .py entry point with a binary and break the uniform
+  # `<interpreter> <script>` invocation the SKILL.md files use), the
+  # `git` argv entries are rewritten to an absolute store path below.
   pythonEnv = python3.withPackages (ps: [ ps.pyyaml ]);
 in
 stdenv.mkDerivation {
@@ -62,6 +68,13 @@ stdenv.mkDerivation {
       examples/sample-bundle --out "$TMPDIR/viz.html"
     test -s "$TMPDIR/viz.html"
 
+    # backfill: the source tarball is not a git checkout, so the
+    # extractor has no repo to walk here. Parsing --help is enough to
+    # prove the script imports and its argparse setup is intact under
+    # the bundled interpreter.
+    ${pythonEnv}/bin/python3 skills/backfill/scripts/okf_backfill_events.py \
+      --help > /dev/null
+
     runHook postCheck
   '';
 
@@ -96,7 +109,7 @@ stdenv.mkDerivation {
     # reference the same absolute path. Keeping them under skills/<s>/
     # would produce four duplicates and force SKILL.md to name one
     # arbitrary copy.
-    for skill in okf validate visualize; do
+    for skill in okf validate visualize backfill; do
       src_dir="$PLUGIN_DIR/skills/$skill/scripts"
       [ -d "$src_dir" ] || { echo "missing $src_dir" >&2; exit 1; }
       mkdir -p "$out/libexec/okf/$skill"
@@ -146,6 +159,18 @@ stdenv.mkDerivation {
       --replace-fail \
         'Run:  uv run okf_visualize.py <bundle-dir> [-o viz.html]' \
         'Run:  python3 okf_visualize.py <bundle-dir> [-o viz.html]'
+    substituteInPlace "$out/libexec/okf/backfill/okf_backfill_events.py" \
+      --replace-fail \
+        'Run:  uv run okf_backfill_events.py <repo-dir> [--out events.jsonl]' \
+        'Run:  python3 okf_backfill_events.py <repo-dir> [--out events.jsonl]'
+
+    # okf_backfill_events.py is the only script that shells out: every
+    # call is `["git", "-C", <repo>, ...]`, resolved off the caller's
+    # PATH. Pin it to the store git so the extractor works from any
+    # environment, matching the no-PATH-dependency rule the gate below
+    # enforces for the SKILL.md files.
+    substituteInPlace "$out/libexec/okf/backfill/okf_backfill_events.py" \
+      --replace-fail '["git", "-C"' '["${lib.getExe git}", "-C"'
 
     # Point every invocation at the bundled interpreter and the libexec
     # copy, by absolute store path. Upstream offers `uv run` with a
@@ -211,6 +236,14 @@ python3 "''${CLAUDE_SKILL_DIR}/scripts/okf_visualize.py" $ARGUMENTS
 of the `okf` plugin or as a standalone skills.sh skill.' \
         'Open it in any browser; the path above is fixed by this flox package build
 regardless of how the skill is installed.'
+
+    substituteInPlace "$PLUGIN_DIR/skills/backfill/SKILL.md" \
+      --replace-fail \
+        'uv run "''${CLAUDE_SKILL_DIR}/scripts/okf_backfill_events.py"' \
+        "$PY $out/libexec/okf/backfill/okf_backfill_events.py" \
+      --replace-fail \
+        'uv run "''${CLAUDE_SKILL_DIR}/../validate/scripts/okf_validate.py"' \
+        "$PY $out/libexec/okf/validate/okf_validate.py"
 
     runHook postInstall
   '';
