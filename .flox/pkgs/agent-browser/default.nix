@@ -56,7 +56,7 @@ let
       inherit version src;
       pnpm = pnpm_11;
       hash = pnpmDepsHash;
-      fetcherVersion = 3;
+      fetcherVersion = 4;
     };
 
     # next/font/google fetches Geist from fonts.googleapis.com at build
