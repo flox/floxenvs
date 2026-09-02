@@ -1,0 +1,21 @@
+[project]
+name = "mergekit-flox"
+version = "0.0.0"
+description = "Flox wrapper to lock mergekit + transitive deps"
+requires-python = ">=3.12"
+# torch is declared directly (not only via mergekit) so the
+# [tool.uv.sources] index pin below applies to it.
+dependencies = ["mergekit", "torch"]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+mergekit = { git = "https://github.com/arcee-ai/mergekit.git", tag = "v0.1.4" }
+# CPU-only torch on linux: default PyPI wheels bundle the CUDA
+# runtime (~6GB closure). Darwin wheels are CPU-only already.
+torch = [
+  { index = "pytorch-cpu", marker = "sys_platform == 'linux'" },
+]

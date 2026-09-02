@@ -1,0 +1,31 @@
+kind: pkg
+subkind: plain
+name: mergekit-cuda
+title: Mergekit (CUDA)
+publisher: flox
+tagline: >
+  Mergekit with CUDA-enabled torch for GPU-accelerated merges —
+  Linux only.
+category: ai
+ai_role: tooling
+tags: [llm, model-merging, transformers, cuda, gpu]
+stack: [python]
+featured: false
+combines_well_with:
+  - env:mergekit
+  - env:huggingface
+status: stable
+license: LGPL-3.0
+upstream:
+  name: Mergekit
+  url: https://github.com/arcee-ai/mergekit
+  license: LGPL-3.0
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    mergekit.pkg-path = "flox/mergekit-cuda"
+    mergekit.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/mergekit-cuda
+  floxhub: https://hub.flox.dev/flox/mergekit-cuda

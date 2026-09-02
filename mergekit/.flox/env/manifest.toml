@@ -1,0 +1,29 @@
+schema-version = "1.10.0"
+
+# Minimal Mergekit environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/mergekit"]
+
+[install]
+flox-ai.pkg-path = "flox/flox-ai"
+flox-ai.pkg-group = "flox-ai"
+# CPU torch build on darwin, CUDA-enabled torch build on linux.
+# Both packages expose the same mergekit-* entry points; the
+# CUDA build falls back to CPU when no GPU is present. torch
+# ships no x86_64-darwin wheels since 2.3, hence no such system.
+mergekit.pkg-path = "flox/mergekit"
+mergekit.pkg-group = "mergekit"
+mergekit.systems = ["aarch64-darwin"]
+mergekit-cuda.pkg-path = "flox/mergekit-cuda"
+mergekit-cuda.pkg-group = "mergekit-cuda"
+mergekit-cuda.systems = ["aarch64-linux", "x86_64-linux"]
+
+[vars]
+# HF_HOME overrides the Hugging Face cache location used when
+# mergekit downloads models (default: ~/.cache/huggingface).
+
+[options]
+systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]

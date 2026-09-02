@@ -1,0 +1,68 @@
+kind: env
+name: mergekit
+title: Mergekit
+publisher: flox
+tagline: >
+  Merge pre-trained LLMs with Arcee's Mergekit — SLERP, TIES,
+  DARE, MoE, and LoRA extraction. GPU optional.
+seo_title: >
+  Mergekit dev environment — merge LLMs with SLERP, TIES, DARE
+  and build MoE models, no GPU needed
+seo_description: >
+  Flox-packaged Mergekit: Arcee's LLM merging toolkit with
+  CUDA torch on linux and CPU torch on macOS. mergekit-yaml,
+  mergekit-moe, and LoRA extraction from one include line.
+intro: >
+  flox/mergekit packages Mergekit — Arcee's open source toolkit
+  for merging pre-trained large language models. The env picks
+  the right torch per platform: CUDA-enabled on linux (GPU
+  acceleration when a card is present, CPU fallback otherwise),
+  lean CPU-only on darwin. All upstream entry points are on
+  PATH:
+  `mergekit-yaml` for config-driven merges (linear, SLERP,
+  TIES, DARE, and more), `mergekit-moe` for Mixture-of-Experts
+  assembly, and `mergekit-extract-lora` for pulling a LoRA out
+  of a fine-tune. Merges execute lazily tensor-by-tensor, so
+  even large models merge within modest RAM. Pair with
+  flox/huggingface for hub authentication and cache tooling.
+summary:
+  - "Config-driven LLM merging: linear, SLERP, TIES, DARE"
+  - "CUDA torch on linux, CPU torch on darwin — no GPU required"
+  - "MoE assembly and LoRA extraction included"
+  - "Lazy tensor loading keeps RAM use modest"
+category: ai
+ai_role: tooling
+tags: [llm, model-merging, transformers, moe, lora]
+stack: [python]
+featured: false
+combines_well_with:
+  - env:huggingface
+  - env:lmstudio
+  - env:omlx
+status: beta
+license: LGPL-3.0
+upstream:
+  name: Mergekit
+  url: https://github.com/arcee-ai/mergekit
+  license: LGPL-3.0
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/mergekit" }]
+  activate: |
+    flox activate -r flox/mergekit
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/mergekit-latest
+recipes:
+  - name: mergekit-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Pre-written example merge config for two small models"
+      - "Guided banner with the exact commands to run"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/mergekit
+  floxhub: https://hub.flox.dev/flox/mergekit
+  docker: https://github.com/flox/floxenvs/pkgs/container/floxenvs/mergekit-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Amergekit

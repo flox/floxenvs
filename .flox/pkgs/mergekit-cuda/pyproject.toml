@@ -1,0 +1,13 @@
+[project]
+name = "mergekit-cuda-flox"
+version = "0.0.0"
+description = "Flox wrapper to lock mergekit + CUDA torch"
+requires-python = ">=3.12"
+dependencies = ["mergekit"]
+
+# Unlike ../mergekit, no CPU wheel index pin: the default PyPI
+# torch wheels bundle the CUDA runtime (nvidia-* packages) on
+# linux, which is exactly what this variant wants.
+
+[tool.uv.sources]
+mergekit = { git = "https://github.com/arcee-ai/mergekit.git", tag = "v0.1.4" }
