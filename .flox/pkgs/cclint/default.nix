@@ -44,3 +44,5 @@ buildNpmPackage {
     platforms = lib.platforms.unix;
   };
 }
+
+# CI touch: exercise Blacksmith stickydisk build path (PR #10818).

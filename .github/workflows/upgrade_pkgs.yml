@@ -21,7 +21,7 @@ jobs:
 
   discover:
     name: "Find packages"
-    runs-on: "ubuntu-latest"
+    runs-on: "blacksmith-2vcpu-ubuntu-2404"
     timeout-minutes: 10
 
     outputs:
@@ -59,7 +59,7 @@ jobs:
 
   upgrade:
     name: "Upgrade '${{ matrix.package }}'"
-    runs-on: "ubuntu-latest"
+    runs-on: "blacksmith-4vcpu-ubuntu-2404"
     timeout-minutes: 30
     needs: ["discover"]
     if: needs.discover.outputs.packages != '[]'
@@ -73,6 +73,17 @@ jobs:
     steps:
       - name: "Checkout"
         uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
+
+      - name: "Create Nix store mount point"
+        run: |
+          sudo mkdir -p /nix/store
+          sudo chmod -R 777 /nix
+
+      - name: "Mount Nix store"
+        uses: "useblacksmith/stickydisk@74f3f01ab1392726dd6ee06904f0452b0ec1e151" # v1
+        with:
+          key: "${{ github.repository }}-nix-${{ runner.arch }}"
+          path: "/nix"
 
       - name: "Install flox"
         uses: "flox/install-flox-action@1128abd73431089ab9d871c893b4e72a729354e1" # v2.6.0
