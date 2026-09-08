@@ -90,21 +90,44 @@ stdenv.mkDerivation (finalAttrs: {
   preBuild = ''
     # rolldown is a transitive dependency (via tsdown), not a direct root
     # dependency, so pnpm does not link its binary into node_modules/.bin.
-    # scripts/bundle-a2ui.mjs probes two hard-coded paths for cli.mjs and
-    # falls back to `pnpm dlx rolldown` (network) when neither is present.
-    # Upstream sets `node-linker=hoisted` in .npmrc so rolldown lands at
-    # node_modules/rolldown; symlink it into the pnpm-isolated path the
-    # probe expects so the pre-fetched binary is used.
-    if [ ! -e node_modules/rolldown/bin/cli.mjs ]; then
-      echo "error: rolldown cli.mjs not found in node_modules" >&2
-      exit 1
+    # extensions/canvas/scripts/bundle-a2ui.mjs probes two hard-coded
+    # paths for cli.mjs and falls back to `pnpm dlx rolldown` (network)
+    # when neither is present. Up to 2026.7.x upstream set
+    # `node-linker=hoisted` in .npmrc, so rolldown landed at
+    # node_modules/rolldown; 2026.9.x dropped that setting, so it now
+    # lives in the isolated store at
+    # node_modules/.pnpm/rolldown@<version>/node_modules/rolldown.
+    # Handle both: link whichever copy exists into the second probed
+    # path so the pre-fetched binary is used.
+    if [ -e node_modules/.pnpm/node_modules/rolldown/bin/cli.mjs ]; then
+      :
+    elif [ -e node_modules/rolldown/bin/cli.mjs ]; then
+      mkdir -p node_modules/.pnpm/node_modules
+      ln -sfT ../../rolldown node_modules/.pnpm/node_modules/rolldown
+    else
+      cli=$(find node_modules/.pnpm -maxdepth 6 \
+        -path '*/rolldown/bin/cli.mjs' -print -quit)
+      if [ -z "$cli" ]; then
+        echo "error: rolldown cli.mjs not found in node_modules" >&2
+        exit 1
+      fi
+      mkdir -p node_modules/.pnpm/node_modules
+      ln -sfT "$PWD/$(dirname "$(dirname "$cli")")" \
+        node_modules/.pnpm/node_modules/rolldown
     fi
-    mkdir -p node_modules/.pnpm/node_modules
-    ln -sfT ../../rolldown node_modules/.pnpm/node_modules/rolldown
   '';
 
   buildPhase = ''
     runHook preBuild
+
+    # scripts/tsdown-build.mts sizes the node heap from the process
+    # cgroup memory limit and refuses to build ("The process memory limit
+    # is not visible through this cgroup mount namespace") when it cannot
+    # read one. The Nix Linux sandbox mounts no cgroup hierarchy for the
+    # build, so pass the heap size upstream would have chosen itself:
+    # DEFAULT_TSDOWN_MAX_OLD_SPACE_MB (tsdown-build.mts:51), which is
+    # comfortably above the ~4.7GB peak the script documents.
+    export OPENCLAW_TSDOWN_MAX_OLD_SPACE_MB=12288
 
     # `pnpm build` and `pnpm ui:build` can run silently for over 30
     # minutes on slower builders (e.g. x86_64-darwin via Rosetta on
