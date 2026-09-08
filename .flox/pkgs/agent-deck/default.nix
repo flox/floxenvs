@@ -5,6 +5,7 @@
   fetchFromGitHub,
   git,
   lsof,
+  tmux,
   versionCheckHook,
   writableTmpDirAsHomeHook,
 }:
@@ -100,9 +101,14 @@ buildGoModule (finalAttrs: {
   # lsof: the 1.15.0 worktree-cleanup safety tests shell out to lsof to
   # inspect live processes; without it every cleanup candidate is treated
   # as protected and the tests fail (surfaced on darwin builders).
+  #
+  # tmux: 1.16.x moved the "tmux not found" preflight ahead of command
+  # dispatch, so every cmd/agent-deck test that runs a command (account
+  # registration, visibility, worktree boundary, ...) aborts with
+  # "Error: tmux not found" unless tmux is on PATH.
   preCheck = ''
     export HOME=$(mktemp -d)
-    export PATH="${git}/bin:${lsof}/bin:$PATH"
+    export PATH="${git}/bin:${lsof}/bin:${tmux}/bin:$PATH"
   '';
 
   ldflags = [
