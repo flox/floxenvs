@@ -162,7 +162,10 @@ stdenv.mkDerivation {
     substituteInPlace "$out/libexec/okf/backfill/okf_backfill_events.py" \
       --replace-fail \
         'Run:  uv run okf_backfill_events.py <repo-dir> [--out events.jsonl]' \
-        'Run:  python3 okf_backfill_events.py <repo-dir> [--out events.jsonl]'
+        'Run:  python3 okf_backfill_events.py <repo-dir> [--out events.jsonl]' \
+      --replace-fail \
+        '      uv run okf_backfill_events.py <repo-dir> --show <sha> [--only <path>]' \
+        '      python3 okf_backfill_events.py <repo-dir> --show <sha> [--only <path>]'
 
     # okf_backfill_events.py is the only script that shells out: every
     # call is `["git", "-C", <repo>, ...]`, resolved off the caller's
