@@ -120,6 +120,15 @@ stdenv.mkDerivation (finalAttrs: {
   buildPhase = ''
     runHook preBuild
 
+    # scripts/tsdown-build.mts sizes the node heap from the process
+    # cgroup memory limit and refuses to build ("The process memory limit
+    # is not visible through this cgroup mount namespace") when it cannot
+    # read one. The Nix Linux sandbox mounts no cgroup hierarchy for the
+    # build, so pass the heap size upstream would have chosen itself:
+    # DEFAULT_TSDOWN_MAX_OLD_SPACE_MB (tsdown-build.mts:51), which is
+    # comfortably above the ~4.7GB peak the script documents.
+    export OPENCLAW_TSDOWN_MAX_OLD_SPACE_MB=12288
+
     # `pnpm build` and `pnpm ui:build` can run silently for over 30
     # minutes on slower builders (e.g. x86_64-darwin via Rosetta on
     # aarch64 hardware), tripping Nix's max-silent-time default of
