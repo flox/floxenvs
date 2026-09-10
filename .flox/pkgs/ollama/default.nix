@@ -174,6 +174,15 @@ buildGoModule (finalAttrs: {
         # /bin and /usr/bin, which don't exist in the Linux sandbox
         "TestEnsureDeepSeekHarnessInstalledUsesPublicNpmPackage"
         "TestEnsureMuseInstalled"
+      ]
+      ++ lib.optionals stdenv.hostPlatform.isLinux [
+        # The request counter skips any session file whose mtime predates
+        # the nanosecond session-start stamp it just wrote
+        # (codex_app_profile.go:143). On the Linux builders' filesystem the
+        # mtime is coarser than that stamp, so the file the test writes is
+        # skipped entirely and the count comes back 0 instead of 2. Darwin
+        # keeps nanosecond mtimes and passes, so skip this on Linux only.
+        "TestCodexAppCountsOnlyOllamaRequestsInRegularProfile"
       ];
     in
     [ "-skip=^${builtins.concatStringsSep "$|^" skippedTests}$" ];
