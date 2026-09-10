@@ -9,7 +9,7 @@
   pnpmConfigHook,
   pnpm_11,
   pnpm-fixup-state-db,
-  nodejs_22,
+  nodejs_24,
   makeWrapper,
   versionCheckHook,
   installShellFiles,
@@ -78,7 +78,7 @@ stdenv.mkDerivation (finalAttrs: {
     git
     pnpmConfigHook
     pnpm_11
-    nodejs_22
+    nodejs_24
     makeWrapper
     installShellFiles
   ];
@@ -192,7 +192,7 @@ stdenv.mkDerivation (finalAttrs: {
       $libdir/node_modules/.pnpm/node_modules/moltbot \
       $libdir/node_modules/.pnpm/node_modules/openclaw-control-ui
 
-    makeWrapper ${lib.getExe nodejs_22} $out/bin/openclaw \
+    makeWrapper ${lib.getExe nodejs_24} $out/bin/openclaw \
       --add-flags "$libdir/openclaw.mjs" \
       --set NODE_PATH "$libdir/node_modules"
     ln -s $out/bin/openclaw $out/bin/moltbot
