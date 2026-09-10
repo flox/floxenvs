@@ -90,8 +90,13 @@ stdenv.mkDerivation {
     # them with nix-store paths would point VAULT_ROOT at the plugin
     # install and break the design. Just make them executable for the
     # case where the user does copy them into their vault.
-    find "$PLUGIN_DIR/bin" "$PLUGIN_DIR/scripts" \
-      -type f -name '*.sh' -exec chmod +x {} +
+    # 2.2.0 dropped the top-level `bin/` directory, and naming a
+    # missing path makes find exit non-zero, which fails the build.
+    # Only walk the directories this release actually ships.
+    for d in bin scripts; do
+      [ -d "$PLUGIN_DIR/$d" ] || continue
+      find "$PLUGIN_DIR/$d" -type f -name '*.sh' -exec chmod +x {} +
+    done
 
     # Drop an installed_plugins.json next to the plugin so flox-ai
     # registers it in $CLAUDE_CONFIG_DIR/plugins/installed_plugins.json
