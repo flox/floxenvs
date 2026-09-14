@@ -1,0 +1,122 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+
+  // COMMON BASE — keep identical across all flox repos.
+  extends: [
+    "config:recommended",
+    "group:allNonMajor", // one PR for all non-major updates (low noise)
+    "helpers:pinGitHubActionDigests", // pin Actions to SHAs (supply chain)
+    "docker:pinDigests", // pin Docker image digests (inert if no Dockerfile)
+    "abandonments:recommended", // flag unmaintained packages
+    ":configMigration", // auto-PR Renovate config migrations
+    ":semanticCommitTypeAll(chore)", // all dep commits use the chore type
+  ],
+
+  timezone: "UTC",
+  automerge: false, // every update is reviewed by a human
+  rebaseWhen: "behind-base-branch",
+  minimumReleaseAge: "7 days", // don't adopt a release until it's a week old
+  constraintsFiltering: "strict", // skip updates incompatible with declared runtimes
+  // Update lockfiles in place; only edit a manifest when a version goes out of
+  // range. Manager-agnostic — applies to whatever lockfile-based managers a repo
+  // has (npm, cargo, terraform, uv…) and is ignored by the rest.
+  rangeStrategy: "update-lockfile",
+  prConcurrentLimit: 10,
+  prHourlyLimit: 4,
+  dependencyDashboard: true,
+  dependencyDashboardTitle: "Renovate dependency dashboard",
+
+  // Refresh lockfiles (npm/cargo/uv/terraform) weekly. Note: flake.lock is NOT
+  // covered — Renovate's nix manager is off by default; use a dedicated
+  // update-flake-lock workflow for that.
+  //
+  // This is what actually drains transitive CVEs. The large majority of open
+  // Dependabot alerts across these repos sit on TRANSITIVE packages (undici,
+  // @xmldom/xmldom, fast-uri, js-yaml, brace-expansion…), which no
+  // manifest-level rule can match — only a lockfile refresh moves them, and
+  // it is the gap that made Dependabot version-updates insufficient here.
+  // Left NOT automerged on purpose: a refresh re-resolves runtime
+  // dependencies too, which is outside the automerge boundary below.
+  lockFileMaintenance: {
+    enabled: true,
+    schedule: ["* 0-6 * * 1"],
+  },
+
+  // Security fixes bypass the 7-day cooldown and the normal schedule.
+  vulnerabilityAlerts: {
+    enabled: true,
+    labels: ["security"],
+    minimumReleaseAge: "1 day",
+    schedule: ["at any time"],
+  },
+  osvVulnerabilityAlerts: true,
+
+  // SCOPE GUARD — this is an allowlist, and it is load-bearing.
+  //
+  // `.flox/pkgs/<tool>/` holds 15 THIRD-PARTY tools that flox packages for
+  // redistribution, each with its own committed package-lock.json / uv.lock.
+  // Those lockfiles are pinned to match a specific upstream release and are
+  // kept in sync by per-package `upgrade.sh` scripts plus Nix `hashes.json`.
+  // A lockfile Renovate bumped behind those scripts' back would break
+  // `flox build` with no signal until the build ran. They are also the bulk
+  // of this repo's Dependabot alert count, so a blocklist that ever drifts
+  // would be loud and wrong.
+  //
+  // includePaths is an allowlist rather than an ignorePaths blocklist on
+  // purpose: a new .flox/pkgs/<tool>/ directory added later is excluded
+  // automatically instead of needing a matching config change. It also keeps
+  // Renovate out of .github/workflows, which Dependabot still owns in this
+  // repo — two bots rewriting the same workflow pins would conflict.
+  includePaths: [".website/**"],
+
+  packageRules: [
+    // --- common rules (keep identical across repos) ---
+    {
+      description: "Label all major updates so they're easy to review",
+      matchUpdateTypes: ["major"],
+      labels: ["major-upgrade"],
+    },
+
+    // Dev tooling (linters, test runners, type stubs, bundlers) is never
+    // shipped to users — it only has to keep the build and test suite green,
+    // which CI already proves on the PR. Split non-major devDependency bumps
+    // out of the `group:allNonMajor` PR so they can carry their own automerge
+    // flag, and let them land unattended.
+    //
+    // Deliberately NOT automerged:
+    //   - major bumps (matchUpdateTypes omits "major"), which is what keeps
+    //     vitest 4.x / astro 7.x / brace-expansion 5.x-class jumps in front of
+    //     a human;
+    //   - anything in `dependencies`, which ships.
+    //
+    // SAFETY PRECONDITION: automerge relies on GitHub's auto-merge, which only
+    // waits for status checks that branch protection marks REQUIRED. On a
+    // branch with no required checks, `--auto` degrades to an immediate merge
+    // and the PR lands while CI is still running. Confirm required checks on
+    // main before enabling this.
+    {
+      description: "Automerge non-major devDependency updates",
+      matchDepTypes: ["devDependencies"],
+      matchUpdateTypes: ["patch", "minor"],
+      groupName: "dev-dependencies (non-major)",
+      automerge: true,
+      automergeType: "pr",
+    },
+
+    // CUSTOM (floxenvs) — edit this section per repo.
+    // The marketing site is a static Astro build: the deployed artifact is
+    // HTML/CSS/JS produced at build time, so `dependencies` and
+    // `devDependencies` are BOTH build-time here — nothing in .website/ is a
+    // runtime dependency of a running service. Automerge the whole non-major
+    // surface of that directory, majors excluded (astro 7.x is exactly the
+    // kind of jump that must stay in front of a human).
+    {
+      description: "CUSTOM(floxenvs): automerge non-major .website/ site-build updates",
+      matchFileNames: [".website/**"],
+      matchUpdateTypes: ["patch", "minor"],
+      groupName: "website (non-major)",
+      automerge: true,
+      automergeType: "pr",
+    },
+  ],
+}

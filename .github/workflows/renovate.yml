@@ -1,0 +1,92 @@
+name: "Renovate"
+
+# Self-hosted Renovate via GitHub Actions.
+# All variable inputs are either workflow_dispatch choice fields (validated
+# against a fixed option list) or the static github.repository slug, passed
+# to the action via env: per GitHub's workflow-injection guidance.
+
+on:
+  schedule:
+    # Daily at 12:00 UTC. The 7-day minimumReleaseAge cooldown in
+    # renovate.json5 dominates the latency for routine updates, so more
+    # frequent runs add cost (Actions minutes) and noise (transient
+    # GitHub-API failures) without faster outcomes. Vulnerability alerts
+    # use a 1-day cooldown, so CVE-patch PRs open within ~24h of the
+    # cooldown clearing.
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Renovate log level"
+        required: false
+        default: "info"
+        type: choice
+        options:
+          - "debug"
+          - "info"
+          - "warn"
+      dryRun:
+        description: "Override renovate.json5 dryRun"
+        required: false
+        default: "off"
+        type: choice
+        options:
+          # "off" rather than "" as the no-override value: actionlint rejects
+          # an empty choice option (syntax-check), and floxhub runs actionlint
+          # in pre-commit, so a blank option cannot be used here. The env
+          # expression below maps "off" back to an empty RENOVATE_DRY_RUN.
+          - "off"
+          - "lookup"
+          - "extract"
+          - "full"
+
+concurrency:
+  group: "renovate"
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  renovate:
+    name: "Renovate"
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 30
+
+    steps:
+      - name: "Mint installation token from Renovate GitHub App"
+        id: "app-token"
+        uses: "actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1" # v3.2.0
+        with:
+          app-id: "${{ secrets.MANAGED_RENOVATE_BOT_APP_ID }}"
+          private-key: "${{ secrets.MANAGED_RENOVATE_BOT_APP_SECRET }}"
+
+      - name: "Checkout"
+        uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0" # v7
+        with:
+          persist-credentials: false
+          show-progress: false
+
+      - name: "Self-hosted Renovate"
+        uses: "renovatebot/github-action@22e0a16091fc706b04affe6ae53d5e3358ac4023" # v46.1.19
+        env:
+          LOG_LEVEL: "${{ inputs.logLevel || 'info' }}"
+          RENOVATE_PLATFORM: "github"
+          RENOVATE_AUTODISCOVER: "false"
+          RENOVATE_REPOSITORIES: "${{ github.repository }}"
+          RENOVATE_ONBOARDING: "false"
+          RENOVATE_REQUIRE_CONFIG: "required"
+          # Safety net: any run NOT on main is forced into full dry-run.
+          # Prevents stray branch runs from opening real PRs/issues.
+          #
+          # The nested ternary exists because GitHub treats "" as falsy, so the
+          # obvious `cond && a || inputs.dryRun` form cannot yield an empty
+          # string. Reading it: off main -> "full"; on main -> the dispatch
+          # input, except "off" (and the empty value a scheduled run supplies),
+          # which both collapse to "" = no override.
+          RENOVATE_DRY_RUN: >-
+            ${{ github.ref != 'refs/heads/main' && 'full'
+                || (inputs.dryRun != 'off' && inputs.dryRun || '') }}
+          RENOVATE_PERSIST_REPO_DATA: "true"
+        with:
+          configurationFile: ".github/renovate.json5"
+          token: "${{ steps.app-token.outputs.token }}"
