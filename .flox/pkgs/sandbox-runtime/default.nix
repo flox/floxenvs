@@ -5,6 +5,7 @@
   fetchzip,
   makeWrapper,
   nodejs,
+  jq,
   runCommand,
   bubblewrap,
   socat,
@@ -18,7 +19,7 @@ let
   # The npmjs tarball doesn't ship package-lock.json (npm strips it on
   # publish), so inject a vendored lockfile into the source before
   # buildNpmPackage walks it.
-  src = runCommand "sandbox-runtime-src-with-lock" { } ''
+  src = runCommand "sandbox-runtime-src-with-lock" { nativeBuildInputs = [ jq ]; } ''
     mkdir -p $out
     cp -r ${
       fetchzip {
@@ -28,6 +29,18 @@ let
       }
     }/* $out/
     cp ${./package-lock.json} $out/package-lock.json
+
+    # The committed package-lock.json has upstream's dev-only entries
+    # pruned (see upgrade.sh): they are lint/typecheck/test tooling that
+    # dontNpmBuild means we never run, but Dependabot scans them anyway
+    # while they sit in the lockfile. `npm ci` refuses to run when
+    # package.json and package-lock.json disagree, so devDependencies is
+    # deleted here to match. nixpkgs' npmInstallHook prunes dev
+    # dependencies from the output regardless, so nothing that used to
+    # ship stops shipping.
+    jq 'del(.devDependencies)' $out/package.json > package.json.pruned
+    rm -f $out/package.json
+    mv package.json.pruned $out/package.json
   '';
 in
 buildNpmPackage {
@@ -41,6 +54,14 @@ buildNpmPackage {
 
   # The published tarball is prebuilt; we only need to install + wrap.
   dontNpmBuild = true;
+
+  # npmInstallHook enumerates the files to install with `npm pack
+  # --dry-run`, which runs the `prepare` lifecycle script. Upstream
+  # packages commonly set `"prepare": "husky"` — a devDependency the
+  # pruned lockfile no longer installs, and one this build has no use
+  # for, since dontNpmBuild means nothing is built from source here.
+  # Skipping pack's scripts keeps that from breaking the install phase.
+  npmPackFlags = [ "--ignore-scripts" ];
 
   postInstall = lib.optionalString stdenv.hostPlatform.isLinux ''
     # On Linux, suffix bubblewrap to PATH (not prefix) so a system bwrap

@@ -9,18 +9,46 @@ LOCKFILE="$SCRIPT_DIR/package-lock.json"
 NPM_PACKAGE="@iloom/cli"
 FAKE_HASH="sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
 
+force=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -f | --force)
+      force=1
+      ;;
+    -h | --help)
+      echo "Usage: ${0##*/} [--force]"
+      echo
+      echo "  --force  Re-fetch the tarball and regenerate package-lock.json"
+      echo "           and hashes.json even when already on the latest"
+      echo "           version. Use after changing how the lockfile is"
+      echo "           generated."
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      echo "Usage: ${0##*/} [--force]" >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
+
 current_version=$(jq -r '.version' "$HASHES_FILE")
 latest_version=$(curl -sfL "https://registry.npmjs.org/${NPM_PACKAGE}/latest" \
   | jq -r '.version')
 
 echo "Current: $current_version, Latest: $latest_version"
 
-if [ "$current_version" = "$latest_version" ]; then
+if [ "$current_version" = "$latest_version" ] && [ "$force" -eq 0 ]; then
   echo "Already up to date"
   exit 0
 fi
 
-echo "Updating iloom-cli from $current_version to $latest_version"
+if [ "$current_version" = "$latest_version" ]; then
+  echo "Forcing regeneration of iloom-cli at $current_version"
+else
+  echo "Updating iloom-cli from $current_version to $latest_version"
+fi
 
 # Fetch and hash the published npm tarball
 src_url="https://registry.npmjs.org/${NPM_PACKAGE}/-/cli-${latest_version}.tgz"
@@ -43,6 +71,20 @@ tar -xzf "$tarball" -C "$tmpdir/extract" --strip-components=1
 
 (
   cd "$tmpdir/extract"
+  # Drop devDependencies before locking. `npm install
+  # --package-lock-only` writes the *whole* dependency graph into the
+  # lockfile no matter what --omit=dev says (it only changes what gets
+  # installed), so upstream's test runners and bundlers end up in the
+  # committed lockfile and Dependabot alerts on them. This package sets
+  # dontNpmBuild — the tarball already ships a prebuilt dist/ — so none
+  # of that tooling is ever run, and nixpkgs' npmInstallHook prunes it
+  # from the output anyway. Removing it from package.json first is the
+  # only way to keep it out of the lockfile. default.nix applies the
+  # same deletion to the source it builds, because `npm ci` refuses to
+  # run when package.json and package-lock.json disagree.
+  jq 'del(.devDependencies)' package.json > package.json.tmp
+  mv package.json.tmp package.json
+
   npm install --package-lock-only --ignore-scripts >/dev/null 2>&1
 )
 

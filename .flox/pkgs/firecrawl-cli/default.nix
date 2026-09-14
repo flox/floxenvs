@@ -2,6 +2,7 @@
   lib,
   buildNpmPackage,
   fetchurl,
+  jq,
   runCommand,
 }:
 
@@ -13,7 +14,7 @@ let
   # it on publish; upstream also uses pnpm, not npm). Inject a pinned
   # lockfile regenerated from the tarball's package.json so
   # buildNpmPackage can resolve dependencies deterministically.
-  srcWithLock = runCommand "firecrawl-cli-src-with-lock" { } ''
+  srcWithLock = runCommand "firecrawl-cli-src-with-lock" { nativeBuildInputs = [ jq ]; } ''
     mkdir -p $out
     tar -xzf ${
       fetchurl {
@@ -22,6 +23,18 @@ let
       }
     } -C $out --strip-components=1
     cp ${./package-lock.json} $out/package-lock.json
+
+    # The committed package-lock.json describes runtime dependencies
+    # only (see upgrade.sh): `npm install --package-lock-only` records
+    # devDependencies no matter what --omit=dev says, and Dependabot
+    # then alerts on test runners and bundlers that dontNpmBuild means
+    # we never run. `npm ci` refuses to run when package.json and
+    # package-lock.json disagree, so the same field is deleted here.
+    # nixpkgs' npmInstallHook prunes dev dependencies from the output
+    # regardless, so nothing that used to ship stops shipping.
+    jq 'del(.devDependencies)' $out/package.json > package.json.pruned
+    rm -f $out/package.json
+    mv package.json.pruned $out/package.json
   '';
 in
 buildNpmPackage {
@@ -32,6 +45,14 @@ buildNpmPackage {
 
   # The npm tarball already ships prebuilt JS in dist/.
   dontNpmBuild = true;
+
+  # npmInstallHook enumerates the files to install with `npm pack
+  # --dry-run`, which runs the `prepare` lifecycle script. Upstream
+  # packages commonly set `"prepare": "husky"` — a devDependency the
+  # pruned lockfile no longer installs, and one this build has no use
+  # for, since dontNpmBuild means nothing is built from source here.
+  # Skipping pack's scripts keeps that from breaking the install phase.
+  npmPackFlags = [ "--ignore-scripts" ];
   makeCacheWritable = true;
 
   # `firecrawl --version` is a self-contained, offline command, so the
