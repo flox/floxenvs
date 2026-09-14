@@ -23,6 +23,17 @@ fi
 
 echo "Current: $current_tag, Latest: $latest_tag"
 
+# Refresh transitive dependencies on every run, before the
+# "already up to date" early exit below. The `uv lock
+# --upgrade-package` further down only re-resolves the pinned
+# upstream source; every transitive PyPI dependency stays frozen at
+# whatever was picked when the lock was first written. Since this
+# script exits early whenever upstream has no new release, those
+# transitive pins never moved and accumulated Dependabot alerts.
+pushd "$SCRIPT_DIR" > /dev/null
+uv lock --upgrade
+popd > /dev/null
+
 if [ "$current_tag" = "$latest_tag" ]; then
   echo "Already up to date"
   exit 0
