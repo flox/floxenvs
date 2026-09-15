@@ -85,27 +85,32 @@ buildNpmPackage (finalAttrs: {
   buildPhase = ''
     runHook preBuild
 
-    npm run generate
-    # The CLI esbuild bundle resolves imports against workspace dist/
-    # output, so build the workspaces it depends on first (subset of
-    # upstream's scripts/build.js buildOrder; the bundled CLI does not
-    # pull in webui/sdk/vscode/plugin-example).
-    for ws in \
-      packages/web-templates \
-      packages/channels/base \
-      packages/channels/telegram \
-      packages/channels/weixin \
-      packages/channels/dingtalk \
-      packages/channels/wecom \
-      packages/channels/feishu \
-      packages/channels/github \
-      packages/channels/gitlab \
-      packages/channels/qqbot \
-      packages/channels/dws \
-      packages/acp-bridge
-    do
-      npm run build --workspace=$ws
-    done
+    # A dependency whose version conflicts with the hoisted one gets a
+    # workspace-local node_modules, and the npm hooks only patch the root
+    # tree. Those nested copies keep their `#!/usr/bin/env node`
+    # shebangs, and the Linux build sandbox has no /usr/bin/env, so
+    # running one dies with "bad interpreter" (npm reports exit code
+    # 126) — web-shell carries its own vite and hit exactly that. Darwin
+    # builders do have /usr/bin/env, so this only bites on Linux.
+    #
+    # Patch the nested trees, not their .bin directories: the entries in
+    # .bin are symlinks, which patchShebangs skips.
+    while IFS= read -r nm; do
+      patchShebangs "$nm"
+    done < <(find packages -type d -name node_modules -prune)
+
+    # Upstream's scripts/build.js builds every workspace in dependency
+    # order and takes `--cli-only` to skip the ones the CLI bundle does
+    # not need (vscode, chrome-extension, qwen-live, the external-context
+    # integrations). Call it instead of maintaining our own copy of the
+    # order: 0.23.4 inserted packages/web-shell before web-templates, and
+    # a hand-kept subset silently fell behind — web-templates failed with
+    # `Could not resolve "@qwen-code/web-shell/transcript"`.
+    #
+    # build.js runs `npm run generate` itself. NODE_OPTIONS mirrors the
+    # root `build` script, whose tsc runs need the larger heap.
+    NODE_OPTIONS="--max-old-space-size=4096" \
+      node scripts/build.js --cli-only
     npm run bundle
 
     runHook postBuild
