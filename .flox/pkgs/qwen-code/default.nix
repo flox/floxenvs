@@ -85,6 +85,20 @@ buildNpmPackage (finalAttrs: {
   buildPhase = ''
     runHook preBuild
 
+    # A dependency whose version conflicts with the hoisted one gets a
+    # workspace-local node_modules, and the npm hooks only patch the root
+    # tree. Those nested copies keep their `#!/usr/bin/env node`
+    # shebangs, and the Linux build sandbox has no /usr/bin/env, so
+    # running one dies with "bad interpreter" (npm reports exit code
+    # 126) — web-shell carries its own vite and hit exactly that. Darwin
+    # builders do have /usr/bin/env, so this only bites on Linux.
+    #
+    # Patch the nested trees, not their .bin directories: the entries in
+    # .bin are symlinks, which patchShebangs skips.
+    while IFS= read -r nm; do
+      patchShebangs "$nm"
+    done < <(find packages -type d -name node_modules -prune)
+
     # Upstream's scripts/build.js builds every workspace in dependency
     # order and takes `--cli-only` to skip the ones the CLI bundle does
     # not need (vscode, chrome-extension, qwen-live, the external-context
