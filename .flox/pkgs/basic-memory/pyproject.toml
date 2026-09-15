@@ -3,7 +3,14 @@ name = "basic-memory-flox"
 version = "0.0.0"
 description = "Flox wrapper to lock basic-memory + transitive deps"
 requires-python = ">=3.12"
-dependencies = ["basic-memory"]
+# fastmcp-slim is already a transitive dep (basic-memory pins
+# fastmcp==4.0.0b1, which pins fastmcp-slim[client]==4.0.0b1).
+# Naming it here makes that pre-release *explicit*, so a plain
+# `uv lock --upgrade` resolves under the default pre-release policy
+# instead of needing `--prerelease=allow`, which would drag betas
+# into every other package. Drop it once basic-memory moves to a
+# stable fastmcp.
+dependencies = ["basic-memory", "fastmcp-slim>=4.0.0b1"]
 
 [tool.uv.sources]
 basic-memory = { git = "https://github.com/basicmachines-co/basic-memory.git", tag = "v0.23.2" }
