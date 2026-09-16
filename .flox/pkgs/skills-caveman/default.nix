@@ -169,18 +169,24 @@ stdenv.mkDerivation {
       chmod +x "$f"
     done < <(find "$PLUGIN_DIR" -type f -name '*.py')
 
-    # Rewrite the bare `node "${pluginRootRef}/..."` invocations in
+    # Rewrite the bare `node "$HOOK_ROOT/..."` invocations in
     # plugin.json (SessionStart + UserPromptSubmit hooks) to use the
     # bundled node by absolute path. Upstream assumes `node` is on the
     # caller's PATH, which it isn't under flox unless the consumer env
     # also installs nodejs — and we don't want to force that, since the
-    # whole point of bundling node here is to avoid it. The file ships
-    # the path as a JSON string with escaped quotes, so the literal
-    # bytes to match are `node \"${pluginRootRef}/`.
+    # whole point of bundling node here is to avoid it.
+    #
+    # 2.7.0 stopped interpolating ${pluginRootRef} directly into the
+    # command and now derives `HOOK_ROOT` from it first (a sed that
+    # rewrites Windows /c/ paths to c:/), then runs
+    # `node "$HOOK_ROOT/src/hooks/...js"`. Match that form and keep the
+    # normalization intact — only the interpreter is pinned. The file
+    # ships the path as a JSON string with escaped quotes, so the
+    # literal bytes to match are `node \"$HOOK_ROOT/`.
     substituteInPlace "$PLUGIN_DIR/.claude-plugin/plugin.json" \
       --replace-fail \
-      'node \"${pluginRootRef}/' \
-      '\"${pluginRootRef}/bin/node\" \"${pluginRootRef}/'
+      'node \"$HOOK_ROOT/' \
+      '\"$HOOK_ROOT/bin/node\" \"$HOOK_ROOT/'
 
     # Rewrite the caveman-compress invocation in SKILL.md so it uses
     # the bundled python3 rather than the consumer's PATH. Upstream
