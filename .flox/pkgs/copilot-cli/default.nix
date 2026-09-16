@@ -5,12 +5,12 @@
   makeWrapper,
   autoPatchelfHook,
   cacert,
-  nodejs_24,
   ripgrep,
   bash,
   glib,
   libsecret,
   versionCheckHook,
+  writableTmpDirAsHomeHook,
 }:
 
 let
@@ -47,6 +47,13 @@ stdenv.mkDerivation (finalAttrs: {
     makeWrapper
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ];
+
+  # The 1.0.85 payload is a Node single-executable app: the CLI is
+  # appended to a node runtime as a blob. `strip` drops the sections it
+  # depends on — the stripped binary died with SIGSEGV, and running it
+  # through the loader reported "object file has no dynamic section".
+  # autoPatchelfHook's RPATH rewrite is fine; only stripping is not.
+  dontStrip = true;
 
   buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     # keytar.node — credential storage via libsecret
@@ -98,15 +105,19 @@ stdenv.mkDerivation (finalAttrs: {
 
   dontBuild = true;
 
+  # 1.0.85 replaced the JS payload with a single self-contained
+  # executable: the platform package now ships only `copilot` (the node
+  # runtime is compiled in), plus package.json and the license. There is
+  # no index.js left to hand to an external node, which is why the
+  # previous wrapper failed at versionCheck with
+  # "Cannot find module '<store>/lib/copilot-cli/index.js'". Install the
+  # binary and wrap it directly.
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out/lib/${finalAttrs.pname}
-    cp -r . $out/lib/${finalAttrs.pname}
+    install -Dm755 copilot $out/lib/${finalAttrs.pname}/copilot
 
-    mkdir -p $out/bin
-    makeWrapper ${nodejs_24}/bin/node $out/bin/copilot \
-      --add-flags "$out/lib/${finalAttrs.pname}/index.js" \
+    makeWrapper $out/lib/${finalAttrs.pname}/copilot $out/bin/copilot \
       --set SSL_CERT_DIR "${cacert}/etc/ssl/certs" \
       --set-default COPILOT_AUTO_UPDATE false \
       --set-default USE_BUILTIN_RIPGREP false \
@@ -120,9 +131,20 @@ stdenv.mkDerivation (finalAttrs: {
     runHook postInstall
   '';
 
+  # The 1.0.85 binary is a Node single-executable app that unpacks its
+  # bundled payload into a cache under $HOME the first time it runs.
+  # $HOME is /var/empty in the sandbox, so the check died with
+  # "Failed to extract bundled package: EPERM ... mkdir
+  # '/var/empty/Library'" before printing a version.
   doInstallCheck = true;
-  nativeInstallCheckInputs = [ versionCheckHook ];
+  nativeInstallCheckInputs = [
+    versionCheckHook
+    writableTmpDirAsHomeHook
+  ];
   versionCheckProgramArg = "--version";
+  # versionCheckHook scrubs the environment, so HOME has to be kept
+  # explicitly or the writable one above never reaches the binary.
+  versionCheckKeepEnvironment = "HOME";
 
   meta = {
     description = "GitHub Copilot CLI - Copilot coding agent in your terminal";
