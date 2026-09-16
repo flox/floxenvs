@@ -1,6 +1,6 @@
 # flox / envs — website
 
-The Astro 5 + Tailwind v4 + Preact + Pagefind site that
+The Astro 7 + Tailwind v4 + Preact + Pagefind site that
 showcases every Flox environment and package in this repo.
 Served at <https://flox.github.io/floxenvs/>.
 
