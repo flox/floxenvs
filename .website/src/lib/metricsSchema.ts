@@ -1,6 +1,6 @@
 // .website/src/lib/metricsSchema.ts
 //
-// Uses `zod` directly (Astro 5 ships it as a transitive
+// Uses `zod` directly (Astro ships it as a transitive
 // dependency, so `import { z } from "zod"` resolves
 // without adding it to package.json). The schema is
 // reused both by the Astro content loader (server side)
