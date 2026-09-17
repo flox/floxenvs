@@ -69,12 +69,17 @@ let
     # in the SDK is Firecrawl's own API-level scrape option, not axios
     # request config.)
     #
-    # The key is version-scoped deliberately. It applies only while
-    # firecrawl-cli is pinned to firecrawl 4.24.0, so it self-expires
-    # the moment upstream bumps that pin — npm silently ignores an
-    # override whose key matches nothing — instead of quietly holding
-    # axios at 1.18.0 long after upstream has moved past it. Delete it
-    # once the pin moves; `upgrade.sh` prints a reminder when it does.
+    # The key is version-scoped deliberately, so that it cannot keep
+    # constraining axios long after upstream has moved past it. It
+    # expires rather than self-expires, though: npm matches override
+    # keys with `semver.intersects(rawSpec, keySpec)`, not equality, so
+    # a firecrawl pin that moves to an exact version outside 4.24.0 is
+    # ignored as intended, but one that moves to a *range* covering
+    # 4.24.0 (`^4.24.0`, `>=4.24.0`) still matches and then makes `npm
+    # install` fail with `EOVERRIDE ... conflicts with direct
+    # dependency`. Delete the override once the pin moves; upgrade.sh
+    # checks this before it re-locks and exits non-zero either way, so
+    # the six-hourly upgrade opens no PR until someone has.
     #
     # `npm ci` rebuilds the expected tree from package.json and rejects
     # a lockfile that disagrees with it, so the override has to be
@@ -125,12 +130,12 @@ buildNpmPackage {
   # Everything that can silently undo it ends the same way — a green
   # build shipping axios 1.15.2 again — and nothing else would catch
   # that. The version-scoped key stops matching once upstream bumps its
-  # firecrawl pin, and firecrawl 4.25.0 still pins axios 1.15.2, so the
-  # next bump is not necessarily a fix; npm's override matching has
-  # churned recently; and a refactor could drop the field from this file
-  # and upgrade.sh together, which stays self-consistent and so passes
-  # `npm ci`. In each case package.json and the lockfile agree and the
-  # build is green.
+  # firecrawl pin past the key, and firecrawl 4.25.0 still pins axios
+  # 1.15.2, so the next bump is not necessarily a fix; npm's override
+  # matching has churned recently; and a refactor could drop the field
+  # from this file and upgrade.sh together, which stays self-consistent
+  # and so passes `npm ci`. In each case package.json and the lockfile
+  # agree and the build is green.
   #
   # That matters more here than it would elsewhere: upgrade.sh runs
   # unattended every six hours, and ci.yml auto-merges the PR it opens
