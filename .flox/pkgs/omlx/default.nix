@@ -64,7 +64,27 @@ let
 
       # PyPI sdist packages that lack a build-system declaration.
       docopt = addSetuptools prev.docopt;
-      webrtcvad = addSetuptools prev.webrtcvad;
+
+      # webrtcvad is another such sdist, and additionally reads its own
+      # version through pkg_resources at import time. setuptools 82 dropped the bundled pkg_resources, so under
+      # setuptools >= 82 a bare `import webrtcvad` raises ImportError —
+      # and mlx-audio's server.py and sts/voice_pipeline.py import it
+      # unguarded at module level. That is why mlx-audio pins
+      # setuptools<81, which held this lock on a setuptools vulnerable
+      # to GHSA-h35f-9h28-mq5c. pyproject.toml overrides that pin; this
+      # swaps the one pkg_resources call for its importlib.metadata
+      # equivalent so the import keeps working.
+      webrtcvad = (addSetuptools prev.webrtcvad).overrideAttrs (old: {
+        postInstall = (old.postInstall or "") + ''
+          substituteInPlace $out/${sitePackages}/webrtcvad.py \
+            --replace-fail \
+              "import pkg_resources" \
+              "import importlib.metadata" \
+            --replace-fail \
+              "pkg_resources.get_distribution('webrtcvad').version" \
+              "importlib.metadata.version('webrtcvad')"
+        '';
+      });
 
       # The mlx wheel has core.cpython-313-darwin.so with
       # `@loader_path/lib/libmlx.dylib`, but libmlx ships in the
