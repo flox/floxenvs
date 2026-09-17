@@ -42,11 +42,21 @@ let
     # cannot move axios on its own and `upgrade.sh` has nothing to
     # bump: firecrawl-cli has published no stable release since
     # 2026-08-27. 1.15.2 carries 18 open advisories here, five of the
-    # seven highs being proxy-handling flaws, and upstream issue
-    # firecrawl/cli#172 reports the CLI failing outright behind an HTTP
-    # proxy for the same reason. 1.18.0 is what firecrawl itself ships
-    # from 4.26.0 onward, so this matches upstream's tested pairing
-    # rather than getting ahead of it.
+    # seven highs being proxy-handling flaws; upstream issue
+    # firecrawl/cli#172 also reports the CLI failing behind an HTTP
+    # proxy on this axios, which is motivating context rather than a
+    # diagnosis anyone has confirmed.
+    #
+    # 1.18.0 because it clears all 18 and is where firecrawl itself
+    # lands from 4.26.0 onward. It is not an upstream-tested pairing:
+    # upstream tested 1.18.0 against firecrawl 4.26.0, and no upstream
+    # release combines firecrawl 4.24.0 with it. What makes that safe
+    # to run is narrow rather than assumed — 4.24.0's axios calls set
+    # only `headers` and `timeout`, and never `proxy`, `httpAgent`,
+    # `httpsAgent`, `maxRedirects` or `paramsSerializer`, so none of
+    # the proxy and redirect semantics 1.18.0 changed touch anything
+    # this SDK configures. (Every `proxy` in the SDK is Firecrawl's own
+    # API-level scrape option, not axios request config.)
     #
     # The key is version-scoped deliberately. It applies only while
     # firecrawl-cli is pinned to firecrawl 4.24.0, so it self-expires
@@ -114,9 +124,12 @@ buildNpmPackage {
   # That matters more here than it would elsewhere: upgrade.sh runs
   # unattended every six hours, and ci.yml auto-merges the PR it opens
   # once this build goes green. Failing here is what stops a regression
-  # reaching main. The env's test.sh is not a substitute — it asserts
-  # only that the binary runs, and it resolves firecrawl-cli from
-  # FloxHub, so it exercises the published package rather than this one.
+  # reaching main. The env's test.sh is not a substitute: it checks
+  # that `firecrawl` is on PATH, that `firecrawl --version` exits 0,
+  # and that the skill bundle's SKILL.md files are installed — nothing
+  # axios-related, so it passes unchanged on 1.15.2. It also resolves
+  # firecrawl-cli from FloxHub, so it exercises the published package
+  # rather than this build.
   #
   # A floor rather than an equality: upstream moving past 1.18.0 is the
   # outcome this override exists to reach, and must not fail the build.
