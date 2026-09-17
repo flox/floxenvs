@@ -67,6 +67,15 @@ Emulated install checks can hang past the 1800s silence timeout. Gate
 `doCheck` on darwin. Only surfaces on PRs that edit the package (`main`
 skips unchanged builds).
 
+### uv2nix venvs: a green build proves installation, not importability
+
+`mkVirtualEnv` links wheels into a venv without importing anything, so
+a transitively broken import (`omlx`'s `webrtcvad` override guards
+against one) still builds clean. None of the eight uv2nix venv packages —
+`mergekit`, `mergekit-cuda`, `serena`, `honcho`, `skillspector`,
+`whichllm`, `basic-memory`, `omlx` — has an import check yet; add
+`doInstallCheck` per package as this regression class turns up.
+
 ## Site job / concurrency
 
 A global `concurrency: pages` group cancels the site job across many

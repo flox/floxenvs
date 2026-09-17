@@ -27,4 +27,26 @@ if ! python3 -c "import omlx" 2>/dev/null; then
 fi
 echo ">>> import omlx ... OK"
 
+# webrtcvad and the mlx-audio modules that import it unguarded at
+# module level: a nix build proves installation, not importability
+# (.github/AGENTS.md), so check the actual import here, outside the
+# sandbox, where Metal is also reachable.
+if ! python3 -c "import webrtcvad" 2>/dev/null; then
+  echo "Error: failed to 'import webrtcvad'"
+  exit 1
+fi
+echo ">>> import webrtcvad ... OK"
+
+if ! python3 -c "import mlx_audio.server" 2>/dev/null; then
+  echo "Error: failed to 'import mlx_audio.server'"
+  exit 1
+fi
+echo ">>> import mlx_audio.server ... OK"
+
+if ! python3 -c "import mlx_audio.sts.voice_pipeline" 2>/dev/null; then
+  echo "Error: failed to 'import mlx_audio.sts.voice_pipeline'"
+  exit 1
+fi
+echo ">>> import mlx_audio.sts.voice_pipeline ... OK"
+
 echo ">>> omlx environment is working"
