@@ -89,10 +89,51 @@ buildNpmPackage {
   npmPackFlags = [ "--ignore-scripts" ];
   makeCacheWritable = true;
 
-  # `firecrawl --version` is a self-contained, offline command, so the
-  # default versionCheckHook would be safe — but buildNpmPackage doesn't
-  # wire it in by default and the env's test.sh exercises the binary
-  # end-to-end, which is the right place for a runtime smoke test.
+  # Gate the build on the override having actually applied.
+  #
+  # Everything that can silently undo it ends the same way — a green
+  # build shipping axios 1.15.2 again — and nothing else would catch
+  # that. The version-scoped key stops matching once upstream bumps its
+  # firecrawl pin, and firecrawl 4.25.0 still pins axios 1.15.2, so the
+  # next bump is not necessarily a fix; npm's override matching has
+  # churned recently; and a refactor could drop the field from this file
+  # and upgrade.sh together, which stays self-consistent and so passes
+  # `npm ci`. In each case package.json and the lockfile agree and the
+  # build is green.
+  #
+  # That matters more here than it would elsewhere: upgrade.sh runs
+  # unattended every six hours, and ci.yml auto-merges the PR it opens
+  # once this build goes green. Failing here is what stops a regression
+  # reaching main. The env's test.sh is not a substitute — it asserts
+  # only that the binary runs, and it resolves firecrawl-cli from
+  # FloxHub, so it exercises the published package rather than this one.
+  #
+  # A floor rather than an equality: upstream moving past 1.18.0 is the
+  # outcome this override exists to reach, and must not fail the build.
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [ jq ];
+  installCheckPhase = ''
+    runHook preInstallCheck
+
+    axios_pkg=$(find $out -path '*/node_modules/axios/package.json' -print -quit)
+    if [ -z "$axios_pkg" ]; then
+      echo "axios is not in the installed closure, so the override" >&2
+      echo "cannot be verified. If the layout changed, update this check" >&2
+      echo "rather than dropping it." >&2
+      exit 1
+    fi
+
+    axios_version=$(jq -r .version "$axios_pkg")
+    axios_floor=1.18.0
+    if [ "$(printf '%s\n%s\n' "$axios_floor" "$axios_version" \
+            | sort -V | head -n1)" != "$axios_floor" ]; then
+      echo "axios override did not apply: got $axios_version," >&2
+      echo "need >= $axios_floor. See the override in srcWithLock." >&2
+      exit 1
+    fi
+
+    runHook postInstallCheck
+  '';
 
   meta = {
     description =
