@@ -10,6 +10,13 @@ dependencies = [
 [tool.uv]
 override-dependencies = [
   "mlx-lm @ git+https://github.com/ml-explore/mlx-lm@ed1fca4cef15a824c5f1702c80f70b4cffc8e4dd",
+  # mlx-audio's `server`/`sts` extras pin setuptools<81, which pinned
+  # this lock to 80.x — vulnerable to GHSA-h35f-9h28-mq5c, fixed in
+  # 83.0.0. Upstream's stated reason for the cap is that setuptools 82
+  # drops the bundled pkg_resources, which webrtcvad imports; the
+  # webrtcvad override in default.nix removes that import, so the cap
+  # no longer buys anything. Drop this once mlx-audio lifts it.
+  "setuptools>=83.0.0",
 ]
 
 [tool.uv.sources]

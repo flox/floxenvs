@@ -64,7 +64,33 @@ let
 
       # PyPI sdist packages that lack a build-system declaration.
       docopt = addSetuptools prev.docopt;
-      webrtcvad = addSetuptools prev.webrtcvad;
+
+      # webrtcvad is another such sdist, and additionally reads
+      # its own version through pkg_resources at import time.
+      # setuptools dropped the bundled pkg_resources at 82;
+      # mlx-audio's setuptools<81 pin catches it one release
+      # early, which held this lock on a setuptools vulnerable
+      # to GHSA-h35f-9h28-mq5c. pyproject.toml's override lifts
+      # that pin. mlx-audio's server.py and sts/voice_pipeline.py
+      # import webrtcvad unguarded at module level, so this
+      # swaps the one pkg_resources call for its
+      # importlib.metadata equivalent to keep the import working
+      # under setuptools>=82. Patched in postPatch, not
+      # postInstall, so the shipped bytecode is compiled from
+      # the patched source rather than the original. Drop
+      # alongside the pyproject.toml override once mlx-audio
+      # lifts its setuptools<81 pin.
+      webrtcvad = (addSetuptools prev.webrtcvad).overrideAttrs (old: {
+        postPatch = (old.postPatch or "") + ''
+          substituteInPlace webrtcvad.py \
+            --replace-fail \
+              "import pkg_resources" \
+              "import importlib.metadata" \
+            --replace-fail \
+              "pkg_resources.get_distribution('webrtcvad').version" \
+              "importlib.metadata.version('webrtcvad')"
+        '';
+      });
 
       # The mlx wheel has core.cpython-313-darwin.so with
       # `@loader_path/lib/libmlx.dylib`, but libmlx ships in the
@@ -108,6 +134,19 @@ venv.overrideAttrs (old: {
   passthru = (old.passthru or { }) // {
     python = python313;
   };
+
+  # A green uv2nix build proves installation, not
+  # importability (.github/AGENTS.md, "Platform-specific
+  # build gotchas"). Scoped to webrtcvad, the package the
+  # setuptools bump put at risk; mlx_audio itself needs
+  # Metal device access, which is unverified inside the nix
+  # build sandbox.
+  doInstallCheck = true;
+  installCheckPhase = ''
+    runHook preInstallCheck
+    $out/bin/python -c "import webrtcvad; webrtcvad.Vad(2)"
+    runHook postInstallCheck
+  '';
 
   meta = {
     description =
