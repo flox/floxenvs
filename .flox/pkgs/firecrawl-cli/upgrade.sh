@@ -34,7 +34,7 @@ while [ $# -gt 0 ]; do
 done
 
 current_version=$(jq -r '.version' "$HASHES_FILE")
-latest_version=$(curl -sfL "https://registry.npmjs.org/${NPM_PACKAGE}/latest" \
+latest_version=$(curl -sSfL "https://registry.npmjs.org/${NPM_PACKAGE}/latest" \
   | jq -r '.version')
 
 echo "Current: $current_version, Latest: $latest_version"
@@ -53,7 +53,10 @@ fi
 # Fetch and hash the published npm tarball
 src_url="https://registry.npmjs.org/${NPM_PACKAGE}/-/${NPM_PACKAGE}-${latest_version}.tgz"
 echo "Fetching source from $src_url ..."
-src_hash=$(nix-prefetch-url "$src_url" 2>/dev/null)
+# stderr carries `error: unable to download ...: HTTP error 404` on a bad
+# version and only the line `path is '/nix/store/...'` on success, so
+# suppressing it traded a usable message for a bare exit 1.
+src_hash=$(nix-prefetch-url "$src_url")
 src_sri=$(nix hash convert --hash-algo sha256 --to sri "$src_hash")
 echo "  sourceHash: $src_sri"
 
@@ -65,7 +68,7 @@ tmpdir=$(mktemp -d)
 trap 'rm -rf "$tmpdir"' EXIT
 
 tarball="$tmpdir/firecrawl-cli.tgz"
-curl -sfL "$src_url" -o "$tarball"
+curl -sSfL "$src_url" -o "$tarball"
 mkdir -p "$tmpdir/extract"
 tar -xzf "$tarball" -C "$tmpdir/extract" --strip-components=1
 
@@ -121,7 +124,15 @@ tar -xzf "$tarball" -C "$tmpdir/extract" --strip-components=1
     echo "      then delete the override from upgrade.sh and default.nix." >&2
   fi
 
-  npm install --package-lock-only --ignore-scripts >/dev/null 2>&1
+  # stdout is discarded (it is just the install summary), but stderr is
+  # not: `2>&1` here used to turn every failure into a bare exit code.
+  # npm reports `EOVERRIDE` on stderr when the override above conflicts
+  # with a direct dependency, and a missing npm is a silent 127 — this
+  # script only has npm inside the repo's flox env. Note that npm's
+  # audit summary ("N high severity vulnerabilities") goes to *stdout*,
+  # so it stays hidden either way; default.nix's installCheckPhase is
+  # what actually gates a regressed axios, not this output.
+  npm install --package-lock-only --ignore-scripts >/dev/null
 )
 
 cp "$tmpdir/extract/package-lock.json" "$LOCKFILE"
