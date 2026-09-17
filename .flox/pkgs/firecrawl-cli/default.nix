@@ -47,16 +47,27 @@ let
     # proxy on this axios, which is motivating context rather than a
     # diagnosis anyone has confirmed.
     #
-    # 1.18.0 because it clears all 18 and is where firecrawl itself
-    # lands from 4.26.0 onward. It is not an upstream-tested pairing:
-    # upstream tested 1.18.0 against firecrawl 4.26.0, and no upstream
-    # release combines firecrawl 4.24.0 with it. What makes that safe
-    # to run is narrow rather than assumed — 4.24.0's axios calls set
-    # only `headers` and `timeout`, and never `proxy`, `httpAgent`,
-    # `httpsAgent`, `maxRedirects` or `paramsSerializer`, so none of
-    # the proxy and redirect semantics 1.18.0 changed touch anything
-    # this SDK configures. (Every `proxy` in the SDK is Firecrawl's own
-    # API-level scrape option, not axios request config.)
+    # `^1.18.0` is a floor, not a pin. 1.18.0 is the first release
+    # clear of all 18, and is where firecrawl itself lands from 4.26.0
+    # onward; the caret then lets npm take later 1.x as they ship, so
+    # this resolves to 1.20.0 today. An exact `1.18.0` would instead
+    # have held axios there for as long as the key kept matching —
+    # upgrade.sh runs every six hours and would re-pin it on each run
+    # — so an advisory against 1.18.0 itself could never be cleared by
+    # the automation, and the exact pin contradicted the `>=` floor the
+    # installCheckPhase below asserts.
+    #
+    # It is not an upstream-tested pairing: upstream tested 1.18.0
+    # against firecrawl 4.26.0, and no upstream release combines
+    # firecrawl 4.24.0 with any of this range. What makes it safe to
+    # run is narrow rather than assumed — 4.24.0 has exactly one
+    # `axios.create`, which sets `baseURL`, `timeout`, `headers` and
+    # `transitional.clarifyTimeoutError` and never `proxy`,
+    # `httpAgent`, `httpsAgent`, `maxRedirects` or `paramsSerializer`,
+    # so none of the proxy and redirect semantics that moved across
+    # 1.16 to 1.20 touch anything this SDK configures. (Every `proxy`
+    # in the SDK is Firecrawl's own API-level scrape option, not axios
+    # request config.)
     #
     # The key is version-scoped deliberately. It applies only while
     # firecrawl-cli is pinned to firecrawl 4.24.0, so it self-expires
@@ -85,7 +96,7 @@ let
     # silently — upgrade.sh applies the same transform, so package.json
     # and the lockfile would still agree and `npm ci` would not object.
     # Our key still wins on collision, which is the intent.
-    jq '.overrides += { "firecrawl@4.24.0": { "axios": "1.18.0" } }' \
+    jq '.overrides += { "firecrawl@4.24.0": { "axios": "^1.18.0" } }' \
       $out/package.json > package.json.overridden
     rm -f $out/package.json
     mv package.json.overridden $out/package.json
@@ -131,8 +142,10 @@ buildNpmPackage {
   # firecrawl-cli from FloxHub, so it exercises the published package
   # rather than this build.
   #
-  # A floor rather than an equality: upstream moving past 1.18.0 is the
-  # outcome this override exists to reach, and must not fail the build.
+  # A floor rather than an equality, matching the `^1.18.0` override:
+  # everything at or above 1.18.0 is clear of all 18 advisories, so the
+  # caret (or upstream) moving past it is the outcome this override
+  # exists to reach and must not fail the build.
   doInstallCheck = true;
   nativeInstallCheckInputs = [ jq ];
   installCheckPhase = ''

@@ -94,16 +94,23 @@ tar -xzf "$tarball" -C "$tmpdir/extract" --strip-components=1
   # next run of this script would silently re-lock axios back to the
   # vulnerable 1.15.2.
   #
+  # `^1.18.0` is a floor, not a pin: 1.18.0 is the first release clear
+  # of all 18 advisories, and the caret lets this script pick up later
+  # 1.x as they ship. An exact `1.18.0` would have re-pinned axios
+  # there on every run — this script runs every six hours — so an
+  # advisory against 1.18.0 itself could never be cleared here, and it
+  # disagreed with the `>=` floor default.nix asserts at build time.
+  #
   # The key is version-scoped so it self-expires: npm ignores an
-  # override whose key matches nothing, so the pin below stops applying
-  # as soon as firecrawl-cli moves off firecrawl 4.24.0, rather than
-  # holding axios at 1.18.0 indefinitely.
+  # override whose key matches nothing, so the floor below stops
+  # applying as soon as firecrawl-cli moves off firecrawl 4.24.0,
+  # rather than constraining axios indefinitely.
   #
   # Merged with `+=` rather than assigned, so an `overrides` field
   # added upstream keeps its own entries instead of being clobbered
   # (jq's `null + object` yields the object, so it is a drop-in while
   # the field is absent). default.nix merges the same way.
-  jq '.overrides += { "firecrawl@4.24.0": { "axios": "1.18.0" } }' \
+  jq '.overrides += { "firecrawl@4.24.0": { "axios": "^1.18.0" } }' \
     package.json > package.json.tmp
   mv package.json.tmp package.json
 
