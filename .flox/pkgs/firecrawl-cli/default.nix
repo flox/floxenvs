@@ -65,7 +65,17 @@ let
     # same disagreement surfaces as `code ENOTCACHED`, because npm
     # falls back to re-resolving axios against a registry it cannot
     # reach. upgrade.sh injects the same field before re-locking.
-    jq '.overrides = { "firecrawl@4.24.0": { "axios": "1.18.0" } }' \
+    #
+    # Merged with `+=`, not assigned. firecrawl-cli 1.23.3 ships no
+    # `overrides` field, and jq's `null + object` yields the object, so
+    # merging is a drop-in today. It is what keeps the field safe to
+    # touch later: an upstream `overrides` block would be carrying its
+    # own security floors (mcporter's upstream uses `pnpm.overrides`
+    # for exactly that), and assigning over it would delete them
+    # silently — upgrade.sh applies the same transform, so package.json
+    # and the lockfile would still agree and `npm ci` would not object.
+    # Our key still wins on collision, which is the intent.
+    jq '.overrides += { "firecrawl@4.24.0": { "axios": "1.18.0" } }' \
       $out/package.json > package.json.overridden
     rm -f $out/package.json
     mv package.json.overridden $out/package.json

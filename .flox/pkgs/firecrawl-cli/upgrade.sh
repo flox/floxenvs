@@ -98,7 +98,12 @@ tar -xzf "$tarball" -C "$tmpdir/extract" --strip-components=1
   # override whose key matches nothing, so the pin below stops applying
   # as soon as firecrawl-cli moves off firecrawl 4.24.0, rather than
   # holding axios at 1.18.0 indefinitely.
-  jq '.overrides = { "firecrawl@4.24.0": { "axios": "1.18.0" } }' \
+  #
+  # Merged with `+=` rather than assigned, so an `overrides` field
+  # added upstream keeps its own entries instead of being clobbered
+  # (jq's `null + object` yields the object, so it is a drop-in while
+  # the field is absent). default.nix merges the same way.
+  jq '.overrides += { "firecrawl@4.24.0": { "axios": "1.18.0" } }' \
     package.json > package.json.tmp
   mv package.json.tmp package.json
 
