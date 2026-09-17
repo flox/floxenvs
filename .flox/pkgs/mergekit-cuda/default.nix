@@ -113,6 +113,45 @@ venv.overrideAttrs (old: {
     python = python313;
   };
 
+  # A green uv2nix build proves installation, not importability
+  # (.github/AGENTS.md, "uv2nix venvs: a green build proves
+  # installation, not importability"). Asserts that
+  # pyproject.toml's accelerate override survived the last
+  # re-lock: >= 1.15.0 clears GHSA-4j2p-28q2-5m79, and a `>=`
+  # comparison keeps accelerate moving further forward — the
+  # outcome the override exists to reach — from failing the build.
+  # Reading installed metadata also makes an absent accelerate a
+  # failure rather than a vacuous pass.
+  #
+  # Deliberately metadata-only: importing accelerate pulls in
+  # torch, and this variant's torch is the CUDA-bundled wheel
+  # whose unresolved libcuda.so.1 is handed to the host driver by
+  # the autoPatchelfIgnoreMissingDeps above. Whether that imports
+  # inside a GPU-less build sandbox is not something this build
+  # should stake itself on. ../mergekit runs the import half
+  # against the same accelerate version and the same mergekit tag
+  # on CPU wheels.
+  doInstallCheck = true;
+  installCheckPhase = ''
+    runHook preInstallCheck
+
+    $out/bin/python - <<'EOF'
+    import importlib.metadata
+    from packaging.version import Version
+
+    floor = Version("1.15.0")
+    found = Version(importlib.metadata.version("accelerate"))
+    if found < floor:
+        raise SystemExit(
+            f"accelerate override did not apply: got {found}, need "
+            f">= {floor} to clear GHSA-4j2p-28q2-5m79"
+        )
+    print(f"accelerate {found} >= {floor}")
+    EOF
+
+    runHook postInstallCheck
+  '';
+
   meta = {
     description = "Tools for merging pre-trained large language models, with CUDA-enabled torch.";
     homepage = "https://github.com/arcee-ai/mergekit";

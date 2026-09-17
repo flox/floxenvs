@@ -7,6 +7,33 @@ requires-python = ">=3.12"
 # [tool.uv.sources] index pin below applies to it.
 dependencies = ["mergekit", "torch"]
 
+[tool.uv]
+override-dependencies = [
+  # mergekit 0.1.4 pins `accelerate~=1.6.0`, which caps this lock
+  # at 1.6.x — inside GHSA-4j2p-28q2-5m79's `<= 1.14.0` range.
+  # GitHub never populated that advisory's `first_patched_version`,
+  # so the alert reads as unpatchable; 1.15.0 sits above the range
+  # and clears it. Because the cap lives in mergekit's own
+  # metadata, `uv lock --upgrade` cannot reach past it, which is
+  # why this has to be an override rather than a re-lock.
+  #
+  # The cap is stylistic, not a known-breakage cap. Every
+  # version-sensitive pin in mergekit 0.1.4 is `~=`, the bumps that
+  # produced it rode along in unrelated PRs, the one issue asking
+  # why (arcee-ai/mergekit#595) went unanswered, and upstream main
+  # has since relaxed it to `accelerate>=1.6.0,<2`
+  # (arcee-ai/mergekit#705) — so this override is narrower than
+  # what upstream itself now ships. mergekit's entire accelerate
+  # surface is a single call, `accelerate.init_empty_weights()` in
+  # mergekit/io/lazy_unpickle.py, whose body is unchanged from
+  # 1.6.0 to 1.15.0.
+  #
+  # A floor rather than an exact pin, so a later accelerate is
+  # still allowed to resolve; default.nix asserts the same floor at
+  # build time. Drop this once mergekit lifts its cap.
+  "accelerate>=1.15.0",
+]
+
 [[tool.uv.index]]
 name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
