@@ -2,6 +2,15 @@
 
 set -euo pipefail
 
+# Authenticate when a token is available (CI) so the GitHub API applies the
+# 5000/hr limit instead of the shared 60/hr anonymous one. Must stay
+# conditional: an empty Bearer value makes GitHub reject the request, which
+# would break local runs where GITHUB_TOKEN is unset.
+auth_header=()
+if [ -n "${GITHUB_TOKEN:-}" ]; then
+  auth_header=(-H "Authorization: Bearer $GITHUB_TOKEN")
+fi
+
 OWNER="agent-sh"
 REPO="agnix"
 
@@ -12,7 +21,7 @@ current_version=$(jq -r '.version' "$HASHES_FILE")
 
 # Get latest stable release tag from GitHub (strip leading v).
 latest_version=$(
-  curl -sfL \
+  curl -sSfL "${auth_header[@]}" \
     -H "Accept: application/vnd.github+json" \
     "https://api.github.com/repos/${OWNER}/${REPO}/releases/latest" \
   | jq -r '.tag_name' \

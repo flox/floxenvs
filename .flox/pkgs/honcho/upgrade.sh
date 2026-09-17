@@ -2,6 +2,15 @@
 
 set -euo pipefail
 
+# Authenticate when a token is available (CI) so the GitHub API applies the
+# 5000/hr limit instead of the shared 60/hr anonymous one. Must stay
+# conditional: an empty Bearer value makes GitHub reject the request, which
+# would break local runs where GITHUB_TOKEN is unset.
+auth_header=()
+if [ -n "${GITHUB_TOKEN:-}" ]; then
+  auth_header=(-H "Authorization: Bearer $GITHUB_TOKEN")
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HASHES_FILE="$SCRIPT_DIR/hashes.json"
 PYPROJECT_FILE="$SCRIPT_DIR/pyproject.toml"
@@ -10,7 +19,7 @@ current_tag=$(jq -r '.tag // empty' "$HASHES_FILE")
 
 # Honcho doesn't publish GitHub Releases — only tags. Pick the
 # highest non-prerelease tag matching vX.Y.Z.
-latest_tag=$(curl -sfL \
+latest_tag=$(curl -sSfL "${auth_header[@]}" \
   "https://api.github.com/repos/plastic-labs/honcho/tags?per_page=100" \
   | jq -r '[.[].name | select(test("^v[0-9]+\\.[0-9]+\\.[0-9]+$"))]
            | sort_by(split(".") | map(tonumber? // (sub("^v"; "") | tonumber? // 0)))

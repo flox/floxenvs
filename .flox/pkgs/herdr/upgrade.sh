@@ -2,13 +2,22 @@
 
 set -euo pipefail
 
+# Authenticate when a token is available (CI) so the GitHub API applies the
+# 5000/hr limit instead of the shared 60/hr anonymous one. Must stay
+# conditional: an empty Bearer value makes GitHub reject the request, which
+# would break local runs where GITHUB_TOKEN is unset.
+auth_header=()
+if [ -n "${GITHUB_TOKEN:-}" ]; then
+  auth_header=(-H "Authorization: Bearer $GITHUB_TOKEN")
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HASHES_FILE="$SCRIPT_DIR/hashes.json"
 
 current_version=$(jq -r '.version' "$HASHES_FILE")
 
 latest_version=$(
-  curl -sfL \
+  curl -sSfL "${auth_header[@]}" \
     -H "Accept: application/vnd.github+json" \
     "https://api.github.com/repos/ogulcancelik/herdr/releases/latest" \
   | jq -r '.tag_name' \
