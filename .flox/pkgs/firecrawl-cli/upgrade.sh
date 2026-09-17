@@ -85,6 +85,30 @@ tar -xzf "$tarball" -C "$tmpdir/extract" --strip-components=1
   jq 'del(.devDependencies)' package.json > package.json.tmp
   mv package.json.tmp package.json
 
+  # Force axios off 1.15.2, which firecrawl 4.24.0 pins exactly and
+  # firecrawl-cli in turn pins exactly — two exact pins in a row, so
+  # npm has no resolution freedom and re-locking alone changes nothing.
+  # See default.nix for the full rationale; it injects this same field
+  # into the source it builds, because `npm ci` refuses to run when
+  # package.json and package-lock.json disagree. Without this step the
+  # next run of this script would silently re-lock axios back to the
+  # vulnerable 1.15.2.
+  #
+  # The key is version-scoped so it self-expires: npm ignores an
+  # override whose key matches nothing, so the pin below stops applying
+  # as soon as firecrawl-cli moves off firecrawl 4.24.0, rather than
+  # holding axios at 1.18.0 indefinitely.
+  jq '.overrides = { "firecrawl@4.24.0": { "axios": "1.18.0" } }' \
+    package.json > package.json.tmp
+  mv package.json.tmp package.json
+
+  if [ "$(jq -r '.dependencies.firecrawl' package.json)" != "4.24.0" ]; then
+    echo "NOTE: firecrawl-cli no longer pins firecrawl 4.24.0, so the" >&2
+    echo "      axios override has self-expired and is now a no-op." >&2
+    echo "      Confirm the new firecrawl pin resolves axios >= 1.18.0," >&2
+    echo "      then delete the override from upgrade.sh and default.nix." >&2
+  fi
+
   npm install --package-lock-only --ignore-scripts >/dev/null 2>&1
 )
 

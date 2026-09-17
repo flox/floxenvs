@@ -35,6 +35,40 @@ let
     jq 'del(.devDependencies)' $out/package.json > package.json.pruned
     rm -f $out/package.json
     mv package.json.pruned $out/package.json
+
+    # Force axios off 1.15.2. Two exact pins in a row leave npm no
+    # resolution freedom — firecrawl-cli pins firecrawl 4.24.0 exactly,
+    # and firecrawl 4.24.0 pins axios 1.15.2 exactly — so the lockfile
+    # cannot move axios on its own and `upgrade.sh` has nothing to
+    # bump: firecrawl-cli has published no stable release since
+    # 2026-08-27. 1.15.2 carries 18 open advisories here, five of the
+    # seven highs being proxy-handling flaws, and upstream issue
+    # firecrawl/cli#172 reports the CLI failing outright behind an HTTP
+    # proxy for the same reason. 1.18.0 is what firecrawl itself ships
+    # from 4.26.0 onward, so this matches upstream's tested pairing
+    # rather than getting ahead of it.
+    #
+    # The key is version-scoped deliberately. It applies only while
+    # firecrawl-cli is pinned to firecrawl 4.24.0, so it self-expires
+    # the moment upstream bumps that pin — npm silently ignores an
+    # override whose key matches nothing — instead of quietly holding
+    # axios at 1.18.0 long after upstream has moved past it. Delete it
+    # once the pin moves; `upgrade.sh` prints a reminder when it does.
+    #
+    # `npm ci` rebuilds the expected tree from package.json and rejects
+    # a lockfile that disagrees with it, so the override has to be
+    # injected into the source as well as applied to the lockfile —
+    # editing package-lock.json alone is not enough. Without this,
+    # `npm ci` computes axios@1.15.2 from firecrawl's pin, does not
+    # find it in the lockfile, and reports `code EUSAGE / Missing:
+    # axios@1.15.2 from lock file`; inside the sealed build sandbox the
+    # same disagreement surfaces as `code ENOTCACHED`, because npm
+    # falls back to re-resolving axios against a registry it cannot
+    # reach. upgrade.sh injects the same field before re-locking.
+    jq '.overrides = { "firecrawl@4.24.0": { "axios": "1.18.0" } }' \
+      $out/package.json > package.json.overridden
+    rm -f $out/package.json
+    mv package.json.overridden $out/package.json
   '';
 in
 buildNpmPackage {
