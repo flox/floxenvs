@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
+# Authenticate when a token is available (CI) so the GitHub API applies the
+# 5000/hr limit instead of the shared 60/hr anonymous one. Must stay
+# conditional: an empty Bearer value makes GitHub reject the request, which
+# would break local runs where GITHUB_TOKEN is unset.
+auth_header=()
+if [ -n "${GITHUB_TOKEN:-}" ]; then
+  auth_header=(-H "Authorization: Bearer $GITHUB_TOKEN")
+fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HASHES_FILE="$SCRIPT_DIR/hashes.json"
 OWNER="anthropics"
@@ -9,7 +18,7 @@ current_version=$(jq -r '.version // ""' "$HASHES_FILE")
 rev=$(git ls-remote "https://github.com/$OWNER/$REPO.git" "refs/heads/$BRANCH" | awk '{print $1}')
 if [ -z "$rev" ]; then echo "Failed to resolve $BRANCH on $OWNER/$REPO" >&2; exit 1; fi
 short_sha="${rev:0:7}"
-commit_json=$(curl -sfL -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$OWNER/$REPO/commits/$rev")
+commit_json=$(curl -sSfL "${auth_header[@]}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$OWNER/$REPO/commits/$rev")
 commit_date=$(echo "$commit_json" | jq -r '.commit.committer.date' | cut -c1-10)
 new_version="unstable-${commit_date}.${short_sha}"
 echo "Current: $current_version"

@@ -2,6 +2,15 @@
 
 set -euo pipefail
 
+# Authenticate when a token is available (CI) so the GitHub API applies the
+# 5000/hr limit instead of the shared 60/hr anonymous one. Must stay
+# conditional: an empty Bearer value makes GitHub reject the request, which
+# would break local runs where GITHUB_TOKEN is unset.
+auth_header=()
+if [ -n "${GITHUB_TOKEN:-}" ]; then
+  auth_header=(-H "Authorization: Bearer $GITHUB_TOKEN")
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HASHES_FILE="$SCRIPT_DIR/hashes.json"
 
@@ -14,10 +23,10 @@ current_commit=$(jq -r '.commit' "$HASHES_FILE")
 # but does not maintain a single "skills bundle" tag, so HEAD of `main`
 # is the canonical source — exactly like remotion-dev/skills. Pin to
 # the committer date so the floxhub version field stays monotonic.
-latest_commit=$(curl -sf \
+latest_commit=$(curl -sSf "${auth_header[@]}" \
   "https://api.github.com/repos/$OWNER/$REPO/commits/main" \
   | jq -r '.sha')
-latest_date=$(curl -sf \
+latest_date=$(curl -sSf "${auth_header[@]}" \
   "https://api.github.com/repos/$OWNER/$REPO/commits/$latest_commit" \
   | jq -r '.commit.committer.date')
 latest_version=$(echo "$latest_date" | cut -dT -f1 | tr - .)
