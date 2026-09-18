@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# Python + Poetry\n\nPoetry commands:\n\n```text\npoetry add <package>\npoetry install\npoetry show\n```\n",
     "install": {
       "gum": {
         "pkg-path": "gum",
@@ -19,7 +20,7 @@
       "PYTHON_AUTO_INSTALL": "true"
     },
     "hook": {
-      "on-activate": "export POETRY_CACHE=\"$FLOX_ENV_CACHE/python-poetry\"\nexport POETRY_VIRTUALENVS_PATH=\"$POETRY_CACHE/venvs\"\n\nmkdir -p \"$POETRY_CACHE\"\n\nunset VIRTUAL_ENV\n\nif [ -f pyproject.toml ]; then\n  POETRY_VENV=\"$(poetry env info --path 2>/dev/null || echo \"\")\"\n\n  if [ -z \"$POETRY_VENV\" ]; then\n    poetry env use python3\n    POETRY_VENV=\"$(poetry env info --path)\"\n  fi\n\n  source \"$POETRY_VENV/bin/activate\"\n\n  if [ \"$PYTHON_AUTO_INSTALL\" = \"true\" ] \\\n      && [ -f poetry.lock ]; then\n    HASH=$(md5sum poetry.lock 2>/dev/null \\\n      || md5 -q poetry.lock)\n    HASH=$(echo \"$HASH\" | cut -d\" \" -f1)\n    LAST=$(cat \"$POETRY_CACHE/.deps_hash\" 2>/dev/null)\n    if [ \"$HASH\" != \"$LAST\" ]; then\n      poetry install --no-interaction\n      echo \"$HASH\" > \"$POETRY_CACHE/.deps_hash\"\n    fi\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Python + Poetry environment ready!' '' \\\n    'Python version:' \\\n    \"  $(python3 --version 2>&1)\" '' \\\n    'Poetry commands:' \\\n    '  poetry add <package>' \\\n    '  poetry install' \\\n    '  poetry show'\nfi\n"
+      "on-activate": "export POETRY_CACHE=\"$FLOX_ENV_CACHE/python-poetry\"\nexport POETRY_VIRTUALENVS_PATH=\"$POETRY_CACHE/venvs\"\n\nmkdir -p \"$POETRY_CACHE\"\n\nunset VIRTUAL_ENV\n\nif [ -f pyproject.toml ]; then\n  POETRY_VENV=\"$(poetry env info --path 2>/dev/null || echo \"\")\"\n\n  if [ -z \"$POETRY_VENV\" ]; then\n    poetry env use python3\n    POETRY_VENV=\"$(poetry env info --path)\"\n  fi\n\n  source \"$POETRY_VENV/bin/activate\"\n\n  if [ \"$PYTHON_AUTO_INSTALL\" = \"true\" ] \\\n      && [ -f poetry.lock ]; then\n    HASH=$(md5sum poetry.lock 2>/dev/null \\\n      || md5 -q poetry.lock)\n    HASH=$(echo \"$HASH\" | cut -d\" \" -f1)\n    LAST=$(cat \"$POETRY_CACHE/.deps_hash\" 2>/dev/null)\n    if [ \"$HASH\" != \"$LAST\" ]; then\n      poetry install --no-interaction\n      echo \"$HASH\" > \"$POETRY_CACHE/.deps_hash\"\n    fi\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Python + Poetry environment ready!' '' \\\n    'Python version:' \\\n    \"  $(python3 --version 2>&1)\"\nfi\n"
     },
     "profile": {
       "bash": "if [ -f pyproject.toml ]; then\n  POETRY_VENV=\"$(poetry env info --path 2>/dev/null)\"\n  if [ -n \"$POETRY_VENV\" ]; then\n    source \"$POETRY_VENV/bin/activate\"\n  fi\nfi\n",
@@ -310,7 +311,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
+      "schema-version": "1.17.0",
+      "description": "# Python + Poetry\n\nPoetry commands:\n\n```text\npoetry add <package>\npoetry install\npoetry show\n```\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -318,7 +320,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Python + Poetry environment ready!' '' \\\n    'Python version:' \\\n    \"  $(python3 --version 2>&1)\" '' \\\n    'Poetry commands:' \\\n    '  poetry add <package>' \\\n    '  poetry install' \\\n    '  poetry show'\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Python + Poetry environment ready!' '' \\\n    'Python version:' \\\n    \"  $(python3 --version 2>&1)\"\nfi\n"
       },
       "options": {
         "systems": [

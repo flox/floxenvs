@@ -1,4 +1,24 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# Go development environment
+
+Included tools:
+
+```text
+go        - compiler and tools
+gopls     - language server
+gotools   - standard tools (goimports, etc.)
+go-task   - task runner
+gore      - REPL
+```
+
+Try the sample app:
+
+```text
+go build && ./hello
+```
+'''
 
 [include]
 environments = [
@@ -21,25 +41,6 @@ gotests.pkg-path = "gotests"
 gotests.pkg-group = "go-tools"
 gore.pkg-path = "gore"
 gore.pkg-group = "go-tools"
-gum.pkg-path = "gum"
-gum.pkg-group = "demo-tools"
-
-[hook]
-on-activate = '''
-if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
-  gum style --border double --margin '1 2' \
-    --padding '1 4' \
-    'Go development environment' '' \
-    'Included tools:' \
-    '  go        - compiler and tools' \
-    '  gopls     - language server' \
-    '  gotools   - standard tools (goimports, etc.)' \
-    '  go-task   - task runner' \
-    '  gore      - REPL' '' \
-    'Try the sample app:' \
-    '  go build && ./hello'
-fi
-'''
 
 [options]
 systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]

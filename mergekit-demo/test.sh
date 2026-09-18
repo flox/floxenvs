@@ -10,12 +10,8 @@ command_exists() {
   echo ">>> '$1' command exists"
 }
 
-# Required commands (composed from mergekit + demo-tools)
 command_exists mergekit-yaml
 command_exists mergekit-moe
-command_exists gum
-
-echo ">>> gum version: $(gum --version)"
 
 # Example merge config exists and parses as a valid config. The
 # hook writes it to $FLOX_ENV_PROJECT (the env dir).

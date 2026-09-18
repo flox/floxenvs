@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# Colima\n\nStart Colima in the background:\n\n```text\nflox services start\nflox activate --start-services\n```\n\nOnce running, try:\n\n```text\ndocker run hello-world\ndocker-compose up\n```\n\nContainer management TUIs:\n\n```text\nlazydocker    — full container/image/volume dashboard\noxker         — lightweight container viewer\nctop          — top-like container metrics\ndive <image>  — explore image layers\n```\n",
     "install": {
       "colima": {
         "pkg-path": "colima"
@@ -21,10 +22,6 @@
         "pkg-path": "docker-compose",
         "pkg-group": "demo-tools"
       },
-      "gum": {
-        "pkg-path": "gum",
-        "pkg-group": "demo-tools"
-      },
       "lazydocker": {
         "pkg-path": "lazydocker",
         "pkg-group": "demo-tools"
@@ -33,9 +30,6 @@
         "pkg-path": "oxker",
         "pkg-group": "demo-tools"
       }
-    },
-    "hook": {
-      "on-activate": "\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'Start Colima in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Once running, try:' \\\n    '  docker run hello-world' \\\n    '  docker-compose up' '' \\\n    'Container management TUIs:' \\\n    '  lazydocker    — full container/image/volume dashboard' \\\n    '  oxker         — lightweight container viewer' \\\n    '  ctop          — top-like container metrics' \\\n    '  dive <image>  — explore image layers'\nfi\n\n"
     },
     "options": {
       "systems": [
@@ -316,99 +310,6 @@
       ],
       "outputs": {
         "out": "/nix/store/q2d8xphgqlvvdzlnb3pciryjxljq6c09-docker-compose-5.0.2"
-      },
-      "system": "x86_64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/0q3saf0py9fifyx6h6jwzjvg7y707x8a-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=62dc67aa6a52b4364dd75994ec00b51fbf474e50",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "62dc67aa6a52b4364dd75994ec00b51fbf474e50",
-      "rev_count": 961274,
-      "rev_date": "2026-03-10T06:05:22Z",
-      "scrape_date": "2026-03-13T04:41:53.517602Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out",
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/x5ngj85sp5paq6la0g60qrx7p6z6h9iz-gum-0.17.0"
-      },
-      "system": "aarch64-darwin",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/nrc9wm1wydfjsch8hxbwqs78fw5r0640-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=62dc67aa6a52b4364dd75994ec00b51fbf474e50",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "62dc67aa6a52b4364dd75994ec00b51fbf474e50",
-      "rev_count": 961274,
-      "rev_date": "2026-03-10T06:05:22Z",
-      "scrape_date": "2026-03-13T05:13:52.623112Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out",
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/8492ypc20ys8kghyq4c9n8bfip85rg0n-gum-0.17.0"
-      },
-      "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/6zn2267d9ynz2jnbvfcz035sfbpql4r1-gum-0.17.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=62dc67aa6a52b4364dd75994ec00b51fbf474e50",
-      "name": "gum-0.17.0",
-      "pname": "gum",
-      "rev": "62dc67aa6a52b4364dd75994ec00b51fbf474e50",
-      "rev_count": 961274,
-      "rev_date": "2026-03-10T06:05:22Z",
-      "scrape_date": "2026-03-13T06:20:18.447201Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.17.0",
-      "outputs_to_install": [
-        "out",
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/x5bn6qhx5qr16w5nz0mh5bh9ww4530h8-gum-0.17.0"
       },
       "system": "x86_64-linux",
       "group": "demo-tools",
@@ -771,7 +672,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
+      "schema-version": "1.17.0",
+      "description": "# Colima\n\nStart Colima in the background:\n\n```text\nflox services start\nflox activate --start-services\n```\n\nOnce running, try:\n\n```text\ndocker run hello-world\ndocker-compose up\n```\n\nContainer management TUIs:\n\n```text\nlazydocker    — full container/image/volume dashboard\noxker         — lightweight container viewer\nctop          — top-like container metrics\ndive <image>  — explore image layers\n```\n",
       "install": {
         "ctop": {
           "pkg-path": "ctop",
@@ -785,10 +687,6 @@
           "pkg-path": "docker-compose",
           "pkg-group": "demo-tools"
         },
-        "gum": {
-          "pkg-path": "gum",
-          "pkg-group": "demo-tools"
-        },
         "lazydocker": {
           "pkg-path": "lazydocker",
           "pkg-group": "demo-tools"
@@ -797,9 +695,6 @@
           "pkg-path": "oxker",
           "pkg-group": "demo-tools"
         }
-      },
-      "hook": {
-        "on-activate": "\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'Start Colima in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Once running, try:' \\\n    '  docker run hello-world' \\\n    '  docker-compose up' '' \\\n    'Container management TUIs:' \\\n    '  lazydocker    — full container/image/volume dashboard' \\\n    '  oxker         — lightweight container viewer' \\\n    '  ctop          — top-like container metrics' \\\n    '  dive <image>  — explore image layers'\nfi\n\n"
       },
       "options": {
         "systems": [

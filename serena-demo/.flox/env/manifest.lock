@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.11.0",
+    "schema-version": "1.17.0",
+    "description": "# Serena demo — IDE-grade MCP toolkit for coding agents\n\nRun the CLI:\n\n```text\nserena --help\n```\n\nStart the MCP server inside the sample project:\n\n```text\ncd sample-project\nflox services start serena-mcp\n```\n",
     "install": {
       "gum": {
         "pkg-path": "gum",
@@ -22,7 +23,7 @@
       "SERENA_TRANSPORT": "sse"
     },
     "hook": {
-      "on-activate": "dir=\"$FLOX_ENV_CACHE/serena\"\nexport SERENA_DATA_DIR=\"$dir\"\nmkdir -p \"$dir\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Serena demo — IDE-grade MCP toolkit for coding agents' '' \\\n    'Run the CLI:' \\\n    '  serena --help' '' \\\n    'Start the MCP server inside the sample project:' \\\n    '  cd sample-project' \\\n    '  flox services start serena-mcp' '' \\\n    \"MCP endpoint: http://${SERENA_MCP_HOST}:${SERENA_MCP_PORT}/sse\" '' \\\n    'Then point Claude Desktop / Cursor / Codex at that URL.'\nfi\n"
+      "on-activate": "dir=\"$FLOX_ENV_CACHE/serena\"\nexport SERENA_DATA_DIR=\"$dir\"\nmkdir -p \"$dir\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    \"MCP endpoint: http://${SERENA_MCP_HOST}:${SERENA_MCP_PORT}/sse\" \\\n    '' \\\n    'Then point Claude Desktop / Cursor / Codex at that URL.'\nfi\n"
     },
     "options": {
       "systems": [
@@ -311,7 +312,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.11.0",
+      "schema-version": "1.17.0",
+      "description": "# Serena demo — IDE-grade MCP toolkit for coding agents\n\nRun the CLI:\n\n```text\nserena --help\n```\n\nStart the MCP server inside the sample project:\n\n```text\ncd sample-project\nflox services start serena-mcp\n```\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -319,7 +321,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Serena demo — IDE-grade MCP toolkit for coding agents' '' \\\n    'Run the CLI:' \\\n    '  serena --help' '' \\\n    'Start the MCP server inside the sample project:' \\\n    '  cd sample-project' \\\n    '  flox services start serena-mcp' '' \\\n    \"MCP endpoint: http://${SERENA_MCP_HOST}:${SERENA_MCP_PORT}/sse\" '' \\\n    'Then point Claude Desktop / Cursor / Codex at that URL.'\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    \"MCP endpoint: http://${SERENA_MCP_HOST}:${SERENA_MCP_PORT}/sse\" \\\n    '' \\\n    'Then point Claude Desktop / Cursor / Codex at that URL.'\nfi\n"
       },
       "options": {
         "systems": [

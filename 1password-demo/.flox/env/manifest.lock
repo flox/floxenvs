@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# 1Password CLI\n\nUsage:\n\n```text\nop vault list          List vaults\nop item list           List items\nop item get <name>     Get an item\n```\n\nFetch secrets in your hook:\n\n```text\nexport API_KEY=$(op item get \"MyService\" \\\n  --field \"credential\")\n```\n",
     "install": {
       "gum": {
         "pkg-path": "gum",
@@ -13,7 +14,7 @@
       }
     },
     "hook": {
-      "on-activate": "# Cache 1Password session token so repeated\n# activations don't prompt for auth.\nexport OP_CACHE=\"$FLOX_ENV_CACHE/1password\"\nmkdir -p \"$OP_CACHE\"\n\nif ! op vault list >/dev/null 2>&1; then\n  SESSION_FILE=\"$OP_CACHE/session\"\n  OP_TOKEN=\"\"\n  if [ -f \"$SESSION_FILE\" ]; then\n    OP_TOKEN=$(cat \"$SESSION_FILE\")\n  fi\n  if [ -z \"$OP_TOKEN\" ] \\\n      || ! op whoami --session \"$OP_TOKEN\" \\\n           >/dev/null 2>&1; then\n    OP_TOKEN=$(op signin --raw 2>&1) || true\n    if op whoami --session \"$OP_TOKEN\" \\\n         >/dev/null 2>&1; then\n      echo \"$OP_TOKEN\" > \"$SESSION_FILE\"\n      chmod 600 \"$SESSION_FILE\"\n    fi\n  fi\n  if [ -n \"$OP_TOKEN\" ]; then\n    export OP_SESSION_TOKEN=\"$OP_TOKEN\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    '1Password CLI environment ready!' '' \\\n    'op version:' \\\n    \"  $(op --version)\" '' \\\n    'Usage:' \\\n    '  op vault list          List vaults' \\\n    '  op item list           List items' \\\n    '  op item get <name>     Get an item' \\\n    '' \\\n    'Fetch secrets in your hook:' \\\n    '  export API_KEY=$(op item get \"MyService\" \\' \\\n    '    --field \"credential\")'\nfi\n"
+      "on-activate": "# Cache 1Password session token so repeated\n# activations don't prompt for auth.\nexport OP_CACHE=\"$FLOX_ENV_CACHE/1password\"\nmkdir -p \"$OP_CACHE\"\n\nif ! op vault list >/dev/null 2>&1; then\n  SESSION_FILE=\"$OP_CACHE/session\"\n  OP_TOKEN=\"\"\n  if [ -f \"$SESSION_FILE\" ]; then\n    OP_TOKEN=$(cat \"$SESSION_FILE\")\n  fi\n  if [ -z \"$OP_TOKEN\" ] \\\n      || ! op whoami --session \"$OP_TOKEN\" \\\n           >/dev/null 2>&1; then\n    OP_TOKEN=$(op signin --raw 2>&1) || true\n    if op whoami --session \"$OP_TOKEN\" \\\n         >/dev/null 2>&1; then\n      echo \"$OP_TOKEN\" > \"$SESSION_FILE\"\n      chmod 600 \"$SESSION_FILE\"\n    fi\n  fi\n  if [ -n \"$OP_TOKEN\" ]; then\n    export OP_SESSION_TOKEN=\"$OP_TOKEN\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    '1Password CLI environment ready!' '' \\\n    'op version:' \\\n    \"  $(op --version)\"\nfi\n"
     },
     "profile": {
       "common": "if [ -n \"${OP_SESSION_TOKEN:-}\" ]; then\n  alias op=\"op --session $OP_SESSION_TOKEN\"\nfi\n"
@@ -215,7 +216,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
+      "schema-version": "1.17.0",
+      "description": "# 1Password CLI\n\nUsage:\n\n```text\nop vault list          List vaults\nop item list           List items\nop item get <name>     Get an item\n```\n\nFetch secrets in your hook:\n\n```text\nexport API_KEY=$(op item get \"MyService\" \\\n  --field \"credential\")\n```\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -223,7 +225,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    '1Password CLI environment ready!' '' \\\n    'op version:' \\\n    \"  $(op --version)\" '' \\\n    'Usage:' \\\n    '  op vault list          List vaults' \\\n    '  op item list           List items' \\\n    '  op item get <name>     Get an item' \\\n    '' \\\n    'Fetch secrets in your hook:' \\\n    '  export API_KEY=$(op item get \"MyService\" \\' \\\n    '    --field \"credential\")'\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    '1Password CLI environment ready!' '' \\\n    'op version:' \\\n    \"  $(op --version)\"\nfi\n"
       },
       "options": {
         "systems": [

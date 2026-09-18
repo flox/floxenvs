@@ -1,4 +1,16 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# Python + Poetry
+
+Poetry commands:
+
+```text
+poetry add <package>
+poetry install
+poetry show
+```
+'''
 
 [include]
 environments = [
@@ -18,11 +30,7 @@ if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
     --padding '1 4' \
     'Python + Poetry environment ready!' '' \
     'Python version:' \
-    "  $(python3 --version 2>&1)" '' \
-    'Poetry commands:' \
-    '  poetry add <package>' \
-    '  poetry install' \
-    '  poetry show'
+    "  $(python3 --version 2>&1)"
 fi
 '''
 

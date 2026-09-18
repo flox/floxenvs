@@ -1,4 +1,15 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# Cassandra
+
+Start Cassandra in the background:
+
+```text
+flox services start
+flox activate --start-services
+```
+'''
 
 [include]
 environments = [
@@ -16,11 +27,9 @@ on-activate = '''
 if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
   gum style --border double --margin '1 2' \
     --padding '1 4' \
-    'Start Cassandra in the background:' \
-    '  flox services start' \
-    '  flox activate --start-services' '' \
     'Connect to Cassandra:' \
-    "  cqlsh $CASSANDRA_HOST $CASSANDRA_PORT" '' \
+    "  cqlsh $CASSANDRA_HOST $CASSANDRA_PORT" \
+    '' \
     'Connection information:' \
     "  host=$CASSANDRA_HOST" \
     "  port=$CASSANDRA_PORT" \

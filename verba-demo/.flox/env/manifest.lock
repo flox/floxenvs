@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# Verba\n\nStart Verba services in the background:\n\n```text\nflox services start\nflox activate --start-services\n```\n\nServices:\n\n```text\nweaviate  http://localhost:8080\nollama    http://localhost:11434\nverba     http://localhost:8000\n```\n",
     "install": {
       "bash": {
         "pkg-path": "bash",
@@ -62,7 +63,7 @@
       "WEAVIATE_URL_VERBA_full": "http://localhost:8080"
     },
     "hook": {
-      "on-activate": "export PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nif [ ! -d \"$PYTHON_DIR\" ]; then\n  python -m venv \"$PYTHON_DIR\"\nfi\n\n(\n  source \"$PYTHON_DIR/bin/activate\"\n  pip install -q \"$VERBA_INSTALL_PACKAGE\"\n)\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Verba services in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Services:' \\\n    '  weaviate  http://localhost:8080' \\\n    '  ollama    http://localhost:11434' \\\n    '  verba     http://localhost:8000' '' \\\n    'Ollama models:' \\\n    \"  chat   = $OLLAMA_MODEL\" \\\n    \"  embed  = $OLLAMA_EMBED_MODEL\"\nfi\n"
+      "on-activate": "export PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nif [ ! -d \"$PYTHON_DIR\" ]; then\n  python -m venv \"$PYTHON_DIR\"\nfi\n\n(\n  source \"$PYTHON_DIR/bin/activate\"\n  pip install -q \"$VERBA_INSTALL_PACKAGE\"\n)\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Ollama models:' \\\n    \"  chat   = $OLLAMA_MODEL\" \\\n    \"  embed  = $OLLAMA_EMBED_MODEL\"\nfi\n"
     },
     "profile": {
       "common": "source \"$PYTHON_DIR/bin/activate\"\n"
@@ -1045,7 +1046,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
+      "schema-version": "1.17.0",
+      "description": "# Verba\n\nStart Verba services in the background:\n\n```text\nflox services start\nflox activate --start-services\n```\n\nServices:\n\n```text\nweaviate  http://localhost:8080\nollama    http://localhost:11434\nverba     http://localhost:8000\n```\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -1053,7 +1055,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Verba services in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Services:' \\\n    '  weaviate  http://localhost:8080' \\\n    '  ollama    http://localhost:11434' \\\n    '  verba     http://localhost:8000' '' \\\n    'Ollama models:' \\\n    \"  chat   = $OLLAMA_MODEL\" \\\n    \"  embed  = $OLLAMA_EMBED_MODEL\"\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Ollama models:' \\\n    \"  chat   = $OLLAMA_MODEL\" \\\n    \"  embed  = $OLLAMA_EMBED_MODEL\"\nfi\n"
       },
       "options": {
         "systems": [

@@ -27,7 +27,6 @@ either a peer chat answer (if a key was set) or a clean skip.
 | Source env       | What it adds                                  |
 | ---------------- | --------------------------------------------- |
 | `../honcho`      | server, deriver, SDK, postgres+pgvector, redis |
-| `demo-tools`     | `gum` for the banner                          |
 | (this env)       | `quickstart.py` sample script                 |
 
 ## What quickstart.py does

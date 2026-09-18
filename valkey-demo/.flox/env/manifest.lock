@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# Valkey\n\nStart Valkey in the background:\n\n```text\nflox services start\nflox activate --start-services\n```\n",
     "install": {
       "gum": {
         "pkg-path": "gum",
@@ -17,7 +18,7 @@
       "VALKEY_PORT": "16380"
     },
     "hook": {
-      "on-activate": "export VALKEY_DATA=\"$FLOX_ENV_CACHE/valkey\"\n\nif [ ! -d \"$VALKEY_DATA\" ]; then\n  mkdir -p \"$VALKEY_DATA\"\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Valkey in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to Valkey:' \\\n    \"  valkey-cli -h $VALKEY_HOST -p $VALKEY_PORT\" '' \\\n    'Connection information:' \\\n    \"  host=$VALKEY_HOST\" \\\n    \"  port=$VALKEY_PORT\"\nfi\n"
+      "on-activate": "export VALKEY_DATA=\"$FLOX_ENV_CACHE/valkey\"\n\nif [ ! -d \"$VALKEY_DATA\" ]; then\n  mkdir -p \"$VALKEY_DATA\"\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Connect to Valkey:' \\\n    \"  valkey-cli -h $VALKEY_HOST -p $VALKEY_PORT\" \\\n    '' \\\n    'Connection information:' \\\n    \"  host=$VALKEY_HOST\" \\\n    \"  port=$VALKEY_PORT\"\nfi\n"
     },
     "options": {
       "systems": [
@@ -210,7 +211,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
+      "schema-version": "1.17.0",
+      "description": "# Valkey\n\nStart Valkey in the background:\n\n```text\nflox services start\nflox activate --start-services\n```\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -218,7 +220,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Valkey in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to Valkey:' \\\n    \"  valkey-cli -h $VALKEY_HOST -p $VALKEY_PORT\" '' \\\n    'Connection information:' \\\n    \"  host=$VALKEY_HOST\" \\\n    \"  port=$VALKEY_PORT\"\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Connect to Valkey:' \\\n    \"  valkey-cli -h $VALKEY_HOST -p $VALKEY_PORT\" \\\n    '' \\\n    'Connection information:' \\\n    \"  host=$VALKEY_HOST\" \\\n    \"  port=$VALKEY_PORT\"\nfi\n"
       },
       "options": {
         "systems": [

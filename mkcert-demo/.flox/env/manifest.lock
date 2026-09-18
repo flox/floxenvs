@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# mkcert\n",
     "install": {
       "gum": {
         "pkg-path": "gum",
@@ -20,7 +21,7 @@
       "MKCERT_DOMAINS": "example.com localhost 127.0.0.1 ::1"
     },
     "hook": {
-      "on-activate": "export CAROOT=\"$FLOX_ENV_CACHE/mkcert\"\nexport NODE_EXTRA_CA_CERTS=\"$CAROOT/rootCA.pem\"\nmkdir -p \"$CAROOT\"\n\n# Create local CA if it doesn't exist\nif [ ! -f \"$CAROOT/rootCA.pem\" ]; then\n  mkcert -install\nfi\n\n# Generate domain certificates if domains changed\nDOMAINS_HASH=\"$CAROOT/domains\"\nif [ ! -f \"$DOMAINS_HASH\" ] \\\n    || [ \"$(cat \"$DOMAINS_HASH\")\" \\\n         != \"$MKCERT_DOMAINS\" ]; then\n  echo \"$MKCERT_DOMAINS\" > \"$DOMAINS_HASH\"\n  pushd \"$CAROOT\" >/dev/null\n  mkcert \\\n    -cert-file=domains.pem \\\n    -key-file=domains-key.pem \\\n    -p12-file=domains.p12 \\\n    $(echo $MKCERT_DOMAINS)\n  popd >/dev/null\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'mkcert environment ready!' '' \\\n    'Domains:' \\\n    \"  $MKCERT_DOMAINS\" '' \\\n    'Certificate files:' \\\n    \"  $CAROOT/domains.pem\" \\\n    \"  $CAROOT/domains-key.pem\" '' \\\n    'Node.js CA:' \\\n    \"  NODE_EXTRA_CA_CERTS=$NODE_EXTRA_CA_CERTS\"\nfi\n"
+      "on-activate": "export CAROOT=\"$FLOX_ENV_CACHE/mkcert\"\nexport NODE_EXTRA_CA_CERTS=\"$CAROOT/rootCA.pem\"\nmkdir -p \"$CAROOT\"\n\n# Create local CA if it doesn't exist\nif [ ! -f \"$CAROOT/rootCA.pem\" ]; then\n  mkcert -install\nfi\n\n# Generate domain certificates if domains changed\nDOMAINS_HASH=\"$CAROOT/domains\"\nif [ ! -f \"$DOMAINS_HASH\" ] \\\n    || [ \"$(cat \"$DOMAINS_HASH\")\" \\\n         != \"$MKCERT_DOMAINS\" ]; then\n  echo \"$MKCERT_DOMAINS\" > \"$DOMAINS_HASH\"\n  pushd \"$CAROOT\" >/dev/null\n  mkcert \\\n    -cert-file=domains.pem \\\n    -key-file=domains-key.pem \\\n    -p12-file=domains.p12 \\\n    $(echo $MKCERT_DOMAINS)\n  popd >/dev/null\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'mkcert environment ready!' '' \\\n    'Domains:' \\\n    \"  $MKCERT_DOMAINS\" \\\n    '' \\\n    'Certificate files:' \\\n    \"  $CAROOT/domains.pem\" \\\n    \"  $CAROOT/domains-key.pem\" \\\n    '' \\\n    'Node.js CA:' \\\n    \"  NODE_EXTRA_CA_CERTS=$NODE_EXTRA_CA_CERTS\"\nfi\n"
     },
     "options": {
       "systems": [
@@ -311,7 +312,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
+      "schema-version": "1.17.0",
+      "description": "# mkcert\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -319,7 +321,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'mkcert environment ready!' '' \\\n    'Domains:' \\\n    \"  $MKCERT_DOMAINS\" '' \\\n    'Certificate files:' \\\n    \"  $CAROOT/domains.pem\" \\\n    \"  $CAROOT/domains-key.pem\" '' \\\n    'Node.js CA:' \\\n    \"  NODE_EXTRA_CA_CERTS=$NODE_EXTRA_CA_CERTS\"\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'mkcert environment ready!' '' \\\n    'Domains:' \\\n    \"  $MKCERT_DOMAINS\" \\\n    '' \\\n    'Certificate files:' \\\n    \"  $CAROOT/domains.pem\" \\\n    \"  $CAROOT/domains-key.pem\" \\\n    '' \\\n    'Node.js CA:' \\\n    \"  NODE_EXTRA_CA_CERTS=$NODE_EXTRA_CA_CERTS\"\nfi\n"
       },
       "options": {
         "systems": [

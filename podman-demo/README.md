@@ -20,11 +20,11 @@ Everything from the base `podman` environment, plus:
 
 ## Behaviour
 
-### Welcome banner
+### Activation output
 
-On activation a styled banner is printed showing the
-podman version and available commands. The banner is
-suppressed when `FLOX_ENVS_TESTING=1`.
+The environment description lists available commands.
+On activation a styled box shows the Podman version;
+that hook output is suppressed when `FLOX_ENVS_TESTING=1`.
 
 ### macOS VM stop on exit
 

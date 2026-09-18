@@ -16,8 +16,8 @@ playwright install chromium
 playwright test
 ```
 
-The activation banner prints the commands above plus
-links to the MCP service and `playwright-cli`.
+The environment description lists the commands above and
+`playwright-cli` usage. The hook prints the MCP service URL.
 
 ## What's inside
 

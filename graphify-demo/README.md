@@ -4,8 +4,7 @@
 [![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fgraphify-demo%2Fdevcontainer.json)
 
 Full [graphify](https://github.com/safishamsi/graphify)
-demo environment with a styled terminal banner showing
-the common commands.
+demo environment with common commands in its description.
 
 For a minimal environment to include in your own
 project, see [graphify](../graphify/) or use
@@ -47,7 +46,6 @@ graphify .
   own Claude Code install)
 - `flox/skills-graphify` — ships the `/graphify` SKILL.md
   so Claude Code finds it once launched via `flox-ai`
-- `gum` for the styled terminal banner
 
 ## Commands cheat sheet
 

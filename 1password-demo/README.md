@@ -5,7 +5,7 @@
 
 Interactive demo of the 1Password CLI environment. This
 environment includes the minimal `1password` base layer
-and adds a welcome banner with usage instructions.
+and adds usage instructions in its description.
 
 ## Quick Start
 
@@ -15,8 +15,9 @@ flox activate -d 1password-demo
 
 ## What It Does
 
-On activation, a styled banner shows the `op` version and
-common commands for working with 1Password vaults and items.
+On activation, the hook shows the `op` version.
+The environment description lists common commands for working
+with 1Password vaults and items.
 
 Session caching is inherited from the base `1password`
 layer. See `../1password/README.md` for details on how
@@ -34,4 +35,4 @@ export API_KEY=$(op item get "MyService" \
 ## Packages
 
 - `op` (`_1password`) -- 1Password CLI (from base layer)
-- `gum` -- terminal UI toolkit (for the welcome banner)
+- `gum` -- terminal UI toolkit (for the version display)

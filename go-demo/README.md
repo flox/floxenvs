@@ -27,7 +27,6 @@ go build && ./hello
 | `gotests`      | Test generator                       |
 | `gore`         | Go REPL                              |
 | `go-task`      | Task runner (Taskfile.yml)           |
-| `gum`          | Terminal UI for scripts              |
 
 ## Sample application
 

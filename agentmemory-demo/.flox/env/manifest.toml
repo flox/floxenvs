@@ -1,4 +1,27 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# agentmemory — persistent memory for Claude Code
+
+Start the backend in the background:
+
+```text
+flox services start
+flox activate --start-services
+```
+
+Plugin:
+
+```text
+$FLOX_ENV/share/claude-code/plugins/agentmemory
+```
+
+Try it:
+
+```text
+claude   # then /recall, /remember, /handoff
+```
+'''
 
 [include]
 environments = [
@@ -16,18 +39,11 @@ on-activate = '''
 if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
   gum style --border double --margin '1 2' \
     --padding '1 4' \
-    'agentmemory — persistent memory for Claude Code' '' \
-    'Start the backend in the background:' \
-    '  flox services start' \
-    '  flox activate --start-services' '' \
     'REST + MCP:' \
-    "  $AGENTMEMORY_URL" '' \
+    "  $AGENTMEMORY_URL" \
+    '' \
     'Pinned server version:' \
-    "  $AGENTMEMORY_VERSION" '' \
-    'Plugin:' \
-    '  $FLOX_ENV/share/claude-code/plugins/agentmemory' '' \
-    'Try it:' \
-    '  claude   # then /recall, /remember, /handoff'
+    "  $AGENTMEMORY_VERSION"
 fi
 '''
 
