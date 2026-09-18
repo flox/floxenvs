@@ -207,6 +207,7 @@ python.pkgs.buildPythonApplication {
     keyring
     markdownify
     mcp
+    miniaudio
     mistralai
     opentelemetry-api
     opentelemetry-exporter-otlp-proto-http
@@ -224,7 +225,6 @@ python.pkgs.buildPythonApplication {
     rich
     sentry-sdk
     setproctitle
-    sounddevice
     textual
     textual-speedups
     tomli-w
@@ -270,6 +270,7 @@ python.pkgs.buildPythonApplication {
     "markdownify"
     "mcp"
     "mdit-py-plugins"
+    "miniaudio"
     "mistralai"
     "more-itertools"
     "opentelemetry-api"
@@ -293,7 +294,6 @@ python.pkgs.buildPythonApplication {
     "rpds-py"
     "sentry-sdk"
     "smmap"
-    "sounddevice"
     "soupsieve"
     "sse-starlette"
     "starlette"
