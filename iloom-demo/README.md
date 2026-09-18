@@ -4,7 +4,7 @@
 [![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Filoom-demo%2Fdevcontainer.json)
 
 Interactive demo of the [iloom](../iloom/) environment with
-a styled banner showing the most-used commands.
+the most-used commands in its description.
 
 ## Quick start
 
@@ -18,8 +18,7 @@ il start <issue-number>
 
 Everything from [iloom](../iloom/) plus:
 
-- `gum` — styled terminal UI
-- Welcome banner on activate
+- Usage instructions in the environment description
 
 ## Typical workflow
 

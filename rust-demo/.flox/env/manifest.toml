@@ -1,4 +1,25 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# Rust development environment
+
+Included tools:
+
+```text
+rustc, cargo    - compiler and package manager
+clippy          - linter
+rustfmt         - formatter
+rust-analyzer   - language server
+cargo-nextest   - test runner
+cargo-watch     - file watcher
+```
+
+Try the sample app:
+
+```text
+cargo run
+```
+'''
 
 [include]
 environments = [
@@ -7,7 +28,7 @@ environments = [
 
 # rust-analyzer uses rust-toolchain group to resolve
 # against the same compiler version as the base env.
-# Extra cargo tools and gum use their own groups.
+# Extra cargo tools use their own groups.
 
 [install]
 rust-analyzer.pkg-path = "rust-analyzer"
@@ -19,27 +40,6 @@ cargo-watch.pkg-path = "cargo-watch"
 cargo-watch.pkg-group = "cargo-tools"
 cargo-semver-checks.pkg-path = "cargo-semver-checks"
 cargo-semver-checks.pkg-group = "cargo-tools"
-
-gum.pkg-path = "gum"
-gum.pkg-group = "demo-tools"
-
-[hook]
-on-activate = '''
-if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
-  gum style --border double --margin '1 2' \
-    --padding '1 4' \
-    'Rust development environment' '' \
-    'Included tools:' \
-    '  rustc, cargo    - compiler and package manager' \
-    '  clippy          - linter' \
-    '  rustfmt         - formatter' \
-    '  rust-analyzer   - language server' \
-    '  cargo-nextest   - test runner' \
-    '  cargo-watch     - file watcher' '' \
-    'Try the sample app:' \
-    '  cargo run'
-fi
-'''
 
 [options]
 systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]

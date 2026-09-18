@@ -1,4 +1,16 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# Python + pip
+
+pip commands:
+
+```text
+pip install <package>
+pip install -r requirements.txt
+pip list
+```
+'''
 
 [include]
 environments = [
@@ -18,11 +30,7 @@ if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
     --padding '1 4' \
     'Python + pip environment ready!' '' \
     'Python version:' \
-    "  $(python3 --version 2>&1)" '' \
-    'pip commands:' \
-    '  pip install <package>' \
-    '  pip install -r requirements.txt' \
-    '  pip list'
+    "  $(python3 --version 2>&1)"
 fi
 '''
 

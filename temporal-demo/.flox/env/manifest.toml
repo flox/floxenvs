@@ -1,4 +1,21 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# Temporal
+
+Start Temporal + worker in the background:
+
+```text
+flox services start
+flox activate --start-services
+```
+
+Send a hello workflow:
+
+```text
+go run ./start YourName
+```
+'''
 
 [include]
 environments = [
@@ -40,11 +57,6 @@ mkdir -p "$GOPATH" "$GOCACHE"
 if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
   gum style --border double --margin '1 2' \
     --padding '1 4' \
-    'Start Temporal + worker in the background:' \
-    '  flox services start' \
-    '  flox activate --start-services' '' \
-    'Send a hello workflow:' \
-    '  go run ./start YourName' '' \
     'Temporal Web UI:' \
     "  http://$TEMPORAL_HOST:$TEMPORAL_UI_PORT"
 fi

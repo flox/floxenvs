@@ -1,4 +1,17 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# Podman
+
+Commands:
+
+```text
+podman run <image>     Run a container
+podman-compose up      Start services
+podman-tui             Terminal UI
+undocker <image>       Extract image
+```
+'''
 
 [include]
 environments = [
@@ -20,12 +33,7 @@ if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
     --padding '1 4' \
     'Podman environment ready!' '' \
     'podman version:' \
-    "  $(podman --version)" '' \
-    'Commands:' \
-    '  podman run <image>     Run a container' \
-    '  podman-compose up      Start services' \
-    '  podman-tui             Terminal UI' \
-    '  undocker <image>       Extract image'
+    "  $(podman --version)"
 fi
 '''
 

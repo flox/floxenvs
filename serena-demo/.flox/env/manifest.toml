@@ -1,4 +1,21 @@
-schema-version = "1.11.0"
+schema-version = "1.17.0"
+
+description = '''
+# Serena demo — IDE-grade MCP toolkit for coding agents
+
+Run the CLI:
+
+```text
+serena --help
+```
+
+Start the MCP server inside the sample project:
+
+```text
+cd sample-project
+flox services start serena-mcp
+```
+'''
 
 [include]
 environments = [
@@ -16,13 +33,8 @@ on-activate = '''
 if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
   gum style --border double --margin '1 2' \
     --padding '1 4' \
-    'Serena demo — IDE-grade MCP toolkit for coding agents' '' \
-    'Run the CLI:' \
-    '  serena --help' '' \
-    'Start the MCP server inside the sample project:' \
-    '  cd sample-project' \
-    '  flox services start serena-mcp' '' \
-    "MCP endpoint: http://${SERENA_MCP_HOST}:${SERENA_MCP_PORT}/sse" '' \
+    "MCP endpoint: http://${SERENA_MCP_HOST}:${SERENA_MCP_PORT}/sse" \
+    '' \
     'Then point Claude Desktop / Cursor / Codex at that URL.'
 fi
 '''

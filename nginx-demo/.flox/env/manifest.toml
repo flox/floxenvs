@@ -1,4 +1,15 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# Nginx
+
+Start Nginx in the background:
+
+```text
+flox services start
+flox activate --start-services
+```
+'''
 [include]
 environments = [
   { dir = "../nginx" }
@@ -33,11 +44,9 @@ on-activate = '''
 
 if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
   gum style --border double --margin '1 2' --padding '1 4' \
-    'Start Nginx in the background:' \
-    '  flox services start' \
-    '  flox activate --start-services' '' \
     'Test the server:' \
-    "  curl http://localhost:$NGINX_PORT" '' \
+    "  curl http://localhost:$NGINX_PORT" \
+    '' \
     'Configuration:' \
     "  port=$NGINX_PORT" \
     "  document_root=$NGINX_WWW_DIR" \
@@ -45,7 +54,6 @@ if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
     "  error_log=$NGINX_DIR/error.log" \
     "  access_log=$NGINX_DIR/access.log"
 fi
-
 '''
 
 [options]

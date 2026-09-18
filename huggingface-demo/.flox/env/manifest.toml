@@ -1,4 +1,27 @@
-schema-version = "1.11.0"
+schema-version = "1.17.0"
+
+description = '''
+# Hugging Face Hub CLI
+
+Authenticate (optional):
+
+```text
+hf auth login
+https://huggingface.co/settings/tokens
+```
+
+Download a file:
+
+```text
+hf download <repo_id> <filename>
+```
+
+Inspect the cache:
+
+```text
+hf cache scan
+```
+'''
 
 [include]
 environments = [
@@ -21,14 +44,6 @@ if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
   fi
   gum style --border double --margin '1 2' \
     --padding '1 4' \
-    'Hugging Face Hub CLI' '' \
-    'Authenticate (optional):' \
-    '  hf auth login' \
-    '  https://huggingface.co/settings/tokens' '' \
-    'Download a file:' \
-    '  hf download <repo_id> <filename>' '' \
-    'Inspect the cache:' \
-    '  hf cache scan' '' \
     "Cache root: $HF_HOME" \
     "$perf_line"
 fi

@@ -15,14 +15,15 @@ FloxHub.
 flox activate -r flox/omlx-demo --start-services
 ```
 
-The activation banner prints connection info and
-example commands.
+The activation hook prints connection info and a test command.
+The environment description contains setup commands.
 
 ## What this demo includes
 
 - oMLX server with `[mcp,grammar,audio]` extras
 - `gum` for styled terminal output
-- A startup banner with download and curl examples
+- Download instructions in the environment description
+- Connection info and a curl example on activation
 
 ## Walkthrough
 

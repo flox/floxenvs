@@ -1,4 +1,15 @@
-schema-version = "1.12.0"
+schema-version = "1.17.0"
+
+description = '''
+# Kafka
+
+Start Kafka in the background:
+
+```text
+flox services start
+flox activate --start-services
+```
+'''
 
 [include]
 environments = [
@@ -16,11 +27,9 @@ on-activate = '''
 if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
   gum style --border double --margin '1 2' \
     --padding '1 4' \
-    'Start Kafka in the background:' \
-    '  flox services start' \
-    '  flox activate --start-services' '' \
     'List topics:' \
-    "  kafka-topics.sh --bootstrap-server $KAFKA_BROKERS --list" '' \
+    "  kafka-topics.sh --bootstrap-server $KAFKA_BROKERS --list" \
+    '' \
     'Connection information:' \
     "  host=$KAFKA_HOST" \
     "  port=$KAFKA_PORT" \

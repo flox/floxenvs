@@ -1,4 +1,14 @@
-schema-version = "1.11.0"
+schema-version = "1.17.0"
+
+description = '''
+# SANA demo
+
+```text
+Pull a model:    sana-pull
+Generate:        sana-generate "your prompt"
+Web UI:          flox services start sana-gradio
+```
+'''
 
 # SANA demo environment with web UI.
 #
@@ -166,12 +176,7 @@ if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
     --foreground 212 --border-foreground 212 \
     --border double --align center --width 60 \
     --margin "1" --padding "1 4" \
-    "SANA demo" \
-    "" \
-    "Pull a model:    sana-pull" \
-    "Generate:        sana-generate \"your prompt\"" \
-    "Web UI:          flox services start sana-gradio" \
-    "                 then open http://${SANA_GRADIO_HOST}:${SANA_GRADIO_PORT}"
+    "Web UI: http://${SANA_GRADIO_HOST}:${SANA_GRADIO_PORT}"
 fi
 '''
 

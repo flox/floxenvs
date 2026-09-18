@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# MongoDB\n\nStart MongoDB in the background:\n\n```text\nflox services start\nflox activate --start-services\n```\n",
     "install": {
       "gum": {
         "pkg-path": "gum",
@@ -21,7 +22,7 @@
       "MONGO_PORT": "27017"
     },
     "hook": {
-      "on-activate": "export MONGO_DATA=\"$FLOX_ENV_CACHE/mongodb\"\n\nif [ ! -d \"$MONGO_DATA\" ]; then\n  mkdir -m 0700 -p \"$MONGO_DATA\"\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start MongoDB in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to MongoDB:' \\\n    \"  mongosh --host $MONGO_HOST --port $MONGO_PORT\" \\\n    '' \\\n    'Connection information:' \\\n    \"  host=$MONGO_HOST\" \\\n    \"  port=$MONGO_PORT\"\nfi\n"
+      "on-activate": "export MONGO_DATA=\"$FLOX_ENV_CACHE/mongodb\"\n\nif [ ! -d \"$MONGO_DATA\" ]; then\n  mkdir -m 0700 -p \"$MONGO_DATA\"\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Connect to MongoDB:' \\\n    \"  mongosh --host $MONGO_HOST --port $MONGO_PORT\" \\\n    '' \\\n    'Connection information:' \\\n    \"  host=$MONGO_HOST\" \\\n    \"  port=$MONGO_PORT\"\nfi\n"
     },
     "options": {
       "systems": [
@@ -301,7 +302,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
+      "schema-version": "1.17.0",
+      "description": "# MongoDB\n\nStart MongoDB in the background:\n\n```text\nflox services start\nflox activate --start-services\n```\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -313,7 +315,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start MongoDB in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Connect to MongoDB:' \\\n    \"  mongosh --host $MONGO_HOST --port $MONGO_PORT\" \\\n    '' \\\n    'Connection information:' \\\n    \"  host=$MONGO_HOST\" \\\n    \"  port=$MONGO_PORT\"\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Connect to MongoDB:' \\\n    \"  mongosh --host $MONGO_HOST --port $MONGO_PORT\" \\\n    '' \\\n    'Connection information:' \\\n    \"  host=$MONGO_HOST\" \\\n    \"  port=$MONGO_PORT\"\nfi\n"
       },
       "options": {
         "systems": [

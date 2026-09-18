@@ -1,11 +1,21 @@
-schema-version = "1.11.0"
+schema-version = "1.17.0"
+
+description = '''
+# Basic Memory
+Local-first knowledge graph wired into Claude Code
+
+```text
+basic-memory --help        — CLI overview
+basic-memory project list  — list projects
+claude                     — start Claude Code with
+                              basic-memory MCP wired up
+```
+'''
 
 [include]
 environments = [{ dir = "../basic-memory" }]
 
 [install]
-gum.pkg-path = "gum"
-gum.pkg-group = "demo-tools"
 flox-ai.pkg-path = "flox/flox-ai"
 flox-ai.pkg-group = "flox-ai"
 
@@ -24,21 +34,6 @@ cat > "$FLOX_ENV_PROJECT/.mcp.json" <<'JSON'
   }
 }
 JSON
-
-if [ "${FLOX_ENVS_TESTING:-}" != "1" ]; then
-  gum style \
-    --foreground 212 --border-foreground 212 \
-    --border double --align center \
-    --width 60 --margin "1 2" --padding "1 2" \
-    "Basic Memory" \
-    "Local-first knowledge graph wired into Claude Code"
-  echo ""
-  echo "  basic-memory --help        — CLI overview"
-  echo "  basic-memory project list  — list projects"
-  echo "  claude                     — start Claude Code with"
-  echo "                                basic-memory MCP wired up"
-  echo ""
-fi
 '''
 
 [options]

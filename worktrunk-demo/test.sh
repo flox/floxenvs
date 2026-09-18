@@ -13,9 +13,7 @@ command_exists() {
 command_exists wt
 command_exists git-wt
 command_exists git
-command_exists gum
 
 echo ">>> wt version: $(wt --version)"
-echo ">>> gum version: $(gum --version)"
 
 echo ">>> worktrunk-demo environment is working"

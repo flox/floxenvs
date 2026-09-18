@@ -1,11 +1,20 @@
-schema-version = "1.11.0"
+schema-version = "1.17.0"
+
+description = '''
+# Mergekit
+Merge LLMs on CPU — no GPU needed
+
+```text
+mergekit-yaml example-merge.yml ./merged-model
+                           — run the example merge
+                              (~1GB model download)
+mergekit-yaml --help       — all merge options
+mergekit-moe --help        — Mixture-of-Experts builds
+```
+'''
 
 [include]
 environments = [{ dir = "../mergekit" }]
-
-[install]
-gum.pkg-path = "gum"
-gum.pkg-group = "demo-tools"
 
 [hook]
 on-activate = '''
@@ -19,22 +28,6 @@ models:
 merge_method: linear
 dtype: float16
 YAML
-
-if [ "${FLOX_ENVS_TESTING:-}" != "1" ]; then
-  gum style \
-    --foreground 212 --border-foreground 212 \
-    --border double --align center \
-    --width 60 --margin "1 2" --padding "1 2" \
-    "Mergekit" \
-    "Merge LLMs on CPU — no GPU needed"
-  echo ""
-  echo "  mergekit-yaml example-merge.yml ./merged-model"
-  echo "                             — run the example merge"
-  echo "                                (~1GB model download)"
-  echo "  mergekit-yaml --help       — all merge options"
-  echo "  mergekit-moe --help        — Mixture-of-Experts builds"
-  echo ""
-fi
 '''
 
 [options]

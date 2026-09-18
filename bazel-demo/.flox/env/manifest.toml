@@ -1,4 +1,15 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# Bazel development environment
+
+Try the sample build:
+
+```text
+flox build hello
+./result-hello/bin/hello
+```
+'''
 
 [include]
 environments = [
@@ -7,21 +18,6 @@ environments = [
 
 # Demo Bazel environment with a sample Go app built via
 # rules_go and exposed through a flox manifest build.
-
-[install]
-gum.pkg-path = "gum"
-
-[hook]
-on-activate = '''
-if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
-  gum style --border double --margin '1 2' \
-    --padding '1 4' \
-    'Bazel development environment' '' \
-    'Try the sample build:' \
-    '  flox build hello' \
-    '  ./result-hello/bin/hello'
-fi
-'''
 
 [build.hello]
 description = "Sample Go binary built with Bazel + rules_go"

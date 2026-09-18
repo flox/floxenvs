@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.11.0",
+    "schema-version": "1.17.0",
+    "description": "# Firecrawl CLI\n\nCheck auth + credits:\n\n```text\nfirecrawl --status\n```\n\nScrape a page to clean markdown:\n\n```text\nfirecrawl scrape \"https://firecrawl.dev\" -o page.md\n```\n\nSearch the web:\n\n```text\nfirecrawl search \"flox dev environments\"\n```\n\nDrive it from Claude Code / OpenCode via the bundled skill.\n",
     "install": {
       "firecrawl-cli": {
         "pkg-path": "flox/firecrawl-cli",
@@ -24,7 +25,7 @@
       "FIRECRAWL_API_KEY": ""
     },
     "hook": {
-      "on-activate": "dir=\"$FLOX_ENV_CACHE/firecrawl\"\nmkdir -p \"$dir\"\nexport FIRECRAWL_DATA_DIR=\"$dir\"\n\n# Persist the key across activations: if it isn't set in the\n# environment but was saved to the cache before, load it back.\nkey_file=\"$dir/api-key\"\nif [ -z \"${FIRECRAWL_API_KEY:-}\" ] && [ -f \"$key_file\" ]; then\n  FIRECRAWL_API_KEY=\"$(cat \"$key_file\")\"\n  export FIRECRAWL_API_KEY\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  dir=\"${FIRECRAWL_DATA_DIR:-$FLOX_ENV_CACHE/firecrawl}\"\n  mkdir -p \"$dir\"\n  key_file=\"$dir/api-key\"\n\n  # Ask for the Firecrawl API key on first run. Only prompt\n  # when running interactively and the key isn't already set.\n  if [[ -z \"${FIRECRAWL_API_KEY:-}\" && -t 0 ]]; then\n    gum style --border double --margin '1 2' --padding '1 4' \\\n      'Firecrawl demo — scrape, crawl, and search the web' '' \\\n      'A Firecrawl API key is required.' \\\n      'Grab one (free tier available) at:' \\\n      '  https://firecrawl.dev/app/api-keys'\n    key=\"$(gum input --password \\\n      --placeholder 'fc-...' \\\n      --prompt 'FIRECRAWL_API_KEY > ')\"\n    if [[ -n \"$key\" ]]; then\n      printf '%s' \"$key\" > \"$key_file\"\n      chmod 600 \"$key_file\"\n      FIRECRAWL_API_KEY=\"$key\"\n      export FIRECRAWL_API_KEY\n      gum style --foreground 42 'Key saved to the env cache. ✓'\n    else\n      gum style --foreground 214 \\\n        'No key entered — set FIRECRAWL_API_KEY later or run `firecrawl login`.'\n    fi\n  fi\n\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'Firecrawl CLI' '' \\\n    'Check auth + credits:' \\\n    '  firecrawl --status' '' \\\n    'Scrape a page to clean markdown:' \\\n    '  firecrawl scrape \"https://firecrawl.dev\" -o page.md' '' \\\n    'Search the web:' \\\n    '  firecrawl search \"flox dev environments\"' '' \\\n    'Drive it from Claude Code / OpenCode via the bundled skill.'\nfi\n"
+      "on-activate": "dir=\"$FLOX_ENV_CACHE/firecrawl\"\nmkdir -p \"$dir\"\nexport FIRECRAWL_DATA_DIR=\"$dir\"\n\n# Persist the key across activations: if it isn't set in the\n# environment but was saved to the cache before, load it back.\nkey_file=\"$dir/api-key\"\nif [ -z \"${FIRECRAWL_API_KEY:-}\" ] && [ -f \"$key_file\" ]; then\n  FIRECRAWL_API_KEY=\"$(cat \"$key_file\")\"\n  export FIRECRAWL_API_KEY\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  dir=\"${FIRECRAWL_DATA_DIR:-$FLOX_ENV_CACHE/firecrawl}\"\n  mkdir -p \"$dir\"\n  key_file=\"$dir/api-key\"\n\n  # Ask for the Firecrawl API key on first run. Only prompt\n  # when running interactively and the key isn't already set.\n  if [[ -z \"${FIRECRAWL_API_KEY:-}\" && -t 0 ]]; then\n    gum style --border double --margin '1 2' --padding '1 4' \\\n      'Firecrawl demo — scrape, crawl, and search the web' '' \\\n      'A Firecrawl API key is required.' \\\n      'Grab one (free tier available) at:' \\\n      '  https://firecrawl.dev/app/api-keys'\n    key=\"$(gum input --password \\\n      --placeholder 'fc-...' \\\n      --prompt 'FIRECRAWL_API_KEY > ')\"\n    if [[ -n \"$key\" ]]; then\n      printf '%s' \"$key\" > \"$key_file\"\n      chmod 600 \"$key_file\"\n      FIRECRAWL_API_KEY=\"$key\"\n      export FIRECRAWL_API_KEY\n      gum style --foreground 42 'Key saved to the env cache. ✓'\n    else\n      gum style --foreground 214 \\\n        'No key entered — set FIRECRAWL_API_KEY later or run `firecrawl login`.'\n    fi\n  fi\nfi\n"
     },
     "options": {
       "systems": [
@@ -389,7 +390,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.11.0",
+      "schema-version": "1.17.0",
+      "description": "# Firecrawl CLI\n\nCheck auth + credits:\n\n```text\nfirecrawl --status\n```\n\nScrape a page to clean markdown:\n\n```text\nfirecrawl scrape \"https://firecrawl.dev\" -o page.md\n```\n\nSearch the web:\n\n```text\nfirecrawl search \"flox dev environments\"\n```\n\nDrive it from Claude Code / OpenCode via the bundled skill.\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -397,7 +399,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  dir=\"${FIRECRAWL_DATA_DIR:-$FLOX_ENV_CACHE/firecrawl}\"\n  mkdir -p \"$dir\"\n  key_file=\"$dir/api-key\"\n\n  # Ask for the Firecrawl API key on first run. Only prompt\n  # when running interactively and the key isn't already set.\n  if [[ -z \"${FIRECRAWL_API_KEY:-}\" && -t 0 ]]; then\n    gum style --border double --margin '1 2' --padding '1 4' \\\n      'Firecrawl demo — scrape, crawl, and search the web' '' \\\n      'A Firecrawl API key is required.' \\\n      'Grab one (free tier available) at:' \\\n      '  https://firecrawl.dev/app/api-keys'\n    key=\"$(gum input --password \\\n      --placeholder 'fc-...' \\\n      --prompt 'FIRECRAWL_API_KEY > ')\"\n    if [[ -n \"$key\" ]]; then\n      printf '%s' \"$key\" > \"$key_file\"\n      chmod 600 \"$key_file\"\n      FIRECRAWL_API_KEY=\"$key\"\n      export FIRECRAWL_API_KEY\n      gum style --foreground 42 'Key saved to the env cache. ✓'\n    else\n      gum style --foreground 214 \\\n        'No key entered — set FIRECRAWL_API_KEY later or run `firecrawl login`.'\n    fi\n  fi\n\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'Firecrawl CLI' '' \\\n    'Check auth + credits:' \\\n    '  firecrawl --status' '' \\\n    'Scrape a page to clean markdown:' \\\n    '  firecrawl scrape \"https://firecrawl.dev\" -o page.md' '' \\\n    'Search the web:' \\\n    '  firecrawl search \"flox dev environments\"' '' \\\n    'Drive it from Claude Code / OpenCode via the bundled skill.'\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  dir=\"${FIRECRAWL_DATA_DIR:-$FLOX_ENV_CACHE/firecrawl}\"\n  mkdir -p \"$dir\"\n  key_file=\"$dir/api-key\"\n\n  # Ask for the Firecrawl API key on first run. Only prompt\n  # when running interactively and the key isn't already set.\n  if [[ -z \"${FIRECRAWL_API_KEY:-}\" && -t 0 ]]; then\n    gum style --border double --margin '1 2' --padding '1 4' \\\n      'Firecrawl demo — scrape, crawl, and search the web' '' \\\n      'A Firecrawl API key is required.' \\\n      'Grab one (free tier available) at:' \\\n      '  https://firecrawl.dev/app/api-keys'\n    key=\"$(gum input --password \\\n      --placeholder 'fc-...' \\\n      --prompt 'FIRECRAWL_API_KEY > ')\"\n    if [[ -n \"$key\" ]]; then\n      printf '%s' \"$key\" > \"$key_file\"\n      chmod 600 \"$key_file\"\n      FIRECRAWL_API_KEY=\"$key\"\n      export FIRECRAWL_API_KEY\n      gum style --foreground 42 'Key saved to the env cache. ✓'\n    else\n      gum style --foreground 214 \\\n        'No key entered — set FIRECRAWL_API_KEY later or run `firecrawl login`.'\n    fi\n  fi\nfi\n"
       },
       "options": {
         "systems": [

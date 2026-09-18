@@ -7,7 +7,8 @@ Interactive demo for the
 [Hugging Face Hub](https://huggingface.co/) CLI. Adds
 [`gum`](https://github.com/charmbracelet/gum) on top of
 the minimal [huggingface](../huggingface/) environment so
-the activation hook prints a styled cheat sheet.
+the activation hook displays cache and transfer settings.
+The environment description contains the CLI cheat sheet.
 
 ## Quick start
 

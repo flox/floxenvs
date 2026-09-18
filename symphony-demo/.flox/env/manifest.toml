@@ -1,4 +1,15 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# Symphony
+
+Start Symphony in the background:
+
+```text
+flox services start
+flox activate --start-services
+```
+'''
 
 [include]
 environments = [
@@ -22,15 +33,15 @@ if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
 
   gum style --border double --margin '1 2' \
     --padding '1 4' \
-    'Start Symphony in the background:' \
-    '  flox services start' \
-    '  flox activate --start-services' '' \
     'Dashboard:' \
-    "  http://localhost:$SYMPHONY_PORT" '' \
+    "  http://localhost:$SYMPHONY_PORT" \
+    '' \
     'Tracker:' \
-    "  $tracker" '' \
+    "  $tracker" \
+    '' \
     'Codex binary:' \
-    "  $CODEX_BIN" '' \
+    "  $CODEX_BIN" \
+    '' \
     'Workspace root:' \
     "  $SYMPHONY_WORKSPACE_ROOT"
 fi

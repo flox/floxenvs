@@ -1,4 +1,16 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# Node.js
+
+Commands:
+
+```text
+npm install    Install packages
+npm start      Run your app
+node <file>    Run a script
+```
+'''
 
 [include]
 environments = [
@@ -16,11 +28,7 @@ if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
     --padding '1 4' \
     'Node.js environment ready!' '' \
     'Node version:' \
-    "  $(node --version)" '' \
-    'Commands:' \
-    '  npm install    Install packages' \
-    '  npm start      Run your app' \
-    '  node <file>    Run a script'
+    "  $(node --version)"
 fi
 '''
 

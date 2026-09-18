@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.11.0",
+    "schema-version": "1.17.0",
+    "description": "# Playwright demo — browser automation in a Flox env\n\nInstall the chromium binary (first time only):\n\n```text\nplaywright install chromium\n```\n\nRun the sample test against demo.playwright.dev:\n\n```text\nplaywright test\n```\n\nOr expose Playwright as an MCP service:\n\n```text\nflox services start playwright-mcp\n```\n\nOr drive a browser directly from the CLI:\n\n```text\nplaywright-cli open https://playwright.dev\n```\n",
     "install": {
       "flox-ai": {
         "pkg-path": "flox/flox-ai",
@@ -42,7 +43,7 @@
       "PLAYWRIGHT_MCP_PORT": "18931"
     },
     "hook": {
-      "on-activate": "dir=\"$FLOX_ENV_CACHE/playwright\"\nexport PLAYWRIGHT_DATA_DIR=\"$dir\"\nexport PLAYWRIGHT_BROWSERS_PATH=\"${PLAYWRIGHT_BROWSERS_PATH:-$dir/browsers}\"\nmkdir -p \"$PLAYWRIGHT_BROWSERS_PATH\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Playwright demo — browser automation in a Flox env' '' \\\n    'Install the chromium binary (first time only):' \\\n    '  playwright install chromium' '' \\\n    'Run the sample test against demo.playwright.dev:' \\\n    '  playwright test' '' \\\n    'Or expose Playwright as an MCP service:' \\\n    '  flox services start playwright-mcp' '' \\\n    \"MCP endpoint: http://${PLAYWRIGHT_MCP_HOST}:${PLAYWRIGHT_MCP_PORT}/\" '' \\\n    'Or drive a browser directly from the CLI:' \\\n    '  playwright-cli open https://playwright.dev'\nfi\n"
+      "on-activate": "dir=\"$FLOX_ENV_CACHE/playwright\"\nexport PLAYWRIGHT_DATA_DIR=\"$dir\"\nexport PLAYWRIGHT_BROWSERS_PATH=\"${PLAYWRIGHT_BROWSERS_PATH:-$dir/browsers}\"\nmkdir -p \"$PLAYWRIGHT_BROWSERS_PATH\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    \"MCP endpoint: http://${PLAYWRIGHT_MCP_HOST}:${PLAYWRIGHT_MCP_PORT}/\"\nfi\n"
     },
     "options": {
       "systems": [
@@ -766,7 +767,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.11.0",
+      "schema-version": "1.17.0",
+      "description": "# Playwright demo — browser automation in a Flox env\n\nInstall the chromium binary (first time only):\n\n```text\nplaywright install chromium\n```\n\nRun the sample test against demo.playwright.dev:\n\n```text\nplaywright test\n```\n\nOr expose Playwright as an MCP service:\n\n```text\nflox services start playwright-mcp\n```\n\nOr drive a browser directly from the CLI:\n\n```text\nplaywright-cli open https://playwright.dev\n```\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -774,7 +776,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Playwright demo — browser automation in a Flox env' '' \\\n    'Install the chromium binary (first time only):' \\\n    '  playwright install chromium' '' \\\n    'Run the sample test against demo.playwright.dev:' \\\n    '  playwright test' '' \\\n    'Or expose Playwright as an MCP service:' \\\n    '  flox services start playwright-mcp' '' \\\n    \"MCP endpoint: http://${PLAYWRIGHT_MCP_HOST}:${PLAYWRIGHT_MCP_PORT}/\" '' \\\n    'Or drive a browser directly from the CLI:' \\\n    '  playwright-cli open https://playwright.dev'\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    \"MCP endpoint: http://${PLAYWRIGHT_MCP_HOST}:${PLAYWRIGHT_MCP_PORT}/\"\nfi\n"
       },
       "options": {
         "systems": [

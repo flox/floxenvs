@@ -1,4 +1,15 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# Valkey
+
+Start Valkey in the background:
+
+```text
+flox services start
+flox activate --start-services
+```
+'''
 
 [include]
 environments = [
@@ -16,11 +27,9 @@ on-activate = '''
 if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
   gum style --border double --margin '1 2' \
     --padding '1 4' \
-    'Start Valkey in the background:' \
-    '  flox services start' \
-    '  flox activate --start-services' '' \
     'Connect to Valkey:' \
-    "  valkey-cli -h $VALKEY_HOST -p $VALKEY_PORT" '' \
+    "  valkey-cli -h $VALKEY_HOST -p $VALKEY_PORT" \
+    '' \
     'Connection information:' \
     "  host=$VALKEY_HOST" \
     "  port=$VALKEY_PORT"

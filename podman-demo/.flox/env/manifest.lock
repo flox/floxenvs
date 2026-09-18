@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# Podman\n\nCommands:\n\n```text\npodman run <image>     Run a container\npodman-compose up      Start services\npodman-tui             Terminal UI\nundocker <image>       Extract image\n```\n",
     "install": {
       "gum": {
         "pkg-path": "gum",
@@ -32,7 +33,7 @@
       }
     },
     "hook": {
-      "on-activate": "# Ensure containers policy exists on Linux\nif [ \"$(uname -s)\" = \"Linux\" ]; then\n  POLICY=\"$HOME/.config/containers/policy.json\"\n  if [ ! -f \"$POLICY\" ]; then\n    mkdir -p \"$(dirname \"$POLICY\")\"\n    printf '%s\\n' \\\n      '{\"default\": [{\"type\": \"insecureAcceptAnything\"}]}' \\\n      > \"$POLICY\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Podman environment ready!' '' \\\n    'podman version:' \\\n    \"  $(podman --version)\" '' \\\n    'Commands:' \\\n    '  podman run <image>     Run a container' \\\n    '  podman-compose up      Start services' \\\n    '  podman-tui             Terminal UI' \\\n    '  undocker <image>       Extract image'\nfi\n"
+      "on-activate": "# Ensure containers policy exists on Linux\nif [ \"$(uname -s)\" = \"Linux\" ]; then\n  POLICY=\"$HOME/.config/containers/policy.json\"\n  if [ ! -f \"$POLICY\" ]; then\n    mkdir -p \"$(dirname \"$POLICY\")\"\n    printf '%s\\n' \\\n      '{\"default\": [{\"type\": \"insecureAcceptAnything\"}]}' \\\n      > \"$POLICY\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Podman environment ready!' '' \\\n    'podman version:' \\\n    \"  $(podman --version)\"\nfi\n"
     },
     "profile": {
       "common": "if [ \"$(uname -s)\" = 'Darwin' ] \\\n    && [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  trap 'gum confirm \"Stop virtual machine?\" \\\n    && gum spin --spinner dot \\\n         --title \"Stopping machine...\" \\\n         -- podman machine stop \\\n    ; echo \"Podman machine stopped\"' EXIT\nfi\n"
@@ -523,7 +524,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
+      "schema-version": "1.17.0",
+      "description": "# Podman\n\nCommands:\n\n```text\npodman run <image>     Run a container\npodman-compose up      Start services\npodman-tui             Terminal UI\nundocker <image>       Extract image\n```\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -539,7 +541,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Podman environment ready!' '' \\\n    'podman version:' \\\n    \"  $(podman --version)\" '' \\\n    'Commands:' \\\n    '  podman run <image>     Run a container' \\\n    '  podman-compose up      Start services' \\\n    '  podman-tui             Terminal UI' \\\n    '  undocker <image>       Extract image'\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Podman environment ready!' '' \\\n    'podman version:' \\\n    \"  $(podman --version)\"\nfi\n"
       },
       "profile": {
         "common": "if [ \"$(uname -s)\" = 'Darwin' ] \\\n    && [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  trap 'gum confirm \"Stop virtual machine?\" \\\n    && gum spin --spinner dot \\\n         --title \"Stopping machine...\" \\\n         -- podman machine stop \\\n    ; echo \"Podman machine stopped\"' EXIT\nfi\n"

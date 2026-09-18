@@ -14,15 +14,10 @@ if ! command -v graphify >/dev/null 2>&1; then
   echo "Error: 'graphify' command not found."
   exit 1
 fi
-if ! command -v gum >/dev/null 2>&1; then
-  echo "Error: 'gum' command not found."
-  exit 1
-fi
 
 echo ">>> python3 version: $(python3 --version)"
 echo ">>> flox-ai version: $(flox-ai --version 2>&1 | head -1)"
 echo ">>> graphify available: $(command -v graphify)"
-echo ">>> gum version: $(gum --version)"
 
 # Verify graphify is a working CLI (no Claude session required).
 graphify --help >/dev/null

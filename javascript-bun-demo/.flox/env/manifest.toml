@@ -1,4 +1,16 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# Bun
+
+Commands:
+
+```text
+bun install    Install packages
+bun run        Run a script
+bun <file>     Run a file
+```
+'''
 
 [include]
 environments = [
@@ -16,11 +28,7 @@ if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
     --padding '1 4' \
     'Bun environment ready!' '' \
     'Bun version:' \
-    "  $(bun --version)" '' \
-    'Commands:' \
-    '  bun install    Install packages' \
-    '  bun run        Run a script' \
-    '  bun <file>     Run a file'
+    "  $(bun --version)"
 fi
 '''
 

@@ -1,4 +1,28 @@
-schema-version = "1.11.0"
+schema-version = "1.17.0"
+
+description = '''
+# Firecrawl CLI
+
+Check auth + credits:
+
+```text
+firecrawl --status
+```
+
+Scrape a page to clean markdown:
+
+```text
+firecrawl scrape "https://firecrawl.dev" -o page.md
+```
+
+Search the web:
+
+```text
+firecrawl search "flox dev environments"
+```
+
+Drive it from Claude Code / OpenCode via the bundled skill.
+'''
 
 [include]
 environments = [
@@ -41,16 +65,6 @@ if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
         'No key entered — set FIRECRAWL_API_KEY later or run `firecrawl login`.'
     fi
   fi
-
-  gum style --border double --margin '1 2' --padding '1 4' \
-    'Firecrawl CLI' '' \
-    'Check auth + credits:' \
-    '  firecrawl --status' '' \
-    'Scrape a page to clean markdown:' \
-    '  firecrawl scrape "https://firecrawl.dev" -o page.md' '' \
-    'Search the web:' \
-    '  firecrawl search "flox dev environments"' '' \
-    'Drive it from Claude Code / OpenCode via the bundled skill.'
 fi
 '''
 

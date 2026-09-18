@@ -12,7 +12,6 @@ command_exists() {
 
 command_exists fnox
 command_exists age
-command_exists gum
 
 if [ -z "${FNOX_AGE_KEY:-}" ]; then
   echo "Error: FNOX_AGE_KEY not set by hook."

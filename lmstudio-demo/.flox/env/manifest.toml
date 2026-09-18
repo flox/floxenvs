@@ -1,4 +1,30 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# LM Studio — local LLMs + OpenAI-compatible API
+
+Start the API server:
+
+```text
+flox services start
+```
+
+Health check:  lmstudio-health
+
+Download + run a model:
+
+```text
+lms get qwen2.5-7b-instruct
+lms load qwen2.5-7b-instruct
+```
+
+Launch an agentic CLI against the local model:
+
+```text
+lms-launch claude --model qwen2.5-7b-instruct
+lms-launch codex  --model qwen2.5-7b-instruct
+```
+'''
 
 [include]
 environments = [{ dir = "../lmstudio" }]
@@ -13,17 +39,7 @@ gum.pkg-group = "demo-tools"
 on-activate = '''
 if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
   gum style --border double --margin '1 2' --padding '1 4' \
-    'LM Studio — local LLMs + OpenAI-compatible API' '' \
-    'Start the API server:' \
-    '  flox services start' '' \
-    "API: http://${LMS_HOST}:${LMS_PORT}/v1" \
-    'Health check:  lmstudio-health' '' \
-    'Download + run a model:' \
-    '  lms get qwen2.5-7b-instruct' \
-    '  lms load qwen2.5-7b-instruct' '' \
-    'Launch an agentic CLI against the local model:' \
-    '  lms-launch claude --model qwen2.5-7b-instruct' \
-    '  lms-launch codex  --model qwen2.5-7b-instruct'
+    "API: http://${LMS_HOST}:${LMS_PORT}/v1"
 fi
 '''
 

@@ -1,4 +1,22 @@
-schema-version = "1.11.0"
+schema-version = "1.17.0"
+
+description = '''
+# Hermes Agent — self-improving AI from Nous Research
+
+First run:
+
+```text
+hermes setup     — interactive wizard
+hermes model     — pick a provider/model
+```
+
+Talk to it:
+
+```text
+hermes           — terminal UI
+hermes gateway   — Telegram/Discord/Slack
+```
+'''
 
 [include]
 environments = [
@@ -16,13 +34,6 @@ on-activate = '''
 if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
   gum style --border double --margin '1 2' \
     --padding '1 4' \
-    'Hermes Agent — self-improving AI from Nous Research' '' \
-    'First run:' \
-    '  hermes setup     — interactive wizard' \
-    '  hermes model     — pick a provider/model' '' \
-    'Talk to it:' \
-    '  hermes           — terminal UI' \
-    '  hermes gateway   — Telegram/Discord/Slack' '' \
     "HERMES_HOME=$HERMES_HOME"
 fi
 '''
