@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# Ruby\n\nCommands:\n\n```text\nbundle install   Install gems\nbundle exec      Run with bundler\nruby <file>      Run a script\n```\n",
     "install": {
       "gum": {
         "pkg-path": "gum",
@@ -16,7 +17,7 @@
       "RUBY_AUTO_INSTALL": "true"
     },
     "hook": {
-      "on-activate": "export RUBY_CACHE=\"$FLOX_ENV_CACHE/ruby\"\nexport BUNDLE_PATH=\"$RUBY_CACHE/vendor\"\nmkdir -p \"$RUBY_CACHE\"\n\nif [ \"$RUBY_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f Gemfile ] \\\n    && [ -f Gemfile.lock ]; then\n  HASH=$(cat Gemfile Gemfile.lock \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$RUBY_CACHE/gems-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    bundle install\n    echo \"$HASH\" > \"$RUBY_CACHE/gems-hash\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Ruby environment ready!' '' \\\n    'Ruby version:' \\\n    \"  $(ruby --version)\" '' \\\n    'Commands:' \\\n    '  bundle install   Install gems' \\\n    '  bundle exec      Run with bundler' \\\n    '  ruby <file>      Run a script'\nfi\n"
+      "on-activate": "export RUBY_CACHE=\"$FLOX_ENV_CACHE/ruby\"\nexport BUNDLE_PATH=\"$RUBY_CACHE/vendor\"\nmkdir -p \"$RUBY_CACHE\"\n\nif [ \"$RUBY_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f Gemfile ] \\\n    && [ -f Gemfile.lock ]; then\n  HASH=$(cat Gemfile Gemfile.lock \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$RUBY_CACHE/gems-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    bundle install\n    echo \"$HASH\" > \"$RUBY_CACHE/gems-hash\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Ruby environment ready!' '' \\\n    'Ruby version:' \\\n    \"  $(ruby --version)\"\nfi\n"
     },
     "options": {
       "systems": [
@@ -207,7 +208,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
+      "schema-version": "1.17.0",
+      "description": "# Ruby\n\nCommands:\n\n```text\nbundle install   Install gems\nbundle exec      Run with bundler\nruby <file>      Run a script\n```\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -215,7 +217,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Ruby environment ready!' '' \\\n    'Ruby version:' \\\n    \"  $(ruby --version)\" '' \\\n    'Commands:' \\\n    '  bundle install   Install gems' \\\n    '  bundle exec      Run with bundler' \\\n    '  ruby <file>      Run a script'\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Ruby environment ready!' '' \\\n    'Ruby version:' \\\n    \"  $(ruby --version)\"\nfi\n"
       },
       "options": {
         "systems": [

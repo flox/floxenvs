@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# LM Studio — local LLMs + OpenAI-compatible API\n\nStart the API server:\n\n```text\nflox services start\n```\n\nHealth check:  lmstudio-health\n\nDownload + run a model:\n\n```text\nlms get qwen2.5-7b-instruct\nlms load qwen2.5-7b-instruct\n```\n\nLaunch an agentic CLI against the local model:\n\n```text\nlms-launch claude --model qwen2.5-7b-instruct\nlms-launch codex  --model qwen2.5-7b-instruct\n```\n",
     "install": {
       "curl": {
         "pkg-path": "curl",
@@ -30,7 +31,7 @@
       "LMS_PORT": "11234"
     },
     "hook": {
-      "on-activate": "export LMS_LOG_DIR=\"$FLOX_ENV_CACHE/lmstudio/logs\"\nmkdir -p \"$LMS_LOG_DIR\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'LM Studio — local LLMs + OpenAI-compatible API' '' \\\n    'Start the API server:' \\\n    '  flox services start' '' \\\n    \"API: http://${LMS_HOST}:${LMS_PORT}/v1\" \\\n    'Health check:  lmstudio-health' '' \\\n    'Download + run a model:' \\\n    '  lms get qwen2.5-7b-instruct' \\\n    '  lms load qwen2.5-7b-instruct' '' \\\n    'Launch an agentic CLI against the local model:' \\\n    '  lms-launch claude --model qwen2.5-7b-instruct' \\\n    '  lms-launch codex  --model qwen2.5-7b-instruct'\nfi\n"
+      "on-activate": "export LMS_LOG_DIR=\"$FLOX_ENV_CACHE/lmstudio/logs\"\nmkdir -p \"$LMS_LOG_DIR\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    \"API: http://${LMS_HOST}:${LMS_PORT}/v1\"\nfi\n"
     },
     "options": {
       "systems": [
@@ -567,7 +568,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
+      "schema-version": "1.17.0",
+      "description": "# LM Studio — local LLMs + OpenAI-compatible API\n\nStart the API server:\n\n```text\nflox services start\n```\n\nHealth check:  lmstudio-health\n\nDownload + run a model:\n\n```text\nlms get qwen2.5-7b-instruct\nlms load qwen2.5-7b-instruct\n```\n\nLaunch an agentic CLI against the local model:\n\n```text\nlms-launch claude --model qwen2.5-7b-instruct\nlms-launch codex  --model qwen2.5-7b-instruct\n```\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -575,7 +577,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'LM Studio — local LLMs + OpenAI-compatible API' '' \\\n    'Start the API server:' \\\n    '  flox services start' '' \\\n    \"API: http://${LMS_HOST}:${LMS_PORT}/v1\" \\\n    'Health check:  lmstudio-health' '' \\\n    'Download + run a model:' \\\n    '  lms get qwen2.5-7b-instruct' \\\n    '  lms load qwen2.5-7b-instruct' '' \\\n    'Launch an agentic CLI against the local model:' \\\n    '  lms-launch claude --model qwen2.5-7b-instruct' \\\n    '  lms-launch codex  --model qwen2.5-7b-instruct'\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    \"API: http://${LMS_HOST}:${LMS_PORT}/v1\"\nfi\n"
       },
       "options": {
         "systems": [

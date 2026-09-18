@@ -21,8 +21,8 @@ flox activate
 deno run --allow-read main.ts
 ```
 
-On activation you will see a styled welcome banner showing
-the Deno version and available commands.
+On activation the hook shows the Deno version.
+The environment description lists available commands.
 
 ## Deno commands
 

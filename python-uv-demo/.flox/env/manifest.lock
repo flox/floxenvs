@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# Python + uv\n\nuv commands:\n\n```text\nuv add <package>\nuv sync\nuv run <script>\n```\n",
     "install": {
       "gum": {
         "pkg-path": "gum",
@@ -19,7 +20,7 @@
       "PYTHON_AUTO_INSTALL": "true"
     },
     "hook": {
-      "on-activate": "export UV_CACHE=\"$FLOX_ENV_CACHE/python-uv\"\nexport UV_VENV=\"$UV_CACHE/venv\"\nexport UV_PROJECT_ENVIRONMENT=\"$UV_VENV\"\n\nmkdir -p \"$UV_CACHE\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$UV_CACHE/venv.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$UV_VENV\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  uv venv -p python3 \"$UV_VENV\"\n  echo \"$CURRENT_INTERP\" > \"$UV_CACHE/venv.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$UV_VENV/bin/activate\"\n\nif [ \"$PYTHON_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f uv.lock ]; then\n  HASH=$(md5sum uv.lock 2>/dev/null \\\n    || md5 -q uv.lock)\n  HASH=$(echo \"$HASH\" | cut -d\" \" -f1)\n  LAST=$(cat \"$UV_VENV/.deps_hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    uv sync\n    echo \"$HASH\" > \"$UV_VENV/.deps_hash\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Python + uv environment ready!' '' \\\n    'Python version:' \\\n    \"  $(python3 --version 2>&1)\" '' \\\n    'uv commands:' \\\n    '  uv add <package>' \\\n    '  uv sync' \\\n    '  uv run <script>'\nfi\n"
+      "on-activate": "export UV_CACHE=\"$FLOX_ENV_CACHE/python-uv\"\nexport UV_VENV=\"$UV_CACHE/venv\"\nexport UV_PROJECT_ENVIRONMENT=\"$UV_VENV\"\n\nmkdir -p \"$UV_CACHE\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$UV_CACHE/venv.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$UV_VENV\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  uv venv -p python3 \"$UV_VENV\"\n  echo \"$CURRENT_INTERP\" > \"$UV_CACHE/venv.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$UV_VENV/bin/activate\"\n\nif [ \"$PYTHON_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f uv.lock ]; then\n  HASH=$(md5sum uv.lock 2>/dev/null \\\n    || md5 -q uv.lock)\n  HASH=$(echo \"$HASH\" | cut -d\" \" -f1)\n  LAST=$(cat \"$UV_VENV/.deps_hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    uv sync\n    echo \"$HASH\" > \"$UV_VENV/.deps_hash\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Python + uv environment ready!' '' \\\n    'Python version:' \\\n    \"  $(python3 --version 2>&1)\"\nfi\n"
     },
     "profile": {
       "bash": "source \"$FLOX_ENV_CACHE/python-uv/venv/bin/activate\"\n",
@@ -310,7 +311,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
+      "schema-version": "1.17.0",
+      "description": "# Python + uv\n\nuv commands:\n\n```text\nuv add <package>\nuv sync\nuv run <script>\n```\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -318,7 +320,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Python + uv environment ready!' '' \\\n    'Python version:' \\\n    \"  $(python3 --version 2>&1)\" '' \\\n    'uv commands:' \\\n    '  uv add <package>' \\\n    '  uv sync' \\\n    '  uv run <script>'\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Python + uv environment ready!' '' \\\n    'Python version:' \\\n    \"  $(python3 --version 2>&1)\"\nfi\n"
       },
       "options": {
         "systems": [

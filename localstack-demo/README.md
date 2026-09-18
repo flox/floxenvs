@@ -3,8 +3,8 @@
 <!-- codespaces-badge -->
 [![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Flocalstack-demo%2Fdevcontainer.json)
 
-Full LocalStack demo environment with styled terminal
-output and service management.
+Full LocalStack demo environment with service-management
+instructions in its description.
 
 For a minimal environment to include in your own project,
 see [localstack](../localstack/) or use `flox/localstack`
@@ -21,7 +21,6 @@ flox activate -r flox/localstack-demo --start-services
 - LocalStack
 - AWS CLI v2 + `awscli-local`
 - kubectl
-- `gum` for styled terminal output
 - Automatic venv setup on first activation
 - Service definition for background LocalStack
 

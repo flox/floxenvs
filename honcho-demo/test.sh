@@ -17,7 +17,6 @@ command_exists honcho-migrate
 command_exists psql
 command_exists redis-cli
 command_exists python
-command_exists gum
 
 # quickstart.py must parse and import its top-level deps cleanly.
 python -c "import ast; ast.parse(open('quickstart.py').read())"

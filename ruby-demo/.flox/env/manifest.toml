@@ -1,4 +1,16 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# Ruby
+
+Commands:
+
+```text
+bundle install   Install gems
+bundle exec      Run with bundler
+ruby <file>      Run a script
+```
+'''
 
 [include]
 environments = [
@@ -16,11 +28,7 @@ if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
     --padding '1 4' \
     'Ruby environment ready!' '' \
     'Ruby version:' \
-    "  $(ruby --version)" '' \
-    'Commands:' \
-    '  bundle install   Install gems' \
-    '  bundle exec      Run with bundler' \
-    '  ruby <file>      Run a script'
+    "  $(ruby --version)"
 fi
 '''
 

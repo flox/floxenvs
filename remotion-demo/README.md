@@ -3,8 +3,8 @@
 <!-- codespaces-badge -->
 [![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fremotion-demo%2Fdevcontainer.json)
 
-Demo variant of [remotion](../remotion) — adds `gum` for a
-styled welcome banner with quick-start commands.
+Demo variant of [remotion](../remotion) with quick-start
+commands in its description and a Node.js version display.
 
 ## Quick start
 
@@ -12,7 +12,7 @@ styled welcome banner with quick-start commands.
 flox activate -r flox/remotion-demo
 ```
 
-The banner prints the canonical bootstrap commands for a new
+The description contains the canonical bootstrap commands for a new
 Remotion project. From here:
 
 ```bash
@@ -38,7 +38,7 @@ flox-ai launch claude
 
 ## What's added on top of `flox/remotion`
 
-- `gum` — styled banner during `on-activate`
+- `gum` — styled Node.js version display during `on-activate`
 
 Everything else (Node.js 22, ffmpeg, the `flox-ai` launcher,
 and the `skills-remotion` plugin) comes from the

@@ -4,7 +4,7 @@
 [![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fworktrunk-demo%2Fdevcontainer.json)
 
 Interactive demo of the [Worktrunk](../worktrunk/)
-environment with a styled banner.
+environment with usage instructions in its description.
 
 ## Quick start
 
@@ -24,8 +24,7 @@ wt switch -c feat
 
 Everything from [worktrunk](../worktrunk/) plus:
 
-- `gum` — styled terminal UI
-- Welcome banner on activate
+- Usage instructions in the environment description
 
 ## See also
 

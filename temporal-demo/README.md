@@ -6,7 +6,7 @@
 Full Temporal demo environment with styled terminal
 output. Includes the Temporal dev server (via the
 minimal [temporal](../temporal/) layer) and `gum` for
-formatted usage hints on activation.
+the Web UI URL display on activation.
 
 For a minimal environment to include in your own
 project, see [temporal](../temporal/) or use

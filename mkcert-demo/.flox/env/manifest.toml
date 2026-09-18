@@ -1,4 +1,8 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# mkcert
+'''
 
 [include]
 environments = [
@@ -16,10 +20,12 @@ if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
     --padding '1 4' \
     'mkcert environment ready!' '' \
     'Domains:' \
-    "  $MKCERT_DOMAINS" '' \
+    "  $MKCERT_DOMAINS" \
+    '' \
     'Certificate files:' \
     "  $CAROOT/domains.pem" \
-    "  $CAROOT/domains-key.pem" '' \
+    "  $CAROOT/domains-key.pem" \
+    '' \
     'Node.js CA:' \
     "  NODE_EXTRA_CA_CERTS=$NODE_EXTRA_CA_CERTS"
 fi

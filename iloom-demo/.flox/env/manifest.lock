@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# iloom\nAI-assisted dev in isolated worktrees\n\n```text\nil start <issue>   — start a loom for an issue\nil finish          — validate, merge, clean up\nil plan <issue>    — decompose an epic\nil telemetry off   — disable anonymous usage data\n```\n\n```text\niloom uses gh for issue tracker auth:\n  gh auth login\n```\n",
     "install": {
       "flox-ai": {
         "pkg-path": "flox/flox-ai",
@@ -11,17 +12,10 @@
         "pkg-path": "gh",
         "pkg-group": "iloom"
       },
-      "gum": {
-        "pkg-path": "gum",
-        "pkg-group": "demo-tools"
-      },
       "iloom-cli": {
         "pkg-path": "flox/iloom-cli",
         "pkg-group": "iloom"
       }
-    },
-    "hook": {
-      "on-activate": "if [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 60 --margin \"1 2\" --padding \"1 2\" \\\n    \"iloom\" \"AI-assisted dev in isolated worktrees\"\n  echo \"\"\n  echo \"  il start <issue>   — start a loom for an issue\"\n  echo \"  il finish          — validate, merge, clean up\"\n  echo \"  il plan <issue>    — decompose an epic\"\n  echo \"  il telemetry off   — disable anonymous usage data\"\n  echo \"\"\n  echo \"  iloom uses gh for issue tracker auth:\"\n  echo \"    gh auth login\"\n  echo \"\"\nfi\n"
     },
     "options": {
       "systems": [
@@ -32,93 +26,6 @@
     }
   },
   "packages": [
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/82mlsar44w9r83rkjglv77yfc1rl2bpj-gum-2.0.1.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
-      "name": "gum-2.0.1",
-      "pname": "gum",
-      "rev": "20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
-      "rev_count": 1076192,
-      "rev_date": "2026-09-19T02:38:33Z",
-      "scrape_date": "2026-09-20T04:57:59.606540Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.0.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/51k6cmy2dmz8mqpf523skc2zx1adsyjc-gum-2.0.1"
-      },
-      "system": "aarch64-darwin",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/rp79p6b38k143sv8imv7jf1x6qy4v4kk-gum-2.0.1.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
-      "name": "gum-2.0.1",
-      "pname": "gum",
-      "rev": "20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
-      "rev_count": 1076192,
-      "rev_date": "2026-09-19T02:38:33Z",
-      "scrape_date": "2026-09-20T05:30:54.743510Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.0.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/spwyp5r4xdmshagzg02zp9kl9hcy1jcs-gum-2.0.1"
-      },
-      "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/i5qkjw5ia5sma1c01fcqjcx6w29pzvi6-gum-2.0.1.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
-      "name": "gum-2.0.1",
-      "pname": "gum",
-      "rev": "20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
-      "rev_count": 1076192,
-      "rev_date": "2026-09-19T02:38:33Z",
-      "scrape_date": "2026-09-20T06:07:13.864905Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.0.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/mds9nirp9ia1mi3fbmcqlymi71nylj94-gum-2.0.1"
-      },
-      "system": "x86_64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
     {
       "attr_path": "flox-ai",
       "broken": false,
@@ -389,16 +296,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
-      "install": {
-        "gum": {
-          "pkg-path": "gum",
-          "pkg-group": "demo-tools"
-        }
-      },
-      "hook": {
-        "on-activate": "if [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 60 --margin \"1 2\" --padding \"1 2\" \\\n    \"iloom\" \"AI-assisted dev in isolated worktrees\"\n  echo \"\"\n  echo \"  il start <issue>   — start a loom for an issue\"\n  echo \"  il finish          — validate, merge, clean up\"\n  echo \"  il plan <issue>    — decompose an epic\"\n  echo \"  il telemetry off   — disable anonymous usage data\"\n  echo \"\"\n  echo \"  iloom uses gh for issue tracker auth:\"\n  echo \"    gh auth login\"\n  echo \"\"\nfi\n"
-      },
+      "schema-version": "1.17.0",
+      "description": "# iloom\nAI-assisted dev in isolated worktrees\n\n```text\nil start <issue>   — start a loom for an issue\nil finish          — validate, merge, clean up\nil plan <issue>    — decompose an epic\nil telemetry off   — disable anonymous usage data\n```\n\n```text\niloom uses gh for issue tracker auth:\n  gh auth login\n```\n",
       "options": {
         "systems": [
           "aarch64-darwin",

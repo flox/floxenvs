@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# Python + pip\n\npip commands:\n\n```text\npip install <package>\npip install -r requirements.txt\npip list\n```\n",
     "install": {
       "gum": {
         "pkg-path": "gum",
@@ -16,7 +17,7 @@
       "PYTHON_AUTO_INSTALL": "true"
     },
     "hook": {
-      "on-activate": "export PIP_CACHE=\"$FLOX_ENV_CACHE/python-pip\"\nexport PIP_VENV=\"$PIP_CACHE/venv\"\n\nmkdir -p \"$PIP_CACHE\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$PIP_CACHE/venv.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$PIP_VENV\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  python3 -m venv --upgrade-deps \"$PIP_VENV\"\n  echo \"$CURRENT_INTERP\" > \"$PIP_CACHE/venv.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$PIP_VENV/bin/activate\"\n\nif [ \"$PYTHON_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f requirements.txt ]; then\n  HASH=$(md5sum requirements.txt 2>/dev/null \\\n    || md5 -q requirements.txt)\n  HASH=$(echo \"$HASH\" | cut -d\" \" -f1)\n  LAST=$(cat \"$PIP_VENV/.deps_hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    pip install -q -r requirements.txt\n    echo \"$HASH\" > \"$PIP_VENV/.deps_hash\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Python + pip environment ready!' '' \\\n    'Python version:' \\\n    \"  $(python3 --version 2>&1)\" '' \\\n    'pip commands:' \\\n    '  pip install <package>' \\\n    '  pip install -r requirements.txt' \\\n    '  pip list'\nfi\n"
+      "on-activate": "export PIP_CACHE=\"$FLOX_ENV_CACHE/python-pip\"\nexport PIP_VENV=\"$PIP_CACHE/venv\"\n\nmkdir -p \"$PIP_CACHE\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$PIP_CACHE/venv.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$PIP_VENV\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  python3 -m venv --upgrade-deps \"$PIP_VENV\"\n  echo \"$CURRENT_INTERP\" > \"$PIP_CACHE/venv.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$PIP_VENV/bin/activate\"\n\nif [ \"$PYTHON_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f requirements.txt ]; then\n  HASH=$(md5sum requirements.txt 2>/dev/null \\\n    || md5 -q requirements.txt)\n  HASH=$(echo \"$HASH\" | cut -d\" \" -f1)\n  LAST=$(cat \"$PIP_VENV/.deps_hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    pip install -q -r requirements.txt\n    echo \"$HASH\" > \"$PIP_VENV/.deps_hash\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Python + pip environment ready!' '' \\\n    'Python version:' \\\n    \"  $(python3 --version 2>&1)\"\nfi\n"
     },
     "profile": {
       "bash": "source \"$FLOX_ENV_CACHE/python-pip/venv/bin/activate\"\n",
@@ -217,7 +218,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
+      "schema-version": "1.17.0",
+      "description": "# Python + pip\n\npip commands:\n\n```text\npip install <package>\npip install -r requirements.txt\npip list\n```\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -225,7 +227,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Python + pip environment ready!' '' \\\n    'Python version:' \\\n    \"  $(python3 --version 2>&1)\" '' \\\n    'pip commands:' \\\n    '  pip install <package>' \\\n    '  pip install -r requirements.txt' \\\n    '  pip list'\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Python + pip environment ready!' '' \\\n    'Python version:' \\\n    \"  $(python3 --version 2>&1)\"\nfi\n"
       },
       "options": {
         "systems": [

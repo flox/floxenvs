@@ -1,4 +1,16 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# Python + uv
+
+uv commands:
+
+```text
+uv add <package>
+uv sync
+uv run <script>
+```
+'''
 
 [include]
 environments = [
@@ -18,11 +30,7 @@ if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
     --padding '1 4' \
     'Python + uv environment ready!' '' \
     'Python version:' \
-    "  $(python3 --version 2>&1)" '' \
-    'uv commands:' \
-    '  uv add <package>' \
-    '  uv sync' \
-    '  uv run <script>'
+    "  $(python3 --version 2>&1)"
 fi
 '''
 
