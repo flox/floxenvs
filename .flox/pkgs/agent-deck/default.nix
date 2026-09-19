@@ -85,13 +85,33 @@ buildGoModule (finalAttrs: {
   # Skip them there only — on Linux they run (procfs works in the
   # sandbox), and the remaining cleanup-safety tests (unpushed/dirty
   # exclusion) run everywhere with lsof on PATH.
+  #
+  # 1.16.11's remote-parity suite drives a real OpenSSH client against an
+  # in-process SSH server fixture. Its sibling tests call t.Skip when
+  # exec.LookPath("ssh") fails, so they stay dormant in the sandbox, but
+  # the new TestHealthRemoteExecJSONParity calls t.Fatal instead
+  # ("health parity requires OpenSSH client") and fails the build. Skip
+  # it rather than putting openssh on PATH: that wakes the whole suite,
+  # whose fixtures need `python3 -u receiver.py` under a live tmux PTY
+  # and a 10s readiness deadline — unreachable on darwin and flaky on
+  # loaded Linux builders.
+  #
+  # TestSessionContextJSONGolden/claude-model-switch redacts the fixture
+  # root out of the golden document by slugifying it into a Claude Code
+  # project key. The darwin builder's sandbox path
+  # (/private/tmp/nix-build-agent-deck-<ver>.drv-0/...) slugifies past
+  # the length the redaction expects, so the raw path leaks into the
+  # produced document and the comparison fails. Linux's shorter /build
+  # path redacts cleanly, so skip that one on darwin only.
   checkFlags = [
     "-short"
     "-skip"
     (
       "^TestValidatePluginFlags_"
+      + "|^TestHealthRemoteExecJSONParity$"
       + lib.optionalString stdenv.hostPlatform.isDarwin (
-        "|^TestCleanupExcludesLiveProcessCWDInside$"
+        "|^TestSessionContextJSONGolden$"
+        + "|^TestCleanupExcludesLiveProcessCWDInside$"
         + "|^TestCleanupRevalidatesRealityBeforeRemoval$"
         + "|^TestCleanupForceCannotOverrideRealityExclusions$"
       )
