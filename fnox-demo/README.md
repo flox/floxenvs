@@ -22,8 +22,9 @@ fnox-demo/
 flox activate -r flox/fnox-demo
 ```
 
-The hook loads the demo age key, then prints a list of things
-to try. The four headline patterns:
+The hook loads the demo age key.
+The environment description lists commands to try.
+The four headline patterns:
 
 ```bash
 # 1. Just decrypt and print one secret.
@@ -94,7 +95,6 @@ Full provider docs: <https://fnox.jdx.dev/providers/overview.html>
 Everything from [fnox](../fnox/) plus:
 
 - `age` — encryption tool (so you can rotate the demo key)
-- `gum` — styled terminal UI for the welcome banner
 
 ## See also
 

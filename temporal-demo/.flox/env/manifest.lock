@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# Temporal\n\nStart Temporal + worker in the background:\n\n```text\nflox services start\nflox activate --start-services\n```\n\nSend a hello workflow:\n\n```text\ngo run ./start YourName\n```\n",
     "install": {
       "flox-ai": {
         "pkg-path": "flox/flox-ai",
@@ -42,7 +43,7 @@
       "TEMPORAL_UI_PORT": "8233"
     },
     "hook": {
-      "on-activate": "export TEMPORAL_DATA=\"$FLOX_ENV_CACHE/temporal\"\n\nif [ ! -d \"$TEMPORAL_DATA\" ]; then\n  mkdir -p \"$TEMPORAL_DATA\"\nfi\n\n# Point Go's caches at a writable location.\n# Default GOPATH is $HOME/go, which fails inside the\n# CI test namespace where HOME=/var/empty (read-only).\nexport GOPATH=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$GOPATH/pkg/mod\"\nexport GOCACHE=\"$FLOX_ENV_CACHE/go-build\"\nmkdir -p \"$GOPATH\" \"$GOCACHE\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Temporal + worker in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Send a hello workflow:' \\\n    '  go run ./start YourName' '' \\\n    'Temporal Web UI:' \\\n    \"  http://$TEMPORAL_HOST:$TEMPORAL_UI_PORT\"\nfi\n"
+      "on-activate": "export TEMPORAL_DATA=\"$FLOX_ENV_CACHE/temporal\"\n\nif [ ! -d \"$TEMPORAL_DATA\" ]; then\n  mkdir -p \"$TEMPORAL_DATA\"\nfi\n\n# Point Go's caches at a writable location.\n# Default GOPATH is $HOME/go, which fails inside the\n# CI test namespace where HOME=/var/empty (read-only).\nexport GOPATH=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$GOPATH/pkg/mod\"\nexport GOCACHE=\"$FLOX_ENV_CACHE/go-build\"\nmkdir -p \"$GOPATH\" \"$GOCACHE\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Temporal Web UI:' \\\n    \"  http://$TEMPORAL_HOST:$TEMPORAL_UI_PORT\"\nfi\n"
     },
     "options": {
       "systems": [
@@ -801,7 +802,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
+      "schema-version": "1.17.0",
+      "description": "# Temporal\n\nStart Temporal + worker in the background:\n\n```text\nflox services start\nflox activate --start-services\n```\n\nSend a hello workflow:\n\n```text\ngo run ./start YourName\n```\n",
       "install": {
         "flox-ai": {
           "pkg-path": "flox/flox-ai",
@@ -829,7 +831,7 @@
         }
       },
       "hook": {
-        "on-activate": "# Point Go's caches at a writable location.\n# Default GOPATH is $HOME/go, which fails inside the\n# CI test namespace where HOME=/var/empty (read-only).\nexport GOPATH=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$GOPATH/pkg/mod\"\nexport GOCACHE=\"$FLOX_ENV_CACHE/go-build\"\nmkdir -p \"$GOPATH\" \"$GOCACHE\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Start Temporal + worker in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Send a hello workflow:' \\\n    '  go run ./start YourName' '' \\\n    'Temporal Web UI:' \\\n    \"  http://$TEMPORAL_HOST:$TEMPORAL_UI_PORT\"\nfi\n"
+        "on-activate": "# Point Go's caches at a writable location.\n# Default GOPATH is $HOME/go, which fails inside the\n# CI test namespace where HOME=/var/empty (read-only).\nexport GOPATH=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$GOPATH/pkg/mod\"\nexport GOCACHE=\"$FLOX_ENV_CACHE/go-build\"\nmkdir -p \"$GOPATH\" \"$GOCACHE\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Temporal Web UI:' \\\n    \"  http://$TEMPORAL_HOST:$TEMPORAL_UI_PORT\"\nfi\n"
       },
       "options": {
         "systems": [
@@ -854,7 +856,8 @@
     "include": [
       {
         "manifest": {
-          "schema-version": "1.10.0",
+          "schema-version": "1.17.0",
+          "description": "Temporal development server with SQLite storage and a web UI.\n",
           "install": {
             "temporal": {
               "pkg-path": "temporal",

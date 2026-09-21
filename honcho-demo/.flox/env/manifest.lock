@@ -1,12 +1,9 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.11.0",
+    "schema-version": "1.17.0",
+    "description": "# Honcho\nSelf-hosted memory infrastructure for stateful agents\n\n```text\nflox services start             — postgres + redis + api + deriver\npython quickstart.py            — run the Store → Reason → Query loop\n```\n\n```text\nReasoning endpoints need an LLM key:\n  export LLM_OPENAI_API_KEY=sk-...\n```\n",
     "install": {
-      "gum": {
-        "pkg-path": "gum",
-        "pkg-group": "demo-tools"
-      },
       "honcho": {
         "pkg-path": "flox/honcho",
         "pkg-group": "honcho",
@@ -46,7 +43,7 @@
       "REDIS_PORT": "16379"
     },
     "hook": {
-      "on-activate": "export HONCHO_CACHE=\"$FLOX_ENV_CACHE/honcho\"\nexport PGDIR=\"$HONCHO_CACHE/pgdata\"\nexport PGDATA=\"$PGDIR/data\"\nexport REDISDIR=\"$HONCHO_CACHE/redis\"\nexport LOGDIR=\"$HONCHO_CACHE/logs\"\nmkdir -p \"$PGDIR\" \"$REDISDIR\" \"$LOGDIR\"\n\n# Unix socket dir kept short (<103 bytes) — hashed per env.\nexport PG_SOCKETDIR=\"/tmp/flox-honcho-pg-$(echo \"$PGDIR\" | cksum | cut -d\" \" -f1)\"\nmkdir -p \"$PG_SOCKETDIR\"\n\nexport PGHOST=\"$PGHOSTADDR\"\nexport DB_CONNECTION_URI=\"postgresql+psycopg://$PGUSER:$PGPASS@$PGHOSTADDR:$PGPORT/$PGDATABASE\"\nexport CACHE_URL=\"redis://$PGHOSTADDR:$REDIS_PORT/0?suppress=true\"\n\n# Where pg_config et al find pgvector's .so — flox links the\n# extension into $FLOX_ENV but postgres needs the dynamic\n# library lookup to work.\nexport PG_LIBDIR=\"$FLOX_ENV/lib\"\nexport PG_SHAREDIR=\"$FLOX_ENV/share/postgresql\"\n\nINIT_LOG=\"$PGDIR/init.log\"\n\npg_init_fail() {\n  echo \"ERROR: PostgreSQL initialization failed.\" >&2\n  [ -f \"$INIT_LOG\" ] && { echo \"--- init.log ---\" >&2; cat \"$INIT_LOG\" >&2; echo \"--- end init.log ---\" >&2; }\n  exit 1\n}\n\nif [[ ! -d \"$PGDATA\" ]]; then\n  mkdir -p \"$PGDATA\"\n  initdb \"$PGDATA\" \\\n    --locale=C --encoding=UTF8 --auth=trust \\\n    --username \"$PGUSER\" \\\n    >> \"$INIT_LOG\" 2>&1 || pg_init_fail\n\n  pg_ctl -D \"$PGDATA\" -w start \\\n    -o \"-c unix_socket_directories=$PG_SOCKETDIR -c listen_addresses=$PGHOSTADDR -p $PGPORT\" \\\n    >> \"$INIT_LOG\" 2>&1 || pg_init_fail\n\n  createdb -h \"$PG_SOCKETDIR\" -p \"$PGPORT\" -U \"$PGUSER\" \"$PGDATABASE\" \\\n    >> \"$INIT_LOG\" 2>&1 || pg_init_fail\n  psql -h \"$PG_SOCKETDIR\" -p \"$PGPORT\" -U \"$PGUSER\" -d \"$PGDATABASE\" \\\n    -c \"CREATE EXTENSION IF NOT EXISTS vector\" \\\n    >> \"$INIT_LOG\" 2>&1 || pg_init_fail\n\n  # Run alembic migrations once at init.\n  honcho-migrate upgrade head >> \"$INIT_LOG\" 2>&1 || pg_init_fail\n\n  pg_ctl -D \"$PGDATA\" -m fast -w stop >> \"$INIT_LOG\" 2>&1\n  rm -f \"$INIT_LOG\"\nfi\n\n# One-shot reminder: honcho's reasoning paths need an LLM key.\n# /health and the storage API work without one, so this is a\n# soft warning, not a hard failure.\nif [ -z \"${LLM_OPENAI_API_KEY:-}${LLM_ANTHROPIC_API_KEY:-}${LLM_GEMINI_API_KEY:-}${LLM_OPENAI_BASE_URL:-}${LLM_ANTHROPIC_BASE_URL:-}${LLM_GEMINI_BASE_URL:-}\" ] \\\n    && [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  echo \"honcho: no LLM provider configured — chat/reasoning endpoints will fail.\" >&2\n  echo \"        set LLM_OPENAI_API_KEY (or _ANTHROPIC_, _GEMINI_), or an\" >&2\n  echo \"        LLM_*_BASE_URL for a local/compatible endpoint, first.\" >&2\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 64 --margin \"1 2\" --padding \"1 2\" \\\n    \"Honcho\" \\\n    \"Self-hosted memory infrastructure for stateful agents\"\n  echo \"\"\n  echo \"  flox services start             — postgres + redis + api + deriver\"\n  echo \"  curl $HONCHO_URL/health         — health probe (no LLM key needed)\"\n  echo \"  python quickstart.py            — run the Store → Reason → Query loop\"\n  echo \"\"\n  echo \"  Reasoning endpoints need an LLM key:\"\n  echo \"    export LLM_OPENAI_API_KEY=sk-...\"\n  echo \"\"\nfi\n"
+      "on-activate": "export HONCHO_CACHE=\"$FLOX_ENV_CACHE/honcho\"\nexport PGDIR=\"$HONCHO_CACHE/pgdata\"\nexport PGDATA=\"$PGDIR/data\"\nexport REDISDIR=\"$HONCHO_CACHE/redis\"\nexport LOGDIR=\"$HONCHO_CACHE/logs\"\nmkdir -p \"$PGDIR\" \"$REDISDIR\" \"$LOGDIR\"\n\n# Unix socket dir kept short (<103 bytes) — hashed per env.\nexport PG_SOCKETDIR=\"/tmp/flox-honcho-pg-$(echo \"$PGDIR\" | cksum | cut -d\" \" -f1)\"\nmkdir -p \"$PG_SOCKETDIR\"\n\nexport PGHOST=\"$PGHOSTADDR\"\nexport DB_CONNECTION_URI=\"postgresql+psycopg://$PGUSER:$PGPASS@$PGHOSTADDR:$PGPORT/$PGDATABASE\"\nexport CACHE_URL=\"redis://$PGHOSTADDR:$REDIS_PORT/0?suppress=true\"\n\n# Where pg_config et al find pgvector's .so — flox links the\n# extension into $FLOX_ENV but postgres needs the dynamic\n# library lookup to work.\nexport PG_LIBDIR=\"$FLOX_ENV/lib\"\nexport PG_SHAREDIR=\"$FLOX_ENV/share/postgresql\"\n\nINIT_LOG=\"$PGDIR/init.log\"\n\npg_init_fail() {\n  echo \"ERROR: PostgreSQL initialization failed.\" >&2\n  [ -f \"$INIT_LOG\" ] && { echo \"--- init.log ---\" >&2; cat \"$INIT_LOG\" >&2; echo \"--- end init.log ---\" >&2; }\n  exit 1\n}\n\nif [[ ! -d \"$PGDATA\" ]]; then\n  mkdir -p \"$PGDATA\"\n  initdb \"$PGDATA\" \\\n    --locale=C --encoding=UTF8 --auth=trust \\\n    --username \"$PGUSER\" \\\n    >> \"$INIT_LOG\" 2>&1 || pg_init_fail\n\n  pg_ctl -D \"$PGDATA\" -w start \\\n    -o \"-c unix_socket_directories=$PG_SOCKETDIR -c listen_addresses=$PGHOSTADDR -p $PGPORT\" \\\n    >> \"$INIT_LOG\" 2>&1 || pg_init_fail\n\n  createdb -h \"$PG_SOCKETDIR\" -p \"$PGPORT\" -U \"$PGUSER\" \"$PGDATABASE\" \\\n    >> \"$INIT_LOG\" 2>&1 || pg_init_fail\n  psql -h \"$PG_SOCKETDIR\" -p \"$PGPORT\" -U \"$PGUSER\" -d \"$PGDATABASE\" \\\n    -c \"CREATE EXTENSION IF NOT EXISTS vector\" \\\n    >> \"$INIT_LOG\" 2>&1 || pg_init_fail\n\n  # Run alembic migrations once at init.\n  honcho-migrate upgrade head >> \"$INIT_LOG\" 2>&1 || pg_init_fail\n\n  pg_ctl -D \"$PGDATA\" -m fast -w stop >> \"$INIT_LOG\" 2>&1\n  rm -f \"$INIT_LOG\"\nfi\n\n# One-shot reminder: honcho's reasoning paths need an LLM key.\n# /health and the storage API work without one, so this is a\n# soft warning, not a hard failure.\nif [ -z \"${LLM_OPENAI_API_KEY:-}${LLM_ANTHROPIC_API_KEY:-}${LLM_GEMINI_API_KEY:-}${LLM_OPENAI_BASE_URL:-}${LLM_ANTHROPIC_BASE_URL:-}${LLM_GEMINI_BASE_URL:-}\" ] \\\n    && [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  echo \"honcho: no LLM provider configured — chat/reasoning endpoints will fail.\" >&2\n  echo \"        set LLM_OPENAI_API_KEY (or _ANTHROPIC_, _GEMINI_), or an\" >&2\n  echo \"        LLM_*_BASE_URL for a local/compatible endpoint, first.\" >&2\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  echo \"  curl $HONCHO_URL/health         — health probe (no LLM key needed)\"\nfi\n"
     },
     "options": {
       "systems": [
@@ -71,93 +68,6 @@
     }
   },
   "packages": [
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/vz30zjaaykvcc8qg04qd2qny12vzpsa7-gum-2.0.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c043004d1c6985732bcc1cbc5a9c9aecbbb4e0f0",
-      "name": "gum-2.0.0",
-      "pname": "gum",
-      "rev": "c043004d1c6985732bcc1cbc5a9c9aecbbb4e0f0",
-      "rev_count": 1068089,
-      "rev_date": "2026-09-05T13:27:54Z",
-      "scrape_date": "2026-09-06T04:57:30.510405Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.0.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/bmw22793009g1j9r50phby3981zai170-gum-2.0.0"
-      },
-      "system": "aarch64-darwin",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/dhr5vw1c0rcychdwisadbwvdp9kv38mv-gum-2.0.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c043004d1c6985732bcc1cbc5a9c9aecbbb4e0f0",
-      "name": "gum-2.0.0",
-      "pname": "gum",
-      "rev": "c043004d1c6985732bcc1cbc5a9c9aecbbb4e0f0",
-      "rev_count": 1068089,
-      "rev_date": "2026-09-05T13:27:54Z",
-      "scrape_date": "2026-09-06T05:28:40.011659Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.0.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/clmwfm4asd0834sm9kcwg35fmx5lk1gs-gum-2.0.0"
-      },
-      "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/3ymjicjdq89finmjjvidbakvnfgxpd3l-gum-2.0.0.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=c043004d1c6985732bcc1cbc5a9c9aecbbb4e0f0",
-      "name": "gum-2.0.0",
-      "pname": "gum",
-      "rev": "c043004d1c6985732bcc1cbc5a9c9aecbbb4e0f0",
-      "rev_count": 1068089,
-      "rev_date": "2026-09-05T13:27:54Z",
-      "scrape_date": "2026-09-06T06:05:14.748702Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.0.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/a6zkjhi574zg3rjl0b3ri0cx102qbd26-gum-2.0.0"
-      },
-      "system": "x86_64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
     {
       "attr_path": "honcho",
       "broken": false,
@@ -538,15 +448,10 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.11.0",
-      "install": {
-        "gum": {
-          "pkg-path": "gum",
-          "pkg-group": "demo-tools"
-        }
-      },
+      "schema-version": "1.17.0",
+      "description": "# Honcho\nSelf-hosted memory infrastructure for stateful agents\n\n```text\nflox services start             — postgres + redis + api + deriver\npython quickstart.py            — run the Store → Reason → Query loop\n```\n\n```text\nReasoning endpoints need an LLM key:\n  export LLM_OPENAI_API_KEY=sk-...\n```\n",
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 64 --margin \"1 2\" --padding \"1 2\" \\\n    \"Honcho\" \\\n    \"Self-hosted memory infrastructure for stateful agents\"\n  echo \"\"\n  echo \"  flox services start             — postgres + redis + api + deriver\"\n  echo \"  curl $HONCHO_URL/health         — health probe (no LLM key needed)\"\n  echo \"  python quickstart.py            — run the Store → Reason → Query loop\"\n  echo \"\"\n  echo \"  Reasoning endpoints need an LLM key:\"\n  echo \"    export LLM_OPENAI_API_KEY=sk-...\"\n  echo \"\"\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  echo \"  curl $HONCHO_URL/health         — health probe (no LLM key needed)\"\nfi\n"
       },
       "options": {
         "systems": [
@@ -566,7 +471,8 @@
     "include": [
       {
         "manifest": {
-          "schema-version": "1.10.0",
+          "schema-version": "1.17.0",
+          "description": "Honcho agent memory server with PostgreSQL, Redis, and Python SDK.\n",
           "install": {
             "honcho": {
               "pkg-path": "flox/honcho",

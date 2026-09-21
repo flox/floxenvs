@@ -1,4 +1,15 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# MongoDB
+
+Start MongoDB in the background:
+
+```text
+flox services start
+flox activate --start-services
+```
+'''
 
 [include]
 environments = [
@@ -20,9 +31,6 @@ on-activate = '''
 if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
   gum style --border double --margin '1 2' \
     --padding '1 4' \
-    'Start MongoDB in the background:' \
-    '  flox services start' \
-    '  flox activate --start-services' '' \
     'Connect to MongoDB:' \
     "  mongosh --host $MONGO_HOST --port $MONGO_PORT" \
     '' \

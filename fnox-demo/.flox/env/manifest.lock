@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# fnox demo\nFort Knox for your secrets\n\n```text\n  fnox list                  — view configured secrets\n  fnox get DATABASE_URL      — decrypt one secret\n  fnox exec -- env | grep ^DEMO_\n  fnox lease create greeting — run command lease\n  fnox tui                   — interactive dashboard\n```\n",
     "install": {
       "age": {
         "pkg-path": "age",
@@ -10,17 +11,13 @@
       "fnox": {
         "pkg-path": "flox/fnox",
         "pkg-group": "fnox"
-      },
-      "gum": {
-        "pkg-path": "gum",
-        "pkg-group": "demo-tools"
       }
     },
     "vars": {
       "FNOX_LOG": "warn"
     },
     "hook": {
-      "on-activate": "# Per-environment data path; used by fnox to cache lease state,\n# session tokens, and resolved secrets.\nexport FNOX_DATA_DIR=\"$FLOX_ENV_CACHE/fnox\"\nmkdir -p \"$FNOX_DATA_DIR\"\n\n# Use the demo identity that's checked into the repo. This is a\n# *demo-only* key — never reuse it for real secrets.\nexport FNOX_AGE_KEY=\"$(grep '^AGE-SECRET-KEY-' \\\n  \"$FLOX_ENV_PROJECT/fnox-demo-key.txt\")\"\n\n# Per-cwd config (fnox auto-discovers fnox.toml).\nexport FNOX_CONFIG_DIR=\"$FLOX_ENV_PROJECT\"\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 60 --margin \"1 2\" --padding \"1 2\" \\\n    \"fnox demo\" \"Fort Knox for your secrets\"\n  echo \"\"\n  echo \"  Try one of these (cwd: $FLOX_ENV_PROJECT):\"\n  echo \"\"\n  echo \"    fnox list                  — view configured secrets\"\n  echo \"    fnox get DATABASE_URL      — decrypt one secret\"\n  echo \"    fnox exec -- env | grep ^DEMO_\"\n  echo \"    fnox lease create greeting — run command lease\"\n  echo \"    fnox tui                   — interactive dashboard\"\n  echo \"\"\nfi\n"
+      "on-activate": "# Per-environment data path; used by fnox to cache lease state,\n# session tokens, and resolved secrets.\nexport FNOX_DATA_DIR=\"$FLOX_ENV_CACHE/fnox\"\nmkdir -p \"$FNOX_DATA_DIR\"\n\n# Use the demo identity that's checked into the repo. This is a\n# *demo-only* key — never reuse it for real secrets.\nexport FNOX_AGE_KEY=\"$(grep '^AGE-SECRET-KEY-' \\\n  \"$FLOX_ENV_PROJECT/fnox-demo-key.txt\")\"\n\n# Per-cwd config (fnox auto-discovers fnox.toml).\nexport FNOX_CONFIG_DIR=\"$FLOX_ENV_PROJECT\"\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  echo \"  Try one of these (cwd: $FLOX_ENV_PROJECT):\"\nfi\n"
     },
     "options": {
       "systems": [
@@ -119,93 +116,6 @@
       "priority": 5
     },
     {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/82mlsar44w9r83rkjglv77yfc1rl2bpj-gum-2.0.1.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
-      "name": "gum-2.0.1",
-      "pname": "gum",
-      "rev": "20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
-      "rev_count": 1076192,
-      "rev_date": "2026-09-19T02:38:33Z",
-      "scrape_date": "2026-09-20T04:57:59.606540Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.0.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/51k6cmy2dmz8mqpf523skc2zx1adsyjc-gum-2.0.1"
-      },
-      "system": "aarch64-darwin",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/rp79p6b38k143sv8imv7jf1x6qy4v4kk-gum-2.0.1.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
-      "name": "gum-2.0.1",
-      "pname": "gum",
-      "rev": "20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
-      "rev_count": 1076192,
-      "rev_date": "2026-09-19T02:38:33Z",
-      "scrape_date": "2026-09-20T05:30:54.743510Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.0.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/spwyp5r4xdmshagzg02zp9kl9hcy1jcs-gum-2.0.1"
-      },
-      "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/i5qkjw5ia5sma1c01fcqjcx6w29pzvi6-gum-2.0.1.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
-      "name": "gum-2.0.1",
-      "pname": "gum",
-      "rev": "20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
-      "rev_count": 1076192,
-      "rev_date": "2026-09-19T02:38:33Z",
-      "scrape_date": "2026-09-20T06:07:13.864905Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.0.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/mds9nirp9ia1mi3fbmcqlymi71nylj94-gum-2.0.1"
-      },
-      "system": "x86_64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
       "attr_path": "fnox",
       "broken": false,
       "derivation": "/nix/store/3yq7z4c204d52n7mgiqlp0kx2naywfli-fnox-1.35.2.drv",
@@ -295,19 +205,16 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
+      "schema-version": "1.17.0",
+      "description": "# fnox demo\nFort Knox for your secrets\n\n```text\n  fnox list                  — view configured secrets\n  fnox get DATABASE_URL      — decrypt one secret\n  fnox exec -- env | grep ^DEMO_\n  fnox lease create greeting — run command lease\n  fnox tui                   — interactive dashboard\n```\n",
       "install": {
         "age": {
           "pkg-path": "age",
           "pkg-group": "demo-tools"
-        },
-        "gum": {
-          "pkg-path": "gum",
-          "pkg-group": "demo-tools"
         }
       },
       "hook": {
-        "on-activate": "# Use the demo identity that's checked into the repo. This is a\n# *demo-only* key — never reuse it for real secrets.\nexport FNOX_AGE_KEY=\"$(grep '^AGE-SECRET-KEY-' \\\n  \"$FLOX_ENV_PROJECT/fnox-demo-key.txt\")\"\n\n# Per-cwd config (fnox auto-discovers fnox.toml).\nexport FNOX_CONFIG_DIR=\"$FLOX_ENV_PROJECT\"\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 60 --margin \"1 2\" --padding \"1 2\" \\\n    \"fnox demo\" \"Fort Knox for your secrets\"\n  echo \"\"\n  echo \"  Try one of these (cwd: $FLOX_ENV_PROJECT):\"\n  echo \"\"\n  echo \"    fnox list                  — view configured secrets\"\n  echo \"    fnox get DATABASE_URL      — decrypt one secret\"\n  echo \"    fnox exec -- env | grep ^DEMO_\"\n  echo \"    fnox lease create greeting — run command lease\"\n  echo \"    fnox tui                   — interactive dashboard\"\n  echo \"\"\nfi\n"
+        "on-activate": "# Use the demo identity that's checked into the repo. This is a\n# *demo-only* key — never reuse it for real secrets.\nexport FNOX_AGE_KEY=\"$(grep '^AGE-SECRET-KEY-' \\\n  \"$FLOX_ENV_PROJECT/fnox-demo-key.txt\")\"\n\n# Per-cwd config (fnox auto-discovers fnox.toml).\nexport FNOX_CONFIG_DIR=\"$FLOX_ENV_PROJECT\"\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  echo \"  Try one of these (cwd: $FLOX_ENV_PROJECT):\"\nfi\n"
       },
       "options": {
         "systems": [
@@ -327,7 +234,8 @@
     "include": [
       {
         "manifest": {
-          "schema-version": "1.10.0",
+          "schema-version": "1.17.0",
+          "description": "Fnox secret management with encryption and cloud providers.\n",
           "install": {
             "fnox": {
               "pkg-path": "flox/fnox",

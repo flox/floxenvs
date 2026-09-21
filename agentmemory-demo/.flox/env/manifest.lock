@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# agentmemory — persistent memory for Claude Code\n\nStart the backend in the background:\n\n```text\nflox services start\nflox activate --start-services\n```\n\nPlugin:\n\n```text\n$FLOX_ENV/share/claude-code/plugins/agentmemory\n```\n\nTry it:\n\n```text\nclaude   # then /recall, /remember, /handoff\n```\n",
     "install": {
       "claude-code": {
         "pkg-path": "flox/claude-code",
@@ -30,7 +31,7 @@
       "AGENTMEMORY_VERSION": "0.9.20"
     },
     "hook": {
-      "on-activate": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\nmkdir -p \"$npm_config_cache\"\neval \"$(flox-ai setup-hook)\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'agentmemory — persistent memory for Claude Code' '' \\\n    'Start the backend in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'REST + MCP:' \\\n    \"  $AGENTMEMORY_URL\" '' \\\n    'Pinned server version:' \\\n    \"  $AGENTMEMORY_VERSION\" '' \\\n    'Plugin:' \\\n    '  $FLOX_ENV/share/claude-code/plugins/agentmemory' '' \\\n    'Try it:' \\\n    '  claude   # then /recall, /remember, /handoff'\nfi\n"
+      "on-activate": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\nmkdir -p \"$npm_config_cache\"\neval \"$(flox-ai setup-hook)\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'REST + MCP:' \\\n    \"  $AGENTMEMORY_URL\" \\\n    '' \\\n    'Pinned server version:' \\\n    \"  $AGENTMEMORY_VERSION\"\nfi\n"
     },
     "profile": {
       "bash": "eval \"$(flox-ai setup-profile-bash)\"\n",
@@ -504,7 +505,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
+      "schema-version": "1.17.0",
+      "description": "# agentmemory — persistent memory for Claude Code\n\nStart the backend in the background:\n\n```text\nflox services start\nflox activate --start-services\n```\n\nPlugin:\n\n```text\n$FLOX_ENV/share/claude-code/plugins/agentmemory\n```\n\nTry it:\n\n```text\nclaude   # then /recall, /remember, /handoff\n```\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -512,7 +514,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'agentmemory — persistent memory for Claude Code' '' \\\n    'Start the backend in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'REST + MCP:' \\\n    \"  $AGENTMEMORY_URL\" '' \\\n    'Pinned server version:' \\\n    \"  $AGENTMEMORY_VERSION\" '' \\\n    'Plugin:' \\\n    '  $FLOX_ENV/share/claude-code/plugins/agentmemory' '' \\\n    'Try it:' \\\n    '  claude   # then /recall, /remember, /handoff'\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'REST + MCP:' \\\n    \"  $AGENTMEMORY_URL\" \\\n    '' \\\n    'Pinned server version:' \\\n    \"  $AGENTMEMORY_VERSION\"\nfi\n"
       },
       "options": {
         "systems": [
@@ -532,7 +534,8 @@
     "include": [
       {
         "manifest": {
-          "schema-version": "1.10.0",
+          "schema-version": "1.17.0",
+          "description": "Persistent memory for coding agents with a REST and MCP backend.\n",
           "install": {
             "claude-code": {
               "pkg-path": "flox/claude-code",

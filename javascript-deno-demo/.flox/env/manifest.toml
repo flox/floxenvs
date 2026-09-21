@@ -1,4 +1,16 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# Deno
+
+Commands:
+
+```text
+deno install    Install packages
+deno run        Run a script
+deno task       Run a task
+```
+'''
 
 [include]
 environments = [
@@ -16,11 +28,7 @@ if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
     --padding '1 4' \
     'Deno environment ready!' '' \
     'Deno version:' \
-    "  $(deno --version | head -1)" '' \
-    'Commands:' \
-    '  deno install    Install packages' \
-    '  deno run        Run a script' \
-    '  deno task       Run a task'
+    "  $(deno --version | head -1)"
 fi
 '''
 

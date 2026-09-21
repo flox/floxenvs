@@ -21,8 +21,8 @@ flox activate
 bun index.ts
 ```
 
-On activation you will see a styled welcome banner showing
-the Bun version and available commands.
+On activation the hook shows the Bun version.
+The environment description lists available commands.
 
 ## Bun commands
 

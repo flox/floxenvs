@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.11.0",
+    "schema-version": "1.17.0",
+    "description": "# Hermes Agent — self-improving AI from Nous Research\n\nFirst run:\n\n```text\nhermes setup     — interactive wizard\nhermes model     — pick a provider/model\n```\n\nTalk to it:\n\n```text\nhermes           — terminal UI\nhermes gateway   — Telegram/Discord/Slack\n```\n",
     "install": {
       "ffmpeg": {
         "pkg-path": "ffmpeg",
@@ -32,7 +33,7 @@
       "HERMES_HOME": ""
     },
     "hook": {
-      "on-activate": "HERMES_HOME=\"$FLOX_ENV_CACHE/hermes\"\nexport HERMES_HOME\nmkdir -p \"$HERMES_HOME\"\n\n# Lazy-install backends (anthropic, exa, faster-whisper, ...)\n# would try to `pip install` into the read-only Nix venv and\n# fail. Seed the user config to disable them so the user\n# gets clean FeatureUnavailable errors instead of pip\n# tracebacks.\nconfig=\"$HERMES_HOME/config.yaml\"\nif [ ! -f \"$config\" ]; then\n  printf 'security:\\n  allow_lazy_installs: false\\n' \\\n    > \"$config\"\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Hermes Agent — self-improving AI from Nous Research' '' \\\n    'First run:' \\\n    '  hermes setup     — interactive wizard' \\\n    '  hermes model     — pick a provider/model' '' \\\n    'Talk to it:' \\\n    '  hermes           — terminal UI' \\\n    '  hermes gateway   — Telegram/Discord/Slack' '' \\\n    \"HERMES_HOME=$HERMES_HOME\"\nfi\n"
+      "on-activate": "HERMES_HOME=\"$FLOX_ENV_CACHE/hermes\"\nexport HERMES_HOME\nmkdir -p \"$HERMES_HOME\"\n\n# Lazy-install backends (anthropic, exa, faster-whisper, ...)\n# would try to `pip install` into the read-only Nix venv and\n# fail. Seed the user config to disable them so the user\n# gets clean FeatureUnavailable errors instead of pip\n# tracebacks.\nconfig=\"$HERMES_HOME/config.yaml\"\nif [ ! -f \"$config\" ]; then\n  printf 'security:\\n  allow_lazy_installs: false\\n' \\\n    > \"$config\"\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    \"HERMES_HOME=$HERMES_HOME\"\nfi\n"
     },
     "options": {
       "systems": [
@@ -607,7 +608,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.11.0",
+      "schema-version": "1.17.0",
+      "description": "# Hermes Agent — self-improving AI from Nous Research\n\nFirst run:\n\n```text\nhermes setup     — interactive wizard\nhermes model     — pick a provider/model\n```\n\nTalk to it:\n\n```text\nhermes           — terminal UI\nhermes gateway   — Telegram/Discord/Slack\n```\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -615,7 +617,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Hermes Agent — self-improving AI from Nous Research' '' \\\n    'First run:' \\\n    '  hermes setup     — interactive wizard' \\\n    '  hermes model     — pick a provider/model' '' \\\n    'Talk to it:' \\\n    '  hermes           — terminal UI' \\\n    '  hermes gateway   — Telegram/Discord/Slack' '' \\\n    \"HERMES_HOME=$HERMES_HOME\"\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    \"HERMES_HOME=$HERMES_HOME\"\nfi\n"
       },
       "options": {
         "systems": [
@@ -635,7 +637,8 @@
     "include": [
       {
         "manifest": {
-          "schema-version": "1.11.0",
+          "schema-version": "1.17.0",
+          "description": "Hermes AI agent with persistent memory and messaging support.\n",
           "install": {
             "ffmpeg": {
               "pkg-path": "ffmpeg",

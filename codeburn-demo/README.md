@@ -4,7 +4,7 @@
 [![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fcodeburn-demo%2Fdevcontainer.json)
 
 Interactive demo of the [CodeBurn](../codeburn/)
-environment with a styled banner.
+environment with usage instructions in its description.
 
 ## Quick start
 
@@ -17,8 +17,7 @@ codeburn
 
 Everything from [codeburn](../codeburn/) plus:
 
-- `gum` — styled terminal UI
-- Welcome banner on activate
+- Usage instructions in the environment description
 
 ## See also
 

@@ -1,4 +1,28 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# PostgreSQL
+
+Start PostgreSQL in the background:
+
+```text
+flox services start
+flox activate --start-services
+```
+
+Connect to PostgreSQL:
+
+```text
+psql
+```
+
+Add extensions (use the postgresql pkg-group):
+
+```text
+flox search postgresqlPackages
+flox install postgresqlPackages.postgis -g postgresql
+```
+'''
 [include]
 environments = [
   { dir = "../postgresql" }
@@ -64,22 +88,13 @@ on-activate = '''
 
 if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
   gum style --border double --margin '1 2' --padding '1 4' \
-    'Start PostgreSQL in the background:' \
-    '  flox services start' \
-    '  flox activate --start-services' '' \
-    'Connect to PostgreSQL:' \
-    '  psql' '' \
     'Connection information:' \
     "  listen_addresses=$PGHOSTADDR" \
     "  port=$PGPORT" \
     "  user=$PGUSER" \
     "  database=$PGDATABASE" \
-    "  DATABASE_URL=$DATABASE_URL" '' \
-    'Add extensions (use the postgresql pkg-group):' \
-    '  flox search postgresqlPackages' \
-    '  flox install postgresqlPackages.postgis -g postgresql'
+    "  DATABASE_URL=$DATABASE_URL"
 fi
-
 '''
 
 [options]

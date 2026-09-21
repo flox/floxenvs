@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# Nginx\n\nStart Nginx in the background:\n\n```text\nflox services start\nflox activate --start-services\n```\n",
     "install": {
       "curl": {
         "pkg-path": "curl",
@@ -22,7 +23,7 @@
       "NGINX_WWW_DIR": ""
     },
     "hook": {
-      "on-activate": "\nexport NGINX_DIR=\"$FLOX_ENV_CACHE/nginx\"\nexport NGINX_CONFIG=\"$NGINX_DIR/nginx.conf\"\nexport NGINX_ERROR_LOG=\"$NGINX_DIR/error.log\"\nexport NGINX_ACCESS_LOG=\"$NGINX_DIR/access.log\"\n\nif [ -z \"$NGINX_WWW_DIR\" ]; then\n  export NGINX_WWW_DIR=\"$FLOX_ENV_CACHE/www\"\nfi\n\nmkdir -p \"$NGINX_DIR\"\n\ncat <<EOF > \"$NGINX_CONFIG\"\nworker_processes $NGINX_WORKER_PROCESSES;\n\nlock_file $NGINX_DIR/nginx.lock;\npid $NGINX_DIR/nginx.pid;\nerror_log $NGINX_ERROR_LOG;\n\nevents {\n  worker_connections $NGINX_WORKER_CONNECTIONS;\n}\n\nhttp {\n  access_log $NGINX_ACCESS_LOG;\n\n  server {\n    listen $NGINX_PORT;\n    root $NGINX_WWW_DIR;\n\n    location / {\n    }\n\n  }\n}\nEOF\n\nif [ ! -d \"$NGINX_WWW_DIR\" ]; then\n  mkdir -p \"$NGINX_WWW_DIR\"\n  cat <<EOF > \"$NGINX_WWW_DIR/index.html\"\n<!doctype html>\n<html>\n  <head>\n    <title>Hello Flox!</title>\n    <meta charset=\"utf-8\" />\n  </head>\n  <body>\n    <h1>\n      Hello from <a href=\"https://flox.dev\">Flox</a> environment!\n    </h1>\n  </body>\n</html>\nEOF\nfi\n\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'Start Nginx in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Test the server:' \\\n    \"  curl http://localhost:$NGINX_PORT\" '' \\\n    'Configuration:' \\\n    \"  port=$NGINX_PORT\" \\\n    \"  document_root=$NGINX_WWW_DIR\" \\\n    \"  config=$NGINX_DIR/nginx.conf\" \\\n    \"  error_log=$NGINX_DIR/error.log\" \\\n    \"  access_log=$NGINX_DIR/access.log\"\nfi\n\n"
+      "on-activate": "\nexport NGINX_DIR=\"$FLOX_ENV_CACHE/nginx\"\nexport NGINX_CONFIG=\"$NGINX_DIR/nginx.conf\"\nexport NGINX_ERROR_LOG=\"$NGINX_DIR/error.log\"\nexport NGINX_ACCESS_LOG=\"$NGINX_DIR/access.log\"\n\nif [ -z \"$NGINX_WWW_DIR\" ]; then\n  export NGINX_WWW_DIR=\"$FLOX_ENV_CACHE/www\"\nfi\n\nmkdir -p \"$NGINX_DIR\"\n\ncat <<EOF > \"$NGINX_CONFIG\"\nworker_processes $NGINX_WORKER_PROCESSES;\n\nlock_file $NGINX_DIR/nginx.lock;\npid $NGINX_DIR/nginx.pid;\nerror_log $NGINX_ERROR_LOG;\n\nevents {\n  worker_connections $NGINX_WORKER_CONNECTIONS;\n}\n\nhttp {\n  access_log $NGINX_ACCESS_LOG;\n\n  server {\n    listen $NGINX_PORT;\n    root $NGINX_WWW_DIR;\n\n    location / {\n    }\n\n  }\n}\nEOF\n\nif [ ! -d \"$NGINX_WWW_DIR\" ]; then\n  mkdir -p \"$NGINX_WWW_DIR\"\n  cat <<EOF > \"$NGINX_WWW_DIR/index.html\"\n<!doctype html>\n<html>\n  <head>\n    <title>Hello Flox!</title>\n    <meta charset=\"utf-8\" />\n  </head>\n  <body>\n    <h1>\n      Hello from <a href=\"https://flox.dev\">Flox</a> environment!\n    </h1>\n  </body>\n</html>\nEOF\nfi\n\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'Test the server:' \\\n    \"  curl http://localhost:$NGINX_PORT\" \\\n    '' \\\n    'Configuration:' \\\n    \"  port=$NGINX_PORT\" \\\n    \"  document_root=$NGINX_WWW_DIR\" \\\n    \"  config=$NGINX_DIR/nginx.conf\" \\\n    \"  error_log=$NGINX_DIR/error.log\" \\\n    \"  access_log=$NGINX_DIR/access.log\"\nfi\n"
     },
     "options": {
       "systems": [
@@ -332,7 +333,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
+      "schema-version": "1.17.0",
+      "description": "# Nginx\n\nStart Nginx in the background:\n\n```text\nflox services start\nflox activate --start-services\n```\n",
       "install": {
         "curl": {
           "pkg-path": "curl",
@@ -344,7 +346,7 @@
         }
       },
       "hook": {
-        "on-activate": "\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'Start Nginx in the background:' \\\n    '  flox services start' \\\n    '  flox activate --start-services' '' \\\n    'Test the server:' \\\n    \"  curl http://localhost:$NGINX_PORT\" '' \\\n    'Configuration:' \\\n    \"  port=$NGINX_PORT\" \\\n    \"  document_root=$NGINX_WWW_DIR\" \\\n    \"  config=$NGINX_DIR/nginx.conf\" \\\n    \"  error_log=$NGINX_DIR/error.log\" \\\n    \"  access_log=$NGINX_DIR/access.log\"\nfi\n\n"
+        "on-activate": "\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'Test the server:' \\\n    \"  curl http://localhost:$NGINX_PORT\" \\\n    '' \\\n    'Configuration:' \\\n    \"  port=$NGINX_PORT\" \\\n    \"  document_root=$NGINX_WWW_DIR\" \\\n    \"  config=$NGINX_DIR/nginx.conf\" \\\n    \"  error_log=$NGINX_DIR/error.log\" \\\n    \"  access_log=$NGINX_DIR/access.log\"\nfi\n"
       },
       "options": {
         "systems": [
@@ -364,7 +366,8 @@
     "include": [
       {
         "manifest": {
-          "schema-version": "1.10.0",
+          "schema-version": "1.17.0",
+          "description": "Nginx web server for local development.\n",
           "install": {
             "nginx": {
               "pkg-path": "nginx"

@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# Node.js\n\nCommands:\n\n```text\nnpm install    Install packages\nnpm start      Run your app\nnode <file>    Run a script\n```\n",
     "install": {
       "gum": {
         "pkg-path": "gum",
@@ -17,7 +18,7 @@
       "NODE_ENV": "development"
     },
     "hook": {
-      "on-activate": "export NODE_CACHE=\"$FLOX_ENV_CACHE/javascript-node\"\nmkdir -p \"$NODE_CACHE\"\n\n# Ensure npm cache is writable (HOME may be /var/empty\n# inside namespace isolation)\nexport npm_config_cache=\"$NODE_CACHE/npm-cache\"\n\nif [ \"$NODE_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f package.json ] \\\n    && [ -f package-lock.json ]; then\n  HASH=$(cat package.json package-lock.json \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$NODE_CACHE/packages-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    npm install\n    echo \"$HASH\" > \"$NODE_CACHE/packages-hash\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Node.js environment ready!' '' \\\n    'Node version:' \\\n    \"  $(node --version)\" '' \\\n    'Commands:' \\\n    '  npm install    Install packages' \\\n    '  npm start      Run your app' \\\n    '  node <file>    Run a script'\nfi\n"
+      "on-activate": "export NODE_CACHE=\"$FLOX_ENV_CACHE/javascript-node\"\nmkdir -p \"$NODE_CACHE\"\n\n# Ensure npm cache is writable (HOME may be /var/empty\n# inside namespace isolation)\nexport npm_config_cache=\"$NODE_CACHE/npm-cache\"\n\nif [ \"$NODE_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f package.json ] \\\n    && [ -f package-lock.json ]; then\n  HASH=$(cat package.json package-lock.json \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$NODE_CACHE/packages-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    npm install\n    echo \"$HASH\" > \"$NODE_CACHE/packages-hash\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Node.js environment ready!' '' \\\n    'Node version:' \\\n    \"  $(node --version)\"\nfi\n"
     },
     "options": {
       "systems": [
@@ -211,7 +212,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
+      "schema-version": "1.17.0",
+      "description": "# Node.js\n\nCommands:\n\n```text\nnpm install    Install packages\nnpm start      Run your app\nnode <file>    Run a script\n```\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -219,7 +221,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Node.js environment ready!' '' \\\n    'Node version:' \\\n    \"  $(node --version)\" '' \\\n    'Commands:' \\\n    '  npm install    Install packages' \\\n    '  npm start      Run your app' \\\n    '  node <file>    Run a script'\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Node.js environment ready!' '' \\\n    'Node version:' \\\n    \"  $(node --version)\"\nfi\n"
       },
       "options": {
         "systems": [
@@ -239,7 +241,8 @@
     "include": [
       {
         "manifest": {
-          "schema-version": "1.10.0",
+          "schema-version": "1.17.0",
+          "description": "Node.js and npm with automatic dependency installation.\n",
           "install": {
             "nodejs": {
               "pkg-path": "nodejs_20",

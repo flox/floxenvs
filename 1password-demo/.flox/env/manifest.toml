@@ -1,4 +1,23 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# 1Password CLI
+
+Usage:
+
+```text
+op vault list          List vaults
+op item list           List items
+op item get <name>     Get an item
+```
+
+Fetch secrets in your hook:
+
+```text
+export API_KEY=$(op item get "MyService" \
+  --field "credential")
+```
+'''
 
 [include]
 environments = [
@@ -16,15 +35,7 @@ if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
     --padding '1 4' \
     '1Password CLI environment ready!' '' \
     'op version:' \
-    "  $(op --version)" '' \
-    'Usage:' \
-    '  op vault list          List vaults' \
-    '  op item list           List items' \
-    '  op item get <name>     Get an item' \
-    '' \
-    'Fetch secrets in your hook:' \
-    '  export API_KEY=$(op item get "MyService" \' \
-    '    --field "credential")'
+    "  $(op --version)"
 fi
 '''
 

@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# oMLX — local LLM inference for Apple Silicon\n\nStart the server:\n\n```text\nflox services start\n```\n\nDownload a small model via the admin UI, or:\n\n```text\nhuggingface-cli download \\\n  mlx-community/Qwen3-1.7B-MLX-4bit \\\n  --local-dir \"$OMLX_MODEL_DIR/Qwen3-1.7B-MLX-4bit\"\n```\n",
     "install": {
       "gum": {
         "pkg-path": "gum",
@@ -17,7 +18,7 @@
       "OMLX_PORT": "18000"
     },
     "hook": {
-      "on-activate": "export OMLX_DATA_DIR=\"$FLOX_ENV_CACHE/omlx\"\nexport OMLX_MODEL_DIR=\"${OMLX_MODEL_DIR:-$OMLX_DATA_DIR/models}\"\nmkdir -p \"$OMLX_MODEL_DIR\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'oMLX — local LLM inference for Apple Silicon' '' \\\n    'Start the server:' \\\n    '  flox services start' '' \\\n    \"Server:   http://${OMLX_HOST}:${OMLX_PORT}\" \\\n    \"Admin UI: http://${OMLX_HOST}:${OMLX_PORT}/admin\" '' \\\n    'Download a small model via the admin UI, or:' \\\n    '  huggingface-cli download \\' \\\n    '    mlx-community/Qwen3-1.7B-MLX-4bit \\' \\\n    \"    --local-dir \\\"\\$OMLX_MODEL_DIR/Qwen3-1.7B-MLX-4bit\\\"\" '' \\\n    'Test inference:' \\\n    \"  curl http://${OMLX_HOST}:${OMLX_PORT}/v1/models\"\nfi\n"
+      "on-activate": "export OMLX_DATA_DIR=\"$FLOX_ENV_CACHE/omlx\"\nexport OMLX_MODEL_DIR=\"${OMLX_MODEL_DIR:-$OMLX_DATA_DIR/models}\"\nmkdir -p \"$OMLX_MODEL_DIR\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    \"Server:   http://${OMLX_HOST}:${OMLX_PORT}\" \\\n    \"Admin UI: http://${OMLX_HOST}:${OMLX_PORT}/admin\" \\\n    '' \\\n    'Test inference:' \\\n    \"  curl http://${OMLX_HOST}:${OMLX_PORT}/v1/models\"\nfi\n"
     },
     "options": {
       "systems": [
@@ -92,7 +93,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
+      "schema-version": "1.17.0",
+      "description": "# oMLX — local LLM inference for Apple Silicon\n\nStart the server:\n\n```text\nflox services start\n```\n\nDownload a small model via the admin UI, or:\n\n```text\nhuggingface-cli download \\\n  mlx-community/Qwen3-1.7B-MLX-4bit \\\n  --local-dir \"$OMLX_MODEL_DIR/Qwen3-1.7B-MLX-4bit\"\n```\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -100,7 +102,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    'oMLX — local LLM inference for Apple Silicon' '' \\\n    'Start the server:' \\\n    '  flox services start' '' \\\n    \"Server:   http://${OMLX_HOST}:${OMLX_PORT}\" \\\n    \"Admin UI: http://${OMLX_HOST}:${OMLX_PORT}/admin\" '' \\\n    'Download a small model via the admin UI, or:' \\\n    '  huggingface-cli download \\' \\\n    '    mlx-community/Qwen3-1.7B-MLX-4bit \\' \\\n    \"    --local-dir \\\"\\$OMLX_MODEL_DIR/Qwen3-1.7B-MLX-4bit\\\"\" '' \\\n    'Test inference:' \\\n    \"  curl http://${OMLX_HOST}:${OMLX_PORT}/v1/models\"\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' --padding '1 4' \\\n    \"Server:   http://${OMLX_HOST}:${OMLX_PORT}\" \\\n    \"Admin UI: http://${OMLX_HOST}:${OMLX_PORT}/admin\" \\\n    '' \\\n    'Test inference:' \\\n    \"  curl http://${OMLX_HOST}:${OMLX_PORT}/v1/models\"\nfi\n"
       },
       "options": {
         "systems": [
@@ -118,7 +120,8 @@
     "include": [
       {
         "manifest": {
-          "schema-version": "1.10.0",
+          "schema-version": "1.17.0",
+          "description": "oMLX language model inference server for Apple Silicon.\n",
           "install": {
             "omlx": {
               "pkg-path": "flox/omlx",

@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# Deno\n\nCommands:\n\n```text\ndeno install    Install packages\ndeno run        Run a script\ndeno task       Run a task\n```\n",
     "install": {
       "deno": {
         "pkg-path": "deno",
@@ -17,7 +18,7 @@
       "NODE_ENV": "development"
     },
     "hook": {
-      "on-activate": "export DENO_CACHE=\"$FLOX_ENV_CACHE/javascript-deno\"\nmkdir -p \"$DENO_CACHE\"\n\nif [ \"$DENO_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f deno.json ] \\\n    && [ -f deno.lock ]; then\n  HASH=$(cat deno.json deno.lock \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$DENO_CACHE/packages-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    deno install\n    echo \"$HASH\" > \"$DENO_CACHE/packages-hash\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Deno environment ready!' '' \\\n    'Deno version:' \\\n    \"  $(deno --version | head -1)\" '' \\\n    'Commands:' \\\n    '  deno install    Install packages' \\\n    '  deno run        Run a script' \\\n    '  deno task       Run a task'\nfi\n"
+      "on-activate": "export DENO_CACHE=\"$FLOX_ENV_CACHE/javascript-deno\"\nmkdir -p \"$DENO_CACHE\"\n\nif [ \"$DENO_AUTO_INSTALL\" = \"true\" ] \\\n    && [ -f deno.json ] \\\n    && [ -f deno.lock ]; then\n  HASH=$(cat deno.json deno.lock \\\n    | sha256sum | cut -d\" \" -f1)\n  LAST=$(cat \"$DENO_CACHE/packages-hash\" 2>/dev/null)\n  if [ \"$HASH\" != \"$LAST\" ]; then\n    deno install\n    echo \"$HASH\" > \"$DENO_CACHE/packages-hash\"\n  fi\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Deno environment ready!' '' \\\n    'Deno version:' \\\n    \"  $(deno --version | head -1)\"\nfi\n"
     },
     "options": {
       "systems": [
@@ -211,7 +212,8 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
+      "schema-version": "1.17.0",
+      "description": "# Deno\n\nCommands:\n\n```text\ndeno install    Install packages\ndeno run        Run a script\ndeno task       Run a task\n```\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -219,7 +221,7 @@
         }
       },
       "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Deno environment ready!' '' \\\n    'Deno version:' \\\n    \"  $(deno --version | head -1)\" '' \\\n    'Commands:' \\\n    '  deno install    Install packages' \\\n    '  deno run        Run a script' \\\n    '  deno task       Run a task'\nfi\n"
+        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Deno environment ready!' '' \\\n    'Deno version:' \\\n    \"  $(deno --version | head -1)\"\nfi\n"
       },
       "options": {
         "systems": [
@@ -239,7 +241,8 @@
     "include": [
       {
         "manifest": {
-          "schema-version": "1.10.0",
+          "schema-version": "1.17.0",
+          "description": "Deno runtime with automatic dependency installation.\n",
           "install": {
             "deno": {
               "pkg-path": "deno",

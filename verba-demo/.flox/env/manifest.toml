@@ -1,4 +1,23 @@
-schema-version = "1.10.0"
+schema-version = "1.17.0"
+
+description = '''
+# Verba
+
+Start Verba services in the background:
+
+```text
+flox services start
+flox activate --start-services
+```
+
+Services:
+
+```text
+weaviate  http://localhost:8080
+ollama    http://localhost:11434
+verba     http://localhost:8000
+```
+'''
 
 [include]
 environments = [
@@ -16,13 +35,6 @@ on-activate = '''
 if [[ "${FLOX_ENVS_TESTING:-}" != "1" ]]; then
   gum style --border double --margin '1 2' \
     --padding '1 4' \
-    'Start Verba services in the background:' \
-    '  flox services start' \
-    '  flox activate --start-services' '' \
-    'Services:' \
-    '  weaviate  http://localhost:8080' \
-    '  ollama    http://localhost:11434' \
-    '  verba     http://localhost:8000' '' \
     'Ollama models:' \
     "  chat   = $OLLAMA_MODEL" \
     "  embed  = $OLLAMA_EMBED_MODEL"

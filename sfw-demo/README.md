@@ -15,7 +15,7 @@ transparently) and adds:
 - per-environment install targets (`NPM_CONFIG_PREFIX`,
   `CARGO_HOME`, `PIP_TARGET`) so installs land in
   `$FLOX_ENV_CACHE` without `sudo` or `$HOME` pollution
-- a `gum` banner with the walkthrough commands
+- an environment description with the walkthrough commands
 
 > [!WARNING]
 > The walkthrough installs packages that are flagged as
@@ -28,7 +28,7 @@ transparently) and adds:
 flox activate
 ```
 
-The banner lists the commands below. `npm`, `pip`, and `cargo`
+The environment description lists the commands below. `npm`, `pip`, and `cargo`
 already route through `sfw`, so no special prefix is needed.
 
 ### Blocked: a flagged package
