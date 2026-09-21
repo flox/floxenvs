@@ -17,7 +17,7 @@
       }
     },
     "hook": {
-      "on-activate": "export GOENV=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$FLOX_ENV_CACHE/go/pkg/mod\"\n"
+      "on-activate": "export GOENV=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$FLOX_ENV_CACHE/go/pkg/mod\"\n\n# cgo defaults to \"gcc\" on Linux and \"clang\" on macOS. This environment\n# provides clang on every system, so point cgo at it unless the user has\n# already chosen a compiler.\nexport CC=\"${CC:-clang}\"\n"
     },
     "options": {
       "systems": [

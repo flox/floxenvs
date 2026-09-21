@@ -28,6 +28,11 @@ libresolv.systems = ["aarch64-darwin"]
 on-activate = '''
 export GOENV="$FLOX_ENV_CACHE/go"
 export GOMODCACHE="$FLOX_ENV_CACHE/go/pkg/mod"
+
+# cgo defaults to "gcc" on Linux and "clang" on macOS. This environment
+# provides clang on every system, so point cgo at it unless the user has
+# already chosen a compiler.
+export CC="${CC:-clang}"
 '''
 
 [options]

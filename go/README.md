@@ -30,9 +30,12 @@ environments = [{ remote = "flox/go" }]
 
 ## Environment variables
 
-| Variable | Description                              |
-| -------- | ---------------------------------------- |
-| `GOENV`  | Set to `$FLOX_ENV_CACHE/go` on activate  |
+| Variable      | Description                                     |
+| ------------- | ----------------------------------------------- |
+| `GOENV`       | Set to `$FLOX_ENV_CACHE/go` on activate         |
+| `GOMODCACHE`  | Set to `$FLOX_ENV_CACHE/go/pkg/mod` on activate |
+| `CC`          | Set to `clang` if unset, so cgo uses the        |
+|               | compiler from this environment                  |
 
 ## Why a C toolchain is included
 
@@ -62,6 +65,10 @@ The build still succeeded, but the warning appeared on every cgo build and
 gave the impression that the environment was broken. Installing `clang` makes
 `$FLOX_ENV/lib` a real directory (the libSystem libraries that ship with the
 compiler), so the path exists and the warning is gone for the right reason.
+
+cgo looks for `gcc` on Linux and `clang` on macOS by default. Since this
+environment ships `clang` everywhere, `CC` is set to `clang` on activation
+unless a compiler is already chosen, so cgo behaves the same on both.
 
 `darwin.libresolv` is installed alongside it because the Go runtime links
 `-lresolv` on macOS, which the libSystem from `clang` does not provide. Without

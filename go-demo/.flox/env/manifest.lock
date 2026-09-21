@@ -46,7 +46,7 @@
       }
     },
     "hook": {
-      "on-activate": "export GOENV=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$FLOX_ENV_CACHE/go/pkg/mod\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Go development environment' '' \\\n    'Included tools:' \\\n    '  go        - compiler and tools' \\\n    '  gopls     - language server' \\\n    '  gotools   - standard tools (goimports, etc.)' \\\n    '  go-task   - task runner' \\\n    '  gore      - REPL' '' \\\n    'Try the sample app:' \\\n    '  go build && ./hello'\nfi\n"
+      "on-activate": "export GOENV=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$FLOX_ENV_CACHE/go/pkg/mod\"\n\n# cgo defaults to \"gcc\" on Linux and \"clang\" on macOS. This environment\n# provides clang on every system, so point cgo at it unless the user has\n# already chosen a compiler.\nexport CC=\"${CC:-clang}\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Go development environment' '' \\\n    'Included tools:' \\\n    '  go        - compiler and tools' \\\n    '  gopls     - language server' \\\n    '  gotools   - standard tools (goimports, etc.)' \\\n    '  go-task   - task runner' \\\n    '  gore      - REPL' '' \\\n    'Try the sample app:' \\\n    '  go build && ./hello'\nfi\n"
     },
     "options": {
       "systems": [
@@ -948,7 +948,7 @@
             }
           },
           "hook": {
-            "on-activate": "export GOENV=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$FLOX_ENV_CACHE/go/pkg/mod\"\n"
+            "on-activate": "export GOENV=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$FLOX_ENV_CACHE/go/pkg/mod\"\n\n# cgo defaults to \"gcc\" on Linux and \"clang\" on macOS. This environment\n# provides clang on every system, so point cgo at it unless the user has\n# already chosen a compiler.\nexport CC=\"${CC:-clang}\"\n"
           },
           "options": {
             "systems": [
