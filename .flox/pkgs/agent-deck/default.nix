@@ -96,6 +96,14 @@ buildGoModule (finalAttrs: {
   # and a 10s readiness deadline — unreachable on darwin and flaky on
   # loaded Linux builders.
   #
+  # TestRecallSearch_FederatedMergesAndLabels (new in 1.16.16) answers a
+  # forwarded `recall search` from a `#!/bin/sh` shim whose printf format
+  # string embeds escaped quotes ("match": "\"retry\" \"budget\"").
+  # bash 3.2 — darwin's /bin/sh — drops those backslashes, so the shim
+  # emits ""retry" "budget"" and the caller rejects it with
+  # `invalid character 'r' after object key:value pair`. Newer shells keep
+  # the backslash, so Linux passes. Upstream test bug, darwin only.
+  #
   # TestSessionContextJSONGolden/claude-model-switch redacts the fixture
   # root out of the golden document by slugifying it into a Claude Code
   # project key. The darwin builder's sandbox path
@@ -110,7 +118,8 @@ buildGoModule (finalAttrs: {
       "^TestValidatePluginFlags_"
       + "|^TestHealthRemoteExecJSONParity$"
       + lib.optionalString stdenv.hostPlatform.isDarwin (
-        "|^TestSessionContextJSONGolden$"
+        "|^TestRecallSearch_FederatedMergesAndLabels$"
+        + "|^TestSessionContextJSONGolden$"
         + "|^TestCleanupExcludesLiveProcessCWDInside$"
         + "|^TestCleanupRevalidatesRealityBeforeRemoval$"
         + "|^TestCleanupForceCannotOverrideRealityExclusions$"
