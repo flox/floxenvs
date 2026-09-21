@@ -10,10 +10,29 @@ schema-version = "1.10.0"
 [install]
 go.pkg-path = "go"
 
+# C toolchain for cgo. cgo is enabled by default, and is pulled in by any
+# dependency that imports "C" -- sqlite drivers, crypto bindings, and parts of
+# the standard library on macOS. Without a compiler in the environment, those
+# builds fall back to the host toolchain, and on macOS $FLOX_ENV/lib never
+# exists, so dev-mode activation leaves LIBRARY_PATH pointing at a missing
+# directory and the linker warns on every build. See README.md.
+clang.pkg-path = "clang"
+
+# Go's runtime links -lresolv on macOS, which the libSystem provided with
+# clang does not carry. Without this, cgo links fail with
+# "ld: library not found for -lresolv".
+libresolv.pkg-path = "darwin.libresolv"
+libresolv.systems = ["aarch64-darwin"]
+
 [hook]
 on-activate = '''
 export GOENV="$FLOX_ENV_CACHE/go"
 export GOMODCACHE="$FLOX_ENV_CACHE/go/pkg/mod"
+
+# cgo defaults to "gcc" on Linux and "clang" on macOS. This environment
+# provides clang on every system, so point cgo at it unless the user has
+# already chosen a compiler.
+export CC="${CC:-clang}"
 '''
 
 [options]

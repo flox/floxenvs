@@ -3,6 +3,9 @@
   "manifest": {
     "schema-version": "1.10.0",
     "install": {
+      "clang": {
+        "pkg-path": "clang"
+      },
       "go": {
         "pkg-path": "go"
       },
@@ -34,10 +37,16 @@
       "gum": {
         "pkg-path": "gum",
         "pkg-group": "demo-tools"
+      },
+      "libresolv": {
+        "pkg-path": "darwin.libresolv",
+        "systems": [
+          "aarch64-darwin"
+        ]
       }
     },
     "hook": {
-      "on-activate": "export GOENV=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$FLOX_ENV_CACHE/go/pkg/mod\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Go development environment' '' \\\n    'Included tools:' \\\n    '  go        - compiler and tools' \\\n    '  gopls     - language server' \\\n    '  gotools   - standard tools (goimports, etc.)' \\\n    '  go-task   - task runner' \\\n    '  gore      - REPL' '' \\\n    'Try the sample app:' \\\n    '  go build && ./hello'\nfi\n"
+      "on-activate": "export GOENV=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$FLOX_ENV_CACHE/go/pkg/mod\"\n\n# cgo defaults to \"gcc\" on Linux and \"clang\" on macOS. This environment\n# provides clang on every system, so point cgo at it unless the user has\n# already chosen a compiler.\nexport CC=\"${CC:-clang}\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'Go development environment' '' \\\n    'Included tools:' \\\n    '  go        - compiler and tools' \\\n    '  gopls     - language server' \\\n    '  gotools   - standard tools (goimports, etc.)' \\\n    '  go-task   - task runner' \\\n    '  gore      - REPL' '' \\\n    'Try the sample app:' \\\n    '  go build && ./hello'\nfi\n"
     },
     "options": {
       "systems": [
@@ -658,6 +667,94 @@
       "priority": 5
     },
     {
+      "attr_path": "clang",
+      "broken": false,
+      "derivation": "/nix/store/k9jsavhfz13wqhfqq72885y801hqmhsh-clang-wrapper-21.1.8.drv",
+      "description": "C language family frontend for LLVM (wrapper script)",
+      "install_id": "clang",
+      "license": "[ NCSA, [ Apache-2.0 LLVM-exception ] ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
+      "name": "clang-wrapper-21.1.8",
+      "pname": "clang",
+      "rev": "20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
+      "rev_count": 1076192,
+      "rev_date": "2026-09-19T02:38:33Z",
+      "scrape_date": "2026-09-20T04:57:58.193486Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "21.1.8",
+      "outputs_to_install": [
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/2yfrcmkvspsrjhj283gdawqp37aghxva-clang-wrapper-21.1.8"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "clang",
+      "broken": false,
+      "derivation": "/nix/store/vv37i43d4z9rrlsj2vyl608zjadwr3kb-clang-wrapper-21.1.8.drv",
+      "description": "C language family frontend for LLVM (wrapper script)",
+      "install_id": "clang",
+      "license": "[ NCSA, [ Apache-2.0 LLVM-exception ] ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
+      "name": "clang-wrapper-21.1.8",
+      "pname": "clang",
+      "rev": "20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
+      "rev_count": 1076192,
+      "rev_date": "2026-09-19T02:38:33Z",
+      "scrape_date": "2026-09-20T05:30:51.976191Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "21.1.8",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/7v2w6x6h13zzswz6agxxcrx73vqdd0px-clang-wrapper-21.1.8"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "clang",
+      "broken": false,
+      "derivation": "/nix/store/7l5pwq76dlg35pai1kzdljmg40lx5hjx-clang-wrapper-21.1.8.drv",
+      "description": "C language family frontend for LLVM (wrapper script)",
+      "install_id": "clang",
+      "license": "[ NCSA, [ Apache-2.0 LLVM-exception ] ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
+      "name": "clang-wrapper-21.1.8",
+      "pname": "clang",
+      "rev": "20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
+      "rev_count": 1076192,
+      "rev_date": "2026-09-19T02:38:33Z",
+      "scrape_date": "2026-09-20T06:07:10.913739Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "21.1.8",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/mn2y6cydn5phwf2hxgfc3n7zjf48d5xg-clang-wrapper-21.1.8"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
       "attr_path": "go",
       "broken": false,
       "derivation": "/nix/store/zyqajpfsg5pbx8riq2218xkylyxbmm58-go-1.26.7.drv",
@@ -743,6 +840,41 @@
       "system": "x86_64-linux",
       "group": "toplevel",
       "priority": 5
+    },
+    {
+      "attr_path": "darwin.libresolv",
+      "broken": false,
+      "derivation": "/nix/store/0gbx5ny5sdajy56m5g5fdqvnwi0xf7qk-libresolv-96.drv",
+      "description": "Libresolv implementation for Darwin",
+      "install_id": "libresolv",
+      "license": "APSL-1.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
+      "name": "libresolv-96",
+      "pname": "libresolv",
+      "rev": "20b1ddd1aa5ace70c9468305030aa4f9ef79671b",
+      "rev_count": 1076192,
+      "rev_date": "2026-09-19T02:38:33Z",
+      "scrape_date": "2026-09-20T04:57:58.449844Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "96",
+      "outputs_to_install": [
+        "man",
+        "out",
+        "out",
+        "out",
+        "out"
+      ],
+      "outputs": {
+        "dev": "/nix/store/80730qxa3wq1dg0x6i07zcvy4rg05mri-libresolv-96-dev",
+        "man": "/nix/store/s1y8hcgv3spgkdc9mx577k9ixhr8zx44-libresolv-96-man",
+        "out": "/nix/store/2zm5grik16b5vb89i3da7cnm8f5cgqdp-libresolv-96"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
     }
   ],
   "compose": {
@@ -802,12 +934,21 @@
         "manifest": {
           "schema-version": "1.10.0",
           "install": {
+            "clang": {
+              "pkg-path": "clang"
+            },
             "go": {
               "pkg-path": "go"
+            },
+            "libresolv": {
+              "pkg-path": "darwin.libresolv",
+              "systems": [
+                "aarch64-darwin"
+              ]
             }
           },
           "hook": {
-            "on-activate": "export GOENV=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$FLOX_ENV_CACHE/go/pkg/mod\"\n"
+            "on-activate": "export GOENV=\"$FLOX_ENV_CACHE/go\"\nexport GOMODCACHE=\"$FLOX_ENV_CACHE/go/pkg/mod\"\n\n# cgo defaults to \"gcc\" on Linux and \"clang\" on macOS. This environment\n# provides clang on every system, so point cgo at it unless the user has\n# already chosen a compiler.\nexport CC=\"${CC:-clang}\"\n"
           },
           "options": {
             "systems": [
