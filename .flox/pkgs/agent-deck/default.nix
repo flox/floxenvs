@@ -155,14 +155,18 @@ buildGoModule (finalAttrs: {
   # writer lock. Neither is on the sandbox's base PATH, so the walk
   # always comes back empty and the tests spin out their 10s poll
   # (confirmed via a diagnostic run: ps/pgrep exit 127; the fd itself
-  # already resolves fine via /proc). Darwin's ps is already on PATH,
-  # so only Linux needs procps.
+  # already resolves fine via /proc). procps supplies both on Linux;
+  # darwin needs its own host binaries below instead (procps doesn't
+  # build there).
   #
-  # /usr/sbin (darwin only): the same suite's darwin prober shells out
-  # to `sysctl -n kern.boottime` for a boot id; /usr/sbin isn't on the
-  # sandbox's base PATH. lmstudio/darwin.nix already calls
-  # /usr/sbin/system_profiler by absolute path from this same sandbox,
-  # so add the dir instead of stubbing sysctl.
+  # /bin:/usr/sbin (darwin only): the darwin prober needs `ps`
+  # (/bin, process identity) and `sysctl` (/usr/sbin, boot id via
+  # kern.boottime); /usr/sbin alone masked the `ps` gap because
+  # BootID() runs first and was short-circuiting before Inspect()
+  # ever called `ps`. /usr/bin is deliberately left off PATH: it
+  # would also expose the system ssh client and wake the
+  # remote-parity suite's currently-dormant t.Skip siblings (see
+  # TestHealthRemoteExecJSONParity above) for no tested gain.
   preCheck = ''
     export HOME=$(mktemp -d)
     export PATH="${git}/bin:${lsof}/bin:${tmux}/bin:$PATH"
@@ -171,7 +175,7 @@ buildGoModule (finalAttrs: {
     export PATH="${procps}/bin:$PATH"
   ''
   + lib.optionalString stdenv.hostPlatform.isDarwin ''
-    export PATH="/usr/sbin:$PATH"
+    export PATH="/bin:/usr/sbin:$PATH"
   '';
 
   ldflags = [
