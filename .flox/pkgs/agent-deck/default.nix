@@ -124,6 +124,16 @@ buildGoModule (finalAttrs: {
   # the length the redaction expects, so the raw path leaks into the
   # produced document and the comparison fails. Linux's shorter /build
   # path redacts cleanly, so skip that one on darwin only.
+  #
+  # The darwin Nix sandbox denies `ps` the same way it denies lsof
+  # above -- confirmed by CI: "fork/exec /bin/ps: operation not
+  # permitted", not a PATH gap, so no PATH addition can fix it. That
+  # breaks every session-restart/ownership identity check
+  # (internal/procowner's darwin prober calls `ps` after its `sysctl`
+  # boot-id check) and the writer-lock suite's process-tree walk
+  # (`ps -eo pid=,ppid=` is collectTmuxPaneProcessTreePIDs's primary
+  # lookup too). Skip both groups on darwin only; Linux has ps/pgrep
+  # via procps below and both groups pass there.
   checkFlags = [
     "-short"
     "-skip"
@@ -136,6 +146,14 @@ buildGoModule (finalAttrs: {
         + "|^TestCleanupExcludesLiveProcessCWDInside$"
         + "|^TestCleanupRevalidatesRealityBeforeRemoval$"
         + "|^TestCleanupForceCannotOverrideRealityExclusions$"
+        + "|^TestCoreRegistryMatchesLegacyHandlers$"
+        + "|^TestDaemonEnvelopesMatchArgv$"
+        + "|^TestDaemonRestartAllReturnsCompletedResult$"
+        + "|^TestStorageBytesGoldens$"
+        + "|^TestCodexAcceptanceGuardAcceptsFreshComposerThread$"
+        + "|^TestIssue2394_HydratePrefersLiveThreadOverGuessedPaneIdentity$"
+        + "|^TestIssue2396_FirstTurnOutputIsBoundToItsConversation$"
+        + "|^TestIssue2400_ArchiveKeepsLiveCodexIdentity$"
       )
     )
   ];
@@ -156,17 +174,13 @@ buildGoModule (finalAttrs: {
   # always comes back empty and the tests spin out their 10s poll
   # (confirmed via a diagnostic run: ps/pgrep exit 127; the fd itself
   # already resolves fine via /proc). procps supplies both on Linux;
-  # darwin needs its own host binaries below instead (procps doesn't
-  # build there).
+  # darwin has no equivalent PATH fix -- ps is sandbox-denied there
+  # regardless of PATH, see the checkFlags comment above.
   #
-  # /bin:/usr/sbin (darwin only): the darwin prober needs `ps`
-  # (/bin, process identity) and `sysctl` (/usr/sbin, boot id via
-  # kern.boottime); /usr/sbin alone masked the `ps` gap because
-  # BootID() runs first and was short-circuiting before Inspect()
-  # ever called `ps`. /usr/bin is deliberately left off PATH: it
-  # would also expose the system ssh client and wake the
-  # remote-parity suite's currently-dormant t.Skip siblings (see
-  # TestHealthRemoteExecJSONParity above) for no tested gain.
+  # /usr/sbin (darwin only): the darwin prober's `sysctl -n
+  # kern.boottime` boot-id check is a plain PATH gap, unlike `ps` --
+  # /usr/sbin isn't on the sandbox's base PATH, but sysctl execs
+  # fine once it's found.
   preCheck = ''
     export HOME=$(mktemp -d)
     export PATH="${git}/bin:${lsof}/bin:${tmux}/bin:$PATH"
@@ -175,7 +189,7 @@ buildGoModule (finalAttrs: {
     export PATH="${procps}/bin:$PATH"
   ''
   + lib.optionalString stdenv.hostPlatform.isDarwin ''
-    export PATH="/bin:/usr/sbin:$PATH"
+    export PATH="/usr/sbin:$PATH"
   '';
 
   ldflags = [
