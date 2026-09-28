@@ -5,6 +5,7 @@
   fetchFromGitHub,
   git,
   lsof,
+  procps,
   tmux,
   versionCheckHook,
   writableTmpDirAsHomeHook,
@@ -62,9 +63,21 @@ buildGoModule (finalAttrs: {
   # Neutralise the guard for the build by making osUserRealHome() report no real
   # home: there is no real user data to protect in the sandbox, and the guard is
   # test-only so production path resolution is unaffected.
+  #
+  # TestIssue2388_CapabilitiesCarryProbe's fake `codex debug models`
+  # shim hardcodes PATH to `<fixture dir>:/usr/bin:/bin`, but neither
+  # /usr/bin nor /bin exists in the Nix sandbox, so its `cat` call
+  # fails closed and the probe falls back to the static list (fails in
+  # 0.00s -- confirmed not a timeout). Append the sandbox's real PATH
+  # so the shim's `cat` resolves.
   postPatch = ''
     substituteInPlace internal/agentpaths/paths.go \
       --replace-fail 'return filepath.Clean(u.HomeDir)' 'return ""'
+
+    substituteInPlace cmd/agent-deck/issue2388_capabilities_models_test.go \
+      --replace-fail \
+        't.Setenv("PATH", dir+string(os.PathListSeparator)+"/usr/bin"+string(os.PathListSeparator)+"/bin")' \
+        't.Setenv("PATH", dir+string(os.PathListSeparator)+"/usr/bin"+string(os.PathListSeparator)+"/bin"+string(os.PathListSeparator)+os.Getenv("PATH"))'
   '';
 
   # The OBS-01 wiring test compiles the binary, launches the full TUI
@@ -135,9 +148,30 @@ buildGoModule (finalAttrs: {
   # dispatch, so every cmd/agent-deck test that runs a command (account
   # registration, visibility, worktree boundary, ...) aborts with
   # "Error: tmux not found" unless tmux is on PATH.
+  #
+  # procps (linux only): the writer-lock live-identity suite (#2394/
+  # #2396/#2400, fresh-composer guard -- new in 1.16.22) walks the
+  # pane's process tree with `ps`/`pgrep` to find the fd holding the
+  # writer lock. Neither is on the sandbox's base PATH, so the walk
+  # always comes back empty and the tests spin out their 10s poll
+  # (confirmed via a diagnostic run: ps/pgrep exit 127; the fd itself
+  # already resolves fine via /proc). Darwin's ps is already on PATH,
+  # so only Linux needs procps.
+  #
+  # /usr/sbin (darwin only): the same suite's darwin prober shells out
+  # to `sysctl -n kern.boottime` for a boot id; /usr/sbin isn't on the
+  # sandbox's base PATH. lmstudio/darwin.nix already calls
+  # /usr/sbin/system_profiler by absolute path from this same sandbox,
+  # so add the dir instead of stubbing sysctl.
   preCheck = ''
     export HOME=$(mktemp -d)
     export PATH="${git}/bin:${lsof}/bin:${tmux}/bin:$PATH"
+  ''
+  + lib.optionalString stdenv.hostPlatform.isLinux ''
+    export PATH="${procps}/bin:$PATH"
+  ''
+  + lib.optionalString stdenv.hostPlatform.isDarwin ''
+    export PATH="/usr/sbin:$PATH"
   '';
 
   ldflags = [
