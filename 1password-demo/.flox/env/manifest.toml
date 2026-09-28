@@ -5,15 +5,15 @@ description = '''
 
 Usage:
 
-```text
-op vault list          List vaults
-op item list           List items
-op item get <name>     Get an item
+```bash
+op vault list         # List vaults
+op item list          # List items
+op item get '<name>'  # Get an item
 ```
 
 Fetch secrets in your hook:
 
-```text
+```bash
 export API_KEY=$(op item get "MyService" \
   --field "credential")
 ```

@@ -2,7 +2,7 @@
   "lockfile-version": 1,
   "manifest": {
     "schema-version": "1.17.0",
-    "description": "# Mergekit\nMerge LLMs on CPU — no GPU needed\n\n```text\nmergekit-yaml example-merge.yml ./merged-model\n                           — run the example merge\n                              (~1GB model download)\nmergekit-yaml --help       — all merge options\nmergekit-moe --help        — Mixture-of-Experts builds\n```\n",
+    "description": "# Mergekit\nMerge LLMs on CPU — no GPU needed\n\n```bash\n# Run the example merge (~1GB model download)\nmergekit-yaml example-merge.yml ./merged-model\nmergekit-yaml --help  # all merge options\nmergekit-moe --help   # Mixture-of-Experts builds\n```\n",
     "install": {
       "flox-ai": {
         "pkg-path": "flox/flox-ai",
@@ -217,7 +217,7 @@
   "compose": {
     "composer": {
       "schema-version": "1.17.0",
-      "description": "# Mergekit\nMerge LLMs on CPU — no GPU needed\n\n```text\nmergekit-yaml example-merge.yml ./merged-model\n                           — run the example merge\n                              (~1GB model download)\nmergekit-yaml --help       — all merge options\nmergekit-moe --help        — Mixture-of-Experts builds\n```\n",
+      "description": "# Mergekit\nMerge LLMs on CPU — no GPU needed\n\n```bash\n# Run the example merge (~1GB model download)\nmergekit-yaml example-merge.yml ./merged-model\nmergekit-yaml --help  # all merge options\nmergekit-moe --help   # Mixture-of-Experts builds\n```\n",
       "hook": {
         "on-activate": "# Example merge config: two small models, linear merge. Small\n# enough (~1GB of downloads) to finish on a laptop. Idempotent —\n# overwritten every activation.\ncat > \"$FLOX_ENV_PROJECT/example-merge.yml\" <<'YAML'\nmodels:\n  - model: Qwen/Qwen2.5-0.5B\n  - model: Qwen/Qwen2.5-0.5B-Instruct\nmerge_method: linear\ndtype: float16\nYAML\n"
       },

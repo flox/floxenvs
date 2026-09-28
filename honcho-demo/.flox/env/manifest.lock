@@ -2,7 +2,7 @@
   "lockfile-version": 1,
   "manifest": {
     "schema-version": "1.17.0",
-    "description": "# Honcho\nSelf-hosted memory infrastructure for stateful agents\n\n```text\nflox services start             — postgres + redis + api + deriver\npython quickstart.py            — run the Store → Reason → Query loop\n```\n\n```text\nReasoning endpoints need an LLM key:\n  export LLM_OPENAI_API_KEY=sk-...\n```\n",
+    "description": "# Honcho\nSelf-hosted memory infrastructure for stateful agents\n\n```bash\nflox services start   # postgres + redis + api + deriver\npython quickstart.py  # run the Store → Reason → Query loop\n```\n\nReasoning endpoints need an LLM key:\n\n```bash\nexport LLM_OPENAI_API_KEY=sk-...\n```\n",
     "install": {
       "honcho": {
         "pkg-path": "flox/honcho",
@@ -449,7 +449,7 @@
   "compose": {
     "composer": {
       "schema-version": "1.17.0",
-      "description": "# Honcho\nSelf-hosted memory infrastructure for stateful agents\n\n```text\nflox services start             — postgres + redis + api + deriver\npython quickstart.py            — run the Store → Reason → Query loop\n```\n\n```text\nReasoning endpoints need an LLM key:\n  export LLM_OPENAI_API_KEY=sk-...\n```\n",
+      "description": "# Honcho\nSelf-hosted memory infrastructure for stateful agents\n\n```bash\nflox services start   # postgres + redis + api + deriver\npython quickstart.py  # run the Store → Reason → Query loop\n```\n\nReasoning endpoints need an LLM key:\n\n```bash\nexport LLM_OPENAI_API_KEY=sk-...\n```\n",
       "hook": {
         "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  echo \"  curl $HONCHO_URL/health         — health probe (no LLM key needed)\"\nfi\n"
       },
