@@ -21,8 +21,8 @@ flox activate
 npm start        # or: node index.js
 ```
 
-On activation you will see a styled welcome banner showing
-the Node.js version and available commands.
+On activation the hook shows the Node.js version.
+The environment description lists available commands.
 
 ## npm commands
 

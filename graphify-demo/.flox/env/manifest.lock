@@ -1,7 +1,8 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.10.0",
+    "schema-version": "1.17.0",
+    "description": "# graphify — knowledge graphs for Claude Code\n\nThe /graphify skill is pre-installed via\nflox/skill-graphify and discovered by\nflox-ai. Just open Claude Code:\n\n```text\n/graphify .\n```\n\nOr use the CLI directly:\n\n```bash\ngraphify .\ngraphify ./raw --mode deep\ngraphify ./raw --update\n```\n\nQuery the graph:\n\n```bash\ngraphify query \"what connects X to Y?\"\ngraphify path \"Module\" \"Database\"\ngraphify explain \"Concept\"\n```\n",
     "install": {
       "bash": {
         "pkg-path": "bash",
@@ -45,10 +46,6 @@
         ],
         "outputs": "all"
       },
-      "gum": {
-        "pkg-path": "gum",
-        "pkg-group": "demo-tools"
-      },
       "pkg-config": {
         "pkg-path": "pkg-config",
         "pkg-group": "graphify-build"
@@ -68,7 +65,7 @@
       "VIRTUAL_ENV_DISABLE_PROMPT": "1"
     },
     "hook": {
-      "on-activate": "# flox-ai sets up Claude Code config + discovers the bundled skill\n# (was previously provided via the flox/claude include).\neval \"$(flox-ai setup-hook)\"\n\nexport PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$PYTHON_DIR/.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$PYTHON_DIR\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  python3 -m venv --upgrade-deps \"$PYTHON_DIR\"\n  echo \"$CURRENT_INTERP\" > \"$PYTHON_DIR/.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$PYTHON_DIR/bin/activate\"\n\nHASH=$(echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5sum 2>/dev/null \\\n  || echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5 -q)\nHASH=$(echo \"$HASH\" | cut -d\" \" -f1)\nLAST=$(cat \"$PYTHON_DIR/.deps_hash\" 2>/dev/null)\nif [ \"$HASH\" != \"$LAST\" ]; then\n  pip install -q \"$GRAPHIFY_INSTALL_PACKAGE\"\n  echo \"$HASH\" > \"$PYTHON_DIR/.deps_hash\"\nfi\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'graphify — knowledge graphs for Claude Code' '' \\\n    'The /graphify skill is pre-installed via' \\\n    'flox/skill-graphify and discovered by' \\\n    'flox-ai. Just open Claude Code:' \\\n    '  /graphify .' '' \\\n    'Or use the CLI directly:' \\\n    '  graphify .' \\\n    '  graphify ./raw --mode deep' \\\n    '  graphify ./raw --update' '' \\\n    'Query the graph:' \\\n    '  graphify query \"what connects X to Y?\"' \\\n    '  graphify path \"Module\" \"Database\"' \\\n    '  graphify explain \"Concept\"'\nfi\n"
+      "on-activate": "# flox-ai sets up Claude Code config + discovers the bundled skill\n# (was previously provided via the flox/claude include).\neval \"$(flox-ai setup-hook)\"\n\nexport PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$PYTHON_DIR/.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$PYTHON_DIR\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  python3 -m venv --upgrade-deps \"$PYTHON_DIR\"\n  echo \"$CURRENT_INTERP\" > \"$PYTHON_DIR/.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$PYTHON_DIR/bin/activate\"\n\nHASH=$(echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5sum 2>/dev/null \\\n  || echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5 -q)\nHASH=$(echo \"$HASH\" | cut -d\" \" -f1)\nLAST=$(cat \"$PYTHON_DIR/.deps_hash\" 2>/dev/null)\nif [ \"$HASH\" != \"$LAST\" ]; then\n  pip install -q \"$GRAPHIFY_INSTALL_PACKAGE\"\n  echo \"$HASH\" > \"$PYTHON_DIR/.deps_hash\"\nfi\n"
     },
     "profile": {
       "bash": "source \"$PYTHON_DIR/bin/activate\"\n",
@@ -178,93 +175,6 @@
       },
       "system": "x86_64-linux",
       "group": "claude-code",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/ziq7rq4mxfq9vfyr31ffcdfprw8j053k-gum-2.0.2.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=e94cb152ed51bd6e24eb4a41f1460252beb52cd2",
-      "name": "gum-2.0.2",
-      "pname": "gum",
-      "rev": "e94cb152ed51bd6e24eb4a41f1460252beb52cd2",
-      "rev_count": 1079315,
-      "rev_date": "2026-09-25T08:03:29Z",
-      "scrape_date": "2026-09-26T04:58:21.269387Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.0.2",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/ggdd20b5q9s2v3rww1rnfxg3ahrgz4l7-gum-2.0.2"
-      },
-      "system": "aarch64-darwin",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/57kxzkv4fpnpbnqxgiyqh1c5pfcvdk9r-gum-2.0.2.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=e94cb152ed51bd6e24eb4a41f1460252beb52cd2",
-      "name": "gum-2.0.2",
-      "pname": "gum",
-      "rev": "e94cb152ed51bd6e24eb4a41f1460252beb52cd2",
-      "rev_count": 1079315,
-      "rev_date": "2026-09-25T08:03:29Z",
-      "scrape_date": "2026-09-26T05:29:41.168164Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.0.2",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/rkzg21sf0ngq5sc57lqy3z65782jlgdh-gum-2.0.2"
-      },
-      "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/fzl3bq4y43sis7wcgzj034a67cwy8alq-gum-2.0.2.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=e94cb152ed51bd6e24eb4a41f1460252beb52cd2",
-      "name": "gum-2.0.2",
-      "pname": "gum",
-      "rev": "e94cb152ed51bd6e24eb4a41f1460252beb52cd2",
-      "rev_count": 1079315,
-      "rev_date": "2026-09-25T08:03:29Z",
-      "scrape_date": "2026-09-26T06:05:33.109243Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.0.2",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/kgws75vr6m3amp17pzjcx28nps8dby9f-gum-2.0.2"
-      },
-      "system": "x86_64-linux",
-      "group": "demo-tools",
       "priority": 5
     },
     {
@@ -1208,23 +1118,17 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.10.0",
+      "schema-version": "1.17.0",
+      "description": "# graphify — knowledge graphs for Claude Code\n\nThe /graphify skill is pre-installed via\nflox/skill-graphify and discovered by\nflox-ai. Just open Claude Code:\n\n```text\n/graphify .\n```\n\nOr use the CLI directly:\n\n```bash\ngraphify .\ngraphify ./raw --mode deep\ngraphify ./raw --update\n```\n\nQuery the graph:\n\n```bash\ngraphify query \"what connects X to Y?\"\ngraphify path \"Module\" \"Database\"\ngraphify explain \"Concept\"\n```\n",
       "install": {
         "flox-ai": {
           "pkg-path": "flox/flox-ai",
           "pkg-group": "flox-ai"
         },
-        "gum": {
-          "pkg-path": "gum",
-          "pkg-group": "demo-tools"
-        },
         "skills-graphify": {
           "pkg-path": "flox/skills-graphify",
           "pkg-group": "skills-graphify"
         }
-      },
-      "hook": {
-        "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'graphify — knowledge graphs for Claude Code' '' \\\n    'The /graphify skill is pre-installed via' \\\n    'flox/skill-graphify and discovered by' \\\n    'flox-ai. Just open Claude Code:' \\\n    '  /graphify .' '' \\\n    'Or use the CLI directly:' \\\n    '  graphify .' \\\n    '  graphify ./raw --mode deep' \\\n    '  graphify ./raw --update' '' \\\n    'Query the graph:' \\\n    '  graphify query \"what connects X to Y?\"' \\\n    '  graphify path \"Module\" \"Database\"' \\\n    '  graphify explain \"Concept\"'\nfi\n"
       },
       "options": {
         "systems": [
@@ -1244,7 +1148,8 @@
     "include": [
       {
         "manifest": {
-          "schema-version": "1.10.0",
+          "schema-version": "1.17.0",
+          "description": "Graphify CLI for turning code and documents into knowledge graphs.\n",
           "install": {
             "bash": {
               "pkg-path": "bash",

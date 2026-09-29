@@ -13,9 +13,7 @@ command_exists() {
 command_exists iloom
 command_exists il
 command_exists gh
-command_exists gum
 
 echo ">>> iloom version: $(iloom --version)"
-echo ">>> gum version: $(gum --version)"
 
 echo ">>> iloom-demo environment is working"

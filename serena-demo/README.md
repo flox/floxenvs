@@ -16,8 +16,8 @@ cd sample-project
 flox services start serena-mcp
 ```
 
-The activation banner prints the commands above plus the MCP
-endpoint URL.
+The environment description lists the commands above.
+The activation hook prints the MCP endpoint URL.
 
 ## What's inside
 

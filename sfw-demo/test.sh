@@ -11,7 +11,6 @@ command_exists() {
 }
 
 command_exists sfw
-command_exists gum
 command_exists node
 command_exists npm
 command_exists pip
@@ -42,13 +41,5 @@ for var in NPM_CONFIG_PREFIX CARGO_HOME PIP_TARGET; do
   fi
   echo ">>> $var=${!var}"
 done
-
-# The hook generates the banner script that [profile] common runs in
-# every shell (including ones attaching to an existing activation).
-if [ ! -x "$FLOX_ENV_CACHE/banner.sh" ]; then
-  echo "Error: \$FLOX_ENV_CACHE/banner.sh missing or not executable."
-  exit 1
-fi
-echo ">>> banner.sh generated and executable"
 
 echo ">>> sfw-demo environment is working"

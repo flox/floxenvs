@@ -4,7 +4,7 @@
 [![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Flmstudio-demo%2Fdevcontainer.json)
 
 Interactive variant of [lmstudio](../lmstudio/) with a
-gum-styled onboarding banner. Shows the activation
+description containing setup instructions. Shows the activation
 flow, model download, and how to point an agentic CLI
 at the local API.
 
@@ -18,7 +18,7 @@ aarch64-linux, x86_64-linux.
 flox activate -r flox/lmstudio-demo --start-services
 ```
 
-You should see a styled banner with the next steps:
+The environment description shows the next steps:
 
 1. `flox services start` — bring up the API server.
 2. `lms get qwen2.5-7b-instruct` — download a model.
@@ -30,7 +30,7 @@ You should see a styled banner with the next steps:
 ## What's different from lmstudio
 
 - Adds [gum](https://github.com/charmbracelet/gum) for
-  the welcome banner.
+  the API endpoint display.
 - Same `lms`, `lm-studio`, `lms-service`,
   `lmstudio-health`, `lms-launch`, `lmstudio-info`
   binaries.

@@ -11,10 +11,8 @@ command_exists() {
 }
 
 command_exists codeburn
-command_exists gum
 
 echo ">>> codeburn version: $(codeburn --version)"
-echo ">>> gum version: $(gum --version)"
 
 # `codeburn status --format json` is the safest
 # non-interactive smoke test.

@@ -13,7 +13,6 @@ command_exists() {
 command_exists localstack
 command_exists aws
 command_exists kubectl
-command_exists gum
 
 # Remove stale LocalStack container if left over from a
 # previous CI run (macOS Colima keeps containers across

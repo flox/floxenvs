@@ -22,8 +22,7 @@ flox activate -r flox/langchain-demo --start-services
 - LangGraph orchestration framework
 - LangChain-Ollama and LangChain-Community integrations
 - Ollama local LLM runtime as a background service
-- `gum` for styled terminal output
-- Connection info display on activation
+- Service commands in the environment description
 
 ## Using Ollama
 

@@ -1,15 +1,12 @@
 {
   "lockfile-version": 1,
   "manifest": {
-    "schema-version": "1.11.0",
+    "schema-version": "1.17.0",
+    "description": "# Mergekit\nMerge LLMs on CPU — no GPU needed\n\n```bash\n# Run the example merge (~1GB model download)\nmergekit-yaml example-merge.yml ./merged-model\nmergekit-yaml --help  # all merge options\nmergekit-moe --help   # Mixture-of-Experts builds\n```\n",
     "install": {
       "flox-ai": {
         "pkg-path": "flox/flox-ai",
         "pkg-group": "flox-ai"
-      },
-      "gum": {
-        "pkg-path": "gum",
-        "pkg-group": "demo-tools"
       },
       "mergekit": {
         "pkg-path": "flox/mergekit",
@@ -28,7 +25,7 @@
       }
     },
     "hook": {
-      "on-activate": "# Example merge config: two small models, linear merge. Small\n# enough (~1GB of downloads) to finish on a laptop. Idempotent —\n# overwritten every activation.\ncat > \"$FLOX_ENV_PROJECT/example-merge.yml\" <<'YAML'\nmodels:\n  - model: Qwen/Qwen2.5-0.5B\n  - model: Qwen/Qwen2.5-0.5B-Instruct\nmerge_method: linear\ndtype: float16\nYAML\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 60 --margin \"1 2\" --padding \"1 2\" \\\n    \"Mergekit\" \\\n    \"Merge LLMs on CPU — no GPU needed\"\n  echo \"\"\n  echo \"  mergekit-yaml example-merge.yml ./merged-model\"\n  echo \"                             — run the example merge\"\n  echo \"                                (~1GB model download)\"\n  echo \"  mergekit-yaml --help       — all merge options\"\n  echo \"  mergekit-moe --help        — Mixture-of-Experts builds\"\n  echo \"\"\nfi\n"
+      "on-activate": "# Example merge config: two small models, linear merge. Small\n# enough (~1GB of downloads) to finish on a laptop. Idempotent —\n# overwritten every activation.\ncat > \"$FLOX_ENV_PROJECT/example-merge.yml\" <<'YAML'\nmodels:\n  - model: Qwen/Qwen2.5-0.5B\n  - model: Qwen/Qwen2.5-0.5B-Instruct\nmerge_method: linear\ndtype: float16\nYAML\n"
     },
     "options": {
       "systems": [
@@ -39,93 +36,6 @@
     }
   },
   "packages": [
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/ziq7rq4mxfq9vfyr31ffcdfprw8j053k-gum-2.0.2.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=e94cb152ed51bd6e24eb4a41f1460252beb52cd2",
-      "name": "gum-2.0.2",
-      "pname": "gum",
-      "rev": "e94cb152ed51bd6e24eb4a41f1460252beb52cd2",
-      "rev_count": 1079315,
-      "rev_date": "2026-09-25T08:03:29Z",
-      "scrape_date": "2026-09-26T04:58:21.269387Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.0.2",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/ggdd20b5q9s2v3rww1rnfxg3ahrgz4l7-gum-2.0.2"
-      },
-      "system": "aarch64-darwin",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/57kxzkv4fpnpbnqxgiyqh1c5pfcvdk9r-gum-2.0.2.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=e94cb152ed51bd6e24eb4a41f1460252beb52cd2",
-      "name": "gum-2.0.2",
-      "pname": "gum",
-      "rev": "e94cb152ed51bd6e24eb4a41f1460252beb52cd2",
-      "rev_count": 1079315,
-      "rev_date": "2026-09-25T08:03:29Z",
-      "scrape_date": "2026-09-26T05:29:41.168164Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.0.2",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/rkzg21sf0ngq5sc57lqy3z65782jlgdh-gum-2.0.2"
-      },
-      "system": "aarch64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "gum",
-      "broken": false,
-      "derivation": "/nix/store/fzl3bq4y43sis7wcgzj034a67cwy8alq-gum-2.0.2.drv",
-      "description": "Tasty Bubble Gum for your shell",
-      "install_id": "gum",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=e94cb152ed51bd6e24eb4a41f1460252beb52cd2",
-      "name": "gum-2.0.2",
-      "pname": "gum",
-      "rev": "e94cb152ed51bd6e24eb4a41f1460252beb52cd2",
-      "rev_count": 1079315,
-      "rev_date": "2026-09-25T08:03:29Z",
-      "scrape_date": "2026-09-26T06:05:33.109243Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "2.0.2",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/kgws75vr6m3amp17pzjcx28nps8dby9f-gum-2.0.2"
-      },
-      "system": "x86_64-linux",
-      "group": "demo-tools",
-      "priority": 5
-    },
     {
       "attr_path": "flox-ai",
       "broken": false,
@@ -306,15 +216,10 @@
   ],
   "compose": {
     "composer": {
-      "schema-version": "1.11.0",
-      "install": {
-        "gum": {
-          "pkg-path": "gum",
-          "pkg-group": "demo-tools"
-        }
-      },
+      "schema-version": "1.17.0",
+      "description": "# Mergekit\nMerge LLMs on CPU — no GPU needed\n\n```bash\n# Run the example merge (~1GB model download)\nmergekit-yaml example-merge.yml ./merged-model\nmergekit-yaml --help  # all merge options\nmergekit-moe --help   # Mixture-of-Experts builds\n```\n",
       "hook": {
-        "on-activate": "# Example merge config: two small models, linear merge. Small\n# enough (~1GB of downloads) to finish on a laptop. Idempotent —\n# overwritten every activation.\ncat > \"$FLOX_ENV_PROJECT/example-merge.yml\" <<'YAML'\nmodels:\n  - model: Qwen/Qwen2.5-0.5B\n  - model: Qwen/Qwen2.5-0.5B-Instruct\nmerge_method: linear\ndtype: float16\nYAML\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 60 --margin \"1 2\" --padding \"1 2\" \\\n    \"Mergekit\" \\\n    \"Merge LLMs on CPU — no GPU needed\"\n  echo \"\"\n  echo \"  mergekit-yaml example-merge.yml ./merged-model\"\n  echo \"                             — run the example merge\"\n  echo \"                                (~1GB model download)\"\n  echo \"  mergekit-yaml --help       — all merge options\"\n  echo \"  mergekit-moe --help        — Mixture-of-Experts builds\"\n  echo \"\"\nfi\n"
+        "on-activate": "# Example merge config: two small models, linear merge. Small\n# enough (~1GB of downloads) to finish on a laptop. Idempotent —\n# overwritten every activation.\ncat > \"$FLOX_ENV_PROJECT/example-merge.yml\" <<'YAML'\nmodels:\n  - model: Qwen/Qwen2.5-0.5B\n  - model: Qwen/Qwen2.5-0.5B-Instruct\nmerge_method: linear\ndtype: float16\nYAML\n"
       },
       "options": {
         "systems": [
@@ -334,7 +239,8 @@
     "include": [
       {
         "manifest": {
-          "schema-version": "1.10.0",
+          "schema-version": "1.17.0",
+          "description": "Mergekit tools for merging pretrained language models.\n",
           "install": {
             "flox-ai": {
               "pkg-path": "flox/flox-ai",

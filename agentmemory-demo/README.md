@@ -4,8 +4,7 @@
 [![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fagentmemory-demo%2Fdevcontainer.json)
 
 Interactive walkthrough for the [agentmemory](../agentmemory/)
-environment. Wraps the minimal env with `gum` and prints
-a styled banner explaining how to start the backend,
+environment. Its description explains how to start the backend,
 where the plugin is installed, and which Claude Code
 commands the plugin contributes.
 
@@ -15,7 +14,7 @@ commands the plugin contributes.
 flox activate -r flox/agentmemory-demo --start-services
 ```
 
-The activation hook prints the banner, the
+The activation hook displays the backend URL and version, the
 `agentmemory` service runs in the background, and the
 `flox-ai` launcher is on PATH with the plugin wired up.
 
