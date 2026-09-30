@@ -13,7 +13,7 @@ env:
 jobs:
   wait-for-environments:
     name: "Wait Envs"
-    runs-on: "ubuntu-latest"
+    runs-on: "blacksmith-2vcpu-ubuntu-2404"
     timeout-minutes: 120
 
     outputs:
@@ -275,7 +275,7 @@ jobs:
 
   wait-for-packages:
     name: "Wait Pkgs"
-    runs-on: "ubuntu-latest"
+    runs-on: "blacksmith-2vcpu-ubuntu-2404"
     timeout-minutes: 120
 
     outputs:
@@ -449,7 +449,7 @@ jobs:
 
   result:
     name: "Summary"
-    runs-on: "ubuntu-latest"
+    runs-on: "blacksmith-2vcpu-ubuntu-2404"
     timeout-minutes: 5
     needs: ["wait-for-environments", "wait-for-packages"]
     if: always()
@@ -506,7 +506,7 @@ jobs:
 
   auto-merge:
     name: "Auto Merge"
-    runs-on: "ubuntu-latest"
+    runs-on: "blacksmith-2vcpu-ubuntu-2404"
     timeout-minutes: 5
     needs: ["wait-for-environments", "wait-for-packages", "result"]
     if: >-
@@ -529,7 +529,7 @@ jobs:
 
   report-failure:
     name: "Report Failure"
-    runs-on: "ubuntu-latest"
+    runs-on: "blacksmith-2vcpu-ubuntu-2404"
     timeout-minutes: 5
     needs: ["wait-for-environments", "wait-for-packages"]
     if: >-
@@ -561,7 +561,7 @@ jobs:
 
   containerize:
     name: "Containerize '${{ matrix.env }}'"
-    runs-on: "ubuntu-latest"
+    runs-on: "blacksmith-4vcpu-ubuntu-2404"
     timeout-minutes: 30
     needs: ["wait-for-environments", "result"]
     if: >-
@@ -593,7 +593,7 @@ jobs:
           ENV="${{ matrix.env }}"
           LOCK="$ENV/.flox/env/manifest.lock"
 
-          # Containers are built on ubuntu-latest (x86_64-linux). If the
+          # Containers are built on x86_64-linux runners. If the
           # env doesn't support x86_64-linux, skip the containerize job.
           # Empty `systems` in the manifest means "all systems" (default).
           ENV_LINUX=$(jq -r '
@@ -619,6 +619,19 @@ jobs:
 
           echo "env x86_64-linux supported: $ENV_LINUX"
           echo "demo x86_64-linux supported: $DEMO_LINUX"
+
+      - name: "Create Nix store mount point"
+        if: steps.linux_support.outputs.env_linux == 'true' || steps.linux_support.outputs.demo_linux == 'true'
+        run: |
+          sudo mkdir -p /nix/store
+          sudo chmod -R 777 /nix
+
+      - name: "Mount Nix store"
+        if: steps.linux_support.outputs.env_linux == 'true' || steps.linux_support.outputs.demo_linux == 'true'
+        uses: "useblacksmith/stickydisk@74f3f01ab1392726dd6ee06904f0452b0ec1e151" # v1
+        with:
+          key: "${{ github.repository }}-nix-${{ runner.arch }}"
+          path: "/nix"
 
       - name: "Install flox"
         if: steps.linux_support.outputs.env_linux == 'true' || steps.linux_support.outputs.demo_linux == 'true'
