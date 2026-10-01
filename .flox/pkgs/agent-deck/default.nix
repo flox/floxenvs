@@ -5,6 +5,7 @@
   fetchFromGitHub,
   git,
   lsof,
+  procps,
   tmux,
   versionCheckHook,
   writableTmpDirAsHomeHook,
@@ -62,9 +63,21 @@ buildGoModule (finalAttrs: {
   # Neutralise the guard for the build by making osUserRealHome() report no real
   # home: there is no real user data to protect in the sandbox, and the guard is
   # test-only so production path resolution is unaffected.
+  #
+  # TestIssue2388_CapabilitiesCarryProbe's fake `codex debug models`
+  # shim hardcodes PATH to `<fixture dir>:/usr/bin:/bin`, but neither
+  # /usr/bin nor /bin exists in the Nix sandbox, so its `cat` call
+  # fails closed and the probe falls back to the static list (fails in
+  # 0.00s -- confirmed not a timeout). Append the sandbox's real PATH
+  # so the shim's `cat` resolves.
   postPatch = ''
     substituteInPlace internal/agentpaths/paths.go \
       --replace-fail 'return filepath.Clean(u.HomeDir)' 'return ""'
+
+    substituteInPlace cmd/agent-deck/issue2388_capabilities_models_test.go \
+      --replace-fail \
+        't.Setenv("PATH", dir+string(os.PathListSeparator)+"/usr/bin"+string(os.PathListSeparator)+"/bin")' \
+        't.Setenv("PATH", dir+string(os.PathListSeparator)+"/usr/bin"+string(os.PathListSeparator)+"/bin"+string(os.PathListSeparator)+os.Getenv("PATH"))'
   '';
 
   # The OBS-01 wiring test compiles the binary, launches the full TUI
@@ -111,6 +124,16 @@ buildGoModule (finalAttrs: {
   # the length the redaction expects, so the raw path leaks into the
   # produced document and the comparison fails. Linux's shorter /build
   # path redacts cleanly, so skip that one on darwin only.
+  #
+  # The darwin Nix sandbox denies `ps` the same way it denies lsof
+  # above -- confirmed by CI: "fork/exec /bin/ps: operation not
+  # permitted", not a PATH gap, so no PATH addition can fix it. That
+  # breaks every session-restart/ownership identity check
+  # (internal/procowner's darwin prober calls `ps` after its `sysctl`
+  # boot-id check) and the writer-lock suite's process-tree walk
+  # (`ps -eo pid=,ppid=` is collectTmuxPaneProcessTreePIDs's primary
+  # lookup too). Skip both groups on darwin only; Linux has ps/pgrep
+  # via procps below and both groups pass there.
   checkFlags = [
     "-short"
     "-skip"
@@ -123,6 +146,14 @@ buildGoModule (finalAttrs: {
         + "|^TestCleanupExcludesLiveProcessCWDInside$"
         + "|^TestCleanupRevalidatesRealityBeforeRemoval$"
         + "|^TestCleanupForceCannotOverrideRealityExclusions$"
+        + "|^TestCoreRegistryMatchesLegacyHandlers$"
+        + "|^TestDaemonEnvelopesMatchArgv$"
+        + "|^TestDaemonRestartAllReturnsCompletedResult$"
+        + "|^TestStorageBytesGoldens$"
+        + "|^TestCodexAcceptanceGuardAcceptsFreshComposerThread$"
+        + "|^TestIssue2394_HydratePrefersLiveThreadOverGuessedPaneIdentity$"
+        + "|^TestIssue2396_FirstTurnOutputIsBoundToItsConversation$"
+        + "|^TestIssue2400_ArchiveKeepsLiveCodexIdentity$"
       )
     )
   ];
@@ -135,9 +166,30 @@ buildGoModule (finalAttrs: {
   # dispatch, so every cmd/agent-deck test that runs a command (account
   # registration, visibility, worktree boundary, ...) aborts with
   # "Error: tmux not found" unless tmux is on PATH.
+  #
+  # procps (linux only): the writer-lock live-identity suite (#2394/
+  # #2396/#2400, fresh-composer guard -- new in 1.16.22) walks the
+  # pane's process tree with `ps`/`pgrep` to find the fd holding the
+  # writer lock. Neither is on the sandbox's base PATH, so the walk
+  # always comes back empty and the tests spin out their 10s poll
+  # (confirmed via a diagnostic run: ps/pgrep exit 127; the fd itself
+  # already resolves fine via /proc). procps supplies both on Linux;
+  # darwin has no equivalent PATH fix -- ps is sandbox-denied there
+  # regardless of PATH, see the checkFlags comment above.
+  #
+  # /usr/sbin (darwin only): the darwin prober's `sysctl -n
+  # kern.boottime` boot-id check is a plain PATH gap, unlike `ps` --
+  # /usr/sbin isn't on the sandbox's base PATH, but sysctl execs
+  # fine once it's found.
   preCheck = ''
     export HOME=$(mktemp -d)
     export PATH="${git}/bin:${lsof}/bin:${tmux}/bin:$PATH"
+  ''
+  + lib.optionalString stdenv.hostPlatform.isLinux ''
+    export PATH="${procps}/bin:$PATH"
+  ''
+  + lib.optionalString stdenv.hostPlatform.isDarwin ''
+    export PATH="/usr/sbin:$PATH"
   '';
 
   ldflags = [
