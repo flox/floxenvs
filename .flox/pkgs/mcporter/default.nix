@@ -67,8 +67,14 @@ stdenv.mkDerivation (finalAttrs: {
 
     mkdir -p $out/{bin,lib/mcporter}
 
-    # Prune dev dependencies to reduce closure size.
+    # Prune dev dependencies to reduce closure size. Pruning removes the
+    # packages but leaves their `node_modules/.bin` symlinks behind, which
+    # trips the noBrokenSymlinks output check — drop the ones whose target
+    # went away.
     pnpm prune --prod
+    for link in node_modules/.bin/*; do
+      [ -e "$link" ] || rm -f "$link"
+    done
 
     cp -r dist $out/lib/mcporter/
     cp -r node_modules $out/lib/mcporter/
