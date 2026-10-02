@@ -28,5 +28,11 @@ python3Packages.toPythonApplication (
       "click"
       "hf-xet"
     ];
+
+    # 2.0.0 switched the HTTP client from httpx to httpx2. nixpkgs' own
+    # huggingface-hub still pins the older version, so its dependency set
+    # lacks httpx2 and pythonRuntimeDepsCheck reports "httpx2 not
+    # installed".
+    dependencies = (old.dependencies or [ ]) ++ [ python3Packages.httpx2 ];
   })
 )
