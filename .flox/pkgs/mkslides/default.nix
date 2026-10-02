@@ -72,14 +72,6 @@ python3.pkgs.buildPythonApplication {
       --replace-fail \
         $'            shutil.copytree(source_path, destination_path, dirs_exist_ok=True)\n' \
         $'            shutil.copytree(source_path, destination_path, dirs_exist_ok=True)\n            for entry in [destination_path, *destination_path.rglob("*")]:\n                entry.chmod(entry.stat().st_mode | 0o200)\n'
-
-    # Upstream caps the build backend at `uv_build<0.9.0` while nixpkgs
-    # ships 0.11, so pypa/build's dependency check rejects it. The cap
-    # constrains the backend, not the built package, and 0.11 builds
-    # this release unchanged — drop the upper bound.
-    substituteInPlace pyproject.toml \
-      --replace-fail 'requires = ["uv_build>=0.8.23,<0.9.0"]' \
-                     'requires = ["uv_build>=0.8.23"]'
   '';
 
   dependencies = with python3.pkgs; [
