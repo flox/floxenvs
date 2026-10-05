@@ -7,3 +7,11 @@ dependencies = ["serena-agent"]
 
 [tool.uv.sources]
 serena-agent = { git = "https://github.com/oraios/serena.git", tag = "v1.7.0" }
+
+[tool.uv]
+# serena-agent v1.7.0 pins `urllib3==2.7.0`, an exact pin that
+# `uv lock --upgrade-package urllib3` cannot move past, so the lock
+# stays on a version carrying three open advisories. Upstream's main
+# branch has itself moved to `urllib3==2.8.0`; this override takes that
+# version early, and can be dropped once a serena release ships it.
+override-dependencies = ["urllib3>=2.8.0"]
