@@ -70,7 +70,6 @@ v1.x — `hf-xet` replaced it.
 | Package | Description |
 | ------- | ----------- |
 | `hf` | Main Hugging Face Hub CLI |
-| `huggingface-cli` | Legacy alias kept for compatibility |
 | `tiny-agents` | Minimal agent runtime |
 | `gum` | Styled terminal UI (demo only) |
 
