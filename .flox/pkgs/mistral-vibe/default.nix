@@ -1,8 +1,10 @@
 {
   lib,
+  stdenv,
   python3,
   fetchFromGitHub,
   fetchPypi,
+  fetchurl,
   callPackage,
   rustPlatform,
   cargo,
@@ -15,6 +17,52 @@
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version srcHash;
+
+  src = fetchFromGitHub {
+    owner = "mistralai";
+    repo = "mistral-vibe";
+    tag = "v${version}";
+    hash = srcHash;
+  };
+
+  # The harness core links V8 through deno_core -> v8 150.3.0, and that
+  # crate's build.rs downloads a prebuilt librusty_v8 archive unless
+  # RUSTY_V8_ARCHIVE already points at one. In the Nix sandbox the download
+  # fails outright:
+  #   urllib.error.URLError: <urlopen error [Errno -3] Temporary failure in
+  #   name resolution>
+  #   thread 'main' panicked at .../v8-150.3.0/build.rs:844
+  # Fetch the archive and its generated bindings up front — the same release
+  # assets build.rs would have pulled — so the build stays offline.
+  rustyV8Version = "150.3.0";
+  rustyV8Target = stdenv.hostPlatform.rust.rustcTarget;
+  rustyV8Hashes = {
+    "aarch64-apple-darwin" = {
+      archive = "sha256-UfWFt8OGkwYSn/1haKjwuJqNSjhw3LBwlgwrT9fQSCU=";
+      binding = "sha256-ylrfDPicmnCtRgrnNkiy/om3SqETs8t/dXtqArdYOU8=";
+    };
+    "aarch64-unknown-linux-gnu" = {
+      archive = "sha256-WR80+czoM+IAeYduyM4gsR0Y6jGk9BL0u6EQGB3ZdrY=";
+      binding = "sha256-dyeCauR5vbZF6Acjn7EtH44uI956bPFvXuWSaQ0dhQY=";
+    };
+    "x86_64-unknown-linux-gnu" = {
+      archive = "sha256-2wl+bvpVp14L3oayuhl5g9CpG76DAfRVDEkNecB9evA=";
+      binding = "sha256-dyeCauR5vbZF6Acjn7EtH44uI956bPFvXuWSaQ0dhQY=";
+    };
+  };
+  rustyV8Asset =
+    name: hash:
+    fetchurl {
+      url = "https://github.com/denoland/rusty_v8/releases/download/v${rustyV8Version}/${name}";
+      inherit hash;
+    };
+  rustyV8 = rustyV8Hashes.${rustyV8Target};
+  # The `simdutf` variant is the one the crate's own default features
+  # expect: linking the plain archive builds, but the extension then fails
+  # to load with `symbol not found in flat namespace
+  # '_simdutf__convert_latin1_to_utf8'`.
+  librustyV8 = rustyV8Asset "librusty_v8_simdutf_release_${rustyV8Target}.a.gz" rustyV8.archive;
+  librustyV8Binding = rustyV8Asset "src_binding_simdutf_release_${rustyV8Target}.rs" rustyV8.binding;
 
   textual-speedups = python3.pkgs.buildPythonPackage rec {
     pname = "textual-speedups";
@@ -168,35 +216,62 @@ let
 in
 python.pkgs.buildPythonApplication {
   pname = "mistral-vibe";
-  inherit version;
+  inherit version src;
   pyproject = true;
 
-  src = fetchFromGitHub {
-    owner = "mistralai";
-    repo = "mistral-vibe";
-    tag = "v${version}";
-    hash = srcHash;
+  cargoDeps = rustPlatform.fetchCargoVendor {
+    inherit src;
+    name = "mistral-vibe-${version}-harness-core";
+    sourceRoot = "${src.name}/harness/core";
+    hash = "sha256-3ykvTIESFANShoj3gFYw+vDoJCETOft0xYKCgpn2Iy0=";
   };
+  cargoRoot = "harness/core";
 
-  build-system = with python.pkgs; [
-    hatchling
-    hatch-vcs
+  nativeBuildInputs = [
+    rustPlatform.cargoSetupHook
+    rustPlatform.maturinBuildHook
+    cargo
+    rustc
+    maturin
   ];
 
-  # mistral-vibe pins its build backend with exact `==` versions
-  # (e.g. `hatchling==1.31.0`, `hatch-vcs==0.5.0`, `editables==0.6`) that
-  # don't match the versions nixpkgs ships, and the pinned versions change
-  # between releases. pythonRelaxDeps only rewrites the built wheel's runtime
-  # metadata, not `build-system.requires`, so strip the pins from the source
-  # pyproject before the wheel is built (version-agnostic to survive bumps).
+  # 2.25.7 replaced the hatchling build with maturin driven through an
+  # in-tree PEP 517 shim (`build_backend/maturin_backend.py`). The shim
+  # cannot run here: it does `import maturin`, and nixpkgs' maturin is the
+  # Rust CLI with no Python module, so pypa/build gives up with
+  # `Backend 'maturin_backend' is not available`. It also cross-builds a
+  # manylinux wheel with zig, which a Nix build neither needs nor wants.
+  #
+  # Drive maturin directly with rustPlatform.maturinBuildHook instead, and
+  # take over the two staging steps the shim did:
+  #   - repoint `manifest-path` at `harness/core` in the source tree rather
+  #     than the `.native-build/harness-core` copy the shim made, so
+  #     cargoSetupHook's vendored config is the one cargo sees,
+  #   - copy the harness Python runtime to the project root, where
+  #     `[tool.maturin] python-packages` expects it.
+  # The second Rust artifact the shim built, `vibe/_bin/vibe-rs`, is left
+  # out: it is the alternative TUI, reached only when VIBE_CLI=rust is set
+  # (vibe/cli/launcher.py), and bundling it would mean vendoring a second
+  # Cargo workspace for a non-default code path.
   postPatch = ''
-    sed -i -E 's/(hatchling|hatch-vcs|editables)==[0-9][0-9.]*/\1/g' pyproject.toml
+    substituteInPlace pyproject.toml \
+      --replace-fail '.native-build/harness-core/Cargo.toml' 'harness/core/Cargo.toml'
+
+    cp -r harness/runtimes/python/python/mistralai_vibe_local_harness .
+    chmod -R u+w mistralai_vibe_local_harness
+  '';
+
+  preBuild = ''
+    gzip -dc ${librustyV8} > "$NIX_BUILD_TOP/librusty_v8.a"
+    export RUSTY_V8_ARCHIVE="$NIX_BUILD_TOP/librusty_v8.a"
+    export RUSTY_V8_SRC_BINDING_PATH=${librustyV8Binding}
   '';
 
   dependencies = with python.pkgs; [
     agent-client-protocol
     anyio
     cachetools
+    croniter
     cryptography
     gitpython
     giturlparse
@@ -252,6 +327,7 @@ python.pkgs.buildPythonApplication {
     "cffi"
     "charset-normalizer"
     "click"
+    "croniter"
     "cryptography"
     "eval-type-backport"
     "gitpython"
