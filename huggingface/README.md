@@ -29,7 +29,6 @@ environments = [{ remote = "flox/huggingface" }]
 | Command | Description |
 | ------- | ----------- |
 | `hf` | Main Hugging Face Hub CLI |
-| `huggingface-cli` | Legacy alias kept for compatibility |
 | `tiny-agents` | Minimal agent runtime built on `hf` |
 
 ## Cache layout

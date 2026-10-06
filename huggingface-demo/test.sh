@@ -12,7 +12,6 @@ command_exists() {
 
 # ── Required commands ─────────────────────────────────
 command_exists hf
-command_exists huggingface-cli
 command_exists tiny-agents
 command_exists gum
 
