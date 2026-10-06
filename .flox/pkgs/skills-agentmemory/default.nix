@@ -52,20 +52,13 @@ stdenv.mkDerivation {
     rm -rf "$PLUGIN_DIR/.codex-plugin" \
            "$PLUGIN_DIR/hooks/hooks.codex.json"
 
-    # Bundle node + npx so the consumer's flox env doesn't need
-    # nodejs installed just to run the plugin's hook scripts and the
-    # MCP shim. Plugin hooks invoke node via plain `node ...` in
-    # hooks.json; .mcp.json invokes `npx -y @agentmemory/mcp`.
+    # Bundle node so the consumer's flox env doesn't need nodejs
+    # installed just to run the plugin's hook scripts and the MCP
+    # server. Both invoke node via plain `node ...` — hooks.json in its
+    # hook commands, .mcp.json for the plugin bridge.
     runtimeBins=${lib.makeBinPath [ nodejs ]}
     mkdir -p "$PLUGIN_DIR/bin"
     makeBinaryWrapper "${nodejs}/bin/node" "$PLUGIN_DIR/bin/node" \
-      --prefix PATH : "$runtimeBins"
-    # npx is a JS script with `#!/usr/bin/env node`. Wrap it so PATH
-    # is amended before the kernel re-reads the shebang and dispatches
-    # `env node`, otherwise the `env` lookup runs against the caller's
-    # PATH — which (for an MCP server spawned by Claude Code) may not
-    # include nodejs.
-    makeBinaryWrapper "${nodejs}/bin/npx" "$PLUGIN_DIR/bin/npx" \
       --prefix PATH : "$runtimeBins"
 
     # Repoint every #!/usr/bin/env node shebang at the bundled node.
@@ -89,15 +82,16 @@ stdenv.mkDerivation {
       'node \"${pluginRootRef}/' \
       '\"${pluginRootRef}/bin/node\" \"${pluginRootRef}/'
 
-    # Repoint the MCP server invocation at the bundled npx for the
-    # same reason. `command` is the literal string `npx` in upstream;
-    # we replace it with the ''${CLAUDE_PLUGIN_ROOT}-anchored path
-    # (the same form hooks.json uses), which Claude Code expands at
-    # plugin load.
+    # Repoint the MCP server invocation at the bundled node for the
+    # same reason. Up to 0.9.29 upstream shelled out to
+    # `npx -y @agentmemory/mcp`; 0.9.30 runs the bridge script
+    # directly, so `command` is now the literal string `node`. Replace
+    # it with the ''${CLAUDE_PLUGIN_ROOT}-anchored path (the same form
+    # hooks.json uses), which Claude Code expands at plugin load.
     substituteInPlace "$PLUGIN_DIR/.mcp.json" \
       --replace-fail \
-      '"command": "npx"' \
-      '"command": "${pluginRootRef}/bin/npx"'
+      '"command": "node"' \
+      '"command": "${pluginRootRef}/bin/node"'
 
     runHook postInstall
   '';
