@@ -6,6 +6,14 @@ requires-python = ">=3.13"
 dependencies = [
   "honcho",
   "honcho-ai",
+  # honcho 3.2.2 imports src.dreamer.surprisal unconditionally from
+  # src.dreamer.__init__, and that module imports numpy at the top
+  # level. Upstream only pulls numpy in through the optional
+  # `surprisal` extra (via scikit-learn), so `import src.main` fails
+  # with ModuleNotFoundError without it. Add numpy on its own — the
+  # scikit-learn imports under src/dreamer/trees/ are all lazy, so the
+  # heavy extra stays out of the closure.
+  "numpy",
 ]
 
 [tool.uv.sources]
