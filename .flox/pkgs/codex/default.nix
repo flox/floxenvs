@@ -145,6 +145,27 @@ rustPlatform.buildRustPackage {
     LK_CUSTOM_WEBRTC = livekitWebrtc;
   };
 
+  # rustc's default recursion limit (128) is not enough to lay out the async
+  # body of chatgpt::connectors::list_connectors, so the crate fails to
+  # compile:
+  #   error: queries overflow the depth limit!
+  #     = help: consider increasing the recursion limit by adding a
+  #       `#![recursion_limit = "256"]` attribute to your crate
+  #       (`codex_chatgpt`)
+  #     = note: query depth increased by 130 when computing layout of
+  #       `{async fn body of connectors::list_connectors()}`
+  # Add the attribute rustc asks for. Upstream builds with its own pinned
+  # toolchain and does not hit the limit, so this is skew between that and the
+  # rustc a given nixpkgs pin ships — the package build survives it, the
+  # `coexist` env build (a different pin) does not.
+  postPatch = ''
+    substituteInPlace chatgpt/src/lib.rs \
+      --replace-fail \
+        'pub mod apply_command;' \
+        '#![recursion_limit = "256"]
+pub mod apply_command;'
+  '';
+
   preBuild = ''
     # Remove LTO to speed up builds. Keep codegen-units = 1 from upstream:
     # raising it bloats the binary past the 128 MB ARM64 branch range and
