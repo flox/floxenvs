@@ -5,11 +5,12 @@
   fetchurl,
   fetchzip,
   installShellFiles,
-  makeWrapper,
   rustPlatform,
   pkg-config,
   openssl,
   bubblewrap,
+  ripgrep,
+  jq,
   libcap,
   versionCheckHook,
 }:
@@ -18,6 +19,16 @@ let
   versionData =
     builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hash cargoHash;
+
+  packageManifest = builtins.toJSON {
+    layoutVersion = 1;
+    inherit version;
+    target = stdenv.hostPlatform.rust.rustcTarget;
+    variant = "codex";
+    entrypoint = "bin/codex";
+    resourcesDir = "codex-resources";
+    pathDir = "codex-path";
+  };
 
   # The v8 crate downloads a prebuilt static library and a matching generated
   # bindings file at build time. Fetch both as fixed-output derivations so the
@@ -111,7 +122,21 @@ rustPlatform.buildRustPackage {
   # ~/.codex or the working tree. Re-verify on every version bump
   # (see upgrade.sh) — the patch targets ext/skills/src/host_roots.rs and
   # core/agents_md.rs. Paths are relative to codex-rs (the sourceRoot).
-  patches = [ ./flox-fragments.patch ];
+  # Re-verify daemon-nix-store.patch on every version bump (see upgrade.sh).
+  patches = [ ./flox-fragments.patch ./daemon-nix-store.patch ];
+
+  # Keep the daemon on the Flox-built package and its injected fragments.
+  postPatch = ''
+    substituteInPlace app-server-daemon/src/prepare_install.rs \
+      --subst-var-by storeDir ${builtins.storeDir} \
+      --subst-var out
+    # rustc needs more query depth for connectors::list_connectors.
+    if ! grep -q 'recursion_limit' chatgpt/src/lib.rs; then
+      substituteInPlace chatgpt/src/lib.rs \
+        --replace-fail 'pub mod apply_command;' \
+        $'#![recursion_limit = "256"]\n\npub mod apply_command;'
+    fi
+  '';
 
   # codex-cli alone leaves out the Code Mode host binary. Codex's Code Mode
   # spawns `codex-code-mode-host` (workspace member code-mode-host) as a child
@@ -129,7 +154,6 @@ rustPlatform.buildRustPackage {
 
   nativeBuildInputs = [
     installShellFiles
-    makeWrapper
     pkg-config
   ];
 
@@ -154,9 +178,20 @@ rustPlatform.buildRustPackage {
       --replace-fail 'lto = "thin"' 'lto = false'
   '';
 
-  postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
-    wrapProgram $out/bin/codex \
-      --prefix PATH : ${lib.makeBinPath [ bubblewrap ]}
+  # The daemon requires the complete package layout around its executable.
+  postFixup = ''
+    mkdir -p $out/libexec/codex/{bin,codex-path,codex-resources}
+    mv $out/bin/codex $out/bin/codex-code-mode-host $out/bin/logs_client \
+      $out/libexec/codex/bin/
+    ln -s ${lib.getExe ripgrep} $out/libexec/codex/codex-path/rg
+    printf '%s\n' ${lib.escapeShellArg packageManifest} \
+      > $out/libexec/codex/codex-package.json
+    ${lib.optionalString stdenv.hostPlatform.isLinux ''
+      ln -s ${lib.getExe bubblewrap} $out/libexec/codex/codex-resources/bwrap
+    ''}
+    for binary in codex codex-code-mode-host logs_client; do
+      ln -s ../libexec/codex/bin/$binary $out/bin/$binary
+    done
   '';
 
   doCheck = false;
@@ -169,7 +204,28 @@ rustPlatform.buildRustPackage {
   '';
 
   doInstallCheck = true;
-  nativeInstallCheckInputs = [ versionCheckHook ];
+  nativeInstallCheckInputs = [ versionCheckHook jq ];
+  installCheckPhase = ''
+    runHook preInstallCheck
+
+    package=$out/libexec/codex
+    jq -e --arg version '${version}' \
+      --arg target '${stdenv.hostPlatform.rust.rustcTarget}' \
+      '.layoutVersion == 1 and .version == $version and .target == $target
+       and .variant == "codex" and .entrypoint == "bin/codex"
+       and .resourcesDir == "codex-resources" and .pathDir == "codex-path"' \
+      "$package/codex-package.json"
+    for binary in codex codex-code-mode-host logs_client; do
+      test -x "$package/bin/$binary"
+      test "$(readlink -f "$out/bin/$binary")" = "$package/bin/$binary"
+    done
+    "$package/codex-path/rg" --version
+    ${lib.optionalString stdenv.hostPlatform.isLinux ''
+      "$package/codex-resources/bwrap" --version
+    ''}
+
+    runHook postInstallCheck
+  '';
 
   meta = {
     description = "OpenAI Codex CLI - a coding agent that runs locally";
