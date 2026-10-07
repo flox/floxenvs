@@ -122,6 +122,7 @@ rustPlatform.buildRustPackage {
   # ~/.codex or the working tree. Re-verify on every version bump
   # (see upgrade.sh) — the patch targets ext/skills/src/host_roots.rs and
   # core/agents_md.rs. Paths are relative to codex-rs (the sourceRoot).
+  # Re-verify daemon-nix-store.patch on every version bump (see upgrade.sh).
   patches = [ ./flox-fragments.patch ./daemon-nix-store.patch ];
 
   # Keep the daemon on the Flox-built package and its injected fragments.
