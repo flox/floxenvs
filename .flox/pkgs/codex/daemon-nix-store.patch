@@ -1,0 +1,68 @@
+diff --git a/app-server-daemon/src/prepare_install.rs b/app-server-daemon/src/prepare_install.rs
+index ecf2501..ae0f01e 100644
+--- a/app-server-daemon/src/prepare_install.rs
++++ b/app-server-daemon/src/prepare_install.rs
+@@ -76,6 +76,8 @@ pub async fn update_from_cli(
+     }))
+ }
+ 
++const NIX_PACKAGE: &str = "@out@/libexec/codex";
++
+ #[derive(Clone, Copy, PartialEq, Eq)]
+ enum InstallMode {
+     Missing,
+@@ -108,9 +110,14 @@ async fn prepare_from_package(
+         {
+             return Ok(true);
+         }
++        // Nix: no daemon is running, so drop a link to another or a
++        // garbage-collected build and select this one below.
++        if std::fs::read_link(root.join("current")).is_ok_and(|target| {
++            target.starts_with("@storeDir@") && target != Path::new(NIX_PACKAGE)
++        }) {
++            std::fs::remove_file(root.join("current"))?;
++        }
+         if !matches!(root.join("current").symlink_metadata(), Err(error) if error.kind() == std::io::ErrorKind::NotFound)
+-            || ["daemon.pid", "daemon.stderr.log", "daemon-updater.pid", "daemon-updater.stderr.log"]
+-                .iter().any(|name| !matches!(home.join("app-server-daemon").join(name).symlink_metadata(), Err(error) if error.kind() == std::io::ErrorKind::NotFound))
+         {
+             daemon.ensure_managed_codex_bin()?;
+             return Ok(true);
+@@ -220,7 +227,12 @@ async fn prepare_from_package(
+         "daemon running state changed while awaiting confirmation; retry the command"
+     );
+     let backend = current_backend;
+-    let stable = stable_version(&version).is_some();
++    // Nix: use the immutable store package in place. It is not a `releases/`
++    // entry, so the updater never replaces it with an upstream build.
++    let stable = false;
++    let (release, name) = (PathBuf::from(NIX_PACKAGE), String::new());
++    #[cfg(any())]
++    {
+     let releases = root.join("releases");
+     std::fs::create_dir_all(&releases)?;
+     let stage = tempfile::Builder::new()
+@@ -264,6 +276,7 @@ async fn prepare_from_package(
+         }
+         std::fs::rename(stage.path(), &release)?;
+     }
++    }
+     let standalone = home.join("packages/standalone");
+     let canonical_source = source.canonicalize()?;
+     let follows_latest = mode == InstallMode::Missing
+@@ -338,6 +351,15 @@ async fn prepare_from_package(
+         let link = temporary.path().join("current");
+         std::os::unix::fs::symlink(&release, &link)?;
+         std::fs::rename(link, root.join("current"))?;
++        // Best effort: a collected package is reselected on the next start.
++        if let Err(error) = std::process::Command::new("nix-store")
++            .args(["--realise", "@out@", "--add-root"])
++            .arg(root.join("nix-gcroot"))
++            .stdout(std::process::Stdio::null())
++            .status()
++        {
++            eprintln!("warning: failed to register a Nix GC root for the daemon: {error}");
++        }
+     }
+     #[cfg(windows)]
+     windows::select_release(&root, &release)?;
