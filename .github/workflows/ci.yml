@@ -541,7 +541,7 @@ jobs:
       - name: "Slack Notification"
         uses: "rtCamp/action-slack-notify@33ca3be66c6f378fe1610fd1d5258632dbed5e58" # v2
         env:
-          SLACK_CHANNEL: "team-content"
+          SLACK_CHANNEL: "#pod-workflows"
           SLACK_TITLE: "floxenvs CI failed on main"
           SLACK_FOOTER: "Thanks for looking at it."
           SLACK_WEBHOOK: "${{ secrets.MANAGED_SLACK_WEBHOOK }}"
@@ -549,7 +549,9 @@ jobs:
           SLACK_ICON_EMOJI: ":poop:"
           SLACK_COLOR: "#ff2800"
           SLACK_LINK_NAMES: true
+          # <@U040X8ZS1BQ> is Matthew Kenigsberg.
           SLACK_MESSAGE: >-
+            <@U040X8ZS1BQ>
             Envs failed:
             ${{ needs.wait-for-environments.outputs.failed_workflows }}
             | Pkgs failed:
