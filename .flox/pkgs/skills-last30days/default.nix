@@ -108,7 +108,13 @@ stdenvNoCC.mkDerivation {
       # Pin the agent-facing interpreter probe to the bundled python so
       # the engine runs with no python3 installed on the host. The loop's
       # own `command -v` + version check still validate the path.
-      substituteInPlace "$skill/SKILL.md" \
+      #
+      # 3.27.x moved this loop out of SKILL.md into
+      # references/runtime.md, unchanged. Targeting the old path failed
+      # the build:
+      #   ERROR: pattern for\ py\ in\ python3.14\ ... doesn't match
+      #   anything in file '.../skills/last30days/SKILL.md'
+      substituteInPlace "$skill/references/runtime.md" \
         --replace-fail \
           'for py in python3.14 python3.13 python3.12 python3 python; do' \
           'for py in "${py}"; do'
