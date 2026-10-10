@@ -53,9 +53,9 @@ get_systems() {
 # darwin-only envs. Mirrors environment.yml.
 runner_for_systems() {
   local systems="$1"
-  if   echo "$systems" | grep -qx 'x86_64-linux';   then echo "ubuntu-latest"
-  elif echo "$systems" | grep -qx 'aarch64-linux';  then echo "ubuntu-24.04-arm"
-  elif echo "$systems" | grep -qx 'aarch64-darwin'; then echo "macos-latest"
+  if   echo "$systems" | grep -qx 'x86_64-linux';   then echo "blacksmith-4vcpu-ubuntu-2404"
+  elif echo "$systems" | grep -qx 'aarch64-linux';  then echo "blacksmith-4vcpu-ubuntu-2404-arm"
+  elif echo "$systems" | grep -qx 'aarch64-darwin'; then echo "blacksmith-6vcpu-macos-latest"
   else
     echo "no supported runner for systems: $systems" >&2
     return 1
