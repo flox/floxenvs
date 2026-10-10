@@ -14,7 +14,8 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HASHES_FILE="$SCRIPT_DIR/hashes.json"
 
-# This script only bumps the main mistral-vibe version + srcHash.
+# This script bumps the main mistral-vibe version + srcHash, and
+# recomputes the Rust vendor hash for harness/core.
 # Python dep overrides in default.nix (textual, pydantic-settings,
 # mistralai, agent-client-protocol, otel) are pinned to versions that
 # match the API contract upstream pins. If a new mistral-vibe release
@@ -42,10 +43,51 @@ src_hash=$(nix-prefetch-url --unpack "$src_url" 2>/dev/null)
 src_sri=$(nix hash convert --hash-algo sha256 --to sri "$src_hash")
 echo "  srcHash: $src_sri"
 
+# harness/core carries its own Cargo.lock, so a release that touches it
+# changes the vendor hash. Stage a known-bad one, let the build report
+# the real value, and parse it out — the same fake-hash trick the other
+# packages here use. Without this step every bump failed with
+#   hash mismatch in fixed-output derivation
+#   '...-harness-core-vendor-staging.drv'
+# because the hash lived inline in default.nix where this script could
+# not reach it.
+fake_hash="sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+
 jq -n \
   --arg v "$latest_version" \
   --arg s "$src_sri" \
-  '{version: $v, srcHash: $s}' > "$HASHES_FILE"
+  --arg c "$fake_hash" \
+  '{version: $v, srcHash: $s, cargoVendorHash: $c}' > "$HASHES_FILE"
+
+echo "Building with a dummy cargoVendorHash to compute the real one..."
+prefetch_log=$(mktemp)
+flox build mistral-vibe > "$prefetch_log" 2>&1 || true
+
+# `|| true`: under `set -o pipefail` a grep that matches nothing would
+# kill the script here, before the diagnostic below can print.
+vendor_hash=$(
+  grep -A2 'hash mismatch in fixed-output derivation' "$prefetch_log" \
+  | grep 'got:' \
+  | head -1 \
+  | awk '{print $NF}' \
+  || true
+)
+
+if [ -z "$vendor_hash" ]; then
+  echo "ERROR: could not extract cargoVendorHash. Build output:" >&2
+  tail -30 "$prefetch_log" >&2
+  rm -f "$prefetch_log"
+  exit 1
+fi
+rm -f "$prefetch_log"
+
+echo "  cargoVendorHash: $vendor_hash"
+
+jq -n \
+  --arg v "$latest_version" \
+  --arg s "$src_sri" \
+  --arg c "$vendor_hash" \
+  '{version: $v, srcHash: $s, cargoVendorHash: $c}' > "$HASHES_FILE"
 
 echo "Updated to $latest_version"
 echo "WARNING: Python dep overrides in default.nix may need" \
