@@ -154,6 +154,9 @@ buildGoModule (finalAttrs: {
         + "|^TestIssue2394_HydratePrefersLiveThreadOverGuessedPaneIdentity$"
         + "|^TestIssue2396_FirstTurnOutputIsBoundToItsConversation$"
         + "|^TestIssue2400_ArchiveKeepsLiveCodexIdentity$"
+        + "|^TestIssue2549_SendAdoptsRotatedLiveThread$"
+        + "|^TestIssue2549_PeerOwnedLiveThreadIsNotAdopted$"
+        + "|^TestIssue2549_SubagentLiveThreadIsNotAdopted$"
       )
     )
   ];
