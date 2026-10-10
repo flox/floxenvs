@@ -1,8 +1,11 @@
 {
   lib,
   stdenv,
-  buildNpmPackage,
   fetchFromGitHub,
+  fetchPnpmDeps,
+  pnpmConfigHook,
+  pnpm_11,
+  nodejs,
   git,
   ripgrep,
   pkg-config,
@@ -11,13 +14,29 @@
   clang_20,
   makeSetupHook,
   writeText,
+  writeShellScriptBin,
   versionCheckHook,
   writableTmpDirAsHomeHook,
 }:
 
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version srcHash npmDepsHash;
+  inherit (versionData) version srcHash pnpmDepsHash;
+  pnpm = pnpm_11;
+
+  # scripts/build.js shells out to `corepack pnpm -r ... run build`, and
+  # corepack honours package.json's `packageManager` by downloading that
+  # exact pnpm. The build sandbox has no network, so it dies with
+  #   Error: unable to get local issuer certificate
+  #   code: 'UNABLE_TO_GET_ISSUER_CERT_LOCALLY'
+  # pnpm is already in nativeBuildInputs at a version that reads this
+  # lockfile, so shadow corepack with a shim that drops the
+  # package-manager argument and runs the one from the closure.
+  corepackShim = writeShellScriptBin "corepack" ''
+    pm="$1"
+    shift
+    exec "$pm" "$@"
+  '';
 
   # node-gyp on macOS sometimes picks up node.js's util.h before the SDK's,
   # so openpty()/forkpty() prototypes go missing and node-pty fails to
@@ -50,8 +69,7 @@ let
     in
     makeSetupHook { name = "darwin-openpty-hook"; } hookScript;
 in
-buildNpmPackage (finalAttrs: {
-  npmDepsFetcherVersion = 2;
+stdenv.mkDerivation (finalAttrs: {
   pname = "qwen-code";
   inherit version;
 
@@ -62,12 +80,25 @@ buildNpmPackage (finalAttrs: {
     hash = srcHash;
   };
 
-  inherit npmDepsHash;
-  makeCacheWritable = true;
+  # 0.25.0 migrated the repo from npm to pnpm: package-lock.json is gone,
+  # replaced by pnpm-lock.yaml plus pnpm-workspace.yaml, and package.json
+  # declares `packageManager: pnpm@11.x`. buildNpmPackage's fetchNpmDeps
+  # has no lockfile to read and fails the build outright with
+  # `ERROR: No lock file!`, so fetch the store with pnpm instead.
+  pnpmDeps = fetchPnpmDeps {
+    inherit (finalAttrs) pname version src;
+    inherit pnpm;
+    hash = pnpmDepsHash;
+    fetcherVersion = 4;
+  };
 
   nativeBuildInputs = [
+    corepackShim
     pkg-config
     git
+    nodejs
+    pnpm
+    pnpmConfigHook
   ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     # node-addon-api (keytar) needs clang 20; clang 21+ trips on a
@@ -86,11 +117,10 @@ buildNpmPackage (finalAttrs: {
     runHook preBuild
 
     # A dependency whose version conflicts with the hoisted one gets a
-    # workspace-local node_modules, and the npm hooks only patch the root
-    # tree. Those nested copies keep their `#!/usr/bin/env node`
+    # workspace-local node_modules, and pnpmConfigHook only patches the
+    # root tree. Those nested copies keep their `#!/usr/bin/env node`
     # shebangs, and the Linux build sandbox has no /usr/bin/env, so
-    # running one dies with "bad interpreter" (npm reports exit code
-    # 126) — web-shell carries its own vite and hit exactly that. Darwin
+    # running one dies with "bad interpreter" (exit code 126) — web-shell carries its own vite and hit exactly that. Darwin
     # builders do have /usr/bin/env, so this only bites on Linux.
     #
     # Patch the nested trees, not their .bin directories: the entries in
@@ -98,6 +128,15 @@ buildNpmPackage (finalAttrs: {
     while IFS= read -r nm; do
       patchShebangs "$nm"
     done < <(find packages -type d -name node_modules -prune)
+
+    # Upstream patches ink in place from its root `postinstall`
+    # (`patch-package` against patches/ink+7.0.3.patch), and
+    # packages/cli compiles against what that patch adds — the
+    # `ReadonlyFrame` export and Text's `selectable` prop. pnpmConfigHook
+    # installs with lifecycle scripts disabled, so run it here; without
+    # it tsc stops with `Module '"ink"' has no exported member
+    # 'ReadonlyFrame'` and `Property 'selectable' does not exist`.
+    node_modules/.bin/patch-package
 
     # Upstream's scripts/build.js builds every workspace in dependency
     # order and takes `--cli-only` to skip the ones the CLI bundle does
@@ -111,7 +150,7 @@ buildNpmPackage (finalAttrs: {
     # root `build` script, whose tsc runs need the larger heap.
     NODE_OPTIONS="--max-old-space-size=4096" \
       node scripts/build.js --cli-only
-    npm run bundle
+    pnpm run bundle
 
     runHook postBuild
   '';
@@ -128,7 +167,20 @@ buildNpmPackage (finalAttrs: {
     # wrapper's --version fast path.
     cp scripts/cli-entry.js $out/share/qwen-code/cli-entry.js
     cp package.json $out/share/qwen-code/package.json
-    npm prune --production
+    # pnpm wants to purge and relink node_modules when pruning a
+    # workspace, and refuses to do that unprompted:
+    #   [ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY] Aborted removal of
+    #   modules directory due to no TTY
+    # It names the fix itself — settle the prompt in the config rather
+    # than exporting CI=true, which other tooling here also reads.
+    # --config.ignoreScripts: pruning relinks the store, and pnpm reruns
+    # every workspace's lifecycle scripts afterwards. The root one is
+    # `patch-package`, a devDependency this prune has just removed, so it
+    # dies with `patch-package: command not found` — after the patch has
+    # already been applied and built against.
+    pnpm prune --prod \
+      --config.confirmModulesPurge=false \
+      --config.ignoreScripts=true
     cp -r node_modules $out/share/qwen-code/
     # Remove broken symlinks that confuse Nix tooling.
     find $out/share/qwen-code/node_modules -type l -delete || true
