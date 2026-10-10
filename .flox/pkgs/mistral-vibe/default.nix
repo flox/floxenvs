@@ -16,7 +16,7 @@
 
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version srcHash;
+  inherit (versionData) version srcHash cargoVendorHash;
 
   src = fetchFromGitHub {
     owner = "mistralai";
@@ -223,7 +223,7 @@ python.pkgs.buildPythonApplication {
     inherit src;
     name = "mistral-vibe-${version}-harness-core";
     sourceRoot = "${src.name}/harness/core";
-    hash = "sha256-3ykvTIESFANShoj3gFYw+vDoJCETOft0xYKCgpn2Iy0=";
+    hash = cargoVendorHash;
   };
   cargoRoot = "harness/core";
 
@@ -376,6 +376,7 @@ python.pkgs.buildPythonApplication {
     "textual"
     "tree-sitter"
     "typing-extensions"
+    "typing-inspection"
     "uc-micro-py"
     "urllib3"
     "uvicorn"
