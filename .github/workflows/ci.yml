@@ -372,6 +372,35 @@ jobs:
             const maxAttempts = 1400;  // ~2 hours at 5s
             const interval = 5000;
 
+            // The site job of ci_pkgs.yml shares one concurrency group
+            // per ref, and GitHub keeps only one running and one pending
+            // job per group. A wave of pushes therefore evicts the older
+            // pending site job, which marks its whole run cancelled
+            // although nothing in it failed. Such a run is one whose only
+            // job that did not pass is the site job, cancelled before it
+            // ran a step.
+            const siteJob = 'Build + deploy site';
+            const onlySiteDeploySuperseded = async (run) => {
+              const jobs = await github.paginate(
+                github.rest.actions.listJobsForWorkflowRun,
+                {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  run_id: run.id,
+                  filter: 'latest',
+                  per_page: 100,
+                }
+              );
+              const notPassed = jobs.filter(
+                j => j.conclusion !== 'success' && j.conclusion !== 'skipped'
+              );
+              return notPassed.length > 0 && notPassed.every(
+                j => j.name === siteJob
+                  && j.conclusion === 'cancelled'
+                  && (j.steps || []).length === 0
+              );
+            };
+
             for (let attempt = 1; attempt <= maxAttempts; attempt++) {
               const runs = await github.rest.actions.listWorkflowRunsForRepo({
                 owner: context.repo.owner,
@@ -428,12 +457,24 @@ jobs:
                 core.info(
                   `All ${pkgRuns.length} CI Packages runs complete!`
                 );
-                const failedNames = failed.map(r => r.name).join(', ');
-                if (failed.length > 0) {
+                const realFailures = [];
+                for (const run of failed) {
+                  if (run.conclusion === 'cancelled'
+                      && await onlySiteDeploySuperseded(run)) {
+                    core.warning(
+                      `CI Packages run ${run.id}: a newer push superseded ` +
+                      'the site deploy, so this push was not deployed.'
+                    );
+                    continue;
+                  }
+                  realFailures.push(run);
+                }
+                const failedNames = realFailures.map(r => r.name).join(', ');
+                if (realFailures.length > 0) {
                   core.info(`Failed: ${failedNames}`);
                 }
                 core.setOutput(
-                  'any_failed', (failed.length > 0).toString()
+                  'any_failed', (realFailures.length > 0).toString()
                 );
                 core.setOutput('failed_workflows', failedNames);
                 core.setOutput(

@@ -84,6 +84,14 @@ otherwise-green PRs. Fixed with a per-ref concurrency group (#4993). PRs
 branched before that fix need `gh pr update-branch` to pick up the fixed
 workflow.
 
+Pushes to `main` share one group, so a wave of merges still evicts the
+older pending site job and GitHub marks that CI Packages run cancelled.
+`Wait Pkgs` in `ci.yml` passes such a run when the site job is the only
+job that did not pass and it never ran a step, and writes a warning
+annotation on the CI run instead of failing `Summary`. The evicted push
+is not deployed: any audit metrics it produced stay off the site until
+that package is next built.
+
 ## Lockfile / schema freshness
 
 - Every env must have a committed `manifest.lock` (enforced by the
