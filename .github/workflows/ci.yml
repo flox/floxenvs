@@ -103,6 +103,9 @@ jobs:
           || steps.decide.outputs.should_poll == 'true'
         uses: "actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3" # v9.0.0
         with:
+          # Retry transient 5xx responses instead of failing the job; the
+          # default exempt list (4xx) still fails fast.
+          retries: 3
           script: |
             const isPR = context.eventName === 'pull_request';
             // For PRs, context.sha is the merge commit — use head SHA instead
@@ -215,7 +218,10 @@ jobs:
                       repo: context.repo.repo,
                       run_id: run.id,
                       filter: 'latest',
-                      per_page: 100,
+                      // Response time scales with the steps in the
+                      // returned jobs; 100 jobs from a full env run
+                      // exceeds the API's ~10s limit and returns 502.
+                      per_page: 20,
                     }
                   );
                   for (const job of jobs) {
