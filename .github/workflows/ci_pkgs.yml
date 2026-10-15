@@ -516,6 +516,8 @@ jobs:
 
   # ── Site: collect metrics, build data.json, deploy (main only) ──
   site:
+    # ci.yml's "Wait Pkgs" matches this name to recognize a superseded
+    # deploy; rename it there too.
     name: "Build + deploy site"
     # Wait on every system leg (not just x86_64-linux) so the site builds
     # only after all builds/publishes settle. always() keeps it running
@@ -527,9 +529,11 @@ jobs:
     # Serialize the site/deploy half (gh-pages) per ref. A single global
     # group means every PR's site job lands in the same queue; GitHub keeps
     # only one running + one pending per group and CANCELS the rest, which
-    # cancels the whole CI Packages run and fails the Summary gate. Keying
-    # the group on github.ref isolates each PR while still serialising the
-    # only ref that actually deploys (refs/heads/main) against itself.
+    # cancels the whole CI Packages run. Keying the group on github.ref
+    # isolates each PR while still serialising the only ref that actually
+    # deploys (refs/heads/main) against itself. Pushes to main still evict
+    # one another's pending site job; ci.yml's "Wait Pkgs" passes a run
+    # whose only casualty is this job, and that push is not deployed.
     concurrency:
       group: "pages-${{ github.ref }}"
       cancel-in-progress: false
