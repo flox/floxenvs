@@ -60,11 +60,16 @@ mix_err=$(
     build "$SCRIPT_DIR/../../..#symphony" \
     --no-link 2>&1 || true
 )
+# `|| true`: the script runs under `set -o pipefail`, so when grep finds
+# no `got:` line the whole pipeline fails and `set -e` kills the run
+# before the diagnostic below can print. That is how an eval error in
+# default.nix surfaced in CI as a bare `exit 1` with no message.
 mix_hash=$(
   echo "$mix_err" \
   | grep -E '^\s*got:\s+sha256-' \
   | head -1 \
-  | sed -E 's/^\s*got:\s+//'
+  | sed -E 's/^\s*got:\s+//' \
+  || true
 )
 
 if [ -z "$mix_hash" ]; then

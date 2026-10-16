@@ -9,7 +9,14 @@ let
     builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version rev srcHash mixFodHash;
 
-  beamPkgs = beam28Packages.extend (self: super: {
+  # `.extend` was removed from the beam package sets in favour of
+  # `.overrideScope`, and keeping it fails at eval:
+  #   error: 'beamPackages.extend' has been replaced by
+  #   'beamPackages.overrideScope'
+  # That broke upgrade.sh in a way that reported nothing useful: the
+  # error arrives before the mixFodDeps derivation is ever built, so
+  # there is no `got: sha256-...` line to scrape.
+  beamPkgs = beam28Packages.overrideScope (self: super: {
     elixir = super.elixir_1_19;
   });
 
