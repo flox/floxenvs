@@ -30,8 +30,7 @@ for f in \
   hooks/hooks.json \
   scripts/session-start.mjs \
   skills/remember/SKILL.md \
-  bin/node \
-  bin/npx
+  bin/node
 do
   if [ ! -e "$plugin_dir/$f" ]; then
     echo "Error: missing $plugin_dir/$f"
@@ -70,12 +69,15 @@ if ! grep -qF '${CLAUDE_PLUGIN_ROOT}/bin/node' "$plugin_dir/hooks/hooks.json"; t
 fi
 echo ">>> hooks.json wired to bundled node"
 
-# Same for .mcp.json's npx invocation.
-if ! grep -qF '${CLAUDE_PLUGIN_ROOT}/bin/npx' "$plugin_dir/.mcp.json"; then
-  echo "Error: .mcp.json not rewritten to bundled npx"
+# Same for .mcp.json's server invocation. agentmemory 0.9.30 stopped
+# shelling out to `npx -y @agentmemory/mcp` and now runs the bridge
+# script directly, so the package rewrites `node` rather than `npx` and
+# the npx wrapper is gone.
+if ! grep -qF '${CLAUDE_PLUGIN_ROOT}/bin/node' "$plugin_dir/.mcp.json"; then
+  echo "Error: .mcp.json not rewritten to bundled node"
   exit 1
 fi
-echo ">>> .mcp.json wired to bundled npx"
+echo ">>> .mcp.json wired to bundled node"
 
 # Vars set up correctly.
 if [ "${AGENTMEMORY_URL:-}" != "http://localhost:3111" ]; then
