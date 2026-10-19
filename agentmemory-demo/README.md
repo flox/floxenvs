@@ -16,11 +16,11 @@ flox activate -r flox/agentmemory-demo --start-services
 
 The activation hook displays the backend URL and version, the
 `agentmemory` service runs in the background, and the
-`flox-ai` launcher is on PATH with the plugin wired up.
+`flox-agent` launcher is on PATH with the plugin wired up.
 
 First install Claude Code (e.g.
-`flox install flox/claude-code`) or use your own install,
-then run `flox-ai launch claude` to start it with this
+`flox install agent-stacks/claude-code`) or use your own install,
+then run `flox-agent launch claude` to start it with this
 environment's skills and rules injected.
 
 Once Claude Code is running, try the plugin's skills:

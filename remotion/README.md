@@ -4,13 +4,11 @@
 [![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fremotion%2Fdevcontainer.json)
 
 Minimal [Remotion](https://remotion.dev) environment. Include
-it in your own manifest to get the `flox-ai` launcher with the
-Remotion best-practices skill bundled, plus Node.js 22 so
+it in your own manifest to get Claude Code, the `flox-agent`
+launcher and the Remotion skills plugin, plus Node.js 22 so
 `npx create-video`, `npx remotion studio`, and
-`npx remotion render` work out of the box. Bring your own
-Claude Code (or install it with `flox install flox/claude-code`)
-and launch it via `flox-ai launch claude` to get the skill
-injected.
+`npx remotion render` work out of the box. Launch Claude Code
+with `flox-agent launch claude` to get the skills loaded.
 
 `ffmpeg`/`ffprobe` are intentionally not installed — Remotion
 ships its own via `npx remotion ffmpeg`, which is what the
@@ -36,8 +34,8 @@ cd my-video
 npx remotion studio
 ```
 
-First install Claude Code (e.g. `flox install flox/claude-code`)
-or use your own install, then run `flox-ai launch claude` to
+First install Claude Code (e.g. `flox install agent-stacks/claude-code`)
+or use your own install, then run `flox-agent launch claude` to
 start it with the `remotion-best-practices` skill injected —
 Claude will automatically load it whenever you work with
 Remotion code.
@@ -53,13 +51,13 @@ environments = ["flox/remotion"]
 
 ## What is included
 
-- `flox-ai` — launcher that injects the bundled skill into
-  your Claude Code via `flox-ai launch claude` (install Claude
-  Code yourself with `flox install flox/claude-code` or bring
-  your own)
-- `skills-remotion` — Remotion best-practices
-  skill (1 SKILL.md + 36 topic rules) installed under
-  `share/claude-code/plugins/remotion/`
+- `agent-stacks/claude-code` — Claude Code
+- `flox/flox-agent` — launcher that loads the bundled skills
+  into Claude Code via `flox-agent launch claude`
+- `agent-stacks/agent-plugin-remotion-dev-skills` — the
+  Remotion skills (best practices, captions, render, studio,
+  and more) installed under
+  `share/agent-plugins/remotion-dev-skills/`
 - `nodejs_22` — for `npx remotion …` and
   `npx create-video@latest`
 

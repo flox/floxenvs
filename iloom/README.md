@@ -40,15 +40,15 @@ environment.
 ## Bring your own coding agent
 
 iloom drives Claude Code by default. This environment ships
-the `flox-ai` launcher but does not bundle Claude Code. First
+the `flox-agent` launcher but does not bundle Claude Code. First
 install Claude Code (for example
-`flox install flox/claude-code`) or use your own install,
-then run `flox-ai launch claude` to start it with this
+`flox install agent-stacks/claude-code`) or use your own install,
+then run `flox-agent launch claude` to start it with this
 environment's skills and rules injected:
 
 ```bash
-flox install flox/claude-code
-flox-ai launch claude
+flox install agent-stacks/claude-code
+flox-agent launch claude
 ```
 
 Other agents are supported by upstream — see the iloom

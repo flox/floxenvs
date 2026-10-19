@@ -2,15 +2,19 @@
   "lockfile-version": 1,
   "manifest": {
     "schema-version": "1.17.0",
-    "description": "# Remotion + Claude Code\n\nScaffold a new video project:\n\n```bash\nnpx create-video@latest --yes --blank --no-tailwind my-video\n```\n\nInside a Remotion project:\n\n```bash\nnpx remotion studio      # Open the visual editor\nnpx remotion render      # Render to MP4\nnpx remotion ffmpeg ...  # Bundled ffmpeg\n```\n\nAsk Claude (skill auto-loads on Remotion code):\n\n```bash\nclaude\n```\n",
+    "description": "# Remotion + Claude Code\n\nScaffold a new video project:\n\n```bash\nnpx create-video@latest --yes --blank --no-tailwind my-video\n```\n\nInside a Remotion project:\n\n```bash\nnpx remotion studio      # Open the visual editor\nnpx remotion render      # Render to MP4\nnpx remotion ffmpeg ...  # Bundled ffmpeg\n```\n\nAsk Claude (skills load on Remotion code):\n\n```bash\nflox-agent launch claude\n```\n",
     "install": {
+      "agent-plugin-remotion": {
+        "pkg-path": "agent-stacks/agent-plugin-remotion-dev-skills",
+        "pkg-group": "agent-plugin-remotion"
+      },
       "claude-code": {
-        "pkg-path": "flox/claude-code",
+        "pkg-path": "agent-stacks/claude-code",
         "pkg-group": "claude-code"
       },
-      "flox-ai": {
-        "pkg-path": "flox/flox-ai",
-        "pkg-group": "flox-ai"
+      "flox-agent": {
+        "pkg-path": "flox/flox-agent",
+        "pkg-group": "flox-agent"
       },
       "gum": {
         "pkg-path": "gum",
@@ -19,19 +23,10 @@
       "nodejs": {
         "pkg-path": "nodejs_22",
         "pkg-group": "remotion"
-      },
-      "skills-remotion": {
-        "pkg-path": "flox/skills-remotion",
-        "pkg-group": "skills-remotion"
       }
     },
     "hook": {
-      "on-activate": "eval \"$(flox-ai setup-hook)\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    \"Node: $(node --version)\"\nfi\n"
-    },
-    "profile": {
-      "bash": "eval \"$(flox-ai setup-profile-bash)\"\n",
-      "zsh": "eval \"$(flox-ai setup-profile-zsh)\"\n",
-      "fish": "flox-ai setup-profile-fish | source\n"
+      "on-activate": "if [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    \"Node: $(node --version)\"\nfi\n"
     },
     "options": {
       "systems": [
@@ -43,31 +38,113 @@
   },
   "packages": [
     {
-      "attr_path": "claude-code",
+      "attr_path": "agent-plugin-remotion-dev-skills",
       "broken": false,
-      "derivation": "/nix/store/shlsz2jg9zwdrp6gilbqgj6pvv037liq-claude-code-2.1.303.drv",
-      "description": "Agentic coding tool from Anthropic",
-      "install_id": "claude-code",
-      "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=0d22191d11862731c079ead5271bad477bb87a7f",
-      "name": "claude-code-2.1.303",
-      "pname": "claude-code",
-      "rev": "0d22191d11862731c079ead5271bad477bb87a7f",
-      "rev_count": 29313,
-      "rev_date": "2026-10-19T01:03:09Z",
-      "scrape_date": "2026-10-19T03:10:51.425356063Z",
+      "derivation": "/nix/store/rnm7jc8gmz57098lxbvx3b4bdaw873y7-agent-plugin-remotion-dev-skills-0.0.0-unstable.2026-10-12.g7ba4dcf.drv",
+      "description": "Agent plugin imported from https://github.com/remotion-dev/skills",
+      "install_id": "agent-plugin-remotion",
+      "locked_url": "file:///tmp/tmp.uUrCUXNwQB?rev=97d7b14fc9d954f233ca21404fdedbc8d8773bc3",
+      "name": "agent-plugin-remotion-dev-skills-0.0.0-unstable.2026-10-12.g7ba4dcf",
+      "pname": "agent-plugin-remotion-dev-skills",
+      "rev": "97d7b14fc9d954f233ca21404fdedbc8d8773bc3",
+      "rev_count": 1,
+      "rev_date": "2026-10-19T06:13:12Z",
+      "scrape_date": "2026-10-19T14:41:10.285213Z",
       "stabilities": [
-        "unstable",
-        "stable",
-        "staging"
+        "unstable"
       ],
-      "unfree": true,
-      "version": "2.1.303",
+      "unfree": false,
+      "version": "0.0.0-unstable.2026-10-12.g7ba4dcf",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/wyc7hni8i1zm1k7rrx2pq263yp1lm8x1-claude-code-2.1.303"
+        "out": "/nix/store/fibia2zcmaqvlpaflax1pnkg8wfy19y5-agent-plugin-remotion-dev-skills-0.0.0-unstable.2026-10-12.g7ba4dcf"
+      },
+      "system": "aarch64-darwin",
+      "group": "agent-plugin-remotion",
+      "priority": 5
+    },
+    {
+      "attr_path": "agent-plugin-remotion-dev-skills",
+      "broken": false,
+      "derivation": "/nix/store/sfq3azln3rp3xkg1np1k5ykzl914281s-agent-plugin-remotion-dev-skills-0.0.0-unstable.2026-10-12.g7ba4dcf.drv",
+      "description": "Agent plugin imported from https://github.com/remotion-dev/skills",
+      "install_id": "agent-plugin-remotion",
+      "locked_url": "file:///tmp/tmp.e9EsuOHOUf?rev=e50d367013fb23cd815f8b3c3a966549da1fb187",
+      "name": "agent-plugin-remotion-dev-skills-0.0.0-unstable.2026-10-12.g7ba4dcf",
+      "pname": "agent-plugin-remotion-dev-skills",
+      "rev": "e50d367013fb23cd815f8b3c3a966549da1fb187",
+      "rev_count": 1,
+      "rev_date": "2026-10-19T11:57:18Z",
+      "scrape_date": "2026-10-19T14:41:10.285219Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.0.0-unstable.2026-10-12.g7ba4dcf",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/j7mdv9ri8zxkjadmag0kd5w2hm2wqmnx-agent-plugin-remotion-dev-skills-0.0.0-unstable.2026-10-12.g7ba4dcf"
+      },
+      "system": "aarch64-linux",
+      "group": "agent-plugin-remotion",
+      "priority": 5
+    },
+    {
+      "attr_path": "agent-plugin-remotion-dev-skills",
+      "broken": false,
+      "derivation": "/nix/store/27lwsscgg7803n8wdwgdq5i05w4bbkni-agent-plugin-remotion-dev-skills-0.0.0-unstable.2026-10-12.g7ba4dcf.drv",
+      "description": "Agent plugin imported from https://github.com/remotion-dev/skills",
+      "install_id": "agent-plugin-remotion",
+      "locked_url": "file:///tmp/tmp.BvMKvPuBSw?rev=bfeb0560b762abc36a20778076b651b47b38bfe6",
+      "name": "agent-plugin-remotion-dev-skills-0.0.0-unstable.2026-10-12.g7ba4dcf",
+      "pname": "agent-plugin-remotion-dev-skills",
+      "rev": "bfeb0560b762abc36a20778076b651b47b38bfe6",
+      "rev_count": 1,
+      "rev_date": "2026-10-19T12:06:03Z",
+      "scrape_date": "2026-10-19T14:41:10.285221Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.0.0-unstable.2026-10-12.g7ba4dcf",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/xhynvx6486vsi9vwkk1n2kaa4f4pbvg4-agent-plugin-remotion-dev-skills-0.0.0-unstable.2026-10-12.g7ba4dcf"
+      },
+      "system": "x86_64-linux",
+      "group": "agent-plugin-remotion",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/j86xz1q16h17hgwlliqbpizb9lhj1hd2-claude-code-2.1.299.drv",
+      "description": "Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "file:///tmp/tmp.lbbTmpBQks?rev=3d83d624c204a474cb484d5b85c28b6bba933394",
+      "name": "claude-code-2.1.299",
+      "pname": "claude-code",
+      "rev": "3d83d624c204a474cb484d5b85c28b6bba933394",
+      "rev_count": 1,
+      "rev_date": "2026-10-18T13:10:15Z",
+      "scrape_date": "2026-10-19T14:41:10.285236Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.1.299",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/j7hczsnvrb7m8ijn4whqp6xpigbx6341-claude-code-2.1.299"
       },
       "system": "aarch64-darwin",
       "group": "claude-code",
@@ -76,29 +153,27 @@
     {
       "attr_path": "claude-code",
       "broken": false,
-      "derivation": "/nix/store/mz98f5jivp21knk6h07345l1c5zplqvs-claude-code-2.1.303.drv",
-      "description": "Agentic coding tool from Anthropic",
+      "derivation": "/nix/store/gzrsadb03qfzxi68f9580dmq3rhzjqv7-claude-code-2.1.299.drv",
+      "description": "Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster",
       "install_id": "claude-code",
       "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=0d22191d11862731c079ead5271bad477bb87a7f",
-      "name": "claude-code-2.1.303",
+      "locked_url": "file:///tmp/tmp.PaiRBYsFKU?rev=64f76c50b595e6747f012182be4fc1115ea2853d",
+      "name": "claude-code-2.1.299",
       "pname": "claude-code",
-      "rev": "0d22191d11862731c079ead5271bad477bb87a7f",
-      "rev_count": 29313,
-      "rev_date": "2026-10-19T01:03:09Z",
-      "scrape_date": "2026-10-19T03:10:51.425359909Z",
+      "rev": "64f76c50b595e6747f012182be4fc1115ea2853d",
+      "rev_count": 1,
+      "rev_date": "2026-10-18T13:11:16Z",
+      "scrape_date": "2026-10-19T14:41:10.285238Z",
       "stabilities": [
-        "unstable",
-        "stable",
-        "staging"
+        "unstable"
       ],
-      "unfree": true,
-      "version": "2.1.303",
+      "unfree": false,
+      "version": "2.1.299",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/6819yq8938w81a8iqv9966gcbms0p41h-claude-code-2.1.303"
+        "out": "/nix/store/np2qh3rkrayp0xyicvx424y90my4dlfk-claude-code-2.1.299"
       },
       "system": "aarch64-linux",
       "group": "claude-code",
@@ -107,29 +182,27 @@
     {
       "attr_path": "claude-code",
       "broken": false,
-      "derivation": "/nix/store/qkf1bqzak92lllvf6ig5h7nfj9sxw1xj-claude-code-2.1.303.drv",
-      "description": "Agentic coding tool from Anthropic",
+      "derivation": "/nix/store/3cax4dq1wzyw0brmy3vw2yrvpccfyw0l-claude-code-2.1.299.drv",
+      "description": "Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster",
       "install_id": "claude-code",
       "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=0d22191d11862731c079ead5271bad477bb87a7f",
-      "name": "claude-code-2.1.303",
+      "locked_url": "file:///tmp/tmp.hr8eNJmugP?rev=4b2bd2aa3ff00bafde02930049b35317f87a4656",
+      "name": "claude-code-2.1.299",
       "pname": "claude-code",
-      "rev": "0d22191d11862731c079ead5271bad477bb87a7f",
-      "rev_count": 29313,
-      "rev_date": "2026-10-19T01:03:09Z",
-      "scrape_date": "2026-10-19T03:10:51.425360480Z",
+      "rev": "4b2bd2aa3ff00bafde02930049b35317f87a4656",
+      "rev_count": 1,
+      "rev_date": "2026-10-18T13:00:28Z",
+      "scrape_date": "2026-10-19T14:41:10.285242Z",
       "stabilities": [
-        "unstable",
-        "stable",
-        "staging"
+        "unstable"
       ],
-      "unfree": true,
-      "version": "2.1.303",
+      "unfree": false,
+      "version": "2.1.299",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/19ck8mj9yrh9is33dc0cmhm7yz74i9c4-claude-code-2.1.303"
+        "out": "/nix/store/4qrmv8k6gchzb3qvy6z5lim1xqprck3g-claude-code-2.1.299"
       },
       "system": "x86_64-linux",
       "group": "claude-code",
@@ -223,93 +296,93 @@
       "priority": 5
     },
     {
-      "attr_path": "flox-ai",
+      "attr_path": "flox-agent",
       "broken": false,
-      "derivation": "/nix/store/57jfyz6s1dig32zmb9ik9ih8kqkvv7dd-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
+      "derivation": "/nix/store/76p691rnrk4zcmlch455cksasw2xr7bg-flox-agent-0.9.0-259-g292d9be.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-10-19T03:10:51.425369203Z",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=292d9bede3475f011489ce050077ef421259bae8",
+      "name": "flox-agent-0.9.0-259-g292d9be",
+      "pname": "flox-agent",
+      "rev": "292d9bede3475f011489ce050077ef421259bae8",
+      "rev_count": 461,
+      "rev_date": "2026-10-16T21:14:11Z",
+      "scrape_date": "2026-10-19T14:41:10.285256Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0.8.0",
+      "version": "0.9.0-259-g292d9be",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/crwyb5188yw5lv4znqprzbiqg5vy4ibd-flox-ai-0.8.0"
+        "out": "/nix/store/yjkhm54ac4p1iaclackafwv19y1gywl5-flox-agent-0.9.0-259-g292d9be"
       },
       "system": "aarch64-darwin",
-      "group": "flox-ai",
+      "group": "flox-agent",
       "priority": 5
     },
     {
-      "attr_path": "flox-ai",
+      "attr_path": "flox-agent",
       "broken": false,
-      "derivation": "/nix/store/1clj1qp1zchjr18xqd6h5qy4krnbfp7x-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
+      "derivation": "/nix/store/fz9ycqqq3zwrvnw0bmhjm9qm89znqcms-flox-agent-0.9.0-259-g292d9be.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-10-19T03:10:51.425370134Z",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=292d9bede3475f011489ce050077ef421259bae8",
+      "name": "flox-agent-0.9.0-259-g292d9be",
+      "pname": "flox-agent",
+      "rev": "292d9bede3475f011489ce050077ef421259bae8",
+      "rev_count": 461,
+      "rev_date": "2026-10-16T21:14:11Z",
+      "scrape_date": "2026-10-19T14:41:10.285258Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0.8.0",
+      "version": "0.9.0-259-g292d9be",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/4zf5cxf627sbr8syddjx7j5pmk4321ri-flox-ai-0.8.0"
+        "out": "/nix/store/sq0d7d2bi74nwvld24vckgl4q30ncyfi-flox-agent-0.9.0-259-g292d9be"
       },
       "system": "aarch64-linux",
-      "group": "flox-ai",
+      "group": "flox-agent",
       "priority": 5
     },
     {
-      "attr_path": "flox-ai",
+      "attr_path": "flox-agent",
       "broken": false,
-      "derivation": "/nix/store/w14almryjawbkglkr56spfxi25ihvhzw-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
+      "derivation": "/nix/store/68b0hk6pclqlx77243xa5vd3pm6afn1q-flox-agent-0.9.0-259-g292d9be.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-10-19T03:10:51.425370475Z",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=292d9bede3475f011489ce050077ef421259bae8",
+      "name": "flox-agent-0.9.0-259-g292d9be",
+      "pname": "flox-agent",
+      "rev": "292d9bede3475f011489ce050077ef421259bae8",
+      "rev_count": 461,
+      "rev_date": "2026-10-16T21:14:11Z",
+      "scrape_date": "2026-10-19T14:41:10.285260Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0.8.0",
+      "version": "0.9.0-259-g292d9be",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/0d1s3sqq8r88f30qjg29gw76vl4gfbwg-flox-ai-0.8.0"
+        "out": "/nix/store/n2mlcszspfj5dkwsx6avqqf3gbqyzafq-flox-agent-0.9.0-259-g292d9be"
       },
       "system": "x86_64-linux",
-      "group": "flox-ai",
+      "group": "flox-agent",
       "priority": 5
     },
     {
@@ -401,105 +474,12 @@
       "system": "x86_64-linux",
       "group": "remotion",
       "priority": 5
-    },
-    {
-      "attr_path": "skills-remotion",
-      "broken": false,
-      "derivation": "/nix/store/24mq7q59rgh22qalybd2zj27bv0bhp0i-skills-remotion-2026.10.16.drv",
-      "description": "Remotion best-practices plugin for Claude Code — 1 skill, 30+ topic rules covering animations, audio, captions, 3D, transitions, and more for programmatic video creation in React.",
-      "install_id": "skills-remotion",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=963062b925e9213e503965936a04279f7d627dce",
-      "name": "skills-remotion-2026.10.16",
-      "pname": "skills-remotion",
-      "rev": "963062b925e9213e503965936a04279f7d627dce",
-      "rev_count": 29139,
-      "rev_date": "2026-10-16T14:16:48Z",
-      "scrape_date": "2026-10-19T03:10:51.425385547Z",
-      "stabilities": [
-        "unstable",
-        "stable",
-        "staging"
-      ],
-      "unfree": false,
-      "version": "2026.10.16",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/1av1yqr9pws5r73bqk9sbcz39lb202ww-skills-remotion-2026.10.16"
-      },
-      "system": "aarch64-darwin",
-      "group": "skills-remotion",
-      "priority": 5
-    },
-    {
-      "attr_path": "skills-remotion",
-      "broken": false,
-      "derivation": "/nix/store/3fprzy6p80d6yccpvqbdv0m8pj546hh9-skills-remotion-2026.10.16.drv",
-      "description": "Remotion best-practices plugin for Claude Code — 1 skill, 30+ topic rules covering animations, audio, captions, 3D, transitions, and more for programmatic video creation in React.",
-      "install_id": "skills-remotion",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=963062b925e9213e503965936a04279f7d627dce",
-      "name": "skills-remotion-2026.10.16",
-      "pname": "skills-remotion",
-      "rev": "963062b925e9213e503965936a04279f7d627dce",
-      "rev_count": 29139,
-      "rev_date": "2026-10-16T14:16:48Z",
-      "scrape_date": "2026-10-19T03:10:51.425386429Z",
-      "stabilities": [
-        "unstable",
-        "stable",
-        "staging"
-      ],
-      "unfree": false,
-      "version": "2026.10.16",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/ygs6iaml35zjdg4fj1i8nwqmapilalbr-skills-remotion-2026.10.16"
-      },
-      "system": "aarch64-linux",
-      "group": "skills-remotion",
-      "priority": 5
-    },
-    {
-      "attr_path": "skills-remotion",
-      "broken": false,
-      "derivation": "/nix/store/2d086h9ad6rs1y6yanhl76lbk7vdgi30-skills-remotion-2026.10.16.drv",
-      "description": "Remotion best-practices plugin for Claude Code — 1 skill, 30+ topic rules covering animations, audio, captions, 3D, transitions, and more for programmatic video creation in React.",
-      "install_id": "skills-remotion",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=963062b925e9213e503965936a04279f7d627dce",
-      "name": "skills-remotion-2026.10.16",
-      "pname": "skills-remotion",
-      "rev": "963062b925e9213e503965936a04279f7d627dce",
-      "rev_count": 29139,
-      "rev_date": "2026-10-16T14:16:48Z",
-      "scrape_date": "2026-10-19T03:10:51.425387420Z",
-      "stabilities": [
-        "unstable",
-        "stable",
-        "staging"
-      ],
-      "unfree": false,
-      "version": "2026.10.16",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/rmlvld1l8962l74mfrw5g9zc0niagzdb-skills-remotion-2026.10.16"
-      },
-      "system": "x86_64-linux",
-      "group": "skills-remotion",
-      "priority": 5
     }
   ],
   "compose": {
     "composer": {
       "schema-version": "1.17.0",
-      "description": "# Remotion + Claude Code\n\nScaffold a new video project:\n\n```bash\nnpx create-video@latest --yes --blank --no-tailwind my-video\n```\n\nInside a Remotion project:\n\n```bash\nnpx remotion studio      # Open the visual editor\nnpx remotion render      # Render to MP4\nnpx remotion ffmpeg ...  # Bundled ffmpeg\n```\n\nAsk Claude (skill auto-loads on Remotion code):\n\n```bash\nclaude\n```\n",
+      "description": "# Remotion + Claude Code\n\nScaffold a new video project:\n\n```bash\nnpx create-video@latest --yes --blank --no-tailwind my-video\n```\n\nInside a Remotion project:\n\n```bash\nnpx remotion studio      # Open the visual editor\nnpx remotion render      # Render to MP4\nnpx remotion ffmpeg ...  # Bundled ffmpeg\n```\n\nAsk Claude (skills load on Remotion code):\n\n```bash\nflox-agent launch claude\n```\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -530,30 +510,22 @@
           "schema-version": "1.17.0",
           "description": "Node.js and agent skills for creating videos with Remotion.\n",
           "install": {
+            "agent-plugin-remotion": {
+              "pkg-path": "agent-stacks/agent-plugin-remotion-dev-skills",
+              "pkg-group": "agent-plugin-remotion"
+            },
             "claude-code": {
-              "pkg-path": "flox/claude-code",
+              "pkg-path": "agent-stacks/claude-code",
               "pkg-group": "claude-code"
             },
-            "flox-ai": {
-              "pkg-path": "flox/flox-ai",
-              "pkg-group": "flox-ai"
+            "flox-agent": {
+              "pkg-path": "flox/flox-agent",
+              "pkg-group": "flox-agent"
             },
             "nodejs": {
               "pkg-path": "nodejs_22",
               "pkg-group": "remotion"
-            },
-            "skills-remotion": {
-              "pkg-path": "flox/skills-remotion",
-              "pkg-group": "skills-remotion"
             }
-          },
-          "hook": {
-            "on-activate": "eval \"$(flox-ai setup-hook)\"\n"
-          },
-          "profile": {
-            "bash": "eval \"$(flox-ai setup-profile-bash)\"\n",
-            "zsh": "eval \"$(flox-ai setup-profile-zsh)\"\n",
-            "fish": "flox-ai setup-profile-fish | source\n"
           },
           "options": {
             "systems": [

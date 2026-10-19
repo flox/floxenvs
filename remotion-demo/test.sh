@@ -13,7 +13,7 @@ command_exists() {
 # ── Required commands (inherited from ../remotion) ─────
 command_exists node
 command_exists npx
-command_exists flox-ai
+command_exists flox-agent
 
 # ── Demo-only ──────────────────────────────────────────
 command_exists gum
@@ -23,23 +23,23 @@ echo ">>> npm version:     $(npm --version)"
 echo ">>> gum version:     $(gum --version)"
 
 # ── Plugin tree present ────────────────────────────────
-plugin_dir="$FLOX_ENV/share/flox/claude/remotion"
-if [ ! -f "$plugin_dir/.claude-plugin/plugin.json" ]; then
+plugin_dir="$FLOX_ENV/share/agent-plugins/remotion-dev-skills"
+if [ ! -f "$plugin_dir/plugin.json" ]; then
   echo "Error: plugin.json missing at $plugin_dir"
   exit 1
 fi
-if [ ! -f "$plugin_dir/skills/remotion/SKILL.md" ]; then
+if [ ! -f "$plugin_dir/skills/remotion-best-practices/SKILL.md" ]; then
   echo "Error: SKILL.md missing at $plugin_dir"
   exit 1
 fi
 echo ">>> remotion plugin tree present"
 
-# ── flox-ai discovered the skill ───────────────
-if ! flox-ai search remotion 2>&1 | grep -q remotion; then
-  echo "Error: flox-ai did not discover the remotion skill"
-  flox-ai doctor || true
+# ── flox-agent discovered the plugin ───────────
+if ! flox-agent list 2>&1 | grep -q agent-plugin-remotion-dev-skills; then
+  echo "Error: flox-agent did not discover the remotion plugin"
+  flox-agent doctor || true
   exit 1
 fi
-echo ">>> flox-ai discovered the remotion skill"
+echo ">>> flox-agent discovered the remotion plugin"
 
 echo ">>> remotion-demo environment is working"

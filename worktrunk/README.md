@@ -46,8 +46,8 @@ Worktrunk's own configuration lives in the host repo's
 details.
 
 To pair Worktrunk with Claude Code, first install Claude Code
-(for example `flox install flox/claude-code`) or use your own
-install, then run `flox-ai launch claude` to start it with this
+(for example `flox install agent-stacks/claude-code`) or use your own
+install, then run `flox-agent launch claude` to start it with this
 environment's skills and rules injected.
 
 ## See also
