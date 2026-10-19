@@ -26,10 +26,8 @@ Then register the Claude Code skill (one-time setup):
 graphify install
 ```
 
-First install Claude Code (e.g.
-`flox install flox/claude-code`) or use your own install,
-then start it with this environment's skills and rules
-injected:
+Then start Claude Code through the `flox-agent`
+launcher:
 
 ```bash
 flox-agent launch claude

@@ -2,7 +2,7 @@
   "lockfile-version": 1,
   "manifest": {
     "schema-version": "1.17.0",
-    "description": "# graphify — knowledge graphs for Claude Code\n\nThe /graphify skill is pre-installed via\nflox/skill-graphify and discovered by\nflox-ai. Just open Claude Code:\n\n```text\n/graphify .\n```\n\nOr use the CLI directly:\n\n```bash\ngraphify .\ngraphify ./raw --mode deep\ngraphify ./raw --update\n```\n\nQuery the graph:\n\n```bash\ngraphify query \"what connects X to Y?\"\ngraphify path \"Module\" \"Database\"\ngraphify explain \"Concept\"\n```\n",
+    "description": "# graphify — knowledge graphs for Claude Code\n\nThe /graphify skill is pre-installed via\nflox/skills-graphify. Start Claude Code with\nthe flox-ai launcher, then run it:\n\n```bash\nflox-ai launch claude\n```\n\n```text\n/graphify .\n```\n\nOr use the CLI directly:\n\n```bash\ngraphify .\ngraphify ./raw --mode deep\ngraphify ./raw --update\n```\n\nQuery the graph:\n\n```bash\ngraphify query \"what connects X to Y?\"\ngraphify path \"Module\" \"Database\"\ngraphify explain \"Concept\"\n```\n",
     "install": {
       "bash": {
         "pkg-path": "bash",
@@ -94,6 +94,99 @@
     }
   },
   "packages": [
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/shlsz2jg9zwdrp6gilbqgj6pvv037liq-claude-code-2.1.303.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=0d22191d11862731c079ead5271bad477bb87a7f",
+      "name": "claude-code-2.1.303",
+      "pname": "claude-code",
+      "rev": "0d22191d11862731c079ead5271bad477bb87a7f",
+      "rev_count": 29313,
+      "rev_date": "2026-10-19T01:03:09Z",
+      "scrape_date": "2026-10-19T15:16:38.490551Z",
+      "stabilities": [
+        "unstable",
+        "stable",
+        "staging"
+      ],
+      "unfree": true,
+      "version": "2.1.303",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/wyc7hni8i1zm1k7rrx2pq263yp1lm8x1-claude-code-2.1.303"
+      },
+      "system": "aarch64-darwin",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/mz98f5jivp21knk6h07345l1c5zplqvs-claude-code-2.1.303.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=0d22191d11862731c079ead5271bad477bb87a7f",
+      "name": "claude-code-2.1.303",
+      "pname": "claude-code",
+      "rev": "0d22191d11862731c079ead5271bad477bb87a7f",
+      "rev_count": 29313,
+      "rev_date": "2026-10-19T01:03:09Z",
+      "scrape_date": "2026-10-19T15:16:38.490553Z",
+      "stabilities": [
+        "unstable",
+        "stable",
+        "staging"
+      ],
+      "unfree": true,
+      "version": "2.1.303",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/6819yq8938w81a8iqv9966gcbms0p41h-claude-code-2.1.303"
+      },
+      "system": "aarch64-linux",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/qkf1bqzak92lllvf6ig5h7nfj9sxw1xj-claude-code-2.1.303.drv",
+      "description": "Agentic coding tool from Anthropic",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "https://github.com/flox/floxenvs?rev=0d22191d11862731c079ead5271bad477bb87a7f",
+      "name": "claude-code-2.1.303",
+      "pname": "claude-code",
+      "rev": "0d22191d11862731c079ead5271bad477bb87a7f",
+      "rev_count": 29313,
+      "rev_date": "2026-10-19T01:03:09Z",
+      "scrape_date": "2026-10-19T15:16:38.490554Z",
+      "stabilities": [
+        "unstable",
+        "stable",
+        "staging"
+      ],
+      "unfree": true,
+      "version": "2.1.303",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/19ck8mj9yrh9is33dc0cmhm7yz74i9c4-claude-code-2.1.303"
+      },
+      "system": "x86_64-linux",
+      "group": "claude-code",
+      "priority": 5
+    },
     {
       "attr_path": "flox-agent",
       "broken": false,
@@ -1138,105 +1231,12 @@
       "system": "x86_64-linux",
       "group": "skills-graphify",
       "priority": 5
-    },
-    {
-      "attr_path": "claude-code",
-      "broken": false,
-      "derivation": "/nix/store/shlsz2jg9zwdrp6gilbqgj6pvv037liq-claude-code-2.1.303.drv",
-      "description": "Agentic coding tool from Anthropic",
-      "install_id": "claude-code",
-      "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=0d22191d11862731c079ead5271bad477bb87a7f",
-      "name": "claude-code-2.1.303",
-      "pname": "claude-code",
-      "rev": "0d22191d11862731c079ead5271bad477bb87a7f",
-      "rev_count": 29313,
-      "rev_date": "2026-10-19T01:03:09Z",
-      "scrape_date": "2026-10-19T15:16:38.490551Z",
-      "stabilities": [
-        "unstable",
-        "stable",
-        "staging"
-      ],
-      "unfree": true,
-      "version": "2.1.303",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/wyc7hni8i1zm1k7rrx2pq263yp1lm8x1-claude-code-2.1.303"
-      },
-      "system": "aarch64-darwin",
-      "group": "claude-code",
-      "priority": 5
-    },
-    {
-      "attr_path": "claude-code",
-      "broken": false,
-      "derivation": "/nix/store/mz98f5jivp21knk6h07345l1c5zplqvs-claude-code-2.1.303.drv",
-      "description": "Agentic coding tool from Anthropic",
-      "install_id": "claude-code",
-      "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=0d22191d11862731c079ead5271bad477bb87a7f",
-      "name": "claude-code-2.1.303",
-      "pname": "claude-code",
-      "rev": "0d22191d11862731c079ead5271bad477bb87a7f",
-      "rev_count": 29313,
-      "rev_date": "2026-10-19T01:03:09Z",
-      "scrape_date": "2026-10-19T15:16:38.490553Z",
-      "stabilities": [
-        "unstable",
-        "stable",
-        "staging"
-      ],
-      "unfree": true,
-      "version": "2.1.303",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/6819yq8938w81a8iqv9966gcbms0p41h-claude-code-2.1.303"
-      },
-      "system": "aarch64-linux",
-      "group": "claude-code",
-      "priority": 5
-    },
-    {
-      "attr_path": "claude-code",
-      "broken": false,
-      "derivation": "/nix/store/qkf1bqzak92lllvf6ig5h7nfj9sxw1xj-claude-code-2.1.303.drv",
-      "description": "Agentic coding tool from Anthropic",
-      "install_id": "claude-code",
-      "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=0d22191d11862731c079ead5271bad477bb87a7f",
-      "name": "claude-code-2.1.303",
-      "pname": "claude-code",
-      "rev": "0d22191d11862731c079ead5271bad477bb87a7f",
-      "rev_count": 29313,
-      "rev_date": "2026-10-19T01:03:09Z",
-      "scrape_date": "2026-10-19T15:16:38.490554Z",
-      "stabilities": [
-        "unstable",
-        "stable",
-        "staging"
-      ],
-      "unfree": true,
-      "version": "2.1.303",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/19ck8mj9yrh9is33dc0cmhm7yz74i9c4-claude-code-2.1.303"
-      },
-      "system": "x86_64-linux",
-      "group": "claude-code",
-      "priority": 5
     }
   ],
   "compose": {
     "composer": {
       "schema-version": "1.17.0",
-      "description": "# graphify — knowledge graphs for Claude Code\n\nThe /graphify skill is pre-installed via\nflox/skill-graphify and discovered by\nflox-ai. Just open Claude Code:\n\n```text\n/graphify .\n```\n\nOr use the CLI directly:\n\n```bash\ngraphify .\ngraphify ./raw --mode deep\ngraphify ./raw --update\n```\n\nQuery the graph:\n\n```bash\ngraphify query \"what connects X to Y?\"\ngraphify path \"Module\" \"Database\"\ngraphify explain \"Concept\"\n```\n",
+      "description": "# graphify — knowledge graphs for Claude Code\n\nThe /graphify skill is pre-installed via\nflox/skills-graphify. Start Claude Code with\nthe flox-ai launcher, then run it:\n\n```bash\nflox-ai launch claude\n```\n\n```text\n/graphify .\n```\n\nOr use the CLI directly:\n\n```bash\ngraphify .\ngraphify ./raw --mode deep\ngraphify ./raw --update\n```\n\nQuery the graph:\n\n```bash\ngraphify query \"what connects X to Y?\"\ngraphify path \"Module\" \"Database\"\ngraphify explain \"Concept\"\n```\n",
       "install": {
         "flox-ai": {
           "pkg-path": "flox/flox-ai",

@@ -39,11 +39,10 @@ graphify .
 ## What this demo includes
 
 - Everything from the `graphify` base environment
-  (Python 3.11, `graphify` CLI)
-- The `flox-ai` launcher, which discovers skills under
-  `$FLOX_ENV/share/claude-code/skills/` and injects them
-  when you run `flox-ai launch claude` (you bring your
-  own Claude Code install)
+  (Python 3.11, `graphify` CLI, Claude Code, `flox-agent`)
+- The `flox-ai` launcher, which discovers the graphify
+  skill and injects it when you run `flox-ai launch claude`.
+  (`flox-agent` can't load this skill package yet.)
 - `flox/skills-graphify` — ships the `/graphify` SKILL.md
   so Claude Code finds it once launched via `flox-ai`
 
@@ -81,7 +80,8 @@ minimal environment in your own manifest:
 environments = [{ remote = "flox/graphify" }]
 ```
 
-This gives you Python, `graphify`, and the `flox-ai`
-launcher with sane defaults. Install Claude Code
-yourself, then run `flox-ai launch claude` to use it.
+This gives you Python, `graphify`, Claude Code and the
+`flox-agent` launcher with sane defaults; run
+`graphify install` to register the skill, then
+`flox-agent launch claude`.
 Override vars in your own manifest as needed.

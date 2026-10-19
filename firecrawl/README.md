@@ -69,10 +69,10 @@ This env does not ship Claude Code itself. First install
 Claude Code (e.g. `flox install flox/claude-code`) or use
 your own install, then run `flox-agent launch claude` to
 start it with this environment's skills injected. The
-bundled skills live under
-`$FLOX_ENV/share/claude-code/skills/`; the same files are
-installed for OpenCode under
-`$FLOX_ENV/share/opencode/skills/`. The bundle covers
+bundled plugin lives under
+`$FLOX_ENV/share/agent-plugins/firecrawl/`; run
+`flox-agent launch opencode` to hand the same skills to
+OpenCode. The bundle covers
 search, scrape, crawl, map, interact, parse, download,
 and monitor.
 

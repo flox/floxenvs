@@ -29,10 +29,9 @@ The first activation downloads the
 cache and starts the backend on
 [`http://localhost:3111`](http://localhost:3111).
 
-Then, in any directory, first install Claude Code (e.g.
-`flox install flox/claude-code`) or use your own install,
-then run `flox-agent launch claude` to start it with this
-environment's skills and rules injected. Use the
+Then, in any directory, run `flox-agent launch claude` to
+start Claude Code with this environment's skills and rules
+injected. Use the
 agentmemory skills (`/recall`, `/remember`, `/handoff`,
 `/recap`, etc.) — hooks fire automatically.
 
@@ -55,10 +54,9 @@ environments = ["flox/agentmemory"]
 | `nodejs_20` | Runtime for the REST backend |
 
 The plugin tree lands under
-`$FLOX_ENV/share/claude-code/plugins/agentmemory/` with
-Node.js bundled as `bin/node` + `bin/npx` so hook
-scripts and the MCP shim don't require nodejs on the
-consumer's PATH.
+`$FLOX_ENV/share/agent-plugins/agentmemory/` with
+Node.js bundled as `bin/node` so hook scripts and the
+MCP bridge don't require nodejs on the consumer's PATH.
 
 ## Services
 

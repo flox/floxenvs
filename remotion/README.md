@@ -34,9 +34,8 @@ cd my-video
 npx remotion studio
 ```
 
-First install Claude Code (e.g. `flox install flox/claude-code`)
-or use your own install, then run `flox-agent launch claude` to
-start it with the `remotion-best-practices` skill injected —
+Run `flox-agent launch claude` to start Claude Code with the
+`remotion-best-practices` skill injected —
 Claude will automatically load it whenever you work with
 Remotion code.
 
