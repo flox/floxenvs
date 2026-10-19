@@ -42,12 +42,12 @@ environment.
 iloom drives Claude Code by default. This environment ships
 the `flox-agent` launcher but does not bundle Claude Code. First
 install Claude Code (for example
-`flox install agent-stacks/claude-code`) or use your own install,
+`flox install flox/claude-code`) or use your own install,
 then run `flox-agent launch claude` to start it with this
 environment's skills and rules injected:
 
 ```bash
-flox install agent-stacks/claude-code
+flox install flox/claude-code
 flox-agent launch claude
 ```
 

@@ -28,7 +28,7 @@ npx remotion render
 
 # Launch Claude with this env's skills and rules injected.
 # First install Claude Code (e.g. `flox install
-# agent-stacks/claude-code`) or use your own install, then run the
+# flox/claude-code`) or use your own install, then run the
 # launcher below. The remotion-best-practices skill is
 # registered, so whenever you ask Claude to touch Remotion
 # code it auto-loads with the topic rules (animations, audio,

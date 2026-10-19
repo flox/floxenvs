@@ -19,7 +19,7 @@ MCP tools.
 ## Try it
 
 This env ships the `flox-agent` launcher but not Claude Code itself.
-First install Claude Code (e.g. `flox install agent-stacks/claude-code`)
+First install Claude Code (e.g. `flox install flox/claude-code`)
 or use your own install, then launch it with this env's skills and
 rules injected:
 

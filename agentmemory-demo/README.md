@@ -19,7 +19,7 @@ The activation hook displays the backend URL and version, the
 `flox-agent` launcher is on PATH with the plugin wired up.
 
 First install Claude Code (e.g.
-`flox install agent-stacks/claude-code`) or use your own install,
+`flox install flox/claude-code`) or use your own install,
 then run `flox-agent launch claude` to start it with this
 environment's skills and rules injected.
 

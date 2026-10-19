@@ -30,7 +30,7 @@ cache and starts the backend on
 [`http://localhost:3111`](http://localhost:3111).
 
 Then, in any directory, first install Claude Code (e.g.
-`flox install agent-stacks/claude-code`) or use your own install,
+`flox install flox/claude-code`) or use your own install,
 then run `flox-agent launch claude` to start it with this
 environment's skills and rules injected. Use the
 agentmemory skills (`/recall`, `/remember`, `/handoff`,
@@ -49,7 +49,7 @@ environments = ["flox/agentmemory"]
 
 | Package | Description |
 | ------- | ----------- |
-| `agent-stacks/claude-code` | Claude Code CLI |
+| `flox/claude-code` | Claude Code CLI |
 | `flox/flox-agent` | Launcher that loads the plugin into Claude Code |
 | `agent-stacks/agent-plugin-agentmemory` | Plugin (hooks, 17 skills, MCP) |
 | `nodejs_20` | Runtime for the REST backend |

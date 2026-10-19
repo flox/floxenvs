@@ -66,7 +66,7 @@ Override either in your own manifest before
 ## Launching your assistant with the skills
 
 This env does not ship Claude Code itself. First install
-Claude Code (e.g. `flox install agent-stacks/claude-code`) or use
+Claude Code (e.g. `flox install flox/claude-code`) or use
 your own install, then run `flox-agent launch claude` to
 start it with this environment's skills injected. The
 bundled skills live under

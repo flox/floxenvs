@@ -27,7 +27,7 @@ graphify install
 ```
 
 First install Claude Code (e.g.
-`flox install agent-stacks/claude-code`) or use your own install,
+`flox install flox/claude-code`) or use your own install,
 then start it with this environment's skills and rules
 injected:
 
