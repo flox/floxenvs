@@ -34,12 +34,12 @@ REPO_ROOT="$TMP" "$TMP/scripts/run-audit.sh" env sample >/dev/null 2>&1
 assert_eq "rejects non-skill kind (env)" "2" "$?"
 
 # ── skill kind: build is skipped, Claude content is audited ───────────
-# Stage a stub flox-ai on PATH that records the audited dir and emits a
+# Stage a stub flox-agent on PATH that records the audited dir and emits a
 # valid metrics.json, plus a pre-built result-<name> so run-audit.sh
 # skips `flox build`. The build emits the same skill under several agent
 # layouts; the Claude copy must win.
 mkdir -p "$TMP/bin"
-cat > "$TMP/bin/flox-ai" <<EOF
+cat > "$TMP/bin/flox-agent" <<EOF
 #!/usr/bin/env bash
 # args: audit --json --kind <kind> <content-dir>
 echo "\${@: -1}" > "$TMP/audited-dir.txt"
@@ -56,7 +56,7 @@ cat <<'JSON'
 }
 JSON
 EOF
-chmod +x "$TMP/bin/flox-ai"
+chmod +x "$TMP/bin/flox-agent"
 
 mkdir -p "$TMP/.flox/pkgs/skills-humanizer"
 # Same skill present under the Claude AND a non-Claude launcher layout.

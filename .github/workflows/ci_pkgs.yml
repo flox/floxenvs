@@ -486,8 +486,8 @@ jobs:
         # realized above, so this activation is instant.
         timeout-minutes: 20
         # Fragments are content-audited from the build above; run-audit.sh
-        # reuses result-<pkg> and runs the flox-ai audit engine. The
-        # flox-ai + skill-audit tools live in the .website env (NOT the
+        # reuses result-<pkg> and runs the flox-agent audit engine. The
+        # flox-agent + skill-audit tools live in the .website env (NOT the
         # root env — they're floxenvs-flake-sourced and would poison
         # `flox build`'s nixpkgs resolution).
         shell: "flox activate -d .website -- bash -e {0}"

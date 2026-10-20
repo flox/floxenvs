@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Audit a single Claude Code skill package: build it (if needed),
-# locate its skill content, and run the flox-ai audit engine, writing
+# locate its skill content, and run the flox-agent audit engine, writing
 # audit/skill/<name>/metrics.json.
 #
 # This script audits SKILLS ONLY. Other item kinds (env, pkg, agent)
@@ -58,13 +58,15 @@ do
 done
 [ -n "$content" ] || content="$built"
 
-# Runner: flox-ai (the audit engine) from PATH, else a local build.
-if command -v flox-ai >/dev/null 2>&1; then
-  runner=(flox-ai)
-elif [ -x "$ROOT/result-flox-ai/bin/flox-ai" ]; then
-  runner=("$ROOT/result-flox-ai/bin/flox-ai")
+# Runner: flox-agent (the audit engine) from PATH, else a local build.
+# `audit --kind` and the metrics.json schema need the flox-agent version
+# pinned in .website's manifest; see the comment there.
+if command -v flox-agent >/dev/null 2>&1; then
+  runner=(flox-agent)
+elif [ -x "$ROOT/result-flox-agent/bin/flox-agent" ]; then
+  runner=("$ROOT/result-flox-agent/bin/flox-agent")
 else
-  echo "flox-ai audit runner not found" >&2; exit 1
+  echo "flox-agent audit runner not found" >&2; exit 1
 fi
 "${runner[@]}" audit --json --kind "$KIND" "$content" > "$out_file"
 echo "wrote $out_file (content: ${content#"$ROOT"/})"
