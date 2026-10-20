@@ -3,10 +3,10 @@ revision = 3
 requires-python = ">=3.12"
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'linux'",
-    "python_full_version < '3.14' and sys_platform == 'linux'",
     "python_full_version >= '3.14' and sys_platform == 'win32'",
     "python_full_version >= '3.14' and sys_platform == 'emscripten'",
     "python_full_version >= '3.14' and sys_platform != 'emscripten' and sys_platform != 'linux' and sys_platform != 'win32'",
+    "python_full_version < '3.14' and sys_platform == 'linux'",
     "python_full_version < '3.14' and sys_platform == 'win32'",
     "python_full_version < '3.14' and sys_platform == 'emscripten'",
     "python_full_version < '3.14' and sys_platform != 'emscripten' and sys_platform != 'linux' and sys_platform != 'win32'",
@@ -807,8 +807,8 @@ wheels = [
 
 [[package]]
 name = "mergekit"
-version = "0.1.4"
-source = { git = "https://github.com/arcee-ai/mergekit.git?tag=v0.1.4#7683563fbcd046fbcc3aa0f5980ec94b84135de5" }
+version = "0.1.5"
+source = { git = "https://github.com/arcee-ai/mergekit.git?tag=v0.1.5#c91c787ff9293bda5d67bf59942700204f7ac2ba" }
 dependencies = [
     { name = "accelerate" },
     { name = "click" },
@@ -841,7 +841,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "mergekit", git = "https://github.com/arcee-ai/mergekit.git?tag=v0.1.4" },
+    { name = "mergekit", git = "https://github.com/arcee-ai/mergekit.git?tag=v0.1.5" },
     { name = "torch", marker = "sys_platform != 'linux'" },
     { name = "torch", marker = "sys_platform == 'linux'", index = "https://download.pytorch.org/whl/cpu" },
 ]
