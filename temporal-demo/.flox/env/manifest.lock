@@ -4,9 +4,13 @@
     "schema-version": "1.17.0",
     "description": "# Temporal\n\nStart Temporal + worker in the background:\n\n```bash\nflox services start\nflox activate --start-services\n```\n\nSend a hello workflow:\n\n```bash\ngo run ./start YourName\n```\n",
     "install": {
-      "flox-ai": {
-        "pkg-path": "flox/flox-ai",
-        "pkg-group": "flox-ai"
+      "agent-plugin-temporal-developer": {
+        "pkg-path": "agent-stacks/agent-plugin-temporalio-skill-temporal-developer",
+        "pkg-group": "agent-plugin-temporal-developer"
+      },
+      "flox-agent": {
+        "pkg-path": "flox/flox-agent",
+        "pkg-group": "flox-agent"
       },
       "gcc": {
         "pkg-path": "gcc",
@@ -23,10 +27,6 @@
       "jq": {
         "pkg-path": "jq",
         "pkg-group": "demo-tools"
-      },
-      "skills-temporal-developer": {
-        "pkg-path": "flox/skills-temporal-developer",
-        "pkg-group": "skills-temporal-developer"
       },
       "temporal": {
         "pkg-path": "temporal",
@@ -62,6 +62,90 @@
     }
   },
   "packages": [
+    {
+      "attr_path": "agent-plugin-temporalio-skill-temporal-developer",
+      "broken": false,
+      "derivation": "/nix/store/lrj6ig53pszwyyn2r8yhjr1hx3bx31c3-agent-plugin-temporalio-skill-temporal-developer-0.0.0-unstable.2026-10-09.g3041178.drv",
+      "description": "Agent plugin imported from https://github.com/temporalio/skill-temporal-developer",
+      "install_id": "agent-plugin-temporal-developer",
+      "locked_url": "file:///tmp/tmp.FAL6L4DCNm?rev=ad415050d28ab628135727f1a8b6a973a34dbf6b",
+      "name": "agent-plugin-temporalio-skill-temporal-developer-0.0.0-unstable.2026-10-09.g3041178",
+      "pname": "agent-plugin-temporalio-skill-temporal-developer",
+      "rev": "ad415050d28ab628135727f1a8b6a973a34dbf6b",
+      "rev_count": 1,
+      "rev_date": "2026-10-19T06:28:10Z",
+      "scrape_date": "2026-10-19T14:40:09.293100Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.0.0-unstable.2026-10-09.g3041178",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/swxqim3f4p1iw65nb58s2zjhywr6r60j-agent-plugin-temporalio-skill-temporal-developer-0.0.0-unstable.2026-10-09.g3041178"
+      },
+      "system": "aarch64-darwin",
+      "group": "agent-plugin-temporal-developer",
+      "priority": 5
+    },
+    {
+      "attr_path": "agent-plugin-temporalio-skill-temporal-developer",
+      "broken": false,
+      "derivation": "/nix/store/2ms072lp0fk2rhddkwgh39dzlwcpccym-agent-plugin-temporalio-skill-temporal-developer-0.0.0-unstable.2026-10-09.g3041178.drv",
+      "description": "Agent plugin imported from https://github.com/temporalio/skill-temporal-developer",
+      "install_id": "agent-plugin-temporal-developer",
+      "locked_url": "file:///tmp/tmp.QoVMetJEFI?rev=dbe6a009b19afef03581e90a760f904e25245141",
+      "name": "agent-plugin-temporalio-skill-temporal-developer-0.0.0-unstable.2026-10-09.g3041178",
+      "pname": "agent-plugin-temporalio-skill-temporal-developer",
+      "rev": "dbe6a009b19afef03581e90a760f904e25245141",
+      "rev_count": 1,
+      "rev_date": "2026-10-19T12:38:46Z",
+      "scrape_date": "2026-10-19T14:40:09.293105Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.0.0-unstable.2026-10-09.g3041178",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/96j3q74ivljj8gspc67xl0q4w31mck1j-agent-plugin-temporalio-skill-temporal-developer-0.0.0-unstable.2026-10-09.g3041178"
+      },
+      "system": "aarch64-linux",
+      "group": "agent-plugin-temporal-developer",
+      "priority": 5
+    },
+    {
+      "attr_path": "agent-plugin-temporalio-skill-temporal-developer",
+      "broken": false,
+      "derivation": "/nix/store/8yqp1amvxfi776kjjar2yhw3b0gjdki2-agent-plugin-temporalio-skill-temporal-developer-0.0.0-unstable.2026-10-09.g3041178.drv",
+      "description": "Agent plugin imported from https://github.com/temporalio/skill-temporal-developer",
+      "install_id": "agent-plugin-temporal-developer",
+      "locked_url": "file:///tmp/tmp.IUpvVPPeI6?rev=af58607a605d0f9fcc730d6d2876079bafd3edb2",
+      "name": "agent-plugin-temporalio-skill-temporal-developer-0.0.0-unstable.2026-10-09.g3041178",
+      "pname": "agent-plugin-temporalio-skill-temporal-developer",
+      "rev": "af58607a605d0f9fcc730d6d2876079bafd3edb2",
+      "rev_count": 1,
+      "rev_date": "2026-10-19T13:31:04Z",
+      "scrape_date": "2026-10-19T14:40:09.293106Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.0.0-unstable.2026-10-09.g3041178",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/145zk3nspzh4bbp7981mwspymj4blvik-agent-plugin-temporalio-skill-temporal-developer-0.0.0-unstable.2026-10-09.g3041178"
+      },
+      "system": "x86_64-linux",
+      "group": "agent-plugin-temporal-developer",
+      "priority": 5
+    },
     {
       "attr_path": "gum",
       "broken": false,
@@ -260,93 +344,93 @@
       "priority": 5
     },
     {
-      "attr_path": "flox-ai",
+      "attr_path": "flox-agent",
       "broken": false,
-      "derivation": "/nix/store/57jfyz6s1dig32zmb9ik9ih8kqkvv7dd-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
+      "derivation": "/nix/store/76p691rnrk4zcmlch455cksasw2xr7bg-flox-agent-0.9.0-259-g292d9be.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-10-19T03:35:09.143959804Z",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=292d9bede3475f011489ce050077ef421259bae8",
+      "name": "flox-agent-0.9.0-259-g292d9be",
+      "pname": "flox-agent",
+      "rev": "292d9bede3475f011489ce050077ef421259bae8",
+      "rev_count": 461,
+      "rev_date": "2026-10-16T21:14:11Z",
+      "scrape_date": "2026-10-19T14:40:09.293116Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0.8.0",
+      "version": "0.9.0-259-g292d9be",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/crwyb5188yw5lv4znqprzbiqg5vy4ibd-flox-ai-0.8.0"
+        "out": "/nix/store/yjkhm54ac4p1iaclackafwv19y1gywl5-flox-agent-0.9.0-259-g292d9be"
       },
       "system": "aarch64-darwin",
-      "group": "flox-ai",
+      "group": "flox-agent",
       "priority": 5
     },
     {
-      "attr_path": "flox-ai",
+      "attr_path": "flox-agent",
       "broken": false,
-      "derivation": "/nix/store/1clj1qp1zchjr18xqd6h5qy4krnbfp7x-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
+      "derivation": "/nix/store/fz9ycqqq3zwrvnw0bmhjm9qm89znqcms-flox-agent-0.9.0-259-g292d9be.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-10-19T03:35:09.143960375Z",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=292d9bede3475f011489ce050077ef421259bae8",
+      "name": "flox-agent-0.9.0-259-g292d9be",
+      "pname": "flox-agent",
+      "rev": "292d9bede3475f011489ce050077ef421259bae8",
+      "rev_count": 461,
+      "rev_date": "2026-10-16T21:14:11Z",
+      "scrape_date": "2026-10-19T14:40:09.293117Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0.8.0",
+      "version": "0.9.0-259-g292d9be",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/4zf5cxf627sbr8syddjx7j5pmk4321ri-flox-ai-0.8.0"
+        "out": "/nix/store/sq0d7d2bi74nwvld24vckgl4q30ncyfi-flox-agent-0.9.0-259-g292d9be"
       },
       "system": "aarch64-linux",
-      "group": "flox-ai",
+      "group": "flox-agent",
       "priority": 5
     },
     {
-      "attr_path": "flox-ai",
+      "attr_path": "flox-agent",
       "broken": false,
-      "derivation": "/nix/store/w14almryjawbkglkr56spfxi25ihvhzw-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
+      "derivation": "/nix/store/68b0hk6pclqlx77243xa5vd3pm6afn1q-flox-agent-0.9.0-259-g292d9be.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-10-19T03:35:09.143960906Z",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=292d9bede3475f011489ce050077ef421259bae8",
+      "name": "flox-agent-0.9.0-259-g292d9be",
+      "pname": "flox-agent",
+      "rev": "292d9bede3475f011489ce050077ef421259bae8",
+      "rev_count": 461,
+      "rev_date": "2026-10-16T21:14:11Z",
+      "scrape_date": "2026-10-19T14:40:09.293120Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0.8.0",
+      "version": "0.9.0-259-g292d9be",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/0d1s3sqq8r88f30qjg29gw76vl4gfbwg-flox-ai-0.8.0"
+        "out": "/nix/store/n2mlcszspfj5dkwsx6avqqf3gbqyzafq-flox-agent-0.9.0-259-g292d9be"
       },
       "system": "x86_64-linux",
-      "group": "flox-ai",
+      "group": "flox-agent",
       "priority": 5
     },
     {
@@ -539,99 +623,6 @@
       "priority": 5
     },
     {
-      "attr_path": "skills-temporal-developer",
-      "broken": false,
-      "derivation": "/nix/store/2yx9skpjhr1fb4lcd9yaxx04wss9kmlj-skills-temporal-developer-0.6.3.drv",
-      "description": "Temporal Developer skill for Claude Code and OpenCode — build, debug, and manage Temporal workflows, activities, and workers across Python, TypeScript, Go, Java, .NET, and Ruby.",
-      "install_id": "skills-temporal-developer",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=683c9b03deff832f91a1067df553133db69f2471",
-      "name": "skills-temporal-developer-0.6.3",
-      "pname": "skills-temporal-developer",
-      "rev": "683c9b03deff832f91a1067df553133db69f2471",
-      "rev_count": 27919,
-      "rev_date": "2026-10-10T02:01:30Z",
-      "scrape_date": "2026-10-19T03:35:09.143980225Z",
-      "stabilities": [
-        "unstable",
-        "stable",
-        "staging"
-      ],
-      "unfree": false,
-      "version": "0.6.3",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/47f9izpx81sp3mrnrv3wmfwcmfzan1r4-skills-temporal-developer-0.6.3"
-      },
-      "system": "aarch64-darwin",
-      "group": "skills-temporal-developer",
-      "priority": 5
-    },
-    {
-      "attr_path": "skills-temporal-developer",
-      "broken": false,
-      "derivation": "/nix/store/f28n2jyah5yfzbqh8s2xn2kgqgjn90wx-skills-temporal-developer-0.6.3.drv",
-      "description": "Temporal Developer skill for Claude Code and OpenCode — build, debug, and manage Temporal workflows, activities, and workers across Python, TypeScript, Go, Java, .NET, and Ruby.",
-      "install_id": "skills-temporal-developer",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=683c9b03deff832f91a1067df553133db69f2471",
-      "name": "skills-temporal-developer-0.6.3",
-      "pname": "skills-temporal-developer",
-      "rev": "683c9b03deff832f91a1067df553133db69f2471",
-      "rev_count": 27919,
-      "rev_date": "2026-10-10T02:01:30Z",
-      "scrape_date": "2026-10-19T03:35:09.143980736Z",
-      "stabilities": [
-        "unstable",
-        "stable",
-        "staging"
-      ],
-      "unfree": false,
-      "version": "0.6.3",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/w8ycf6b24wd66003bvndkgs79h342d6r-skills-temporal-developer-0.6.3"
-      },
-      "system": "aarch64-linux",
-      "group": "skills-temporal-developer",
-      "priority": 5
-    },
-    {
-      "attr_path": "skills-temporal-developer",
-      "broken": false,
-      "derivation": "/nix/store/bqxygbdd11vhwqk7nl6pckzf6d8g4qi4-skills-temporal-developer-0.6.3.drv",
-      "description": "Temporal Developer skill for Claude Code and OpenCode — build, debug, and manage Temporal workflows, activities, and workers across Python, TypeScript, Go, Java, .NET, and Ruby.",
-      "install_id": "skills-temporal-developer",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=683c9b03deff832f91a1067df553133db69f2471",
-      "name": "skills-temporal-developer-0.6.3",
-      "pname": "skills-temporal-developer",
-      "rev": "683c9b03deff832f91a1067df553133db69f2471",
-      "rev_count": 27919,
-      "rev_date": "2026-10-10T02:01:30Z",
-      "scrape_date": "2026-10-19T03:35:09.143983390Z",
-      "stabilities": [
-        "unstable",
-        "stable",
-        "staging"
-      ],
-      "unfree": false,
-      "version": "0.6.3",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/pvl3hcv8x9c275rizqxvwxmrjklsa2wc-skills-temporal-developer-0.6.3"
-      },
-      "system": "x86_64-linux",
-      "group": "skills-temporal-developer",
-      "priority": 5
-    },
-    {
       "attr_path": "temporal",
       "broken": false,
       "derivation": "/nix/store/n12ahvrxk6nqbvy2cxwg06qca6rqdn9p-temporal-1.31.2.drv",
@@ -814,9 +805,13 @@
       "schema-version": "1.17.0",
       "description": "# Temporal\n\nStart Temporal + worker in the background:\n\n```bash\nflox services start\nflox activate --start-services\n```\n\nSend a hello workflow:\n\n```bash\ngo run ./start YourName\n```\n",
       "install": {
-        "flox-ai": {
-          "pkg-path": "flox/flox-ai",
-          "pkg-group": "flox-ai"
+        "agent-plugin-temporal-developer": {
+          "pkg-path": "agent-stacks/agent-plugin-temporalio-skill-temporal-developer",
+          "pkg-group": "agent-plugin-temporal-developer"
+        },
+        "flox-agent": {
+          "pkg-path": "flox/flox-agent",
+          "pkg-group": "flox-agent"
         },
         "gcc": {
           "pkg-path": "gcc",
@@ -833,10 +828,6 @@
         "jq": {
           "pkg-path": "jq",
           "pkg-group": "demo-tools"
-        },
-        "skills-temporal-developer": {
-          "pkg-path": "flox/skills-temporal-developer",
-          "pkg-group": "skills-temporal-developer"
         }
       },
       "hook": {

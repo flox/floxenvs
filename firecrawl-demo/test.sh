@@ -18,16 +18,16 @@ firecrawl --version >/dev/null
 echo ">>> firecrawl --version ... OK"
 
 if [ ! -f \
-  "$FLOX_ENV/share/flox/claude/firecrawl-cli/skills/firecrawl/SKILL.md" ]; then
+  "$FLOX_ENV/share/agent-plugins/firecrawl/skills/firecrawl/SKILL.md" ]; then
   echo "Error: firecrawl SKILL.md not installed"
   exit 1
 fi
 echo ">>> firecrawl skill installed"
 
-if ! flox-ai search firecrawl 2>&1 | grep -q "skills-firecrawl-cli"; then
-  echo "Error: flox-ai search did not surface the firecrawl-cli skill"
+if ! flox-agent list 2>&1 | grep -q "agent-plugin-firecrawl"; then
+  echo "Error: flox-agent list did not show the firecrawl plugin"
   exit 1
 fi
-echo ">>> flox-ai search firecrawl ... OK"
+echo ">>> flox-agent list shows firecrawl ... OK"
 
 echo ">>> firecrawl-demo environment is working"

@@ -37,12 +37,12 @@ jq.pkg-group = "demo-tools"
 # Demo-only banner UI.
 gum.pkg-path = "gum"
 gum.pkg-group = "demo-tools"
-# Temporal Developer skill, auto-discovered by flox-ai.
-skills-temporal-developer.pkg-path = "flox/skills-temporal-developer"
-skills-temporal-developer.pkg-group = "skills-temporal-developer"
-# flox-ai launcher (was previously pulled in via ../claude).
-flox-ai.pkg-path = "flox/flox-ai"
-flox-ai.pkg-group = "flox-ai"
+# Temporal Developer skill, loaded by `flox-agent launch claude`.
+agent-plugin-temporal-developer.pkg-path = "agent-stacks/agent-plugin-temporalio-skill-temporal-developer"
+agent-plugin-temporal-developer.pkg-group = "agent-plugin-temporal-developer"
+# flox-agent launcher.
+flox-agent.pkg-path = "flox/flox-agent"
+flox-agent.pkg-group = "flox-agent"
 
 [hook]
 on-activate = '''

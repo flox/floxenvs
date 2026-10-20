@@ -11,8 +11,8 @@ Persistent memory for coding agents with a REST and MCP backend.
 #   [include]
 #   environments = ["flox/agentmemory"]
 #
-# Provides Claude Code with the agentmemory plugin
-# wired up via flox-ai, plus a background
+# Provides Claude Code and the agentmemory plugin, loaded
+# with `flox-agent launch claude`, plus a background
 # `agentmemory` service running the REST/MCP backend
 # on port 3111 (configurable via AGENTMEMORY_URL).
 #
@@ -22,10 +22,10 @@ Persistent memory for coding agents with a REST and MCP backend.
 [install]
 claude-code.pkg-path = "flox/claude-code"
 claude-code.pkg-group = "claude-code"
-flox-ai.pkg-path = "flox/flox-ai"
-flox-ai.pkg-group = "flox-ai"
-skills-agentmemory.pkg-path = "flox/skills-agentmemory"
-skills-agentmemory.pkg-group = "skills-agentmemory"
+flox-agent.pkg-path = "flox/flox-agent"
+flox-agent.pkg-group = "flox-agent"
+agent-plugin-agentmemory.pkg-path = "agent-stacks/agent-plugin-agentmemory"
+agent-plugin-agentmemory.pkg-group = "agent-plugin-agentmemory"
 nodejs.pkg-path = "nodejs_20"
 nodejs.pkg-group = "agentmemory"
 
@@ -48,18 +48,6 @@ on-activate = '''
 export AGENTMEMORY_CACHE="$FLOX_ENV_CACHE/agentmemory"
 export npm_config_cache="$AGENTMEMORY_CACHE/npm"
 mkdir -p "$npm_config_cache"
-eval "$(flox-ai setup-hook)"
-'''
-
-[profile]
-bash = '''
-eval "$(flox-ai setup-profile-bash)"
-'''
-zsh = '''
-eval "$(flox-ai setup-profile-zsh)"
-'''
-fish = '''
-flox-ai setup-profile-fish | source
 '''
 
 [services]

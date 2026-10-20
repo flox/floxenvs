@@ -12,10 +12,10 @@ command_exists() {
 
 command_exists basic-memory
 command_exists bm
-command_exists flox-ai
+command_exists flox-agent
 
 echo ">>> basic-memory version: $(basic-memory --version)"
-echo ">>> flox-ai version: $(flox-ai version)"
+echo ">>> flox-agent version: $(flox-agent version)"
 
 # .mcp.json wiring exists and references basic-memory. The hook
 # writes it to $FLOX_ENV_PROJECT (the env dir). Plain grep avoids

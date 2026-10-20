@@ -33,18 +33,17 @@ npx remotion render
 # registered, so whenever you ask Claude to touch Remotion
 # code it auto-loads with the topic rules (animations, audio,
 # captions, 3D, transitions, etc.).
-flox-ai launch claude
+flox-agent launch claude
 ```
 
 ## What's added on top of `flox/remotion`
 
 - `gum` — styled Node.js version display during `on-activate`
 
-Everything else (Node.js 22, ffmpeg, the `flox-ai` launcher,
-and the `skills-remotion` plugin) comes from the
-included [remotion](../remotion) environment. Claude Code is
-not bundled — install it yourself, then start it with
-`flox-ai launch claude`.
+Everything else (Node.js 22, ffmpeg, the `flox-agent` launcher,
+Claude Code and the Remotion skills plugin) comes from the
+included [remotion](../remotion) environment. Start Claude
+Code with `flox-agent launch claude`.
 
 ## See also
 
