@@ -18,13 +18,6 @@ skillspector.pkg-path = "flox/skillspector"
 skillspector.pkg-group = "skillspector"
 flox-agent.pkg-path = "flox/flox-agent"
 flox-agent.pkg-group = "flox-agent"
-# Pinned: scripts/run-audit.sh needs the multi-dimension `audit --kind`
-# engine whose JSON matches .website/src/lib/metricsSchema.ts. Later
-# flox-agent builds replace it with a security-only SkillSpector audit
-# that has no --kind, emits a different schema, and only accepts
-# agent-plugin layouts (plugin.json at the root), which skills-*
-# builds do not produce.
-flox-agent.version = "0.9.0-259-g292d9be"
 skill-validator.pkg-path = "flox/skill-validator"
 skill-validator.pkg-group = "skill-validator"
 nodejs.pkg-path = "nodejs"
