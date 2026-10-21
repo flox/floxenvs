@@ -89,13 +89,34 @@ const agentMeta: Record<
   },
 };
 
-const agents = AGENT_NAMES.map((name) => ({
-  name,
-  pkg: pkgMap[name],
-  meta: agentMeta[name],
-})).filter((a) => a.pkg !== undefined);
+// Agents that agent-pkgs builds and publishes in the agent-stacks catalog.
+// They have no meta.yaml here, so title and license live here and their
+// links go to FloxHub instead of a package page.
+const agentStacksAgents: Record<string, { title: string; license: string }> = {
+  crush: { title: "Crush", license: "FSL-1.1-MIT" },
+  opencode: { title: "Opencode", license: "MIT" },
+  openclaw: { title: "Openclaw", license: "MIT" },
+  "agent-deck": { title: "Agent Deck", license: "MIT" },
+};
 
 const origin = (Astro.site?.toString() ?? "").replace(/\/$/, "");
+
+const agents = AGENT_NAMES.map((name) => {
+  const pkg = pkgMap[name];
+  const external = agentStacksAgents[name];
+  const hubUrl = `https://hub.flox.dev/agent-stacks/${name}`;
+  return {
+    name,
+    meta: agentMeta[name],
+    title: pkg?.data.title ?? external?.title,
+    license: pkg?.data.license ?? external?.license,
+    lastUpdated: pkg?.data.last_updated,
+    onFloxHub: !pkg,
+    href: pkg ? `${base}packages/${name}/` : hubUrl,
+    url: pkg ? `${origin}${base}packages/${name}/` : hubUrl,
+  };
+}).filter((a) => a.title !== undefined);
+
 const pageUrl = `${origin}${base}compare/ai-coding-agents/`;
 
 const faqItems = [
@@ -160,8 +181,8 @@ const jsonLd = [
     },
     about: agents.map((a) => ({
       "@type": "SoftwareApplication",
-      name: a.pkg.data.title,
-      url: `${origin}${base}packages/${a.name}/`,
+      name: a.title,
+      url: a.url,
     })),
   },
   {
@@ -185,8 +206,8 @@ const jsonLd = [
     itemListElement: agents.map((a, i) => ({
       "@type": "ListItem",
       position: i + 1,
-      name: a.pkg.data.title,
-      url: `${origin}${base}packages/${a.name}/`,
+      name: a.title,
+      url: a.url,
     })),
   },
   {
@@ -277,14 +298,14 @@ const jsonLd = [
             ]}>
               <td class="px-4 py-3 font-semibold whitespace-nowrap">
                 <a
-                  href={`${base}packages/${a.name}/`}
+                  href={a.href}
                   class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300"
                 >
-                  {a.pkg.data.title}
+                  {a.title}
                 </a>
               </td>
               <td class="px-4 py-3 font-mono text-xs whitespace-nowrap text-slate-600 dark:text-slate-300">
-                {a.pkg.data.license ?? "—"}
+                {a.license ?? "—"}
               </td>
               <td class="px-4 py-3 whitespace-nowrap text-slate-600 dark:text-slate-300">
                 {a.meta.provider}
@@ -303,8 +324,8 @@ const jsonLd = [
                 {a.meta.surface}
               </td>
               <td class="px-4 py-3 whitespace-nowrap text-slate-500 font-mono text-xs">
-                {a.pkg.data.last_updated
-                  ? <time datetime={a.pkg.data.last_updated}>{a.pkg.data.last_updated.slice(0, 10)}</time>
+                {a.lastUpdated
+                  ? <time datetime={a.lastUpdated}>{a.lastUpdated.slice(0, 10)}</time>
                   : "—"}
               </td>
             </tr>
@@ -325,11 +346,11 @@ const jsonLd = [
         <div class="rounded-lg border border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-2 hover:border-slate-400 dark:hover:border-slate-600 transition">
           <div class="flex items-start justify-between gap-2">
             <div>
-              <h3 class="font-bold text-base">{a.pkg.data.title}</h3>
+              <h3 class="font-bold text-base">{a.title}</h3>
               <p class="text-xs font-mono text-slate-500 mt-0.5">{a.name}</p>
             </div>
             <span class="shrink-0 text-xs font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-              {a.pkg.data.license ?? "—"}
+              {a.license ?? "—"}
             </span>
           </div>
           <p class="text-sm text-slate-600 dark:text-slate-300 leading-snug">
@@ -347,10 +368,10 @@ const jsonLd = [
           </dl>
           <div class="mt-auto pt-2 flex flex-col items-start gap-1 text-xs">
             <a
-              href={`${base}packages/${a.name}/`}
+              href={a.href}
               class="underline decoration-slate-300 dark:decoration-slate-700 hover:decoration-slate-700 dark:hover:decoration-slate-300"
             >
-              View {a.pkg.data.title} package →
+              {a.onFloxHub ? `View ${a.title} on FloxHub →` : `View ${a.title} package →`}
             </a>
             {a.name === "claude-code" && (
               <a
@@ -405,17 +426,18 @@ claude-code.publisher = <span class="text-kind-env">"flox"</span>
 codex.pkg-path        = <span class="text-kind-env">"flox/codex"</span>
 codex.publisher       = <span class="text-kind-env">"flox"</span>
 
-crush.pkg-path        = <span class="text-kind-env">"flox/crush"</span>
-crush.publisher       = <span class="text-kind-env">"flox"</span>
+<span class="text-slate-400"># agent-stacks packages each need their own pkg-group</span>
+crush.pkg-path        = <span class="text-kind-env">"agent-stacks/crush"</span>
+crush.pkg-group       = <span class="text-kind-env">"crush"</span>
 
-opencode.pkg-path     = <span class="text-kind-env">"flox/opencode"</span>
-opencode.publisher    = <span class="text-kind-env">"flox"</span>
+opencode.pkg-path     = <span class="text-kind-env">"agent-stacks/opencode"</span>
+opencode.pkg-group    = <span class="text-kind-env">"opencode"</span>
 
-openclaw.pkg-path     = <span class="text-kind-env">"flox/openclaw"</span>
-openclaw.publisher    = <span class="text-kind-env">"flox"</span>
+openclaw.pkg-path     = <span class="text-kind-env">"agent-stacks/openclaw"</span>
+openclaw.pkg-group    = <span class="text-kind-env">"openclaw"</span>
 
-agent-deck.pkg-path   = <span class="text-kind-env">"flox/agent-deck"</span>
-agent-deck.publisher  = <span class="text-kind-env">"flox"</span></code></pre>
+agent-deck.pkg-path   = <span class="text-kind-env">"agent-stacks/agent-deck"</span>
+agent-deck.pkg-group  = <span class="text-kind-env">"agent-deck"</span></code></pre>
     </div>
     <p class="mt-3 text-xs text-slate-500">
       New to Flox?{" "}
