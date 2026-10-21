@@ -6,6 +6,11 @@
 # (.website/src/lib/metricsSchema.ts). flox-agent's own result is kept
 # beside it as flox-agent-audit.json.
 #
+# When flox-agent cannot audit the package (exit 3: osv.dev unreachable,
+# a scan timed out, a SKILL.md fails validation, ...) this prints a CI
+# warning, writes no metrics, and exits 0, so the site keeps the
+# package's previous metrics instead of the build going red.
+#
 # This script audits SKILLS ONLY. Other item kinds (env, pkg, agent)
 # are not handled here.
 #
@@ -30,6 +35,8 @@ out_dir="$ROOT/audit/$KIND/$NAME"
 mkdir -p "$out_dir"
 out_file="$out_dir/metrics.json"
 raw_file="$out_dir/flox-agent-audit.json"
+# A run that ends without a result must not leave an earlier one behind.
+rm -f "$out_file" "$raw_file"
 
 # The .flox/pkgs/<name> source holds only packaging files — the actual
 # skill content (SKILL.md, .claude-plugin) is produced by the build,
@@ -44,10 +51,9 @@ if [ ! -d "$built" ]; then
 fi
 
 # flox_agent_layout (.flox/nix/flox-agent-layout.sh) emits every plugin a
-# package carries as share/flox/claude/<plugin>/, holding
-# .claude-plugin/plugin.json and skills/<skill>/SKILL.md. The other
-# launcher dirs are copies of the same skills, so Claude's is the one
-# audited.
+# package carries as share/flox/claude/<plugin>/, holding skills/<skill>/
+# and usually .claude-plugin/plugin.json. The other launcher dirs are
+# copies of the same skills, so Claude's is the one audited.
 claude="$built/share/flox/claude"
 if [ ! -d "$claude" ]; then
   echo "no share/flox/claude in result-$NAME; not a fragment build" >&2
@@ -66,12 +72,17 @@ fi
 # root, and skills/<skill>/ as real directories holding SKILL.md (it
 # never follows a symlink). Stage that view of each Claude plugin under
 # <view>/share/agent-plugins/, which audit takes as one target scored by
-# its worst plugin. A skills/ child without SKILL.md is support content
-# Claude Code does not load as a skill and would fail validation, so it
-# is left out; a plugin with no skills at all (an LSP plugin, say) has
-# nothing SkillSpector scans and is left out too.
-view="$(mktemp -d)"
-trap 'chmod -R u+w "$view" 2>/dev/null; rm -rf "$view"' EXIT
+# its worst plugin.
+#   - A skills/ child without SKILL.md is support content Claude Code
+#     does not load as a skill and would fail validation: left out.
+#   - Every other top-level entry (hooks/, commands/, bin/, ...) is
+#     copied as-is, so the audit lists it under coverage.notChecked
+#     instead of the view hiding that it exists.
+#   - A plugin with no skills at all (an LSP plugin, say) has nothing
+#     SkillSpector scans: left out.
+work="$(mktemp -d)"
+trap 'chmod -R u+w "$work" 2>/dev/null; rm -rf "$work"' EXIT
+view="$work/view"
 staged=()
 for pdir in "$claude"/*/; do
   [ -d "$pdir" ] || continue
@@ -83,8 +94,16 @@ for pdir in "$claude"/*/; do
     cp -RL "$sdir" "$dst/skills/$(basename "$sdir")"
   done
   [ -d "$dst" ] || continue
-  desc="$(jq -r '(.description | strings) // ""' \
-    "$pdir.claude-plugin/plugin.json")"
+  for entry in "$pdir".[!.]* "$pdir"*; do
+    [ -e "$entry" ] || [ -L "$entry" ] || continue
+    case "$(basename "$entry")" in skills|plugin.json) continue ;; esac
+    cp -R "$entry" "$dst/"
+  done
+  manifest="$pdir.claude-plugin/plugin.json"
+  desc=""
+  if [ -f "$manifest" ]; then
+    desc="$(jq -r '(.description | strings) // ""' "$manifest")"
+  fi
   jq -n --arg name "$plugin" --arg desc "$desc" '
     {"$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
      name: $name}
@@ -104,50 +123,94 @@ if [ ${#staged[@]} -eq 0 ]; then
      quality: {score: 0, checks: []}, reliability: {},
      security: {score: 0, cap: 100, scanners: [], findings: []},
      impact: {}}
-  ' > "$out_file"
-  rm -f "$raw_file"
+  ' > "$work/metrics.json"
+  mv "$work/metrics.json" "$out_file"
   echo "wrote $out_file (no skills to audit in ${claude#"$ROOT"/})"
   exit 0
 fi
 
-# Quality: one check per plugin, from check-plugin (exit 1 = invalid).
-quality="$(
-  for plugin in "${staged[@]}"; do
-    res="$("${runner[@]}" check-plugin --json \
-      "$view/share/agent-plugins/$plugin" || true)"
-    valid="$(jq -r 'if .valid == true then "true" else "false" end' \
-      <<<"$res")"
-    note="$(jq -r '"\(.errors | length) errors, \(.warnings | length) warnings"' \
-      <<<"$res")"
-    sh_check_json "check-plugin:$plugin" "$valid" 1 "$note"
-  done | sh_aggregate_quality
-)"
+# No --threshold is passed, so any score exits 0. Exit 3 means the
+# package could not be audited; anything else is a failure of the run.
+rc=0
+"${runner[@]}" audit --json "$view" > "$work/result.json" \
+  2> "$work/audit.err" || rc=$?
+cat "$work/audit.err" >&2
+if [ "$rc" -eq 3 ]; then
+  reason="$(grep -m1 . "$work/audit.err" || echo "flox-agent audit exit 3")"
+  echo "::warning title=audit $NAME::not audited: ${reason//$'\r'/}"
+  echo "no metrics written for $NAME; the site keeps its previous ones" >&2
+  exit 0
+elif [ "$rc" -ne 0 ]; then
+  echo "flox-agent audit failed for $NAME (exit $rc)" >&2
+  exit "$rc"
+fi
 
-# Exit 3 (could not audit) fails the script via set -e; no --threshold
-# is passed, so any score exits 0. Results are written in the view and
-# moved into place, so a failure never leaves a truncated file behind.
-"${runner[@]}" audit --json "$view" > "$view/result.json"
-mv "$view/result.json" "$raw_file"
+# Quality: one check-plugin check per plugin (exit 0 valid, 1 invalid;
+# anything else, or output that is not a check-plugin result, is a
+# failure of the run, never a silently missing check).
+: > "$work/checks.jsonl"
+for plugin in "${staged[@]}"; do
+  rc=0
+  "${runner[@]}" check-plugin --json "$view/share/agent-plugins/$plugin" \
+    > "$work/check.json" || rc=$?
+  if [ "$rc" -gt 1 ] \
+     || ! jq -e '(.valid | type) == "boolean"' "$work/check.json" >/dev/null 2>&1
+  then
+    echo "check-plugin failed for $plugin in $NAME (exit $rc)" >&2
+    exit 1
+  fi
+  jq -c --arg plugin "$plugin" '
+    {plugin: $plugin, valid,
+     errors: (.errors | length), warnings: (.warnings | length)}
+  ' "$work/check.json" >> "$work/checks.jsonl"
+done
 
-# Map the result into metricsSchema.ts. Security.findings there is a
-# per-severity tally, not the per-finding shape scripts/lib/*-to-findings.sh
-# produce. Reliability and impact are not measured for skills.
-jq --argjson identity "$identity" --argjson quality "$quality" '
+mv "$work/result.json" "$raw_file"
+
+# Map the result into metricsSchema.ts.
+#   - status comes from overall by the site's own thresholds (overallStatus
+#     in .website/src/lib/scoring.ts), since ScorePanel derives it that
+#     way; flox-agent's own status stays on the scanner row.
+#   - quality scores check-plugin errors and warnings with the formula the
+#     earlier flox-agent ensemble used (100 - 25*errors - 5*warnings,
+#     clamped to 0-100), averaged over plugins.
+#   - security.findings is a per-severity tally (not the per-finding shape
+#     scripts/lib/*-to-findings.sh produce), plus INFO rows for components
+#     scanned incompletely and entries the audit did not check.
+#   - reliability and impact are not measured for skills.
+jq --argjson identity "$identity" --slurpfile checks "$work/checks.jsonl" '
   def sevs: ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"];
   def pill:
-    {"safe": "stable", "caution": "warn",
-     "do not install": "risk", "incomplete": "risk"}[.]
-    // error("unknown flox-agent audit status: \(.)");
+    if . >= 80 then "stable" elif . >= 60 then "warn" else "risk" end;
+  def clamp: if . < 0 then 0 elif . > 100 then 100 else . end;
+  def listed: if length > 5 then (.[:5] + ["…"]) else . end | join(", ");
+  (.plugins | length > 1) as $multi
+  | def where($p): if $multi then "\($p.name)/" else "" end;
   [.plugins[].components[].findings[].severity | ascii_upcase] as $all
   | ($all | map(select(. as $s | sevs | index($s) | not))) as $bad
   | if ($bad | length) > 0
     then error("unknown SkillSpector severity: \($bad | unique | join(", "))")
     else . end
+  | [.plugins[] as $p | $p.components[]
+      | select(.partial and (.coverage // 100) < 100)
+      | "\(where($p))\(.path) \(.coverage | floor)%"] as $incomplete
+  | [.plugins[] as $p | $p.coverage.notChecked[]
+      | "\(where($p))\(.path)"] as $unchecked
   | {
       identity: $identity,
       overall: .score,
-      status: (.status | pill),
-      quality: $quality,
+      status: (.score | pill),
+      quality: {
+        score: ($checks
+          | map(100 - 25 * .errors - 5 * .warnings | clamp)
+          | add / length | floor),
+        checks: [$checks[] | {
+          id: "check-plugin:\(.plugin)",
+          pass: (.valid and .errors == 0 and .warnings == 0),
+          weight: 1,
+          note: "\(.errors) errors, \(.warnings) warnings"
+        }]
+      },
       reliability: {},
       security: {
         score: .score,
@@ -158,13 +221,23 @@ jq --argjson identity "$identity" --argjson quality "$quality" '
                   // "INFO"),
           status: .status
         }],
-        findings: [sevs[] as $s
-          | ($all | map(select(. == $s)) | length) as $n
-          | select($n > 0)
-          | {tool: "skillspector", level: $s, count: $n, status: "open"}]
+        findings: (
+          [sevs[] as $s
+            | ($all | map(select(. == $s)) | length) as $n
+            | select($n > 0)
+            | {tool: "skillspector", level: $s, count: $n, status: "open"}]
+          + (if ($incomplete | length) > 0 then [{
+              tool: "skillspector", level: "INFO",
+              count: ($incomplete | length), status: "incomplete",
+              note: ($incomplete | listed)}] else [] end)
+          + (if ($unchecked | length) > 0 then [{
+              tool: "flox-agent", level: "INFO",
+              count: ($unchecked | length), status: "not checked",
+              note: ($unchecked | listed)}] else [] end)
+        )
       },
       impact: {}
     }
-' "$raw_file" > "$view/metrics.json"
-mv "$view/metrics.json" "$out_file"
+' "$raw_file" > "$work/metrics.json"
+mv "$work/metrics.json" "$out_file"
 echo "wrote $out_file (plugins: ${staged[*]})"
