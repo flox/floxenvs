@@ -45,13 +45,13 @@ mapfile -t SKILLS < <(
   grep -rl 'flox_agent_layout' "$REPO_ROOT"/.flox/pkgs/*/default.nix \
     | xargs -n1 dirname | xargs -n1 basename | sort -u
 )
-# The 4 agent runtimes + the 5 source-built audit tools. flox-ai is NOT
-# built here: the CLI now lives in its own repo (flox/flox-ai) with no
-# local .flox/pkgs entry, so it can't be `flox build`-ed. It is still
+# The 2 source-built agent runtimes + the 5 source-built audit tools.
+# flox-ai, opencode and pi are NOT built here: they have no local
+# .flox/pkgs entry, so they can't be `flox build`-ed. They are still
 # checked for coexistence — installed from the catalog into the same env
 # below (see EXTERNAL_PKGS).
 TOOLS=(
-  claude-code codex opencode pi
+  claude-code codex
   skill-tools skill-validator skillcheck skillspector claudelint
 )
 # Extra packages to install into the single env (NOT built from source),
@@ -60,6 +60,8 @@ TOOLS=(
 #   - flox/flox-ai: our CLI, now in its own repo (no local .flox/pkgs
 #     entry), consumed from FloxHub — needs FLOX_FLOXHUB_TOKEN. Must still
 #     coexist with every skill in one env.
+#   - agent-stacks/opencode, agent-stacks/pi: agent runtimes that agent-pkgs
+#     builds and publishes; the skills still lay out content for them.
 #   - python3, nodejs: the runtimes skills bundle most (33 ship bin/python3,
 #     26 ship bin/node), deliberately UNDER their plugin dir so they don't
 #     land on $FLOX_ENV/bin. Real user envs almost always already have these
@@ -68,7 +70,7 @@ TOOLS=(
 #     $FLOX_ENV/bin would collide with these and fail the check.
 #
 # Extend with uv/bun/ruby/go if those become common env-level runtimes.
-EXTERNAL_PKGS=(flox/flox-ai python3 nodejs)
+EXTERNAL_PKGS=(flox/flox-ai agent-stacks/opencode agent-stacks/pi python3 nodejs)
 PACKAGES=("${SKILLS[@]}" "${TOOLS[@]}")
 TOTAL=$(( ${#PACKAGES[@]} + ${#EXTERNAL_PKGS[@]} ))
 echo "Target: ${#SKILLS[@]} skills + ${#TOOLS[@]} agents/audit tools" \
