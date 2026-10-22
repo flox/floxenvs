@@ -2,7 +2,7 @@
   "lockfile-version": 1,
   "manifest": {
     "schema-version": "1.17.0",
-    "description": "# graphify — knowledge graphs for Claude Code\n\nThe /graphify skill is pre-installed via\nflox/skill-graphify and discovered by\nflox-ai. Just open Claude Code:\n\n```text\n/graphify .\n```\n\nOr use the CLI directly:\n\n```bash\ngraphify .\ngraphify ./raw --mode deep\ngraphify ./raw --update\n```\n\nQuery the graph:\n\n```bash\ngraphify query \"what connects X to Y?\"\ngraphify path \"Module\" \"Database\"\ngraphify explain \"Concept\"\n```\n",
+    "description": "# graphify — knowledge graphs for Claude Code\n\nThe /graphify skill is pre-installed via\nflox/skills-graphify. Start Claude Code with\nthe flox-ai launcher, then run it:\n\n```bash\nflox-ai launch claude\n```\n\n```text\n/graphify .\n```\n\nOr use the CLI directly:\n\n```bash\ngraphify .\ngraphify ./raw --mode deep\ngraphify ./raw --update\n```\n\nQuery the graph:\n\n```bash\ngraphify query \"what connects X to Y?\"\ngraphify path \"Module\" \"Database\"\ngraphify explain \"Concept\"\n```\n",
     "install": {
       "bash": {
         "pkg-path": "bash",
@@ -24,6 +24,10 @@
       "curl": {
         "pkg-path": "curl",
         "pkg-group": "graphify-tools"
+      },
+      "flox-agent": {
+        "pkg-path": "flox/flox-agent",
+        "pkg-group": "flox-agent"
       },
       "flox-ai": {
         "pkg-path": "flox/flox-ai",
@@ -65,7 +69,7 @@
       "VIRTUAL_ENV_DISABLE_PROMPT": "1"
     },
     "hook": {
-      "on-activate": "# flox-ai sets up Claude Code config + discovers the bundled skill\n# (was previously provided via the flox/claude include).\neval \"$(flox-ai setup-hook)\"\n\nexport PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$PYTHON_DIR/.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$PYTHON_DIR\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  python3 -m venv --upgrade-deps \"$PYTHON_DIR\"\n  echo \"$CURRENT_INTERP\" > \"$PYTHON_DIR/.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$PYTHON_DIR/bin/activate\"\n\nHASH=$(echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5sum 2>/dev/null \\\n  || echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5 -q)\nHASH=$(echo \"$HASH\" | cut -d\" \" -f1)\nLAST=$(cat \"$PYTHON_DIR/.deps_hash\" 2>/dev/null)\nif [ \"$HASH\" != \"$LAST\" ]; then\n  pip install -q \"$GRAPHIFY_INSTALL_PACKAGE\"\n  echo \"$HASH\" > \"$PYTHON_DIR/.deps_hash\"\nfi\n"
+      "on-activate": "export PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$PYTHON_DIR/.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$PYTHON_DIR\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  python3 -m venv --upgrade-deps \"$PYTHON_DIR\"\n  echo \"$CURRENT_INTERP\" > \"$PYTHON_DIR/.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$PYTHON_DIR/bin/activate\"\n\nHASH=$(echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5sum 2>/dev/null \\\n  || echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5 -q)\nHASH=$(echo \"$HASH\" | cut -d\" \" -f1)\nLAST=$(cat \"$PYTHON_DIR/.deps_hash\" 2>/dev/null)\nif [ \"$HASH\" != \"$LAST\" ]; then\n  pip install -q \"$GRAPHIFY_INSTALL_PACKAGE\"\n  echo \"$HASH\" > \"$PYTHON_DIR/.deps_hash\"\nfi\n"
     },
     "profile": {
       "bash": "source \"$PYTHON_DIR/bin/activate\"\n",
@@ -103,7 +107,7 @@
       "rev": "0d22191d11862731c079ead5271bad477bb87a7f",
       "rev_count": 29313,
       "rev_date": "2026-10-19T01:03:09Z",
-      "scrape_date": "2026-10-19T01:45:13.167110678Z",
+      "scrape_date": "2026-10-19T15:16:38.490551Z",
       "stabilities": [
         "unstable",
         "stable",
@@ -134,7 +138,7 @@
       "rev": "0d22191d11862731c079ead5271bad477bb87a7f",
       "rev_count": 29313,
       "rev_date": "2026-10-19T01:03:09Z",
-      "scrape_date": "2026-10-19T01:45:13.167114996Z",
+      "scrape_date": "2026-10-19T15:16:38.490553Z",
       "stabilities": [
         "unstable",
         "stable",
@@ -165,7 +169,7 @@
       "rev": "0d22191d11862731c079ead5271bad477bb87a7f",
       "rev_count": 29313,
       "rev_date": "2026-10-19T01:03:09Z",
-      "scrape_date": "2026-10-19T01:45:13.167115688Z",
+      "scrape_date": "2026-10-19T15:16:38.490554Z",
       "stabilities": [
         "unstable",
         "stable",
@@ -181,6 +185,96 @@
       },
       "system": "x86_64-linux",
       "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-agent",
+      "broken": false,
+      "derivation": "/nix/store/76p691rnrk4zcmlch455cksasw2xr7bg-flox-agent-0.9.0-259-g292d9be.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
+      "license": "MIT",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=292d9bede3475f011489ce050077ef421259bae8",
+      "name": "flox-agent-0.9.0-259-g292d9be",
+      "pname": "flox-agent",
+      "rev": "292d9bede3475f011489ce050077ef421259bae8",
+      "rev_count": 461,
+      "rev_date": "2026-10-16T21:14:11Z",
+      "scrape_date": "2026-10-19T14:41:03.513202Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.9.0-259-g292d9be",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/yjkhm54ac4p1iaclackafwv19y1gywl5-flox-agent-0.9.0-259-g292d9be"
+      },
+      "system": "aarch64-darwin",
+      "group": "flox-agent",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-agent",
+      "broken": false,
+      "derivation": "/nix/store/fz9ycqqq3zwrvnw0bmhjm9qm89znqcms-flox-agent-0.9.0-259-g292d9be.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
+      "license": "MIT",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=292d9bede3475f011489ce050077ef421259bae8",
+      "name": "flox-agent-0.9.0-259-g292d9be",
+      "pname": "flox-agent",
+      "rev": "292d9bede3475f011489ce050077ef421259bae8",
+      "rev_count": 461,
+      "rev_date": "2026-10-16T21:14:11Z",
+      "scrape_date": "2026-10-19T14:41:03.513203Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.9.0-259-g292d9be",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/sq0d7d2bi74nwvld24vckgl4q30ncyfi-flox-agent-0.9.0-259-g292d9be"
+      },
+      "system": "aarch64-linux",
+      "group": "flox-agent",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-agent",
+      "broken": false,
+      "derivation": "/nix/store/68b0hk6pclqlx77243xa5vd3pm6afn1q-flox-agent-0.9.0-259-g292d9be.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
+      "license": "MIT",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=292d9bede3475f011489ce050077ef421259bae8",
+      "name": "flox-agent-0.9.0-259-g292d9be",
+      "pname": "flox-agent",
+      "rev": "292d9bede3475f011489ce050077ef421259bae8",
+      "rev_count": 461,
+      "rev_date": "2026-10-16T21:14:11Z",
+      "scrape_date": "2026-10-19T14:41:03.513206Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.9.0-259-g292d9be",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/n2mlcszspfj5dkwsx6avqqf3gbqyzafq-flox-agent-0.9.0-259-g292d9be"
+      },
+      "system": "x86_64-linux",
+      "group": "flox-agent",
       "priority": 5
     },
     {
@@ -1142,7 +1236,7 @@
   "compose": {
     "composer": {
       "schema-version": "1.17.0",
-      "description": "# graphify — knowledge graphs for Claude Code\n\nThe /graphify skill is pre-installed via\nflox/skill-graphify and discovered by\nflox-ai. Just open Claude Code:\n\n```text\n/graphify .\n```\n\nOr use the CLI directly:\n\n```bash\ngraphify .\ngraphify ./raw --mode deep\ngraphify ./raw --update\n```\n\nQuery the graph:\n\n```bash\ngraphify query \"what connects X to Y?\"\ngraphify path \"Module\" \"Database\"\ngraphify explain \"Concept\"\n```\n",
+      "description": "# graphify — knowledge graphs for Claude Code\n\nThe /graphify skill is pre-installed via\nflox/skills-graphify. Start Claude Code with\nthe flox-ai launcher, then run it:\n\n```bash\nflox-ai launch claude\n```\n\n```text\n/graphify .\n```\n\nOr use the CLI directly:\n\n```bash\ngraphify .\ngraphify ./raw --mode deep\ngraphify ./raw --update\n```\n\nQuery the graph:\n\n```bash\ngraphify query \"what connects X to Y?\"\ngraphify path \"Module\" \"Database\"\ngraphify explain \"Concept\"\n```\n",
       "install": {
         "flox-ai": {
           "pkg-path": "flox/flox-ai",
@@ -1195,9 +1289,9 @@
               "pkg-path": "curl",
               "pkg-group": "graphify-tools"
             },
-            "flox-ai": {
-              "pkg-path": "flox/flox-ai",
-              "pkg-group": "flox-ai"
+            "flox-agent": {
+              "pkg-path": "flox/flox-agent",
+              "pkg-group": "flox-agent"
             },
             "gcc-unwrapped": {
               "pkg-path": "gcc-unwrapped",
@@ -1231,7 +1325,7 @@
             "VIRTUAL_ENV_DISABLE_PROMPT": "1"
           },
           "hook": {
-            "on-activate": "# flox-ai sets up Claude Code config + discovers the bundled skill\n# (was previously provided via the flox/claude include).\neval \"$(flox-ai setup-hook)\"\n\nexport PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$PYTHON_DIR/.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$PYTHON_DIR\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  python3 -m venv --upgrade-deps \"$PYTHON_DIR\"\n  echo \"$CURRENT_INTERP\" > \"$PYTHON_DIR/.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$PYTHON_DIR/bin/activate\"\n\nHASH=$(echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5sum 2>/dev/null \\\n  || echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5 -q)\nHASH=$(echo \"$HASH\" | cut -d\" \" -f1)\nLAST=$(cat \"$PYTHON_DIR/.deps_hash\" 2>/dev/null)\nif [ \"$HASH\" != \"$LAST\" ]; then\n  pip install -q \"$GRAPHIFY_INSTALL_PACKAGE\"\n  echo \"$HASH\" > \"$PYTHON_DIR/.deps_hash\"\nfi\n"
+            "on-activate": "export PYTHON_DIR=\"$FLOX_ENV_CACHE/python\"\n\nCURRENT_INTERP=\"$(realpath \"$(which python3)\")\"\nCACHED_INTERP=\"$(cat \"$PYTHON_DIR/.interpreter\" \\\n  2>/dev/null || echo none)\"\n\nif [ ! -d \"$PYTHON_DIR\" ] \\\n    || [ \"$CURRENT_INTERP\" != \"$CACHED_INTERP\" ]; then\n  python3 -m venv --upgrade-deps \"$PYTHON_DIR\"\n  echo \"$CURRENT_INTERP\" > \"$PYTHON_DIR/.interpreter\"\nfi\n\nunset VIRTUAL_ENV\nsource \"$PYTHON_DIR/bin/activate\"\n\nHASH=$(echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5sum 2>/dev/null \\\n  || echo \"$GRAPHIFY_INSTALL_PACKAGE\" | md5 -q)\nHASH=$(echo \"$HASH\" | cut -d\" \" -f1)\nLAST=$(cat \"$PYTHON_DIR/.deps_hash\" 2>/dev/null)\nif [ \"$HASH\" != \"$LAST\" ]; then\n  pip install -q \"$GRAPHIFY_INSTALL_PACKAGE\"\n  echo \"$HASH\" > \"$PYTHON_DIR/.deps_hash\"\nfi\n"
           },
           "profile": {
             "bash": "source \"$PYTHON_DIR/bin/activate\"\n",
@@ -1262,15 +1356,6 @@
       }
     ],
     "warnings": [
-      {
-        "warning": {
-          "Overriding": [
-            "install",
-            "flox-ai"
-          ]
-        },
-        "higher_priority_name": "Current manifest"
-      },
       {
         "warning": {
           "Overriding": [

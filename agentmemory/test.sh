@@ -10,14 +10,15 @@ command_exists() {
   echo ">>> '$1' command exists"
 }
 
-command_exists flox-ai
+command_exists flox-agent
 command_exists node
 command_exists npx
 
 echo ">>> node version: $(node --version)"
 
-# Plugin tree must land where flox-ai discovers it.
-plugin_dir="$FLOX_ENV/share/flox/claude/agentmemory"
+# Plugin tree must land where flox-agent discovers it: the Agent
+# Plugins layout under share/agent-plugins/<name>/.
+plugin_dir="$FLOX_ENV/share/agent-plugins/agentmemory"
 if [ ! -d "$plugin_dir" ]; then
   echo "Error: plugin dir missing: $plugin_dir"
   exit 1
@@ -25,13 +26,12 @@ fi
 echo ">>> plugin installed at $plugin_dir"
 
 for f in \
-  .claude-plugin/plugin.json \
-  .mcp.json \
-  hooks/hooks.json \
+  plugin.json \
+  mcp.json \
+  com.anthropic.claude-code/hooks/hooks.json \
   scripts/session-start.mjs \
   skills/remember/SKILL.md \
-  bin/node \
-  bin/npx
+  bin/node
 do
   if [ ! -e "$plugin_dir/$f" ]; then
     echo "Error: missing $plugin_dir/$f"
@@ -53,29 +53,28 @@ case "$shebang" in
 esac
 echo ">>> hook script shebang repointed off /usr/bin/env"
 
-# The node Claude Code actually runs is the bundled one anchored at
-# ${CLAUDE_PLUGIN_ROOT}/bin/node — confirm it exists and is executable.
 if [ ! -x "$plugin_dir/bin/node" ]; then
   echo "Error: bundled node missing/not executable: $plugin_dir/bin/node"
   exit 1
 fi
 echo ">>> bundled node executable at $plugin_dir/bin/node"
 
-# hooks.json must invoke the bundled node via the
-# ${CLAUDE_PLUGIN_ROOT}-anchored path so Claude Code can
-# expand it at load time without depending on PATH.
-if ! grep -qF '${CLAUDE_PLUGIN_ROOT}/bin/node' "$plugin_dir/hooks/hooks.json"; then
-  echo "Error: hooks.json not rewritten to bundled node"
+# hooks.json must invoke the plugin's own bundled node, not whatever
+# node happens to be on PATH.
+if ! grep -qF '/share/agent-plugins/agentmemory/bin/node' \
+    "$plugin_dir/com.anthropic.claude-code/hooks/hooks.json"; then
+  echo "Error: hooks.json not wired to bundled node"
   exit 1
 fi
 echo ">>> hooks.json wired to bundled node"
 
-# Same for .mcp.json's npx invocation.
-if ! grep -qF '${CLAUDE_PLUGIN_ROOT}/bin/npx' "$plugin_dir/.mcp.json"; then
-  echo "Error: .mcp.json not rewritten to bundled npx"
+# Same for the MCP server: mcp.json runs the bundled node, which
+# `flox-agent launch` rewrites to ${CLAUDE_PLUGIN_ROOT}/bin/node.
+if ! grep -qF '"./bin/node"' "$plugin_dir/mcp.json"; then
+  echo "Error: mcp.json not wired to bundled node"
   exit 1
 fi
-echo ">>> .mcp.json wired to bundled npx"
+echo ">>> mcp.json wired to bundled node"
 
 # Vars set up correctly.
 if [ "${AGENTMEMORY_URL:-}" != "http://localhost:3111" ]; then
@@ -90,18 +89,16 @@ if [ -z "${AGENTMEMORY_CACHE:-}" ] || [ ! -d "$AGENTMEMORY_CACHE" ]; then
 fi
 echo ">>> AGENTMEMORY_CACHE=$AGENTMEMORY_CACHE"
 
-# flox-ai must discover the plugin's skills. `search` lists fragments
-# matching a query; the bundled skills surface under the
-# skills-agentmemory id, so confirm agentmemory is found. Capture the
-# output with `|| true` so a non-zero exit doesn't fail the pipe under
-# `pipefail`.
-search_out="$(flox-ai search agentmemory 2>&1 || true)"
-if ! grep -q agentmemory <<<"$search_out"; then
-  echo "Error: flox-ai search did not surface agentmemory"
-  echo "$search_out" | head -40
+# flox-agent must see the plugin it will hand to Claude Code. Capture
+# the output with `|| true` so a non-zero exit doesn't fail the pipe
+# under `pipefail`.
+list_out="$(flox-agent list 2>&1 || true)"
+if ! grep -q agent-plugin-agentmemory <<<"$list_out"; then
+  echo "Error: flox-agent list did not show agentmemory"
+  echo "$list_out" | head -40
   exit 1
 fi
-echo ">>> flox-ai sees the agentmemory plugin"
+echo ">>> flox-agent sees the agentmemory plugin"
 
 # Service must be defined.
 status="$(flox services status 2>&1)"

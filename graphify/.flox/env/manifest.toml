@@ -13,11 +13,12 @@ Graphify CLI for turning code and documents into knowledge graphs.
 #   environments = [{ remote = "flox/graphify" }]
 #
 # Provides Python 3.11 with the graphify CLI installed in a
-# venv, plus the claude-code CLI used by the skill.
+# venv, plus Claude Code and flox-agent to run it
+# (`flox-agent launch claude`).
 
 [install]
-flox-ai.pkg-path = "flox/flox-ai"
-flox-ai.pkg-group = "flox-ai"
+flox-agent.pkg-path = "flox/flox-agent"
+flox-agent.pkg-group = "flox-agent"
 python.pkg-path = "python311"
 python.pkg-group = "graphify"
 claude-code.pkg-path = "flox/claude-code"
@@ -54,10 +55,6 @@ VIRTUAL_ENV_DISABLE_PROMPT = "1"
 
 [hook]
 on-activate = '''
-# flox-ai sets up Claude Code config + discovers the bundled skill
-# (was previously provided via the flox/claude include).
-eval "$(flox-ai setup-hook)"
-
 export PYTHON_DIR="$FLOX_ENV_CACHE/python"
 
 CURRENT_INTERP="$(realpath "$(which python3)")"

@@ -14,9 +14,10 @@ seo_description: >
   Claude Code plugin. ffmpeg comes from Remotion itself.
 intro: >
   flox/remotion sets up a Remotion-ready Node 22 sandbox and
-  composes flox/claude with skills-remotion so
-  the Remotion best-practices skill loads automatically
-  whenever Claude touches Remotion code. ffmpeg/ffprobe are
+  ships Claude Code with the Remotion skills plugin, so
+  Claude sessions started with `flox-agent launch claude`
+  pick up the Remotion skills whenever they touch Remotion
+  code. ffmpeg/ffprobe are
   intentionally not in the closure — Remotion ships its own
   via `npx remotion ffmpeg`, which is what the skill tells
   the agent to use. Useful for building videos
@@ -30,7 +31,7 @@ summary:
   - "Node 22 ready for `npx create-video`, `remotion studio`, `remotion render`"
   - "Remotion best-practices skill auto-loaded in Claude Code"
   - "ffmpeg sourced from Remotion itself — no host install"
-  - "Composes cleanly with flox/claude"
+  - "Claude Code and the Remotion skills plugin via flox-agent"
 category: ai
 ai_role: tooling
 tags: [video, react, claude-code, plugin, programmatic-video]

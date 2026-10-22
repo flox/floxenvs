@@ -4,9 +4,13 @@
     "schema-version": "1.17.0",
     "description": "# Playwright demo — browser automation in a Flox env\n\nInstall the chromium binary (first time only):\n\n```bash\nplaywright install chromium\n```\n\nRun the sample test against demo.playwright.dev:\n\n```bash\nplaywright test\n```\n\nOr expose Playwright as an MCP service:\n\n```bash\nflox services start playwright-mcp\n```\n\nOr drive a browser directly from the CLI:\n\n```bash\nplaywright-cli open https://playwright.dev\n```\n",
     "install": {
-      "flox-ai": {
-        "pkg-path": "flox/flox-ai",
-        "pkg-group": "flox-ai"
+      "agent-plugin-playwright-cli": {
+        "pkg-path": "agent-stacks/agent-plugin-microsoft-playwright-cli",
+        "pkg-group": "agent-plugin-playwright-cli"
+      },
+      "flox-agent": {
+        "pkg-path": "flox/flox-agent",
+        "pkg-group": "flox-agent"
       },
       "gum": {
         "pkg-path": "gum",
@@ -30,10 +34,6 @@
       },
       "playwright-test": {
         "pkg-path": "playwright-test",
-        "pkg-group": "playwright"
-      },
-      "skills-playwright-cli": {
-        "pkg-path": "flox/skills-playwright-cli",
         "pkg-group": "playwright"
       }
     },
@@ -59,6 +59,90 @@
     }
   },
   "packages": [
+    {
+      "attr_path": "agent-plugin-microsoft-playwright-cli",
+      "broken": false,
+      "derivation": "/nix/store/pz1lsnlfyvgi5mij539ygvkbw1wpkrw9-agent-plugin-microsoft-playwright-cli-0.0.0-unstable.2026-09-28.gb85c7a7.drv",
+      "description": "Agent plugin imported from https://github.com/microsoft/playwright-cli",
+      "install_id": "agent-plugin-playwright-cli",
+      "locked_url": "file:///tmp/tmp.xXH2uocfp5?rev=e080e42ad80b8ee13c0e3dd8d40e3dcf1038ac7a",
+      "name": "agent-plugin-microsoft-playwright-cli-0.0.0-unstable.2026-09-28.gb85c7a7",
+      "pname": "agent-plugin-microsoft-playwright-cli",
+      "rev": "e080e42ad80b8ee13c0e3dd8d40e3dcf1038ac7a",
+      "rev_count": 1,
+      "rev_date": "2026-10-19T04:04:42Z",
+      "scrape_date": "2026-10-19T14:41:09.027388Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.0.0-unstable.2026-09-28.gb85c7a7",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/l7mykj39xc8kivsly4b9l50a46gxckf2-agent-plugin-microsoft-playwright-cli-0.0.0-unstable.2026-09-28.gb85c7a7"
+      },
+      "system": "aarch64-darwin",
+      "group": "agent-plugin-playwright-cli",
+      "priority": 5
+    },
+    {
+      "attr_path": "agent-plugin-microsoft-playwright-cli",
+      "broken": false,
+      "derivation": "/nix/store/30mkqq602pmfb5v4fqlclsw87f00k582-agent-plugin-microsoft-playwright-cli-0.0.0-unstable.2026-09-28.gb85c7a7.drv",
+      "description": "Agent plugin imported from https://github.com/microsoft/playwright-cli",
+      "install_id": "agent-plugin-playwright-cli",
+      "locked_url": "file:///tmp/tmp.2yyW61rhvt?rev=00252a74f705702fb9637a8601042274d9b52379",
+      "name": "agent-plugin-microsoft-playwright-cli-0.0.0-unstable.2026-09-28.gb85c7a7",
+      "pname": "agent-plugin-microsoft-playwright-cli",
+      "rev": "00252a74f705702fb9637a8601042274d9b52379",
+      "rev_count": 1,
+      "rev_date": "2026-10-19T11:40:43Z",
+      "scrape_date": "2026-10-19T14:41:09.027392Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.0.0-unstable.2026-09-28.gb85c7a7",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/qfvaj5n1n6303dq8vfg5h534yvass63w-agent-plugin-microsoft-playwright-cli-0.0.0-unstable.2026-09-28.gb85c7a7"
+      },
+      "system": "aarch64-linux",
+      "group": "agent-plugin-playwright-cli",
+      "priority": 5
+    },
+    {
+      "attr_path": "agent-plugin-microsoft-playwright-cli",
+      "broken": false,
+      "derivation": "/nix/store/zfk2xnc0iympqy3ljxl03r2g0xm4jq86-agent-plugin-microsoft-playwright-cli-0.0.0-unstable.2026-09-28.gb85c7a7.drv",
+      "description": "Agent plugin imported from https://github.com/microsoft/playwright-cli",
+      "install_id": "agent-plugin-playwright-cli",
+      "locked_url": "file:///tmp/tmp.o2jdEKh8ZH?rev=3aaf38d13040fb3ba3c6ce7f28e70578703df674",
+      "name": "agent-plugin-microsoft-playwright-cli-0.0.0-unstable.2026-09-28.gb85c7a7",
+      "pname": "agent-plugin-microsoft-playwright-cli",
+      "rev": "3aaf38d13040fb3ba3c6ce7f28e70578703df674",
+      "rev_count": 1,
+      "rev_date": "2026-10-19T11:59:44Z",
+      "scrape_date": "2026-10-19T14:41:09.027393Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.0.0-unstable.2026-09-28.gb85c7a7",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/a061yagk5crdgnfhq06flvfxz106gqib-agent-plugin-microsoft-playwright-cli-0.0.0-unstable.2026-09-28.gb85c7a7"
+      },
+      "system": "x86_64-linux",
+      "group": "agent-plugin-playwright-cli",
+      "priority": 5
+    },
     {
       "attr_path": "gum",
       "broken": false,
@@ -147,93 +231,93 @@
       "priority": 5
     },
     {
-      "attr_path": "flox-ai",
+      "attr_path": "flox-agent",
       "broken": false,
-      "derivation": "/nix/store/57jfyz6s1dig32zmb9ik9ih8kqkvv7dd-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
+      "derivation": "/nix/store/76p691rnrk4zcmlch455cksasw2xr7bg-flox-agent-0.9.0-259-g292d9be.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-10-19T02:50:47.705234565Z",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=292d9bede3475f011489ce050077ef421259bae8",
+      "name": "flox-agent-0.9.0-259-g292d9be",
+      "pname": "flox-agent",
+      "rev": "292d9bede3475f011489ce050077ef421259bae8",
+      "rev_count": 461,
+      "rev_date": "2026-10-16T21:14:11Z",
+      "scrape_date": "2026-10-19T14:41:09.027399Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0.8.0",
+      "version": "0.9.0-259-g292d9be",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/crwyb5188yw5lv4znqprzbiqg5vy4ibd-flox-ai-0.8.0"
+        "out": "/nix/store/yjkhm54ac4p1iaclackafwv19y1gywl5-flox-agent-0.9.0-259-g292d9be"
       },
       "system": "aarch64-darwin",
-      "group": "flox-ai",
+      "group": "flox-agent",
       "priority": 5
     },
     {
-      "attr_path": "flox-ai",
+      "attr_path": "flox-agent",
       "broken": false,
-      "derivation": "/nix/store/1clj1qp1zchjr18xqd6h5qy4krnbfp7x-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
+      "derivation": "/nix/store/fz9ycqqq3zwrvnw0bmhjm9qm89znqcms-flox-agent-0.9.0-259-g292d9be.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-10-19T02:50:47.705235026Z",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=292d9bede3475f011489ce050077ef421259bae8",
+      "name": "flox-agent-0.9.0-259-g292d9be",
+      "pname": "flox-agent",
+      "rev": "292d9bede3475f011489ce050077ef421259bae8",
+      "rev_count": 461,
+      "rev_date": "2026-10-16T21:14:11Z",
+      "scrape_date": "2026-10-19T14:41:09.027400Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0.8.0",
+      "version": "0.9.0-259-g292d9be",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/4zf5cxf627sbr8syddjx7j5pmk4321ri-flox-ai-0.8.0"
+        "out": "/nix/store/sq0d7d2bi74nwvld24vckgl4q30ncyfi-flox-agent-0.9.0-259-g292d9be"
       },
       "system": "aarch64-linux",
-      "group": "flox-ai",
+      "group": "flox-agent",
       "priority": 5
     },
     {
-      "attr_path": "flox-ai",
+      "attr_path": "flox-agent",
       "broken": false,
-      "derivation": "/nix/store/w14almryjawbkglkr56spfxi25ihvhzw-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
+      "derivation": "/nix/store/68b0hk6pclqlx77243xa5vd3pm6afn1q-flox-agent-0.9.0-259-g292d9be.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-10-19T02:50:47.705237049Z",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=292d9bede3475f011489ce050077ef421259bae8",
+      "name": "flox-agent-0.9.0-259-g292d9be",
+      "pname": "flox-agent",
+      "rev": "292d9bede3475f011489ce050077ef421259bae8",
+      "rev_count": 461,
+      "rev_date": "2026-10-16T21:14:11Z",
+      "scrape_date": "2026-10-19T14:41:09.027403Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0.8.0",
+      "version": "0.9.0-259-g292d9be",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/0d1s3sqq8r88f30qjg29gw76vl4gfbwg-flox-ai-0.8.0"
+        "out": "/nix/store/n2mlcszspfj5dkwsx6avqqf3gbqyzafq-flox-agent-0.9.0-259-g292d9be"
       },
       "system": "x86_64-linux",
-      "group": "flox-ai",
+      "group": "flox-agent",
       "priority": 5
     },
     {
@@ -676,93 +760,6 @@
       "system": "x86_64-linux",
       "group": "playwright",
       "priority": 5
-    },
-    {
-      "attr_path": "skills-playwright-cli",
-      "broken": false,
-      "derivation": "/nix/store/mv39ihwc3flmdcsxzj2k336410jlk7ip-skills-playwright-cli-0+unstable-2026-09-28.b85c7a7.drv",
-      "description": "Playwright CLI skill bundle for Claude Code and OpenCode — drives playwright-cli from an agent via a token-efficient command set.",
-      "install_id": "skills-playwright-cli",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/floxenvs?rev=5dc0999cee5775785222e0b2c02ffdc8c72c3d2b",
-      "name": "skills-playwright-cli-0+unstable-2026-09-28.b85c7a7",
-      "pname": "skills-playwright-cli",
-      "rev": "5dc0999cee5775785222e0b2c02ffdc8c72c3d2b",
-      "rev_count": 26287,
-      "rev_date": "2026-09-29T08:02:12Z",
-      "scrape_date": "2026-10-19T02:50:47.705289197Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0+unstable-2026-09-28.b85c7a7",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/ja037g2wlsd1syn2rw87w484mad655sj-skills-playwright-cli-0+unstable-2026-09-28.b85c7a7"
-      },
-      "system": "aarch64-darwin",
-      "group": "playwright",
-      "priority": 5
-    },
-    {
-      "attr_path": "skills-playwright-cli",
-      "broken": false,
-      "derivation": "/nix/store/w9j4ma9k5yqvc4p71i8akj7bkag4zhbq-skills-playwright-cli-0+unstable-2026-09-28.b85c7a7.drv",
-      "description": "Playwright CLI skill bundle for Claude Code and OpenCode — drives playwright-cli from an agent via a token-efficient command set.",
-      "install_id": "skills-playwright-cli",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/floxenvs?rev=5dc0999cee5775785222e0b2c02ffdc8c72c3d2b",
-      "name": "skills-playwright-cli-0+unstable-2026-09-28.b85c7a7",
-      "pname": "skills-playwright-cli",
-      "rev": "5dc0999cee5775785222e0b2c02ffdc8c72c3d2b",
-      "rev_count": 26287,
-      "rev_date": "2026-09-29T08:02:12Z",
-      "scrape_date": "2026-10-19T02:50:47.705289758Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0+unstable-2026-09-28.b85c7a7",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/152vplavk4kpqdq4vq6qn0nw903j6ivw-skills-playwright-cli-0+unstable-2026-09-28.b85c7a7"
-      },
-      "system": "aarch64-linux",
-      "group": "playwright",
-      "priority": 5
-    },
-    {
-      "attr_path": "skills-playwright-cli",
-      "broken": false,
-      "derivation": "/nix/store/hzv2xggl9mwrl6brx3imb6xjxk3k7703-skills-playwright-cli-0+unstable-2026-09-28.b85c7a7.drv",
-      "description": "Playwright CLI skill bundle for Claude Code and OpenCode — drives playwright-cli from an agent via a token-efficient command set.",
-      "install_id": "skills-playwright-cli",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/floxenvs?rev=5dc0999cee5775785222e0b2c02ffdc8c72c3d2b",
-      "name": "skills-playwright-cli-0+unstable-2026-09-28.b85c7a7",
-      "pname": "skills-playwright-cli",
-      "rev": "5dc0999cee5775785222e0b2c02ffdc8c72c3d2b",
-      "rev_count": 26287,
-      "rev_date": "2026-09-29T08:02:12Z",
-      "scrape_date": "2026-10-19T02:50:47.705290489Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0+unstable-2026-09-28.b85c7a7",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/d3dz27w73wmhr29n0b00chwx9964c02z-skills-playwright-cli-0+unstable-2026-09-28.b85c7a7"
-      },
-      "system": "x86_64-linux",
-      "group": "playwright",
-      "priority": 5
     }
   ],
   "compose": {
@@ -799,9 +796,13 @@
           "schema-version": "1.17.0",
           "description": "Playwright browser testing and automation tools with MCP support.\n",
           "install": {
-            "flox-ai": {
-              "pkg-path": "flox/flox-ai",
-              "pkg-group": "flox-ai"
+            "agent-plugin-playwright-cli": {
+              "pkg-path": "agent-stacks/agent-plugin-microsoft-playwright-cli",
+              "pkg-group": "agent-plugin-playwright-cli"
+            },
+            "flox-agent": {
+              "pkg-path": "flox/flox-agent",
+              "pkg-group": "flox-agent"
             },
             "playwright": {
               "pkg-path": "playwright",
@@ -821,10 +822,6 @@
             },
             "playwright-test": {
               "pkg-path": "playwright-test",
-              "pkg-group": "playwright"
-            },
-            "skills-playwright-cli": {
-              "pkg-path": "flox/skills-playwright-cli",
               "pkg-group": "playwright"
             }
           },

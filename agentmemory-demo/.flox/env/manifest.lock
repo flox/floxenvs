@@ -2,15 +2,19 @@
   "lockfile-version": 1,
   "manifest": {
     "schema-version": "1.17.0",
-    "description": "# agentmemory — persistent memory for Claude Code\n\nStart the backend in the background:\n\n```bash\nflox services start\nflox activate --start-services\n```\n\nPlugin:\n\n```text\n$FLOX_ENV/share/claude-code/plugins/agentmemory\n```\n\nTry it:\n\n```bash\nclaude  # then /recall, /remember, /handoff\n```\n",
+    "description": "# agentmemory — persistent memory for Claude Code\n\nStart the backend in the background:\n\n```bash\nflox services start\nflox activate --start-services\n```\n\nPlugin:\n\n```text\n$FLOX_ENV/share/agent-plugins/agentmemory\n```\n\nTry it:\n\n```bash\nflox-agent launch claude  # then /recall, /remember, /handoff\n```\n",
     "install": {
+      "agent-plugin-agentmemory": {
+        "pkg-path": "agent-stacks/agent-plugin-agentmemory",
+        "pkg-group": "agent-plugin-agentmemory"
+      },
       "claude-code": {
         "pkg-path": "flox/claude-code",
         "pkg-group": "claude-code"
       },
-      "flox-ai": {
-        "pkg-path": "flox/flox-ai",
-        "pkg-group": "flox-ai"
+      "flox-agent": {
+        "pkg-path": "flox/flox-agent",
+        "pkg-group": "flox-agent"
       },
       "gum": {
         "pkg-path": "gum",
@@ -19,10 +23,6 @@
       "nodejs": {
         "pkg-path": "nodejs_20",
         "pkg-group": "agentmemory"
-      },
-      "skills-agentmemory": {
-        "pkg-path": "flox/skills-agentmemory",
-        "pkg-group": "skills-agentmemory"
       }
     },
     "vars": {
@@ -31,12 +31,7 @@
       "AGENTMEMORY_VERSION": "0.9.20"
     },
     "hook": {
-      "on-activate": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\nmkdir -p \"$npm_config_cache\"\neval \"$(flox-ai setup-hook)\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'REST + MCP:' \\\n    \"  $AGENTMEMORY_URL\" \\\n    '' \\\n    'Pinned server version:' \\\n    \"  $AGENTMEMORY_VERSION\"\nfi\n"
-    },
-    "profile": {
-      "bash": "eval \"$(flox-ai setup-profile-bash)\"\n",
-      "zsh": "eval \"$(flox-ai setup-profile-zsh)\"\n",
-      "fish": "flox-ai setup-profile-fish | source\n"
+      "on-activate": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\nmkdir -p \"$npm_config_cache\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'REST + MCP:' \\\n    \"  $AGENTMEMORY_URL\" \\\n    '' \\\n    'Pinned server version:' \\\n    \"  $AGENTMEMORY_VERSION\"\nfi\n"
     },
     "options": {
       "systems": [
@@ -52,6 +47,93 @@
     }
   },
   "packages": [
+    {
+      "attr_path": "agent-plugin-agentmemory",
+      "broken": false,
+      "derivation": "/nix/store/yaj4xm4cjd1hyyrkj50wbq0m01r1fmvl-agent-plugin-agentmemory-0.9.30.drv",
+      "description": "Persistent memory for AI coding agents",
+      "install_id": "agent-plugin-agentmemory",
+      "license": "Apache-2.0",
+      "locked_url": "file:///tmp/tmp.zoWiihzkbk?rev=115247cf2ea80377e462b66d742ed95a2800d786",
+      "name": "agent-plugin-agentmemory-0.9.30",
+      "pname": "agent-plugin-agentmemory",
+      "rev": "115247cf2ea80377e462b66d742ed95a2800d786",
+      "rev_count": 1,
+      "rev_date": "2026-10-19T12:18:56Z",
+      "scrape_date": "2026-10-19T14:41:00.459152Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.9.30",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/g2qg093lylr951wryz8wc9ksw5fnzm30-agent-plugin-agentmemory-0.9.30"
+      },
+      "system": "aarch64-darwin",
+      "group": "agent-plugin-agentmemory",
+      "priority": 5
+    },
+    {
+      "attr_path": "agent-plugin-agentmemory",
+      "broken": false,
+      "derivation": "/nix/store/22zmc1q59i8q3s1zc8r7s007yv7dyrs8-agent-plugin-agentmemory-0.9.30.drv",
+      "description": "Persistent memory for AI coding agents",
+      "install_id": "agent-plugin-agentmemory",
+      "license": "Apache-2.0",
+      "locked_url": "file:///tmp/tmp.ihANgCPAM7?rev=a45b252aa63f2d8fda461848ef1c03b29cebc8be",
+      "name": "agent-plugin-agentmemory-0.9.30",
+      "pname": "agent-plugin-agentmemory",
+      "rev": "a45b252aa63f2d8fda461848ef1c03b29cebc8be",
+      "rev_count": 1,
+      "rev_date": "2026-10-19T10:25:06Z",
+      "scrape_date": "2026-10-19T14:41:00.459156Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.9.30",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/bbs02zz32fmgz48sz002lcadsh1smj1v-agent-plugin-agentmemory-0.9.30"
+      },
+      "system": "aarch64-linux",
+      "group": "agent-plugin-agentmemory",
+      "priority": 5
+    },
+    {
+      "attr_path": "agent-plugin-agentmemory",
+      "broken": false,
+      "derivation": "/nix/store/cihd58gik59vkxfqwl3nnjfv2f78j8s2-agent-plugin-agentmemory-0.9.30.drv",
+      "description": "Persistent memory for AI coding agents",
+      "install_id": "agent-plugin-agentmemory",
+      "license": "Apache-2.0",
+      "locked_url": "file:///tmp/tmp.zMHsooi4mz?rev=93110d0c21cfbf1657fab7f46abd5c55544b3ea9",
+      "name": "agent-plugin-agentmemory-0.9.30",
+      "pname": "agent-plugin-agentmemory",
+      "rev": "93110d0c21cfbf1657fab7f46abd5c55544b3ea9",
+      "rev_count": 1,
+      "rev_date": "2026-10-19T03:48:10Z",
+      "scrape_date": "2026-10-19T14:41:00.459157Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.9.30",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/4aq2gysp2ikax1wcvv8s5s6lxkd2k9ls-agent-plugin-agentmemory-0.9.30"
+      },
+      "system": "x86_64-linux",
+      "group": "agent-plugin-agentmemory",
+      "priority": 5
+    },
     {
       "attr_path": "nodejs_20",
       "broken": false,
@@ -148,27 +230,29 @@
     {
       "attr_path": "claude-code",
       "broken": false,
-      "derivation": "/nix/store/gc410pzwv6509iw6yxf0p30vi3ng5gsc-claude-code-2.1.289.drv",
+      "derivation": "/nix/store/shlsz2jg9zwdrp6gilbqgj6pvv037liq-claude-code-2.1.303.drv",
       "description": "Agentic coding tool from Anthropic",
       "install_id": "claude-code",
       "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=381d487ad5e09abb3b45bad3acc9ef6633a96b80",
-      "name": "claude-code-2.1.289",
+      "locked_url": "https://github.com/flox/floxenvs?rev=0d22191d11862731c079ead5271bad477bb87a7f",
+      "name": "claude-code-2.1.303",
       "pname": "claude-code",
-      "rev": "381d487ad5e09abb3b45bad3acc9ef6633a96b80",
-      "rev_count": 26953,
-      "rev_date": "2026-10-04T02:01:00Z",
-      "scrape_date": "2026-10-05T01:23:10.218774302Z",
+      "rev": "0d22191d11862731c079ead5271bad477bb87a7f",
+      "rev_count": 29313,
+      "rev_date": "2026-10-19T01:03:09Z",
+      "scrape_date": "2026-10-19T15:16:35.541042Z",
       "stabilities": [
-        "unstable"
+        "unstable",
+        "stable",
+        "staging"
       ],
       "unfree": true,
-      "version": "2.1.289",
+      "version": "2.1.303",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/xyil7vh4vvzfk7dribbdvnbvrm3993d8-claude-code-2.1.289"
+        "out": "/nix/store/wyc7hni8i1zm1k7rrx2pq263yp1lm8x1-claude-code-2.1.303"
       },
       "system": "aarch64-darwin",
       "group": "claude-code",
@@ -177,27 +261,29 @@
     {
       "attr_path": "claude-code",
       "broken": false,
-      "derivation": "/nix/store/9fmpdp1fqddmkhc3kp46rmki9jkh35lz-claude-code-2.1.289.drv",
+      "derivation": "/nix/store/mz98f5jivp21knk6h07345l1c5zplqvs-claude-code-2.1.303.drv",
       "description": "Agentic coding tool from Anthropic",
       "install_id": "claude-code",
       "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=381d487ad5e09abb3b45bad3acc9ef6633a96b80",
-      "name": "claude-code-2.1.289",
+      "locked_url": "https://github.com/flox/floxenvs?rev=0d22191d11862731c079ead5271bad477bb87a7f",
+      "name": "claude-code-2.1.303",
       "pname": "claude-code",
-      "rev": "381d487ad5e09abb3b45bad3acc9ef6633a96b80",
-      "rev_count": 26953,
-      "rev_date": "2026-10-04T02:01:00Z",
-      "scrape_date": "2026-10-05T01:23:10.218774923Z",
+      "rev": "0d22191d11862731c079ead5271bad477bb87a7f",
+      "rev_count": 29313,
+      "rev_date": "2026-10-19T01:03:09Z",
+      "scrape_date": "2026-10-19T15:16:35.541046Z",
       "stabilities": [
-        "unstable"
+        "unstable",
+        "stable",
+        "staging"
       ],
       "unfree": true,
-      "version": "2.1.289",
+      "version": "2.1.303",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/kj8n4sayvldahkjzmqmw29zf1vkh6ypn-claude-code-2.1.289"
+        "out": "/nix/store/6819yq8938w81a8iqv9966gcbms0p41h-claude-code-2.1.303"
       },
       "system": "aarch64-linux",
       "group": "claude-code",
@@ -206,27 +292,29 @@
     {
       "attr_path": "claude-code",
       "broken": false,
-      "derivation": "/nix/store/w23pa7pxsdf6zkhjjvzhqh9z6vs0a9ji-claude-code-2.1.289.drv",
+      "derivation": "/nix/store/qkf1bqzak92lllvf6ig5h7nfj9sxw1xj-claude-code-2.1.303.drv",
       "description": "Agentic coding tool from Anthropic",
       "install_id": "claude-code",
       "license": "Unfree",
-      "locked_url": "https://github.com/flox/floxenvs?rev=381d487ad5e09abb3b45bad3acc9ef6633a96b80",
-      "name": "claude-code-2.1.289",
+      "locked_url": "https://github.com/flox/floxenvs?rev=0d22191d11862731c079ead5271bad477bb87a7f",
+      "name": "claude-code-2.1.303",
       "pname": "claude-code",
-      "rev": "381d487ad5e09abb3b45bad3acc9ef6633a96b80",
-      "rev_count": 26953,
-      "rev_date": "2026-10-04T02:01:00Z",
-      "scrape_date": "2026-10-05T01:23:10.218776987Z",
+      "rev": "0d22191d11862731c079ead5271bad477bb87a7f",
+      "rev_count": 29313,
+      "rev_date": "2026-10-19T01:03:09Z",
+      "scrape_date": "2026-10-19T15:16:35.541047Z",
       "stabilities": [
-        "unstable"
+        "unstable",
+        "stable",
+        "staging"
       ],
       "unfree": true,
-      "version": "2.1.289",
+      "version": "2.1.303",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/bb3hjmf7w2l94bvklzmx8djh2n877rg5-claude-code-2.1.289"
+        "out": "/nix/store/19ck8mj9yrh9is33dc0cmhm7yz74i9c4-claude-code-2.1.303"
       },
       "system": "x86_64-linux",
       "group": "claude-code",
@@ -323,193 +411,100 @@
       "priority": 5
     },
     {
-      "attr_path": "flox-ai",
+      "attr_path": "flox-agent",
       "broken": false,
-      "derivation": "/nix/store/57jfyz6s1dig32zmb9ik9ih8kqkvv7dd-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
+      "derivation": "/nix/store/76p691rnrk4zcmlch455cksasw2xr7bg-flox-agent-0.9.0-259-g292d9be.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-10-05T01:23:10.218956753Z",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=292d9bede3475f011489ce050077ef421259bae8",
+      "name": "flox-agent-0.9.0-259-g292d9be",
+      "pname": "flox-agent",
+      "rev": "292d9bede3475f011489ce050077ef421259bae8",
+      "rev_count": 461,
+      "rev_date": "2026-10-16T21:14:11Z",
+      "scrape_date": "2026-10-19T14:41:00.459176Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0.8.0",
+      "version": "0.9.0-259-g292d9be",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/crwyb5188yw5lv4znqprzbiqg5vy4ibd-flox-ai-0.8.0"
+        "out": "/nix/store/yjkhm54ac4p1iaclackafwv19y1gywl5-flox-agent-0.9.0-259-g292d9be"
       },
       "system": "aarch64-darwin",
-      "group": "flox-ai",
+      "group": "flox-agent",
       "priority": 5
     },
     {
-      "attr_path": "flox-ai",
+      "attr_path": "flox-agent",
       "broken": false,
-      "derivation": "/nix/store/1clj1qp1zchjr18xqd6h5qy4krnbfp7x-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
+      "derivation": "/nix/store/fz9ycqqq3zwrvnw0bmhjm9qm89znqcms-flox-agent-0.9.0-259-g292d9be.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-10-05T01:23:10.218958557Z",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=292d9bede3475f011489ce050077ef421259bae8",
+      "name": "flox-agent-0.9.0-259-g292d9be",
+      "pname": "flox-agent",
+      "rev": "292d9bede3475f011489ce050077ef421259bae8",
+      "rev_count": 461,
+      "rev_date": "2026-10-16T21:14:11Z",
+      "scrape_date": "2026-10-19T14:41:00.459177Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0.8.0",
+      "version": "0.9.0-259-g292d9be",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/4zf5cxf627sbr8syddjx7j5pmk4321ri-flox-ai-0.8.0"
+        "out": "/nix/store/sq0d7d2bi74nwvld24vckgl4q30ncyfi-flox-agent-0.9.0-259-g292d9be"
       },
       "system": "aarch64-linux",
-      "group": "flox-ai",
+      "group": "flox-agent",
       "priority": 5
     },
     {
-      "attr_path": "flox-ai",
+      "attr_path": "flox-agent",
       "broken": false,
-      "derivation": "/nix/store/w14almryjawbkglkr56spfxi25ihvhzw-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
+      "derivation": "/nix/store/68b0hk6pclqlx77243xa5vd3pm6afn1q-flox-agent-0.9.0-259-g292d9be.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-10-05T01:23:10.218959689Z",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=292d9bede3475f011489ce050077ef421259bae8",
+      "name": "flox-agent-0.9.0-259-g292d9be",
+      "pname": "flox-agent",
+      "rev": "292d9bede3475f011489ce050077ef421259bae8",
+      "rev_count": 461,
+      "rev_date": "2026-10-16T21:14:11Z",
+      "scrape_date": "2026-10-19T14:41:00.459178Z",
       "stabilities": [
         "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0.8.0",
+      "version": "0.9.0-259-g292d9be",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/0d1s3sqq8r88f30qjg29gw76vl4gfbwg-flox-ai-0.8.0"
+        "out": "/nix/store/n2mlcszspfj5dkwsx6avqqf3gbqyzafq-flox-agent-0.9.0-259-g292d9be"
       },
       "system": "x86_64-linux",
-      "group": "flox-ai",
-      "priority": 5
-    },
-    {
-      "attr_path": "skills-agentmemory",
-      "broken": false,
-      "derivation": "/nix/store/6dwlxb76z4mh2bq0q8aq2n3j6d1wi3yd-skills-agentmemory-0.9.29.drv",
-      "description": "agentmemory plugin for Claude Code (13 hooks + 8 skills) with Node.js bundled for the hook scripts and MCP shim.",
-      "install_id": "skills-agentmemory",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/floxenvs?rev=77e59f83af9616e048c8c1ae9803b5772d114a8a",
-      "name": "skills-agentmemory-0.9.29",
-      "pname": "skills-agentmemory",
-      "rev": "77e59f83af9616e048c8c1ae9803b5772d114a8a",
-      "rev_count": 20454,
-      "rev_date": "2026-08-16T19:01:47Z",
-      "scrape_date": "2026-10-05T01:23:10.218975629Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "0.9.29",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/x4ga39ir4amydh52f3x3kngbbiv7pnzz-skills-agentmemory-0.9.29"
-      },
-      "system": "aarch64-darwin",
-      "group": "skills-agentmemory",
-      "priority": 5
-    },
-    {
-      "attr_path": "skills-agentmemory",
-      "broken": false,
-      "derivation": "/nix/store/r5vw3xbzzfx9z0gs1fa8aqg84302xxxb-skills-agentmemory-0.9.29.drv",
-      "description": "agentmemory plugin for Claude Code (13 hooks + 8 skills) with Node.js bundled for the hook scripts and MCP shim.",
-      "install_id": "skills-agentmemory",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/floxenvs?rev=77e59f83af9616e048c8c1ae9803b5772d114a8a",
-      "name": "skills-agentmemory-0.9.29",
-      "pname": "skills-agentmemory",
-      "rev": "77e59f83af9616e048c8c1ae9803b5772d114a8a",
-      "rev_count": 20454,
-      "rev_date": "2026-08-16T19:01:47Z",
-      "scrape_date": "2026-10-05T01:23:10.218977151Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "0.9.29",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/bk2gad4lm1xqzdsrilssbrikysxlla0j-skills-agentmemory-0.9.29"
-      },
-      "system": "aarch64-linux",
-      "group": "skills-agentmemory",
-      "priority": 5
-    },
-    {
-      "attr_path": "skills-agentmemory",
-      "broken": false,
-      "derivation": "/nix/store/4b4djl8dsdml8fvp2882r5j8w22imzrq-skills-agentmemory-0.9.29.drv",
-      "description": "agentmemory plugin for Claude Code (13 hooks + 8 skills) with Node.js bundled for the hook scripts and MCP shim.",
-      "install_id": "skills-agentmemory",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/floxenvs?rev=77e59f83af9616e048c8c1ae9803b5772d114a8a",
-      "name": "skills-agentmemory-0.9.29",
-      "pname": "skills-agentmemory",
-      "rev": "77e59f83af9616e048c8c1ae9803b5772d114a8a",
-      "rev_count": 20454,
-      "rev_date": "2026-08-16T19:01:47Z",
-      "scrape_date": "2026-10-05T01:23:10.218978654Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "0.9.29",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/7vbg4llpkwvm5kbc92ic1gjkd5195q22-skills-agentmemory-0.9.29"
-      },
-      "system": "x86_64-linux",
-      "group": "skills-agentmemory",
+      "group": "flox-agent",
       "priority": 5
     }
   ],
   "compose": {
     "composer": {
       "schema-version": "1.17.0",
-      "description": "# agentmemory — persistent memory for Claude Code\n\nStart the backend in the background:\n\n```bash\nflox services start\nflox activate --start-services\n```\n\nPlugin:\n\n```text\n$FLOX_ENV/share/claude-code/plugins/agentmemory\n```\n\nTry it:\n\n```bash\nclaude  # then /recall, /remember, /handoff\n```\n",
+      "description": "# agentmemory — persistent memory for Claude Code\n\nStart the backend in the background:\n\n```bash\nflox services start\nflox activate --start-services\n```\n\nPlugin:\n\n```text\n$FLOX_ENV/share/agent-plugins/agentmemory\n```\n\nTry it:\n\n```bash\nflox-agent launch claude  # then /recall, /remember, /handoff\n```\n",
       "install": {
         "gum": {
           "pkg-path": "gum",
@@ -540,21 +535,21 @@
           "schema-version": "1.17.0",
           "description": "Persistent memory for coding agents with a REST and MCP backend.\n",
           "install": {
+            "agent-plugin-agentmemory": {
+              "pkg-path": "agent-stacks/agent-plugin-agentmemory",
+              "pkg-group": "agent-plugin-agentmemory"
+            },
             "claude-code": {
               "pkg-path": "flox/claude-code",
               "pkg-group": "claude-code"
             },
-            "flox-ai": {
-              "pkg-path": "flox/flox-ai",
-              "pkg-group": "flox-ai"
+            "flox-agent": {
+              "pkg-path": "flox/flox-agent",
+              "pkg-group": "flox-agent"
             },
             "nodejs": {
               "pkg-path": "nodejs_20",
               "pkg-group": "agentmemory"
-            },
-            "skills-agentmemory": {
-              "pkg-path": "flox/skills-agentmemory",
-              "pkg-group": "skills-agentmemory"
             }
           },
           "vars": {
@@ -563,12 +558,7 @@
             "AGENTMEMORY_VERSION": "0.9.20"
           },
           "hook": {
-            "on-activate": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\nmkdir -p \"$npm_config_cache\"\neval \"$(flox-ai setup-hook)\"\n"
-          },
-          "profile": {
-            "bash": "eval \"$(flox-ai setup-profile-bash)\"\n",
-            "zsh": "eval \"$(flox-ai setup-profile-zsh)\"\n",
-            "fish": "flox-ai setup-profile-fish | source\n"
+            "on-activate": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\nmkdir -p \"$npm_config_cache\"\n"
           },
           "options": {
             "systems": [

@@ -15,18 +15,18 @@ echo ">>> firecrawl --version ... OK"
 # Upstream renamed the entry skill firecrawl-cli -> firecrawl.
 for skill in firecrawl firecrawl-scrape firecrawl-search; do
   if [ ! -f \
-    "$FLOX_ENV/share/flox/claude/firecrawl-cli/skills/$skill/SKILL.md" ]; then
+    "$FLOX_ENV/share/agent-plugins/firecrawl/skills/$skill/SKILL.md" ]; then
     echo "Error: $skill SKILL.md not installed under" \
-      "\$FLOX_ENV/share/flox/claude/firecrawl-cli/skills/$skill/"
+      "\$FLOX_ENV/share/agent-plugins/firecrawl/skills/$skill/"
     exit 1
   fi
   echo ">>> skill $skill installed"
 done
 
-if ! flox-ai search firecrawl 2>&1 | grep -q "skills-firecrawl-cli"; then
-  echo "Error: flox-ai search did not surface the firecrawl-cli skill"
+if ! flox-agent list 2>&1 | grep -q "agent-plugin-firecrawl"; then
+  echo "Error: flox-agent list did not show the firecrawl plugin"
   exit 1
 fi
-echo ">>> flox-ai search firecrawl ... OK"
+echo ">>> flox-agent list shows firecrawl ... OK"
 
 echo ">>> firecrawl environment is working"

@@ -11,8 +11,8 @@ Node.js and agent skills for creating videos with Remotion.
 #   [include]
 #   environments = ["flox/remotion"]
 #
-# Ships Claude Code with the Remotion best-practices skill
-# pre-registered as a plugin, plus Node.js so
+# Ships Claude Code and the Remotion skills plugin, loaded
+# with `flox-agent launch claude`, plus Node.js so
 # `npx create-video@latest`, `npx remotion studio`, and
 # `npx remotion render` work out of the box. ffmpeg/ffprobe
 # are intentionally not installed — Remotion bundles its own
@@ -23,28 +23,12 @@ Node.js and agent skills for creating videos with Remotion.
 [install]
 claude-code.pkg-path = "flox/claude-code"
 claude-code.pkg-group = "claude-code"
-flox-ai.pkg-path = "flox/flox-ai"
-flox-ai.pkg-group = "flox-ai"
-skills-remotion.pkg-path = "flox/skills-remotion"
-skills-remotion.pkg-group = "skills-remotion"
+flox-agent.pkg-path = "flox/flox-agent"
+flox-agent.pkg-group = "flox-agent"
+agent-plugin-remotion.pkg-path = "agent-stacks/agent-plugin-remotion-dev-skills"
+agent-plugin-remotion.pkg-group = "agent-plugin-remotion"
 nodejs.pkg-path = "nodejs_22"
 nodejs.pkg-group = "remotion"
-
-[hook]
-on-activate = '''
-eval "$(flox-ai setup-hook)"
-'''
-
-[profile]
-bash = '''
-eval "$(flox-ai setup-profile-bash)"
-'''
-zsh = '''
-eval "$(flox-ai setup-profile-zsh)"
-'''
-fish = '''
-flox-ai setup-profile-fish | source
-'''
 
 [options]
 systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]

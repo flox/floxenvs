@@ -13,12 +13,12 @@ MCP tools.
 
 - `basic-memory` and `bm` from the
   [basic-memory](../basic-memory/) env
-- The `flox-ai` launcher from the [claude](../claude/) env
+- The `flox-agent` launcher
 - A pre-written `.mcp.json` wiring basic-memory into Claude Code
 
 ## Try it
 
-This env ships the `flox-ai` launcher but not Claude Code itself.
+This env ships the `flox-agent` launcher but not Claude Code itself.
 First install Claude Code (e.g. `flox install flox/claude-code`)
 or use your own install, then launch it with this env's skills and
 rules injected:
@@ -26,7 +26,7 @@ rules injected:
 ```bash
 cd basic-memory-demo
 flox activate
-flox-ai launch claude
+flox-agent launch claude
 ```
 
 Once Claude Code is running, ask it to:
@@ -56,7 +56,7 @@ On activate the demo writes:
 Claude Code reads `.mcp.json` from the current working directory.
 Because `basic-memory` is on PATH from the included env, the
 command resolves without any global config. Run
-`flox-ai launch claude` from a different directory and
+`flox-agent launch claude` from a different directory and
 basic-memory won't be wired — by design.
 
 ## Manual MCP smoke test

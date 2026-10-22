@@ -12,19 +12,19 @@ Firecrawl CLI and agent skills for scraping and crawling the web.
 #   environments = [{ remote = "flox/firecrawl" }]
 #
 # Provides the official Firecrawl CLI (`firecrawl`) and a
-# Claude Code / OpenCode skill bundle for driving it. flox-ai
-# auto-discovers the bundled skills. To use Claude Code,
-# install it (or bring your own) and run `flox-ai launch
-# claude`. Authenticate with a key from https://firecrawl.dev
+# Claude Code / OpenCode skill bundle for driving it. To use
+# Claude Code, install it (or bring your own) and run
+# `flox-agent launch claude`, which loads the bundled skills.
+# Authenticate with a key from https://firecrawl.dev
 # by exporting FIRECRAWL_API_KEY (or running `firecrawl login`).
 
 [install]
 firecrawl-cli.pkg-path = "flox/firecrawl-cli"
 firecrawl-cli.pkg-group = "firecrawl"
-skills-firecrawl-cli.pkg-path = "flox/skills-firecrawl-cli"
-skills-firecrawl-cli.pkg-group = "firecrawl"
-flox-ai.pkg-path = "flox/flox-ai"
-flox-ai.pkg-group = "flox-ai"
+agent-plugin-firecrawl.pkg-path = "agent-stacks/agent-plugin-firecrawl"
+agent-plugin-firecrawl.pkg-group = "agent-plugin-firecrawl"
+flox-agent.pkg-path = "flox/flox-agent"
+flox-agent.pkg-group = "flox-agent"
 
 [vars]
 # Set your Firecrawl API key here, export it before

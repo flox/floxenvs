@@ -38,7 +38,7 @@ environments = [{ remote = "flox/playwright" }]
 | `playwright-driver` | Browser drivers (chromium, firefox, webkit) |
 | `playwright-cli` | Microsoft `playwright-cli` — record / replay |
 | `playwright-mcp` | Playwright MCP server (STDIO + HTTP) |
-| `skills-playwright-cli` | Claude Code / OpenCode skill for `playwright-cli` |
+| `agent-stacks/agent-plugin-microsoft-playwright-cli` | Claude Code / OpenCode skill for `playwright-cli` |
 
 ## Configuration variables
 
@@ -75,13 +75,12 @@ the service if the browser binary isn't cached yet.
 
 First install Claude Code (e.g.
 `flox install flox/claude-code`) or use your own
-install, then run `flox-ai launch claude` to start it
+install, then run `flox-agent launch claude` to start it
 with this environment's skills and rules injected. The
-bundled `SKILL.md` at
-`$FLOX_ENV/share/claude-code/skills/playwright-cli/`
-is discovered by `flox-ai` and surfaced to Claude Code.
-Same for OpenCode under
-`$FLOX_ENV/share/opencode/skills/playwright-cli/`.
+bundled plugin at
+`$FLOX_ENV/share/agent-plugins/microsoft-playwright-cli/`
+is discovered by `flox-agent` and handed to Claude Code
+(or OpenCode, via `flox-agent launch opencode`).
 
 ## See also
 

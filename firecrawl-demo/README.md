@@ -52,7 +52,7 @@ command.
 
 To use Claude Code, first install it (e.g. `flox install
 flox/claude-code`) or bring your own install, then run
-`flox-ai launch claude` to start it with this
+`flox-agent launch claude` to start it with this
 environment's skills and rules injected. The skill files
 come from the included `flox/firecrawl` environment.
 
