@@ -137,7 +137,10 @@ rc=0
 cat "$work/audit.err" >&2
 if [ "$rc" -eq 3 ]; then
   reason="$(grep -m1 . "$work/audit.err" || echo "flox-agent audit exit 3")"
-  echo "::warning title=audit $NAME::not audited: ${reason//$'\r'/}"
+  # Workflow-command data must escape %, CR and LF.
+  reason="${reason//%/%25}"
+  reason="${reason//$'\r'/%0D}"
+  echo "::warning title=audit $NAME::not audited: ${reason//$'\n'/%0A}"
   echo "no metrics written for $NAME; the site keeps its previous ones" >&2
   exit 0
 elif [ "$rc" -ne 0 ]; then
@@ -168,11 +171,17 @@ done
 mv "$work/result.json" "$raw_file"
 
 # Map the result into metricsSchema.ts.
-#   - status comes from overall by the site's own thresholds (overallStatus
-#     in .website/src/lib/scoring.ts), since ScorePanel derives it that
-#     way; flox-agent's own status stays on the scanner row.
+#   - status is not written: ScorePanel derives it from overall with
+#     overallStatus (.website/src/lib/scoring.ts) and reads status only to
+#     spot "missing".
+#   - the scanner row carries flox-agent's status band in the words
+#     ScannerRow.astro renders (Passed / Warnings / Failed), and the worst
+#     severity found as its level.
+#   - security.cap stays 100: flox-agent scores 100 - risk and caps
+#     nothing, so a "Capped at ..." label would describe a rule that was
+#     not applied. The scanner row's level shows what drove the score.
 #   - quality scores check-plugin errors and warnings with the formula the
-#     earlier flox-agent ensemble used (100 - 25*errors - 5*warnings,
+#     earlier flox-ai ensemble used (100 - 25*errors - 5*warnings,
 #     clamped to 0-100), averaged over plugins.
 #   - security.findings is a per-severity tally (not the per-finding shape
 #     scripts/lib/*-to-findings.sh produce), plus INFO rows for components
@@ -180,8 +189,10 @@ mv "$work/result.json" "$raw_file"
 #   - reliability and impact are not measured for skills.
 jq --argjson identity "$identity" --slurpfile checks "$work/checks.jsonl" '
   def sevs: ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"];
-  def pill:
-    if . >= 80 then "stable" elif . >= 60 then "warn" else "risk" end;
+  def scanner_status:
+    {"safe": "Passed", "caution": "Warnings", "incomplete": "Warnings",
+     "do not install": "Failed"}[.]
+    // error("unknown flox-agent audit status: \(.)");
   def clamp: if . < 0 then 0 elif . > 100 then 100 else . end;
   def listed: if length > 5 then (.[:5] + ["…"]) else . end | join(", ");
   (.plugins | length > 1) as $multi
@@ -199,7 +210,6 @@ jq --argjson identity "$identity" --slurpfile checks "$work/checks.jsonl" '
   | {
       identity: $identity,
       overall: .score,
-      status: (.score | pill),
       quality: {
         score: ($checks
           | map(100 - 25 * .errors - 5 * .warnings | clamp)
@@ -219,7 +229,7 @@ jq --argjson identity "$identity" --slurpfile checks "$work/checks.jsonl" '
           tool: "\(.tool.name) \(.tool.version)",
           level: (first(sevs[] as $s | select($all | index($s)) | $s)
                   // "INFO"),
-          status: .status
+          status: (.status | scanner_status)
         }],
         findings: (
           [sevs[] as $s

@@ -37,8 +37,8 @@ assert_eq "rejects non-skill kind (env)" "2" "$?"
 # check-plugin reports valid with one warning (STUB_CHECK_RC overrides
 # its exit code and makes it print a non-result). audit snapshots the
 # staged view (it is deleted when run-audit.sh exits) and prints a
-# result in flox-agent's audit JSON shape; STUB_SCORE and STUB_AUDIT_RC
-# override its score and exit code.
+# result in flox-agent's audit JSON shape; STUB_SCORE, STUB_STATUS and
+# STUB_AUDIT_RC override its score, status band and exit code.
 mkdir -p "$TMP/bin"
 cat > "$TMP/bin/flox-agent" <<EOF
 #!/usr/bin/env bash
@@ -53,7 +53,7 @@ case "\$1" in
     dir="\${@: -1}"
     echo "\$dir" > "$TMP/audited-dir.txt"
     if [ -n "\${STUB_AUDIT_RC:-}" ]; then
-      echo "ERROR: cannot audit \$dir: api.osv.dev is unreachable" >&2
+      echo "ERROR: cannot audit \$dir: api.osv.dev is unreachable (100% of retries failed)" >&2
       exit "\$STUB_AUDIT_RC"
     fi
     ( cd "\$dir" && find . | sort ) > "$TMP/view-tree.txt"
@@ -85,7 +85,7 @@ case "\$1" in
                      "partial": true, "coverage": 10.5, "findings": []}]}
   ],
   "score": \$score,
-  "status": "caution",
+  "status": "\${STUB_STATUS:-caution}",
   "tool": {"name": "skillspector", "version": "2.12.0", "mode": "static",
            "osv": {"live": true, "checkedAt": "2026-10-20T00:00:00Z"}}
 }
@@ -179,10 +179,11 @@ done
 assert_eq "identity" "skill|skills-humanizer" \
   "$(jq -r '"\(.identity.kind)|\(.identity.name)"' "$sk")"
 assert_eq "overall is the audit score" "62" "$(jq -r '.overall' "$sk")"
-assert_eq "status from overall (62 -> warn)" "warn" "$(jq -r '.status' "$sk")"
+assert_eq "status not written; the site derives it from overall" "false" \
+  "$(jq -r 'has("status")' "$sk")"
 assert_eq "security score" "62" "$(jq -r '.security.score' "$sk")"
-assert_eq "scanner keeps flox-agent's status and worst severity" \
-  "caution|HIGH" \
+assert_eq "scanner shows flox-agent's band as ScannerRow words, worst severity" \
+  "Warnings|HIGH" \
   "$(jq -r '.security.scanners[0] | "\(.status)|\(.level)"' "$sk")"
 assert_eq "findings tallied by severity" "HIGH=2,LOW=1" \
   "$(jq -r '[.security.findings[] | select(.status == "open")
@@ -199,10 +200,19 @@ assert_eq "quality scores warnings (1 warning -> 95)" "95" \
 assert_eq "a check with warnings does not pass" "false" \
   "$(jq -r '.quality.checks[0].pass' "$sk")"
 
-# ── status follows the site's thresholds, not SkillSpector's bands ────
-STUB_SCORE=55 run skills-humanizer >/dev/null
-assert_eq "score 55 (caution) -> risk, as overallStatus shows it" "risk" \
-  "$(jq -r '.status' "$sk")"
+# ── every flox-agent status band maps to a word ScannerRow renders ────
+for band in "safe:Passed" "caution:Warnings" "incomplete:Warnings" \
+            "do not install:Failed"; do
+  STUB_STATUS="${band%%:*}" run skills-humanizer >/dev/null
+  assert_eq "scanner status for '${band%%:*}'" "${band#*:}" \
+    "$(jq -r '.security.scanners[0].status' "$sk")"
+done
+STUB_STATUS="bogus" run skills-humanizer >/dev/null 2>&1
+rc=$?
+assert_eq "an unknown status band fails the run" "true" \
+  "$([ "$rc" -ne 0 ] && echo true || echo false)"
+assert_eq "an unknown status band writes no metrics.json" "false" \
+  "$([ -f "$sk" ] && echo true || echo false)"
 
 # ── could not audit: warn, keep no stale result, exit 0 ───────────────
 out="$(STUB_AUDIT_RC=3 run skills-humanizer 2>/dev/null)"
@@ -210,6 +220,8 @@ assert_eq "exit 3 is not a failure" "0" "$?"
 assert_eq "exit 3 emits a CI warning" "true" \
   "$(grep -q '^::warning title=audit skills-humanizer::not audited: ERROR: cannot audit' \
        <<<"$out" && echo true || echo false)"
+assert_eq "warning escapes % for the workflow command" "true" \
+  "$(grep -qF '(100%25 of retries failed)' <<<"$out" && echo true || echo false)"
 assert_eq "exit 3 leaves no metrics.json" "false" \
   "$([ -f "$sk" ] && echo true || echo false)"
 assert_eq "exit 3 leaves no earlier flox-agent result" "false" \
