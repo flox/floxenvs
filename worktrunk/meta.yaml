@@ -19,7 +19,7 @@ intro: >
   branches. Exposes `wt` and the same binary as `git wt`,
   with `git` always wrapped onto the PATH so it works
   regardless of what the consumer env provides. Pair with
-  any coding agent env — flox/claude, pkg:codex,
+  any coding agent — flox/claude-code, pkg:codex,
   agent-stacks/gemini-cli, agent-stacks/opencode — and run
   them side by side in isolated worktrees. Useful when one
   repo needs many concurrent agent sessions, or for
@@ -35,7 +35,6 @@ tags: [git, worktree, agent, workflow]
 stack: [go]
 featured: false
 combines_well_with:
-  - env:claude
   - pkg:codex
 status: beta
 license: MIT

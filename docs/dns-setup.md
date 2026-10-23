@@ -85,7 +85,7 @@ After rollout, run:
 
 ```bash
 curl -sI https://envs.flox.dev/ | head -5
-curl -sI https://envs.flox.dev/envs/claude/ | head -5
+curl -sI https://envs.flox.dev/envs/langchain/ | head -5
 curl -sI https://envs.flox.dev/sitemap-index.xml | head -5
 ```
 

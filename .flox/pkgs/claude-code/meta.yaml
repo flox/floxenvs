@@ -26,9 +26,9 @@ intro: >
   your Anthropic API key or Claude subscription. The Flox
   package disables the upstream auto-updater so the version
   you pinned stays pinned until you bump the manifest
-  yourself. Combines well with flox/claude (managed config
-  + MCP fragments + isolated mode), with editor plugin
-  packages like flox/skills-*, and with other
+  yourself. Combines well with flox/flox-agent (`flox-agent launch
+  claude` loads an environment's plugins and skills), with
+  plugin packages like flox/skills-*, and with other
   agents in the catalog (codex, crush, opencode) for
   side-by-side comparison. Published by Flox under the
   upstream Unfree license; the package is free to install,
@@ -43,8 +43,7 @@ ai_role: agent
 tags: [agent, cli, anthropic, mcp, coding, coding-agent]
 stack: [nodejs, typescript]
 featured: true
-combines_well_with:
-  - env:claude
+combines_well_with: []
 status: stable
 license: Unfree
 upstream:
