@@ -54,17 +54,39 @@ mkdir -p "$npm_config_cache"
 
 [services]
 # Run the agentmemory REST/MCP backend via npx so flox
-# services manages its lifecycle. The first activation
+# services manages its lifecycle. The first start
 # downloads @agentmemory/agentmemory@$AGENTMEMORY_VERSION
-# into the per-env npm cache; subsequent starts are
-# cache-fast. The server uses SQLite under
-# $XDG_DATA_HOME (scoped via AGENTMEMORY_CACHE below).
+# into the per-env npm cache, and the CLI fetches its
+# pinned iii engine into ~/.agentmemory/bin; later starts
+# are cache-fast. Memory state lives in
+# AGENTMEMORY_DATA_DIR under the env cache.
 agentmemory.command = '''
 export AGENTMEMORY_CACHE="$FLOX_ENV_CACHE/agentmemory"
 export npm_config_cache="$AGENTMEMORY_CACHE/npm"
-export XDG_DATA_HOME="$AGENTMEMORY_CACHE/data"
-mkdir -p "$npm_config_cache" "$XDG_DATA_HOME"
+# nixpkgs runs npm under nodejs-slim, whose store path has no
+# lib/, so npm's default global prefix is unusable and npx
+# fails with ENOENT. Give npm a writable prefix of its own,
+# set here rather than in the hook so it doesn't override
+# the global prefix of environments that include this one.
+export npm_config_prefix="$AGENTMEMORY_CACHE/npm-prefix"
+export AGENTMEMORY_DATA_DIR="$AGENTMEMORY_CACHE/data"
+# The CLI skips its onboarding, global-install and
+# engine-install prompts when CI is set, even if the
+# service is attached to a terminal.
+export CI=1
+mkdir -p "$npm_config_cache" "$npm_config_prefix/lib" "$AGENTMEMORY_DATA_DIR"
 exec npx -y "@agentmemory/agentmemory@$AGENTMEMORY_VERSION"
+'''
+# The CLI starts the iii engine detached, so it outlives
+# the service process. Its own `stop` command shuts down
+# the worker and then the engine. --prefer-offline runs the
+# package from the npm cache the start populated, so
+# stopping doesn't wait on the registry.
+agentmemory.shutdown.command = '''
+export npm_config_cache="$FLOX_ENV_CACHE/agentmemory/npm"
+export npm_config_prefix="$FLOX_ENV_CACHE/agentmemory/npm-prefix"
+export CI=1
+exec npx -y --prefer-offline "@agentmemory/agentmemory@$AGENTMEMORY_VERSION" stop
 '''
 
 [options]

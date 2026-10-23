@@ -34,12 +34,44 @@ if ! grep -q agent-plugin-agentmemory <<<"$list_out"; then
 fi
 echo ">>> flox-agent sees the agentmemory plugin"
 
+# Same health check as the minimal env: the included backend must serve.
+health_url="$AGENTMEMORY_URL/agentmemory/health"
+echo -n "Waiting for $health_url .."
+MAX=180
+while [[ "$MAX" != "0" ]]; do
+  secret="${AGENTMEMORY_SECRET:-$(cat "$HOME/.agentmemory/secret" 2>/dev/null || true)}"
+  if health="$(curl -fsS -H "Authorization: Bearer $secret" "$health_url" 2>/dev/null)"; then
+    echo ""
+    break
+  fi
+  echo -n "."
+  sleep 1
+  MAX=$((MAX-1))
+done
+if [[ "$MAX" == "0" ]]; then
+  echo ""
+  echo "Error: agentmemory backend did not become healthy."
+  flox services status || true
+  flox services logs agentmemory 2>&1 | tail -80 || true
+  exit 1
+fi
+if ! node -e '
+  const h = JSON.parse(require("fs").readFileSync(0, "utf8"));
+  process.exit(h.service === "agentmemory" ? 0 : 1);
+' <<<"$health"; then
+  echo "Error: unexpected health response: $health"
+  exit 1
+fi
+echo ">>> $health_url: $(head -c 200 <<<"$health")"
+
+# A healthy answer on the port could come from some other agentmemory
+# (a leftover engine, a parallel test), so the service itself must be up.
 status="$(flox services status 2>&1)"
-if ! echo "$status" | grep -q agentmemory; then
-  echo "Error: agentmemory service not configured"
+if ! grep -Eq '^agentmemory[[:space:]]+Running' <<<"$status"; then
+  echo "Error: agentmemory service is not running"
   echo "$status"
   exit 1
 fi
-echo ">>> agentmemory service configured"
+echo ">>> agentmemory service running"
 
 echo ">>> agentmemory-demo environment is working"

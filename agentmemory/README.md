@@ -26,7 +26,8 @@ flox activate -r flox/agentmemory --start-services
 
 The first activation downloads the
 `@agentmemory/agentmemory` npm package into the per-env
-cache and starts the backend on
+cache, fetches the pinned iii engine it runs on, and starts
+the backend on
 [`http://localhost:3111`](http://localhost:3111).
 
 Then, in any directory, run `flox-agent launch claude` to
@@ -74,8 +75,16 @@ flox services status           # check status
 flox services logs agentmemory # view logs
 ```
 
-SQLite state and the npm cache live under
-`$FLOX_ENV_CACHE/agentmemory/`.
+The service runs non-interactively, skipping the upstream
+CLI's setup prompts. `flox services stop` also stops the iii
+engine the backend starts.
+
+Check that it is serving:
+
+```bash
+curl -H "Authorization: Bearer $(cat ~/.agentmemory/secret)" \
+  http://localhost:3111/agentmemory/health
+```
 
 ## Environment variables
 
@@ -84,7 +93,7 @@ SQLite state and the npm cache live under
 | `AGENTMEMORY_URL` | `http://localhost:3111` | REST endpoint hooks talk to |
 | `AGENTMEMORY_INJECT_CONTEXT` | `true` | Injects context on SessionStart |
 | `AGENTMEMORY_VERSION` | `0.9.30` | Pinned server version for `npx` |
-| `AGENTMEMORY_SECRET` | _(unset)_ | Bearer token sent to the REST endpoint |
+| `AGENTMEMORY_SECRET` | _(unset)_ | Bearer token for the REST endpoint; when unset, the server generates one in `~/.agentmemory/secret` and local hooks read it from there |
 
 Override in your own manifest:
 
@@ -99,14 +108,24 @@ AGENTMEMORY_SECRET = "redacted"
 
 ## Data directory
 
-State (SQLite, npm cache) lives in
+Memory state (`data/`) and the npm cache live in
 `$FLOX_ENV_CACHE/agentmemory/`.
+
+The upstream CLI keeps its runtime files in
+`~/.agentmemory/`: the pinned iii engine binary, the
+generated API secret, pidfiles and preferences. The plugin
+hooks look for the secret there, so it is left in place.
 
 To start fresh:
 
 ```bash
 rm -rf "$FLOX_ENV_CACHE/agentmemory"
 ```
+
+This clears this environment's memories and npm cache but
+leaves `~/.agentmemory/` alone, since other projects using
+agentmemory share it. To reset that too, stop every
+agentmemory service and remove it.
 
 ## See also
 

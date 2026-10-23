@@ -38,7 +38,10 @@
     },
     "services": {
       "agentmemory": {
-        "command": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\nexport XDG_DATA_HOME=\"$AGENTMEMORY_CACHE/data\"\nmkdir -p \"$npm_config_cache\" \"$XDG_DATA_HOME\"\nexec npx -y \"@agentmemory/agentmemory@$AGENTMEMORY_VERSION\"\n"
+        "command": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\n# nixpkgs runs npm under nodejs-slim, whose store path has no\n# lib/, so npm's default global prefix is unusable and npx\n# fails with ENOENT. Give npm a writable prefix of its own,\n# set here rather than in the hook so it doesn't override\n# the global prefix of environments that include this one.\nexport npm_config_prefix=\"$AGENTMEMORY_CACHE/npm-prefix\"\nexport AGENTMEMORY_DATA_DIR=\"$AGENTMEMORY_CACHE/data\"\n# The CLI skips its onboarding, global-install and\n# engine-install prompts when CI is set, even if the\n# service is attached to a terminal.\nexport CI=1\nmkdir -p \"$npm_config_cache\" \"$npm_config_prefix/lib\" \"$AGENTMEMORY_DATA_DIR\"\nexec npx -y \"@agentmemory/agentmemory@$AGENTMEMORY_VERSION\"\n",
+        "shutdown": {
+          "command": "export npm_config_cache=\"$FLOX_ENV_CACHE/agentmemory/npm\"\nexport npm_config_prefix=\"$FLOX_ENV_CACHE/agentmemory/npm-prefix\"\nexport CI=1\nexec npx -y --prefer-offline \"@agentmemory/agentmemory@$AGENTMEMORY_VERSION\" stop\n"
+        }
       }
     }
   },
