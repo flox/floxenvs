@@ -478,11 +478,14 @@ jobs:
       - name: "Audit fragment content"
         if: ${{ contains(matrix.chunk.pkgs, 'skills-') }}
         # Backstop for the audit run itself — the env is already
-        # realized above, so this activation is instant.
-        timeout-minutes: 20
+        # realized above, so this activation is instant. Each package
+        # gets its own 20-minute bound below (one multi-plugin package
+        # can take several minutes); this step covers a whole chunk of
+        # up to six, audited one after another.
+        timeout-minutes: 60
         # Fragments are content-audited from the build above; run-audit.sh
-        # reuses result-<pkg> and runs the flox-ai audit engine. The
-        # flox-ai + skill-audit tools live in the .website env (NOT the
+        # reuses result-<pkg> and runs `flox-agent audit`. flox-agent and
+        # skillspector live in the .website env (NOT the
         # root env — they're floxenvs-flake-sourced and would poison
         # `flox build`'s nixpkgs resolution).
         shell: "flox activate -d .website -- bash -e {0}"
@@ -493,7 +496,8 @@ jobs:
             case "$pkg" in
               skills-*)
                 echo "::group::audit $pkg"
-                REPO_ROOT="$PWD" bash scripts/run-audit.sh skill "$pkg" || failed+=("$pkg")
+                REPO_ROOT="$PWD" timeout --kill-after=30s 20m \
+                  bash scripts/run-audit.sh skill "$pkg" || failed+=("$pkg")
                 echo "::endgroup::"
                 ;;
             esac
@@ -504,10 +508,13 @@ jobs:
         uses: "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" # v7
         with:
           # One artifact per chunk; it holds <pkg>/metrics.json for every
-          # audited package (the site job globs them out).
+          # audited package (the site job globs them out). A package
+          # flox-agent could not audit writes nothing (run-audit.sh warns
+          # and the site keeps its prior metrics), so a chunk can
+          # legitimately have none.
           name: "metrics-skill-${{ matrix.chunk.id }}"
           path: "audit/skill/"
-          if-no-files-found: "error"
+          if-no-files-found: "warn"
 
   # ── Site: collect metrics, build data.json, deploy (main only) ──
   site:

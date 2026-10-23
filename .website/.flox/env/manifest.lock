@@ -3,13 +3,9 @@
   "manifest": {
     "schema-version": "1.13.0",
     "install": {
-      "claudelint": {
-        "pkg-path": "flox/claudelint",
-        "pkg-group": "claudelint"
-      },
-      "flox-ai": {
-        "pkg-path": "flox/flox-ai",
-        "pkg-group": "flox-ai"
+      "flox-agent": {
+        "pkg-path": "flox/flox-agent",
+        "pkg-group": "flox-agent"
       },
       "inter": {
         "pkg-path": "inter"
@@ -20,18 +16,6 @@
       "nodejs": {
         "pkg-path": "nodejs",
         "version": "^22"
-      },
-      "skill-tools": {
-        "pkg-path": "flox/skill-tools",
-        "pkg-group": "skill-tools"
-      },
-      "skill-validator": {
-        "pkg-path": "flox/skill-validator",
-        "pkg-group": "skill-validator"
-      },
-      "skillcheck": {
-        "pkg-path": "flox/skillcheck",
-        "pkg-group": "skillcheck"
       },
       "skillspector": {
         "pkg-path": "flox/skillspector",
@@ -50,453 +34,93 @@
   },
   "packages": [
     {
-      "attr_path": "claudelint",
+      "attr_path": "flox-agent",
       "broken": false,
-      "derivation": "/nix/store/dphsnz1z1b2rwxmcjfwvmc33ibqsdkl7-claude-code-lint-0.10.0.drv",
-      "description": "Linter for the whole Claude Code project: skills, agents, settings, hooks, MCP",
-      "install_id": "claudelint",
+      "derivation": "/nix/store/bkyqsddnfl3dbl9asi0cvhkxg5zxlmp1-flox-agent-0.9.0-293-g8764bc5.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=8b0ed172ad0a5da77627a4d2cf5d4aa92e6a7279",
-      "name": "claude-code-lint-0.10.0",
-      "pname": "claude-code-lint",
-      "rev": "8b0ed172ad0a5da77627a4d2cf5d4aa92e6a7279",
-      "rev_count": 26997,
-      "rev_date": "2026-10-04T20:01:08Z",
-      "scrape_date": "2026-10-12T01:24:49.001860557Z",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=8764bc526a2608c10f286841f015b65b63716201",
+      "name": "flox-agent-0.9.0-293-g8764bc5",
+      "pname": "flox-agent",
+      "rev": "8764bc526a2608c10f286841f015b65b63716201",
+      "rev_count": 495,
+      "rev_date": "2026-10-19T22:10:50Z",
+      "scrape_date": "2026-10-20T14:42:37.573282Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0.10.0",
+      "version": "0.9.0-293-g8764bc5",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/jz98wajvsxqckj1wvgbcv6ssfq6d5bra-claude-code-lint-0.10.0"
+        "out": "/nix/store/5iw1gb00m92pn44y60cyxairr5jwrfgk-flox-agent-0.9.0-293-g8764bc5"
       },
       "system": "aarch64-darwin",
-      "group": "claudelint",
+      "group": "flox-agent",
       "priority": 5
     },
     {
-      "attr_path": "claudelint",
+      "attr_path": "flox-agent",
       "broken": false,
-      "derivation": "/nix/store/08x23p9apvfv5hzhd682kk66cihscndz-claude-code-lint-0.10.0.drv",
-      "description": "Linter for the whole Claude Code project: skills, agents, settings, hooks, MCP",
-      "install_id": "claudelint",
+      "derivation": "/nix/store/q7pjd3xh7spwzqhcjya2f5vvblhksg9y-flox-agent-0.9.0-293-g8764bc5.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=8b0ed172ad0a5da77627a4d2cf5d4aa92e6a7279",
-      "name": "claude-code-lint-0.10.0",
-      "pname": "claude-code-lint",
-      "rev": "8b0ed172ad0a5da77627a4d2cf5d4aa92e6a7279",
-      "rev_count": 26997,
-      "rev_date": "2026-10-04T20:01:08Z",
-      "scrape_date": "2026-10-12T01:24:49.001864373Z",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=8764bc526a2608c10f286841f015b65b63716201",
+      "name": "flox-agent-0.9.0-293-g8764bc5",
+      "pname": "flox-agent",
+      "rev": "8764bc526a2608c10f286841f015b65b63716201",
+      "rev_count": 495,
+      "rev_date": "2026-10-19T22:10:50Z",
+      "scrape_date": "2026-10-20T14:42:37.573329Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0.10.0",
+      "version": "0.9.0-293-g8764bc5",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/b0xq8vfylsz7j93hkvafil15fwx7kg2d-claude-code-lint-0.10.0"
+        "out": "/nix/store/7w05z1bjgzb057y573a5w1k6yh3ls2vl-flox-agent-0.9.0-293-g8764bc5"
       },
       "system": "aarch64-linux",
-      "group": "claudelint",
+      "group": "flox-agent",
       "priority": 5
     },
     {
-      "attr_path": "claudelint",
+      "attr_path": "flox-agent",
       "broken": false,
-      "derivation": "/nix/store/n4h2371sbd4ng5z90xha6flpkcx11wav-claude-code-lint-0.10.0.drv",
-      "description": "Linter for the whole Claude Code project: skills, agents, settings, hooks, MCP",
-      "install_id": "claudelint",
+      "derivation": "/nix/store/pxlh9z6wnsq07azjw39syx1jhvg7l66z-flox-agent-0.9.0-293-g8764bc5.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
       "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=8b0ed172ad0a5da77627a4d2cf5d4aa92e6a7279",
-      "name": "claude-code-lint-0.10.0",
-      "pname": "claude-code-lint",
-      "rev": "8b0ed172ad0a5da77627a4d2cf5d4aa92e6a7279",
-      "rev_count": 26997,
-      "rev_date": "2026-10-04T20:01:08Z",
-      "scrape_date": "2026-10-12T01:24:49.001865215Z",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=8764bc526a2608c10f286841f015b65b63716201",
+      "name": "flox-agent-0.9.0-293-g8764bc5",
+      "pname": "flox-agent",
+      "rev": "8764bc526a2608c10f286841f015b65b63716201",
+      "rev_count": 495,
+      "rev_date": "2026-10-19T22:10:50Z",
+      "scrape_date": "2026-10-20T14:42:37.573331Z",
       "stabilities": [
+        "staging",
         "unstable"
       ],
       "unfree": false,
-      "version": "0.10.0",
+      "version": "0.9.0-293-g8764bc5",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/08lllhycklz9j4kqcf82cw4jf4gwhix3-claude-code-lint-0.10.0"
+        "out": "/nix/store/kp6frw3mi52av7jm4s4px77csbnvp6ad-flox-agent-0.9.0-293-g8764bc5"
       },
       "system": "x86_64-linux",
-      "group": "claudelint",
-      "priority": 5
-    },
-    {
-      "attr_path": "flox-ai",
-      "broken": false,
-      "derivation": "/nix/store/57jfyz6s1dig32zmb9ik9ih8kqkvv7dd-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-10-12T01:24:49.001870936Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.8.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/crwyb5188yw5lv4znqprzbiqg5vy4ibd-flox-ai-0.8.0"
-      },
-      "system": "aarch64-darwin",
-      "group": "flox-ai",
-      "priority": 5
-    },
-    {
-      "attr_path": "flox-ai",
-      "broken": false,
-      "derivation": "/nix/store/1clj1qp1zchjr18xqd6h5qy4krnbfp7x-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-10-12T01:24:49.001871657Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.8.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/4zf5cxf627sbr8syddjx7j5pmk4321ri-flox-ai-0.8.0"
-      },
-      "system": "aarch64-linux",
-      "group": "flox-ai",
-      "priority": 5
-    },
-    {
-      "attr_path": "flox-ai",
-      "broken": false,
-      "derivation": "/nix/store/w14almryjawbkglkr56spfxi25ihvhzw-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-10-12T01:24:49.001874132Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.8.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/0d1s3sqq8r88f30qjg29gw76vl4gfbwg-flox-ai-0.8.0"
-      },
-      "system": "x86_64-linux",
-      "group": "flox-ai",
-      "priority": 5
-    },
-    {
-      "attr_path": "skill-tools",
-      "broken": false,
-      "derivation": "/nix/store/ldx2aq2f75psv5iv1859a7fh6d1i352v-skill-tools-0.4.1.drv",
-      "description": "CLI to score, validate, lint, and route Claude Agent Skills (SKILL.md)",
-      "install_id": "skill-tools",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/floxenvs?rev=5c42815c1f8119c7dc9c4da777956d734fe9b75f",
-      "name": "skill-tools-0.4.1",
-      "pname": "skill-tools",
-      "rev": "5c42815c1f8119c7dc9c4da777956d734fe9b75f",
-      "rev_count": 24305,
-      "rev_date": "2026-09-15T22:26:27Z",
-      "scrape_date": "2026-10-12T01:24:49.001879171Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/w1nmn2yz0sgkzjisifqb6d9xvkvrydly-skill-tools-0.4.1"
-      },
-      "system": "aarch64-darwin",
-      "group": "skill-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "skill-tools",
-      "broken": false,
-      "derivation": "/nix/store/vgr94dbj2an0vsg5c0l05vhdxrc3xd25-skill-tools-0.4.1.drv",
-      "description": "CLI to score, validate, lint, and route Claude Agent Skills (SKILL.md)",
-      "install_id": "skill-tools",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/floxenvs?rev=5c42815c1f8119c7dc9c4da777956d734fe9b75f",
-      "name": "skill-tools-0.4.1",
-      "pname": "skill-tools",
-      "rev": "5c42815c1f8119c7dc9c4da777956d734fe9b75f",
-      "rev_count": 24305,
-      "rev_date": "2026-09-15T22:26:27Z",
-      "scrape_date": "2026-10-12T01:24:49.001880153Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/8szg7m4zw4dxwp4li2z5l68awd9n8mc6-skill-tools-0.4.1"
-      },
-      "system": "aarch64-linux",
-      "group": "skill-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "skill-tools",
-      "broken": false,
-      "derivation": "/nix/store/p8bm1iv80p0jn4145028b82vlj1jddsl-skill-tools-0.4.1.drv",
-      "description": "CLI to score, validate, lint, and route Claude Agent Skills (SKILL.md)",
-      "install_id": "skill-tools",
-      "license": "Apache-2.0",
-      "locked_url": "https://github.com/flox/floxenvs?rev=5c42815c1f8119c7dc9c4da777956d734fe9b75f",
-      "name": "skill-tools-0.4.1",
-      "pname": "skill-tools",
-      "rev": "5c42815c1f8119c7dc9c4da777956d734fe9b75f",
-      "rev_count": 24305,
-      "rev_date": "2026-09-15T22:26:27Z",
-      "scrape_date": "2026-10-12T01:24:49.001881145Z",
-      "stabilities": [
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.4.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/12k6af84prd771dx3ana59mjdwpam6xh-skill-tools-0.4.1"
-      },
-      "system": "x86_64-linux",
-      "group": "skill-tools",
-      "priority": 5
-    },
-    {
-      "attr_path": "skill-validator",
-      "broken": false,
-      "derivation": "/nix/store/rjcpz7p5fgs7mlf74zjv809rkj019kck-skill-validator-1.6.2.drv",
-      "description": "Validate and score Claude Agent Skills (SKILL.md)",
-      "install_id": "skill-validator",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=c4af23b05c850b0972d90b5ccd4a0c8e17ceafa0",
-      "name": "skill-validator-1.6.2",
-      "pname": "skill-validator",
-      "rev": "c4af23b05c850b0972d90b5ccd4a0c8e17ceafa0",
-      "rev_count": 27375,
-      "rev_date": "2026-10-07T08:01:11Z",
-      "scrape_date": "2026-10-12T01:24:49.001889050Z",
-      "stabilities": [
-        "unstable",
-        "stable",
-        "staging"
-      ],
-      "unfree": false,
-      "version": "1.6.2",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/h4zcly3bpd0dkhh9dysxvqhsscb4kflx-skill-validator-1.6.2"
-      },
-      "system": "aarch64-darwin",
-      "group": "skill-validator",
-      "priority": 5
-    },
-    {
-      "attr_path": "skill-validator",
-      "broken": false,
-      "derivation": "/nix/store/sc7kg9f4n36fbncbb3yx6f2s7jx3a19y-skill-validator-1.6.2.drv",
-      "description": "Validate and score Claude Agent Skills (SKILL.md)",
-      "install_id": "skill-validator",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=c4af23b05c850b0972d90b5ccd4a0c8e17ceafa0",
-      "name": "skill-validator-1.6.2",
-      "pname": "skill-validator",
-      "rev": "c4af23b05c850b0972d90b5ccd4a0c8e17ceafa0",
-      "rev_count": 27375,
-      "rev_date": "2026-10-07T08:01:11Z",
-      "scrape_date": "2026-10-12T01:24:49.001889891Z",
-      "stabilities": [
-        "unstable",
-        "stable",
-        "staging"
-      ],
-      "unfree": false,
-      "version": "1.6.2",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/bycfx73lygx129wcw36vy418qigfzgkc-skill-validator-1.6.2"
-      },
-      "system": "aarch64-linux",
-      "group": "skill-validator",
-      "priority": 5
-    },
-    {
-      "attr_path": "skill-validator",
-      "broken": false,
-      "derivation": "/nix/store/a2xi6qvm3bwwbd76l0qcalja6i5ylgld-skill-validator-1.6.2.drv",
-      "description": "Validate and score Claude Agent Skills (SKILL.md)",
-      "install_id": "skill-validator",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=c4af23b05c850b0972d90b5ccd4a0c8e17ceafa0",
-      "name": "skill-validator-1.6.2",
-      "pname": "skill-validator",
-      "rev": "c4af23b05c850b0972d90b5ccd4a0c8e17ceafa0",
-      "rev_count": 27375,
-      "rev_date": "2026-10-07T08:01:11Z",
-      "scrape_date": "2026-10-12T01:24:49.001890442Z",
-      "stabilities": [
-        "unstable",
-        "stable",
-        "staging"
-      ],
-      "unfree": false,
-      "version": "1.6.2",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/pya78qfpr1mb7c9ak0i0azxsy3nb47mx-skill-validator-1.6.2"
-      },
-      "system": "x86_64-linux",
-      "group": "skill-validator",
-      "priority": 5
-    },
-    {
-      "attr_path": "skillcheck",
-      "broken": false,
-      "derivation": "/nix/store/mv84nlhm4c2imrms31804hafgsl0g31v-skillcheck-1.0.0.drv",
-      "description": "SAST scanner for SKILL.md bodies — secrets, injection, priv-esc (SARIF)",
-      "install_id": "skillcheck",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=6f958de0b4a824749a0e6c8359a626407d412327",
-      "name": "skillcheck-1.0.0",
-      "pname": "skillcheck",
-      "rev": "6f958de0b4a824749a0e6c8359a626407d412327",
-      "rev_count": 19409,
-      "rev_date": "2026-08-12T11:00:02Z",
-      "scrape_date": "2026-10-12T01:24:49.001896694Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "1.0.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/ks3w721wdxd4gyjddmx11m8mylrxyg0p-skillcheck-1.0.0"
-      },
-      "system": "aarch64-darwin",
-      "group": "skillcheck",
-      "priority": 5
-    },
-    {
-      "attr_path": "skillcheck",
-      "broken": false,
-      "derivation": "/nix/store/ls03xyk2cvn138q13ifmr817m5pb1p7i-skillcheck-1.0.0.drv",
-      "description": "SAST scanner for SKILL.md bodies — secrets, injection, priv-esc (SARIF)",
-      "install_id": "skillcheck",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=6f958de0b4a824749a0e6c8359a626407d412327",
-      "name": "skillcheck-1.0.0",
-      "pname": "skillcheck",
-      "rev": "6f958de0b4a824749a0e6c8359a626407d412327",
-      "rev_count": 19409,
-      "rev_date": "2026-08-12T11:00:02Z",
-      "scrape_date": "2026-10-12T01:24:49.001897555Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "1.0.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/5ql3sc65ibr10bxi3ip68xr8ii1f7myb-skillcheck-1.0.0"
-      },
-      "system": "aarch64-linux",
-      "group": "skillcheck",
-      "priority": 5
-    },
-    {
-      "attr_path": "skillcheck",
-      "broken": false,
-      "derivation": "/nix/store/fzbm3ifkrh8sl8p1dnbwj1v3hgq5pq6n-skillcheck-1.0.0.drv",
-      "description": "SAST scanner for SKILL.md bodies — secrets, injection, priv-esc (SARIF)",
-      "install_id": "skillcheck",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=6f958de0b4a824749a0e6c8359a626407d412327",
-      "name": "skillcheck-1.0.0",
-      "pname": "skillcheck",
-      "rev": "6f958de0b4a824749a0e6c8359a626407d412327",
-      "rev_count": 19409,
-      "rev_date": "2026-08-12T11:00:02Z",
-      "scrape_date": "2026-10-12T01:24:49.001898167Z",
-      "stabilities": [
-        "staging",
-        "unstable",
-        "stable"
-      ],
-      "unfree": false,
-      "version": "1.0.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/vzjf8jf606bc2hrcgxskzv7lidijphwk-skillcheck-1.0.0"
-      },
-      "system": "x86_64-linux",
-      "group": "skillcheck",
+      "group": "flox-agent",
       "priority": 5
     },
     {
