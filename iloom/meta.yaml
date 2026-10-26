@@ -20,9 +20,9 @@ intro: >
   of the box. The env bundles `gh` for GitHub auth and wraps
   the binary so `git` is always on its PATH, regardless of
   what the consumer env provides. Bring your own coding
-  agent: layer flox/claude alongside this env for a managed
-  Claude CLI, or pair with pkg:codex / agent-stacks/opencode for
-  alternative agents. Useful when one repo needs many
+  agent: install flox/claude-code and start it with the bundled
+  `flox-agent launch claude`, or pair with pkg:codex /
+  agent-stacks/opencode for alternative agents. Useful when one repo needs many
   parallel agent sessions without trampling each other's
   worktrees.
 summary:
@@ -36,7 +36,6 @@ tags: [agent, worktree, git, workflow, claude-code]
 stack: [rust]
 featured: false
 combines_well_with:
-  - env:claude
   - env:graphify
 status: beta
 license: MIT
@@ -58,7 +57,6 @@ recipes:
     title: Quick start
     start_services: false
     features:
-      - "Composes iloom with flox/claude"
       - "Demonstrates `il start <issue-number>`"
 links:
   source: https://github.com/flox/floxenvs/tree/main/iloom

@@ -18,9 +18,9 @@ intro: >
   files — with FastEmbed and sqlite-vec already in the Nix
   closure so semantic search works on first run. The env
   exposes the `basic-memory` CLI (with the short alias `bm`) and
-  can be wired as an MCP server for any MCP client. Pair with
-  flox/claude or flox/basic-memory-demo to get the MCP wiring
-  written into a project-scoped `.mcp.json` for you. Useful as
+  can be wired as an MCP server for any MCP client. Use
+  flox/basic-memory-demo to get the MCP wiring written into a
+  project-scoped `.mcp.json` for you. Useful as
   a personal second-brain that agents can read and write, or as
   a shared project log that survives chat compaction.
 summary:
@@ -34,7 +34,6 @@ tags: [mcp, memory, knowledge-graph, markdown, rag]
 stack: [python]
 featured: false
 combines_well_with:
-  - env:claude
   - env:graphify
   - env:verba
 status: beta
@@ -57,7 +56,6 @@ recipes:
     title: Quick start
     start_services: false
     features:
-      - "Composes Basic Memory with flox/claude"
       - "Writes project-scoped .mcp.json for Claude Code"
 links:
   source: https://github.com/flox/floxenvs/tree/main/basic-memory
