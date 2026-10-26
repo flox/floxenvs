@@ -35,10 +35,10 @@ const pkgs = (await getCollection("packages"))
     agent with the same skills is ready to go.
   </p>
   <p class="mt-3 text-base leading-relaxed text-slate-700 dark:text-slate-300 max-w-3xl">
-    Pair any of these with <a href="https://hub.flox.dev/flox/flox-agent" class="underline">flox-agent</a>,
-    which hands the plugin bundles installed in the environment to the
-    agent when it starts: launch the agent with
-    <code class="font-mono text-xs">flox-agent launch claude</code>. No
+    Each package installs a Claude Code plugin under
+    <code class="font-mono text-xs">$FLOX_ENV/share/flox/claude/&lt;plugin&gt;</code>;
+    load it with
+    <code class="font-mono text-xs">claude --plugin-dir "$FLOX_ENV/share/flox/claude/&lt;plugin&gt;"</code>. No
     copy-pasting prompts between machines, no drift between a developer's
     local skills and the CI runner's.
   </p>
