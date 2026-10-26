@@ -100,16 +100,21 @@ if ! grep -q agent-plugin-agentmemory <<<"$list_out"; then
 fi
 echo ">>> flox-agent sees the agentmemory plugin"
 
+# The hook hands Claude Code the service's API secret.
+if [ -z "${AGENTMEMORY_SECRET:-}" ]; then
+  echo "Error: AGENTMEMORY_SECRET not set by the activation hook"
+  exit 1
+fi
+echo ">>> AGENTMEMORY_SECRET set"
+
 # The backend must actually serve. /agentmemory/health sits behind the
-# server's bearer secret, which it generates into ~/.agentmemory/secret
-# on first start unless AGENTMEMORY_SECRET is set. The first start also
-# downloads the npm package and the iii engine, hence the long wait.
+# server's bearer secret. The first start also downloads the npm
+# package, hence the long wait.
 health_url="$AGENTMEMORY_URL/agentmemory/health"
 echo -n "Waiting for $health_url .."
 MAX=180
 while [[ "$MAX" != "0" ]]; do
-  secret="${AGENTMEMORY_SECRET:-$(cat "$HOME/.agentmemory/secret" 2>/dev/null || true)}"
-  if health="$(curl -fsS -H "Authorization: Bearer $secret" "$health_url" 2>/dev/null)"; then
+  if health="$(curl -fsS -H "Authorization: Bearer $AGENTMEMORY_SECRET" "$health_url" 2>/dev/null)"; then
     echo ""
     break
   fi
@@ -142,5 +147,14 @@ if ! grep -Eq '^agentmemory[[:space:]]+Running' <<<"$status"; then
   exit 1
 fi
 echo ">>> agentmemory service running"
+
+# The CLI's runtime state (engine state, pidfiles, secret) must live in
+# the env cache, not the user's ~/.agentmemory.
+state="$AGENTMEMORY_CACHE/home/.agentmemory/engine-state.json"
+if [ ! -f "$state" ]; then
+  echo "Error: CLI state not under the env cache: $state missing"
+  exit 1
+fi
+echo ">>> CLI state under $AGENTMEMORY_CACHE/home"
 
 echo ">>> agentmemory environment is working"

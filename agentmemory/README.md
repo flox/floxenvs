@@ -82,9 +82,14 @@ engine the backend starts.
 Check that it is serving:
 
 ```bash
-curl -H "Authorization: Bearer $(cat ~/.agentmemory/secret)" \
+curl -H "Authorization: Bearer $AGENTMEMORY_SECRET" \
   http://localhost:3111/agentmemory/health
 ```
+
+The server reads its LLM and embedding settings from the
+environment it starts in (for example `ANTHROPIC_API_KEY`),
+not from `~/.agentmemory/.env`. Set them in `[vars]` or your
+shell before starting the service.
 
 ## Environment variables
 
@@ -93,7 +98,7 @@ curl -H "Authorization: Bearer $(cat ~/.agentmemory/secret)" \
 | `AGENTMEMORY_URL` | `http://localhost:3111` | REST endpoint hooks talk to |
 | `AGENTMEMORY_INJECT_CONTEXT` | `true` | Injects context on SessionStart |
 | `AGENTMEMORY_VERSION` | `0.9.30` | Pinned server version for `npx` |
-| `AGENTMEMORY_SECRET` | _(unset)_ | Bearer token for the REST endpoint; when unset, the server generates one in `~/.agentmemory/secret` and local hooks read it from there |
+| `AGENTMEMORY_SECRET` | _(generated)_ | Bearer token for the REST endpoint. Unless set, the activation hook generates one in the env cache and exports it for the service and Claude Code |
 
 Override in your own manifest:
 
@@ -108,24 +113,25 @@ AGENTMEMORY_SECRET = "redacted"
 
 ## Data directory
 
-Memory state (`data/`) and the npm cache live in
-`$FLOX_ENV_CACHE/agentmemory/`.
+Everything the service keeps lives in
+`$FLOX_ENV_CACHE/agentmemory/`:
 
-The upstream CLI keeps its runtime files in
-`~/.agentmemory/`: the pinned iii engine binary, the
-generated API secret, pidfiles and preferences. The plugin
-hooks look for the secret there, so it is left in place.
+| Path | Contents |
+| ---- | -------- |
+| `data/` | Memory state |
+| `home/.agentmemory/` | The upstream CLI's runtime files: API secret, engine state, pidfiles, preferences |
+| `npm/`, `npm-prefix/` | npm cache and prefix for `npx` |
 
-To start fresh:
+The service runs the CLI with `HOME` pointed at `home/`,
+so it never touches your own `~/.agentmemory/` and each
+project gets its own state. Only one agentmemory backend
+can hold port `3111` at a time.
+
+To start fresh, stop the service and run:
 
 ```bash
 rm -rf "$FLOX_ENV_CACHE/agentmemory"
 ```
-
-This clears this environment's memories and npm cache but
-leaves `~/.agentmemory/` alone, since other projects using
-agentmemory share it. To reset that too, stop every
-agentmemory service and remove it.
 
 ## See also
 

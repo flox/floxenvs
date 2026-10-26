@@ -34,13 +34,19 @@ if ! grep -q agent-plugin-agentmemory <<<"$list_out"; then
 fi
 echo ">>> flox-agent sees the agentmemory plugin"
 
+# The hook hands Claude Code the service's API secret.
+if [ -z "${AGENTMEMORY_SECRET:-}" ]; then
+  echo "Error: AGENTMEMORY_SECRET not set by the activation hook"
+  exit 1
+fi
+echo ">>> AGENTMEMORY_SECRET set"
+
 # Same health check as the minimal env: the included backend must serve.
 health_url="$AGENTMEMORY_URL/agentmemory/health"
 echo -n "Waiting for $health_url .."
 MAX=180
 while [[ "$MAX" != "0" ]]; do
-  secret="${AGENTMEMORY_SECRET:-$(cat "$HOME/.agentmemory/secret" 2>/dev/null || true)}"
-  if health="$(curl -fsS -H "Authorization: Bearer $secret" "$health_url" 2>/dev/null)"; then
+  if health="$(curl -fsS -H "Authorization: Bearer $AGENTMEMORY_SECRET" "$health_url" 2>/dev/null)"; then
     echo ""
     break
   fi

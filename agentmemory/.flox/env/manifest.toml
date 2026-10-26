@@ -50,16 +50,33 @@ on-activate = '''
 export AGENTMEMORY_CACHE="$FLOX_ENV_CACHE/agentmemory"
 export npm_config_cache="$AGENTMEMORY_CACHE/npm"
 mkdir -p "$npm_config_cache"
+
+# The service keeps its API secret in the env cache (see the
+# service's HOME below), so hand it to Claude Code here: the
+# plugin's hooks and MCP bridge read AGENTMEMORY_SECRET before
+# looking in ~/.agentmemory. An AGENTMEMORY_SECRET set in
+# [vars] wins.
+if [ -z "${AGENTMEMORY_SECRET:-}" ]; then
+  secret_file="$AGENTMEMORY_CACHE/home/.agentmemory/secret"
+  if [ ! -s "$secret_file" ]; then
+    (
+      umask 077
+      mkdir -p "$(dirname "$secret_file")"
+      node -e 'process.stdout.write(require("crypto").randomBytes(32).toString("hex") + "\n")' \
+        > "$secret_file"
+    )
+  fi
+  AGENTMEMORY_SECRET="$(cat "$secret_file")"
+  export AGENTMEMORY_SECRET
+fi
 '''
 
 [services]
 # Run the agentmemory REST/MCP backend via npx so flox
 # services manages its lifecycle. The first start
 # downloads @agentmemory/agentmemory@$AGENTMEMORY_VERSION
-# into the per-env npm cache, and the CLI fetches its
-# pinned iii engine into ~/.agentmemory/bin; later starts
-# are cache-fast. Memory state lives in
-# AGENTMEMORY_DATA_DIR under the env cache.
+# into the per-env npm cache; later starts are
+# cache-fast.
 agentmemory.command = '''
 export AGENTMEMORY_CACHE="$FLOX_ENV_CACHE/agentmemory"
 export npm_config_cache="$AGENTMEMORY_CACHE/npm"
@@ -69,22 +86,31 @@ export npm_config_cache="$AGENTMEMORY_CACHE/npm"
 # set here rather than in the hook so it doesn't override
 # the global prefix of environments that include this one.
 export npm_config_prefix="$AGENTMEMORY_CACHE/npm-prefix"
+export npm_config_userconfig="${npm_config_userconfig:-$HOME/.npmrc}"
+# The CLI keeps its engine state, pidfiles, preferences and
+# API secret under $HOME/.agentmemory. Point HOME into the
+# env cache so each environment has its own, and so the
+# service works where HOME isn't writable.
+export HOME="$AGENTMEMORY_CACHE/home"
 export AGENTMEMORY_DATA_DIR="$AGENTMEMORY_CACHE/data"
 # The CLI skips its onboarding, global-install and
 # engine-install prompts when CI is set, even if the
 # service is attached to a terminal.
 export CI=1
-mkdir -p "$npm_config_cache" "$npm_config_prefix/lib" "$AGENTMEMORY_DATA_DIR"
+mkdir -p "$npm_config_cache" "$npm_config_prefix/lib" "$HOME" "$AGENTMEMORY_DATA_DIR"
 exec npx -y "@agentmemory/agentmemory@$AGENTMEMORY_VERSION"
 '''
 # The CLI starts the iii engine detached, so it outlives
 # the service process. Its own `stop` command shuts down
-# the worker and then the engine. --prefer-offline runs the
-# package from the npm cache the start populated, so
-# stopping doesn't wait on the registry.
+# the worker and then the engine; it needs the same HOME
+# to find their pidfiles. --prefer-offline runs the package
+# from the npm cache the start populated, so stopping
+# doesn't wait on the registry.
 agentmemory.shutdown.command = '''
 export npm_config_cache="$FLOX_ENV_CACHE/agentmemory/npm"
 export npm_config_prefix="$FLOX_ENV_CACHE/agentmemory/npm-prefix"
+export npm_config_userconfig="${npm_config_userconfig:-$HOME/.npmrc}"
+export HOME="$FLOX_ENV_CACHE/agentmemory/home"
 export CI=1
 exec npx -y --prefer-offline "@agentmemory/agentmemory@$AGENTMEMORY_VERSION" stop
 '''
