@@ -21,8 +21,9 @@ intro: >
   long-lived facts, and exposes recall/remember/handoff skills to
   the agent. The backend boots as a Flox service on
   http://localhost:3111 and stops with `flox services stop`;
-  its memories, secret and runtime state stay in the project's
-  Flox cache. Includes the node runtime so the REST shim runs
+  its memories and runtime state stay in the project's Flox
+  cache, and its API secret in ~/.agentmemory, shared across
+  projects. Includes the node runtime so the REST shim runs
   without the consumer env supplying nodejs. Combines well with
   graphify for graph-shaped retrieval.
 summary:

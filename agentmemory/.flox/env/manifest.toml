@@ -65,13 +65,20 @@ case "$agentmemory_host" in
 esac
 if [ -n "$agentmemory_local" ] && [ -z "${AGENTMEMORY_SECRET:-}" ]; then
   secret_file="$HOME/.agentmemory/secret"
+  if [ ! -s "$secret_file" ] \
+    && ! { (umask 077; mkdir -p "$HOME/.agentmemory") 2>/dev/null \
+      && [ -w "$HOME/.agentmemory" ]; }; then
+    # HOME isn't writable (CI builders, some containers), so keep
+    # this env's secret in its own cache instead.
+    secret_file="$AGENTMEMORY_CACHE/secret"
+  fi
   if [ ! -s "$secret_file" ]; then
     # Write a temp file and hard-link it into place, as upstream's
     # ensureServerSecret does, so concurrent activations settle on
     # one secret and nothing ever reads a half-written file.
     (
       umask 077
-      mkdir -p "$HOME/.agentmemory" 2>/dev/null || exit 0
+      mkdir -p "$(dirname "$secret_file")" 2>/dev/null || exit 0
       [ -e "$secret_file" ] && [ ! -s "$secret_file" ] && rm -f "$secret_file"
       tmp="$secret_file.$$.tmp"
       node -e 'process.stdout.write(require("crypto").randomBytes(32).toString("hex") + "\n")' \

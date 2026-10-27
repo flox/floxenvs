@@ -148,7 +148,7 @@ if ! grep -Eq '^agentmemory[[:space:]]+Running' <<<"$status"; then
 fi
 echo ">>> agentmemory service running"
 
-# The CLI's runtime state (engine state, pidfiles, secret) must live in
+# The CLI's runtime state (engine state, pidfiles) must live in
 # the env cache, not the user's ~/.agentmemory.
 state="$AGENTMEMORY_CACHE/home/.agentmemory/engine-state.json"
 if [ ! -f "$state" ]; then

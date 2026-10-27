@@ -98,7 +98,7 @@ shell before starting the service.
 | `AGENTMEMORY_URL` | `http://localhost:3111` | REST endpoint hooks talk to; the service also serves on its port |
 | `AGENTMEMORY_INJECT_CONTEXT` | `true` | Injects context on SessionStart |
 | `AGENTMEMORY_VERSION` | `0.9.30` | Pinned server version for `npx` |
-| `AGENTMEMORY_SECRET` | _(generated)_ | Bearer token for the REST endpoint. For a local `AGENTMEMORY_URL`, the activation hook reads it from `~/.agentmemory/secret` (creating it if needed) and exports it for the service and Claude Code. Set it yourself for a remote server |
+| `AGENTMEMORY_SECRET` | _(generated)_ | Bearer token for the REST endpoint. For a local `AGENTMEMORY_URL`, the activation hook reads it from `~/.agentmemory/secret` (creating it if needed; in the env cache instead when `HOME` isn't writable) and exports it for the service and Claude Code. Set it yourself for a remote server |
 
 Override in your own manifest:
 
@@ -129,6 +129,8 @@ things stay shared, as upstream intends:
 - The API secret, in `~/.agentmemory/secret`. Only one
   backend can hold a port, and Claude Code in every project
   talks to whichever one does, so they all use one secret.
+  Where `HOME` isn't writable (CI builders, some containers),
+  the env keeps its own secret in the cache instead.
 - `~/.claude`, which `home/.claude` links to, so transcript
   import and `CLAUDE_MEMORY_BRIDGE` see your real Claude Code
   data.
