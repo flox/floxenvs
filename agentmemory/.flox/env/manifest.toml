@@ -14,7 +14,7 @@ Persistent memory for coding agents with a REST and MCP backend.
 # Provides Claude Code and the agentmemory plugin, loaded
 # with `flox-agent launch claude`, plus a background
 # `agentmemory` service running the REST/MCP backend
-# on port 3111 (configurable via AGENTMEMORY_URL).
+# on port 3111 (set another with AGENTMEMORY_URL).
 #
 # Pin the runtime server version via AGENTMEMORY_VERSION;
 # the bundled plugin is the matching tag of upstream.
@@ -28,6 +28,12 @@ agent-plugin-agentmemory.pkg-path = "agent-stacks/agent-plugin-agentmemory"
 agent-plugin-agentmemory.pkg-group = "agent-plugin-agentmemory"
 nodejs.pkg-path = "nodejs_20"
 nodejs.pkg-group = "agentmemory"
+# The iii engine the agentmemory server runs on, at the exact
+# version AGENTMEMORY_VERSION pins. With it on PATH the CLI
+# runs it instead of downloading upstream's generic build,
+# which does not run on NixOS or in Flox containers.
+iii.pkg-path = "flox/iii"
+iii.pkg-group = "iii"
 
 [vars]
 # REST endpoint the plugin hooks talk to. Override to point
@@ -50,22 +56,115 @@ on-activate = '''
 export AGENTMEMORY_CACHE="$FLOX_ENV_CACHE/agentmemory"
 export npm_config_cache="$AGENTMEMORY_CACHE/npm"
 mkdir -p "$npm_config_cache"
+
+# Hand Claude Code the local backend's API secret. The plugin's
+# hooks and MCP bridge send AGENTMEMORY_SECRET to whatever
+# AGENTMEMORY_URL is, so only do this for a loopback URL; a
+# remote server needs its own AGENTMEMORY_SECRET in [vars]. The
+# secret lives where upstream keeps it, ~/.agentmemory/secret:
+# every project's Claude Code talks to whichever backend holds
+# the port, so they all need the same one.
+#
+# "Loopback" is upstream's isLoopbackUrl, done the same way: parse
+# the URL, lowercase the host, and accept only localhost, ::1 or a
+# dotted-quad 127.x.x.x. A shell glob on the text would also accept
+# hosts like 127.0.0.1.nip.io, or http://127.0.0.1@example.com
+# (whose host is example.com), and send them the local secret.
+agentmemory_local="$(node -e '
+  let h;
+  try { h = new URL(process.argv[1]).hostname.toLowerCase(); } catch { process.exit(0); }
+  h = h.replace(/^\[|\]$/g, "");
+  if (h === "localhost" || h === "::1" || /^127(?:\.\d{1,3}){3}$/.test(h)) process.stdout.write("1");
+' "$AGENTMEMORY_URL" 2>/dev/null)"
+if [ -n "$agentmemory_local" ] && [ -z "${AGENTMEMORY_SECRET:-}" ]; then
+  secret_file="$HOME/.agentmemory/secret"
+  if [ ! -s "$secret_file" ] \
+    && ! { (umask 077; mkdir -p "$HOME/.agentmemory") 2>/dev/null \
+      && [ -w "$HOME/.agentmemory" ]; }; then
+    # HOME isn't writable (CI builders, some containers), so keep
+    # this env's secret in its own cache instead.
+    secret_file="$AGENTMEMORY_CACHE/secret"
+  fi
+  if [ ! -s "$secret_file" ]; then
+    # Write a temp file and hard-link it into place, as upstream's
+    # ensureServerSecret does, so concurrent activations settle on
+    # one secret and nothing ever reads a half-written file.
+    (
+      umask 077
+      mkdir -p "$(dirname "$secret_file")" 2>/dev/null || exit 0
+      [ -e "$secret_file" ] && [ ! -s "$secret_file" ] && rm -f "$secret_file"
+      tmp="$secret_file.$$.tmp"
+      node -e 'process.stdout.write(require("crypto").randomBytes(32).toString("hex") + "\n")' \
+        > "$tmp" 2>/dev/null && [ -s "$tmp" ] && ln "$tmp" "$secret_file" 2>/dev/null
+      rm -f "$tmp"
+    )
+  fi
+  if [ -s "$secret_file" ]; then
+    AGENTMEMORY_SECRET="$(cat "$secret_file")"
+    export AGENTMEMORY_SECRET
+  fi
+fi
+unset agentmemory_local secret_file
 '''
 
 [services]
 # Run the agentmemory REST/MCP backend via npx so flox
-# services manages its lifecycle. The first activation
+# services manages its lifecycle. The first start
 # downloads @agentmemory/agentmemory@$AGENTMEMORY_VERSION
-# into the per-env npm cache; subsequent starts are
-# cache-fast. The server uses SQLite under
-# $XDG_DATA_HOME (scoped via AGENTMEMORY_CACHE below).
+# into the per-env npm cache; later starts are
+# cache-fast.
 agentmemory.command = '''
 export AGENTMEMORY_CACHE="$FLOX_ENV_CACHE/agentmemory"
 export npm_config_cache="$AGENTMEMORY_CACHE/npm"
-export XDG_DATA_HOME="$AGENTMEMORY_CACHE/data"
-mkdir -p "$npm_config_cache" "$XDG_DATA_HOME"
-exec npx -y "@agentmemory/agentmemory@$AGENTMEMORY_VERSION"
+# nixpkgs runs npm under nodejs-slim, whose store path has no
+# lib/, so npm's default global prefix is unusable and npx
+# fails with ENOENT. Give npm a writable prefix of its own,
+# set here rather than in the hook so it doesn't override
+# the global prefix of environments that include this one.
+export npm_config_prefix="$AGENTMEMORY_CACHE/npm-prefix"
+export npm_config_userconfig="${npm_config_userconfig:-$HOME/.npmrc}"
+# The CLI keeps its engine state, pidfiles and preferences
+# under $HOME/.agentmemory. Point HOME into the env cache so
+# each environment has its own, and so the service works
+# where HOME isn't writable. The API secret comes from
+# AGENTMEMORY_SECRET, which the hook exports.
+real_home="$HOME"
+export HOME="$AGENTMEMORY_CACHE/home"
+export AGENTMEMORY_DATA_DIR="$AGENTMEMORY_CACHE/data"
+# The CLI skips its onboarding, global-install and
+# engine-install prompts when CI is set, even if the
+# service is attached to a terminal.
+export CI=1
+mkdir -p "$npm_config_cache" "$npm_config_prefix/lib" "$HOME" "$AGENTMEMORY_DATA_DIR"
+# Transcript import and CLAUDE_MEMORY_BRIDGE use ~/.claude;
+# keep them on the real one.
+if [ -d "$real_home/.claude" ] && [ ! -e "$HOME/.claude" ]; then
+  ln -s "$real_home/.claude" "$HOME/.claude"
+fi
+# Serve on AGENTMEMORY_URL's port so the server and its
+# clients agree; the CLI derives its other ports from it.
+port="$(printf '%s' "$AGENTMEMORY_URL" | sed -nE 's#^[a-zA-Z]+://[^/]*:([0-9]+)(/.*)?$#\1#p')"
+exec npx -y "@agentmemory/agentmemory@$AGENTMEMORY_VERSION" --port "${port:-3111}"
 '''
+# The CLI starts the iii engine detached, so it outlives
+# the service process. Its own `stop` command shuts down
+# the worker and then the engine; it needs the same HOME
+# and port to find them. --prefer-offline runs the package
+# from the npm cache the start populated, so stopping
+# doesn't wait on the registry. Stopping waits up to ~9s
+# for the worker to flush, so allow more than the default.
+agentmemory.shutdown.command = '''
+export AGENTMEMORY_CACHE="$FLOX_ENV_CACHE/agentmemory"
+export npm_config_cache="$AGENTMEMORY_CACHE/npm"
+export npm_config_prefix="$AGENTMEMORY_CACHE/npm-prefix"
+export npm_config_userconfig="${npm_config_userconfig:-$HOME/.npmrc}"
+export HOME="$AGENTMEMORY_CACHE/home"
+export CI=1
+mkdir -p "$npm_config_cache" "$npm_config_prefix/lib" "$HOME"
+port="$(printf '%s' "$AGENTMEMORY_URL" | sed -nE 's#^[a-zA-Z]+://[^/]*:([0-9]+)(/.*)?$#\1#p')"
+exec npx -y --prefer-offline "@agentmemory/agentmemory@$AGENTMEMORY_VERSION" stop --port "${port:-3111}"
+'''
+agentmemory.shutdown.timeout-seconds = 30
 
 [options]
 systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]

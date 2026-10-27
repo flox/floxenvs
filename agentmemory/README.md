@@ -26,7 +26,8 @@ flox activate -r flox/agentmemory --start-services
 
 The first activation downloads the
 `@agentmemory/agentmemory` npm package into the per-env
-cache and starts the backend on
+cache, fetches the pinned iii engine it runs on, and starts
+the backend on
 [`http://localhost:3111`](http://localhost:3111).
 
 Then, in any directory, run `flox-agent launch claude` to
@@ -74,17 +75,30 @@ flox services status           # check status
 flox services logs agentmemory # view logs
 ```
 
-SQLite state and the npm cache live under
-`$FLOX_ENV_CACHE/agentmemory/`.
+The service runs non-interactively, skipping the upstream
+CLI's setup prompts. `flox services stop` also stops the iii
+engine the backend starts.
+
+Check that it is serving:
+
+```bash
+curl -H "Authorization: Bearer $AGENTMEMORY_SECRET" \
+  http://localhost:3111/agentmemory/health
+```
+
+The server reads its LLM and embedding settings from the
+environment it starts in (for example `ANTHROPIC_API_KEY`),
+not from `~/.agentmemory/.env`. Set them in `[vars]` or your
+shell before starting the service.
 
 ## Environment variables
 
 | Variable | Default | Description |
 | -------- | ------- | ----------- |
-| `AGENTMEMORY_URL` | `http://localhost:3111` | REST endpoint hooks talk to |
+| `AGENTMEMORY_URL` | `http://localhost:3111` | REST endpoint hooks talk to; the service also serves on its port. Give the port explicitly (`http://localhost:3111`, not `http://localhost`): without one the service still listens on 3111 while clients go to 80 |
 | `AGENTMEMORY_INJECT_CONTEXT` | `true` | Injects context on SessionStart |
 | `AGENTMEMORY_VERSION` | `0.9.30` | Pinned server version for `npx` |
-| `AGENTMEMORY_SECRET` | _(unset)_ | Bearer token sent to the REST endpoint |
+| `AGENTMEMORY_SECRET` | _(generated)_ | Bearer token for the REST endpoint. For a local `AGENTMEMORY_URL`, the activation hook reads it from `~/.agentmemory/secret` (creating it if needed; in the env cache instead when `HOME` isn't writable) and exports it for the service and Claude Code. Set it yourself for a remote server |
 
 Override in your own manifest:
 
@@ -99,10 +113,33 @@ AGENTMEMORY_SECRET = "redacted"
 
 ## Data directory
 
-State (SQLite, npm cache) lives in
-`$FLOX_ENV_CACHE/agentmemory/`.
+Everything the service keeps lives in
+`$FLOX_ENV_CACHE/agentmemory/`:
 
-To start fresh:
+| Path | Contents |
+| ---- | -------- |
+| `data/` | Memory state |
+| `home/.agentmemory/` | The upstream CLI's runtime files: engine state, pidfiles, preferences |
+| `npm/`, `npm-prefix/` | npm cache and prefix for `npx` |
+
+The service runs the CLI with `HOME` pointed at `home/`,
+so each project gets its own engine and memory state. Two
+things stay shared, as upstream intends:
+
+- The API secret, in `~/.agentmemory/secret`. Only one
+  backend can hold a port, and Claude Code in every project
+  talks to whichever one does, so they all use one secret.
+  Where `HOME` isn't writable (CI builders, some containers),
+  the env keeps its own secret in the cache instead.
+- `~/.claude`, which `home/.claude` links to, so transcript
+  import and `CLAUDE_MEMORY_BRIDGE` see your real Claude Code
+  data.
+
+To run a backend per project at the same time, give each
+project its own port in `AGENTMEMORY_URL` (for example
+`http://localhost:13111`).
+
+To start fresh, stop the service and run:
 
 ```bash
 rm -rf "$FLOX_ENV_CACHE/agentmemory"

@@ -20,6 +20,10 @@
         "pkg-path": "gum",
         "pkg-group": "demo-tools"
       },
+      "iii": {
+        "pkg-path": "flox/iii",
+        "pkg-group": "iii"
+      },
       "nodejs": {
         "pkg-path": "nodejs_20",
         "pkg-group": "agentmemory"
@@ -31,7 +35,7 @@
       "AGENTMEMORY_VERSION": "0.9.30"
     },
     "hook": {
-      "on-activate": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\nmkdir -p \"$npm_config_cache\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'REST + MCP:' \\\n    \"  $AGENTMEMORY_URL\" \\\n    '' \\\n    'Pinned server version:' \\\n    \"  $AGENTMEMORY_VERSION\"\nfi\n"
+      "on-activate": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\nmkdir -p \"$npm_config_cache\"\n\n# Hand Claude Code the local backend's API secret. The plugin's\n# hooks and MCP bridge send AGENTMEMORY_SECRET to whatever\n# AGENTMEMORY_URL is, so only do this for a loopback URL; a\n# remote server needs its own AGENTMEMORY_SECRET in [vars]. The\n# secret lives where upstream keeps it, ~/.agentmemory/secret:\n# every project's Claude Code talks to whichever backend holds\n# the port, so they all need the same one.\n#\n# \"Loopback\" is upstream's isLoopbackUrl, done the same way: parse\n# the URL, lowercase the host, and accept only localhost, ::1 or a\n# dotted-quad 127.x.x.x. A shell glob on the text would also accept\n# hosts like 127.0.0.1.nip.io, or http://127.0.0.1@example.com\n# (whose host is example.com), and send them the local secret.\nagentmemory_local=\"$(node -e '\n  let h;\n  try { h = new URL(process.argv[1]).hostname.toLowerCase(); } catch { process.exit(0); }\n  h = h.replace(/^\\[|\\]$/g, \"\");\n  if (h === \"localhost\" || h === \"::1\" || /^127(?:\\.\\d{1,3}){3}$/.test(h)) process.stdout.write(\"1\");\n' \"$AGENTMEMORY_URL\" 2>/dev/null)\"\nif [ -n \"$agentmemory_local\" ] && [ -z \"${AGENTMEMORY_SECRET:-}\" ]; then\n  secret_file=\"$HOME/.agentmemory/secret\"\n  if [ ! -s \"$secret_file\" ] \\\n    && ! { (umask 077; mkdir -p \"$HOME/.agentmemory\") 2>/dev/null \\\n      && [ -w \"$HOME/.agentmemory\" ]; }; then\n    # HOME isn't writable (CI builders, some containers), so keep\n    # this env's secret in its own cache instead.\n    secret_file=\"$AGENTMEMORY_CACHE/secret\"\n  fi\n  if [ ! -s \"$secret_file\" ]; then\n    # Write a temp file and hard-link it into place, as upstream's\n    # ensureServerSecret does, so concurrent activations settle on\n    # one secret and nothing ever reads a half-written file.\n    (\n      umask 077\n      mkdir -p \"$(dirname \"$secret_file\")\" 2>/dev/null || exit 0\n      [ -e \"$secret_file\" ] && [ ! -s \"$secret_file\" ] && rm -f \"$secret_file\"\n      tmp=\"$secret_file.$$.tmp\"\n      node -e 'process.stdout.write(require(\"crypto\").randomBytes(32).toString(\"hex\") + \"\\n\")' \\\n        > \"$tmp\" 2>/dev/null && [ -s \"$tmp\" ] && ln \"$tmp\" \"$secret_file\" 2>/dev/null\n      rm -f \"$tmp\"\n    )\n  fi\n  if [ -s \"$secret_file\" ]; then\n    AGENTMEMORY_SECRET=\"$(cat \"$secret_file\")\"\n    export AGENTMEMORY_SECRET\n  fi\nfi\nunset agentmemory_local secret_file\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'REST + MCP:' \\\n    \"  $AGENTMEMORY_URL\" \\\n    '' \\\n    'Pinned server version:' \\\n    \"  $AGENTMEMORY_VERSION\"\nfi\n"
     },
     "options": {
       "systems": [
@@ -42,7 +46,11 @@
     },
     "services": {
       "agentmemory": {
-        "command": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\nexport XDG_DATA_HOME=\"$AGENTMEMORY_CACHE/data\"\nmkdir -p \"$npm_config_cache\" \"$XDG_DATA_HOME\"\nexec npx -y \"@agentmemory/agentmemory@$AGENTMEMORY_VERSION\"\n"
+        "command": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\n# nixpkgs runs npm under nodejs-slim, whose store path has no\n# lib/, so npm's default global prefix is unusable and npx\n# fails with ENOENT. Give npm a writable prefix of its own,\n# set here rather than in the hook so it doesn't override\n# the global prefix of environments that include this one.\nexport npm_config_prefix=\"$AGENTMEMORY_CACHE/npm-prefix\"\nexport npm_config_userconfig=\"${npm_config_userconfig:-$HOME/.npmrc}\"\n# The CLI keeps its engine state, pidfiles and preferences\n# under $HOME/.agentmemory. Point HOME into the env cache so\n# each environment has its own, and so the service works\n# where HOME isn't writable. The API secret comes from\n# AGENTMEMORY_SECRET, which the hook exports.\nreal_home=\"$HOME\"\nexport HOME=\"$AGENTMEMORY_CACHE/home\"\nexport AGENTMEMORY_DATA_DIR=\"$AGENTMEMORY_CACHE/data\"\n# The CLI skips its onboarding, global-install and\n# engine-install prompts when CI is set, even if the\n# service is attached to a terminal.\nexport CI=1\nmkdir -p \"$npm_config_cache\" \"$npm_config_prefix/lib\" \"$HOME\" \"$AGENTMEMORY_DATA_DIR\"\n# Transcript import and CLAUDE_MEMORY_BRIDGE use ~/.claude;\n# keep them on the real one.\nif [ -d \"$real_home/.claude\" ] && [ ! -e \"$HOME/.claude\" ]; then\n  ln -s \"$real_home/.claude\" \"$HOME/.claude\"\nfi\n# Serve on AGENTMEMORY_URL's port so the server and its\n# clients agree; the CLI derives its other ports from it.\nport=\"$(printf '%s' \"$AGENTMEMORY_URL\" | sed -nE 's#^[a-zA-Z]+://[^/]*:([0-9]+)(/.*)?$#\\1#p')\"\nexec npx -y \"@agentmemory/agentmemory@$AGENTMEMORY_VERSION\" --port \"${port:-3111}\"\n",
+        "shutdown": {
+          "command": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\nexport npm_config_prefix=\"$AGENTMEMORY_CACHE/npm-prefix\"\nexport npm_config_userconfig=\"${npm_config_userconfig:-$HOME/.npmrc}\"\nexport HOME=\"$AGENTMEMORY_CACHE/home\"\nexport CI=1\nmkdir -p \"$npm_config_cache\" \"$npm_config_prefix/lib\" \"$HOME\"\nport=\"$(printf '%s' \"$AGENTMEMORY_URL\" | sed -nE 's#^[a-zA-Z]+://[^/]*:([0-9]+)(/.*)?$#\\1#p')\"\nexec npx -y --prefer-offline \"@agentmemory/agentmemory@$AGENTMEMORY_VERSION\" stop --port \"${port:-3111}\"\n",
+          "timeout-seconds": 30
+        }
       }
     }
   },
@@ -499,6 +507,99 @@
       "system": "x86_64-linux",
       "group": "flox-agent",
       "priority": 5
+    },
+    {
+      "attr_path": "iii",
+      "broken": false,
+      "derivation": "/nix/store/51y0z6azj8fgswhly0nmpskak0ib2mv5-iii-0.22.1.drv",
+      "description": "iii engine, the runtime the agentmemory server runs on",
+      "install_id": "iii",
+      "license": "[ Apache-2.0, Elastic-2.0 ]",
+      "locked_url": "https://github.com/flox/floxenvs?rev=db1063f20743cc69d058b0952aea6672f0a17b48",
+      "name": "iii-0.22.1",
+      "pname": "iii",
+      "rev": "db1063f20743cc69d058b0952aea6672f0a17b48",
+      "rev_count": 30377,
+      "rev_date": "2026-10-27T18:22:02Z",
+      "scrape_date": "2026-10-27T18:55:07.460364Z",
+      "stabilities": [
+        "unstable",
+        "stable",
+        "staging"
+      ],
+      "unfree": true,
+      "version": "0.22.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/2f9ls887klbzvpqdawabgy03dc5b3r4l-iii-0.22.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "iii",
+      "priority": 5
+    },
+    {
+      "attr_path": "iii",
+      "broken": false,
+      "derivation": "/nix/store/jl16aphmvmas10mhnfc10y0y473fy9hq-iii-0.22.1.drv",
+      "description": "iii engine, the runtime the agentmemory server runs on",
+      "install_id": "iii",
+      "license": "[ Apache-2.0, Elastic-2.0 ]",
+      "locked_url": "https://github.com/flox/floxenvs?rev=db1063f20743cc69d058b0952aea6672f0a17b48",
+      "name": "iii-0.22.1",
+      "pname": "iii",
+      "rev": "db1063f20743cc69d058b0952aea6672f0a17b48",
+      "rev_count": 30377,
+      "rev_date": "2026-10-27T18:22:02Z",
+      "scrape_date": "2026-10-27T18:55:07.460366Z",
+      "stabilities": [
+        "unstable",
+        "stable",
+        "staging"
+      ],
+      "unfree": true,
+      "version": "0.22.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/f347jwy35vdz44s29yjywm61s0w1vpmi-iii-0.22.1"
+      },
+      "system": "aarch64-linux",
+      "group": "iii",
+      "priority": 5
+    },
+    {
+      "attr_path": "iii",
+      "broken": false,
+      "derivation": "/nix/store/wj4wkh6iqabdp950vhh08nm2vy14q0mh-iii-0.22.1.drv",
+      "description": "iii engine, the runtime the agentmemory server runs on",
+      "install_id": "iii",
+      "license": "[ Apache-2.0, Elastic-2.0 ]",
+      "locked_url": "https://github.com/flox/floxenvs?rev=db1063f20743cc69d058b0952aea6672f0a17b48",
+      "name": "iii-0.22.1",
+      "pname": "iii",
+      "rev": "db1063f20743cc69d058b0952aea6672f0a17b48",
+      "rev_count": 30377,
+      "rev_date": "2026-10-27T18:22:02Z",
+      "scrape_date": "2026-10-27T18:55:07.460367Z",
+      "stabilities": [
+        "unstable",
+        "stable",
+        "staging"
+      ],
+      "unfree": true,
+      "version": "0.22.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/hgxbilniwnidfmj647j56k42k8jblv0w-iii-0.22.1"
+      },
+      "system": "x86_64-linux",
+      "group": "iii",
+      "priority": 5
     }
   ],
   "compose": {
@@ -547,6 +648,10 @@
               "pkg-path": "flox/flox-agent",
               "pkg-group": "flox-agent"
             },
+            "iii": {
+              "pkg-path": "flox/iii",
+              "pkg-group": "iii"
+            },
             "nodejs": {
               "pkg-path": "nodejs_20",
               "pkg-group": "agentmemory"
@@ -558,7 +663,7 @@
             "AGENTMEMORY_VERSION": "0.9.30"
           },
           "hook": {
-            "on-activate": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\nmkdir -p \"$npm_config_cache\"\n"
+            "on-activate": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\nmkdir -p \"$npm_config_cache\"\n\n# Hand Claude Code the local backend's API secret. The plugin's\n# hooks and MCP bridge send AGENTMEMORY_SECRET to whatever\n# AGENTMEMORY_URL is, so only do this for a loopback URL; a\n# remote server needs its own AGENTMEMORY_SECRET in [vars]. The\n# secret lives where upstream keeps it, ~/.agentmemory/secret:\n# every project's Claude Code talks to whichever backend holds\n# the port, so they all need the same one.\n#\n# \"Loopback\" is upstream's isLoopbackUrl, done the same way: parse\n# the URL, lowercase the host, and accept only localhost, ::1 or a\n# dotted-quad 127.x.x.x. A shell glob on the text would also accept\n# hosts like 127.0.0.1.nip.io, or http://127.0.0.1@example.com\n# (whose host is example.com), and send them the local secret.\nagentmemory_local=\"$(node -e '\n  let h;\n  try { h = new URL(process.argv[1]).hostname.toLowerCase(); } catch { process.exit(0); }\n  h = h.replace(/^\\[|\\]$/g, \"\");\n  if (h === \"localhost\" || h === \"::1\" || /^127(?:\\.\\d{1,3}){3}$/.test(h)) process.stdout.write(\"1\");\n' \"$AGENTMEMORY_URL\" 2>/dev/null)\"\nif [ -n \"$agentmemory_local\" ] && [ -z \"${AGENTMEMORY_SECRET:-}\" ]; then\n  secret_file=\"$HOME/.agentmemory/secret\"\n  if [ ! -s \"$secret_file\" ] \\\n    && ! { (umask 077; mkdir -p \"$HOME/.agentmemory\") 2>/dev/null \\\n      && [ -w \"$HOME/.agentmemory\" ]; }; then\n    # HOME isn't writable (CI builders, some containers), so keep\n    # this env's secret in its own cache instead.\n    secret_file=\"$AGENTMEMORY_CACHE/secret\"\n  fi\n  if [ ! -s \"$secret_file\" ]; then\n    # Write a temp file and hard-link it into place, as upstream's\n    # ensureServerSecret does, so concurrent activations settle on\n    # one secret and nothing ever reads a half-written file.\n    (\n      umask 077\n      mkdir -p \"$(dirname \"$secret_file\")\" 2>/dev/null || exit 0\n      [ -e \"$secret_file\" ] && [ ! -s \"$secret_file\" ] && rm -f \"$secret_file\"\n      tmp=\"$secret_file.$$.tmp\"\n      node -e 'process.stdout.write(require(\"crypto\").randomBytes(32).toString(\"hex\") + \"\\n\")' \\\n        > \"$tmp\" 2>/dev/null && [ -s \"$tmp\" ] && ln \"$tmp\" \"$secret_file\" 2>/dev/null\n      rm -f \"$tmp\"\n    )\n  fi\n  if [ -s \"$secret_file\" ]; then\n    AGENTMEMORY_SECRET=\"$(cat \"$secret_file\")\"\n    export AGENTMEMORY_SECRET\n  fi\nfi\nunset agentmemory_local secret_file\n"
           },
           "options": {
             "systems": [
@@ -569,7 +674,11 @@
           },
           "services": {
             "agentmemory": {
-              "command": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\nexport XDG_DATA_HOME=\"$AGENTMEMORY_CACHE/data\"\nmkdir -p \"$npm_config_cache\" \"$XDG_DATA_HOME\"\nexec npx -y \"@agentmemory/agentmemory@$AGENTMEMORY_VERSION\"\n"
+              "command": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\n# nixpkgs runs npm under nodejs-slim, whose store path has no\n# lib/, so npm's default global prefix is unusable and npx\n# fails with ENOENT. Give npm a writable prefix of its own,\n# set here rather than in the hook so it doesn't override\n# the global prefix of environments that include this one.\nexport npm_config_prefix=\"$AGENTMEMORY_CACHE/npm-prefix\"\nexport npm_config_userconfig=\"${npm_config_userconfig:-$HOME/.npmrc}\"\n# The CLI keeps its engine state, pidfiles and preferences\n# under $HOME/.agentmemory. Point HOME into the env cache so\n# each environment has its own, and so the service works\n# where HOME isn't writable. The API secret comes from\n# AGENTMEMORY_SECRET, which the hook exports.\nreal_home=\"$HOME\"\nexport HOME=\"$AGENTMEMORY_CACHE/home\"\nexport AGENTMEMORY_DATA_DIR=\"$AGENTMEMORY_CACHE/data\"\n# The CLI skips its onboarding, global-install and\n# engine-install prompts when CI is set, even if the\n# service is attached to a terminal.\nexport CI=1\nmkdir -p \"$npm_config_cache\" \"$npm_config_prefix/lib\" \"$HOME\" \"$AGENTMEMORY_DATA_DIR\"\n# Transcript import and CLAUDE_MEMORY_BRIDGE use ~/.claude;\n# keep them on the real one.\nif [ -d \"$real_home/.claude\" ] && [ ! -e \"$HOME/.claude\" ]; then\n  ln -s \"$real_home/.claude\" \"$HOME/.claude\"\nfi\n# Serve on AGENTMEMORY_URL's port so the server and its\n# clients agree; the CLI derives its other ports from it.\nport=\"$(printf '%s' \"$AGENTMEMORY_URL\" | sed -nE 's#^[a-zA-Z]+://[^/]*:([0-9]+)(/.*)?$#\\1#p')\"\nexec npx -y \"@agentmemory/agentmemory@$AGENTMEMORY_VERSION\" --port \"${port:-3111}\"\n",
+              "shutdown": {
+                "command": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\nexport npm_config_prefix=\"$AGENTMEMORY_CACHE/npm-prefix\"\nexport npm_config_userconfig=\"${npm_config_userconfig:-$HOME/.npmrc}\"\nexport HOME=\"$AGENTMEMORY_CACHE/home\"\nexport CI=1\nmkdir -p \"$npm_config_cache\" \"$npm_config_prefix/lib\" \"$HOME\"\nport=\"$(printf '%s' \"$AGENTMEMORY_URL\" | sed -nE 's#^[a-zA-Z]+://[^/]*:([0-9]+)(/.*)?$#\\1#p')\"\nexec npx -y --prefer-offline \"@agentmemory/agentmemory@$AGENTMEMORY_VERSION\" stop --port \"${port:-3111}\"\n",
+                "timeout-seconds": 30
+              }
             }
           }
         },
