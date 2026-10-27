@@ -83,7 +83,7 @@ SQLite state and the npm cache live under
 | -------- | ------- | ----------- |
 | `AGENTMEMORY_URL` | `http://localhost:3111` | REST endpoint hooks talk to |
 | `AGENTMEMORY_INJECT_CONTEXT` | `true` | Injects context on SessionStart |
-| `AGENTMEMORY_VERSION` | `0.9.20` | Pinned server version for `npx` |
+| `AGENTMEMORY_VERSION` | `0.9.30` | Pinned server version for `npx` |
 | `AGENTMEMORY_SECRET` | _(unset)_ | Bearer token sent to the REST endpoint |
 
 Override in your own manifest:
