@@ -33,7 +33,7 @@ jobs:
         uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
 
       - name: "Install flox"
-        uses: "flox/install-flox-action@1128abd73431089ab9d871c893b4e72a729354e1" # v2.6.0
+        uses: "flox/install-flox-action@5bb9eaaffbeaa699a8251a1ae21ecf4c8e0e37d4" # v2.7.0
 
       - name: "Install Nix"
         uses: "DeterminateSystems/nix-installer-action@1d87d45818068401a10cf16bdc5f00b24994a83f" # v22
@@ -250,7 +250,7 @@ jobs:
           ssh-private-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
 
       - name: "Setup Tailscale"
-        uses: "tailscale/github-action@d1b6cd204f8dceda5b3eaad7f1f767be390056cd" # v4.2.0
+        uses: "tailscale/github-action@99a8333667fff04fdd6cffb46dfd409f8329a7bf" # v4.3.0
         with:
           oauth-secret: "${{ secrets.MANAGED_TAILSCALE_AUTH_KEY }}"
           tags: "tag:ci"
@@ -321,7 +321,7 @@ jobs:
           ssh-private-key: "${{ secrets.MANAGED_FLOXBOT_SSH_KEY }}"
 
       - name: "Setup Tailscale"
-        uses: "tailscale/github-action@d1b6cd204f8dceda5b3eaad7f1f767be390056cd" # v4.2.0
+        uses: "tailscale/github-action@99a8333667fff04fdd6cffb46dfd409f8329a7bf" # v4.3.0
         with:
           oauth-secret: "${{ secrets.MANAGED_TAILSCALE_AUTH_KEY }}"
           tags: "tag:ci"
@@ -389,7 +389,7 @@ jobs:
         uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
 
       - name: "Install flox"
-        uses: "flox/install-flox-action@1128abd73431089ab9d871c893b4e72a729354e1" # v2.6.0
+        uses: "flox/install-flox-action@5bb9eaaffbeaa699a8251a1ae21ecf4c8e0e37d4" # v2.7.0
 
       - name: "Determine target org"
         id: "org"
@@ -483,7 +483,7 @@ jobs:
         uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
 
       - name: "Install flox"
-        uses: "flox/install-flox-action@1128abd73431089ab9d871c893b4e72a729354e1" # v2.6.0
+        uses: "flox/install-flox-action@5bb9eaaffbeaa699a8251a1ae21ecf4c8e0e37d4" # v2.7.0
 
       - name: "Determine target org"
         id: "org"
