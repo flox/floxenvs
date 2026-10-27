@@ -4,6 +4,7 @@
   fetchurl,
   autoPatchelfHook,
   gcc-unwrapped,
+  makeWrapper,
   versionCheckHook,
   writableTmpDirAsHomeHook,
 }:
@@ -38,7 +39,10 @@ stdenv.mkDerivation {
   # The upstream Linux builds are glibc binaries with a hardcoded
   # /lib64 interpreter, which doesn't exist on NixOS or in Flox
   # containers.
-  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [
+  nativeBuildInputs = [
+    makeWrapper
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
     autoPatchelfHook
   ];
 
@@ -50,6 +54,11 @@ stdenv.mkDerivation {
     runHook preInstall
 
     install -Dm755 iii $out/bin/iii
+
+    # iii sends anonymous usage data unless told not to. Default it
+    # off; anyone who wants it can still set III_TELEMETRY_ENABLED.
+    wrapProgram $out/bin/iii \
+      --set-default III_TELEMETRY_ENABLED false
 
     runHook postInstall
   '';
