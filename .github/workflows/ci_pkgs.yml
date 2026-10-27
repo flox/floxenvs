@@ -485,8 +485,8 @@ jobs:
         timeout-minutes: 60
         # Fragments are content-audited from the build above; run-audit.sh
         # reuses result-<pkg> and runs `flox-agent audit`. flox-agent and
-        # skillspector live in the .website env (NOT the root env, so
-        # they stay out of `flox build`'s nixpkgs resolution).
+        # skillspector live in the .website env, which this step
+        # activates, not in the root env that `flox build` uses.
         shell: "flox activate -d .website -- bash -e {0}"
         run: |
           set -euo pipefail

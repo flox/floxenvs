@@ -426,8 +426,8 @@ jobs:
         run: |
           ENV="${{ inputs.environment }}"
           MANIFEST="$ENV/.flox/env/manifest.toml"
-          # A non-demo env can still include local siblings (e.g.
-          # understand-anything includes ../claude). FloxHub rejects
+          # A non-demo env can still include local siblings (a
+          # `{ dir = "../X" }` entry). FloxHub rejects
           # pushes whose manifest includes local environments, so rewrite
           # any `{ dir = "../X" }` to its published `{ remote = "OWNER/X" }`
           # form and re-lock. No-op for envs without local includes.
