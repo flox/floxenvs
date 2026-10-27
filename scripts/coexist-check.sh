@@ -45,13 +45,14 @@ mapfile -t SKILLS < <(
   grep -rl 'flox_agent_layout' "$REPO_ROOT"/.flox/pkgs/*/default.nix \
     | xargs -n1 dirname | xargs -n1 basename | sort -u
 )
-# The 2 source-built agent runtimes.
+# The 2 source-built agent runtimes + the 4 source-built audit tools.
 # flox-agent, opencode and pi are NOT built here: they have no local
 # .flox/pkgs entry, so they can't be `flox build`-ed. They are still
 # checked for coexistence — installed from the catalog into the same env
 # below (see EXTERNAL_PKGS).
 TOOLS=(
   claude-code codex
+  skill-tools skill-validator skillcheck claudelint
 )
 # Extra packages to install into the single env (NOT built from source),
 # each installed by pkg-path after the source-built artifacts:
@@ -74,7 +75,7 @@ TOOLS=(
 EXTERNAL_PKGS=(flox/flox-agent agent-stacks/skillspector agent-stacks/opencode agent-stacks/pi python3 nodejs)
 PACKAGES=("${SKILLS[@]}" "${TOOLS[@]}")
 TOTAL=$(( ${#PACKAGES[@]} + ${#EXTERNAL_PKGS[@]} ))
-echo "Target: ${#SKILLS[@]} skills + ${#TOOLS[@]} agents" \
+echo "Target: ${#SKILLS[@]} skills + ${#TOOLS[@]} agents/audit tools" \
      "+ ${#EXTERNAL_PKGS[@]} external pkgs = $TOTAL packages"
 
 # ── Build every package from source; collect the result symlink paths ──
