@@ -29,7 +29,7 @@ environments = ["flox/hermes"]
 
 | Package | Description |
 | ------- | ----------- |
-| `flox/hermes-agent` | The `hermes` CLI (Python 3.14 venv) |
+| `agent-stacks/hermes-agent` | The `hermes` CLI (Python 3.14 venv) |
 | `ripgrep` | Required by hermes' shell tools |
 | `ffmpeg` | Required for voice-memo transcription |
 | `git` | Required by hermes' git-aware tools |
