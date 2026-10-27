@@ -95,10 +95,10 @@ shell before starting the service.
 
 | Variable | Default | Description |
 | -------- | ------- | ----------- |
-| `AGENTMEMORY_URL` | `http://localhost:3111` | REST endpoint hooks talk to |
+| `AGENTMEMORY_URL` | `http://localhost:3111` | REST endpoint hooks talk to; the service also serves on its port |
 | `AGENTMEMORY_INJECT_CONTEXT` | `true` | Injects context on SessionStart |
 | `AGENTMEMORY_VERSION` | `0.9.30` | Pinned server version for `npx` |
-| `AGENTMEMORY_SECRET` | _(generated)_ | Bearer token for the REST endpoint. Unless set, the activation hook generates one in the env cache and exports it for the service and Claude Code |
+| `AGENTMEMORY_SECRET` | _(generated)_ | Bearer token for the REST endpoint. For a local `AGENTMEMORY_URL`, the activation hook reads it from `~/.agentmemory/secret` (creating it if needed) and exports it for the service and Claude Code. Set it yourself for a remote server |
 
 Override in your own manifest:
 
@@ -119,13 +119,23 @@ Everything the service keeps lives in
 | Path | Contents |
 | ---- | -------- |
 | `data/` | Memory state |
-| `home/.agentmemory/` | The upstream CLI's runtime files: API secret, engine state, pidfiles, preferences |
+| `home/.agentmemory/` | The upstream CLI's runtime files: engine state, pidfiles, preferences |
 | `npm/`, `npm-prefix/` | npm cache and prefix for `npx` |
 
 The service runs the CLI with `HOME` pointed at `home/`,
-so it never touches your own `~/.agentmemory/` and each
-project gets its own state. Only one agentmemory backend
-can hold port `3111` at a time.
+so each project gets its own engine and memory state. Two
+things stay shared, as upstream intends:
+
+- The API secret, in `~/.agentmemory/secret`. Only one
+  backend can hold a port, and Claude Code in every project
+  talks to whichever one does, so they all use one secret.
+- `~/.claude`, which `home/.claude` links to, so transcript
+  import and `CLAUDE_MEMORY_BRIDGE` see your real Claude Code
+  data.
+
+To run a backend per project at the same time, give each
+project its own port in `AGENTMEMORY_URL` (for example
+`http://localhost:13111`).
 
 To start fresh, stop the service and run:
 
