@@ -28,6 +28,12 @@ agent-plugin-agentmemory.pkg-path = "agent-stacks/agent-plugin-agentmemory"
 agent-plugin-agentmemory.pkg-group = "agent-plugin-agentmemory"
 nodejs.pkg-path = "nodejs_20"
 nodejs.pkg-group = "agentmemory"
+# The iii engine the agentmemory server runs on, at the exact
+# version AGENTMEMORY_VERSION pins. With it on PATH the CLI
+# runs it instead of downloading upstream's generic build,
+# which does not run on NixOS or in Flox containers.
+iii.pkg-path = "flox/iii"
+iii.pkg-group = "iii"
 
 [vars]
 # REST endpoint the plugin hooks talk to. Override to point
