@@ -95,7 +95,7 @@ shell before starting the service.
 
 | Variable | Default | Description |
 | -------- | ------- | ----------- |
-| `AGENTMEMORY_URL` | `http://localhost:3111` | REST endpoint hooks talk to; the service also serves on its port |
+| `AGENTMEMORY_URL` | `http://localhost:3111` | REST endpoint hooks talk to; the service also serves on its port. Give the port explicitly (`http://localhost:3111`, not `http://localhost`): without one the service still listens on 3111 while clients go to 80 |
 | `AGENTMEMORY_INJECT_CONTEXT` | `true` | Injects context on SessionStart |
 | `AGENTMEMORY_VERSION` | `0.9.30` | Pinned server version for `npx` |
 | `AGENTMEMORY_SECRET` | _(generated)_ | Bearer token for the REST endpoint. For a local `AGENTMEMORY_URL`, the activation hook reads it from `~/.agentmemory/secret` (creating it if needed; in the env cache instead when `HOME` isn't writable) and exports it for the service and Claude Code. Set it yourself for a remote server |

@@ -114,8 +114,13 @@ health_url="$AGENTMEMORY_URL/agentmemory/health"
 echo -n "Waiting for $health_url .."
 MAX=180
 while [[ "$MAX" != "0" ]]; do
-  if health="$(curl -fsS -H "Authorization: Bearer $AGENTMEMORY_SECRET" "$health_url" 2>/dev/null)"; then
+  if health="$(curl -fsS -m 5 -H "Authorization: Bearer $AGENTMEMORY_SECRET" "$health_url" 2>/dev/null)"; then
     echo ""
+    break
+  fi
+  # Stop waiting once the service has exited: it won't come back.
+  if flox services status 2>/dev/null | grep -Eq '^agentmemory[[:space:]]+(Completed|Failed|Error|Stopped)'; then
+    MAX=0
     break
   fi
   echo -n "."
@@ -156,5 +161,21 @@ if [ ! -f "$state" ]; then
   exit 1
 fi
 echo ">>> CLI state under $AGENTMEMORY_CACHE/home"
+
+# The engine must be flox/iii from the Nix store, not the generic
+# build the CLI downloads when no iii is on PATH (it doesn't run on
+# NixOS or in Flox containers). binPath is the env's bin/iii, a
+# symlink into the store.
+if ! iii_bin="$(node -e '
+  const fs = require("fs");
+  const p = JSON.parse(fs.readFileSync(process.argv[1], "utf8")).binPath;
+  const real = fs.realpathSync(p);
+  if (!real.startsWith("/nix/store/")) { console.error(p + " -> " + real); process.exit(1); }
+  process.stdout.write(real);
+' "$state")"; then
+  echo "Error: the engine is not the Nix store iii"
+  exit 1
+fi
+echo ">>> engine runs $iii_bin"
 
 echo ">>> agentmemory environment is working"

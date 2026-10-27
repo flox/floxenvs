@@ -46,8 +46,13 @@ health_url="$AGENTMEMORY_URL/agentmemory/health"
 echo -n "Waiting for $health_url .."
 MAX=180
 while [[ "$MAX" != "0" ]]; do
-  if health="$(curl -fsS -H "Authorization: Bearer $AGENTMEMORY_SECRET" "$health_url" 2>/dev/null)"; then
+  if health="$(curl -fsS -m 5 -H "Authorization: Bearer $AGENTMEMORY_SECRET" "$health_url" 2>/dev/null)"; then
     echo ""
+    break
+  fi
+  # Stop waiting once the service has exited: it won't come back.
+  if flox services status 2>/dev/null | grep -Eq '^agentmemory[[:space:]]+(Completed|Failed|Error|Stopped)'; then
+    MAX=0
     break
   fi
   echo -n "."
