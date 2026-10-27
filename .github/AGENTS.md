@@ -71,9 +71,9 @@ skips unchanged builds).
 
 `mkVirtualEnv` links wheels into a venv without importing anything, so
 a transitively broken import (`omlx`'s `webrtcvad` override guards
-against one) still builds clean. None of the eight uv2nix venv packages —
-`mergekit`, `mergekit-cuda`, `serena`, `honcho`, `skillspector`,
-`whichllm`, `basic-memory`, `omlx` — has an import check yet; add
+against one) still builds clean. None of the seven uv2nix venv packages —
+`mergekit`, `mergekit-cuda`, `serena`, `honcho`, `whichllm`,
+`basic-memory`, `omlx` — has an import check yet; add
 `doInstallCheck` per package as this regression class turns up.
 
 ## Site job / concurrency
