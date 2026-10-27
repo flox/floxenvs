@@ -1,0 +1,29 @@
+kind: pkg
+subkind: plain
+name: iii
+title: iii engine
+publisher: flox
+tagline: >
+  The iii engine, packaged at the version the agentmemory server
+  pins so it runs on Linux and in Flox containers.
+category: tool
+tags: [agent, memory, runtime, agentmemory]
+stack: [rust]
+featured: false
+combines_well_with:
+  - env:agentmemory
+status: beta
+license: Apache-2.0 AND Elastic-2.0
+upstream:
+  name: iii
+  url: https://github.com/iii-hq/iii
+  license: Apache-2.0 AND Elastic-2.0
+maintainer: "@rok"
+install:
+  pkg: |
+    [install]
+    iii.pkg-path = "flox/iii"
+    iii.publisher = "flox"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/.flox/pkgs/iii
+  floxhub: https://hub.flox.dev/flox/iii

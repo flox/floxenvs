@@ -40,8 +40,10 @@ AGENTMEMORY_URL = "http://localhost:3111"
 AGENTMEMORY_INJECT_CONTEXT = "true"
 # Pinned upstream server version. The bundled Claude Code
 # plugin is fetched from the matching git tag, so keep the
-# two in sync when bumping.
-AGENTMEMORY_VERSION = "0.9.20"
+# two in sync when bumping. The server only runs the exact
+# iii engine version it pins, so bump flox/iii in the same
+# change: .flox/pkgs/iii/upgrade.sh reads this line.
+AGENTMEMORY_VERSION = "0.9.30"
 
 [hook]
 on-activate = '''

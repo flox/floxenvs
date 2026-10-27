@@ -28,7 +28,7 @@
     "vars": {
       "AGENTMEMORY_INJECT_CONTEXT": "true",
       "AGENTMEMORY_URL": "http://localhost:3111",
-      "AGENTMEMORY_VERSION": "0.9.20"
+      "AGENTMEMORY_VERSION": "0.9.30"
     },
     "hook": {
       "on-activate": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\nmkdir -p \"$npm_config_cache\"\n\nif [[ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]]; then\n  gum style --border double --margin '1 2' \\\n    --padding '1 4' \\\n    'REST + MCP:' \\\n    \"  $AGENTMEMORY_URL\" \\\n    '' \\\n    'Pinned server version:' \\\n    \"  $AGENTMEMORY_VERSION\"\nfi\n"
@@ -555,7 +555,7 @@
           "vars": {
             "AGENTMEMORY_INJECT_CONTEXT": "true",
             "AGENTMEMORY_URL": "http://localhost:3111",
-            "AGENTMEMORY_VERSION": "0.9.20"
+            "AGENTMEMORY_VERSION": "0.9.30"
           },
           "hook": {
             "on-activate": "export AGENTMEMORY_CACHE=\"$FLOX_ENV_CACHE/agentmemory\"\nexport npm_config_cache=\"$AGENTMEMORY_CACHE/npm\"\nmkdir -p \"$npm_config_cache\"\n"
