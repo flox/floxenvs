@@ -21,10 +21,10 @@ echo ">>> gum version: $(gum --version)"
 # Claude Code through flox-agent.
 plugins="$(claude plugin list)"
 echo "$plugins"
-if ! grep -q "claude-md-management" <<<"$plugins"; then
-  echo "Error: claude-md-management plugin not loaded."
+if ! grep -q "flox@" <<<"$plugins"; then
+  echo "Error: flox plugin not loaded."
   exit 1
 fi
-echo ">>> claude-md-management plugin loaded"
+echo ">>> flox plugin loaded"
 
 echo ">>> claude-demo environment is working"

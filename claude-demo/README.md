@@ -15,15 +15,15 @@ claude plugin list
 claude
 ```
 
-`claude plugin list` shows `claude-md-management` as a
-session-only plugin, loaded by `flox-agent launch claude`.
+`claude plugin list` shows `flox` as a session-only plugin,
+loaded by `flox-agent launch claude`.
 
 ## What it provides
 
 Everything from [claude](../claude/) plus:
 
-- `agent-stacks/agent-plugin-claude-md-management` — an agent
-  plugin for maintaining `CLAUDE.md` files
+- `agent-stacks/agent-plugin-flox` — the Flox agent plugin,
+  which teaches Claude Code to work with Flox environments
 - `gum` — styled terminal UI
 - Welcome banner on activate
 
