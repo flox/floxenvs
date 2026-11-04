@@ -586,7 +586,7 @@ jobs:
 
     steps:
       - name: "Slack Notification"
-        uses: "rtCamp/action-slack-notify@33ca3be66c6f378fe1610fd1d5258632dbed5e58" # v2
+        uses: "rtCamp/action-slack-notify@06cc13f74fa8d4d2296c09455d91e9453e4025f4" # v2
         env:
           SLACK_CHANNEL: "#pod-workflows-alerts"
           SLACK_TITLE: "floxenvs CI failed on main"
@@ -671,11 +671,11 @@ jobs:
 
       - name: "Install flox"
         if: steps.linux_support.outputs.env_linux == 'true' || steps.linux_support.outputs.demo_linux == 'true'
-        uses: "flox/install-flox-action@1128abd73431089ab9d871c893b4e72a729354e1" # main
+        uses: "flox/install-flox-action@5bb9eaaffbeaa699a8251a1ae21ecf4c8e0e37d4" # main
 
       - name: "Login to GHCR"
         if: steps.linux_support.outputs.env_linux == 'true' || steps.linux_support.outputs.demo_linux == 'true'
-        uses: "docker/login-action@dbcb813823bdd20940b903addbd779551569679f" # v4
+        uses: "docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6" # v4
         with:
           registry: "ghcr.io"
           username: "${{ github.actor }}"
