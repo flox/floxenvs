@@ -49,7 +49,7 @@ environments = ["flox/agentmemory"]
 
 | Package | Description |
 | ------- | ----------- |
-| `flox/claude-code` | Claude Code CLI |
+| `agent-stacks/claude-code` | Claude Code CLI |
 | `flox/flox-agent` | Launcher that loads the plugin into Claude Code |
 | `agent-stacks/agent-plugin-agentmemory` | Plugin (hooks, 17 skills, MCP) |
 | `nodejs_20` | Runtime for the REST backend |

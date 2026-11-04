@@ -1,0 +1,205 @@
+{
+  "lockfile-version": 1,
+  "manifest": {
+    "schema-version": "1.17.0",
+    "description": "Claude Code, started through flox-agent so it loads the environment's agent plugins.\n",
+    "install": {
+      "claude-code": {
+        "pkg-path": "agent-stacks/claude-code",
+        "pkg-group": "claude-code"
+      },
+      "flox-agent": {
+        "pkg-path": "flox/flox-agent",
+        "pkg-group": "flox-agent"
+      }
+    },
+    "hook": {
+      "on-activate": "# `claude` runs through `flox-agent launch claude`. The\n# wrapper goes on PATH ahead of $FLOX_ENV/bin, and\n# flox-agent finds claude-code by a PATH lookup, so the\n# wrapper drops its own directory from PATH before the\n# exec; otherwise flox-agent would find the wrapper again\n# and loop.\nclaude_bin=\"$FLOX_ENV_CACHE/claude/bin\"\nmkdir -p \"$claude_bin\"\ncat > \"$claude_bin/claude.$$\" <<'EOF'\n#!/bin/sh\nset -eu\nself_dir=$(cd \"$(dirname \"$0\")\" && pwd -P)\npath=\nold_ifs=$IFS\nIFS=:\nfor entry in $PATH; do\n  [ -n \"$entry\" ] || continue\n  if [ -d \"$entry\" ] && [ \"$(cd \"$entry\" && pwd -P)\" = \"$self_dir\" ]; then\n    continue\n  fi\n  path=\"${path:+$path:}$entry\"\ndone\nIFS=$old_ifs\nPATH=$path\nAGENT_STACKS_WRAPPED=1\nexport PATH AGENT_STACKS_WRAPPED\nexec flox-agent launch claude -- \"$@\"\nEOF\nchmod +x \"$claude_bin/claude.$$\"\nmv -f \"$claude_bin/claude.$$\" \"$claude_bin/claude\"\nexport PATH=\"$claude_bin:$PATH\"\nunset claude_bin\n"
+    },
+    "profile": {
+      "bash": "if [ -d \"$FLOX_ENV_CACHE/claude/bin\" ]; then\n  PATH=\"$FLOX_ENV_CACHE/claude/bin:$PATH\"\n  export PATH\nfi\n",
+      "zsh": "if [ -d \"$FLOX_ENV_CACHE/claude/bin\" ]; then\n  PATH=\"$FLOX_ENV_CACHE/claude/bin:$PATH\"\n  export PATH\nfi\n",
+      "fish": "if test -d \"$FLOX_ENV_CACHE/claude/bin\"\n  set -gx PATH \"$FLOX_ENV_CACHE/claude/bin\" $PATH\nend\n"
+    },
+    "options": {}
+  },
+  "packages": [
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/n2mrcz34avc59j3awlbkjh7xkhgw77jf-claude-code-2.1.316.drv",
+      "description": "Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "file:///tmp/tmp.yHYdRG9fw2?rev=2202b9d51dae60c1e428d35cdde889eb2db0f60c",
+      "name": "claude-code-2.1.316",
+      "pname": "claude-code",
+      "rev": "2202b9d51dae60c1e428d35cdde889eb2db0f60c",
+      "rev_count": 1,
+      "rev_date": "2026-10-31T22:11:12Z",
+      "scrape_date": "2026-11-04T15:52:02.489773Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.1.316",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/3fbvfif9ws97gqismnmym0cav42gwm58-claude-code-2.1.316"
+      },
+      "system": "aarch64-darwin",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/cj3bmcswajbqhmb8jz0pjjsfzzxl1q1w-claude-code-2.1.316.drv",
+      "description": "Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "file:///tmp/tmp.5IHSa94tsZ?rev=a7b6c301f75c975b71cb3c4fb1fdb43b91745605",
+      "name": "claude-code-2.1.316",
+      "pname": "claude-code",
+      "rev": "a7b6c301f75c975b71cb3c4fb1fdb43b91745605",
+      "rev_count": 1,
+      "rev_date": "2026-10-31T22:19:29Z",
+      "scrape_date": "2026-11-04T15:52:02.489775Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.1.316",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/raaszlb6n3civbp19w8993f2b7fyx2ic-claude-code-2.1.316"
+      },
+      "system": "aarch64-linux",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/4bkyhkh6168x0brjh7v87rd9yjyrgjxc-claude-code-2.1.316.drv",
+      "description": "Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "file:///tmp/tmp.0p2YY9JiRt?rev=0e73d28385516a8c0957d37e43acfd2303490b4c",
+      "name": "claude-code-2.1.316",
+      "pname": "claude-code",
+      "rev": "0e73d28385516a8c0957d37e43acfd2303490b4c",
+      "rev_count": 1,
+      "rev_date": "2026-10-31T21:56:02Z",
+      "scrape_date": "2026-11-04T15:52:02.489775Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.1.316",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/pl5fj0lmgwy1aghz9vvnvbfpkbsk11q2-claude-code-2.1.316"
+      },
+      "system": "x86_64-linux",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-agent",
+      "broken": false,
+      "derivation": "/nix/store/cx1xhzsfxqab6fn6fg4qn653szyliwvj-flox-agent-0.9.0-394-g87033c2.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
+      "license": "MIT",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=87033c2abc55e16d3cd998dede4b64c63ab63b06",
+      "name": "flox-agent-0.9.0-394-g87033c2",
+      "pname": "flox-agent",
+      "rev": "87033c2abc55e16d3cd998dede4b64c63ab63b06",
+      "rev_count": 596,
+      "rev_date": "2026-11-04T15:29:28Z",
+      "scrape_date": "2026-11-04T15:52:02.489778Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.9.0-394-g87033c2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/93ghyiwj9qg50vn9fbgkg9qa7d9dnfvq-flox-agent-0.9.0-394-g87033c2"
+      },
+      "system": "aarch64-darwin",
+      "group": "flox-agent",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-agent",
+      "broken": false,
+      "derivation": "/nix/store/0vza8caw6gb482qk98cb52c46028v5na-flox-agent-0.9.0-394-g87033c2.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
+      "license": "MIT",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=87033c2abc55e16d3cd998dede4b64c63ab63b06",
+      "name": "flox-agent-0.9.0-394-g87033c2",
+      "pname": "flox-agent",
+      "rev": "87033c2abc55e16d3cd998dede4b64c63ab63b06",
+      "rev_count": 596,
+      "rev_date": "2026-11-04T15:29:28Z",
+      "scrape_date": "2026-11-04T15:52:02.489778Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.9.0-394-g87033c2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/zx3qik24p881mpf966rkbgm8zsdvygfa-flox-agent-0.9.0-394-g87033c2"
+      },
+      "system": "aarch64-linux",
+      "group": "flox-agent",
+      "priority": 5
+    },
+    {
+      "attr_path": "flox-agent",
+      "broken": false,
+      "derivation": "/nix/store/7zdfli9d8kgwwkwnk2dgmml0shmcv5as-flox-agent-0.9.0-394-g87033c2.drv",
+      "description": "Flox-native config management for AI coding agents",
+      "install_id": "flox-agent",
+      "license": "MIT",
+      "locked_url": "https://github.com/agent-stacks/agent-stacks-cli?rev=87033c2abc55e16d3cd998dede4b64c63ab63b06",
+      "name": "flox-agent-0.9.0-394-g87033c2",
+      "pname": "flox-agent",
+      "rev": "87033c2abc55e16d3cd998dede4b64c63ab63b06",
+      "rev_count": 596,
+      "rev_date": "2026-11-04T15:29:28Z",
+      "scrape_date": "2026-11-04T15:52:02.489779Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.9.0-394-g87033c2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/cj1gabrff5ilrpm3pbigch6k4gwzvbff-flox-agent-0.9.0-394-g87033c2"
+      },
+      "system": "x86_64-linux",
+      "group": "flox-agent",
+      "priority": 5
+    }
+  ]
+}

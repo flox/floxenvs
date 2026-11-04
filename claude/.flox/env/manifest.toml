@@ -1,0 +1,81 @@
+schema-version = "1.17.0"
+
+description = '''
+Claude Code, started through flox-agent so it loads the environment's agent plugins.
+'''
+
+# Minimal Claude Code environment for use with [include].
+#
+# Include it in your own manifest:
+#
+#   [include]
+#   environments = ["flox/claude"]
+#
+# Then `claude` starts Claude Code through
+# `flox-agent launch claude`, with every agent plugin
+# installed in the composed environment loaded.
+
+[install]
+claude-code.pkg-path = "agent-stacks/claude-code"
+claude-code.pkg-group = "claude-code"
+flox-agent.pkg-path = "flox/flox-agent"
+flox-agent.pkg-group = "flox-agent"
+
+[hook]
+on-activate = '''
+# `claude` runs through `flox-agent launch claude`. The
+# wrapper goes on PATH ahead of $FLOX_ENV/bin, and
+# flox-agent finds claude-code by a PATH lookup, so the
+# wrapper drops its own directory from PATH before the
+# exec; otherwise flox-agent would find the wrapper again
+# and loop.
+claude_bin="$FLOX_ENV_CACHE/claude/bin"
+mkdir -p "$claude_bin"
+cat > "$claude_bin/claude.$$" <<'EOF'
+#!/bin/sh
+set -eu
+self_dir=$(cd "$(dirname "$0")" && pwd -P)
+path=
+old_ifs=$IFS
+IFS=:
+for entry in $PATH; do
+  [ -n "$entry" ] || continue
+  if [ -d "$entry" ] && [ "$(cd "$entry" && pwd -P)" = "$self_dir" ]; then
+    continue
+  fi
+  path="${path:+$path:}$entry"
+done
+IFS=$old_ifs
+PATH=$path
+AGENT_STACKS_WRAPPED=1
+export PATH AGENT_STACKS_WRAPPED
+exec flox-agent launch claude -- "$@"
+EOF
+chmod +x "$claude_bin/claude.$$"
+mv -f "$claude_bin/claude.$$" "$claude_bin/claude"
+export PATH="$claude_bin:$PATH"
+unset claude_bin
+'''
+
+# A shell that runs the profile scripts (an interactive
+# shell, `flox activate -c`) gets $FLOX_ENV/bin put back in
+# front after the hook ran, so the wrapper is prepended
+# again here.
+[profile]
+bash = '''
+if [ -d "$FLOX_ENV_CACHE/claude/bin" ]; then
+  PATH="$FLOX_ENV_CACHE/claude/bin:$PATH"
+  export PATH
+fi
+'''
+zsh = '''
+if [ -d "$FLOX_ENV_CACHE/claude/bin" ]; then
+  PATH="$FLOX_ENV_CACHE/claude/bin:$PATH"
+  export PATH
+fi
+'''
+fish = '''
+if test -d "$FLOX_ENV_CACHE/claude/bin"
+  set -gx PATH "$FLOX_ENV_CACHE/claude/bin" $PATH
+end
+'''

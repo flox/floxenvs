@@ -50,7 +50,7 @@ environments = ["flox/remotion"]
 
 ## What is included
 
-- `flox/claude-code` — Claude Code
+- `agent-stacks/claude-code` — Claude Code
 - `flox/flox-agent` — launcher that loads the bundled skills
   into Claude Code via `flox-agent launch claude`
 - `agent-stacks/agent-plugin-remotion-dev-skills` — the

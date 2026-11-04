@@ -1,0 +1,57 @@
+kind: env
+name: claude
+title: Claude Code
+publisher: flox
+tagline: >
+  Claude Code started through flox-agent, so every session
+  loads the environment's agent plugins.
+intro: >
+  flox/claude ships Claude Code from the agent-stacks catalog
+  together with flox-agent, and puts a `claude` wrapper first
+  on PATH that runs `flox-agent launch claude`. Include it in
+  any Flox manifest, install the agent-stacks plugins you want
+  next to it, and a plain `claude` starts with all of them
+  loaded: from an interactive shell, `flox activate -- claude`,
+  or a tmux or agent-deck pane started from an activated
+  shell. Plugins are handed to Claude Code for that session
+  only, never installed into `~/.claude/`.
+summary:
+  - "One-line include — `claude` ready in any Flox env"
+  - "`claude` runs through `flox-agent launch claude`"
+  - "Loads every agent plugin installed in the environment"
+  - "Plugins are session-only, never installed into ~/.claude/"
+category: ai
+ai_role: agent
+tags: [agent, cli, anthropic, agent-stacks]
+featured: true
+combines_well_with:
+  - pkg:graphify
+  - env:playwright
+  - pkg:vibe-kanban
+status: stable
+license: MIT
+upstream:
+  name: Claude Code
+  url: https://github.com/anthropics/claude-code
+  license: Apache-2.0
+maintainer: "@rok"
+install:
+  include: |
+    [include]
+    environments = [{ remote = "flox/claude" }]
+  activate: |
+    flox activate -r flox/claude
+  docker: |
+    docker run -it ghcr.io/flox/floxenvs/claude-latest
+recipes:
+  - name: claude-demo
+    title: Quick start
+    start_services: false
+    features:
+      - "Loads an agent-stacks plugin through flox-agent"
+      - "`claude plugin list` shows what was loaded"
+links:
+  source: https://github.com/flox/floxenvs/tree/main/claude
+  floxhub: https://hub.flox.dev/flox/claude
+  docker: https://github.com/flox/floxenvs/pkgs/container/floxenvs/claude-latest
+  issues: https://github.com/flox/floxenvs/issues?q=label%3Aclaude
