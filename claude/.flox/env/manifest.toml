@@ -56,3 +56,26 @@ mv -f "$claude_bin/claude.$$" "$claude_bin/claude"
 export PATH="$claude_bin:$PATH"
 unset claude_bin
 '''
+
+# A shell that runs the profile scripts (an interactive
+# shell, `flox activate -c`) gets $FLOX_ENV/bin put back in
+# front after the hook ran, so the wrapper is prepended
+# again here.
+[profile]
+bash = '''
+if [ -d "$FLOX_ENV_CACHE/claude/bin" ]; then
+  PATH="$FLOX_ENV_CACHE/claude/bin:$PATH"
+  export PATH
+fi
+'''
+zsh = '''
+if [ -d "$FLOX_ENV_CACHE/claude/bin" ]; then
+  PATH="$FLOX_ENV_CACHE/claude/bin:$PATH"
+  export PATH
+fi
+'''
+fish = '''
+if test -d "$FLOX_ENV_CACHE/claude/bin"
+  set -gx PATH "$FLOX_ENV_CACHE/claude/bin" $PATH
+end
+'''

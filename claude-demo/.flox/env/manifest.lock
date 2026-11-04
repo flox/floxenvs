@@ -23,6 +23,11 @@
     "hook": {
       "on-activate": "# `claude` runs through `flox-agent launch claude`. The\n# wrapper goes on PATH ahead of $FLOX_ENV/bin, and\n# flox-agent finds claude-code by a PATH lookup, so the\n# wrapper drops its own directory from PATH before the\n# exec; otherwise flox-agent would find the wrapper again\n# and loop.\nclaude_bin=\"$FLOX_ENV_CACHE/claude/bin\"\nmkdir -p \"$claude_bin\"\ncat > \"$claude_bin/claude.$$\" <<'EOF'\n#!/bin/sh\nset -eu\nself_dir=$(cd \"$(dirname \"$0\")\" && pwd -P)\npath=\nold_ifs=$IFS\nIFS=:\nfor entry in $PATH; do\n  [ -n \"$entry\" ] || continue\n  if [ -d \"$entry\" ] && [ \"$(cd \"$entry\" && pwd -P)\" = \"$self_dir\" ]; then\n    continue\n  fi\n  path=\"${path:+$path:}$entry\"\ndone\nIFS=$old_ifs\nPATH=$path\nAGENT_STACKS_WRAPPED=1\nexport PATH AGENT_STACKS_WRAPPED\nexec flox-agent launch claude -- \"$@\"\nEOF\nchmod +x \"$claude_bin/claude.$$\"\nmv -f \"$claude_bin/claude.$$\" \"$claude_bin/claude\"\nexport PATH=\"$claude_bin:$PATH\"\nunset claude_bin\n\nif [ \"${FLOX_ENVS_TESTING:-}\" != \"1\" ]; then\n  gum style \\\n    --foreground 212 --border-foreground 212 \\\n    --border double --align center \\\n    --width 50 --margin \"1 2\" --padding \"1 2\" \\\n    \"Claude Code\" \"with the environment's agent plugins\"\n  echo \"\"\n  echo \"  claude              — start Claude Code\"\n  echo \"  claude plugin list  — show the loaded plugins\"\n  echo \"  flox-agent list     — show the stack's plugins\"\n  echo \"\"\nfi\n"
     },
+    "profile": {
+      "bash": "if [ -d \"$FLOX_ENV_CACHE/claude/bin\" ]; then\n  PATH=\"$FLOX_ENV_CACHE/claude/bin:$PATH\"\n  export PATH\nfi\n",
+      "zsh": "if [ -d \"$FLOX_ENV_CACHE/claude/bin\" ]; then\n  PATH=\"$FLOX_ENV_CACHE/claude/bin:$PATH\"\n  export PATH\nfi\n",
+      "fish": "if test -d \"$FLOX_ENV_CACHE/claude/bin\"\n  set -gx PATH \"$FLOX_ENV_CACHE/claude/bin\" $PATH\nend\n"
+    },
     "options": {}
   },
   "packages": [
@@ -420,6 +425,11 @@
           },
           "hook": {
             "on-activate": "# `claude` runs through `flox-agent launch claude`. The\n# wrapper goes on PATH ahead of $FLOX_ENV/bin, and\n# flox-agent finds claude-code by a PATH lookup, so the\n# wrapper drops its own directory from PATH before the\n# exec; otherwise flox-agent would find the wrapper again\n# and loop.\nclaude_bin=\"$FLOX_ENV_CACHE/claude/bin\"\nmkdir -p \"$claude_bin\"\ncat > \"$claude_bin/claude.$$\" <<'EOF'\n#!/bin/sh\nset -eu\nself_dir=$(cd \"$(dirname \"$0\")\" && pwd -P)\npath=\nold_ifs=$IFS\nIFS=:\nfor entry in $PATH; do\n  [ -n \"$entry\" ] || continue\n  if [ -d \"$entry\" ] && [ \"$(cd \"$entry\" && pwd -P)\" = \"$self_dir\" ]; then\n    continue\n  fi\n  path=\"${path:+$path:}$entry\"\ndone\nIFS=$old_ifs\nPATH=$path\nAGENT_STACKS_WRAPPED=1\nexport PATH AGENT_STACKS_WRAPPED\nexec flox-agent launch claude -- \"$@\"\nEOF\nchmod +x \"$claude_bin/claude.$$\"\nmv -f \"$claude_bin/claude.$$\" \"$claude_bin/claude\"\nexport PATH=\"$claude_bin:$PATH\"\nunset claude_bin\n"
+          },
+          "profile": {
+            "bash": "if [ -d \"$FLOX_ENV_CACHE/claude/bin\" ]; then\n  PATH=\"$FLOX_ENV_CACHE/claude/bin:$PATH\"\n  export PATH\nfi\n",
+            "zsh": "if [ -d \"$FLOX_ENV_CACHE/claude/bin\" ]; then\n  PATH=\"$FLOX_ENV_CACHE/claude/bin:$PATH\"\n  export PATH\nfi\n",
+            "fish": "if test -d \"$FLOX_ENV_CACHE/claude/bin\"\n  set -gx PATH \"$FLOX_ENV_CACHE/claude/bin\" $PATH\nend\n"
           },
           "options": {}
         },
