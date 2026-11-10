@@ -3,16 +3,16 @@ schema-version = "1.17.0"
 description = '''
 # graphify — knowledge graphs for Claude Code
 
-The /graphify skill is pre-installed via
-flox/skills-graphify. Start Claude Code with
-the flox-ai launcher, then run it:
+The graphify skill is pre-installed via
+agent-stacks/agent-plugin-graphify-labs-graphify.
+Start Claude Code with flox-agent, then run it:
 
 ```bash
-flox-ai launch claude
+flox-agent launch claude
 ```
 
 ```text
-/graphify .
+/graphify-labs-graphify:graphify .
 ```
 
 Or use the CLI directly:
@@ -36,17 +36,6 @@ graphify explain "Concept"
 environments = [
   { dir = "../graphify" }
 ]
-
-# skills-graphify ships the /graphify SKILL.md into
-# $FLOX_ENV/share/claude-code/skills/graphify/ where
-# flox-ai (installed below) auto-discovers it on
-# activate — no `graphify install` step needed.
-
-[install]
-skills-graphify.pkg-path = "flox/skills-graphify"
-skills-graphify.pkg-group = "skills-graphify"
-flox-ai.pkg-path = "flox/flox-ai"
-flox-ai.pkg-group = "flox-ai"
 
 [options]
 systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]

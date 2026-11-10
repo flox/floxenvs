@@ -13,7 +13,8 @@ Graphify CLI for turning code and documents into knowledge graphs.
 #   environments = [{ remote = "flox/graphify" }]
 #
 # Provides Python 3.11 with the graphify CLI installed in a
-# venv, plus Claude Code and flox-agent to run it
+# venv, the graphify skill (the agent-stacks plugin), and
+# Claude Code and flox-agent to run it
 # (`flox-agent launch claude`).
 
 [install]
@@ -23,6 +24,8 @@ python.pkg-path = "python311"
 python.pkg-group = "graphify"
 claude-code.pkg-path = "agent-stacks/claude-code"
 claude-code.pkg-group = "claude-code"
+agent-plugin-graphify.pkg-path = "agent-stacks/agent-plugin-graphify-labs-graphify"
+agent-plugin-graphify.pkg-group = "agent-plugin-graphify"
 bash.pkg-path = "bash"
 bash.pkg-group = "graphify"
 bash.priority = 0
@@ -47,7 +50,11 @@ binutils.systems = ["x86_64-linux", "aarch64-linux"]
 # [mcp] extra pulls in `mcp` for the graphify-mcp service
 # and [watch] pulls in `watchdog` for the graphify-watch
 # service — both are required by the services below.
-GRAPHIFY_INSTALL_PACKAGE = "graphifyy[mcp,watch]"
+# Pinned to the release of the graphify plugin's skill
+# (agent-stacks/agent-plugin-graphify-labs-graphify): the
+# skill imports the CLI's own modules, so bump both
+# together (AI-1075).
+GRAPHIFY_INSTALL_PACKAGE = "graphifyy[mcp,watch]==0.9.105"
 # Folder graphify operates on. Empty means "use the dir
 # that contains the .flox/ directory" — see services.
 GRAPHIFY_PROJECT_ROOT = ""

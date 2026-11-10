@@ -3,10 +3,11 @@
 <!-- codespaces-badge -->
 [![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fgraphify%2Fdevcontainer.json)
 
-Minimal [graphify](https://github.com/safishamsi/graphify)
+Minimal [graphify](https://github.com/Graphify-Labs/graphify)
 environment. Include it in your own manifest to get
-Python 3.11, the `graphify` CLI, Claude Code, and the
-`flox-agent` launcher with sane defaults.
+Python 3.11, the `graphify` CLI, the graphify skill,
+Claude Code, and the `flox-agent` launcher with sane
+defaults.
 
 graphify is a Claude Code skill that turns any folder of
 code, docs, papers, or images into a queryable knowledge
@@ -20,14 +21,8 @@ Activate directly:
 flox activate -r flox/graphify
 ```
 
-Then register the Claude Code skill (one-time setup):
-
-```bash
-graphify install
-```
-
 Then start Claude Code through the `flox-agent`
-launcher:
+launcher, which loads the graphify skill:
 
 ```bash
 flox-agent launch claude
@@ -36,7 +31,7 @@ flox-agent launch claude
 In any directory, type:
 
 ```text
-/graphify .
+/graphify-labs-graphify:graphify .
 ```
 
 ## Include in your project
@@ -54,6 +49,9 @@ defaults.
 ## What is included
 
 - Python 3.11 with `graphifyy` installed in a venv
+- `agent-stacks/agent-plugin-graphify-labs-graphify`,
+  the graphify skill, pinned to the same release as
+  `graphifyy`
 - Claude Code and the `flox-agent` launcher
 - Git, curl, and build tools for tree-sitter native deps
 

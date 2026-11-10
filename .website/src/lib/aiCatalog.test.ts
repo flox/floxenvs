@@ -80,19 +80,19 @@ describe("rankItems", () => {
 describe("extractInstallPkg", () => {
   it("falls back to flox/<name> when install.pkg is absent", () => {
     const p: PkgData = {
-      name: "skills-graphify",
-      title: "Graphify",
+      name: "skills-financial-services",
+      title: "Financial Services",
       subkind: "skill",
       tagline: "x",
       category: "ai",
     };
-    expect(extractInstallPkg(p)).toBe("flox/skills-graphify");
+    expect(extractInstallPkg(p)).toBe("flox/skills-financial-services");
   });
 
   it("matches the package's own name, not a dependency line", () => {
     const p: PkgData = {
-      name: "skills-graphify",
-      title: "Graphify",
+      name: "skills-financial-services",
+      title: "Financial Services",
       subkind: "skill",
       tagline: "x",
       category: "ai",
@@ -100,11 +100,11 @@ describe("extractInstallPkg", () => {
         pkg: [
           "[install]",
           'claude-code.pkg-path = "flox/claude-code"',
-          'skills-graphify.pkg-path = "flox/skills-graphify"',
+          'skills-financial-services.pkg-path = "flox/skills-financial-services"',
         ].join("\n"),
       },
     };
-    expect(extractInstallPkg(p)).toBe("flox/skills-graphify");
+    expect(extractInstallPkg(p)).toBe("flox/skills-financial-services");
   });
 });
 
