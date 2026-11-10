@@ -2,8 +2,12 @@
   "lockfile-version": 1,
   "manifest": {
     "schema-version": "1.17.0",
-    "description": "# graphify — knowledge graphs for Claude Code\n\nThe /graphify skill is pre-installed via\nflox/skills-graphify. Start Claude Code with\nthe flox-ai launcher, then run it:\n\n```bash\nflox-ai launch claude\n```\n\n```text\n/graphify .\n```\n\nOr use the CLI directly:\n\n```bash\ngraphify .\ngraphify ./raw --mode deep\ngraphify ./raw --update\n```\n\nQuery the graph:\n\n```bash\ngraphify query \"what connects X to Y?\"\ngraphify path \"Module\" \"Database\"\ngraphify explain \"Concept\"\n```\n",
+    "description": "# graphify — knowledge graphs for Claude Code\n\nThe graphify skill is pre-installed via\nagent-stacks/agent-plugin-graphify-labs-graphify.\nStart Claude Code with flox-agent, then run it:\n\n```bash\nflox-agent launch claude\n```\n\n```text\n/graphify-labs-graphify:graphify .\n```\n\nOr use the CLI directly:\n\n```bash\ngraphify .\ngraphify ./raw --mode deep\ngraphify ./raw --update\n```\n\nQuery the graph:\n\n```bash\ngraphify query \"what connects X to Y?\"\ngraphify path \"Module\" \"Database\"\ngraphify explain \"Concept\"\n```\n",
     "install": {
+      "agent-plugin-graphify": {
+        "pkg-path": "agent-stacks/agent-plugin-graphify-labs-graphify",
+        "pkg-group": "agent-plugin-graphify"
+      },
       "bash": {
         "pkg-path": "bash",
         "pkg-group": "graphify",
@@ -29,10 +33,6 @@
         "pkg-path": "flox/flox-agent",
         "pkg-group": "flox-agent"
       },
-      "flox-ai": {
-        "pkg-path": "flox/flox-ai",
-        "pkg-group": "flox-ai"
-      },
       "gcc-unwrapped": {
         "pkg-path": "gcc-unwrapped",
         "pkg-group": "graphify-build"
@@ -57,14 +57,10 @@
       "python": {
         "pkg-path": "python311",
         "pkg-group": "graphify"
-      },
-      "skills-graphify": {
-        "pkg-path": "flox/skills-graphify",
-        "pkg-group": "skills-graphify"
       }
     },
     "vars": {
-      "GRAPHIFY_INSTALL_PACKAGE": "graphifyy[mcp,watch]",
+      "GRAPHIFY_INSTALL_PACKAGE": "graphifyy[mcp,watch]==0.9.105",
       "GRAPHIFY_PROJECT_ROOT": "",
       "VIRTUAL_ENV_DISABLE_PROMPT": "1"
     },
@@ -94,6 +90,93 @@
     }
   },
   "packages": [
+    {
+      "attr_path": "agent-plugin-graphify-labs-graphify",
+      "broken": false,
+      "derivation": "/nix/store/fkwf0z133a16jssha5gbqiq3j3mkkdy0-agent-plugin-graphify-labs-graphify-0.9.105.drv",
+      "description": "Turn any folder of code, docs, papers, images, or videos into a queryable knowledge graph",
+      "install_id": "agent-plugin-graphify",
+      "license": "Apache-2.0",
+      "locked_url": "file:///tmp/tmp.NAMEUDB5iU?rev=583be867fb13f42dd9ebe574fd5e2be26c332720",
+      "name": "agent-plugin-graphify-labs-graphify-0.9.105",
+      "pname": "agent-plugin-graphify-labs-graphify",
+      "rev": "583be867fb13f42dd9ebe574fd5e2be26c332720",
+      "rev_count": 1,
+      "rev_date": "2026-11-10T20:53:49Z",
+      "scrape_date": "2026-11-10T21:27:37.649063Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.9.105",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/6hc6wh16knckzvpjfaqcrk8fhrp8l4jf-agent-plugin-graphify-labs-graphify-0.9.105"
+      },
+      "system": "aarch64-darwin",
+      "group": "agent-plugin-graphify",
+      "priority": 5
+    },
+    {
+      "attr_path": "agent-plugin-graphify-labs-graphify",
+      "broken": false,
+      "derivation": "/nix/store/s4czsxpi1njsph1f4qv4zdb5zmz0xqga-agent-plugin-graphify-labs-graphify-0.9.105.drv",
+      "description": "Turn any folder of code, docs, papers, images, or videos into a queryable knowledge graph",
+      "install_id": "agent-plugin-graphify",
+      "license": "Apache-2.0",
+      "locked_url": "file:///tmp/tmp.0w87FvPGk5?rev=6e32bcc06f7715b6611827e161006f61d1a61c4a",
+      "name": "agent-plugin-graphify-labs-graphify-0.9.105",
+      "pname": "agent-plugin-graphify-labs-graphify",
+      "rev": "6e32bcc06f7715b6611827e161006f61d1a61c4a",
+      "rev_count": 1,
+      "rev_date": "2026-11-10T21:24:57Z",
+      "scrape_date": "2026-11-10T21:27:37.649068Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.9.105",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/2d6nkl84djdw7rqdxkclprrql6nd7czj-agent-plugin-graphify-labs-graphify-0.9.105"
+      },
+      "system": "aarch64-linux",
+      "group": "agent-plugin-graphify",
+      "priority": 5
+    },
+    {
+      "attr_path": "agent-plugin-graphify-labs-graphify",
+      "broken": false,
+      "derivation": "/nix/store/zzr106gcbsikk1db3i5xs5jwb2v86q59-agent-plugin-graphify-labs-graphify-0.9.105.drv",
+      "description": "Turn any folder of code, docs, papers, images, or videos into a queryable knowledge graph",
+      "install_id": "agent-plugin-graphify",
+      "license": "Apache-2.0",
+      "locked_url": "file:///tmp/tmp.9AIdy602dM?rev=bb47ce5d21802b38431cfac2a79f3feffda71760",
+      "name": "agent-plugin-graphify-labs-graphify-0.9.105",
+      "pname": "agent-plugin-graphify-labs-graphify",
+      "rev": "bb47ce5d21802b38431cfac2a79f3feffda71760",
+      "rev_count": 1,
+      "rev_date": "2026-11-10T20:54:18Z",
+      "scrape_date": "2026-11-10T21:27:37.649069Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "0.9.105",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/dsf2j4df4bhv1iqw4zg3cjbrvrbhlmk7-agent-plugin-graphify-labs-graphify-0.9.105"
+      },
+      "system": "x86_64-linux",
+      "group": "agent-plugin-graphify",
+      "priority": 5
+    },
     {
       "attr_path": "claude-code",
       "broken": false,
@@ -269,96 +352,6 @@
       },
       "system": "x86_64-linux",
       "group": "flox-agent",
-      "priority": 5
-    },
-    {
-      "attr_path": "flox-ai",
-      "broken": false,
-      "derivation": "/nix/store/57jfyz6s1dig32zmb9ik9ih8kqkvv7dd-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-10-19T01:45:13.167120867Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.8.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/crwyb5188yw5lv4znqprzbiqg5vy4ibd-flox-ai-0.8.0"
-      },
-      "system": "aarch64-darwin",
-      "group": "flox-ai",
-      "priority": 5
-    },
-    {
-      "attr_path": "flox-ai",
-      "broken": false,
-      "derivation": "/nix/store/1clj1qp1zchjr18xqd6h5qy4krnbfp7x-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-10-19T01:45:13.167121539Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.8.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/4zf5cxf627sbr8syddjx7j5pmk4321ri-flox-ai-0.8.0"
-      },
-      "system": "aarch64-linux",
-      "group": "flox-ai",
-      "priority": 5
-    },
-    {
-      "attr_path": "flox-ai",
-      "broken": false,
-      "derivation": "/nix/store/w14almryjawbkglkr56spfxi25ihvhzw-flox-ai-0.8.0.drv",
-      "description": "Flox-native config management for Claude Code CLI",
-      "install_id": "flox-ai",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/flox-ai?rev=e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "name": "flox-ai-0.8.0",
-      "pname": "flox-ai",
-      "rev": "e7c5caacac6fd88ef553914c61b7ec23ac091f63",
-      "rev_count": 84,
-      "rev_date": "2026-08-04T10:34:57Z",
-      "scrape_date": "2026-10-19T01:45:13.167123482Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "0.8.0",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/0d1s3sqq8r88f30qjg29gw76vl4gfbwg-flox-ai-0.8.0"
-      },
-      "system": "x86_64-linux",
-      "group": "flox-ai",
       "priority": 5
     },
     {
@@ -1132,115 +1125,12 @@
       "system": "x86_64-linux",
       "group": "graphify-tools",
       "priority": 5
-    },
-    {
-      "attr_path": "skills-graphify",
-      "broken": false,
-      "derivation": "/nix/store/g3qd3yk5dl2iqlakmgbrcmwvvcv3qjbm-skills-graphify-0.9.92.drv",
-      "description": "graphify skill for Claude Code and OpenCode — turn any folder of files into a knowledge graph.",
-      "install_id": "skills-graphify",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=e4ad9d7c0db0080bf1678222e3edf03e562b6d50",
-      "name": "skills-graphify-0.9.92",
-      "pname": "skills-graphify",
-      "rev": "e4ad9d7c0db0080bf1678222e3edf03e562b6d50",
-      "rev_count": 29163,
-      "rev_date": "2026-10-16T20:00:53Z",
-      "scrape_date": "2026-10-19T01:45:13.167212490Z",
-      "stabilities": [
-        "unstable",
-        "stable",
-        "staging"
-      ],
-      "unfree": false,
-      "version": "0.9.92",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/n060qcjfk30i9s4japshya9pyypvhpq6-skills-graphify-0.9.92"
-      },
-      "system": "aarch64-darwin",
-      "group": "skills-graphify",
-      "priority": 5
-    },
-    {
-      "attr_path": "skills-graphify",
-      "broken": false,
-      "derivation": "/nix/store/ag5ikahbvqbh7ij2mls4x9lpakbm573a-skills-graphify-0.9.92.drv",
-      "description": "graphify skill for Claude Code and OpenCode — turn any folder of files into a knowledge graph.",
-      "install_id": "skills-graphify",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=e4ad9d7c0db0080bf1678222e3edf03e562b6d50",
-      "name": "skills-graphify-0.9.92",
-      "pname": "skills-graphify",
-      "rev": "e4ad9d7c0db0080bf1678222e3edf03e562b6d50",
-      "rev_count": 29163,
-      "rev_date": "2026-10-16T20:00:53Z",
-      "scrape_date": "2026-10-19T01:45:13.167213101Z",
-      "stabilities": [
-        "unstable",
-        "stable",
-        "staging"
-      ],
-      "unfree": false,
-      "version": "0.9.92",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/cx461jx204kbii4kv8505vypjyydkbjk-skills-graphify-0.9.92"
-      },
-      "system": "aarch64-linux",
-      "group": "skills-graphify",
-      "priority": 5
-    },
-    {
-      "attr_path": "skills-graphify",
-      "broken": false,
-      "derivation": "/nix/store/9xgz5v3l6fqg91hcfb0qc1bz2gl8siw3-skills-graphify-0.9.92.drv",
-      "description": "graphify skill for Claude Code and OpenCode — turn any folder of files into a knowledge graph.",
-      "install_id": "skills-graphify",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/floxenvs?rev=e4ad9d7c0db0080bf1678222e3edf03e562b6d50",
-      "name": "skills-graphify-0.9.92",
-      "pname": "skills-graphify",
-      "rev": "e4ad9d7c0db0080bf1678222e3edf03e562b6d50",
-      "rev_count": 29163,
-      "rev_date": "2026-10-16T20:00:53Z",
-      "scrape_date": "2026-10-19T01:45:13.167213753Z",
-      "stabilities": [
-        "unstable",
-        "stable",
-        "staging"
-      ],
-      "unfree": false,
-      "version": "0.9.92",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/1cbbxgank6mjxcnpysa9ib9gf800bzw6-skills-graphify-0.9.92"
-      },
-      "system": "x86_64-linux",
-      "group": "skills-graphify",
-      "priority": 5
     }
   ],
   "compose": {
     "composer": {
       "schema-version": "1.17.0",
-      "description": "# graphify — knowledge graphs for Claude Code\n\nThe /graphify skill is pre-installed via\nflox/skills-graphify. Start Claude Code with\nthe flox-ai launcher, then run it:\n\n```bash\nflox-ai launch claude\n```\n\n```text\n/graphify .\n```\n\nOr use the CLI directly:\n\n```bash\ngraphify .\ngraphify ./raw --mode deep\ngraphify ./raw --update\n```\n\nQuery the graph:\n\n```bash\ngraphify query \"what connects X to Y?\"\ngraphify path \"Module\" \"Database\"\ngraphify explain \"Concept\"\n```\n",
-      "install": {
-        "flox-ai": {
-          "pkg-path": "flox/flox-ai",
-          "pkg-group": "flox-ai"
-        },
-        "skills-graphify": {
-          "pkg-path": "flox/skills-graphify",
-          "pkg-group": "skills-graphify"
-        }
-      },
+      "description": "# graphify — knowledge graphs for Claude Code\n\nThe graphify skill is pre-installed via\nagent-stacks/agent-plugin-graphify-labs-graphify.\nStart Claude Code with flox-agent, then run it:\n\n```bash\nflox-agent launch claude\n```\n\n```text\n/graphify-labs-graphify:graphify .\n```\n\nOr use the CLI directly:\n\n```bash\ngraphify .\ngraphify ./raw --mode deep\ngraphify ./raw --update\n```\n\nQuery the graph:\n\n```bash\ngraphify query \"what connects X to Y?\"\ngraphify path \"Module\" \"Database\"\ngraphify explain \"Concept\"\n```\n",
       "options": {
         "systems": [
           "aarch64-darwin",
@@ -1262,6 +1152,10 @@
           "schema-version": "1.17.0",
           "description": "Graphify CLI for turning code and documents into knowledge graphs.\n",
           "install": {
+            "agent-plugin-graphify": {
+              "pkg-path": "agent-stacks/agent-plugin-graphify-labs-graphify",
+              "pkg-group": "agent-plugin-graphify"
+            },
             "bash": {
               "pkg-path": "bash",
               "pkg-group": "graphify",
@@ -1314,7 +1208,7 @@
             }
           },
           "vars": {
-            "GRAPHIFY_INSTALL_PACKAGE": "graphifyy[mcp,watch]",
+            "GRAPHIFY_INSTALL_PACKAGE": "graphifyy[mcp,watch]==0.9.105",
             "GRAPHIFY_PROJECT_ROOT": "",
             "VIRTUAL_ENV_DISABLE_PROMPT": "1"
           },

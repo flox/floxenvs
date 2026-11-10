@@ -3,7 +3,7 @@
 <!-- codespaces-badge -->
 [![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/flox/floxenvs?devcontainer_path=.devcontainer%2Fgraphify-demo%2Fdevcontainer.json)
 
-Full [graphify](https://github.com/safishamsi/graphify)
+Full [graphify](https://github.com/Graphify-Labs/graphify)
 demo environment with common commands in its description.
 
 For a minimal environment to include in your own
@@ -16,18 +16,16 @@ project, see [graphify](../graphify/) or use
 flox activate -r flox/graphify-demo
 ```
 
-The `/graphify` skill is pre-installed via
-`flox/skills-graphify` and auto-discovered by
-`flox-ai` — no `graphify install` step needed.
+The graphify skill is pre-installed via
+`agent-stacks/agent-plugin-graphify-labs-graphify`,
+from the base environment.
 
-First install Claude Code (e.g.
-`flox install flox/claude-code`) or use your own
-install, then run `flox-ai launch claude` to start it
+Run `flox-agent launch claude` to start Claude Code
 with this environment's skills and rules injected. In
 any directory, type:
 
 ```text
-/graphify .
+/graphify-labs-graphify:graphify .
 ```
 
 Or use the CLI directly:
@@ -38,13 +36,10 @@ graphify .
 
 ## What this demo includes
 
-- Everything from the `graphify` base environment
-  (Python 3.11, `graphify` CLI, Claude Code, `flox-agent`)
-- The `flox-ai` launcher, which discovers the graphify
-  skill and injects it when you run `flox-ai launch claude`.
-  (`flox-agent` can't load this skill package yet.)
-- `flox/skills-graphify` — ships the `/graphify` SKILL.md
-  so Claude Code finds it once launched via `flox-ai`
+- Everything from the `graphify` base environment:
+  Python 3.11, the `graphify` CLI, the graphify skill
+  (`agent-stacks/agent-plugin-graphify-labs-graphify`),
+  Claude Code and `flox-agent`
 
 ## Commands cheat sheet
 
@@ -80,8 +75,8 @@ minimal environment in your own manifest:
 environments = [{ remote = "flox/graphify" }]
 ```
 
-This gives you Python, `graphify`, Claude Code and the
-`flox-agent` launcher with sane defaults; run
-`graphify install` to register the skill, then
-`flox-agent launch claude`.
+This gives you Python, `graphify`, the graphify skill,
+Claude Code and the `flox-agent` launcher with sane
+defaults; run `flox-agent launch claude` to use the
+skill.
 Override vars in your own manifest as needed.

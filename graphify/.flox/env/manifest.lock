@@ -4,6 +4,10 @@
     "schema-version": "1.17.0",
     "description": "Graphify CLI for turning code and documents into knowledge graphs.\n",
     "install": {
+      "agent-plugin-graphify": {
+        "pkg-path": "agent-stacks/agent-plugin-graphify-labs-graphify",
+        "pkg-group": "agent-plugin-graphify"
+      },
       "bash": {
         "pkg-path": "bash",
         "pkg-group": "graphify",
@@ -56,7 +60,7 @@
       }
     },
     "vars": {
-      "GRAPHIFY_INSTALL_PACKAGE": "graphifyy[mcp,watch]",
+      "GRAPHIFY_INSTALL_PACKAGE": "graphifyy[mcp,watch]==0.9.105",
       "GRAPHIFY_PROJECT_ROOT": "",
       "VIRTUAL_ENV_DISABLE_PROMPT": "1"
     },
@@ -86,6 +90,93 @@
     }
   },
   "packages": [
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/n2mrcz34avc59j3awlbkjh7xkhgw77jf-claude-code-2.1.316.drv",
+      "description": "Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "file:///tmp/tmp.yHYdRG9fw2?rev=2202b9d51dae60c1e428d35cdde889eb2db0f60c",
+      "name": "claude-code-2.1.316",
+      "pname": "claude-code",
+      "rev": "2202b9d51dae60c1e428d35cdde889eb2db0f60c",
+      "rev_count": 1,
+      "rev_date": "2026-10-31T22:11:12Z",
+      "scrape_date": "2026-11-04T15:54:57.487719Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.1.316",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/3fbvfif9ws97gqismnmym0cav42gwm58-claude-code-2.1.316"
+      },
+      "system": "aarch64-darwin",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/cj3bmcswajbqhmb8jz0pjjsfzzxl1q1w-claude-code-2.1.316.drv",
+      "description": "Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "file:///tmp/tmp.5IHSa94tsZ?rev=a7b6c301f75c975b71cb3c4fb1fdb43b91745605",
+      "name": "claude-code-2.1.316",
+      "pname": "claude-code",
+      "rev": "a7b6c301f75c975b71cb3c4fb1fdb43b91745605",
+      "rev_count": 1,
+      "rev_date": "2026-10-31T22:19:29Z",
+      "scrape_date": "2026-11-04T15:54:57.487723Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.1.316",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/raaszlb6n3civbp19w8993f2b7fyx2ic-claude-code-2.1.316"
+      },
+      "system": "aarch64-linux",
+      "group": "claude-code",
+      "priority": 5
+    },
+    {
+      "attr_path": "claude-code",
+      "broken": false,
+      "derivation": "/nix/store/4bkyhkh6168x0brjh7v87rd9yjyrgjxc-claude-code-2.1.316.drv",
+      "description": "Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster",
+      "install_id": "claude-code",
+      "license": "Unfree",
+      "locked_url": "file:///tmp/tmp.0p2YY9JiRt?rev=0e73d28385516a8c0957d37e43acfd2303490b4c",
+      "name": "claude-code-2.1.316",
+      "pname": "claude-code",
+      "rev": "0e73d28385516a8c0957d37e43acfd2303490b4c",
+      "rev_count": 1,
+      "rev_date": "2026-10-31T21:56:02Z",
+      "scrape_date": "2026-11-04T15:54:57.487724Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "2.1.316",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/pl5fj0lmgwy1aghz9vvnvbfpkbsk11q2-claude-code-2.1.316"
+      },
+      "system": "x86_64-linux",
+      "group": "claude-code",
+      "priority": 5
+    },
     {
       "attr_path": "flox-agent",
       "broken": false,
@@ -949,90 +1040,90 @@
       "priority": 5
     },
     {
-      "attr_path": "claude-code",
+      "attr_path": "agent-plugin-graphify-labs-graphify",
       "broken": false,
-      "derivation": "/nix/store/n2mrcz34avc59j3awlbkjh7xkhgw77jf-claude-code-2.1.316.drv",
-      "description": "Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster",
-      "install_id": "claude-code",
-      "license": "Unfree",
-      "locked_url": "file:///tmp/tmp.yHYdRG9fw2?rev=2202b9d51dae60c1e428d35cdde889eb2db0f60c",
-      "name": "claude-code-2.1.316",
-      "pname": "claude-code",
-      "rev": "2202b9d51dae60c1e428d35cdde889eb2db0f60c",
+      "derivation": "/nix/store/fkwf0z133a16jssha5gbqiq3j3mkkdy0-agent-plugin-graphify-labs-graphify-0.9.105.drv",
+      "description": "Turn any folder of code, docs, papers, images, or videos into a queryable knowledge graph",
+      "install_id": "agent-plugin-graphify",
+      "license": "Apache-2.0",
+      "locked_url": "file:///tmp/tmp.NAMEUDB5iU?rev=583be867fb13f42dd9ebe574fd5e2be26c332720",
+      "name": "agent-plugin-graphify-labs-graphify-0.9.105",
+      "pname": "agent-plugin-graphify-labs-graphify",
+      "rev": "583be867fb13f42dd9ebe574fd5e2be26c332720",
       "rev_count": 1,
-      "rev_date": "2026-10-31T22:11:12Z",
-      "scrape_date": "2026-11-04T15:54:57.487719Z",
+      "rev_date": "2026-11-10T20:53:49Z",
+      "scrape_date": "2026-11-10T21:27:35.118927Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "2.1.316",
+      "version": "0.9.105",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/3fbvfif9ws97gqismnmym0cav42gwm58-claude-code-2.1.316"
+        "out": "/nix/store/6hc6wh16knckzvpjfaqcrk8fhrp8l4jf-agent-plugin-graphify-labs-graphify-0.9.105"
       },
       "system": "aarch64-darwin",
-      "group": "claude-code",
+      "group": "agent-plugin-graphify",
       "priority": 5
     },
     {
-      "attr_path": "claude-code",
+      "attr_path": "agent-plugin-graphify-labs-graphify",
       "broken": false,
-      "derivation": "/nix/store/cj3bmcswajbqhmb8jz0pjjsfzzxl1q1w-claude-code-2.1.316.drv",
-      "description": "Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster",
-      "install_id": "claude-code",
-      "license": "Unfree",
-      "locked_url": "file:///tmp/tmp.5IHSa94tsZ?rev=a7b6c301f75c975b71cb3c4fb1fdb43b91745605",
-      "name": "claude-code-2.1.316",
-      "pname": "claude-code",
-      "rev": "a7b6c301f75c975b71cb3c4fb1fdb43b91745605",
+      "derivation": "/nix/store/s4czsxpi1njsph1f4qv4zdb5zmz0xqga-agent-plugin-graphify-labs-graphify-0.9.105.drv",
+      "description": "Turn any folder of code, docs, papers, images, or videos into a queryable knowledge graph",
+      "install_id": "agent-plugin-graphify",
+      "license": "Apache-2.0",
+      "locked_url": "file:///tmp/tmp.0w87FvPGk5?rev=6e32bcc06f7715b6611827e161006f61d1a61c4a",
+      "name": "agent-plugin-graphify-labs-graphify-0.9.105",
+      "pname": "agent-plugin-graphify-labs-graphify",
+      "rev": "6e32bcc06f7715b6611827e161006f61d1a61c4a",
       "rev_count": 1,
-      "rev_date": "2026-10-31T22:19:29Z",
-      "scrape_date": "2026-11-04T15:54:57.487723Z",
+      "rev_date": "2026-11-10T21:24:57Z",
+      "scrape_date": "2026-11-10T21:27:35.118933Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "2.1.316",
+      "version": "0.9.105",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/raaszlb6n3civbp19w8993f2b7fyx2ic-claude-code-2.1.316"
+        "out": "/nix/store/2d6nkl84djdw7rqdxkclprrql6nd7czj-agent-plugin-graphify-labs-graphify-0.9.105"
       },
       "system": "aarch64-linux",
-      "group": "claude-code",
+      "group": "agent-plugin-graphify",
       "priority": 5
     },
     {
-      "attr_path": "claude-code",
+      "attr_path": "agent-plugin-graphify-labs-graphify",
       "broken": false,
-      "derivation": "/nix/store/4bkyhkh6168x0brjh7v87rd9yjyrgjxc-claude-code-2.1.316.drv",
-      "description": "Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster",
-      "install_id": "claude-code",
-      "license": "Unfree",
-      "locked_url": "file:///tmp/tmp.0p2YY9JiRt?rev=0e73d28385516a8c0957d37e43acfd2303490b4c",
-      "name": "claude-code-2.1.316",
-      "pname": "claude-code",
-      "rev": "0e73d28385516a8c0957d37e43acfd2303490b4c",
+      "derivation": "/nix/store/zzr106gcbsikk1db3i5xs5jwb2v86q59-agent-plugin-graphify-labs-graphify-0.9.105.drv",
+      "description": "Turn any folder of code, docs, papers, images, or videos into a queryable knowledge graph",
+      "install_id": "agent-plugin-graphify",
+      "license": "Apache-2.0",
+      "locked_url": "file:///tmp/tmp.9AIdy602dM?rev=bb47ce5d21802b38431cfac2a79f3feffda71760",
+      "name": "agent-plugin-graphify-labs-graphify-0.9.105",
+      "pname": "agent-plugin-graphify-labs-graphify",
+      "rev": "bb47ce5d21802b38431cfac2a79f3feffda71760",
       "rev_count": 1,
-      "rev_date": "2026-10-31T21:56:02Z",
-      "scrape_date": "2026-11-04T15:54:57.487724Z",
+      "rev_date": "2026-11-10T20:54:18Z",
+      "scrape_date": "2026-11-10T21:27:35.118935Z",
       "stabilities": [
         "unstable"
       ],
       "unfree": false,
-      "version": "2.1.316",
+      "version": "0.9.105",
       "outputs_to_install": [
         "out"
       ],
       "outputs": {
-        "out": "/nix/store/pl5fj0lmgwy1aghz9vvnvbfpkbsk11q2-claude-code-2.1.316"
+        "out": "/nix/store/dsf2j4df4bhv1iqw4zg3cjbrvrbhlmk7-agent-plugin-graphify-labs-graphify-0.9.105"
       },
       "system": "x86_64-linux",
-      "group": "claude-code",
+      "group": "agent-plugin-graphify",
       "priority": 5
     }
   ]
