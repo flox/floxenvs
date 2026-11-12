@@ -75,7 +75,7 @@ jobs:
         uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
 
       - name: "Install flox"
-        uses: "flox/install-flox-action@1128abd73431089ab9d871c893b4e72a729354e1" # v2.6.0
+        uses: "flox/install-flox-action@5bb9eaaffbeaa699a8251a1ae21ecf4c8e0e37d4" # v2.7.0
 
       - name: "Run update script"
         env:
@@ -90,7 +90,7 @@ jobs:
 
       - name: "Create Pull Request"
         id: "create-pr"
-        uses: "peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1" # v8
+        uses: "peter-evans/create-pull-request@15733dbdfeedb4f7fdb73d13c6f5ac83b710fab8" # v8
         with:
           token: "${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}"
           add-paths: |
