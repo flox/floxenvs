@@ -41,5 +41,29 @@ in
     # Extensions linked against the libraries in buildInputs.
     $out/bin/ruby -ropenssl -ryaml -rzlib -rreline -rfiddle -e 'puts "extensions ok"'
     $out/bin/gem --version
+
+    # Build and load a native extension the way `gem install` does: mkmf
+    # reads CC, LDSHARED and the link flags from this Ruby's rbconfig.rb and
+    # links against its libruby. jitSupport = false leaves CC as a bare
+    # compiler name resolved from PATH, so this fails if that is not enough.
+    # It cannot see a consumer's compiler: one built against an older glibc
+    # than this package's cannot link libruby (cosh@GLIBC_2.44), so
+    # consumers keep their compiler on this package's nixpkgs snapshot.
+    ext=$(mktemp -d)
+    (
+      cd "$ext"
+      cat > extconf.rb <<'EOF'
+    require "mkmf"
+    abort "no native build toolchain" unless have_func("rb_str_new")
+    create_makefile("native_check")
+    EOF
+      cat > native_check.c <<'EOF'
+    #include <ruby.h>
+    void Init_native_check(void) { rb_define_global_const("NATIVE_CHECK", INT2FIX(42)); }
+    EOF
+      $out/bin/ruby extconf.rb
+      make
+      $out/bin/ruby -I. -rnative_check -e 'abort "extension did not load" unless NATIVE_CHECK == 42; puts "native extension ok"'
+    )
   '';
 })
