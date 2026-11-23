@@ -60,6 +60,13 @@ rubyForPlatform.overrideAttrs (old: {
       sed -i "$rbConfig" \
         -e '/CONFIG\["CC"\]/ s|then "\([^"]*\)" else|then "${stdenv.cc}/bin/\1" else|' \
         -e '/CONFIG\["CXX"\]/ s|then "\([^"]*\)" else|then "${stdenv.cc}/bin/\1" else|'
+    ''
+    # configure keeps the newest -std flag the build's clang accepts (here
+    # -std=gnu23), and rbconfig.rb derives CPP, LDSHARED and the rest from
+    # CC. Apple clang 16 rejects that flag, so every gem build fails for a
+    # consumer on Xcode 16.0. Without it clang uses its own default.
+    + lib.optionalString stdenv.hostPlatform.isDarwin ''
+      sed -i "$rbConfig" -e 's/ -std=[A-Za-z0-9+]*//g'
     '';
 
   installCheckPhase =
@@ -74,6 +81,16 @@ rubyForPlatform.overrideAttrs (old: {
     $out/bin/ruby -ropenssl -ryaml -rzlib -rreline -rfiddle -e 'puts "extensions ok"'
     $out/bin/gem --version
 
+    ${lib.optionalString stdenv.hostPlatform.isDarwin ''
+      # Consumers compile gems with whichever Apple clang they have, and older
+      # releases reject the newest -std flag the build's compiler accepted.
+      # CC, CXX and CPP are unset because rbconfig.rb returns them in place
+      # of its recorded defaults when the build's stdenv exports them.
+      env -u CC -u CXX -u CPP $out/bin/ruby -rrbconfig -e '
+        bad = RbConfig::CONFIG.select { |_, v| v.to_s.include?("-std=") }
+        abort "-std= flag in rbconfig.rb: #{bad.map { |k, v| "#{k}=#{v}" }.join(", ")}" unless bad.empty?
+        puts "rbconfig.rb carries no -std= flag"'
+    ''}
     # Build and load a native extension the way `gem install` does: mkmf
     # reads CC, LDSHARED and the link flags from this Ruby's rbconfig.rb and
     # links against its libruby.
