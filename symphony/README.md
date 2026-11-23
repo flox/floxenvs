@@ -38,7 +38,7 @@ environments = [{ remote = "flox/symphony" }]
 | Package | Description |
 | ------- | ----------- |
 | `flox/symphony` | OpenAI Symphony orchestrator |
-| `flox/codex` | Codex coding agent backend |
+| `agent-stacks/codex` | Codex coding agent backend |
 | `git` | Git CLI for workspace ops |
 | `bash` | Bash for hook + service scripts |
 
