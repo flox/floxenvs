@@ -128,7 +128,7 @@ const faqItems = [
   {
     question: "Which is the best AI coding agent for Claude users?",
     answer:
-      "Claude Code is the canonical choice for Claude users. It is Anthropic's official CLI, ships with MCP tool support and a bubblewrap sandbox on Linux, and is pre-packaged by Flox so the auto-updater is disabled for reproducible Nix builds. Install it in one line: flox install flox/claude-code.",
+      "Claude Code is the canonical choice for Claude users. It is Anthropic's official CLI, ships with MCP tool support and a bubblewrap sandbox on Linux, and is pre-packaged by Flox so the auto-updater is disabled for reproducible Nix builds. Install it in one line: flox install agent-stacks/claude-code.",
   },
   {
     question: "Which AI coding agent works offline with local models?",
@@ -420,11 +420,11 @@ const jsonLd = [
       ></div>
       <pre class="relative font-mono text-sm leading-relaxed p-6 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 overflow-x-auto"><code><span class="text-slate-400"># .flox/env/manifest.toml</span>
 <span class="text-slate-500">[install]</span>
-claude-code.pkg-path  = <span class="text-kind-env">"flox/claude-code"</span>
-claude-code.publisher = <span class="text-kind-env">"flox"</span>
+claude-code.pkg-path  = <span class="text-kind-env">"agent-stacks/claude-code"</span>
+claude-code.pkg-group = <span class="text-kind-env">"claude-code"</span>
 
-codex.pkg-path        = <span class="text-kind-env">"flox/codex"</span>
-codex.publisher       = <span class="text-kind-env">"flox"</span>
+codex.pkg-path        = <span class="text-kind-env">"agent-stacks/codex"</span>
+codex.pkg-group       = <span class="text-kind-env">"codex"</span>
 
 <span class="text-slate-400"># agent-stacks packages each need their own pkg-group</span>
 crush.pkg-path        = <span class="text-kind-env">"agent-stacks/crush"</span>

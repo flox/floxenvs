@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchurl,
-  autoPatchelfHook,
+  makeWrapper,
   gcc-unwrapped,
   versionCheckHook,
   writableTmpDirAsHomeHook,
@@ -39,18 +39,45 @@ stdenv.mkDerivation {
   # The release binary bundles a JS runtime; stripping can break it.
   dontStrip = true;
 
-  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [
-    autoPatchelfHook
-  ];
+  # The release binary is a Node single-executable app: the sfw program
+  # is injected into a node binary as an ELF note. On Linux it must not
+  # be rewritten by patchelf. Setting its RPATH (as autoPatchelfHook
+  # does) corrupts it with patchelf 0.19, and the patched binary
+  # segfaults on startup. Instead the binary is installed unmodified
+  # and bin/sfw runs it through the glibc loader with --library-path.
+  # Unlike LD_LIBRARY_PATH, --library-path applies to this process
+  # only, so the package managers sfw launches don't inherit
+  # nixpkgs' libstdc++.
+  dontPatchELF = stdenv.hostPlatform.isLinux;
 
-  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
-    gcc-unwrapped.lib
+  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [
+    makeWrapper
   ];
 
   installPhase = ''
     runHook preInstall
 
-    install -Dm755 $src $out/bin/sfw
+  ''
+  + (
+    if stdenv.hostPlatform.isLinux then
+      ''
+        install -Dm755 $src $out/libexec/sfw/sfw
+        makeWrapper "$(cat $NIX_CC/nix-support/dynamic-linker)" $out/bin/sfw \
+          --add-flags "--library-path ${
+            lib.makeLibraryPath [
+              gcc-unwrapped.lib
+              (gcc-unwrapped.libgcc or null)
+            ]
+          }" \
+          --add-flags "--argv0 sfw" \
+          --add-flags "$out/libexec/sfw/sfw"
+      ''
+    else
+      ''
+        install -Dm755 $src $out/bin/sfw
+      ''
+  )
+  + ''
 
     # Per-ecosystem PATH shims. Consumers opt in by prepending
     # $FLOX_ENV/libexec/sfw-shims to their PATH (e.g. in [hook]

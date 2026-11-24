@@ -45,13 +45,12 @@ mapfile -t SKILLS < <(
   grep -rl 'flox_agent_layout' "$REPO_ROOT"/.flox/pkgs/*/default.nix \
     | xargs -n1 dirname | xargs -n1 basename | sort -u
 )
-# The 2 source-built agent runtimes + the 4 source-built audit tools.
-# flox-agent, opencode and pi are NOT built here: they have no local
-# .flox/pkgs entry, so they can't be `flox build`-ed. They are still
-# checked for coexistence — installed from the catalog into the same env
-# below (see EXTERNAL_PKGS).
+# The 4 source-built audit tools.
+# flox-agent and the agent runtimes (claude-code, codex, opencode, pi) are
+# NOT built here: they have no local .flox/pkgs entry, so they can't be
+# `flox build`-ed. They are still checked for coexistence — installed from
+# the catalog into the same env below (see EXTERNAL_PKGS).
 TOOLS=(
-  claude-code codex
   skill-tools skill-validator skillcheck claudelint
 )
 # Extra packages to install into the single env (NOT built from source),
@@ -62,8 +61,9 @@ TOOLS=(
 #     FLOX_FLOXHUB_TOKEN. Must coexist with every skill in one env.
 #   - agent-stacks/skillspector: the audit tool `flox-agent audit` runs
 #     (from the .website env in CI).
-#   - agent-stacks/opencode, agent-stacks/pi: agent runtimes that agent-pkgs
-#     builds and publishes; the skills still lay out content for them.
+#   - agent-stacks/claude-code, agent-stacks/codex, agent-stacks/opencode,
+#     agent-stacks/pi: agent runtimes that agent-pkgs builds and publishes;
+#     the skills still lay out content for them.
 #   - python3, nodejs: the runtimes skills bundle most (33 ship bin/python3,
 #     26 ship bin/node), deliberately UNDER their plugin dir so they don't
 #     land on $FLOX_ENV/bin. Real user envs almost always already have these
@@ -72,7 +72,7 @@ TOOLS=(
 #     $FLOX_ENV/bin would collide with these and fail the check.
 #
 # Extend with uv/bun/ruby/go if those become common env-level runtimes.
-EXTERNAL_PKGS=(flox/flox-agent agent-stacks/skillspector agent-stacks/opencode agent-stacks/pi python3 nodejs)
+EXTERNAL_PKGS=(flox/flox-agent agent-stacks/skillspector agent-stacks/claude-code agent-stacks/codex agent-stacks/opencode agent-stacks/pi python3 nodejs)
 PACKAGES=("${SKILLS[@]}" "${TOOLS[@]}")
 TOTAL=$(( ${#PACKAGES[@]} + ${#EXTERNAL_PKGS[@]} ))
 echo "Target: ${#SKILLS[@]} skills + ${#TOOLS[@]} agents/audit tools" \
