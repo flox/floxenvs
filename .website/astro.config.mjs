@@ -55,7 +55,7 @@ function newest(values) {
 
 // Cached newest-of-collection-members lookup. Used for index
 // and taxonomy pages so /envs/ reflects the newest env
-// directory and /packages/skills/ reflects the newest skill.
+// directory.
 const collNewestCache = new Map();
 function newestUnder(root, filter) {
   const key = `${root}::${filter?.toString() ?? ""}`;
@@ -102,7 +102,7 @@ function lastModFor(urlPath) {
   // Pkg detail
   if (
     segments[0] === "packages" && segments[1] && segments.length === 2 &&
-    segments[1] !== "plugins" && segments[1] !== "skills"
+    segments[1] !== "plugins"
   ) {
     return dirLastMod(path.join(REPO_ROOT, ".flox", "pkgs", segments[1]))
       || BUILD_TIME;
@@ -116,15 +116,6 @@ function lastModFor(urlPath) {
   // Packages index — newest pkg dir
   if (segments[0] === "packages" && segments.length === 1) {
     return newestUnder(path.join(REPO_ROOT, ".flox", "pkgs"), null);
-  }
-  // Skills filtered index (fragment packages: skills + plugin bundles,
-  // all named skills-* or skill-coreutils after the catalog rename)
-  if (
-    segments[0] === "packages" && segments.length === 2 &&
-    segments[1] === "skills"
-  ) {
-    return newestUnder(path.join(REPO_ROOT, ".flox", "pkgs"), (n) =>
-      n === "skill-coreutils" || n.startsWith("skills-"));
   }
   // Category / tag pages — fall back to all-content newest
   if (segments[0] === "categories" || segments[0] === "tags") {

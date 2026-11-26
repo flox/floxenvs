@@ -38,9 +38,6 @@ const ogImage = `${base}og/pkg/${pkg.data.name}.png`;
 
 const origin = (Astro.site?.toString() ?? "").replace(/\/$/, "");
 const pageUrl = `${origin}${base}packages/${pkg.data.name}/`;
-const isFragment = pkg.data.subkind === "plugin" || pkg.data.subkind === "skill";
-const subkindLabel = isFragment ? "Skills" : null;
-const subkindHref = isFragment ? `${origin}${base}packages/skills/` : null;
 const breadcrumbItems = [
   {
     "@type": "ListItem",
@@ -55,14 +52,6 @@ const breadcrumbItems = [
     item: `${origin}${base}packages/`,
   },
 ];
-if (subkindLabel && subkindHref) {
-  breadcrumbItems.push({
-    "@type": "ListItem",
-    position: 3,
-    name: subkindLabel,
-    item: subkindHref,
-  });
-}
 breadcrumbItems.push({
   "@type": "ListItem",
   position: breadcrumbItems.length + 1,
@@ -137,9 +126,6 @@ const isAgentPkg = ["claude-code","codex"]
 >
   <nav class="text-sm text-slate-500 mb-4">
     <a href={`${base}packages/`} class="underline">Packages</a>
-    {(pkg.data.subkind === "plugin" || pkg.data.subkind === "skill") && (
-      <> / <a href={`${base}packages/skills/`} class="underline">Skills</a></>
-    )}
     {" "}/ {pkg.data.name}
   </nav>
 
