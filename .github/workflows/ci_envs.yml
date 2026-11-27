@@ -87,6 +87,11 @@ jobs:
     if: needs.discover.outputs.environments != '[]'
     strategy:
       fail-fast: false
+      # Every env's darwin tests SSH into the same darwin builder, whose
+      # sshd resets connections when ~70 arrive at once. GitHub-hosted
+      # runners throttled this through their concurrency limit; Blacksmith
+      # starts every job at once, so cap the fan-out here instead.
+      max-parallel: 10
       matrix:
         environment: ${{ fromJSON(needs.discover.outputs.environments) }}
     uses: "./.github/workflows/environment.yml"
