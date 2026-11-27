@@ -225,8 +225,11 @@ jobs:
       - name: "Mount Nix store"
         uses: "useblacksmith/stickydisk@74f3f01ab1392726dd6ee06904f0452b0ec1e151" # v1
         with:
-          key: "${{ github.repository }}-nix-${{ runner.arch }}"
+          key: "${{ github.repository }}-nix-${{ github.job }}-${{ runner.arch }}"
           path: "/nix"
+          # Only main saves snapshots, so a PR run can never leave a
+          # broken store behind for everyone else.
+          commit: "${{ github.ref == 'refs/heads/main' }}"
       - name: "Install flox"
         uses: "flox/install-flox-action@1128abd73431089ab9d871c893b4e72a729354e1" # v2.6.0
       - name: "Setup Tailscale"
@@ -274,6 +277,15 @@ jobs:
           done
           [ ${#failed[@]} -eq 0 ] || { echo "PUBLISH FAILED: ${failed[*]}" >&2; exit 1; }
 
+      # The sticky disk's post step snapshots /nix after this; the
+      # multi-user nix-daemon keeps the mount busy, so stop it last.
+      - name: "Stop nix-daemon for sticky disk commit"
+        if: ${{ always() && runner.os == 'Linux' }}
+        shell: "bash {0}"
+        run: |
+          sudo systemctl stop nix-daemon.socket nix-daemon.service 2>/dev/null || true
+          sudo pkill -9 nix-daemon 2>/dev/null || true
+
   aarch64-linux:
     name: "${{ needs.discover.outputs.is_publish == 'true' && 'Publish' || 'Build' }} '${{ matrix.chunk.id }}' (aarch64-linux)"
     runs-on: "blacksmith-4vcpu-ubuntu-2404"
@@ -298,8 +310,11 @@ jobs:
       - name: "Mount Nix store"
         uses: "useblacksmith/stickydisk@74f3f01ab1392726dd6ee06904f0452b0ec1e151" # v1
         with:
-          key: "${{ github.repository }}-nix-${{ runner.arch }}"
+          key: "${{ github.repository }}-nix-${{ github.job }}-${{ runner.arch }}"
           path: "/nix"
+          # Only main saves snapshots, so a PR run can never leave a
+          # broken store behind for everyone else.
+          commit: "${{ github.ref == 'refs/heads/main' }}"
       - name: "Install flox"
         uses: "flox/install-flox-action@1128abd73431089ab9d871c893b4e72a729354e1" # v2.6.0
       - name: "Setup Tailscale"
@@ -347,6 +362,15 @@ jobs:
           done
           [ ${#failed[@]} -eq 0 ] || { echo "PUBLISH FAILED: ${failed[*]}" >&2; exit 1; }
 
+      # The sticky disk's post step snapshots /nix after this; the
+      # multi-user nix-daemon keeps the mount busy, so stop it last.
+      - name: "Stop nix-daemon for sticky disk commit"
+        if: ${{ always() && runner.os == 'Linux' }}
+        shell: "bash {0}"
+        run: |
+          sudo systemctl stop nix-daemon.socket nix-daemon.service 2>/dev/null || true
+          sudo pkill -9 nix-daemon 2>/dev/null || true
+
   x86_64-darwin:
     name: "${{ needs.discover.outputs.is_publish == 'true' && 'Publish' || 'Build' }} '${{ matrix.chunk.id }}' (x86_64-darwin)"
     runs-on: "blacksmith-4vcpu-ubuntu-2404"
@@ -371,8 +395,11 @@ jobs:
       - name: "Mount Nix store"
         uses: "useblacksmith/stickydisk@74f3f01ab1392726dd6ee06904f0452b0ec1e151" # v1
         with:
-          key: "${{ github.repository }}-nix-${{ runner.arch }}"
+          key: "${{ github.repository }}-nix-${{ github.job }}-${{ runner.arch }}"
           path: "/nix"
+          # Only main saves snapshots, so a PR run can never leave a
+          # broken store behind for everyone else.
+          commit: "${{ github.ref == 'refs/heads/main' }}"
       - name: "Install flox"
         uses: "flox/install-flox-action@1128abd73431089ab9d871c893b4e72a729354e1" # v2.6.0
       - name: "Setup Tailscale"
@@ -420,6 +447,15 @@ jobs:
           done
           [ ${#failed[@]} -eq 0 ] || { echo "PUBLISH FAILED: ${failed[*]}" >&2; exit 1; }
 
+      # The sticky disk's post step snapshots /nix after this; the
+      # multi-user nix-daemon keeps the mount busy, so stop it last.
+      - name: "Stop nix-daemon for sticky disk commit"
+        if: ${{ always() && runner.os == 'Linux' }}
+        shell: "bash {0}"
+        run: |
+          sudo systemctl stop nix-daemon.socket nix-daemon.service 2>/dev/null || true
+          sudo pkill -9 nix-daemon 2>/dev/null || true
+
   x86_64-linux:
     name: "${{ needs.discover.outputs.is_publish == 'true' && 'Publish' || 'Build' }} '${{ matrix.chunk.id }}' (x86_64-linux)"
     runs-on: "blacksmith-4vcpu-ubuntu-2404"
@@ -444,8 +480,11 @@ jobs:
       - name: "Mount Nix store"
         uses: "useblacksmith/stickydisk@74f3f01ab1392726dd6ee06904f0452b0ec1e151" # v1
         with:
-          key: "${{ github.repository }}-nix-${{ runner.arch }}"
+          key: "${{ github.repository }}-nix-${{ github.job }}-${{ runner.arch }}"
           path: "/nix"
+          # Only main saves snapshots, so a PR run can never leave a
+          # broken store behind for everyone else.
+          commit: "${{ github.ref == 'refs/heads/main' }}"
       - name: "Install flox"
         uses: "flox/install-flox-action@1128abd73431089ab9d871c893b4e72a729354e1" # v2.6.0
       - name: "Setup Tailscale"
@@ -552,6 +591,15 @@ jobs:
           if-no-files-found: "warn"
 
   # ── Site: collect metrics, build data.json, deploy (main only) ──
+
+      # The sticky disk's post step snapshots /nix after this; the
+      # multi-user nix-daemon keeps the mount busy, so stop it last.
+      - name: "Stop nix-daemon for sticky disk commit"
+        if: ${{ always() && runner.os == 'Linux' }}
+        shell: "bash {0}"
+        run: |
+          sudo systemctl stop nix-daemon.socket nix-daemon.service 2>/dev/null || true
+          sudo pkill -9 nix-daemon 2>/dev/null || true
   site:
     # ci.yml's "Wait Pkgs" matches this name to recognize a superseded
     # deploy; rename it there too.
@@ -595,8 +643,11 @@ jobs:
       - name: "Mount Nix store"
         uses: "useblacksmith/stickydisk@74f3f01ab1392726dd6ee06904f0452b0ec1e151" # v1
         with:
-          key: "${{ github.repository }}-nix-${{ runner.arch }}"
+          key: "${{ github.repository }}-nix-${{ github.job }}-${{ runner.arch }}"
           path: "/nix"
+          # Only main saves snapshots, so a PR run can never leave a
+          # broken store behind for everyone else.
+          commit: "${{ github.ref == 'refs/heads/main' }}"
       - name: "Install flox"
         # Required so the run steps' `flox activate -d .website` works.
         uses: "flox/install-flox-action@1128abd73431089ab9d871c893b4e72a729354e1" # v2.6.0
@@ -710,6 +761,15 @@ jobs:
   #    matrix already gates each package on PRs. always() keeps it independent
   #    of a single leg failing. coexist-check.sh builds every package from
   #    source and installs each ./result-<pkg> into one throwaway env.
+
+      # The sticky disk's post step snapshots /nix after this; the
+      # multi-user nix-daemon keeps the mount busy, so stop it last.
+      - name: "Stop nix-daemon for sticky disk commit"
+        if: ${{ always() && runner.os == 'Linux' }}
+        shell: "bash {0}"
+        run: |
+          sudo systemctl stop nix-daemon.socket nix-daemon.service 2>/dev/null || true
+          sudo pkill -9 nix-daemon 2>/dev/null || true
   coexist:
     name: "All skills + agents + audit tools coexist in one Flox env"
     needs: ["discover", "aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
@@ -726,8 +786,11 @@ jobs:
       - name: "Mount Nix store"
         uses: "useblacksmith/stickydisk@74f3f01ab1392726dd6ee06904f0452b0ec1e151" # v1
         with:
-          key: "${{ github.repository }}-nix-${{ runner.arch }}"
+          key: "${{ github.repository }}-nix-${{ github.job }}-${{ runner.arch }}"
           path: "/nix"
+          # Only main saves snapshots, so a PR run can never leave a
+          # broken store behind for everyone else.
+          commit: "${{ github.ref == 'refs/heads/main' }}"
       - name: "Install flox"
         uses: "flox/install-flox-action@1128abd73431089ab9d871c893b4e72a729354e1" # v2.6.0
       - name: "Setup Tailscale"
@@ -755,3 +818,12 @@ jobs:
           FLOX_FLOXHUB_TOKEN: "${{ secrets.MANAGED_FLOX_FLOXHUB_TOKEN }}"
         run: |
           bash scripts/coexist-check.sh
+
+      # The sticky disk's post step snapshots /nix after this; the
+      # multi-user nix-daemon keeps the mount busy, so stop it last.
+      - name: "Stop nix-daemon for sticky disk commit"
+        if: ${{ always() && runner.os == 'Linux' }}
+        shell: "bash {0}"
+        run: |
+          sudo systemctl stop nix-daemon.socket nix-daemon.service 2>/dev/null || true
+          sudo pkill -9 nix-daemon 2>/dev/null || true

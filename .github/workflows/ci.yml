@@ -679,8 +679,11 @@ jobs:
         if: steps.linux_support.outputs.env_linux == 'true' || steps.linux_support.outputs.demo_linux == 'true'
         uses: "useblacksmith/stickydisk@74f3f01ab1392726dd6ee06904f0452b0ec1e151" # v1
         with:
-          key: "${{ github.repository }}-nix-${{ runner.arch }}"
+          key: "${{ github.repository }}-nix-${{ github.job }}-${{ runner.arch }}"
           path: "/nix"
+          # Only main saves snapshots, so a PR run can never leave a
+          # broken store behind for everyone else.
+          commit: "${{ github.ref == 'refs/heads/main' }}"
 
       - name: "Install flox"
         if: steps.linux_support.outputs.env_linux == 'true' || steps.linux_support.outputs.demo_linux == 'true'
@@ -725,3 +728,12 @@ jobs:
   # "CI Packages" workflow's `site` job — fragments are built once there
   # and audited from that same build — so ci.yml no longer triggers a
   # separate Website workflow.
+
+      # The sticky disk's post step snapshots /nix after this; the
+      # multi-user nix-daemon keeps the mount busy, so stop it last.
+      - name: "Stop nix-daemon for sticky disk commit"
+        if: ${{ always() && runner.os == 'Linux' }}
+        shell: "bash {0}"
+        run: |
+          sudo systemctl stop nix-daemon.socket nix-daemon.service 2>/dev/null || true
+          sudo pkill -9 nix-daemon 2>/dev/null || true
